@@ -13,25 +13,189 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Website<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub description: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub preview_image: Option<jacquard_common::types::blob::BlobRef<'a>>,
     #[serde(borrow)]
     pub src: jacquard_common::types::string::Uri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub title: Option<jacquard_common::CowStr<'a>>,
+}
+
+pub mod website_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Src;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Src = Unset;
+    }
+    ///State transition - sets the `src` field to Set
+    pub struct SetSrc<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSrc<S> {}
+    impl<S: State> State for SetSrc<S> {
+        type Src = Set<members::src>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `src` field
+        pub struct src(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct WebsiteBuilder<'a, S: website_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Website<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> WebsiteBuilder<'a, website_state::Empty> {
+        WebsiteBuilder::new()
+    }
+}
+
+impl<'a> WebsiteBuilder<'a, website_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        WebsiteBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: website_state::State> WebsiteBuilder<'a, S> {
+    /// Set the `description` field (optional)
+    pub fn description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `description` field to an Option value (optional)
+    pub fn maybe_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: website_state::State> WebsiteBuilder<'a, S> {
+    /// Set the `previewImage` field (optional)
+    pub fn preview_image(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::blob::BlobRef<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `previewImage` field to an Option value (optional)
+    pub fn maybe_preview_image(
+        mut self,
+        value: Option<jacquard_common::types::blob::BlobRef<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> WebsiteBuilder<'a, S>
+where
+    S: website_state::State,
+    S::Src: website_state::IsUnset,
+{
+    /// Set the `src` field (required)
+    pub fn src(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+    ) -> WebsiteBuilder<'a, website_state::SetSrc<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        WebsiteBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: website_state::State> WebsiteBuilder<'a, S> {
+    /// Set the `title` field (optional)
+    pub fn title(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `title` field to an Option value (optional)
+    pub fn maybe_title(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S> WebsiteBuilder<'a, S>
+where
+    S: website_state::State,
+    S::Src: website_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Website<'a> {
+        Website {
+            description: self.__unsafe_private_named.0,
+            preview_image: self.__unsafe_private_named.1,
+            src: self.__unsafe_private_named.2.unwrap(),
+            title: self.__unsafe_private_named.3,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Website<'a> {
+        Website {
+            description: self.__unsafe_private_named.0,
+            preview_image: self.__unsafe_private_named.1,
+            src: self.__unsafe_private_named.2.unwrap(),
+            title: self.__unsafe_private_named.3,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_pub_leaflet_blocks_website() -> ::jacquard_lexicon::lexicon::LexiconDoc<

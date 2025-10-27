@@ -14,15 +14,96 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Settings<'a> {
     /// Whether this node may archive your livestream for improving the service
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub debug_recording: Option<bool>,
+}
+
+pub mod settings_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {}
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {}
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {}
+}
+
+/// Builder for constructing an instance of this type
+pub struct SettingsBuilder<'a, S: settings_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (::core::option::Option<bool>,),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Settings<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> SettingsBuilder<'a, settings_state::Empty> {
+        SettingsBuilder::new()
+    }
+}
+
+impl<'a> SettingsBuilder<'a, settings_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        SettingsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
+    /// Set the `debugRecording` field (optional)
+    pub fn debug_recording(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `debugRecording` field to an Option value (optional)
+    pub fn maybe_debug_recording(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> SettingsBuilder<'a, S>
+where
+    S: settings_state::State,
+{
+    /// Build the final struct
+    pub fn build(self) -> Settings<'a> {
+        Settings {
+            debug_recording: self.__unsafe_private_named.0,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Settings<'a> {
+        Settings {
+            debug_recording: self.__unsafe_private_named.0,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Settings<'a> {

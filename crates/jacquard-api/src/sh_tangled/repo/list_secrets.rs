@@ -12,14 +12,103 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct ListSecrets<'a> {
     #[serde(borrow)]
     pub repo: jacquard_common::types::string::AtUri<'a>,
+}
+
+pub mod list_secrets_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Repo;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Repo = Unset;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Repo = Set<members::repo>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `repo` field
+        pub struct repo(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ListSecretsBuilder<'a, S: list_secrets_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ListSecrets<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ListSecretsBuilder<'a, list_secrets_state::Empty> {
+        ListSecretsBuilder::new()
+    }
+}
+
+impl<'a> ListSecretsBuilder<'a, list_secrets_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ListSecretsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ListSecretsBuilder<'a, S>
+where
+    S: list_secrets_state::State,
+    S::Repo: list_secrets_state::IsUnset,
+{
+    /// Set the `repo` field (required)
+    pub fn repo(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> ListSecretsBuilder<'a, list_secrets_state::SetRepo<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ListSecretsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ListSecretsBuilder<'a, S>
+where
+    S: list_secrets_state::State,
+    S::Repo: list_secrets_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> ListSecrets<'a> {
+        ListSecrets {
+            repo: self.__unsafe_private_named.0.unwrap(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]
@@ -35,7 +124,7 @@ pub struct ListSecrets<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct ListSecretsOutput<'a> {
     #[serde(borrow)]
-    pub secrets: Vec<jacquard_common::types::value::Data<'a>>,
+    pub secrets: Vec<crate::sh_tangled::repo::list_secrets::Secret<'a>>,
 }
 
 /// Response type for
@@ -72,8 +161,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for ListSecretsRequest {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Secret<'a> {
@@ -81,10 +169,225 @@ pub struct Secret<'a> {
     #[serde(borrow)]
     pub created_by: jacquard_common::types::string::Did<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub key: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub repo: jacquard_common::types::string::AtUri<'a>,
+}
+
+pub mod secret_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Repo;
+        type Key;
+        type CreatedAt;
+        type CreatedBy;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Repo = Unset;
+        type Key = Unset;
+        type CreatedAt = Unset;
+        type CreatedBy = Unset;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Repo = Set<members::repo>;
+        type Key = S::Key;
+        type CreatedAt = S::CreatedAt;
+        type CreatedBy = S::CreatedBy;
+    }
+    ///State transition - sets the `key` field to Set
+    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetKey<S> {}
+    impl<S: State> State for SetKey<S> {
+        type Repo = S::Repo;
+        type Key = Set<members::key>;
+        type CreatedAt = S::CreatedAt;
+        type CreatedBy = S::CreatedBy;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Repo = S::Repo;
+        type Key = S::Key;
+        type CreatedAt = Set<members::created_at>;
+        type CreatedBy = S::CreatedBy;
+    }
+    ///State transition - sets the `created_by` field to Set
+    pub struct SetCreatedBy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedBy<S> {}
+    impl<S: State> State for SetCreatedBy<S> {
+        type Repo = S::Repo;
+        type Key = S::Key;
+        type CreatedAt = S::CreatedAt;
+        type CreatedBy = Set<members::created_by>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `repo` field
+        pub struct repo(());
+        ///Marker type for the `key` field
+        pub struct key(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `created_by` field
+        pub struct created_by(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct SecretBuilder<'a, S: secret_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Secret<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> SecretBuilder<'a, secret_state::Empty> {
+        SecretBuilder::new()
+    }
+}
+
+impl<'a> SecretBuilder<'a, secret_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        SecretBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SecretBuilder<'a, S>
+where
+    S: secret_state::State,
+    S::CreatedAt: secret_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> SecretBuilder<'a, secret_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        SecretBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SecretBuilder<'a, S>
+where
+    S: secret_state::State,
+    S::CreatedBy: secret_state::IsUnset,
+{
+    /// Set the `createdBy` field (required)
+    pub fn created_by(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> SecretBuilder<'a, secret_state::SetCreatedBy<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        SecretBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SecretBuilder<'a, S>
+where
+    S: secret_state::State,
+    S::Key: secret_state::IsUnset,
+{
+    /// Set the `key` field (required)
+    pub fn key(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> SecretBuilder<'a, secret_state::SetKey<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        SecretBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SecretBuilder<'a, S>
+where
+    S: secret_state::State,
+    S::Repo: secret_state::IsUnset,
+{
+    /// Set the `repo` field (required)
+    pub fn repo(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> SecretBuilder<'a, secret_state::SetRepo<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        SecretBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SecretBuilder<'a, S>
+where
+    S: secret_state::State,
+    S::Repo: secret_state::IsSet,
+    S::Key: secret_state::IsSet,
+    S::CreatedAt: secret_state::IsSet,
+    S::CreatedBy: secret_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Secret<'a> {
+        Secret {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            created_by: self.__unsafe_private_named.1.unwrap(),
+            key: self.__unsafe_private_named.2.unwrap(),
+            repo: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Secret<'a> {
+        Secret {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            created_by: self.__unsafe_private_named.1.unwrap(),
+            key: self.__unsafe_private_named.2.unwrap(),
+            repo: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_sh_tangled_repo_listSecrets() -> ::jacquard_lexicon::lexicon::LexiconDoc<

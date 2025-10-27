@@ -12,15 +12,101 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetVerificationUrl<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub domain: jacquard_common::CowStr<'a>,
+}
+
+pub mod get_verification_url_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Domain;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Domain = Unset;
+    }
+    ///State transition - sets the `domain` field to Set
+    pub struct SetDomain<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDomain<S> {}
+    impl<S: State> State for SetDomain<S> {
+        type Domain = Set<members::domain>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `domain` field
+        pub struct domain(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetVerificationUrlBuilder<'a, S: get_verification_url_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (::core::option::Option<jacquard_common::CowStr<'a>>,),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GetVerificationUrl<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GetVerificationUrlBuilder<'a, get_verification_url_state::Empty> {
+        GetVerificationUrlBuilder::new()
+    }
+}
+
+impl<'a> GetVerificationUrlBuilder<'a, get_verification_url_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetVerificationUrlBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetVerificationUrlBuilder<'a, S>
+where
+    S: get_verification_url_state::State,
+    S::Domain: get_verification_url_state::IsUnset,
+{
+    /// Set the `domain` field (required)
+    pub fn domain(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> GetVerificationUrlBuilder<'a, get_verification_url_state::SetDomain<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        GetVerificationUrlBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetVerificationUrlBuilder<'a, S>
+where
+    S: get_verification_url_state::State,
+    S::Domain: get_verification_url_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetVerificationUrl<'a> {
+        GetVerificationUrl {
+            domain: self.__unsafe_private_named.0.unwrap(),
+        }
+    }
 }
 
 /// The intent data

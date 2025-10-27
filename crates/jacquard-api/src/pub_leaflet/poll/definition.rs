@@ -14,19 +14,180 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Definition<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub end_date: Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
-    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub options: Vec<crate::pub_leaflet::poll::definition::DefinitionOption<'a>>,
+}
+
+pub mod definition_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Name;
+        type Options;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Name = Unset;
+        type Options = Unset;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Name = Set<members::name>;
+        type Options = S::Options;
+    }
+    ///State transition - sets the `options` field to Set
+    pub struct SetOptions<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOptions<S> {}
+    impl<S: State> State for SetOptions<S> {
+        type Name = S::Name;
+        type Options = Set<members::options>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `options` field
+        pub struct options(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct DefinitionBuilder<'a, S: definition_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<
+            Vec<crate::pub_leaflet::poll::definition::DefinitionOption<'a>>,
+        >,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Definition<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> DefinitionBuilder<'a, definition_state::Empty> {
+        DefinitionBuilder::new()
+    }
+}
+
+impl<'a> DefinitionBuilder<'a, definition_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        DefinitionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: definition_state::State> DefinitionBuilder<'a, S> {
+    /// Set the `endDate` field (optional)
+    pub fn end_date(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `endDate` field to an Option value (optional)
+    pub fn maybe_end_date(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> DefinitionBuilder<'a, S>
+where
+    S: definition_state::State,
+    S::Name: definition_state::IsUnset,
+{
+    /// Set the `name` field (required)
+    pub fn name(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> DefinitionBuilder<'a, definition_state::SetName<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        DefinitionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DefinitionBuilder<'a, S>
+where
+    S: definition_state::State,
+    S::Options: definition_state::IsUnset,
+{
+    /// Set the `options` field (required)
+    pub fn options(
+        mut self,
+        value: impl Into<Vec<crate::pub_leaflet::poll::definition::DefinitionOption<'a>>>,
+    ) -> DefinitionBuilder<'a, definition_state::SetOptions<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        DefinitionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DefinitionBuilder<'a, S>
+where
+    S: definition_state::State,
+    S::Name: definition_state::IsSet,
+    S::Options: definition_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Definition<'a> {
+        Definition {
+            end_date: self.__unsafe_private_named.0,
+            name: self.__unsafe_private_named.1.unwrap(),
+            options: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Definition<'a> {
+        Definition {
+            end_date: self.__unsafe_private_named.0,
+            name: self.__unsafe_private_named.1.unwrap(),
+            options: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Definition<'a> {

@@ -13,26 +13,193 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-#[builder(start_fn = new)]
 pub struct InvokeWebhook<'a> {
     #[serde(borrow)]
     pub context: jacquard_common::types::value::Data<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub event: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub record: jacquard_common::types::value::Data<'a>,
-    #[serde(flatten)]
-    #[serde(borrow)]
-    #[builder(default)]
-    pub extra_data: ::std::collections::BTreeMap<
-        ::jacquard_common::smol_str::SmolStr,
-        ::jacquard_common::types::value::Data<'a>,
-    >,
+}
+
+pub mod invoke_webhook_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Event;
+        type Record;
+        type Context;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Event = Unset;
+        type Record = Unset;
+        type Context = Unset;
+    }
+    ///State transition - sets the `event` field to Set
+    pub struct SetEvent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEvent<S> {}
+    impl<S: State> State for SetEvent<S> {
+        type Event = Set<members::event>;
+        type Record = S::Record;
+        type Context = S::Context;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecord<S> {}
+    impl<S: State> State for SetRecord<S> {
+        type Event = S::Event;
+        type Record = Set<members::record>;
+        type Context = S::Context;
+    }
+    ///State transition - sets the `context` field to Set
+    pub struct SetContext<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContext<S> {}
+    impl<S: State> State for SetContext<S> {
+        type Event = S::Event;
+        type Record = S::Record;
+        type Context = Set<members::context>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `event` field
+        pub struct event(());
+        ///Marker type for the `record` field
+        pub struct record(());
+        ///Marker type for the `context` field
+        pub struct context(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct InvokeWebhookBuilder<'a, S: invoke_webhook_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> InvokeWebhook<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> InvokeWebhookBuilder<'a, invoke_webhook_state::Empty> {
+        InvokeWebhookBuilder::new()
+    }
+}
+
+impl<'a> InvokeWebhookBuilder<'a, invoke_webhook_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        InvokeWebhookBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> InvokeWebhookBuilder<'a, S>
+where
+    S: invoke_webhook_state::State,
+    S::Context: invoke_webhook_state::IsUnset,
+{
+    /// Set the `context` field (required)
+    pub fn context(
+        mut self,
+        value: impl Into<jacquard_common::types::value::Data<'a>>,
+    ) -> InvokeWebhookBuilder<'a, invoke_webhook_state::SetContext<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        InvokeWebhookBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> InvokeWebhookBuilder<'a, S>
+where
+    S: invoke_webhook_state::State,
+    S::Event: invoke_webhook_state::IsUnset,
+{
+    /// Set the `event` field (required)
+    pub fn event(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> InvokeWebhookBuilder<'a, invoke_webhook_state::SetEvent<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        InvokeWebhookBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> InvokeWebhookBuilder<'a, S>
+where
+    S: invoke_webhook_state::State,
+    S::Record: invoke_webhook_state::IsUnset,
+{
+    /// Set the `record` field (required)
+    pub fn record(
+        mut self,
+        value: impl Into<jacquard_common::types::value::Data<'a>>,
+    ) -> InvokeWebhookBuilder<'a, invoke_webhook_state::SetRecord<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        InvokeWebhookBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> InvokeWebhookBuilder<'a, S>
+where
+    S: invoke_webhook_state::State,
+    S::Event: invoke_webhook_state::IsSet,
+    S::Record: invoke_webhook_state::IsSet,
+    S::Context: invoke_webhook_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> InvokeWebhook<'a> {
+        InvokeWebhook {
+            context: self.__unsafe_private_named.0.unwrap(),
+            event: self.__unsafe_private_named.1.unwrap(),
+            record: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> InvokeWebhook<'a> {
+        InvokeWebhook {
+            context: self.__unsafe_private_named.0.unwrap(),
+            event: self.__unsafe_private_named.1.unwrap(),
+            record: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

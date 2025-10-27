@@ -14,44 +14,302 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Post<'a> {
     /// Client-declared timestamp when this post was created.
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub embed: Option<PostEmbed<'a>>,
     /// Annotations of text (mentions, URLs, hashtags, etc)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub facets: Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
     /// Self-label values for this post. Effectively content warnings.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub labels: Option<crate::com_atproto::label::SelfLabels<'a>>,
     /// Indicates human language of post primary text content.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub langs: Option<Vec<jacquard_common::types::string::Language>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub reply: Option<crate::net_anisota::feed::post::ReplyRef<'a>>,
     /// Additional hashtags, in addition to any included in post text and facets.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub tags: Option<Vec<jacquard_common::CowStr<'a>>>,
     /// The primary post content. May be an empty string, if there are embeds.
     #[serde(borrow)]
-    #[builder(into)]
     pub text: jacquard_common::CowStr<'a>,
+}
+
+pub mod post_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Text;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Text = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetText<S> {}
+    impl<S: State> State for SetText<S> {
+        type Text = Set<members::text>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Text = S::Text;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `text` field
+        pub struct text(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct PostBuilder<'a, S: post_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<PostEmbed<'a>>,
+        ::core::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
+        ::core::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
+        ::core::option::Option<Vec<jacquard_common::types::string::Language>>,
+        ::core::option::Option<crate::net_anisota::feed::post::ReplyRef<'a>>,
+        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Post<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> PostBuilder<'a, post_state::Empty> {
+        PostBuilder::new()
+    }
+}
+
+impl<'a> PostBuilder<'a, post_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        PostBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PostBuilder<'a, S>
+where
+    S: post_state::State,
+    S::CreatedAt: post_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> PostBuilder<'a, post_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        PostBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: post_state::State> PostBuilder<'a, S> {
+    /// Set the `embed` field (optional)
+    pub fn embed(mut self, value: impl Into<Option<PostEmbed<'a>>>) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `embed` field to an Option value (optional)
+    pub fn maybe_embed(mut self, value: Option<PostEmbed<'a>>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: post_state::State> PostBuilder<'a, S> {
+    /// Set the `facets` field (optional)
+    pub fn facets(
+        mut self,
+        value: impl Into<Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `facets` field to an Option value (optional)
+    pub fn maybe_facets(
+        mut self,
+        value: Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: post_state::State> PostBuilder<'a, S> {
+    /// Set the `labels` field (optional)
+    pub fn labels(
+        mut self,
+        value: impl Into<Option<crate::com_atproto::label::SelfLabels<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `labels` field to an Option value (optional)
+    pub fn maybe_labels(
+        mut self,
+        value: Option<crate::com_atproto::label::SelfLabels<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: post_state::State> PostBuilder<'a, S> {
+    /// Set the `langs` field (optional)
+    pub fn langs(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::types::string::Language>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `langs` field to an Option value (optional)
+    pub fn maybe_langs(
+        mut self,
+        value: Option<Vec<jacquard_common::types::string::Language>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: post_state::State> PostBuilder<'a, S> {
+    /// Set the `reply` field (optional)
+    pub fn reply(
+        mut self,
+        value: impl Into<Option<crate::net_anisota::feed::post::ReplyRef<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `reply` field to an Option value (optional)
+    pub fn maybe_reply(
+        mut self,
+        value: Option<crate::net_anisota::feed::post::ReplyRef<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S: post_state::State> PostBuilder<'a, S> {
+    /// Set the `tags` field (optional)
+    pub fn tags(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `tags` field to an Option value (optional)
+    pub fn maybe_tags(
+        mut self,
+        value: Option<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S> PostBuilder<'a, S>
+where
+    S: post_state::State,
+    S::Text: post_state::IsUnset,
+{
+    /// Set the `text` field (required)
+    pub fn text(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> PostBuilder<'a, post_state::SetText<S>> {
+        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        PostBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PostBuilder<'a, S>
+where
+    S: post_state::State,
+    S::Text: post_state::IsSet,
+    S::CreatedAt: post_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Post<'a> {
+        Post {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            embed: self.__unsafe_private_named.1,
+            facets: self.__unsafe_private_named.2,
+            labels: self.__unsafe_private_named.3,
+            langs: self.__unsafe_private_named.4,
+            reply: self.__unsafe_private_named.5,
+            tags: self.__unsafe_private_named.6,
+            text: self.__unsafe_private_named.7.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Post<'a> {
+        Post {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            embed: self.__unsafe_private_named.1,
+            facets: self.__unsafe_private_named.2,
+            labels: self.__unsafe_private_named.3,
+            langs: self.__unsafe_private_named.4,
+            reply: self.__unsafe_private_named.5,
+            tags: self.__unsafe_private_named.6,
+            text: self.__unsafe_private_named.7.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Post<'a> {
@@ -443,8 +701,7 @@ fn lexicon_doc_net_anisota_feed_post() -> ::jacquard_lexicon::lexicon::LexiconDo
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ReplyRef<'a> {
@@ -452,6 +709,146 @@ pub struct ReplyRef<'a> {
     pub parent: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     #[serde(borrow)]
     pub root: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+}
+
+pub mod reply_ref_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Root;
+        type Parent;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Root = Unset;
+        type Parent = Unset;
+    }
+    ///State transition - sets the `root` field to Set
+    pub struct SetRoot<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRoot<S> {}
+    impl<S: State> State for SetRoot<S> {
+        type Root = Set<members::root>;
+        type Parent = S::Parent;
+    }
+    ///State transition - sets the `parent` field to Set
+    pub struct SetParent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetParent<S> {}
+    impl<S: State> State for SetParent<S> {
+        type Root = S::Root;
+        type Parent = Set<members::parent>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `root` field
+        pub struct root(());
+        ///Marker type for the `parent` field
+        pub struct parent(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ReplyRefBuilder<'a, S: reply_ref_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ReplyRef<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ReplyRefBuilder<'a, reply_ref_state::Empty> {
+        ReplyRefBuilder::new()
+    }
+}
+
+impl<'a> ReplyRefBuilder<'a, reply_ref_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ReplyRefBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ReplyRefBuilder<'a, S>
+where
+    S: reply_ref_state::State,
+    S::Parent: reply_ref_state::IsUnset,
+{
+    /// Set the `parent` field (required)
+    pub fn parent(
+        mut self,
+        value: impl Into<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    ) -> ReplyRefBuilder<'a, reply_ref_state::SetParent<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ReplyRefBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ReplyRefBuilder<'a, S>
+where
+    S: reply_ref_state::State,
+    S::Root: reply_ref_state::IsUnset,
+{
+    /// Set the `root` field (required)
+    pub fn root(
+        mut self,
+        value: impl Into<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    ) -> ReplyRefBuilder<'a, reply_ref_state::SetRoot<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        ReplyRefBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ReplyRefBuilder<'a, S>
+where
+    S: reply_ref_state::State,
+    S::Root: reply_ref_state::IsSet,
+    S::Parent: reply_ref_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> ReplyRef<'a> {
+        ReplyRef {
+            parent: self.__unsafe_private_named.0.unwrap(),
+            root: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> ReplyRef<'a> {
+        ReplyRef {
+            parent: self.__unsafe_private_named.0.unwrap(),
+            root: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReplyRef<'a> {

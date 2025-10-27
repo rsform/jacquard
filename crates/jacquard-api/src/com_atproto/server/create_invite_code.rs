@@ -13,24 +13,141 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-#[builder(start_fn = new)]
 pub struct CreateInviteCode<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub for_account: Option<jacquard_common::types::string::Did<'a>>,
     pub use_count: i64,
-    #[serde(flatten)]
-    #[serde(borrow)]
-    #[builder(default)]
-    pub extra_data: ::std::collections::BTreeMap<
-        ::jacquard_common::smol_str::SmolStr,
-        ::jacquard_common::types::value::Data<'a>,
-    >,
+}
+
+pub mod create_invite_code_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type UseCount;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type UseCount = Unset;
+    }
+    ///State transition - sets the `use_count` field to Set
+    pub struct SetUseCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUseCount<S> {}
+    impl<S: State> State for SetUseCount<S> {
+        type UseCount = Set<members::use_count>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `use_count` field
+        pub struct use_count(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct CreateInviteCodeBuilder<'a, S: create_invite_code_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<i64>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> CreateInviteCode<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> CreateInviteCodeBuilder<'a, create_invite_code_state::Empty> {
+        CreateInviteCodeBuilder::new()
+    }
+}
+
+impl<'a> CreateInviteCodeBuilder<'a, create_invite_code_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        CreateInviteCodeBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: create_invite_code_state::State> CreateInviteCodeBuilder<'a, S> {
+    /// Set the `forAccount` field (optional)
+    pub fn for_account(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Did<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `forAccount` field to an Option value (optional)
+    pub fn maybe_for_account(
+        mut self,
+        value: Option<jacquard_common::types::string::Did<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> CreateInviteCodeBuilder<'a, S>
+where
+    S: create_invite_code_state::State,
+    S::UseCount: create_invite_code_state::IsUnset,
+{
+    /// Set the `useCount` field (required)
+    pub fn use_count(
+        mut self,
+        value: impl Into<i64>,
+    ) -> CreateInviteCodeBuilder<'a, create_invite_code_state::SetUseCount<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        CreateInviteCodeBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CreateInviteCodeBuilder<'a, S>
+where
+    S: create_invite_code_state::State,
+    S::UseCount: create_invite_code_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> CreateInviteCode<'a> {
+        CreateInviteCode {
+            for_account: self.__unsafe_private_named.0,
+            use_count: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> CreateInviteCode<'a> {
+        CreateInviteCode {
+            for_account: self.__unsafe_private_named.0,
+            use_count: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

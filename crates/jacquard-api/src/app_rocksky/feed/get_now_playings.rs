@@ -12,15 +12,80 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetNowPlayings {
     ///(min: 1)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub size: std::option::Option<i64>,
+}
+
+pub mod get_now_playings_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {}
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {}
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {}
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetNowPlayingsBuilder<S: get_now_playings_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (::core::option::Option<i64>,),
+}
+
+impl GetNowPlayings {
+    /// Create a new builder for this type
+    pub fn new() -> GetNowPlayingsBuilder<get_now_playings_state::Empty> {
+        GetNowPlayingsBuilder::new()
+    }
+}
+
+impl GetNowPlayingsBuilder<get_now_playings_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetNowPlayingsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+        }
+    }
+}
+
+impl<S: get_now_playings_state::State> GetNowPlayingsBuilder<S> {
+    /// Set the `size` field (optional)
+    pub fn size(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `size` field to an Option value (optional)
+    pub fn maybe_size(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<S> GetNowPlayingsBuilder<S>
+where
+    S: get_now_playings_state::State,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetNowPlayings {
+        GetNowPlayings {
+            size: self.__unsafe_private_named.0,
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

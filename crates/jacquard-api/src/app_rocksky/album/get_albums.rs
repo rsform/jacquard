@@ -12,10 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetAlbums {
     ///(min: 1)
@@ -24,6 +22,87 @@ pub struct GetAlbums {
     ///(min: 0)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub offset: std::option::Option<i64>,
+}
+
+pub mod get_albums_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {}
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {}
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {}
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetAlbumsBuilder<S: get_albums_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (::core::option::Option<i64>, ::core::option::Option<i64>),
+}
+
+impl GetAlbums {
+    /// Create a new builder for this type
+    pub fn new() -> GetAlbumsBuilder<get_albums_state::Empty> {
+        GetAlbumsBuilder::new()
+    }
+}
+
+impl GetAlbumsBuilder<get_albums_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetAlbumsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+        }
+    }
+}
+
+impl<S: get_albums_state::State> GetAlbumsBuilder<S> {
+    /// Set the `limit` field (optional)
+    pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `limit` field to an Option value (optional)
+    pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<S: get_albums_state::State> GetAlbumsBuilder<S> {
+    /// Set the `offset` field (optional)
+    pub fn offset(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `offset` field to an Option value (optional)
+    pub fn maybe_offset(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<S> GetAlbumsBuilder<S>
+where
+    S: get_albums_state::State,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetAlbums {
+        GetAlbums {
+            limit: self.__unsafe_private_named.0,
+            offset: self.__unsafe_private_named.1,
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

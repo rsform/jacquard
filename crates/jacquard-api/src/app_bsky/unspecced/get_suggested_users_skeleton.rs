@@ -12,15 +12,12 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetSuggestedUsersSkeleton<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    #[builder(into)]
     pub category: std::option::Option<jacquard_common::CowStr<'a>>,
     ///(default: 25, min: 1, max: 50)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -28,6 +25,133 @@ pub struct GetSuggestedUsersSkeleton<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub viewer: std::option::Option<jacquard_common::types::string::Did<'a>>,
+}
+
+pub mod get_suggested_users_skeleton_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {}
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {}
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {}
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetSuggestedUsersSkeletonBuilder<
+    'a,
+    S: get_suggested_users_skeleton_state::State,
+> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GetSuggestedUsersSkeleton<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GetSuggestedUsersSkeletonBuilder<
+        'a,
+        get_suggested_users_skeleton_state::Empty,
+    > {
+        GetSuggestedUsersSkeletonBuilder::new()
+    }
+}
+
+impl<
+    'a,
+> GetSuggestedUsersSkeletonBuilder<'a, get_suggested_users_skeleton_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetSuggestedUsersSkeletonBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<
+    'a,
+    S: get_suggested_users_skeleton_state::State,
+> GetSuggestedUsersSkeletonBuilder<'a, S> {
+    /// Set the `category` field (optional)
+    pub fn category(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `category` field to an Option value (optional)
+    pub fn maybe_category(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<
+    'a,
+    S: get_suggested_users_skeleton_state::State,
+> GetSuggestedUsersSkeletonBuilder<'a, S> {
+    /// Set the `limit` field (optional)
+    pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `limit` field to an Option value (optional)
+    pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<
+    'a,
+    S: get_suggested_users_skeleton_state::State,
+> GetSuggestedUsersSkeletonBuilder<'a, S> {
+    /// Set the `viewer` field (optional)
+    pub fn viewer(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Did<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `viewer` field to an Option value (optional)
+    pub fn maybe_viewer(
+        mut self,
+        value: Option<jacquard_common::types::string::Did<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> GetSuggestedUsersSkeletonBuilder<'a, S>
+where
+    S: get_suggested_users_skeleton_state::State,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetSuggestedUsersSkeleton<'a> {
+        GetSuggestedUsersSkeleton {
+            category: self.__unsafe_private_named.0,
+            limit: self.__unsafe_private_named.1,
+            viewer: self.__unsafe_private_named.2,
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

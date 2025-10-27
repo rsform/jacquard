@@ -12,10 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetScrobbles<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -27,6 +25,113 @@ pub struct GetScrobbles<'a> {
     ///(min: 0)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub offset: std::option::Option<i64>,
+}
+
+pub mod get_scrobbles_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {}
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {}
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {}
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetScrobblesBuilder<'a, S: get_scrobbles_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<i64>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GetScrobbles<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GetScrobblesBuilder<'a, get_scrobbles_state::Empty> {
+        GetScrobblesBuilder::new()
+    }
+}
+
+impl<'a> GetScrobblesBuilder<'a, get_scrobbles_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetScrobblesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: get_scrobbles_state::State> GetScrobblesBuilder<'a, S> {
+    /// Set the `did` field (optional)
+    pub fn did(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::ident::AtIdentifier<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `did` field to an Option value (optional)
+    pub fn maybe_did(
+        mut self,
+        value: Option<jacquard_common::types::ident::AtIdentifier<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: get_scrobbles_state::State> GetScrobblesBuilder<'a, S> {
+    /// Set the `limit` field (optional)
+    pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `limit` field to an Option value (optional)
+    pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: get_scrobbles_state::State> GetScrobblesBuilder<'a, S> {
+    /// Set the `offset` field (optional)
+    pub fn offset(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `offset` field to an Option value (optional)
+    pub fn maybe_offset(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> GetScrobblesBuilder<'a, S>
+where
+    S: get_scrobbles_state::State,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetScrobbles<'a> {
+        GetScrobbles {
+            did: self.__unsafe_private_named.0,
+            limit: self.__unsafe_private_named.1,
+            offset: self.__unsafe_private_named.2,
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

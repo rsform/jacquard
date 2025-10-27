@@ -13,39 +13,347 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Car<'a> {
     /// The car fuel amount remaining value (floating point string)
     #[serde(borrow)]
-    #[builder(into)]
     pub amount_remaining: jacquard_common::CowStr<'a>,
     /// The car fuel range value in miles
     pub car_fuel_range: i64,
     /// The car make value
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub car_make: Option<jacquard_common::CowStr<'a>>,
     /// The car model value
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub car_model: Option<jacquard_common::CowStr<'a>>,
     /// The car fuel level value in percentage (floating point string)
     #[serde(borrow)]
-    #[builder(into)]
     pub car_percent_fuel_remaining: jacquard_common::CowStr<'a>,
     /// The car traveled distance value
     pub car_traveled_distance: i64,
     /// The car year value
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub car_year: Option<i64>,
     /// The unix timestamp of when the vital was recorded
     pub created_at: jacquard_common::types::string::Datetime,
+}
+
+pub mod car_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type CreatedAt;
+        type CarFuelRange;
+        type CarPercentFuelRemaining;
+        type AmountRemaining;
+        type CarTraveledDistance;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type CreatedAt = Unset;
+        type CarFuelRange = Unset;
+        type CarPercentFuelRemaining = Unset;
+        type AmountRemaining = Unset;
+        type CarTraveledDistance = Unset;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
+        type CarFuelRange = S::CarFuelRange;
+        type CarPercentFuelRemaining = S::CarPercentFuelRemaining;
+        type AmountRemaining = S::AmountRemaining;
+        type CarTraveledDistance = S::CarTraveledDistance;
+    }
+    ///State transition - sets the `car_fuel_range` field to Set
+    pub struct SetCarFuelRange<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCarFuelRange<S> {}
+    impl<S: State> State for SetCarFuelRange<S> {
+        type CreatedAt = S::CreatedAt;
+        type CarFuelRange = Set<members::car_fuel_range>;
+        type CarPercentFuelRemaining = S::CarPercentFuelRemaining;
+        type AmountRemaining = S::AmountRemaining;
+        type CarTraveledDistance = S::CarTraveledDistance;
+    }
+    ///State transition - sets the `car_percent_fuel_remaining` field to Set
+    pub struct SetCarPercentFuelRemaining<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCarPercentFuelRemaining<S> {}
+    impl<S: State> State for SetCarPercentFuelRemaining<S> {
+        type CreatedAt = S::CreatedAt;
+        type CarFuelRange = S::CarFuelRange;
+        type CarPercentFuelRemaining = Set<members::car_percent_fuel_remaining>;
+        type AmountRemaining = S::AmountRemaining;
+        type CarTraveledDistance = S::CarTraveledDistance;
+    }
+    ///State transition - sets the `amount_remaining` field to Set
+    pub struct SetAmountRemaining<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAmountRemaining<S> {}
+    impl<S: State> State for SetAmountRemaining<S> {
+        type CreatedAt = S::CreatedAt;
+        type CarFuelRange = S::CarFuelRange;
+        type CarPercentFuelRemaining = S::CarPercentFuelRemaining;
+        type AmountRemaining = Set<members::amount_remaining>;
+        type CarTraveledDistance = S::CarTraveledDistance;
+    }
+    ///State transition - sets the `car_traveled_distance` field to Set
+    pub struct SetCarTraveledDistance<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCarTraveledDistance<S> {}
+    impl<S: State> State for SetCarTraveledDistance<S> {
+        type CreatedAt = S::CreatedAt;
+        type CarFuelRange = S::CarFuelRange;
+        type CarPercentFuelRemaining = S::CarPercentFuelRemaining;
+        type AmountRemaining = S::AmountRemaining;
+        type CarTraveledDistance = Set<members::car_traveled_distance>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `car_fuel_range` field
+        pub struct car_fuel_range(());
+        ///Marker type for the `car_percent_fuel_remaining` field
+        pub struct car_percent_fuel_remaining(());
+        ///Marker type for the `amount_remaining` field
+        pub struct amount_remaining(());
+        ///Marker type for the `car_traveled_distance` field
+        pub struct car_traveled_distance(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct CarBuilder<'a, S: car_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Car<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> CarBuilder<'a, car_state::Empty> {
+        CarBuilder::new()
+    }
+}
+
+impl<'a> CarBuilder<'a, car_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        CarBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CarBuilder<'a, S>
+where
+    S: car_state::State,
+    S::AmountRemaining: car_state::IsUnset,
+{
+    /// Set the `amountRemaining` field (required)
+    pub fn amount_remaining(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> CarBuilder<'a, car_state::SetAmountRemaining<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        CarBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CarBuilder<'a, S>
+where
+    S: car_state::State,
+    S::CarFuelRange: car_state::IsUnset,
+{
+    /// Set the `carFuelRange` field (required)
+    pub fn car_fuel_range(
+        mut self,
+        value: impl Into<i64>,
+    ) -> CarBuilder<'a, car_state::SetCarFuelRange<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        CarBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: car_state::State> CarBuilder<'a, S> {
+    /// Set the `carMake` field (optional)
+    pub fn car_make(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `carMake` field to an Option value (optional)
+    pub fn maybe_car_make(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: car_state::State> CarBuilder<'a, S> {
+    /// Set the `carModel` field (optional)
+    pub fn car_model(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `carModel` field to an Option value (optional)
+    pub fn maybe_car_model(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S> CarBuilder<'a, S>
+where
+    S: car_state::State,
+    S::CarPercentFuelRemaining: car_state::IsUnset,
+{
+    /// Set the `carPercentFuelRemaining` field (required)
+    pub fn car_percent_fuel_remaining(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> CarBuilder<'a, car_state::SetCarPercentFuelRemaining<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        CarBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CarBuilder<'a, S>
+where
+    S: car_state::State,
+    S::CarTraveledDistance: car_state::IsUnset,
+{
+    /// Set the `carTraveledDistance` field (required)
+    pub fn car_traveled_distance(
+        mut self,
+        value: impl Into<i64>,
+    ) -> CarBuilder<'a, car_state::SetCarTraveledDistance<S>> {
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        CarBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: car_state::State> CarBuilder<'a, S> {
+    /// Set the `carYear` field (optional)
+    pub fn car_year(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `carYear` field to an Option value (optional)
+    pub fn maybe_car_year(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S> CarBuilder<'a, S>
+where
+    S: car_state::State,
+    S::CreatedAt: car_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> CarBuilder<'a, car_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        CarBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CarBuilder<'a, S>
+where
+    S: car_state::State,
+    S::CreatedAt: car_state::IsSet,
+    S::CarFuelRange: car_state::IsSet,
+    S::CarPercentFuelRemaining: car_state::IsSet,
+    S::AmountRemaining: car_state::IsSet,
+    S::CarTraveledDistance: car_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Car<'a> {
+        Car {
+            amount_remaining: self.__unsafe_private_named.0.unwrap(),
+            car_fuel_range: self.__unsafe_private_named.1.unwrap(),
+            car_make: self.__unsafe_private_named.2,
+            car_model: self.__unsafe_private_named.3,
+            car_percent_fuel_remaining: self.__unsafe_private_named.4.unwrap(),
+            car_traveled_distance: self.__unsafe_private_named.5.unwrap(),
+            car_year: self.__unsafe_private_named.6,
+            created_at: self.__unsafe_private_named.7.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Car<'a> {
+        Car {
+            amount_remaining: self.__unsafe_private_named.0.unwrap(),
+            car_fuel_range: self.__unsafe_private_named.1.unwrap(),
+            car_make: self.__unsafe_private_named.2,
+            car_model: self.__unsafe_private_named.3,
+            car_percent_fuel_remaining: self.__unsafe_private_named.4.unwrap(),
+            car_traveled_distance: self.__unsafe_private_named.5.unwrap(),
+            car_year: self.__unsafe_private_named.6,
+            created_at: self.__unsafe_private_named.7.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Car<'a> {

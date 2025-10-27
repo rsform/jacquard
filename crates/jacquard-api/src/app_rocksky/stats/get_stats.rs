@@ -12,14 +12,103 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetStats<'a> {
     #[serde(borrow)]
     pub did: jacquard_common::types::ident::AtIdentifier<'a>,
+}
+
+pub mod get_stats_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Did;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Did = Unset;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Did = Set<members::did>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `did` field
+        pub struct did(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetStatsBuilder<'a, S: get_stats_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GetStats<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GetStatsBuilder<'a, get_stats_state::Empty> {
+        GetStatsBuilder::new()
+    }
+}
+
+impl<'a> GetStatsBuilder<'a, get_stats_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetStatsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetStatsBuilder<'a, S>
+where
+    S: get_stats_state::State,
+    S::Did: get_stats_state::IsUnset,
+{
+    /// Set the `did` field (required)
+    pub fn did(
+        mut self,
+        value: impl Into<jacquard_common::types::ident::AtIdentifier<'a>>,
+    ) -> GetStatsBuilder<'a, get_stats_state::SetDid<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        GetStatsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetStatsBuilder<'a, S>
+where
+    S: get_stats_state::State,
+    S::Did: get_stats_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetStats<'a> {
+        GetStats {
+            did: self.__unsafe_private_named.0.unwrap(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

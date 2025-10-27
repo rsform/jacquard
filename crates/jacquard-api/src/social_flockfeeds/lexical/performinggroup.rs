@@ -14,454 +14,2339 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Performinggroup<'a> {
     /// The payment method(s) that are accepted in general by an organization, or for some specific demand or offer.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub accepted_payment_method: Option<PerforminggroupAcceptedPaymentMethod<'a>>,
     /// For a [[NewsMediaOrganization]] or other news-related [[Organization]], a statement about public engagement activities (for news media, the newsroom’s), including involving the public - digitally or otherwise -- in coverage decisions, reporting and activities after publication.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub actionable_feedback_policy: Option<PerforminggroupActionableFeedbackPolicy<'a>>,
     /** An additional type for the item, typically used for adding more specific types from external vocabularies in microdata syntax. This is a relationship between something and a class that the thing is in. Typically the value is a URI-identified RDF class, and in this case corresponds to the
     use of rdf:type in RDF. Text values can be used sparingly, for cases where useful information can be added without their being an appropriate schema to reference. In the case of text values, the class label should follow the schema.org <a href="https://schema.org/docs/styleguide.html">style guide</a>.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub additional_type: Option<jacquard_common::CowStr<'a>>,
     /// Physical address of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub address: Option<PerforminggroupAddress<'a>>,
     /// The number of completed interactions for this entity, in a particular role (the 'agent'), in a particular action (indicated in the statistic), and in a particular context (i.e. interactionService).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub agent_interaction_statistic: Option<
         PerforminggroupAgentInteractionStatistic<'a>,
     >,
     /// The overall rating, based on a collection of reviews or ratings, of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub aggregate_rating: Option<PerforminggroupAggregateRating<'a>>,
     /// An alias for the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub alternate_name: Option<jacquard_common::CowStr<'a>>,
     /// Alumni of an organization.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub alumni: Option<PerforminggroupAlumni<'a>>,
     /// The geographic area where a service or offered item is provided.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub area_served: Option<PerforminggroupAreaServed<'a>>,
     /// An award won by or for this item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub award: Option<jacquard_common::CowStr<'a>>,
     /// Awards won by or for this item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub awards: Option<jacquard_common::CowStr<'a>>,
     /// The brand(s) associated with a product or service, or the brand(s) maintained by an organization or business person.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub brand: Option<PerforminggroupBrand<'a>>,
     /// The official registration number of a business including the organization that issued it such as Company House or Chamber of Commerce.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub company_registration: Option<PerforminggroupCompanyRegistration<'a>>,
     /// A contact point for a person or organization.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub contact_point: Option<PerforminggroupContactPoint<'a>>,
     /// A contact point for a person or organization.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub contact_points: Option<PerforminggroupContactPoints<'a>>,
     /// For an [[Organization]] (e.g. [[NewsMediaOrganization]]), a statement describing (in news media, the newsroom’s) disclosure and correction policy for errors.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub corrections_policy: Option<PerforminggroupCorrectionsPolicy<'a>>,
     /// A relationship between an organization and a department of that organization, also described as an organization (allowing different urls, logos, opening hours). For example: a store with a pharmacy, or a bakery with a cafe.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub department: Option<PerforminggroupDepartment<'a>>,
     /// A description of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub description: Option<PerforminggroupDescription<'a>>,
     /// A sub property of description. A short description of the item used to disambiguate from other, similar items. Information from other properties (in particular, name) may be necessary for the description to be useful for disambiguation.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub disambiguating_description: Option<jacquard_common::CowStr<'a>>,
     /// The date that this organization was dissolved.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub dissolution_date: Option<jacquard_common::types::string::Datetime>,
     /// Statement on diversity policy by an [[Organization]] e.g. a [[NewsMediaOrganization]]. For a [[NewsMediaOrganization]], a statement describing the newsroom’s diversity policy on both staffing and sources, typically providing staffing data.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub diversity_policy: Option<PerforminggroupDiversityPolicy<'a>>,
     /// For an [[Organization]] (often but not necessarily a [[NewsMediaOrganization]]), a report on staffing diversity issues. In a news context this might be for example ASNE or RTDNA (US) reports, or self-reported.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub diversity_staffing_report: Option<PerforminggroupDiversityStaffingReport<'a>>,
     /// The Dun & Bradstreet DUNS number for identifying an organization or business person.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub duns: Option<jacquard_common::CowStr<'a>>,
     /// Email address.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub email: Option<jacquard_common::CowStr<'a>>,
     /// Someone working for this organization.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub employee: Option<PerforminggroupEmployee<'a>>,
     /// People working for this organization.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub employees: Option<PerforminggroupEmployees<'a>>,
     /// Statement about ethics policy, e.g. of a [[NewsMediaOrganization]] regarding journalistic and publishing practices, or of a [[Restaurant]], a page describing food source policies. In the case of a [[NewsMediaOrganization]], an ethicsPolicy is typically a statement describing the personal, organizational, and corporate standards of behavior expected by the organization.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub ethics_policy: Option<PerforminggroupEthicsPolicy<'a>>,
     /// Upcoming or past event associated with this place, organization, or action.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub event: Option<PerforminggroupEvent<'a>>,
     /// Upcoming or past events associated with this place or organization.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub events: Option<PerforminggroupEvents<'a>>,
     /// The fax number.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub fax_number: Option<jacquard_common::CowStr<'a>>,
     /// A person or organization who founded this organization.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub founder: Option<PerforminggroupFounder<'a>>,
     /// A person who founded this organization.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub founders: Option<PerforminggroupFounders<'a>>,
     /// The date that this organization was founded.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub founding_date: Option<jacquard_common::types::string::Datetime>,
     /// The place where the Organization was founded.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub founding_location: Option<PerforminggroupFoundingLocation<'a>>,
     /// A person or organization that supports (sponsors) something through some kind of financial contribution.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub funder: Option<PerforminggroupFunder<'a>>,
     /// A [[Grant]] that directly or indirectly provide funding or sponsorship for this item. See also [[ownershipFundingInfo]].
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub funding: Option<PerforminggroupFunding<'a>>,
     /// The [Global Location Number](http://www.gs1.org/gln) (GLN, sometimes also referred to as International Location Number or ILN) of the respective organization, person, or place. The GLN is a 13-digit number used to identify parties and physical locations.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub global_location_number: Option<jacquard_common::CowStr<'a>>,
     /// Certification information about a product, organization, service, place, or person.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub has_certification: Option<PerforminggroupHasCertification<'a>>,
     /// A credential awarded to the Person or Organization.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub has_credential: Option<PerforminggroupHasCredential<'a>>,
     /// The <a href="https://www.gs1.org/standards/gs1-digital-link">GS1 digital link</a> associated with the object. This URL should conform to the particular requirements of digital links. The link should only contain the Application Identifiers (AIs) that are relevant for the entity being annotated, for instance a [[Product]] or an [[Organization]], and for the correct granularity. In particular, for products:<ul><li>A Digital Link that contains a serial number (AI <code>21</code>) should only be present on instances of [[IndividualProduct]]</li><li>A Digital Link that contains a lot number (AI <code>10</code>) should be annotated as [[SomeProduct]] if only products from that lot are sold, or [[IndividualProduct]] if there is only a specific product.</li><li>A Digital Link that contains a global model number (AI <code>8013</code>)  should be attached to a [[Product]] or a [[ProductModel]].</li></ul> Other item types should be adapted similarly.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub has_gs1_digital_link: Option<jacquard_common::types::string::Uri<'a>>,
     /// MemberProgram offered by an Organization, for example an eCommerce merchant or an airline.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub has_member_program: Option<PerforminggroupHasMemberProgram<'a>>,
     /// Specifies a MerchantReturnPolicy that may be applicable.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub has_merchant_return_policy: Option<PerforminggroupHasMerchantReturnPolicy<'a>>,
     /// Indicates an OfferCatalog listing for this Organization, Person, or Service.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub has_offer_catalog: Option<PerforminggroupHasOfferCatalog<'a>>,
     /// Points-of-Sales operated by the organization or person.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub has_pos: Option<PerforminggroupHasPos<'a>>,
     /// Specification of a shipping service offered by the organization.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub has_shipping_service: Option<PerforminggroupHasShippingService<'a>>,
     /// The identifier property represents any kind of identifier for any kind of [[Thing]], such as ISBNs, GTIN codes, UUIDs etc. Schema.org provides dedicated properties for representing many of these, either as textual strings or as URL (URI) links. See [background notes](/docs/datamodel.html#identifierBg) for more details.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub identifier: Option<PerforminggroupIdentifier<'a>>,
     /// An image of the item. This can be a [[URL]] or a fully described [[ImageObject]].
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub image: Option<PerforminggroupImage<'a>>,
     /// The number of interactions for the CreativeWork using the WebSite or SoftwareApplication. The most specific child type of InteractionCounter should be used.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub interaction_statistic: Option<PerforminggroupInteractionStatistic<'a>>,
     /// The International Standard of Industrial Classification of All Economic Activities (ISIC), Revision 4 code for a particular organization, business person, or place.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub isic_v4: Option<jacquard_common::CowStr<'a>>,
     /// An organization identifier as defined in [ISO 6523(-1)](https://en.wikipedia.org/wiki/ISO/IEC_6523). The identifier should be in the `XXXX:YYYYYY:ZZZ` or `XXXX:YYYYYY`format. Where `XXXX` is a 4 digit _ICD_ (International Code Designator), `YYYYYY` is an _OID_ (Organization Identifier) with all formatting characters (dots, dashes, spaces) removed with a maximal length of 35 characters, and `ZZZ` is an optional OPI (Organization Part Identifier) with a maximum length of 35 characters. The various components (ICD, OID, OPI) are joined with a colon character (ASCII `0x3a`). Note that many existing organization identifiers defined as attributes like [leiCode](https://schema.org/leiCode) (`0199`), [duns](https://schema.org/duns) (`0060`) or [GLN](https://schema.org/globalLocationNumber) (`0088`) can be expressed using ISO-6523. If possible, ISO-6523 codes should be preferred to populating [vatID](https://schema.org/vatID) or [taxID](https://schema.org/taxID), as ISO identifiers are less ambiguous.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub iso6523_code: Option<jacquard_common::CowStr<'a>>,
     /// Keywords or tags used to describe some item. Multiple textual entries in a keywords list are typically delimited by commas, or by repeating the property.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub keywords: Option<PerforminggroupKeywords<'a>>,
     /// Of a [[Person]], and less typically of an [[Organization]], to indicate a topic that is known about - suggesting possible expertise but not implying it. We do not distinguish skill levels here, or relate this to educational content, events, objectives or [[JobPosting]] descriptions.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub knows_about: Option<PerforminggroupKnowsAbout<'a>>,
     /// Of a [[Person]], and less typically of an [[Organization]], to indicate a known language. We do not distinguish skill levels or reading/writing/speaking/signing here. Use language codes from the [IETF BCP 47 standard](http://tools.ietf.org/html/bcp47).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub knows_language: Option<PerforminggroupKnowsLanguage<'a>>,
     /// The legal address of an organization which acts as the officially registered address used for legal and tax purposes. The legal address can be different from the place of operations of a business and other addresses can be part of an organization.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub legal_address: Option<PerforminggroupLegalAddress<'a>>,
     /// The official name of the organization, e.g. the registered company name.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub legal_name: Option<jacquard_common::CowStr<'a>>,
     /// One or multiple persons who represent this organization legally such as CEO or sole administrator.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub legal_representative: Option<PerforminggroupLegalRepresentative<'a>>,
     /// An organization identifier that uniquely identifies a legal entity as defined in ISO 17442.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub lei_code: Option<jacquard_common::CowStr<'a>>,
     /// The location of, for example, where an event is happening, where an organization is located, or where an action takes place.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub location: Option<PerforminggroupLocation<'a>>,
     /// An associated logo.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub logo: Option<PerforminggroupLogo<'a>>,
     /// Indicates a page (or other CreativeWork) for which this thing is the main entity being described. See [background notes](/docs/datamodel.html#mainEntityBackground) for details.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub main_entity_of_page: Option<PerforminggroupMainEntityOfPage<'a>>,
     /// A pointer to products or services offered by the organization or person.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub makes_offer: Option<PerforminggroupMakesOffer<'a>>,
     /// A member of an Organization or a ProgramMembership. Organizations can be members of organizations; ProgramMembership is typically for individuals.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub member: Option<PerforminggroupMember<'a>>,
     /// An Organization (or ProgramMembership) to which this Person or Organization belongs.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub member_of: Option<PerforminggroupMemberOf<'a>>,
     /// A member of this organization.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub members: Option<PerforminggroupMembers<'a>>,
     /// The North American Industry Classification System (NAICS) code for a particular organization or business person.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub naics: Option<jacquard_common::CowStr<'a>>,
     /// The name of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub name: Option<jacquard_common::CowStr<'a>>,
     /// nonprofitStatus indicates the legal status of a non-profit organization in its primary place of business.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub nonprofit_status: Option<PerforminggroupNonprofitStatus<'a>>,
     /// The number of employees in an organization, e.g. business.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub number_of_employees: Option<PerforminggroupNumberOfEmployees<'a>>,
     /// For an [[Organization]] (often but not necessarily a [[NewsMediaOrganization]]), a description of organizational ownership structure; funding and grants. In a news/media setting, this is with particular reference to editorial independence.   Note that the [[funder]] is also available and can be used to make basic funder information machine-readable.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub ownership_funding_info: Option<PerforminggroupOwnershipFundingInfo<'a>>,
     /// Products owned by the organization or person.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub owns: Option<PerforminggroupOwns<'a>>,
     /// The larger organization that this organization is a [[subOrganization]] of, if any.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub parent_organization: Option<PerforminggroupParentOrganization<'a>>,
     /// Indicates a potential Action, which describes an idealized action in which this thing would play an 'object' role.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub potential_action: Option<PerforminggroupPotentialAction<'a>>,
     /** The publishingPrinciples property indicates (typically via [[URL]]) a document describing the editorial principles of an [[Organization]] (or individual, e.g. a [[Person]] writing a blog) that relate to their activities as a publisher, e.g. ethics or diversity policies. When applied to a [[CreativeWork]] (e.g. [[NewsArticle]]) the principles are those of the party primarily responsible for the creation of the [[CreativeWork]].
 
 While such policies are most typically expressed in natural language, sometimes related information (e.g. indicating a [[funder]]) can be expressed using schema.org terminology.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub publishing_principles: Option<PerforminggroupPublishingPrinciples<'a>>,
     /// A review of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub review: Option<PerforminggroupReview<'a>>,
     /// Review of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub reviews: Option<PerforminggroupReviews<'a>>,
     /// URL of a reference Web page that unambiguously indicates the item's identity. E.g. the URL of the item's Wikipedia page, Wikidata entry, or official website.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub same_as: Option<jacquard_common::types::string::Uri<'a>>,
     /// A pointer to products or services sought by the organization or person (demand).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub seeks: Option<PerforminggroupSeeks<'a>>,
     /// The geographic area where the service is provided.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub service_area: Option<PerforminggroupServiceArea<'a>>,
     /// A statement of knowledge, skill, ability, task or any other assertion expressing a competency that is either claimed by a person, an organization or desired or required to fulfill a role or to work in an occupation.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub skills: Option<PerforminggroupSkills<'a>>,
     /// A slogan or motto associated with the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub slogan: Option<jacquard_common::CowStr<'a>>,
     /// A person or organization that supports a thing through a pledge, promise, or financial contribution. E.g. a sponsor of a Medical Study or a corporate sponsor of an event.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub sponsor: Option<PerforminggroupSponsor<'a>>,
     /// A relationship between two organizations where the first includes the second, e.g., as a subsidiary. See also: the more specific 'department' property.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub sub_organization: Option<PerforminggroupSubOrganization<'a>>,
     /// A CreativeWork or Event about this Thing.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub subject_of: Option<PerforminggroupSubjectOf<'a>>,
     /// The Tax / Fiscal ID of the organization or person, e.g. the TIN in the US or the CIF/NIF in Spain.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub tax_id: Option<jacquard_common::CowStr<'a>>,
     /// The telephone number.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub telephone: Option<jacquard_common::CowStr<'a>>,
     /// For an [[Organization]] (typically a [[NewsMediaOrganization]]), a statement about policy on use of unnamed sources and the decision process required.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub unnamed_sources_policy: Option<PerforminggroupUnnamedSourcesPolicy<'a>>,
     /// URL of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub url: Option<jacquard_common::types::string::Uri<'a>>,
     /// The Value-added Tax ID of the organization or person.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub vat_id: Option<jacquard_common::CowStr<'a>>,
+}
+
+pub mod performinggroup_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {}
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {}
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {}
+}
+
+/// Builder for constructing an instance of this type
+pub struct PerforminggroupBuilder<'a, S: performinggroup_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<PerforminggroupAcceptedPaymentMethod<'a>>,
+        ::core::option::Option<PerforminggroupActionableFeedbackPolicy<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<PerforminggroupAddress<'a>>,
+        ::core::option::Option<PerforminggroupAgentInteractionStatistic<'a>>,
+        ::core::option::Option<PerforminggroupAggregateRating<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<PerforminggroupAlumni<'a>>,
+        ::core::option::Option<PerforminggroupAreaServed<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<PerforminggroupBrand<'a>>,
+        ::core::option::Option<PerforminggroupCompanyRegistration<'a>>,
+        ::core::option::Option<PerforminggroupContactPoint<'a>>,
+        ::core::option::Option<PerforminggroupContactPoints<'a>>,
+        ::core::option::Option<PerforminggroupCorrectionsPolicy<'a>>,
+        ::core::option::Option<PerforminggroupDepartment<'a>>,
+        ::core::option::Option<PerforminggroupDescription<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<PerforminggroupDiversityPolicy<'a>>,
+        ::core::option::Option<PerforminggroupDiversityStaffingReport<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<PerforminggroupEmployee<'a>>,
+        ::core::option::Option<PerforminggroupEmployees<'a>>,
+        ::core::option::Option<PerforminggroupEthicsPolicy<'a>>,
+        ::core::option::Option<PerforminggroupEvent<'a>>,
+        ::core::option::Option<PerforminggroupEvents<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<PerforminggroupFounder<'a>>,
+        ::core::option::Option<PerforminggroupFounders<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<PerforminggroupFoundingLocation<'a>>,
+        ::core::option::Option<PerforminggroupFunder<'a>>,
+        ::core::option::Option<PerforminggroupFunding<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<PerforminggroupHasCertification<'a>>,
+        ::core::option::Option<PerforminggroupHasCredential<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<PerforminggroupHasMemberProgram<'a>>,
+        ::core::option::Option<PerforminggroupHasMerchantReturnPolicy<'a>>,
+        ::core::option::Option<PerforminggroupHasOfferCatalog<'a>>,
+        ::core::option::Option<PerforminggroupHasPos<'a>>,
+        ::core::option::Option<PerforminggroupHasShippingService<'a>>,
+        ::core::option::Option<PerforminggroupIdentifier<'a>>,
+        ::core::option::Option<PerforminggroupImage<'a>>,
+        ::core::option::Option<PerforminggroupInteractionStatistic<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<PerforminggroupKeywords<'a>>,
+        ::core::option::Option<PerforminggroupKnowsAbout<'a>>,
+        ::core::option::Option<PerforminggroupKnowsLanguage<'a>>,
+        ::core::option::Option<PerforminggroupLegalAddress<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<PerforminggroupLegalRepresentative<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<PerforminggroupLocation<'a>>,
+        ::core::option::Option<PerforminggroupLogo<'a>>,
+        ::core::option::Option<PerforminggroupMainEntityOfPage<'a>>,
+        ::core::option::Option<PerforminggroupMakesOffer<'a>>,
+        ::core::option::Option<PerforminggroupMember<'a>>,
+        ::core::option::Option<PerforminggroupMemberOf<'a>>,
+        ::core::option::Option<PerforminggroupMembers<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<PerforminggroupNonprofitStatus<'a>>,
+        ::core::option::Option<PerforminggroupNumberOfEmployees<'a>>,
+        ::core::option::Option<PerforminggroupOwnershipFundingInfo<'a>>,
+        ::core::option::Option<PerforminggroupOwns<'a>>,
+        ::core::option::Option<PerforminggroupParentOrganization<'a>>,
+        ::core::option::Option<PerforminggroupPotentialAction<'a>>,
+        ::core::option::Option<PerforminggroupPublishingPrinciples<'a>>,
+        ::core::option::Option<PerforminggroupReview<'a>>,
+        ::core::option::Option<PerforminggroupReviews<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<PerforminggroupSeeks<'a>>,
+        ::core::option::Option<PerforminggroupServiceArea<'a>>,
+        ::core::option::Option<PerforminggroupSkills<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<PerforminggroupSponsor<'a>>,
+        ::core::option::Option<PerforminggroupSubOrganization<'a>>,
+        ::core::option::Option<PerforminggroupSubjectOf<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<PerforminggroupUnnamedSourcesPolicy<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Performinggroup<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> PerforminggroupBuilder<'a, performinggroup_state::Empty> {
+        PerforminggroupBuilder::new()
+    }
+}
+
+impl<'a> PerforminggroupBuilder<'a, performinggroup_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        PerforminggroupBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `acceptedPaymentMethod` field (optional)
+    pub fn accepted_payment_method(
+        mut self,
+        value: impl Into<Option<PerforminggroupAcceptedPaymentMethod<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `acceptedPaymentMethod` field to an Option value (optional)
+    pub fn maybe_accepted_payment_method(
+        mut self,
+        value: Option<PerforminggroupAcceptedPaymentMethod<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `actionableFeedbackPolicy` field (optional)
+    pub fn actionable_feedback_policy(
+        mut self,
+        value: impl Into<Option<PerforminggroupActionableFeedbackPolicy<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `actionableFeedbackPolicy` field to an Option value (optional)
+    pub fn maybe_actionable_feedback_policy(
+        mut self,
+        value: Option<PerforminggroupActionableFeedbackPolicy<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `additionalType` field (optional)
+    pub fn additional_type(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `additionalType` field to an Option value (optional)
+    pub fn maybe_additional_type(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `address` field (optional)
+    pub fn address(
+        mut self,
+        value: impl Into<Option<PerforminggroupAddress<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `address` field to an Option value (optional)
+    pub fn maybe_address(mut self, value: Option<PerforminggroupAddress<'a>>) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `agentInteractionStatistic` field (optional)
+    pub fn agent_interaction_statistic(
+        mut self,
+        value: impl Into<Option<PerforminggroupAgentInteractionStatistic<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `agentInteractionStatistic` field to an Option value (optional)
+    pub fn maybe_agent_interaction_statistic(
+        mut self,
+        value: Option<PerforminggroupAgentInteractionStatistic<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `aggregateRating` field (optional)
+    pub fn aggregate_rating(
+        mut self,
+        value: impl Into<Option<PerforminggroupAggregateRating<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `aggregateRating` field to an Option value (optional)
+    pub fn maybe_aggregate_rating(
+        mut self,
+        value: Option<PerforminggroupAggregateRating<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `alternateName` field (optional)
+    pub fn alternate_name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `alternateName` field to an Option value (optional)
+    pub fn maybe_alternate_name(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `alumni` field (optional)
+    pub fn alumni(
+        mut self,
+        value: impl Into<Option<PerforminggroupAlumni<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value.into();
+        self
+    }
+    /// Set the `alumni` field to an Option value (optional)
+    pub fn maybe_alumni(mut self, value: Option<PerforminggroupAlumni<'a>>) -> Self {
+        self.__unsafe_private_named.7 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `areaServed` field (optional)
+    pub fn area_served(
+        mut self,
+        value: impl Into<Option<PerforminggroupAreaServed<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value.into();
+        self
+    }
+    /// Set the `areaServed` field to an Option value (optional)
+    pub fn maybe_area_served(
+        mut self,
+        value: Option<PerforminggroupAreaServed<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `award` field (optional)
+    pub fn award(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.9 = value.into();
+        self
+    }
+    /// Set the `award` field to an Option value (optional)
+    pub fn maybe_award(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.9 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `awards` field (optional)
+    pub fn awards(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.10 = value.into();
+        self
+    }
+    /// Set the `awards` field to an Option value (optional)
+    pub fn maybe_awards(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.10 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `brand` field (optional)
+    pub fn brand(mut self, value: impl Into<Option<PerforminggroupBrand<'a>>>) -> Self {
+        self.__unsafe_private_named.11 = value.into();
+        self
+    }
+    /// Set the `brand` field to an Option value (optional)
+    pub fn maybe_brand(mut self, value: Option<PerforminggroupBrand<'a>>) -> Self {
+        self.__unsafe_private_named.11 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `companyRegistration` field (optional)
+    pub fn company_registration(
+        mut self,
+        value: impl Into<Option<PerforminggroupCompanyRegistration<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.12 = value.into();
+        self
+    }
+    /// Set the `companyRegistration` field to an Option value (optional)
+    pub fn maybe_company_registration(
+        mut self,
+        value: Option<PerforminggroupCompanyRegistration<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.12 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `contactPoint` field (optional)
+    pub fn contact_point(
+        mut self,
+        value: impl Into<Option<PerforminggroupContactPoint<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.13 = value.into();
+        self
+    }
+    /// Set the `contactPoint` field to an Option value (optional)
+    pub fn maybe_contact_point(
+        mut self,
+        value: Option<PerforminggroupContactPoint<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.13 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `contactPoints` field (optional)
+    pub fn contact_points(
+        mut self,
+        value: impl Into<Option<PerforminggroupContactPoints<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.14 = value.into();
+        self
+    }
+    /// Set the `contactPoints` field to an Option value (optional)
+    pub fn maybe_contact_points(
+        mut self,
+        value: Option<PerforminggroupContactPoints<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.14 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `correctionsPolicy` field (optional)
+    pub fn corrections_policy(
+        mut self,
+        value: impl Into<Option<PerforminggroupCorrectionsPolicy<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.15 = value.into();
+        self
+    }
+    /// Set the `correctionsPolicy` field to an Option value (optional)
+    pub fn maybe_corrections_policy(
+        mut self,
+        value: Option<PerforminggroupCorrectionsPolicy<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.15 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `department` field (optional)
+    pub fn department(
+        mut self,
+        value: impl Into<Option<PerforminggroupDepartment<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.16 = value.into();
+        self
+    }
+    /// Set the `department` field to an Option value (optional)
+    pub fn maybe_department(
+        mut self,
+        value: Option<PerforminggroupDepartment<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.16 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `description` field (optional)
+    pub fn description(
+        mut self,
+        value: impl Into<Option<PerforminggroupDescription<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.17 = value.into();
+        self
+    }
+    /// Set the `description` field to an Option value (optional)
+    pub fn maybe_description(
+        mut self,
+        value: Option<PerforminggroupDescription<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.17 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `disambiguatingDescription` field (optional)
+    pub fn disambiguating_description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.18 = value.into();
+        self
+    }
+    /// Set the `disambiguatingDescription` field to an Option value (optional)
+    pub fn maybe_disambiguating_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.18 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `dissolutionDate` field (optional)
+    pub fn dissolution_date(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.19 = value.into();
+        self
+    }
+    /// Set the `dissolutionDate` field to an Option value (optional)
+    pub fn maybe_dissolution_date(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.19 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `diversityPolicy` field (optional)
+    pub fn diversity_policy(
+        mut self,
+        value: impl Into<Option<PerforminggroupDiversityPolicy<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.20 = value.into();
+        self
+    }
+    /// Set the `diversityPolicy` field to an Option value (optional)
+    pub fn maybe_diversity_policy(
+        mut self,
+        value: Option<PerforminggroupDiversityPolicy<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.20 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `diversityStaffingReport` field (optional)
+    pub fn diversity_staffing_report(
+        mut self,
+        value: impl Into<Option<PerforminggroupDiversityStaffingReport<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.21 = value.into();
+        self
+    }
+    /// Set the `diversityStaffingReport` field to an Option value (optional)
+    pub fn maybe_diversity_staffing_report(
+        mut self,
+        value: Option<PerforminggroupDiversityStaffingReport<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.21 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `duns` field (optional)
+    pub fn duns(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.22 = value.into();
+        self
+    }
+    /// Set the `duns` field to an Option value (optional)
+    pub fn maybe_duns(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.22 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `email` field (optional)
+    pub fn email(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.23 = value.into();
+        self
+    }
+    /// Set the `email` field to an Option value (optional)
+    pub fn maybe_email(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.23 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `employee` field (optional)
+    pub fn employee(
+        mut self,
+        value: impl Into<Option<PerforminggroupEmployee<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.24 = value.into();
+        self
+    }
+    /// Set the `employee` field to an Option value (optional)
+    pub fn maybe_employee(mut self, value: Option<PerforminggroupEmployee<'a>>) -> Self {
+        self.__unsafe_private_named.24 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `employees` field (optional)
+    pub fn employees(
+        mut self,
+        value: impl Into<Option<PerforminggroupEmployees<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.25 = value.into();
+        self
+    }
+    /// Set the `employees` field to an Option value (optional)
+    pub fn maybe_employees(
+        mut self,
+        value: Option<PerforminggroupEmployees<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.25 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `ethicsPolicy` field (optional)
+    pub fn ethics_policy(
+        mut self,
+        value: impl Into<Option<PerforminggroupEthicsPolicy<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.26 = value.into();
+        self
+    }
+    /// Set the `ethicsPolicy` field to an Option value (optional)
+    pub fn maybe_ethics_policy(
+        mut self,
+        value: Option<PerforminggroupEthicsPolicy<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.26 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `event` field (optional)
+    pub fn event(mut self, value: impl Into<Option<PerforminggroupEvent<'a>>>) -> Self {
+        self.__unsafe_private_named.27 = value.into();
+        self
+    }
+    /// Set the `event` field to an Option value (optional)
+    pub fn maybe_event(mut self, value: Option<PerforminggroupEvent<'a>>) -> Self {
+        self.__unsafe_private_named.27 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `events` field (optional)
+    pub fn events(
+        mut self,
+        value: impl Into<Option<PerforminggroupEvents<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.28 = value.into();
+        self
+    }
+    /// Set the `events` field to an Option value (optional)
+    pub fn maybe_events(mut self, value: Option<PerforminggroupEvents<'a>>) -> Self {
+        self.__unsafe_private_named.28 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `faxNumber` field (optional)
+    pub fn fax_number(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.29 = value.into();
+        self
+    }
+    /// Set the `faxNumber` field to an Option value (optional)
+    pub fn maybe_fax_number(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.29 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `founder` field (optional)
+    pub fn founder(
+        mut self,
+        value: impl Into<Option<PerforminggroupFounder<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.30 = value.into();
+        self
+    }
+    /// Set the `founder` field to an Option value (optional)
+    pub fn maybe_founder(mut self, value: Option<PerforminggroupFounder<'a>>) -> Self {
+        self.__unsafe_private_named.30 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `founders` field (optional)
+    pub fn founders(
+        mut self,
+        value: impl Into<Option<PerforminggroupFounders<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.31 = value.into();
+        self
+    }
+    /// Set the `founders` field to an Option value (optional)
+    pub fn maybe_founders(mut self, value: Option<PerforminggroupFounders<'a>>) -> Self {
+        self.__unsafe_private_named.31 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `foundingDate` field (optional)
+    pub fn founding_date(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.32 = value.into();
+        self
+    }
+    /// Set the `foundingDate` field to an Option value (optional)
+    pub fn maybe_founding_date(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.32 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `foundingLocation` field (optional)
+    pub fn founding_location(
+        mut self,
+        value: impl Into<Option<PerforminggroupFoundingLocation<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.33 = value.into();
+        self
+    }
+    /// Set the `foundingLocation` field to an Option value (optional)
+    pub fn maybe_founding_location(
+        mut self,
+        value: Option<PerforminggroupFoundingLocation<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.33 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `funder` field (optional)
+    pub fn funder(
+        mut self,
+        value: impl Into<Option<PerforminggroupFunder<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.34 = value.into();
+        self
+    }
+    /// Set the `funder` field to an Option value (optional)
+    pub fn maybe_funder(mut self, value: Option<PerforminggroupFunder<'a>>) -> Self {
+        self.__unsafe_private_named.34 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `funding` field (optional)
+    pub fn funding(
+        mut self,
+        value: impl Into<Option<PerforminggroupFunding<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.35 = value.into();
+        self
+    }
+    /// Set the `funding` field to an Option value (optional)
+    pub fn maybe_funding(mut self, value: Option<PerforminggroupFunding<'a>>) -> Self {
+        self.__unsafe_private_named.35 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `globalLocationNumber` field (optional)
+    pub fn global_location_number(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.36 = value.into();
+        self
+    }
+    /// Set the `globalLocationNumber` field to an Option value (optional)
+    pub fn maybe_global_location_number(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.36 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `hasCertification` field (optional)
+    pub fn has_certification(
+        mut self,
+        value: impl Into<Option<PerforminggroupHasCertification<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.37 = value.into();
+        self
+    }
+    /// Set the `hasCertification` field to an Option value (optional)
+    pub fn maybe_has_certification(
+        mut self,
+        value: Option<PerforminggroupHasCertification<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.37 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `hasCredential` field (optional)
+    pub fn has_credential(
+        mut self,
+        value: impl Into<Option<PerforminggroupHasCredential<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.38 = value.into();
+        self
+    }
+    /// Set the `hasCredential` field to an Option value (optional)
+    pub fn maybe_has_credential(
+        mut self,
+        value: Option<PerforminggroupHasCredential<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.38 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `hasGS1DigitalLink` field (optional)
+    pub fn has_gs1_digital_link(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.39 = value.into();
+        self
+    }
+    /// Set the `hasGS1DigitalLink` field to an Option value (optional)
+    pub fn maybe_has_gs1_digital_link(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.39 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `hasMemberProgram` field (optional)
+    pub fn has_member_program(
+        mut self,
+        value: impl Into<Option<PerforminggroupHasMemberProgram<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.40 = value.into();
+        self
+    }
+    /// Set the `hasMemberProgram` field to an Option value (optional)
+    pub fn maybe_has_member_program(
+        mut self,
+        value: Option<PerforminggroupHasMemberProgram<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.40 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `hasMerchantReturnPolicy` field (optional)
+    pub fn has_merchant_return_policy(
+        mut self,
+        value: impl Into<Option<PerforminggroupHasMerchantReturnPolicy<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.41 = value.into();
+        self
+    }
+    /// Set the `hasMerchantReturnPolicy` field to an Option value (optional)
+    pub fn maybe_has_merchant_return_policy(
+        mut self,
+        value: Option<PerforminggroupHasMerchantReturnPolicy<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.41 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `hasOfferCatalog` field (optional)
+    pub fn has_offer_catalog(
+        mut self,
+        value: impl Into<Option<PerforminggroupHasOfferCatalog<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.42 = value.into();
+        self
+    }
+    /// Set the `hasOfferCatalog` field to an Option value (optional)
+    pub fn maybe_has_offer_catalog(
+        mut self,
+        value: Option<PerforminggroupHasOfferCatalog<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.42 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `hasPOS` field (optional)
+    pub fn has_pos(
+        mut self,
+        value: impl Into<Option<PerforminggroupHasPos<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.43 = value.into();
+        self
+    }
+    /// Set the `hasPOS` field to an Option value (optional)
+    pub fn maybe_has_pos(mut self, value: Option<PerforminggroupHasPos<'a>>) -> Self {
+        self.__unsafe_private_named.43 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `hasShippingService` field (optional)
+    pub fn has_shipping_service(
+        mut self,
+        value: impl Into<Option<PerforminggroupHasShippingService<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.44 = value.into();
+        self
+    }
+    /// Set the `hasShippingService` field to an Option value (optional)
+    pub fn maybe_has_shipping_service(
+        mut self,
+        value: Option<PerforminggroupHasShippingService<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.44 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `identifier` field (optional)
+    pub fn identifier(
+        mut self,
+        value: impl Into<Option<PerforminggroupIdentifier<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.45 = value.into();
+        self
+    }
+    /// Set the `identifier` field to an Option value (optional)
+    pub fn maybe_identifier(
+        mut self,
+        value: Option<PerforminggroupIdentifier<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.45 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `image` field (optional)
+    pub fn image(mut self, value: impl Into<Option<PerforminggroupImage<'a>>>) -> Self {
+        self.__unsafe_private_named.46 = value.into();
+        self
+    }
+    /// Set the `image` field to an Option value (optional)
+    pub fn maybe_image(mut self, value: Option<PerforminggroupImage<'a>>) -> Self {
+        self.__unsafe_private_named.46 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `interactionStatistic` field (optional)
+    pub fn interaction_statistic(
+        mut self,
+        value: impl Into<Option<PerforminggroupInteractionStatistic<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.47 = value.into();
+        self
+    }
+    /// Set the `interactionStatistic` field to an Option value (optional)
+    pub fn maybe_interaction_statistic(
+        mut self,
+        value: Option<PerforminggroupInteractionStatistic<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.47 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `isicV4` field (optional)
+    pub fn isic_v4(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.48 = value.into();
+        self
+    }
+    /// Set the `isicV4` field to an Option value (optional)
+    pub fn maybe_isic_v4(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.48 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `iso6523Code` field (optional)
+    pub fn iso6523_code(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.49 = value.into();
+        self
+    }
+    /// Set the `iso6523Code` field to an Option value (optional)
+    pub fn maybe_iso6523_code(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.49 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `keywords` field (optional)
+    pub fn keywords(
+        mut self,
+        value: impl Into<Option<PerforminggroupKeywords<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.50 = value.into();
+        self
+    }
+    /// Set the `keywords` field to an Option value (optional)
+    pub fn maybe_keywords(mut self, value: Option<PerforminggroupKeywords<'a>>) -> Self {
+        self.__unsafe_private_named.50 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `knowsAbout` field (optional)
+    pub fn knows_about(
+        mut self,
+        value: impl Into<Option<PerforminggroupKnowsAbout<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.51 = value.into();
+        self
+    }
+    /// Set the `knowsAbout` field to an Option value (optional)
+    pub fn maybe_knows_about(
+        mut self,
+        value: Option<PerforminggroupKnowsAbout<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.51 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `knowsLanguage` field (optional)
+    pub fn knows_language(
+        mut self,
+        value: impl Into<Option<PerforminggroupKnowsLanguage<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.52 = value.into();
+        self
+    }
+    /// Set the `knowsLanguage` field to an Option value (optional)
+    pub fn maybe_knows_language(
+        mut self,
+        value: Option<PerforminggroupKnowsLanguage<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.52 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `legalAddress` field (optional)
+    pub fn legal_address(
+        mut self,
+        value: impl Into<Option<PerforminggroupLegalAddress<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.53 = value.into();
+        self
+    }
+    /// Set the `legalAddress` field to an Option value (optional)
+    pub fn maybe_legal_address(
+        mut self,
+        value: Option<PerforminggroupLegalAddress<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.53 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `legalName` field (optional)
+    pub fn legal_name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.54 = value.into();
+        self
+    }
+    /// Set the `legalName` field to an Option value (optional)
+    pub fn maybe_legal_name(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.54 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `legalRepresentative` field (optional)
+    pub fn legal_representative(
+        mut self,
+        value: impl Into<Option<PerforminggroupLegalRepresentative<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.55 = value.into();
+        self
+    }
+    /// Set the `legalRepresentative` field to an Option value (optional)
+    pub fn maybe_legal_representative(
+        mut self,
+        value: Option<PerforminggroupLegalRepresentative<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.55 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `leiCode` field (optional)
+    pub fn lei_code(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.56 = value.into();
+        self
+    }
+    /// Set the `leiCode` field to an Option value (optional)
+    pub fn maybe_lei_code(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.56 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `location` field (optional)
+    pub fn location(
+        mut self,
+        value: impl Into<Option<PerforminggroupLocation<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.57 = value.into();
+        self
+    }
+    /// Set the `location` field to an Option value (optional)
+    pub fn maybe_location(mut self, value: Option<PerforminggroupLocation<'a>>) -> Self {
+        self.__unsafe_private_named.57 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `logo` field (optional)
+    pub fn logo(mut self, value: impl Into<Option<PerforminggroupLogo<'a>>>) -> Self {
+        self.__unsafe_private_named.58 = value.into();
+        self
+    }
+    /// Set the `logo` field to an Option value (optional)
+    pub fn maybe_logo(mut self, value: Option<PerforminggroupLogo<'a>>) -> Self {
+        self.__unsafe_private_named.58 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `mainEntityOfPage` field (optional)
+    pub fn main_entity_of_page(
+        mut self,
+        value: impl Into<Option<PerforminggroupMainEntityOfPage<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.59 = value.into();
+        self
+    }
+    /// Set the `mainEntityOfPage` field to an Option value (optional)
+    pub fn maybe_main_entity_of_page(
+        mut self,
+        value: Option<PerforminggroupMainEntityOfPage<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.59 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `makesOffer` field (optional)
+    pub fn makes_offer(
+        mut self,
+        value: impl Into<Option<PerforminggroupMakesOffer<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.60 = value.into();
+        self
+    }
+    /// Set the `makesOffer` field to an Option value (optional)
+    pub fn maybe_makes_offer(
+        mut self,
+        value: Option<PerforminggroupMakesOffer<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.60 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `member` field (optional)
+    pub fn member(
+        mut self,
+        value: impl Into<Option<PerforminggroupMember<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.61 = value.into();
+        self
+    }
+    /// Set the `member` field to an Option value (optional)
+    pub fn maybe_member(mut self, value: Option<PerforminggroupMember<'a>>) -> Self {
+        self.__unsafe_private_named.61 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `memberOf` field (optional)
+    pub fn member_of(
+        mut self,
+        value: impl Into<Option<PerforminggroupMemberOf<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.62 = value.into();
+        self
+    }
+    /// Set the `memberOf` field to an Option value (optional)
+    pub fn maybe_member_of(
+        mut self,
+        value: Option<PerforminggroupMemberOf<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.62 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `members` field (optional)
+    pub fn members(
+        mut self,
+        value: impl Into<Option<PerforminggroupMembers<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.63 = value.into();
+        self
+    }
+    /// Set the `members` field to an Option value (optional)
+    pub fn maybe_members(mut self, value: Option<PerforminggroupMembers<'a>>) -> Self {
+        self.__unsafe_private_named.63 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `naics` field (optional)
+    pub fn naics(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.64 = value.into();
+        self
+    }
+    /// Set the `naics` field to an Option value (optional)
+    pub fn maybe_naics(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.64 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `name` field (optional)
+    pub fn name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.65 = value.into();
+        self
+    }
+    /// Set the `name` field to an Option value (optional)
+    pub fn maybe_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.65 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `nonprofitStatus` field (optional)
+    pub fn nonprofit_status(
+        mut self,
+        value: impl Into<Option<PerforminggroupNonprofitStatus<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.66 = value.into();
+        self
+    }
+    /// Set the `nonprofitStatus` field to an Option value (optional)
+    pub fn maybe_nonprofit_status(
+        mut self,
+        value: Option<PerforminggroupNonprofitStatus<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.66 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `numberOfEmployees` field (optional)
+    pub fn number_of_employees(
+        mut self,
+        value: impl Into<Option<PerforminggroupNumberOfEmployees<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.67 = value.into();
+        self
+    }
+    /// Set the `numberOfEmployees` field to an Option value (optional)
+    pub fn maybe_number_of_employees(
+        mut self,
+        value: Option<PerforminggroupNumberOfEmployees<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.67 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `ownershipFundingInfo` field (optional)
+    pub fn ownership_funding_info(
+        mut self,
+        value: impl Into<Option<PerforminggroupOwnershipFundingInfo<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.68 = value.into();
+        self
+    }
+    /// Set the `ownershipFundingInfo` field to an Option value (optional)
+    pub fn maybe_ownership_funding_info(
+        mut self,
+        value: Option<PerforminggroupOwnershipFundingInfo<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.68 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `owns` field (optional)
+    pub fn owns(mut self, value: impl Into<Option<PerforminggroupOwns<'a>>>) -> Self {
+        self.__unsafe_private_named.69 = value.into();
+        self
+    }
+    /// Set the `owns` field to an Option value (optional)
+    pub fn maybe_owns(mut self, value: Option<PerforminggroupOwns<'a>>) -> Self {
+        self.__unsafe_private_named.69 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `parentOrganization` field (optional)
+    pub fn parent_organization(
+        mut self,
+        value: impl Into<Option<PerforminggroupParentOrganization<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.70 = value.into();
+        self
+    }
+    /// Set the `parentOrganization` field to an Option value (optional)
+    pub fn maybe_parent_organization(
+        mut self,
+        value: Option<PerforminggroupParentOrganization<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.70 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `potentialAction` field (optional)
+    pub fn potential_action(
+        mut self,
+        value: impl Into<Option<PerforminggroupPotentialAction<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.71 = value.into();
+        self
+    }
+    /// Set the `potentialAction` field to an Option value (optional)
+    pub fn maybe_potential_action(
+        mut self,
+        value: Option<PerforminggroupPotentialAction<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.71 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `publishingPrinciples` field (optional)
+    pub fn publishing_principles(
+        mut self,
+        value: impl Into<Option<PerforminggroupPublishingPrinciples<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.72 = value.into();
+        self
+    }
+    /// Set the `publishingPrinciples` field to an Option value (optional)
+    pub fn maybe_publishing_principles(
+        mut self,
+        value: Option<PerforminggroupPublishingPrinciples<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.72 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `review` field (optional)
+    pub fn review(
+        mut self,
+        value: impl Into<Option<PerforminggroupReview<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.73 = value.into();
+        self
+    }
+    /// Set the `review` field to an Option value (optional)
+    pub fn maybe_review(mut self, value: Option<PerforminggroupReview<'a>>) -> Self {
+        self.__unsafe_private_named.73 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `reviews` field (optional)
+    pub fn reviews(
+        mut self,
+        value: impl Into<Option<PerforminggroupReviews<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.74 = value.into();
+        self
+    }
+    /// Set the `reviews` field to an Option value (optional)
+    pub fn maybe_reviews(mut self, value: Option<PerforminggroupReviews<'a>>) -> Self {
+        self.__unsafe_private_named.74 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `sameAs` field (optional)
+    pub fn same_as(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.75 = value.into();
+        self
+    }
+    /// Set the `sameAs` field to an Option value (optional)
+    pub fn maybe_same_as(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.75 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `seeks` field (optional)
+    pub fn seeks(mut self, value: impl Into<Option<PerforminggroupSeeks<'a>>>) -> Self {
+        self.__unsafe_private_named.76 = value.into();
+        self
+    }
+    /// Set the `seeks` field to an Option value (optional)
+    pub fn maybe_seeks(mut self, value: Option<PerforminggroupSeeks<'a>>) -> Self {
+        self.__unsafe_private_named.76 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `serviceArea` field (optional)
+    pub fn service_area(
+        mut self,
+        value: impl Into<Option<PerforminggroupServiceArea<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.77 = value.into();
+        self
+    }
+    /// Set the `serviceArea` field to an Option value (optional)
+    pub fn maybe_service_area(
+        mut self,
+        value: Option<PerforminggroupServiceArea<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.77 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `skills` field (optional)
+    pub fn skills(
+        mut self,
+        value: impl Into<Option<PerforminggroupSkills<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.78 = value.into();
+        self
+    }
+    /// Set the `skills` field to an Option value (optional)
+    pub fn maybe_skills(mut self, value: Option<PerforminggroupSkills<'a>>) -> Self {
+        self.__unsafe_private_named.78 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `slogan` field (optional)
+    pub fn slogan(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.79 = value.into();
+        self
+    }
+    /// Set the `slogan` field to an Option value (optional)
+    pub fn maybe_slogan(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.79 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `sponsor` field (optional)
+    pub fn sponsor(
+        mut self,
+        value: impl Into<Option<PerforminggroupSponsor<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.80 = value.into();
+        self
+    }
+    /// Set the `sponsor` field to an Option value (optional)
+    pub fn maybe_sponsor(mut self, value: Option<PerforminggroupSponsor<'a>>) -> Self {
+        self.__unsafe_private_named.80 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `subOrganization` field (optional)
+    pub fn sub_organization(
+        mut self,
+        value: impl Into<Option<PerforminggroupSubOrganization<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.81 = value.into();
+        self
+    }
+    /// Set the `subOrganization` field to an Option value (optional)
+    pub fn maybe_sub_organization(
+        mut self,
+        value: Option<PerforminggroupSubOrganization<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.81 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `subjectOf` field (optional)
+    pub fn subject_of(
+        mut self,
+        value: impl Into<Option<PerforminggroupSubjectOf<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.82 = value.into();
+        self
+    }
+    /// Set the `subjectOf` field to an Option value (optional)
+    pub fn maybe_subject_of(
+        mut self,
+        value: Option<PerforminggroupSubjectOf<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.82 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `taxID` field (optional)
+    pub fn tax_id(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.83 = value.into();
+        self
+    }
+    /// Set the `taxID` field to an Option value (optional)
+    pub fn maybe_tax_id(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.83 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `telephone` field (optional)
+    pub fn telephone(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.84 = value.into();
+        self
+    }
+    /// Set the `telephone` field to an Option value (optional)
+    pub fn maybe_telephone(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.84 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `unnamedSourcesPolicy` field (optional)
+    pub fn unnamed_sources_policy(
+        mut self,
+        value: impl Into<Option<PerforminggroupUnnamedSourcesPolicy<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.85 = value.into();
+        self
+    }
+    /// Set the `unnamedSourcesPolicy` field to an Option value (optional)
+    pub fn maybe_unnamed_sources_policy(
+        mut self,
+        value: Option<PerforminggroupUnnamedSourcesPolicy<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.85 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `url` field (optional)
+    pub fn url(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.86 = value.into();
+        self
+    }
+    /// Set the `url` field to an Option value (optional)
+    pub fn maybe_url(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.86 = value;
+        self
+    }
+}
+
+impl<'a, S: performinggroup_state::State> PerforminggroupBuilder<'a, S> {
+    /// Set the `vatID` field (optional)
+    pub fn vat_id(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.87 = value.into();
+        self
+    }
+    /// Set the `vatID` field to an Option value (optional)
+    pub fn maybe_vat_id(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.87 = value;
+        self
+    }
+}
+
+impl<'a, S> PerforminggroupBuilder<'a, S>
+where
+    S: performinggroup_state::State,
+{
+    /// Build the final struct
+    pub fn build(self) -> Performinggroup<'a> {
+        Performinggroup {
+            accepted_payment_method: self.__unsafe_private_named.0,
+            actionable_feedback_policy: self.__unsafe_private_named.1,
+            additional_type: self.__unsafe_private_named.2,
+            address: self.__unsafe_private_named.3,
+            agent_interaction_statistic: self.__unsafe_private_named.4,
+            aggregate_rating: self.__unsafe_private_named.5,
+            alternate_name: self.__unsafe_private_named.6,
+            alumni: self.__unsafe_private_named.7,
+            area_served: self.__unsafe_private_named.8,
+            award: self.__unsafe_private_named.9,
+            awards: self.__unsafe_private_named.10,
+            brand: self.__unsafe_private_named.11,
+            company_registration: self.__unsafe_private_named.12,
+            contact_point: self.__unsafe_private_named.13,
+            contact_points: self.__unsafe_private_named.14,
+            corrections_policy: self.__unsafe_private_named.15,
+            department: self.__unsafe_private_named.16,
+            description: self.__unsafe_private_named.17,
+            disambiguating_description: self.__unsafe_private_named.18,
+            dissolution_date: self.__unsafe_private_named.19,
+            diversity_policy: self.__unsafe_private_named.20,
+            diversity_staffing_report: self.__unsafe_private_named.21,
+            duns: self.__unsafe_private_named.22,
+            email: self.__unsafe_private_named.23,
+            employee: self.__unsafe_private_named.24,
+            employees: self.__unsafe_private_named.25,
+            ethics_policy: self.__unsafe_private_named.26,
+            event: self.__unsafe_private_named.27,
+            events: self.__unsafe_private_named.28,
+            fax_number: self.__unsafe_private_named.29,
+            founder: self.__unsafe_private_named.30,
+            founders: self.__unsafe_private_named.31,
+            founding_date: self.__unsafe_private_named.32,
+            founding_location: self.__unsafe_private_named.33,
+            funder: self.__unsafe_private_named.34,
+            funding: self.__unsafe_private_named.35,
+            global_location_number: self.__unsafe_private_named.36,
+            has_certification: self.__unsafe_private_named.37,
+            has_credential: self.__unsafe_private_named.38,
+            has_gs1_digital_link: self.__unsafe_private_named.39,
+            has_member_program: self.__unsafe_private_named.40,
+            has_merchant_return_policy: self.__unsafe_private_named.41,
+            has_offer_catalog: self.__unsafe_private_named.42,
+            has_pos: self.__unsafe_private_named.43,
+            has_shipping_service: self.__unsafe_private_named.44,
+            identifier: self.__unsafe_private_named.45,
+            image: self.__unsafe_private_named.46,
+            interaction_statistic: self.__unsafe_private_named.47,
+            isic_v4: self.__unsafe_private_named.48,
+            iso6523_code: self.__unsafe_private_named.49,
+            keywords: self.__unsafe_private_named.50,
+            knows_about: self.__unsafe_private_named.51,
+            knows_language: self.__unsafe_private_named.52,
+            legal_address: self.__unsafe_private_named.53,
+            legal_name: self.__unsafe_private_named.54,
+            legal_representative: self.__unsafe_private_named.55,
+            lei_code: self.__unsafe_private_named.56,
+            location: self.__unsafe_private_named.57,
+            logo: self.__unsafe_private_named.58,
+            main_entity_of_page: self.__unsafe_private_named.59,
+            makes_offer: self.__unsafe_private_named.60,
+            member: self.__unsafe_private_named.61,
+            member_of: self.__unsafe_private_named.62,
+            members: self.__unsafe_private_named.63,
+            naics: self.__unsafe_private_named.64,
+            name: self.__unsafe_private_named.65,
+            nonprofit_status: self.__unsafe_private_named.66,
+            number_of_employees: self.__unsafe_private_named.67,
+            ownership_funding_info: self.__unsafe_private_named.68,
+            owns: self.__unsafe_private_named.69,
+            parent_organization: self.__unsafe_private_named.70,
+            potential_action: self.__unsafe_private_named.71,
+            publishing_principles: self.__unsafe_private_named.72,
+            review: self.__unsafe_private_named.73,
+            reviews: self.__unsafe_private_named.74,
+            same_as: self.__unsafe_private_named.75,
+            seeks: self.__unsafe_private_named.76,
+            service_area: self.__unsafe_private_named.77,
+            skills: self.__unsafe_private_named.78,
+            slogan: self.__unsafe_private_named.79,
+            sponsor: self.__unsafe_private_named.80,
+            sub_organization: self.__unsafe_private_named.81,
+            subject_of: self.__unsafe_private_named.82,
+            tax_id: self.__unsafe_private_named.83,
+            telephone: self.__unsafe_private_named.84,
+            unnamed_sources_policy: self.__unsafe_private_named.85,
+            url: self.__unsafe_private_named.86,
+            vat_id: self.__unsafe_private_named.87,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Performinggroup<'a> {
+        Performinggroup {
+            accepted_payment_method: self.__unsafe_private_named.0,
+            actionable_feedback_policy: self.__unsafe_private_named.1,
+            additional_type: self.__unsafe_private_named.2,
+            address: self.__unsafe_private_named.3,
+            agent_interaction_statistic: self.__unsafe_private_named.4,
+            aggregate_rating: self.__unsafe_private_named.5,
+            alternate_name: self.__unsafe_private_named.6,
+            alumni: self.__unsafe_private_named.7,
+            area_served: self.__unsafe_private_named.8,
+            award: self.__unsafe_private_named.9,
+            awards: self.__unsafe_private_named.10,
+            brand: self.__unsafe_private_named.11,
+            company_registration: self.__unsafe_private_named.12,
+            contact_point: self.__unsafe_private_named.13,
+            contact_points: self.__unsafe_private_named.14,
+            corrections_policy: self.__unsafe_private_named.15,
+            department: self.__unsafe_private_named.16,
+            description: self.__unsafe_private_named.17,
+            disambiguating_description: self.__unsafe_private_named.18,
+            dissolution_date: self.__unsafe_private_named.19,
+            diversity_policy: self.__unsafe_private_named.20,
+            diversity_staffing_report: self.__unsafe_private_named.21,
+            duns: self.__unsafe_private_named.22,
+            email: self.__unsafe_private_named.23,
+            employee: self.__unsafe_private_named.24,
+            employees: self.__unsafe_private_named.25,
+            ethics_policy: self.__unsafe_private_named.26,
+            event: self.__unsafe_private_named.27,
+            events: self.__unsafe_private_named.28,
+            fax_number: self.__unsafe_private_named.29,
+            founder: self.__unsafe_private_named.30,
+            founders: self.__unsafe_private_named.31,
+            founding_date: self.__unsafe_private_named.32,
+            founding_location: self.__unsafe_private_named.33,
+            funder: self.__unsafe_private_named.34,
+            funding: self.__unsafe_private_named.35,
+            global_location_number: self.__unsafe_private_named.36,
+            has_certification: self.__unsafe_private_named.37,
+            has_credential: self.__unsafe_private_named.38,
+            has_gs1_digital_link: self.__unsafe_private_named.39,
+            has_member_program: self.__unsafe_private_named.40,
+            has_merchant_return_policy: self.__unsafe_private_named.41,
+            has_offer_catalog: self.__unsafe_private_named.42,
+            has_pos: self.__unsafe_private_named.43,
+            has_shipping_service: self.__unsafe_private_named.44,
+            identifier: self.__unsafe_private_named.45,
+            image: self.__unsafe_private_named.46,
+            interaction_statistic: self.__unsafe_private_named.47,
+            isic_v4: self.__unsafe_private_named.48,
+            iso6523_code: self.__unsafe_private_named.49,
+            keywords: self.__unsafe_private_named.50,
+            knows_about: self.__unsafe_private_named.51,
+            knows_language: self.__unsafe_private_named.52,
+            legal_address: self.__unsafe_private_named.53,
+            legal_name: self.__unsafe_private_named.54,
+            legal_representative: self.__unsafe_private_named.55,
+            lei_code: self.__unsafe_private_named.56,
+            location: self.__unsafe_private_named.57,
+            logo: self.__unsafe_private_named.58,
+            main_entity_of_page: self.__unsafe_private_named.59,
+            makes_offer: self.__unsafe_private_named.60,
+            member: self.__unsafe_private_named.61,
+            member_of: self.__unsafe_private_named.62,
+            members: self.__unsafe_private_named.63,
+            naics: self.__unsafe_private_named.64,
+            name: self.__unsafe_private_named.65,
+            nonprofit_status: self.__unsafe_private_named.66,
+            number_of_employees: self.__unsafe_private_named.67,
+            ownership_funding_info: self.__unsafe_private_named.68,
+            owns: self.__unsafe_private_named.69,
+            parent_organization: self.__unsafe_private_named.70,
+            potential_action: self.__unsafe_private_named.71,
+            publishing_principles: self.__unsafe_private_named.72,
+            review: self.__unsafe_private_named.73,
+            reviews: self.__unsafe_private_named.74,
+            same_as: self.__unsafe_private_named.75,
+            seeks: self.__unsafe_private_named.76,
+            service_area: self.__unsafe_private_named.77,
+            skills: self.__unsafe_private_named.78,
+            slogan: self.__unsafe_private_named.79,
+            sponsor: self.__unsafe_private_named.80,
+            sub_organization: self.__unsafe_private_named.81,
+            subject_of: self.__unsafe_private_named.82,
+            tax_id: self.__unsafe_private_named.83,
+            telephone: self.__unsafe_private_named.84,
+            unnamed_sources_policy: self.__unsafe_private_named.85,
+            url: self.__unsafe_private_named.86,
+            vat_id: self.__unsafe_private_named.87,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Performinggroup<'a> {

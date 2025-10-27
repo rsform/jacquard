@@ -14,409 +14,1964 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Person<'a> {
     /// An additional name for a Person, can be used for a middle name.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub additional_name: Option<jacquard_common::CowStr<'a>>,
     /** An additional type for the item, typically used for adding more specific types from external vocabularies in microdata syntax. This is a relationship between something and a class that the thing is in. Typically the value is a URI-identified RDF class, and in this case corresponds to the
     use of rdf:type in RDF. Text values can be used sparingly, for cases where useful information can be added without their being an appropriate schema to reference. In the case of text values, the class label should follow the schema.org <a href="https://schema.org/docs/styleguide.html">style guide</a>.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub additional_type: Option<jacquard_common::CowStr<'a>>,
     /// Physical address of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub address: Option<PersonAddress<'a>>,
     /// An organization that this person is affiliated with. For example, a school/university, a club, or a team.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub affiliation: Option<PersonAffiliation<'a>>,
     /// The number of completed interactions for this entity, in a particular role (the 'agent'), in a particular action (indicated in the statistic), and in a particular context (i.e. interactionService).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub agent_interaction_statistic: Option<PersonAgentInteractionStatistic<'a>>,
     /// An alias for the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub alternate_name: Option<jacquard_common::CowStr<'a>>,
     /// An organization that the person is an alumni of.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub alumni_of: Option<PersonAlumniOf<'a>>,
     /// An award won by or for this item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub award: Option<jacquard_common::CowStr<'a>>,
     /// Awards won by or for this item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub awards: Option<jacquard_common::CowStr<'a>>,
     /// Date of birth.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub birth_date: Option<jacquard_common::types::string::Datetime>,
     /// The place where the person was born.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub birth_place: Option<PersonBirthPlace<'a>>,
     /// The brand(s) associated with a product or service, or the brand(s) maintained by an organization or business person.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub brand: Option<PersonBrand<'a>>,
     /// A [callsign](https://en.wikipedia.org/wiki/Call_sign), as used in broadcasting and radio communications to identify people, radio and TV stations, or vehicles.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub call_sign: Option<jacquard_common::CowStr<'a>>,
     /// A child of the person.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub children: Option<PersonChildren<'a>>,
     /// A colleague of the person.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub colleague: Option<PersonColleague<'a>>,
     /// A colleague of the person.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub colleagues: Option<PersonColleagues<'a>>,
     /// A contact point for a person or organization.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub contact_point: Option<PersonContactPoint<'a>>,
     /// A contact point for a person or organization.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub contact_points: Option<PersonContactPoints<'a>>,
     /// Date of death.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub death_date: Option<jacquard_common::types::string::Datetime>,
     /// The place where the person died.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub death_place: Option<PersonDeathPlace<'a>>,
     /// A description of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub description: Option<PersonDescription<'a>>,
     /// A sub property of description. A short description of the item used to disambiguate from other, similar items. Information from other properties (in particular, name) may be necessary for the description to be useful for disambiguation.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub disambiguating_description: Option<jacquard_common::CowStr<'a>>,
     /// The Dun & Bradstreet DUNS number for identifying an organization or business person.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub duns: Option<jacquard_common::CowStr<'a>>,
     /// Email address.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub email: Option<jacquard_common::CowStr<'a>>,
     /// Family name. In the U.S., the last name of a Person.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub family_name: Option<jacquard_common::CowStr<'a>>,
     /// The fax number.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub fax_number: Option<jacquard_common::CowStr<'a>>,
     /// The most generic uni-directional social relation.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub follows: Option<PersonFollows<'a>>,
     /// A person or organization that supports (sponsors) something through some kind of financial contribution.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub funder: Option<PersonFunder<'a>>,
     /// A [[Grant]] that directly or indirectly provide funding or sponsorship for this item. See also [[ownershipFundingInfo]].
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub funding: Option<PersonFunding<'a>>,
     /// Gender of something, typically a [[Person]], but possibly also fictional characters, animals, etc. While https://schema.org/Male and https://schema.org/Female may be used, text strings are also acceptable for people who are not a binary gender. The [[gender]] property can also be used in an extended sense to cover e.g. the gender of sports teams. As with the gender of individuals, we do not try to enumerate all possibilities. A mixed-gender [[SportsTeam]] can be indicated with a text value of "Mixed".
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub gender: Option<PersonGender<'a>>,
     /// Given name. In the U.S., the first name of a Person.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub given_name: Option<jacquard_common::CowStr<'a>>,
     /// The [Global Location Number](http://www.gs1.org/gln) (GLN, sometimes also referred to as International Location Number or ILN) of the respective organization, person, or place. The GLN is a 13-digit number used to identify parties and physical locations.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub global_location_number: Option<jacquard_common::CowStr<'a>>,
     /// Certification information about a product, organization, service, place, or person.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub has_certification: Option<PersonHasCertification<'a>>,
     /// A credential awarded to the Person or Organization.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub has_credential: Option<PersonHasCredential<'a>>,
     /// The Person's occupation. For past professions, use Role for expressing dates.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub has_occupation: Option<PersonHasOccupation<'a>>,
     /// Indicates an OfferCatalog listing for this Organization, Person, or Service.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub has_offer_catalog: Option<PersonHasOfferCatalog<'a>>,
     /// Points-of-Sales operated by the organization or person.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub has_pos: Option<PersonHasPos<'a>>,
     /// The height of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub height: Option<PersonHeight<'a>>,
     /// A contact location for a person's residence.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub home_location: Option<PersonHomeLocation<'a>>,
     /// An honorific prefix preceding a Person's name such as Dr/Mrs/Mr.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub honorific_prefix: Option<jacquard_common::CowStr<'a>>,
     /// An honorific suffix following a Person's name such as M.D./PhD/MSCSW.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub honorific_suffix: Option<jacquard_common::CowStr<'a>>,
     /// The identifier property represents any kind of identifier for any kind of [[Thing]], such as ISBNs, GTIN codes, UUIDs etc. Schema.org provides dedicated properties for representing many of these, either as textual strings or as URL (URI) links. See [background notes](/docs/datamodel.html#identifierBg) for more details.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub identifier: Option<PersonIdentifier<'a>>,
     /// An image of the item. This can be a [[URL]] or a fully described [[ImageObject]].
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub image: Option<PersonImage<'a>>,
     /// The number of interactions for the CreativeWork using the WebSite or SoftwareApplication. The most specific child type of InteractionCounter should be used.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub interaction_statistic: Option<PersonInteractionStatistic<'a>>,
     /// The International Standard of Industrial Classification of All Economic Activities (ISIC), Revision 4 code for a particular organization, business person, or place.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub isic_v4: Option<jacquard_common::CowStr<'a>>,
     /// The job title of the person (for example, Financial Manager).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub job_title: Option<PersonJobTitle<'a>>,
     /// The most generic bi-directional social/work relation.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub knows: Option<PersonKnows<'a>>,
     /// Of a [[Person]], and less typically of an [[Organization]], to indicate a topic that is known about - suggesting possible expertise but not implying it. We do not distinguish skill levels here, or relate this to educational content, events, objectives or [[JobPosting]] descriptions.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub knows_about: Option<PersonKnowsAbout<'a>>,
     /// Of a [[Person]], and less typically of an [[Organization]], to indicate a known language. We do not distinguish skill levels or reading/writing/speaking/signing here. Use language codes from the [IETF BCP 47 standard](http://tools.ietf.org/html/bcp47).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub knows_language: Option<PersonKnowsLanguage<'a>>,
     /// Indicates a page (or other CreativeWork) for which this thing is the main entity being described. See [background notes](/docs/datamodel.html#mainEntityBackground) for details.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub main_entity_of_page: Option<PersonMainEntityOfPage<'a>>,
     /// A pointer to products or services offered by the organization or person.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub makes_offer: Option<PersonMakesOffer<'a>>,
     /// An Organization (or ProgramMembership) to which this Person or Organization belongs.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub member_of: Option<PersonMemberOf<'a>>,
     /// The North American Industry Classification System (NAICS) code for a particular organization or business person.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub naics: Option<jacquard_common::CowStr<'a>>,
     /// The name of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub name: Option<jacquard_common::CowStr<'a>>,
     /// Nationality of the person.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub nationality: Option<PersonNationality<'a>>,
     /// The total financial value of the person as calculated by subtracting the total value of liabilities from the total value of assets.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub net_worth: Option<PersonNetWorth<'a>>,
     /// Products owned by the organization or person.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub owns: Option<PersonOwns<'a>>,
     /// A parent of this person.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub parent: Option<PersonParent<'a>>,
     /// A parents of the person.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub parents: Option<PersonParents<'a>>,
     /// Event that this person is a performer or participant in.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub performer_in: Option<PersonPerformerIn<'a>>,
     /// Indicates a potential Action, which describes an idealized action in which this thing would play an 'object' role.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub potential_action: Option<PersonPotentialAction<'a>>,
     /** A short string listing or describing pronouns for a person. Typically the person concerned is the best authority as pronouns are a critical part of personal identity and expression. Publishers and consumers of this information are reminded to treat this data responsibly, take country-specific laws related to gender expression into account, and be wary of out-of-date data and drawing unwarranted inferences about the person being described.
 
 In English, formulations such as "they/them", "she/her", and "he/him" are commonly used online and can also be used here. We do not intend to enumerate all possible micro-syntaxes in all languages. More structured and well-defined external values for pronouns can be referenced using the [[StructuredValue]] or [[DefinedTerm]] values.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub pronouns: Option<PersonPronouns<'a>>,
     /** The publishingPrinciples property indicates (typically via [[URL]]) a document describing the editorial principles of an [[Organization]] (or individual, e.g. a [[Person]] writing a blog) that relate to their activities as a publisher, e.g. ethics or diversity policies. When applied to a [[CreativeWork]] (e.g. [[NewsArticle]]) the principles are those of the party primarily responsible for the creation of the [[CreativeWork]].
 
 While such policies are most typically expressed in natural language, sometimes related information (e.g. indicating a [[funder]]) can be expressed using schema.org terminology.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub publishing_principles: Option<PersonPublishingPrinciples<'a>>,
     /// The most generic familial relation.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub related_to: Option<PersonRelatedTo<'a>>,
     /// URL of a reference Web page that unambiguously indicates the item's identity. E.g. the URL of the item's Wikipedia page, Wikidata entry, or official website.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub same_as: Option<jacquard_common::types::string::Uri<'a>>,
     /// A pointer to products or services sought by the organization or person (demand).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub seeks: Option<PersonSeeks<'a>>,
     /// A sibling of the person.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub sibling: Option<PersonSibling<'a>>,
     /// A sibling of the person.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub siblings: Option<PersonSiblings<'a>>,
     /// A statement of knowledge, skill, ability, task or any other assertion expressing a competency that is either claimed by a person, an organization or desired or required to fulfill a role or to work in an occupation.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub skills: Option<PersonSkills<'a>>,
     /// A person or organization that supports a thing through a pledge, promise, or financial contribution. E.g. a sponsor of a Medical Study or a corporate sponsor of an event.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub sponsor: Option<PersonSponsor<'a>>,
     /// The person's spouse.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub spouse: Option<PersonSpouse<'a>>,
     /// A CreativeWork or Event about this Thing.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub subject_of: Option<PersonSubjectOf<'a>>,
     /// The Tax / Fiscal ID of the organization or person, e.g. the TIN in the US or the CIF/NIF in Spain.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub tax_id: Option<jacquard_common::CowStr<'a>>,
     /// The telephone number.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub telephone: Option<jacquard_common::CowStr<'a>>,
     /// URL of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub url: Option<jacquard_common::types::string::Uri<'a>>,
     /// The Value-added Tax ID of the organization or person.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub vat_id: Option<jacquard_common::CowStr<'a>>,
     /// The weight of the product or person.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub weight: Option<PersonWeight<'a>>,
     /// A contact location for a person's place of work.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub work_location: Option<PersonWorkLocation<'a>>,
     /// Organizations that the person works for.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub works_for: Option<PersonWorksFor<'a>>,
+}
+
+pub mod person_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {}
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {}
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {}
+}
+
+/// Builder for constructing an instance of this type
+pub struct PersonBuilder<'a, S: person_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<PersonAddress<'a>>,
+        ::core::option::Option<PersonAffiliation<'a>>,
+        ::core::option::Option<PersonAgentInteractionStatistic<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<PersonAlumniOf<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<PersonBirthPlace<'a>>,
+        ::core::option::Option<PersonBrand<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<PersonChildren<'a>>,
+        ::core::option::Option<PersonColleague<'a>>,
+        ::core::option::Option<PersonColleagues<'a>>,
+        ::core::option::Option<PersonContactPoint<'a>>,
+        ::core::option::Option<PersonContactPoints<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<PersonDeathPlace<'a>>,
+        ::core::option::Option<PersonDescription<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<PersonFollows<'a>>,
+        ::core::option::Option<PersonFunder<'a>>,
+        ::core::option::Option<PersonFunding<'a>>,
+        ::core::option::Option<PersonGender<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<PersonHasCertification<'a>>,
+        ::core::option::Option<PersonHasCredential<'a>>,
+        ::core::option::Option<PersonHasOccupation<'a>>,
+        ::core::option::Option<PersonHasOfferCatalog<'a>>,
+        ::core::option::Option<PersonHasPos<'a>>,
+        ::core::option::Option<PersonHeight<'a>>,
+        ::core::option::Option<PersonHomeLocation<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<PersonIdentifier<'a>>,
+        ::core::option::Option<PersonImage<'a>>,
+        ::core::option::Option<PersonInteractionStatistic<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<PersonJobTitle<'a>>,
+        ::core::option::Option<PersonKnows<'a>>,
+        ::core::option::Option<PersonKnowsAbout<'a>>,
+        ::core::option::Option<PersonKnowsLanguage<'a>>,
+        ::core::option::Option<PersonMainEntityOfPage<'a>>,
+        ::core::option::Option<PersonMakesOffer<'a>>,
+        ::core::option::Option<PersonMemberOf<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<PersonNationality<'a>>,
+        ::core::option::Option<PersonNetWorth<'a>>,
+        ::core::option::Option<PersonOwns<'a>>,
+        ::core::option::Option<PersonParent<'a>>,
+        ::core::option::Option<PersonParents<'a>>,
+        ::core::option::Option<PersonPerformerIn<'a>>,
+        ::core::option::Option<PersonPotentialAction<'a>>,
+        ::core::option::Option<PersonPronouns<'a>>,
+        ::core::option::Option<PersonPublishingPrinciples<'a>>,
+        ::core::option::Option<PersonRelatedTo<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<PersonSeeks<'a>>,
+        ::core::option::Option<PersonSibling<'a>>,
+        ::core::option::Option<PersonSiblings<'a>>,
+        ::core::option::Option<PersonSkills<'a>>,
+        ::core::option::Option<PersonSponsor<'a>>,
+        ::core::option::Option<PersonSpouse<'a>>,
+        ::core::option::Option<PersonSubjectOf<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<PersonWeight<'a>>,
+        ::core::option::Option<PersonWorkLocation<'a>>,
+        ::core::option::Option<PersonWorksFor<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Person<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> PersonBuilder<'a, person_state::Empty> {
+        PersonBuilder::new()
+    }
+}
+
+impl<'a> PersonBuilder<'a, person_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        PersonBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `additionalName` field (optional)
+    pub fn additional_name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `additionalName` field to an Option value (optional)
+    pub fn maybe_additional_name(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `additionalType` field (optional)
+    pub fn additional_type(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `additionalType` field to an Option value (optional)
+    pub fn maybe_additional_type(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `address` field (optional)
+    pub fn address(mut self, value: impl Into<Option<PersonAddress<'a>>>) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `address` field to an Option value (optional)
+    pub fn maybe_address(mut self, value: Option<PersonAddress<'a>>) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `affiliation` field (optional)
+    pub fn affiliation(
+        mut self,
+        value: impl Into<Option<PersonAffiliation<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `affiliation` field to an Option value (optional)
+    pub fn maybe_affiliation(mut self, value: Option<PersonAffiliation<'a>>) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `agentInteractionStatistic` field (optional)
+    pub fn agent_interaction_statistic(
+        mut self,
+        value: impl Into<Option<PersonAgentInteractionStatistic<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `agentInteractionStatistic` field to an Option value (optional)
+    pub fn maybe_agent_interaction_statistic(
+        mut self,
+        value: Option<PersonAgentInteractionStatistic<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `alternateName` field (optional)
+    pub fn alternate_name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `alternateName` field to an Option value (optional)
+    pub fn maybe_alternate_name(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `alumniOf` field (optional)
+    pub fn alumni_of(mut self, value: impl Into<Option<PersonAlumniOf<'a>>>) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `alumniOf` field to an Option value (optional)
+    pub fn maybe_alumni_of(mut self, value: Option<PersonAlumniOf<'a>>) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `award` field (optional)
+    pub fn award(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value.into();
+        self
+    }
+    /// Set the `award` field to an Option value (optional)
+    pub fn maybe_award(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.7 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `awards` field (optional)
+    pub fn awards(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value.into();
+        self
+    }
+    /// Set the `awards` field to an Option value (optional)
+    pub fn maybe_awards(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.8 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `birthDate` field (optional)
+    pub fn birth_date(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.9 = value.into();
+        self
+    }
+    /// Set the `birthDate` field to an Option value (optional)
+    pub fn maybe_birth_date(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.9 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `birthPlace` field (optional)
+    pub fn birth_place(
+        mut self,
+        value: impl Into<Option<PersonBirthPlace<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.10 = value.into();
+        self
+    }
+    /// Set the `birthPlace` field to an Option value (optional)
+    pub fn maybe_birth_place(mut self, value: Option<PersonBirthPlace<'a>>) -> Self {
+        self.__unsafe_private_named.10 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `brand` field (optional)
+    pub fn brand(mut self, value: impl Into<Option<PersonBrand<'a>>>) -> Self {
+        self.__unsafe_private_named.11 = value.into();
+        self
+    }
+    /// Set the `brand` field to an Option value (optional)
+    pub fn maybe_brand(mut self, value: Option<PersonBrand<'a>>) -> Self {
+        self.__unsafe_private_named.11 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `callSign` field (optional)
+    pub fn call_sign(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.12 = value.into();
+        self
+    }
+    /// Set the `callSign` field to an Option value (optional)
+    pub fn maybe_call_sign(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.12 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `children` field (optional)
+    pub fn children(mut self, value: impl Into<Option<PersonChildren<'a>>>) -> Self {
+        self.__unsafe_private_named.13 = value.into();
+        self
+    }
+    /// Set the `children` field to an Option value (optional)
+    pub fn maybe_children(mut self, value: Option<PersonChildren<'a>>) -> Self {
+        self.__unsafe_private_named.13 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `colleague` field (optional)
+    pub fn colleague(mut self, value: impl Into<Option<PersonColleague<'a>>>) -> Self {
+        self.__unsafe_private_named.14 = value.into();
+        self
+    }
+    /// Set the `colleague` field to an Option value (optional)
+    pub fn maybe_colleague(mut self, value: Option<PersonColleague<'a>>) -> Self {
+        self.__unsafe_private_named.14 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `colleagues` field (optional)
+    pub fn colleagues(mut self, value: impl Into<Option<PersonColleagues<'a>>>) -> Self {
+        self.__unsafe_private_named.15 = value.into();
+        self
+    }
+    /// Set the `colleagues` field to an Option value (optional)
+    pub fn maybe_colleagues(mut self, value: Option<PersonColleagues<'a>>) -> Self {
+        self.__unsafe_private_named.15 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `contactPoint` field (optional)
+    pub fn contact_point(
+        mut self,
+        value: impl Into<Option<PersonContactPoint<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.16 = value.into();
+        self
+    }
+    /// Set the `contactPoint` field to an Option value (optional)
+    pub fn maybe_contact_point(mut self, value: Option<PersonContactPoint<'a>>) -> Self {
+        self.__unsafe_private_named.16 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `contactPoints` field (optional)
+    pub fn contact_points(
+        mut self,
+        value: impl Into<Option<PersonContactPoints<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.17 = value.into();
+        self
+    }
+    /// Set the `contactPoints` field to an Option value (optional)
+    pub fn maybe_contact_points(
+        mut self,
+        value: Option<PersonContactPoints<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.17 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `deathDate` field (optional)
+    pub fn death_date(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.18 = value.into();
+        self
+    }
+    /// Set the `deathDate` field to an Option value (optional)
+    pub fn maybe_death_date(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.18 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `deathPlace` field (optional)
+    pub fn death_place(
+        mut self,
+        value: impl Into<Option<PersonDeathPlace<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.19 = value.into();
+        self
+    }
+    /// Set the `deathPlace` field to an Option value (optional)
+    pub fn maybe_death_place(mut self, value: Option<PersonDeathPlace<'a>>) -> Self {
+        self.__unsafe_private_named.19 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `description` field (optional)
+    pub fn description(
+        mut self,
+        value: impl Into<Option<PersonDescription<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.20 = value.into();
+        self
+    }
+    /// Set the `description` field to an Option value (optional)
+    pub fn maybe_description(mut self, value: Option<PersonDescription<'a>>) -> Self {
+        self.__unsafe_private_named.20 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `disambiguatingDescription` field (optional)
+    pub fn disambiguating_description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.21 = value.into();
+        self
+    }
+    /// Set the `disambiguatingDescription` field to an Option value (optional)
+    pub fn maybe_disambiguating_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.21 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `duns` field (optional)
+    pub fn duns(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.22 = value.into();
+        self
+    }
+    /// Set the `duns` field to an Option value (optional)
+    pub fn maybe_duns(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.22 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `email` field (optional)
+    pub fn email(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.23 = value.into();
+        self
+    }
+    /// Set the `email` field to an Option value (optional)
+    pub fn maybe_email(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.23 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `familyName` field (optional)
+    pub fn family_name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.24 = value.into();
+        self
+    }
+    /// Set the `familyName` field to an Option value (optional)
+    pub fn maybe_family_name(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.24 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `faxNumber` field (optional)
+    pub fn fax_number(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.25 = value.into();
+        self
+    }
+    /// Set the `faxNumber` field to an Option value (optional)
+    pub fn maybe_fax_number(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.25 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `follows` field (optional)
+    pub fn follows(mut self, value: impl Into<Option<PersonFollows<'a>>>) -> Self {
+        self.__unsafe_private_named.26 = value.into();
+        self
+    }
+    /// Set the `follows` field to an Option value (optional)
+    pub fn maybe_follows(mut self, value: Option<PersonFollows<'a>>) -> Self {
+        self.__unsafe_private_named.26 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `funder` field (optional)
+    pub fn funder(mut self, value: impl Into<Option<PersonFunder<'a>>>) -> Self {
+        self.__unsafe_private_named.27 = value.into();
+        self
+    }
+    /// Set the `funder` field to an Option value (optional)
+    pub fn maybe_funder(mut self, value: Option<PersonFunder<'a>>) -> Self {
+        self.__unsafe_private_named.27 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `funding` field (optional)
+    pub fn funding(mut self, value: impl Into<Option<PersonFunding<'a>>>) -> Self {
+        self.__unsafe_private_named.28 = value.into();
+        self
+    }
+    /// Set the `funding` field to an Option value (optional)
+    pub fn maybe_funding(mut self, value: Option<PersonFunding<'a>>) -> Self {
+        self.__unsafe_private_named.28 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `gender` field (optional)
+    pub fn gender(mut self, value: impl Into<Option<PersonGender<'a>>>) -> Self {
+        self.__unsafe_private_named.29 = value.into();
+        self
+    }
+    /// Set the `gender` field to an Option value (optional)
+    pub fn maybe_gender(mut self, value: Option<PersonGender<'a>>) -> Self {
+        self.__unsafe_private_named.29 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `givenName` field (optional)
+    pub fn given_name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.30 = value.into();
+        self
+    }
+    /// Set the `givenName` field to an Option value (optional)
+    pub fn maybe_given_name(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.30 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `globalLocationNumber` field (optional)
+    pub fn global_location_number(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.31 = value.into();
+        self
+    }
+    /// Set the `globalLocationNumber` field to an Option value (optional)
+    pub fn maybe_global_location_number(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.31 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `hasCertification` field (optional)
+    pub fn has_certification(
+        mut self,
+        value: impl Into<Option<PersonHasCertification<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.32 = value.into();
+        self
+    }
+    /// Set the `hasCertification` field to an Option value (optional)
+    pub fn maybe_has_certification(
+        mut self,
+        value: Option<PersonHasCertification<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.32 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `hasCredential` field (optional)
+    pub fn has_credential(
+        mut self,
+        value: impl Into<Option<PersonHasCredential<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.33 = value.into();
+        self
+    }
+    /// Set the `hasCredential` field to an Option value (optional)
+    pub fn maybe_has_credential(
+        mut self,
+        value: Option<PersonHasCredential<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.33 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `hasOccupation` field (optional)
+    pub fn has_occupation(
+        mut self,
+        value: impl Into<Option<PersonHasOccupation<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.34 = value.into();
+        self
+    }
+    /// Set the `hasOccupation` field to an Option value (optional)
+    pub fn maybe_has_occupation(
+        mut self,
+        value: Option<PersonHasOccupation<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.34 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `hasOfferCatalog` field (optional)
+    pub fn has_offer_catalog(
+        mut self,
+        value: impl Into<Option<PersonHasOfferCatalog<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.35 = value.into();
+        self
+    }
+    /// Set the `hasOfferCatalog` field to an Option value (optional)
+    pub fn maybe_has_offer_catalog(
+        mut self,
+        value: Option<PersonHasOfferCatalog<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.35 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `hasPOS` field (optional)
+    pub fn has_pos(mut self, value: impl Into<Option<PersonHasPos<'a>>>) -> Self {
+        self.__unsafe_private_named.36 = value.into();
+        self
+    }
+    /// Set the `hasPOS` field to an Option value (optional)
+    pub fn maybe_has_pos(mut self, value: Option<PersonHasPos<'a>>) -> Self {
+        self.__unsafe_private_named.36 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `height` field (optional)
+    pub fn height(mut self, value: impl Into<Option<PersonHeight<'a>>>) -> Self {
+        self.__unsafe_private_named.37 = value.into();
+        self
+    }
+    /// Set the `height` field to an Option value (optional)
+    pub fn maybe_height(mut self, value: Option<PersonHeight<'a>>) -> Self {
+        self.__unsafe_private_named.37 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `homeLocation` field (optional)
+    pub fn home_location(
+        mut self,
+        value: impl Into<Option<PersonHomeLocation<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.38 = value.into();
+        self
+    }
+    /// Set the `homeLocation` field to an Option value (optional)
+    pub fn maybe_home_location(mut self, value: Option<PersonHomeLocation<'a>>) -> Self {
+        self.__unsafe_private_named.38 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `honorificPrefix` field (optional)
+    pub fn honorific_prefix(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.39 = value.into();
+        self
+    }
+    /// Set the `honorificPrefix` field to an Option value (optional)
+    pub fn maybe_honorific_prefix(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.39 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `honorificSuffix` field (optional)
+    pub fn honorific_suffix(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.40 = value.into();
+        self
+    }
+    /// Set the `honorificSuffix` field to an Option value (optional)
+    pub fn maybe_honorific_suffix(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.40 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `identifier` field (optional)
+    pub fn identifier(mut self, value: impl Into<Option<PersonIdentifier<'a>>>) -> Self {
+        self.__unsafe_private_named.41 = value.into();
+        self
+    }
+    /// Set the `identifier` field to an Option value (optional)
+    pub fn maybe_identifier(mut self, value: Option<PersonIdentifier<'a>>) -> Self {
+        self.__unsafe_private_named.41 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `image` field (optional)
+    pub fn image(mut self, value: impl Into<Option<PersonImage<'a>>>) -> Self {
+        self.__unsafe_private_named.42 = value.into();
+        self
+    }
+    /// Set the `image` field to an Option value (optional)
+    pub fn maybe_image(mut self, value: Option<PersonImage<'a>>) -> Self {
+        self.__unsafe_private_named.42 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `interactionStatistic` field (optional)
+    pub fn interaction_statistic(
+        mut self,
+        value: impl Into<Option<PersonInteractionStatistic<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.43 = value.into();
+        self
+    }
+    /// Set the `interactionStatistic` field to an Option value (optional)
+    pub fn maybe_interaction_statistic(
+        mut self,
+        value: Option<PersonInteractionStatistic<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.43 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `isicV4` field (optional)
+    pub fn isic_v4(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.44 = value.into();
+        self
+    }
+    /// Set the `isicV4` field to an Option value (optional)
+    pub fn maybe_isic_v4(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.44 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `jobTitle` field (optional)
+    pub fn job_title(mut self, value: impl Into<Option<PersonJobTitle<'a>>>) -> Self {
+        self.__unsafe_private_named.45 = value.into();
+        self
+    }
+    /// Set the `jobTitle` field to an Option value (optional)
+    pub fn maybe_job_title(mut self, value: Option<PersonJobTitle<'a>>) -> Self {
+        self.__unsafe_private_named.45 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `knows` field (optional)
+    pub fn knows(mut self, value: impl Into<Option<PersonKnows<'a>>>) -> Self {
+        self.__unsafe_private_named.46 = value.into();
+        self
+    }
+    /// Set the `knows` field to an Option value (optional)
+    pub fn maybe_knows(mut self, value: Option<PersonKnows<'a>>) -> Self {
+        self.__unsafe_private_named.46 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `knowsAbout` field (optional)
+    pub fn knows_about(
+        mut self,
+        value: impl Into<Option<PersonKnowsAbout<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.47 = value.into();
+        self
+    }
+    /// Set the `knowsAbout` field to an Option value (optional)
+    pub fn maybe_knows_about(mut self, value: Option<PersonKnowsAbout<'a>>) -> Self {
+        self.__unsafe_private_named.47 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `knowsLanguage` field (optional)
+    pub fn knows_language(
+        mut self,
+        value: impl Into<Option<PersonKnowsLanguage<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.48 = value.into();
+        self
+    }
+    /// Set the `knowsLanguage` field to an Option value (optional)
+    pub fn maybe_knows_language(
+        mut self,
+        value: Option<PersonKnowsLanguage<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.48 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `mainEntityOfPage` field (optional)
+    pub fn main_entity_of_page(
+        mut self,
+        value: impl Into<Option<PersonMainEntityOfPage<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.49 = value.into();
+        self
+    }
+    /// Set the `mainEntityOfPage` field to an Option value (optional)
+    pub fn maybe_main_entity_of_page(
+        mut self,
+        value: Option<PersonMainEntityOfPage<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.49 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `makesOffer` field (optional)
+    pub fn makes_offer(
+        mut self,
+        value: impl Into<Option<PersonMakesOffer<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.50 = value.into();
+        self
+    }
+    /// Set the `makesOffer` field to an Option value (optional)
+    pub fn maybe_makes_offer(mut self, value: Option<PersonMakesOffer<'a>>) -> Self {
+        self.__unsafe_private_named.50 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `memberOf` field (optional)
+    pub fn member_of(mut self, value: impl Into<Option<PersonMemberOf<'a>>>) -> Self {
+        self.__unsafe_private_named.51 = value.into();
+        self
+    }
+    /// Set the `memberOf` field to an Option value (optional)
+    pub fn maybe_member_of(mut self, value: Option<PersonMemberOf<'a>>) -> Self {
+        self.__unsafe_private_named.51 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `naics` field (optional)
+    pub fn naics(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.52 = value.into();
+        self
+    }
+    /// Set the `naics` field to an Option value (optional)
+    pub fn maybe_naics(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.52 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `name` field (optional)
+    pub fn name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.53 = value.into();
+        self
+    }
+    /// Set the `name` field to an Option value (optional)
+    pub fn maybe_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.53 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `nationality` field (optional)
+    pub fn nationality(
+        mut self,
+        value: impl Into<Option<PersonNationality<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.54 = value.into();
+        self
+    }
+    /// Set the `nationality` field to an Option value (optional)
+    pub fn maybe_nationality(mut self, value: Option<PersonNationality<'a>>) -> Self {
+        self.__unsafe_private_named.54 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `netWorth` field (optional)
+    pub fn net_worth(mut self, value: impl Into<Option<PersonNetWorth<'a>>>) -> Self {
+        self.__unsafe_private_named.55 = value.into();
+        self
+    }
+    /// Set the `netWorth` field to an Option value (optional)
+    pub fn maybe_net_worth(mut self, value: Option<PersonNetWorth<'a>>) -> Self {
+        self.__unsafe_private_named.55 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `owns` field (optional)
+    pub fn owns(mut self, value: impl Into<Option<PersonOwns<'a>>>) -> Self {
+        self.__unsafe_private_named.56 = value.into();
+        self
+    }
+    /// Set the `owns` field to an Option value (optional)
+    pub fn maybe_owns(mut self, value: Option<PersonOwns<'a>>) -> Self {
+        self.__unsafe_private_named.56 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `parent` field (optional)
+    pub fn parent(mut self, value: impl Into<Option<PersonParent<'a>>>) -> Self {
+        self.__unsafe_private_named.57 = value.into();
+        self
+    }
+    /// Set the `parent` field to an Option value (optional)
+    pub fn maybe_parent(mut self, value: Option<PersonParent<'a>>) -> Self {
+        self.__unsafe_private_named.57 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `parents` field (optional)
+    pub fn parents(mut self, value: impl Into<Option<PersonParents<'a>>>) -> Self {
+        self.__unsafe_private_named.58 = value.into();
+        self
+    }
+    /// Set the `parents` field to an Option value (optional)
+    pub fn maybe_parents(mut self, value: Option<PersonParents<'a>>) -> Self {
+        self.__unsafe_private_named.58 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `performerIn` field (optional)
+    pub fn performer_in(
+        mut self,
+        value: impl Into<Option<PersonPerformerIn<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.59 = value.into();
+        self
+    }
+    /// Set the `performerIn` field to an Option value (optional)
+    pub fn maybe_performer_in(mut self, value: Option<PersonPerformerIn<'a>>) -> Self {
+        self.__unsafe_private_named.59 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `potentialAction` field (optional)
+    pub fn potential_action(
+        mut self,
+        value: impl Into<Option<PersonPotentialAction<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.60 = value.into();
+        self
+    }
+    /// Set the `potentialAction` field to an Option value (optional)
+    pub fn maybe_potential_action(
+        mut self,
+        value: Option<PersonPotentialAction<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.60 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `pronouns` field (optional)
+    pub fn pronouns(mut self, value: impl Into<Option<PersonPronouns<'a>>>) -> Self {
+        self.__unsafe_private_named.61 = value.into();
+        self
+    }
+    /// Set the `pronouns` field to an Option value (optional)
+    pub fn maybe_pronouns(mut self, value: Option<PersonPronouns<'a>>) -> Self {
+        self.__unsafe_private_named.61 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `publishingPrinciples` field (optional)
+    pub fn publishing_principles(
+        mut self,
+        value: impl Into<Option<PersonPublishingPrinciples<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.62 = value.into();
+        self
+    }
+    /// Set the `publishingPrinciples` field to an Option value (optional)
+    pub fn maybe_publishing_principles(
+        mut self,
+        value: Option<PersonPublishingPrinciples<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.62 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `relatedTo` field (optional)
+    pub fn related_to(mut self, value: impl Into<Option<PersonRelatedTo<'a>>>) -> Self {
+        self.__unsafe_private_named.63 = value.into();
+        self
+    }
+    /// Set the `relatedTo` field to an Option value (optional)
+    pub fn maybe_related_to(mut self, value: Option<PersonRelatedTo<'a>>) -> Self {
+        self.__unsafe_private_named.63 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `sameAs` field (optional)
+    pub fn same_as(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.64 = value.into();
+        self
+    }
+    /// Set the `sameAs` field to an Option value (optional)
+    pub fn maybe_same_as(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.64 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `seeks` field (optional)
+    pub fn seeks(mut self, value: impl Into<Option<PersonSeeks<'a>>>) -> Self {
+        self.__unsafe_private_named.65 = value.into();
+        self
+    }
+    /// Set the `seeks` field to an Option value (optional)
+    pub fn maybe_seeks(mut self, value: Option<PersonSeeks<'a>>) -> Self {
+        self.__unsafe_private_named.65 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `sibling` field (optional)
+    pub fn sibling(mut self, value: impl Into<Option<PersonSibling<'a>>>) -> Self {
+        self.__unsafe_private_named.66 = value.into();
+        self
+    }
+    /// Set the `sibling` field to an Option value (optional)
+    pub fn maybe_sibling(mut self, value: Option<PersonSibling<'a>>) -> Self {
+        self.__unsafe_private_named.66 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `siblings` field (optional)
+    pub fn siblings(mut self, value: impl Into<Option<PersonSiblings<'a>>>) -> Self {
+        self.__unsafe_private_named.67 = value.into();
+        self
+    }
+    /// Set the `siblings` field to an Option value (optional)
+    pub fn maybe_siblings(mut self, value: Option<PersonSiblings<'a>>) -> Self {
+        self.__unsafe_private_named.67 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `skills` field (optional)
+    pub fn skills(mut self, value: impl Into<Option<PersonSkills<'a>>>) -> Self {
+        self.__unsafe_private_named.68 = value.into();
+        self
+    }
+    /// Set the `skills` field to an Option value (optional)
+    pub fn maybe_skills(mut self, value: Option<PersonSkills<'a>>) -> Self {
+        self.__unsafe_private_named.68 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `sponsor` field (optional)
+    pub fn sponsor(mut self, value: impl Into<Option<PersonSponsor<'a>>>) -> Self {
+        self.__unsafe_private_named.69 = value.into();
+        self
+    }
+    /// Set the `sponsor` field to an Option value (optional)
+    pub fn maybe_sponsor(mut self, value: Option<PersonSponsor<'a>>) -> Self {
+        self.__unsafe_private_named.69 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `spouse` field (optional)
+    pub fn spouse(mut self, value: impl Into<Option<PersonSpouse<'a>>>) -> Self {
+        self.__unsafe_private_named.70 = value.into();
+        self
+    }
+    /// Set the `spouse` field to an Option value (optional)
+    pub fn maybe_spouse(mut self, value: Option<PersonSpouse<'a>>) -> Self {
+        self.__unsafe_private_named.70 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `subjectOf` field (optional)
+    pub fn subject_of(mut self, value: impl Into<Option<PersonSubjectOf<'a>>>) -> Self {
+        self.__unsafe_private_named.71 = value.into();
+        self
+    }
+    /// Set the `subjectOf` field to an Option value (optional)
+    pub fn maybe_subject_of(mut self, value: Option<PersonSubjectOf<'a>>) -> Self {
+        self.__unsafe_private_named.71 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `taxID` field (optional)
+    pub fn tax_id(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.72 = value.into();
+        self
+    }
+    /// Set the `taxID` field to an Option value (optional)
+    pub fn maybe_tax_id(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.72 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `telephone` field (optional)
+    pub fn telephone(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.73 = value.into();
+        self
+    }
+    /// Set the `telephone` field to an Option value (optional)
+    pub fn maybe_telephone(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.73 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `url` field (optional)
+    pub fn url(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.74 = value.into();
+        self
+    }
+    /// Set the `url` field to an Option value (optional)
+    pub fn maybe_url(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.74 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `vatID` field (optional)
+    pub fn vat_id(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.75 = value.into();
+        self
+    }
+    /// Set the `vatID` field to an Option value (optional)
+    pub fn maybe_vat_id(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.75 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `weight` field (optional)
+    pub fn weight(mut self, value: impl Into<Option<PersonWeight<'a>>>) -> Self {
+        self.__unsafe_private_named.76 = value.into();
+        self
+    }
+    /// Set the `weight` field to an Option value (optional)
+    pub fn maybe_weight(mut self, value: Option<PersonWeight<'a>>) -> Self {
+        self.__unsafe_private_named.76 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `workLocation` field (optional)
+    pub fn work_location(
+        mut self,
+        value: impl Into<Option<PersonWorkLocation<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.77 = value.into();
+        self
+    }
+    /// Set the `workLocation` field to an Option value (optional)
+    pub fn maybe_work_location(mut self, value: Option<PersonWorkLocation<'a>>) -> Self {
+        self.__unsafe_private_named.77 = value;
+        self
+    }
+}
+
+impl<'a, S: person_state::State> PersonBuilder<'a, S> {
+    /// Set the `worksFor` field (optional)
+    pub fn works_for(mut self, value: impl Into<Option<PersonWorksFor<'a>>>) -> Self {
+        self.__unsafe_private_named.78 = value.into();
+        self
+    }
+    /// Set the `worksFor` field to an Option value (optional)
+    pub fn maybe_works_for(mut self, value: Option<PersonWorksFor<'a>>) -> Self {
+        self.__unsafe_private_named.78 = value;
+        self
+    }
+}
+
+impl<'a, S> PersonBuilder<'a, S>
+where
+    S: person_state::State,
+{
+    /// Build the final struct
+    pub fn build(self) -> Person<'a> {
+        Person {
+            additional_name: self.__unsafe_private_named.0,
+            additional_type: self.__unsafe_private_named.1,
+            address: self.__unsafe_private_named.2,
+            affiliation: self.__unsafe_private_named.3,
+            agent_interaction_statistic: self.__unsafe_private_named.4,
+            alternate_name: self.__unsafe_private_named.5,
+            alumni_of: self.__unsafe_private_named.6,
+            award: self.__unsafe_private_named.7,
+            awards: self.__unsafe_private_named.8,
+            birth_date: self.__unsafe_private_named.9,
+            birth_place: self.__unsafe_private_named.10,
+            brand: self.__unsafe_private_named.11,
+            call_sign: self.__unsafe_private_named.12,
+            children: self.__unsafe_private_named.13,
+            colleague: self.__unsafe_private_named.14,
+            colleagues: self.__unsafe_private_named.15,
+            contact_point: self.__unsafe_private_named.16,
+            contact_points: self.__unsafe_private_named.17,
+            death_date: self.__unsafe_private_named.18,
+            death_place: self.__unsafe_private_named.19,
+            description: self.__unsafe_private_named.20,
+            disambiguating_description: self.__unsafe_private_named.21,
+            duns: self.__unsafe_private_named.22,
+            email: self.__unsafe_private_named.23,
+            family_name: self.__unsafe_private_named.24,
+            fax_number: self.__unsafe_private_named.25,
+            follows: self.__unsafe_private_named.26,
+            funder: self.__unsafe_private_named.27,
+            funding: self.__unsafe_private_named.28,
+            gender: self.__unsafe_private_named.29,
+            given_name: self.__unsafe_private_named.30,
+            global_location_number: self.__unsafe_private_named.31,
+            has_certification: self.__unsafe_private_named.32,
+            has_credential: self.__unsafe_private_named.33,
+            has_occupation: self.__unsafe_private_named.34,
+            has_offer_catalog: self.__unsafe_private_named.35,
+            has_pos: self.__unsafe_private_named.36,
+            height: self.__unsafe_private_named.37,
+            home_location: self.__unsafe_private_named.38,
+            honorific_prefix: self.__unsafe_private_named.39,
+            honorific_suffix: self.__unsafe_private_named.40,
+            identifier: self.__unsafe_private_named.41,
+            image: self.__unsafe_private_named.42,
+            interaction_statistic: self.__unsafe_private_named.43,
+            isic_v4: self.__unsafe_private_named.44,
+            job_title: self.__unsafe_private_named.45,
+            knows: self.__unsafe_private_named.46,
+            knows_about: self.__unsafe_private_named.47,
+            knows_language: self.__unsafe_private_named.48,
+            main_entity_of_page: self.__unsafe_private_named.49,
+            makes_offer: self.__unsafe_private_named.50,
+            member_of: self.__unsafe_private_named.51,
+            naics: self.__unsafe_private_named.52,
+            name: self.__unsafe_private_named.53,
+            nationality: self.__unsafe_private_named.54,
+            net_worth: self.__unsafe_private_named.55,
+            owns: self.__unsafe_private_named.56,
+            parent: self.__unsafe_private_named.57,
+            parents: self.__unsafe_private_named.58,
+            performer_in: self.__unsafe_private_named.59,
+            potential_action: self.__unsafe_private_named.60,
+            pronouns: self.__unsafe_private_named.61,
+            publishing_principles: self.__unsafe_private_named.62,
+            related_to: self.__unsafe_private_named.63,
+            same_as: self.__unsafe_private_named.64,
+            seeks: self.__unsafe_private_named.65,
+            sibling: self.__unsafe_private_named.66,
+            siblings: self.__unsafe_private_named.67,
+            skills: self.__unsafe_private_named.68,
+            sponsor: self.__unsafe_private_named.69,
+            spouse: self.__unsafe_private_named.70,
+            subject_of: self.__unsafe_private_named.71,
+            tax_id: self.__unsafe_private_named.72,
+            telephone: self.__unsafe_private_named.73,
+            url: self.__unsafe_private_named.74,
+            vat_id: self.__unsafe_private_named.75,
+            weight: self.__unsafe_private_named.76,
+            work_location: self.__unsafe_private_named.77,
+            works_for: self.__unsafe_private_named.78,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Person<'a> {
+        Person {
+            additional_name: self.__unsafe_private_named.0,
+            additional_type: self.__unsafe_private_named.1,
+            address: self.__unsafe_private_named.2,
+            affiliation: self.__unsafe_private_named.3,
+            agent_interaction_statistic: self.__unsafe_private_named.4,
+            alternate_name: self.__unsafe_private_named.5,
+            alumni_of: self.__unsafe_private_named.6,
+            award: self.__unsafe_private_named.7,
+            awards: self.__unsafe_private_named.8,
+            birth_date: self.__unsafe_private_named.9,
+            birth_place: self.__unsafe_private_named.10,
+            brand: self.__unsafe_private_named.11,
+            call_sign: self.__unsafe_private_named.12,
+            children: self.__unsafe_private_named.13,
+            colleague: self.__unsafe_private_named.14,
+            colleagues: self.__unsafe_private_named.15,
+            contact_point: self.__unsafe_private_named.16,
+            contact_points: self.__unsafe_private_named.17,
+            death_date: self.__unsafe_private_named.18,
+            death_place: self.__unsafe_private_named.19,
+            description: self.__unsafe_private_named.20,
+            disambiguating_description: self.__unsafe_private_named.21,
+            duns: self.__unsafe_private_named.22,
+            email: self.__unsafe_private_named.23,
+            family_name: self.__unsafe_private_named.24,
+            fax_number: self.__unsafe_private_named.25,
+            follows: self.__unsafe_private_named.26,
+            funder: self.__unsafe_private_named.27,
+            funding: self.__unsafe_private_named.28,
+            gender: self.__unsafe_private_named.29,
+            given_name: self.__unsafe_private_named.30,
+            global_location_number: self.__unsafe_private_named.31,
+            has_certification: self.__unsafe_private_named.32,
+            has_credential: self.__unsafe_private_named.33,
+            has_occupation: self.__unsafe_private_named.34,
+            has_offer_catalog: self.__unsafe_private_named.35,
+            has_pos: self.__unsafe_private_named.36,
+            height: self.__unsafe_private_named.37,
+            home_location: self.__unsafe_private_named.38,
+            honorific_prefix: self.__unsafe_private_named.39,
+            honorific_suffix: self.__unsafe_private_named.40,
+            identifier: self.__unsafe_private_named.41,
+            image: self.__unsafe_private_named.42,
+            interaction_statistic: self.__unsafe_private_named.43,
+            isic_v4: self.__unsafe_private_named.44,
+            job_title: self.__unsafe_private_named.45,
+            knows: self.__unsafe_private_named.46,
+            knows_about: self.__unsafe_private_named.47,
+            knows_language: self.__unsafe_private_named.48,
+            main_entity_of_page: self.__unsafe_private_named.49,
+            makes_offer: self.__unsafe_private_named.50,
+            member_of: self.__unsafe_private_named.51,
+            naics: self.__unsafe_private_named.52,
+            name: self.__unsafe_private_named.53,
+            nationality: self.__unsafe_private_named.54,
+            net_worth: self.__unsafe_private_named.55,
+            owns: self.__unsafe_private_named.56,
+            parent: self.__unsafe_private_named.57,
+            parents: self.__unsafe_private_named.58,
+            performer_in: self.__unsafe_private_named.59,
+            potential_action: self.__unsafe_private_named.60,
+            pronouns: self.__unsafe_private_named.61,
+            publishing_principles: self.__unsafe_private_named.62,
+            related_to: self.__unsafe_private_named.63,
+            same_as: self.__unsafe_private_named.64,
+            seeks: self.__unsafe_private_named.65,
+            sibling: self.__unsafe_private_named.66,
+            siblings: self.__unsafe_private_named.67,
+            skills: self.__unsafe_private_named.68,
+            sponsor: self.__unsafe_private_named.69,
+            spouse: self.__unsafe_private_named.70,
+            subject_of: self.__unsafe_private_named.71,
+            tax_id: self.__unsafe_private_named.72,
+            telephone: self.__unsafe_private_named.73,
+            url: self.__unsafe_private_named.74,
+            vat_id: self.__unsafe_private_named.75,
+            weight: self.__unsafe_private_named.76,
+            work_location: self.__unsafe_private_named.77,
+            works_for: self.__unsafe_private_named.78,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Person<'a> {

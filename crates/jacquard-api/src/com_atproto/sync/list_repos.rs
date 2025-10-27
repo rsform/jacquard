@@ -12,19 +12,105 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct ListRepos<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    #[builder(into)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     ///(default: 500, min: 1, max: 1000)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
+}
+
+pub mod list_repos_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {}
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {}
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {}
+}
+
+/// Builder for constructing an instance of this type
+pub struct ListReposBuilder<'a, S: list_repos_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ListRepos<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ListReposBuilder<'a, list_repos_state::Empty> {
+        ListReposBuilder::new()
+    }
+}
+
+impl<'a> ListReposBuilder<'a, list_repos_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ListReposBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: list_repos_state::State> ListReposBuilder<'a, S> {
+    /// Set the `cursor` field (optional)
+    pub fn cursor(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `cursor` field to an Option value (optional)
+    pub fn maybe_cursor(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: list_repos_state::State> ListReposBuilder<'a, S> {
+    /// Set the `limit` field (optional)
+    pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `limit` field to an Option value (optional)
+    pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> ListReposBuilder<'a, S>
+where
+    S: list_repos_state::State,
+{
+    /// Build the final struct
+    pub fn build(self) -> ListRepos<'a> {
+        ListRepos {
+            cursor: self.__unsafe_private_named.0,
+            limit: self.__unsafe_private_named.1,
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]
@@ -43,7 +129,7 @@ pub struct ListReposOutput<'a> {
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
-    pub repos: Vec<jacquard_common::types::value::Data<'a>>,
+    pub repos: Vec<crate::com_atproto::sync::list_repos::Repo<'a>>,
 }
 
 /// Response type for
@@ -80,13 +166,11 @@ impl jacquard_common::xrpc::XrpcEndpoint for ListReposRequest {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Repo<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub active: Option<bool>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
@@ -96,9 +180,220 @@ pub struct Repo<'a> {
     pub rev: jacquard_common::types::string::Tid,
     /// If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub status: Option<jacquard_common::CowStr<'a>>,
+}
+
+pub mod repo_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Did;
+        type Head;
+        type Rev;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Did = Unset;
+        type Head = Unset;
+        type Rev = Unset;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Did = Set<members::did>;
+        type Head = S::Head;
+        type Rev = S::Rev;
+    }
+    ///State transition - sets the `head` field to Set
+    pub struct SetHead<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHead<S> {}
+    impl<S: State> State for SetHead<S> {
+        type Did = S::Did;
+        type Head = Set<members::head>;
+        type Rev = S::Rev;
+    }
+    ///State transition - sets the `rev` field to Set
+    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRev<S> {}
+    impl<S: State> State for SetRev<S> {
+        type Did = S::Did;
+        type Head = S::Head;
+        type Rev = Set<members::rev>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `head` field
+        pub struct head(());
+        ///Marker type for the `rev` field
+        pub struct rev(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct RepoBuilder<'a, S: repo_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<bool>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Tid>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Repo<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> RepoBuilder<'a, repo_state::Empty> {
+        RepoBuilder::new()
+    }
+}
+
+impl<'a> RepoBuilder<'a, repo_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        RepoBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: repo_state::State> RepoBuilder<'a, S> {
+    /// Set the `active` field (optional)
+    pub fn active(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `active` field to an Option value (optional)
+    pub fn maybe_active(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> RepoBuilder<'a, S>
+where
+    S: repo_state::State,
+    S::Did: repo_state::IsUnset,
+{
+    /// Set the `did` field (required)
+    pub fn did(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> RepoBuilder<'a, repo_state::SetDid<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        RepoBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RepoBuilder<'a, S>
+where
+    S: repo_state::State,
+    S::Head: repo_state::IsUnset,
+{
+    /// Set the `head` field (required)
+    pub fn head(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Cid<'a>>,
+    ) -> RepoBuilder<'a, repo_state::SetHead<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        RepoBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RepoBuilder<'a, S>
+where
+    S: repo_state::State,
+    S::Rev: repo_state::IsUnset,
+{
+    /// Set the `rev` field (required)
+    pub fn rev(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Tid>,
+    ) -> RepoBuilder<'a, repo_state::SetRev<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        RepoBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: repo_state::State> RepoBuilder<'a, S> {
+    /// Set the `status` field (optional)
+    pub fn status(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `status` field to an Option value (optional)
+    pub fn maybe_status(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S> RepoBuilder<'a, S>
+where
+    S: repo_state::State,
+    S::Did: repo_state::IsSet,
+    S::Head: repo_state::IsSet,
+    S::Rev: repo_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Repo<'a> {
+        Repo {
+            active: self.__unsafe_private_named.0,
+            did: self.__unsafe_private_named.1.unwrap(),
+            head: self.__unsafe_private_named.2.unwrap(),
+            rev: self.__unsafe_private_named.3.unwrap(),
+            status: self.__unsafe_private_named.4,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Repo<'a> {
+        Repo {
+            active: self.__unsafe_private_named.0,
+            did: self.__unsafe_private_named.1.unwrap(),
+            head: self.__unsafe_private_named.2.unwrap(),
+            rev: self.__unsafe_private_named.3.unwrap(),
+            status: self.__unsafe_private_named.4,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_com_atproto_sync_listRepos() -> ::jacquard_lexicon::lexicon::LexiconDoc<

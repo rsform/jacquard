@@ -18,68 +18,451 @@ pub mod get_albums;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Album<'a> {
     /// The album art of the album.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub album_art: Option<jacquard_common::types::blob::BlobRef<'a>>,
     /// The Apple Music link of the album.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub apple_music_link: Option<jacquard_common::types::string::Uri<'a>>,
     /// The artist of the album.
     #[serde(borrow)]
-    #[builder(into)]
     pub artist: jacquard_common::CowStr<'a>,
     /// The date and time when the album was created.
     pub created_at: jacquard_common::types::string::Datetime,
     /// The duration of the album in seconds.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub duration: Option<i64>,
     /// The genre of the album.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub genre: Option<jacquard_common::CowStr<'a>>,
     /// The release date of the album.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub release_date: Option<jacquard_common::types::string::Datetime>,
     /// The Spotify link of the album.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub spotify_link: Option<jacquard_common::types::string::Uri<'a>>,
     /// The tags of the album.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub tags: Option<Vec<jacquard_common::CowStr<'a>>>,
     /// The tidal link of the album.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub tidal_link: Option<jacquard_common::types::string::Uri<'a>>,
     /// The title of the album.
     #[serde(borrow)]
-    #[builder(into)]
     pub title: jacquard_common::CowStr<'a>,
     /// The year the album was released.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub year: Option<i64>,
     /// The YouTube link of the album.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub youtube_link: Option<jacquard_common::types::string::Uri<'a>>,
+}
+
+pub mod album_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Title;
+        type Artist;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Title = Unset;
+        type Artist = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Title = Set<members::title>;
+        type Artist = S::Artist;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `artist` field to Set
+    pub struct SetArtist<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetArtist<S> {}
+    impl<S: State> State for SetArtist<S> {
+        type Title = S::Title;
+        type Artist = Set<members::artist>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Title = S::Title;
+        type Artist = S::Artist;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `artist` field
+        pub struct artist(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct AlbumBuilder<'a, S: album_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Album<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> AlbumBuilder<'a, album_state::Empty> {
+        AlbumBuilder::new()
+    }
+}
+
+impl<'a> AlbumBuilder<'a, album_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        AlbumBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: album_state::State> AlbumBuilder<'a, S> {
+    /// Set the `albumArt` field (optional)
+    pub fn album_art(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::blob::BlobRef<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `albumArt` field to an Option value (optional)
+    pub fn maybe_album_art(
+        mut self,
+        value: Option<jacquard_common::types::blob::BlobRef<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: album_state::State> AlbumBuilder<'a, S> {
+    /// Set the `appleMusicLink` field (optional)
+    pub fn apple_music_link(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `appleMusicLink` field to an Option value (optional)
+    pub fn maybe_apple_music_link(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> AlbumBuilder<'a, S>
+where
+    S: album_state::State,
+    S::Artist: album_state::IsUnset,
+{
+    /// Set the `artist` field (required)
+    pub fn artist(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> AlbumBuilder<'a, album_state::SetArtist<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        AlbumBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AlbumBuilder<'a, S>
+where
+    S: album_state::State,
+    S::CreatedAt: album_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> AlbumBuilder<'a, album_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        AlbumBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: album_state::State> AlbumBuilder<'a, S> {
+    /// Set the `duration` field (optional)
+    pub fn duration(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `duration` field to an Option value (optional)
+    pub fn maybe_duration(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: album_state::State> AlbumBuilder<'a, S> {
+    /// Set the `genre` field (optional)
+    pub fn genre(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `genre` field to an Option value (optional)
+    pub fn maybe_genre(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S: album_state::State> AlbumBuilder<'a, S> {
+    /// Set the `releaseDate` field (optional)
+    pub fn release_date(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `releaseDate` field to an Option value (optional)
+    pub fn maybe_release_date(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S: album_state::State> AlbumBuilder<'a, S> {
+    /// Set the `spotifyLink` field (optional)
+    pub fn spotify_link(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value.into();
+        self
+    }
+    /// Set the `spotifyLink` field to an Option value (optional)
+    pub fn maybe_spotify_link(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value;
+        self
+    }
+}
+
+impl<'a, S: album_state::State> AlbumBuilder<'a, S> {
+    /// Set the `tags` field (optional)
+    pub fn tags(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value.into();
+        self
+    }
+    /// Set the `tags` field to an Option value (optional)
+    pub fn maybe_tags(
+        mut self,
+        value: Option<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value;
+        self
+    }
+}
+
+impl<'a, S: album_state::State> AlbumBuilder<'a, S> {
+    /// Set the `tidalLink` field (optional)
+    pub fn tidal_link(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.9 = value.into();
+        self
+    }
+    /// Set the `tidalLink` field to an Option value (optional)
+    pub fn maybe_tidal_link(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.9 = value;
+        self
+    }
+}
+
+impl<'a, S> AlbumBuilder<'a, S>
+where
+    S: album_state::State,
+    S::Title: album_state::IsUnset,
+{
+    /// Set the `title` field (required)
+    pub fn title(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> AlbumBuilder<'a, album_state::SetTitle<S>> {
+        self.__unsafe_private_named.10 = ::core::option::Option::Some(value.into());
+        AlbumBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: album_state::State> AlbumBuilder<'a, S> {
+    /// Set the `year` field (optional)
+    pub fn year(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.11 = value.into();
+        self
+    }
+    /// Set the `year` field to an Option value (optional)
+    pub fn maybe_year(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.11 = value;
+        self
+    }
+}
+
+impl<'a, S: album_state::State> AlbumBuilder<'a, S> {
+    /// Set the `youtubeLink` field (optional)
+    pub fn youtube_link(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.12 = value.into();
+        self
+    }
+    /// Set the `youtubeLink` field to an Option value (optional)
+    pub fn maybe_youtube_link(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.12 = value;
+        self
+    }
+}
+
+impl<'a, S> AlbumBuilder<'a, S>
+where
+    S: album_state::State,
+    S::Title: album_state::IsSet,
+    S::Artist: album_state::IsSet,
+    S::CreatedAt: album_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Album<'a> {
+        Album {
+            album_art: self.__unsafe_private_named.0,
+            apple_music_link: self.__unsafe_private_named.1,
+            artist: self.__unsafe_private_named.2.unwrap(),
+            created_at: self.__unsafe_private_named.3.unwrap(),
+            duration: self.__unsafe_private_named.4,
+            genre: self.__unsafe_private_named.5,
+            release_date: self.__unsafe_private_named.6,
+            spotify_link: self.__unsafe_private_named.7,
+            tags: self.__unsafe_private_named.8,
+            tidal_link: self.__unsafe_private_named.9,
+            title: self.__unsafe_private_named.10.unwrap(),
+            year: self.__unsafe_private_named.11,
+            youtube_link: self.__unsafe_private_named.12,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Album<'a> {
+        Album {
+            album_art: self.__unsafe_private_named.0,
+            apple_music_link: self.__unsafe_private_named.1,
+            artist: self.__unsafe_private_named.2.unwrap(),
+            created_at: self.__unsafe_private_named.3.unwrap(),
+            duration: self.__unsafe_private_named.4,
+            genre: self.__unsafe_private_named.5,
+            release_date: self.__unsafe_private_named.6,
+            spotify_link: self.__unsafe_private_named.7,
+            tags: self.__unsafe_private_named.8,
+            tidal_link: self.__unsafe_private_named.9,
+            title: self.__unsafe_private_named.10.unwrap(),
+            year: self.__unsafe_private_named.11,
+            youtube_link: self.__unsafe_private_named.12,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Album<'a> {

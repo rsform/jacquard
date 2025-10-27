@@ -12,14 +12,103 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetProfiles<'a> {
     #[serde(borrow)]
     pub actors: Vec<jacquard_common::types::ident::AtIdentifier<'a>>,
+}
+
+pub mod get_profiles_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Actors;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Actors = Unset;
+    }
+    ///State transition - sets the `actors` field to Set
+    pub struct SetActors<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActors<S> {}
+    impl<S: State> State for SetActors<S> {
+        type Actors = Set<members::actors>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `actors` field
+        pub struct actors(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetProfilesBuilder<'a, S: get_profiles_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<Vec<jacquard_common::types::ident::AtIdentifier<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GetProfiles<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GetProfilesBuilder<'a, get_profiles_state::Empty> {
+        GetProfilesBuilder::new()
+    }
+}
+
+impl<'a> GetProfilesBuilder<'a, get_profiles_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetProfilesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetProfilesBuilder<'a, S>
+where
+    S: get_profiles_state::State,
+    S::Actors: get_profiles_state::IsUnset,
+{
+    /// Set the `actors` field (required)
+    pub fn actors(
+        mut self,
+        value: impl Into<Vec<jacquard_common::types::ident::AtIdentifier<'a>>>,
+    ) -> GetProfilesBuilder<'a, get_profiles_state::SetActors<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        GetProfilesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetProfilesBuilder<'a, S>
+where
+    S: get_profiles_state::State,
+    S::Actors: get_profiles_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetProfiles<'a> {
+        GetProfiles {
+            actors: self.__unsafe_private_named.0.unwrap(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

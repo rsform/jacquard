@@ -13,25 +13,155 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-#[builder(start_fn = new)]
 pub struct UpdateAccountEmail<'a> {
     /// The handle or DID of the repo.
     #[serde(borrow)]
     pub account: jacquard_common::types::ident::AtIdentifier<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub email: jacquard_common::CowStr<'a>,
-    #[serde(flatten)]
-    #[serde(borrow)]
-    #[builder(default)]
-    pub extra_data: ::std::collections::BTreeMap<
-        ::jacquard_common::smol_str::SmolStr,
-        ::jacquard_common::types::value::Data<'a>,
-    >,
+}
+
+pub mod update_account_email_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Account;
+        type Email;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Account = Unset;
+        type Email = Unset;
+    }
+    ///State transition - sets the `account` field to Set
+    pub struct SetAccount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAccount<S> {}
+    impl<S: State> State for SetAccount<S> {
+        type Account = Set<members::account>;
+        type Email = S::Email;
+    }
+    ///State transition - sets the `email` field to Set
+    pub struct SetEmail<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEmail<S> {}
+    impl<S: State> State for SetEmail<S> {
+        type Account = S::Account;
+        type Email = Set<members::email>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `account` field
+        pub struct account(());
+        ///Marker type for the `email` field
+        pub struct email(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct UpdateAccountEmailBuilder<'a, S: update_account_email_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> UpdateAccountEmail<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> UpdateAccountEmailBuilder<'a, update_account_email_state::Empty> {
+        UpdateAccountEmailBuilder::new()
+    }
+}
+
+impl<'a> UpdateAccountEmailBuilder<'a, update_account_email_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        UpdateAccountEmailBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> UpdateAccountEmailBuilder<'a, S>
+where
+    S: update_account_email_state::State,
+    S::Account: update_account_email_state::IsUnset,
+{
+    /// Set the `account` field (required)
+    pub fn account(
+        mut self,
+        value: impl Into<jacquard_common::types::ident::AtIdentifier<'a>>,
+    ) -> UpdateAccountEmailBuilder<'a, update_account_email_state::SetAccount<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        UpdateAccountEmailBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> UpdateAccountEmailBuilder<'a, S>
+where
+    S: update_account_email_state::State,
+    S::Email: update_account_email_state::IsUnset,
+{
+    /// Set the `email` field (required)
+    pub fn email(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> UpdateAccountEmailBuilder<'a, update_account_email_state::SetEmail<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        UpdateAccountEmailBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> UpdateAccountEmailBuilder<'a, S>
+where
+    S: update_account_email_state::State,
+    S::Account: update_account_email_state::IsSet,
+    S::Email: update_account_email_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> UpdateAccountEmail<'a> {
+        UpdateAccountEmail {
+            account: self.__unsafe_private_named.0.unwrap(),
+            email: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> UpdateAccountEmail<'a> {
+        UpdateAccountEmail {
+            account: self.__unsafe_private_named.0.unwrap(),
+            email: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 /// Response type for

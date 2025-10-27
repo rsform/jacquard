@@ -13,26 +13,197 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Image<'a> {
     /// alt text description of the image
     #[serde(borrow)]
-    #[builder(into)]
     pub alt: jacquard_common::CowStr<'a>,
     /// Blurhash string for the image, used for low-resolution placeholders. This must be a valid Blurhash string.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub blurhash: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub dimensions: Option<ImageDimensions<'a>>,
     #[serde(borrow)]
     pub image: jacquard_common::types::blob::BlobRef<'a>,
+}
+
+pub mod image_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Image;
+        type Alt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Image = Unset;
+        type Alt = Unset;
+    }
+    ///State transition - sets the `image` field to Set
+    pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetImage<S> {}
+    impl<S: State> State for SetImage<S> {
+        type Image = Set<members::image>;
+        type Alt = S::Alt;
+    }
+    ///State transition - sets the `alt` field to Set
+    pub struct SetAlt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAlt<S> {}
+    impl<S: State> State for SetAlt<S> {
+        type Image = S::Image;
+        type Alt = Set<members::alt>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `image` field
+        pub struct image(());
+        ///Marker type for the `alt` field
+        pub struct alt(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ImageBuilder<'a, S: image_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ImageDimensions<'a>>,
+        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Image<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ImageBuilder<'a, image_state::Empty> {
+        ImageBuilder::new()
+    }
+}
+
+impl<'a> ImageBuilder<'a, image_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ImageBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ImageBuilder<'a, S>
+where
+    S: image_state::State,
+    S::Alt: image_state::IsUnset,
+{
+    /// Set the `alt` field (required)
+    pub fn alt(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> ImageBuilder<'a, image_state::SetAlt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ImageBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: image_state::State> ImageBuilder<'a, S> {
+    /// Set the `blurhash` field (optional)
+    pub fn blurhash(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `blurhash` field to an Option value (optional)
+    pub fn maybe_blurhash(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: image_state::State> ImageBuilder<'a, S> {
+    /// Set the `dimensions` field (optional)
+    pub fn dimensions(mut self, value: impl Into<Option<ImageDimensions<'a>>>) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `dimensions` field to an Option value (optional)
+    pub fn maybe_dimensions(mut self, value: Option<ImageDimensions<'a>>) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> ImageBuilder<'a, S>
+where
+    S: image_state::State,
+    S::Image: image_state::IsUnset,
+{
+    /// Set the `image` field (required)
+    pub fn image(
+        mut self,
+        value: impl Into<jacquard_common::types::blob::BlobRef<'a>>,
+    ) -> ImageBuilder<'a, image_state::SetImage<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        ImageBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ImageBuilder<'a, S>
+where
+    S: image_state::State,
+    S::Image: image_state::IsSet,
+    S::Alt: image_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Image<'a> {
+        Image {
+            alt: self.__unsafe_private_named.0.unwrap(),
+            blurhash: self.__unsafe_private_named.1,
+            dimensions: self.__unsafe_private_named.2,
+            image: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Image<'a> {
+        Image {
+            alt: self.__unsafe_private_named.0.unwrap(),
+            blurhash: self.__unsafe_private_named.1,
+            dimensions: self.__unsafe_private_named.2,
+            image: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -213,13 +384,117 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Image<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Images<'a> {
     #[serde(borrow)]
     pub images: Vec<crate::sh_weaver::embed::images::Image<'a>>,
+}
+
+pub mod images_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Images;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Images = Unset;
+    }
+    ///State transition - sets the `images` field to Set
+    pub struct SetImages<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetImages<S> {}
+    impl<S: State> State for SetImages<S> {
+        type Images = Set<members::images>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `images` field
+        pub struct images(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ImagesBuilder<'a, S: images_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<Vec<crate::sh_weaver::embed::images::Image<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Images<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ImagesBuilder<'a, images_state::Empty> {
+        ImagesBuilder::new()
+    }
+}
+
+impl<'a> ImagesBuilder<'a, images_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ImagesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ImagesBuilder<'a, S>
+where
+    S: images_state::State,
+    S::Images: images_state::IsUnset,
+{
+    /// Set the `images` field (required)
+    pub fn images(
+        mut self,
+        value: impl Into<Vec<crate::sh_weaver::embed::images::Image<'a>>>,
+    ) -> ImagesBuilder<'a, images_state::SetImages<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ImagesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ImagesBuilder<'a, S>
+where
+    S: images_state::State,
+    S::Images: images_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Images<'a> {
+        Images {
+            images: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Images<'a> {
+        Images {
+            images: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Images<'a> {

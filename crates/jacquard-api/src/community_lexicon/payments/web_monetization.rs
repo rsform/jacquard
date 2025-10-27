@@ -14,8 +14,7 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct WebMonetization<'a> {
@@ -24,9 +23,132 @@ pub struct WebMonetization<'a> {
     pub address: jacquard_common::types::string::Uri<'a>,
     /// Short, human-readable description of how this wallet is related to this account.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub note: Option<jacquard_common::CowStr<'a>>,
+}
+
+pub mod web_monetization_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Address;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Address = Unset;
+    }
+    ///State transition - sets the `address` field to Set
+    pub struct SetAddress<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAddress<S> {}
+    impl<S: State> State for SetAddress<S> {
+        type Address = Set<members::address>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `address` field
+        pub struct address(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct WebMonetizationBuilder<'a, S: web_monetization_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> WebMonetization<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> WebMonetizationBuilder<'a, web_monetization_state::Empty> {
+        WebMonetizationBuilder::new()
+    }
+}
+
+impl<'a> WebMonetizationBuilder<'a, web_monetization_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        WebMonetizationBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> WebMonetizationBuilder<'a, S>
+where
+    S: web_monetization_state::State,
+    S::Address: web_monetization_state::IsUnset,
+{
+    /// Set the `address` field (required)
+    pub fn address(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+    ) -> WebMonetizationBuilder<'a, web_monetization_state::SetAddress<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        WebMonetizationBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: web_monetization_state::State> WebMonetizationBuilder<'a, S> {
+    /// Set the `note` field (optional)
+    pub fn note(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `note` field to an Option value (optional)
+    pub fn maybe_note(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> WebMonetizationBuilder<'a, S>
+where
+    S: web_monetization_state::State,
+    S::Address: web_monetization_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> WebMonetization<'a> {
+        WebMonetization {
+            address: self.__unsafe_private_named.0.unwrap(),
+            note: self.__unsafe_private_named.1,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> WebMonetization<'a> {
+        WebMonetization {
+            address: self.__unsafe_private_named.0.unwrap(),
+            note: self.__unsafe_private_named.1,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> WebMonetization<'a> {

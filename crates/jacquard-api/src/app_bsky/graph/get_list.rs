@@ -12,21 +12,142 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetList<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    #[builder(into)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     ///(default: 50, min: 1, max: 100)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
     #[serde(borrow)]
     pub list: jacquard_common::types::string::AtUri<'a>,
+}
+
+pub mod get_list_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type List;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type List = Unset;
+    }
+    ///State transition - sets the `list` field to Set
+    pub struct SetList<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetList<S> {}
+    impl<S: State> State for SetList<S> {
+        type List = Set<members::list>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `list` field
+        pub struct list(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetListBuilder<'a, S: get_list_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GetList<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GetListBuilder<'a, get_list_state::Empty> {
+        GetListBuilder::new()
+    }
+}
+
+impl<'a> GetListBuilder<'a, get_list_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetListBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: get_list_state::State> GetListBuilder<'a, S> {
+    /// Set the `cursor` field (optional)
+    pub fn cursor(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `cursor` field to an Option value (optional)
+    pub fn maybe_cursor(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: get_list_state::State> GetListBuilder<'a, S> {
+    /// Set the `limit` field (optional)
+    pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `limit` field to an Option value (optional)
+    pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> GetListBuilder<'a, S>
+where
+    S: get_list_state::State,
+    S::List: get_list_state::IsUnset,
+{
+    /// Set the `list` field (required)
+    pub fn list(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> GetListBuilder<'a, get_list_state::SetList<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        GetListBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetListBuilder<'a, S>
+where
+    S: get_list_state::State,
+    S::List: get_list_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetList<'a> {
+        GetList {
+            cursor: self.__unsafe_private_named.0,
+            limit: self.__unsafe_private_named.1,
+            list: self.__unsafe_private_named.2.unwrap(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

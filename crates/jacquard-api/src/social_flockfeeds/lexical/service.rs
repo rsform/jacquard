@@ -14,197 +14,984 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Service<'a> {
     /** An additional type for the item, typically used for adding more specific types from external vocabularies in microdata syntax. This is a relationship between something and a class that the thing is in. Typically the value is a URI-identified RDF class, and in this case corresponds to the
     use of rdf:type in RDF. Text values can be used sparingly, for cases where useful information can be added without their being an appropriate schema to reference. In the case of text values, the class label should follow the schema.org <a href="https://schema.org/docs/styleguide.html">style guide</a>.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub additional_type: Option<jacquard_common::CowStr<'a>>,
     /// The overall rating, based on a collection of reviews or ratings, of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub aggregate_rating: Option<ServiceAggregateRating<'a>>,
     /// An alias for the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub alternate_name: Option<jacquard_common::CowStr<'a>>,
     /// The geographic area where a service or offered item is provided.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub area_served: Option<ServiceAreaServed<'a>>,
     /// An intended audience, i.e. a group for whom something was created.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub audience: Option<ServiceAudience<'a>>,
     /// A means of accessing the service (e.g. a phone bank, a web site, a location, etc.).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub available_channel: Option<ServiceAvailableChannel<'a>>,
     /// An award won by or for this item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub award: Option<jacquard_common::CowStr<'a>>,
     /// The brand(s) associated with a product or service, or the brand(s) maintained by an organization or business person.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub brand: Option<ServiceBrand<'a>>,
     /// An entity that arranges for an exchange between a buyer and a seller.  In most cases a broker never acquires or releases ownership of a product or service involved in an exchange.  If it is not clear whether an entity is a broker, seller, or buyer, the latter two terms are preferred.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub broker: Option<ServiceBroker<'a>>,
     /// A category for the item. Greater signs or slashes can be used to informally indicate a category hierarchy.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub category: Option<ServiceCategory<'a>>,
     /// A description of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub description: Option<ServiceDescription<'a>>,
     /// A sub property of description. A short description of the item used to disambiguate from other, similar items. Information from other properties (in particular, name) may be necessary for the description to be useful for disambiguation.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub disambiguating_description: Option<jacquard_common::CowStr<'a>>,
     /// Certification information about a product, organization, service, place, or person.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub has_certification: Option<ServiceHasCertification<'a>>,
     /// Indicates an OfferCatalog listing for this Organization, Person, or Service.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub has_offer_catalog: Option<ServiceHasOfferCatalog<'a>>,
     /// The hours during which this service or contact is available.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub hours_available: Option<ServiceHoursAvailable<'a>>,
     /// The identifier property represents any kind of identifier for any kind of [[Thing]], such as ISBNs, GTIN codes, UUIDs etc. Schema.org provides dedicated properties for representing many of these, either as textual strings or as URL (URI) links. See [background notes](/docs/datamodel.html#identifierBg) for more details.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub identifier: Option<ServiceIdentifier<'a>>,
     /// An image of the item. This can be a [[URL]] or a fully described [[ImageObject]].
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub image: Option<ServiceImage<'a>>,
     /// A pointer to another, somehow related product (or multiple products).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub is_related_to: Option<ServiceIsRelatedTo<'a>>,
     /// A pointer to another, functionally similar product (or multiple products).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub is_similar_to: Option<ServiceIsSimilarTo<'a>>,
     /// An associated logo.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub logo: Option<ServiceLogo<'a>>,
     /// Indicates a page (or other CreativeWork) for which this thing is the main entity being described. See [background notes](/docs/datamodel.html#mainEntityBackground) for details.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub main_entity_of_page: Option<ServiceMainEntityOfPage<'a>>,
     /// The name of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub name: Option<jacquard_common::CowStr<'a>>,
     /// An offer to provide this item&#x2014;for example, an offer to sell a product, rent the DVD of a movie, perform a service, or give away tickets to an event. Use [[businessFunction]] to indicate the kind of transaction offered, i.e. sell, lease, etc. This property can also be used to describe a [[Demand]]. While this property is listed as expected on a number of common types, it can be used in others. In that case, using a second type, such as Product or a subtype of Product, can clarify the nature of the offer.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub offers: Option<ServiceOffers<'a>>,
     /// Indicates a potential Action, which describes an idealized action in which this thing would play an 'object' role.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub potential_action: Option<ServicePotentialAction<'a>>,
     /// The tangible thing generated by the service, e.g. a passport, permit, etc.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub produces: Option<ServiceProduces<'a>>,
     /// The service provider, service operator, or service performer; the goods producer. Another party (a seller) may offer those services or goods on behalf of the provider. A provider may also serve as the seller.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub provider: Option<ServiceProvider<'a>>,
     /// Indicates the mobility of a provided service (e.g. 'static', 'dynamic').
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub provider_mobility: Option<jacquard_common::CowStr<'a>>,
     /// A review of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub review: Option<ServiceReview<'a>>,
     /// URL of a reference Web page that unambiguously indicates the item's identity. E.g. the URL of the item's Wikipedia page, Wikidata entry, or official website.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub same_as: Option<jacquard_common::types::string::Uri<'a>>,
     /// The geographic area where the service is provided.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub service_area: Option<ServiceServiceArea<'a>>,
     /// The audience eligible for this service.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub service_audience: Option<ServiceServiceAudience<'a>>,
     /// The tangible thing generated by the service, e.g. a passport, permit, etc.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub service_output: Option<ServiceServiceOutput<'a>>,
     /// The type of service being offered, e.g. veterans' benefits, emergency relief, etc.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub service_type: Option<ServiceServiceType<'a>>,
     /// A slogan or motto associated with the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub slogan: Option<jacquard_common::CowStr<'a>>,
     /// A CreativeWork or Event about this Thing.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub subject_of: Option<ServiceSubjectOf<'a>>,
     /// Human-readable terms of service documentation.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub terms_of_service: Option<jacquard_common::CowStr<'a>>,
     /// URL of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub url: Option<jacquard_common::types::string::Uri<'a>>,
+}
+
+pub mod service_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {}
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {}
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {}
+}
+
+/// Builder for constructing an instance of this type
+pub struct ServiceBuilder<'a, S: service_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ServiceAggregateRating<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ServiceAreaServed<'a>>,
+        ::core::option::Option<ServiceAudience<'a>>,
+        ::core::option::Option<ServiceAvailableChannel<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ServiceBrand<'a>>,
+        ::core::option::Option<ServiceBroker<'a>>,
+        ::core::option::Option<ServiceCategory<'a>>,
+        ::core::option::Option<ServiceDescription<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ServiceHasCertification<'a>>,
+        ::core::option::Option<ServiceHasOfferCatalog<'a>>,
+        ::core::option::Option<ServiceHoursAvailable<'a>>,
+        ::core::option::Option<ServiceIdentifier<'a>>,
+        ::core::option::Option<ServiceImage<'a>>,
+        ::core::option::Option<ServiceIsRelatedTo<'a>>,
+        ::core::option::Option<ServiceIsSimilarTo<'a>>,
+        ::core::option::Option<ServiceLogo<'a>>,
+        ::core::option::Option<ServiceMainEntityOfPage<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ServiceOffers<'a>>,
+        ::core::option::Option<ServicePotentialAction<'a>>,
+        ::core::option::Option<ServiceProduces<'a>>,
+        ::core::option::Option<ServiceProvider<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ServiceReview<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<ServiceServiceArea<'a>>,
+        ::core::option::Option<ServiceServiceAudience<'a>>,
+        ::core::option::Option<ServiceServiceOutput<'a>>,
+        ::core::option::Option<ServiceServiceType<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ServiceSubjectOf<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Service<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ServiceBuilder<'a, service_state::Empty> {
+        ServiceBuilder::new()
+    }
+}
+
+impl<'a> ServiceBuilder<'a, service_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ServiceBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
+    /// Set the `additionalType` field (optional)
+    pub fn additional_type(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `additionalType` field to an Option value (optional)
+    pub fn maybe_additional_type(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
+    /// Set the `aggregateRating` field (optional)
+    pub fn aggregate_rating(
+        mut self,
+        value: impl Into<Option<ServiceAggregateRating<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `aggregateRating` field to an Option value (optional)
+    pub fn maybe_aggregate_rating(
+        mut self,
+        value: Option<ServiceAggregateRating<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
+    /// Set the `alternateName` field (optional)
+    pub fn alternate_name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `alternateName` field to an Option value (optional)
+    pub fn maybe_alternate_name(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
+    /// Set the `areaServed` field (optional)
+    pub fn area_served(
+        mut self,
+        value: impl Into<Option<ServiceAreaServed<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `areaServed` field to an Option value (optional)
+    pub fn maybe_area_served(mut self, value: Option<ServiceAreaServed<'a>>) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
+    /// Set the `audience` field (optional)
+    pub fn audience(mut self, value: impl Into<Option<ServiceAudience<'a>>>) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `audience` field to an Option value (optional)
+    pub fn maybe_audience(mut self, value: Option<ServiceAudience<'a>>) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
+    /// Set the `availableChannel` field (optional)
+    pub fn available_channel(
+        mut self,
+        value: impl Into<Option<ServiceAvailableChannel<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `availableChannel` field to an Option value (optional)
+    pub fn maybe_available_channel(
+        mut self,
+        value: Option<ServiceAvailableChannel<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
+    /// Set the `award` field (optional)
+    pub fn award(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `award` field to an Option value (optional)
+    pub fn maybe_award(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
+    /// Set the `brand` field (optional)
+    pub fn brand(mut self, value: impl Into<Option<ServiceBrand<'a>>>) -> Self {
+        self.__unsafe_private_named.7 = value.into();
+        self
+    }
+    /// Set the `brand` field to an Option value (optional)
+    pub fn maybe_brand(mut self, value: Option<ServiceBrand<'a>>) -> Self {
+        self.__unsafe_private_named.7 = value;
+        self
+    }
+}
+
+impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
+    /// Set the `broker` field (optional)
+    pub fn broker(mut self, value: impl Into<Option<ServiceBroker<'a>>>) -> Self {
+        self.__unsafe_private_named.8 = value.into();
+        self
+    }
+    /// Set the `broker` field to an Option value (optional)
+    pub fn maybe_broker(mut self, value: Option<ServiceBroker<'a>>) -> Self {
+        self.__unsafe_private_named.8 = value;
+        self
+    }
+}
+
+impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
+    /// Set the `category` field (optional)
+    pub fn category(mut self, value: impl Into<Option<ServiceCategory<'a>>>) -> Self {
+        self.__unsafe_private_named.9 = value.into();
+        self
+    }
+    /// Set the `category` field to an Option value (optional)
+    pub fn maybe_category(mut self, value: Option<ServiceCategory<'a>>) -> Self {
+        self.__unsafe_private_named.9 = value;
+        self
+    }
+}
+
+impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
+    /// Set the `description` field (optional)
+    pub fn description(
+        mut self,
+        value: impl Into<Option<ServiceDescription<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.10 = value.into();
+        self
+    }
+    /// Set the `description` field to an Option value (optional)
+    pub fn maybe_description(mut self, value: Option<ServiceDescription<'a>>) -> Self {
+        self.__unsafe_private_named.10 = value;
+        self
+    }
+}
+
+impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
+    /// Set the `disambiguatingDescription` field (optional)
+    pub fn disambiguating_description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.11 = value.into();
+        self
+    }
+    /// Set the `disambiguatingDescription` field to an Option value (optional)
+    pub fn maybe_disambiguating_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.11 = value;
+        self
+    }
+}
+
+impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
+    /// Set the `hasCertification` field (optional)
+    pub fn has_certification(
+        mut self,
+        value: impl Into<Option<ServiceHasCertification<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.12 = value.into();
+        self
+    }
+    /// Set the `hasCertification` field to an Option value (optional)
+    pub fn maybe_has_certification(
+        mut self,
+        value: Option<ServiceHasCertification<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.12 = value;
+        self
+    }
+}
+
+impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
+    /// Set the `hasOfferCatalog` field (optional)
+    pub fn has_offer_catalog(
+        mut self,
+        value: impl Into<Option<ServiceHasOfferCatalog<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.13 = value.into();
+        self
+    }
+    /// Set the `hasOfferCatalog` field to an Option value (optional)
+    pub fn maybe_has_offer_catalog(
+        mut self,
+        value: Option<ServiceHasOfferCatalog<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.13 = value;
+        self
+    }
+}
+
+impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
+    /// Set the `hoursAvailable` field (optional)
+    pub fn hours_available(
+        mut self,
+        value: impl Into<Option<ServiceHoursAvailable<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.14 = value.into();
+        self
+    }
+    /// Set the `hoursAvailable` field to an Option value (optional)
+    pub fn maybe_hours_available(
+        mut self,
+        value: Option<ServiceHoursAvailable<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.14 = value;
+        self
+    }
+}
+
+impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
+    /// Set the `identifier` field (optional)
+    pub fn identifier(
+        mut self,
+        value: impl Into<Option<ServiceIdentifier<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.15 = value.into();
+        self
+    }
+    /// Set the `identifier` field to an Option value (optional)
+    pub fn maybe_identifier(mut self, value: Option<ServiceIdentifier<'a>>) -> Self {
+        self.__unsafe_private_named.15 = value;
+        self
+    }
+}
+
+impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
+    /// Set the `image` field (optional)
+    pub fn image(mut self, value: impl Into<Option<ServiceImage<'a>>>) -> Self {
+        self.__unsafe_private_named.16 = value.into();
+        self
+    }
+    /// Set the `image` field to an Option value (optional)
+    pub fn maybe_image(mut self, value: Option<ServiceImage<'a>>) -> Self {
+        self.__unsafe_private_named.16 = value;
+        self
+    }
+}
+
+impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
+    /// Set the `isRelatedTo` field (optional)
+    pub fn is_related_to(
+        mut self,
+        value: impl Into<Option<ServiceIsRelatedTo<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.17 = value.into();
+        self
+    }
+    /// Set the `isRelatedTo` field to an Option value (optional)
+    pub fn maybe_is_related_to(mut self, value: Option<ServiceIsRelatedTo<'a>>) -> Self {
+        self.__unsafe_private_named.17 = value;
+        self
+    }
+}
+
+impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
+    /// Set the `isSimilarTo` field (optional)
+    pub fn is_similar_to(
+        mut self,
+        value: impl Into<Option<ServiceIsSimilarTo<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.18 = value.into();
+        self
+    }
+    /// Set the `isSimilarTo` field to an Option value (optional)
+    pub fn maybe_is_similar_to(mut self, value: Option<ServiceIsSimilarTo<'a>>) -> Self {
+        self.__unsafe_private_named.18 = value;
+        self
+    }
+}
+
+impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
+    /// Set the `logo` field (optional)
+    pub fn logo(mut self, value: impl Into<Option<ServiceLogo<'a>>>) -> Self {
+        self.__unsafe_private_named.19 = value.into();
+        self
+    }
+    /// Set the `logo` field to an Option value (optional)
+    pub fn maybe_logo(mut self, value: Option<ServiceLogo<'a>>) -> Self {
+        self.__unsafe_private_named.19 = value;
+        self
+    }
+}
+
+impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
+    /// Set the `mainEntityOfPage` field (optional)
+    pub fn main_entity_of_page(
+        mut self,
+        value: impl Into<Option<ServiceMainEntityOfPage<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.20 = value.into();
+        self
+    }
+    /// Set the `mainEntityOfPage` field to an Option value (optional)
+    pub fn maybe_main_entity_of_page(
+        mut self,
+        value: Option<ServiceMainEntityOfPage<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.20 = value;
+        self
+    }
+}
+
+impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
+    /// Set the `name` field (optional)
+    pub fn name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.21 = value.into();
+        self
+    }
+    /// Set the `name` field to an Option value (optional)
+    pub fn maybe_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.21 = value;
+        self
+    }
+}
+
+impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
+    /// Set the `offers` field (optional)
+    pub fn offers(mut self, value: impl Into<Option<ServiceOffers<'a>>>) -> Self {
+        self.__unsafe_private_named.22 = value.into();
+        self
+    }
+    /// Set the `offers` field to an Option value (optional)
+    pub fn maybe_offers(mut self, value: Option<ServiceOffers<'a>>) -> Self {
+        self.__unsafe_private_named.22 = value;
+        self
+    }
+}
+
+impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
+    /// Set the `potentialAction` field (optional)
+    pub fn potential_action(
+        mut self,
+        value: impl Into<Option<ServicePotentialAction<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.23 = value.into();
+        self
+    }
+    /// Set the `potentialAction` field to an Option value (optional)
+    pub fn maybe_potential_action(
+        mut self,
+        value: Option<ServicePotentialAction<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.23 = value;
+        self
+    }
+}
+
+impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
+    /// Set the `produces` field (optional)
+    pub fn produces(mut self, value: impl Into<Option<ServiceProduces<'a>>>) -> Self {
+        self.__unsafe_private_named.24 = value.into();
+        self
+    }
+    /// Set the `produces` field to an Option value (optional)
+    pub fn maybe_produces(mut self, value: Option<ServiceProduces<'a>>) -> Self {
+        self.__unsafe_private_named.24 = value;
+        self
+    }
+}
+
+impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
+    /// Set the `provider` field (optional)
+    pub fn provider(mut self, value: impl Into<Option<ServiceProvider<'a>>>) -> Self {
+        self.__unsafe_private_named.25 = value.into();
+        self
+    }
+    /// Set the `provider` field to an Option value (optional)
+    pub fn maybe_provider(mut self, value: Option<ServiceProvider<'a>>) -> Self {
+        self.__unsafe_private_named.25 = value;
+        self
+    }
+}
+
+impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
+    /// Set the `providerMobility` field (optional)
+    pub fn provider_mobility(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.26 = value.into();
+        self
+    }
+    /// Set the `providerMobility` field to an Option value (optional)
+    pub fn maybe_provider_mobility(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.26 = value;
+        self
+    }
+}
+
+impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
+    /// Set the `review` field (optional)
+    pub fn review(mut self, value: impl Into<Option<ServiceReview<'a>>>) -> Self {
+        self.__unsafe_private_named.27 = value.into();
+        self
+    }
+    /// Set the `review` field to an Option value (optional)
+    pub fn maybe_review(mut self, value: Option<ServiceReview<'a>>) -> Self {
+        self.__unsafe_private_named.27 = value;
+        self
+    }
+}
+
+impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
+    /// Set the `sameAs` field (optional)
+    pub fn same_as(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.28 = value.into();
+        self
+    }
+    /// Set the `sameAs` field to an Option value (optional)
+    pub fn maybe_same_as(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.28 = value;
+        self
+    }
+}
+
+impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
+    /// Set the `serviceArea` field (optional)
+    pub fn service_area(
+        mut self,
+        value: impl Into<Option<ServiceServiceArea<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.29 = value.into();
+        self
+    }
+    /// Set the `serviceArea` field to an Option value (optional)
+    pub fn maybe_service_area(mut self, value: Option<ServiceServiceArea<'a>>) -> Self {
+        self.__unsafe_private_named.29 = value;
+        self
+    }
+}
+
+impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
+    /// Set the `serviceAudience` field (optional)
+    pub fn service_audience(
+        mut self,
+        value: impl Into<Option<ServiceServiceAudience<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.30 = value.into();
+        self
+    }
+    /// Set the `serviceAudience` field to an Option value (optional)
+    pub fn maybe_service_audience(
+        mut self,
+        value: Option<ServiceServiceAudience<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.30 = value;
+        self
+    }
+}
+
+impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
+    /// Set the `serviceOutput` field (optional)
+    pub fn service_output(
+        mut self,
+        value: impl Into<Option<ServiceServiceOutput<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.31 = value.into();
+        self
+    }
+    /// Set the `serviceOutput` field to an Option value (optional)
+    pub fn maybe_service_output(
+        mut self,
+        value: Option<ServiceServiceOutput<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.31 = value;
+        self
+    }
+}
+
+impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
+    /// Set the `serviceType` field (optional)
+    pub fn service_type(
+        mut self,
+        value: impl Into<Option<ServiceServiceType<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.32 = value.into();
+        self
+    }
+    /// Set the `serviceType` field to an Option value (optional)
+    pub fn maybe_service_type(mut self, value: Option<ServiceServiceType<'a>>) -> Self {
+        self.__unsafe_private_named.32 = value;
+        self
+    }
+}
+
+impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
+    /// Set the `slogan` field (optional)
+    pub fn slogan(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.33 = value.into();
+        self
+    }
+    /// Set the `slogan` field to an Option value (optional)
+    pub fn maybe_slogan(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.33 = value;
+        self
+    }
+}
+
+impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
+    /// Set the `subjectOf` field (optional)
+    pub fn subject_of(mut self, value: impl Into<Option<ServiceSubjectOf<'a>>>) -> Self {
+        self.__unsafe_private_named.34 = value.into();
+        self
+    }
+    /// Set the `subjectOf` field to an Option value (optional)
+    pub fn maybe_subject_of(mut self, value: Option<ServiceSubjectOf<'a>>) -> Self {
+        self.__unsafe_private_named.34 = value;
+        self
+    }
+}
+
+impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
+    /// Set the `termsOfService` field (optional)
+    pub fn terms_of_service(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.35 = value.into();
+        self
+    }
+    /// Set the `termsOfService` field to an Option value (optional)
+    pub fn maybe_terms_of_service(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.35 = value;
+        self
+    }
+}
+
+impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
+    /// Set the `url` field (optional)
+    pub fn url(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.36 = value.into();
+        self
+    }
+    /// Set the `url` field to an Option value (optional)
+    pub fn maybe_url(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.36 = value;
+        self
+    }
+}
+
+impl<'a, S> ServiceBuilder<'a, S>
+where
+    S: service_state::State,
+{
+    /// Build the final struct
+    pub fn build(self) -> Service<'a> {
+        Service {
+            additional_type: self.__unsafe_private_named.0,
+            aggregate_rating: self.__unsafe_private_named.1,
+            alternate_name: self.__unsafe_private_named.2,
+            area_served: self.__unsafe_private_named.3,
+            audience: self.__unsafe_private_named.4,
+            available_channel: self.__unsafe_private_named.5,
+            award: self.__unsafe_private_named.6,
+            brand: self.__unsafe_private_named.7,
+            broker: self.__unsafe_private_named.8,
+            category: self.__unsafe_private_named.9,
+            description: self.__unsafe_private_named.10,
+            disambiguating_description: self.__unsafe_private_named.11,
+            has_certification: self.__unsafe_private_named.12,
+            has_offer_catalog: self.__unsafe_private_named.13,
+            hours_available: self.__unsafe_private_named.14,
+            identifier: self.__unsafe_private_named.15,
+            image: self.__unsafe_private_named.16,
+            is_related_to: self.__unsafe_private_named.17,
+            is_similar_to: self.__unsafe_private_named.18,
+            logo: self.__unsafe_private_named.19,
+            main_entity_of_page: self.__unsafe_private_named.20,
+            name: self.__unsafe_private_named.21,
+            offers: self.__unsafe_private_named.22,
+            potential_action: self.__unsafe_private_named.23,
+            produces: self.__unsafe_private_named.24,
+            provider: self.__unsafe_private_named.25,
+            provider_mobility: self.__unsafe_private_named.26,
+            review: self.__unsafe_private_named.27,
+            same_as: self.__unsafe_private_named.28,
+            service_area: self.__unsafe_private_named.29,
+            service_audience: self.__unsafe_private_named.30,
+            service_output: self.__unsafe_private_named.31,
+            service_type: self.__unsafe_private_named.32,
+            slogan: self.__unsafe_private_named.33,
+            subject_of: self.__unsafe_private_named.34,
+            terms_of_service: self.__unsafe_private_named.35,
+            url: self.__unsafe_private_named.36,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Service<'a> {
+        Service {
+            additional_type: self.__unsafe_private_named.0,
+            aggregate_rating: self.__unsafe_private_named.1,
+            alternate_name: self.__unsafe_private_named.2,
+            area_served: self.__unsafe_private_named.3,
+            audience: self.__unsafe_private_named.4,
+            available_channel: self.__unsafe_private_named.5,
+            award: self.__unsafe_private_named.6,
+            brand: self.__unsafe_private_named.7,
+            broker: self.__unsafe_private_named.8,
+            category: self.__unsafe_private_named.9,
+            description: self.__unsafe_private_named.10,
+            disambiguating_description: self.__unsafe_private_named.11,
+            has_certification: self.__unsafe_private_named.12,
+            has_offer_catalog: self.__unsafe_private_named.13,
+            hours_available: self.__unsafe_private_named.14,
+            identifier: self.__unsafe_private_named.15,
+            image: self.__unsafe_private_named.16,
+            is_related_to: self.__unsafe_private_named.17,
+            is_similar_to: self.__unsafe_private_named.18,
+            logo: self.__unsafe_private_named.19,
+            main_entity_of_page: self.__unsafe_private_named.20,
+            name: self.__unsafe_private_named.21,
+            offers: self.__unsafe_private_named.22,
+            potential_action: self.__unsafe_private_named.23,
+            produces: self.__unsafe_private_named.24,
+            provider: self.__unsafe_private_named.25,
+            provider_mobility: self.__unsafe_private_named.26,
+            review: self.__unsafe_private_named.27,
+            same_as: self.__unsafe_private_named.28,
+            service_area: self.__unsafe_private_named.29,
+            service_audience: self.__unsafe_private_named.30,
+            service_output: self.__unsafe_private_named.31,
+            service_type: self.__unsafe_private_named.32,
+            slogan: self.__unsafe_private_named.33,
+            subject_of: self.__unsafe_private_named.34,
+            terms_of_service: self.__unsafe_private_named.35,
+            url: self.__unsafe_private_named.36,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Service<'a> {

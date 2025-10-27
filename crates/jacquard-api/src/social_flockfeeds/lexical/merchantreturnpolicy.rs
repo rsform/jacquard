@@ -14,189 +14,1002 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Merchantreturnpolicy<'a> {
     /// A property-value pair representing an additional characteristic of the entity, e.g. a product feature or another characteristic for which there is no matching property in schema.org.\n\nNote: Publishers should be aware that applications designed to use specific schema.org properties (e.g. https://schema.org/width, https://schema.org/color, https://schema.org/gtin13, ...) will typically expect such data to be provided using those properties, rather than using the generic property/value mechanism.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub additional_property: Option<MerchantreturnpolicyAdditionalProperty<'a>>,
     /** An additional type for the item, typically used for adding more specific types from external vocabularies in microdata syntax. This is a relationship between something and a class that the thing is in. Typically the value is a URI-identified RDF class, and in this case corresponds to the
     use of rdf:type in RDF. Text values can be used sparingly, for cases where useful information can be added without their being an appropriate schema to reference. In the case of text values, the class label should follow the schema.org <a href="https://schema.org/docs/styleguide.html">style guide</a>.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub additional_type: Option<jacquard_common::CowStr<'a>>,
     /// An alias for the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub alternate_name: Option<jacquard_common::CowStr<'a>>,
     /// A country where a particular merchant return policy applies to, for example the two-letter ISO 3166-1 alpha-2 country code.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub applicable_country: Option<MerchantreturnpolicyApplicableCountry<'a>>,
     /// The type of return fees if the product is returned due to customer remorse.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub customer_remorse_return_fees: Option<jacquard_common::CowStr<'a>>,
     /// The method (from an enumeration) by which the customer obtains a return shipping label for a product returned due to customer remorse.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub customer_remorse_return_label_source: Option<jacquard_common::CowStr<'a>>,
     /// The amount of shipping costs if a product is returned due to customer remorse. Applicable when property [[customerRemorseReturnFees]] equals [[ReturnShippingFees]].
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub customer_remorse_return_shipping_fees_amount: Option<
         MerchantreturnpolicyCustomerRemorseReturnShippingFeesAmount<'a>,
     >,
     /// A description of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub description: Option<MerchantreturnpolicyDescription<'a>>,
     /// A sub property of description. A short description of the item used to disambiguate from other, similar items. Information from other properties (in particular, name) may be necessary for the description to be useful for disambiguation.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub disambiguating_description: Option<jacquard_common::CowStr<'a>>,
     /// The identifier property represents any kind of identifier for any kind of [[Thing]], such as ISBNs, GTIN codes, UUIDs etc. Schema.org provides dedicated properties for representing many of these, either as textual strings or as URL (URI) links. See [background notes](/docs/datamodel.html#identifierBg) for more details.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub identifier: Option<MerchantreturnpolicyIdentifier<'a>>,
     /// An image of the item. This can be a [[URL]] or a fully described [[ImageObject]].
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub image: Option<MerchantreturnpolicyImage<'a>>,
     /// Are in-store returns offered? (For more advanced return methods use the [[returnMethod]] property.)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub in_store_returns_offered: Option<bool>,
     /// A predefined value from OfferItemCondition specifying the condition of the product or service, or the products or services included in the offer. Also used for product return policies to specify the condition of products accepted for returns.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub item_condition: Option<MerchantreturnpolicyItemCondition<'a>>,
     /// The type of return fees for returns of defect products.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub item_defect_return_fees: Option<jacquard_common::CowStr<'a>>,
     /// The method (from an enumeration) by which the customer obtains a return shipping label for a defect product.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub item_defect_return_label_source: Option<jacquard_common::CowStr<'a>>,
     /// Amount of shipping costs for defect product returns. Applicable when property [[itemDefectReturnFees]] equals [[ReturnShippingFees]].
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub item_defect_return_shipping_fees_amount: Option<
         MerchantreturnpolicyItemDefectReturnShippingFeesAmount<'a>,
     >,
     /// Indicates a page (or other CreativeWork) for which this thing is the main entity being described. See [background notes](/docs/datamodel.html#mainEntityBackground) for details.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub main_entity_of_page: Option<MerchantreturnpolicyMainEntityOfPage<'a>>,
     /// Specifies either a fixed return date or the number of days (from the delivery date) that a product can be returned. Used when the [[returnPolicyCategory]] property is specified as [[MerchantReturnFiniteReturnWindow]].
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub merchant_return_days: Option<jacquard_common::CowStr<'a>>,
     /// Specifies a Web page or service by URL, for product returns.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub merchant_return_link: Option<jacquard_common::types::string::Uri<'a>>,
     /// The name of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub name: Option<jacquard_common::CowStr<'a>>,
     /// Indicates a potential Action, which describes an idealized action in which this thing would play an 'object' role.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub potential_action: Option<MerchantreturnpolicyPotentialAction<'a>>,
     /// A refund type, from an enumerated list.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub refund_type: Option<jacquard_common::CowStr<'a>>,
     /// Use [[MonetaryAmount]] to specify a fixed restocking fee for product returns, or use [[Number]] to specify a percentage of the product price paid by the customer.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub restocking_fee: Option<MerchantreturnpolicyRestockingFee<'a>>,
     /// The type of return fees for purchased products (for any return reason).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub return_fees: Option<jacquard_common::CowStr<'a>>,
     /// The method (from an enumeration) by which the customer obtains a return shipping label for a product returned for any reason.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub return_label_source: Option<jacquard_common::CowStr<'a>>,
     /// The type of return method offered, specified from an enumeration.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub return_method: Option<jacquard_common::CowStr<'a>>,
     /// Specifies an applicable return policy (from an enumeration).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub return_policy_category: Option<jacquard_common::CowStr<'a>>,
     /// The country where the product has to be sent to for returns, for example "Ireland" using the [[name]] property of [[Country]]. You can also provide the two-letter [ISO 3166-1 alpha-2 country code](http://en.wikipedia.org/wiki/ISO_3166-1). Note that this can be different from the country where the product was originally shipped from or sent to.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub return_policy_country: Option<MerchantreturnpolicyReturnPolicyCountry<'a>>,
     /// Seasonal override of a return policy.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub return_policy_seasonal_override: Option<
         MerchantreturnpolicyReturnPolicySeasonalOverride<'a>,
     >,
     /// Amount of shipping costs for product returns (for any reason). Applicable when property [[returnFees]] equals [[ReturnShippingFees]].
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub return_shipping_fees_amount: Option<
         MerchantreturnpolicyReturnShippingFeesAmount<'a>,
     >,
     /// URL of a reference Web page that unambiguously indicates the item's identity. E.g. the URL of the item's Wikipedia page, Wikidata entry, or official website.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub same_as: Option<jacquard_common::types::string::Uri<'a>>,
     /// A CreativeWork or Event about this Thing.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub subject_of: Option<MerchantreturnpolicySubjectOf<'a>>,
     /// URL of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub url: Option<jacquard_common::types::string::Uri<'a>>,
     /// The membership program tier an Offer (or a PriceSpecification, OfferShippingDetails, or MerchantReturnPolicy under an Offer) is valid for.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub valid_for_member_tier: Option<MerchantreturnpolicyValidForMemberTier<'a>>,
+}
+
+pub mod merchantreturnpolicy_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {}
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {}
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {}
+}
+
+/// Builder for constructing an instance of this type
+pub struct MerchantreturnpolicyBuilder<'a, S: merchantreturnpolicy_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<MerchantreturnpolicyAdditionalProperty<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<MerchantreturnpolicyApplicableCountry<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<
+            MerchantreturnpolicyCustomerRemorseReturnShippingFeesAmount<'a>,
+        >,
+        ::core::option::Option<MerchantreturnpolicyDescription<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<MerchantreturnpolicyIdentifier<'a>>,
+        ::core::option::Option<MerchantreturnpolicyImage<'a>>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<MerchantreturnpolicyItemCondition<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<
+            MerchantreturnpolicyItemDefectReturnShippingFeesAmount<'a>,
+        >,
+        ::core::option::Option<MerchantreturnpolicyMainEntityOfPage<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<MerchantreturnpolicyPotentialAction<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<MerchantreturnpolicyRestockingFee<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<MerchantreturnpolicyReturnPolicyCountry<'a>>,
+        ::core::option::Option<MerchantreturnpolicyReturnPolicySeasonalOverride<'a>>,
+        ::core::option::Option<MerchantreturnpolicyReturnShippingFeesAmount<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<MerchantreturnpolicySubjectOf<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<MerchantreturnpolicyValidForMemberTier<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Merchantreturnpolicy<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> MerchantreturnpolicyBuilder<'a, merchantreturnpolicy_state::Empty> {
+        MerchantreturnpolicyBuilder::new()
+    }
+}
+
+impl<'a> MerchantreturnpolicyBuilder<'a, merchantreturnpolicy_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        MerchantreturnpolicyBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: merchantreturnpolicy_state::State> MerchantreturnpolicyBuilder<'a, S> {
+    /// Set the `additionalProperty` field (optional)
+    pub fn additional_property(
+        mut self,
+        value: impl Into<Option<MerchantreturnpolicyAdditionalProperty<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `additionalProperty` field to an Option value (optional)
+    pub fn maybe_additional_property(
+        mut self,
+        value: Option<MerchantreturnpolicyAdditionalProperty<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: merchantreturnpolicy_state::State> MerchantreturnpolicyBuilder<'a, S> {
+    /// Set the `additionalType` field (optional)
+    pub fn additional_type(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `additionalType` field to an Option value (optional)
+    pub fn maybe_additional_type(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: merchantreturnpolicy_state::State> MerchantreturnpolicyBuilder<'a, S> {
+    /// Set the `alternateName` field (optional)
+    pub fn alternate_name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `alternateName` field to an Option value (optional)
+    pub fn maybe_alternate_name(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: merchantreturnpolicy_state::State> MerchantreturnpolicyBuilder<'a, S> {
+    /// Set the `applicableCountry` field (optional)
+    pub fn applicable_country(
+        mut self,
+        value: impl Into<Option<MerchantreturnpolicyApplicableCountry<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `applicableCountry` field to an Option value (optional)
+    pub fn maybe_applicable_country(
+        mut self,
+        value: Option<MerchantreturnpolicyApplicableCountry<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: merchantreturnpolicy_state::State> MerchantreturnpolicyBuilder<'a, S> {
+    /// Set the `customerRemorseReturnFees` field (optional)
+    pub fn customer_remorse_return_fees(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `customerRemorseReturnFees` field to an Option value (optional)
+    pub fn maybe_customer_remorse_return_fees(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: merchantreturnpolicy_state::State> MerchantreturnpolicyBuilder<'a, S> {
+    /// Set the `customerRemorseReturnLabelSource` field (optional)
+    pub fn customer_remorse_return_label_source(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `customerRemorseReturnLabelSource` field to an Option value (optional)
+    pub fn maybe_customer_remorse_return_label_source(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S: merchantreturnpolicy_state::State> MerchantreturnpolicyBuilder<'a, S> {
+    /// Set the `customerRemorseReturnShippingFeesAmount` field (optional)
+    pub fn customer_remorse_return_shipping_fees_amount(
+        mut self,
+        value: impl Into<
+            Option<MerchantreturnpolicyCustomerRemorseReturnShippingFeesAmount<'a>>,
+        >,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `customerRemorseReturnShippingFeesAmount` field to an Option value (optional)
+    pub fn maybe_customer_remorse_return_shipping_fees_amount(
+        mut self,
+        value: Option<MerchantreturnpolicyCustomerRemorseReturnShippingFeesAmount<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S: merchantreturnpolicy_state::State> MerchantreturnpolicyBuilder<'a, S> {
+    /// Set the `description` field (optional)
+    pub fn description(
+        mut self,
+        value: impl Into<Option<MerchantreturnpolicyDescription<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value.into();
+        self
+    }
+    /// Set the `description` field to an Option value (optional)
+    pub fn maybe_description(
+        mut self,
+        value: Option<MerchantreturnpolicyDescription<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value;
+        self
+    }
+}
+
+impl<'a, S: merchantreturnpolicy_state::State> MerchantreturnpolicyBuilder<'a, S> {
+    /// Set the `disambiguatingDescription` field (optional)
+    pub fn disambiguating_description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value.into();
+        self
+    }
+    /// Set the `disambiguatingDescription` field to an Option value (optional)
+    pub fn maybe_disambiguating_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value;
+        self
+    }
+}
+
+impl<'a, S: merchantreturnpolicy_state::State> MerchantreturnpolicyBuilder<'a, S> {
+    /// Set the `identifier` field (optional)
+    pub fn identifier(
+        mut self,
+        value: impl Into<Option<MerchantreturnpolicyIdentifier<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.9 = value.into();
+        self
+    }
+    /// Set the `identifier` field to an Option value (optional)
+    pub fn maybe_identifier(
+        mut self,
+        value: Option<MerchantreturnpolicyIdentifier<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.9 = value;
+        self
+    }
+}
+
+impl<'a, S: merchantreturnpolicy_state::State> MerchantreturnpolicyBuilder<'a, S> {
+    /// Set the `image` field (optional)
+    pub fn image(
+        mut self,
+        value: impl Into<Option<MerchantreturnpolicyImage<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.10 = value.into();
+        self
+    }
+    /// Set the `image` field to an Option value (optional)
+    pub fn maybe_image(mut self, value: Option<MerchantreturnpolicyImage<'a>>) -> Self {
+        self.__unsafe_private_named.10 = value;
+        self
+    }
+}
+
+impl<'a, S: merchantreturnpolicy_state::State> MerchantreturnpolicyBuilder<'a, S> {
+    /// Set the `inStoreReturnsOffered` field (optional)
+    pub fn in_store_returns_offered(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.11 = value.into();
+        self
+    }
+    /// Set the `inStoreReturnsOffered` field to an Option value (optional)
+    pub fn maybe_in_store_returns_offered(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.11 = value;
+        self
+    }
+}
+
+impl<'a, S: merchantreturnpolicy_state::State> MerchantreturnpolicyBuilder<'a, S> {
+    /// Set the `itemCondition` field (optional)
+    pub fn item_condition(
+        mut self,
+        value: impl Into<Option<MerchantreturnpolicyItemCondition<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.12 = value.into();
+        self
+    }
+    /// Set the `itemCondition` field to an Option value (optional)
+    pub fn maybe_item_condition(
+        mut self,
+        value: Option<MerchantreturnpolicyItemCondition<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.12 = value;
+        self
+    }
+}
+
+impl<'a, S: merchantreturnpolicy_state::State> MerchantreturnpolicyBuilder<'a, S> {
+    /// Set the `itemDefectReturnFees` field (optional)
+    pub fn item_defect_return_fees(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.13 = value.into();
+        self
+    }
+    /// Set the `itemDefectReturnFees` field to an Option value (optional)
+    pub fn maybe_item_defect_return_fees(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.13 = value;
+        self
+    }
+}
+
+impl<'a, S: merchantreturnpolicy_state::State> MerchantreturnpolicyBuilder<'a, S> {
+    /// Set the `itemDefectReturnLabelSource` field (optional)
+    pub fn item_defect_return_label_source(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.14 = value.into();
+        self
+    }
+    /// Set the `itemDefectReturnLabelSource` field to an Option value (optional)
+    pub fn maybe_item_defect_return_label_source(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.14 = value;
+        self
+    }
+}
+
+impl<'a, S: merchantreturnpolicy_state::State> MerchantreturnpolicyBuilder<'a, S> {
+    /// Set the `itemDefectReturnShippingFeesAmount` field (optional)
+    pub fn item_defect_return_shipping_fees_amount(
+        mut self,
+        value: impl Into<
+            Option<MerchantreturnpolicyItemDefectReturnShippingFeesAmount<'a>>,
+        >,
+    ) -> Self {
+        self.__unsafe_private_named.15 = value.into();
+        self
+    }
+    /// Set the `itemDefectReturnShippingFeesAmount` field to an Option value (optional)
+    pub fn maybe_item_defect_return_shipping_fees_amount(
+        mut self,
+        value: Option<MerchantreturnpolicyItemDefectReturnShippingFeesAmount<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.15 = value;
+        self
+    }
+}
+
+impl<'a, S: merchantreturnpolicy_state::State> MerchantreturnpolicyBuilder<'a, S> {
+    /// Set the `mainEntityOfPage` field (optional)
+    pub fn main_entity_of_page(
+        mut self,
+        value: impl Into<Option<MerchantreturnpolicyMainEntityOfPage<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.16 = value.into();
+        self
+    }
+    /// Set the `mainEntityOfPage` field to an Option value (optional)
+    pub fn maybe_main_entity_of_page(
+        mut self,
+        value: Option<MerchantreturnpolicyMainEntityOfPage<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.16 = value;
+        self
+    }
+}
+
+impl<'a, S: merchantreturnpolicy_state::State> MerchantreturnpolicyBuilder<'a, S> {
+    /// Set the `merchantReturnDays` field (optional)
+    pub fn merchant_return_days(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.17 = value.into();
+        self
+    }
+    /// Set the `merchantReturnDays` field to an Option value (optional)
+    pub fn maybe_merchant_return_days(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.17 = value;
+        self
+    }
+}
+
+impl<'a, S: merchantreturnpolicy_state::State> MerchantreturnpolicyBuilder<'a, S> {
+    /// Set the `merchantReturnLink` field (optional)
+    pub fn merchant_return_link(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.18 = value.into();
+        self
+    }
+    /// Set the `merchantReturnLink` field to an Option value (optional)
+    pub fn maybe_merchant_return_link(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.18 = value;
+        self
+    }
+}
+
+impl<'a, S: merchantreturnpolicy_state::State> MerchantreturnpolicyBuilder<'a, S> {
+    /// Set the `name` field (optional)
+    pub fn name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.19 = value.into();
+        self
+    }
+    /// Set the `name` field to an Option value (optional)
+    pub fn maybe_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.19 = value;
+        self
+    }
+}
+
+impl<'a, S: merchantreturnpolicy_state::State> MerchantreturnpolicyBuilder<'a, S> {
+    /// Set the `potentialAction` field (optional)
+    pub fn potential_action(
+        mut self,
+        value: impl Into<Option<MerchantreturnpolicyPotentialAction<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.20 = value.into();
+        self
+    }
+    /// Set the `potentialAction` field to an Option value (optional)
+    pub fn maybe_potential_action(
+        mut self,
+        value: Option<MerchantreturnpolicyPotentialAction<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.20 = value;
+        self
+    }
+}
+
+impl<'a, S: merchantreturnpolicy_state::State> MerchantreturnpolicyBuilder<'a, S> {
+    /// Set the `refundType` field (optional)
+    pub fn refund_type(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.21 = value.into();
+        self
+    }
+    /// Set the `refundType` field to an Option value (optional)
+    pub fn maybe_refund_type(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.21 = value;
+        self
+    }
+}
+
+impl<'a, S: merchantreturnpolicy_state::State> MerchantreturnpolicyBuilder<'a, S> {
+    /// Set the `restockingFee` field (optional)
+    pub fn restocking_fee(
+        mut self,
+        value: impl Into<Option<MerchantreturnpolicyRestockingFee<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.22 = value.into();
+        self
+    }
+    /// Set the `restockingFee` field to an Option value (optional)
+    pub fn maybe_restocking_fee(
+        mut self,
+        value: Option<MerchantreturnpolicyRestockingFee<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.22 = value;
+        self
+    }
+}
+
+impl<'a, S: merchantreturnpolicy_state::State> MerchantreturnpolicyBuilder<'a, S> {
+    /// Set the `returnFees` field (optional)
+    pub fn return_fees(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.23 = value.into();
+        self
+    }
+    /// Set the `returnFees` field to an Option value (optional)
+    pub fn maybe_return_fees(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.23 = value;
+        self
+    }
+}
+
+impl<'a, S: merchantreturnpolicy_state::State> MerchantreturnpolicyBuilder<'a, S> {
+    /// Set the `returnLabelSource` field (optional)
+    pub fn return_label_source(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.24 = value.into();
+        self
+    }
+    /// Set the `returnLabelSource` field to an Option value (optional)
+    pub fn maybe_return_label_source(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.24 = value;
+        self
+    }
+}
+
+impl<'a, S: merchantreturnpolicy_state::State> MerchantreturnpolicyBuilder<'a, S> {
+    /// Set the `returnMethod` field (optional)
+    pub fn return_method(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.25 = value.into();
+        self
+    }
+    /// Set the `returnMethod` field to an Option value (optional)
+    pub fn maybe_return_method(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.25 = value;
+        self
+    }
+}
+
+impl<'a, S: merchantreturnpolicy_state::State> MerchantreturnpolicyBuilder<'a, S> {
+    /// Set the `returnPolicyCategory` field (optional)
+    pub fn return_policy_category(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.26 = value.into();
+        self
+    }
+    /// Set the `returnPolicyCategory` field to an Option value (optional)
+    pub fn maybe_return_policy_category(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.26 = value;
+        self
+    }
+}
+
+impl<'a, S: merchantreturnpolicy_state::State> MerchantreturnpolicyBuilder<'a, S> {
+    /// Set the `returnPolicyCountry` field (optional)
+    pub fn return_policy_country(
+        mut self,
+        value: impl Into<Option<MerchantreturnpolicyReturnPolicyCountry<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.27 = value.into();
+        self
+    }
+    /// Set the `returnPolicyCountry` field to an Option value (optional)
+    pub fn maybe_return_policy_country(
+        mut self,
+        value: Option<MerchantreturnpolicyReturnPolicyCountry<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.27 = value;
+        self
+    }
+}
+
+impl<'a, S: merchantreturnpolicy_state::State> MerchantreturnpolicyBuilder<'a, S> {
+    /// Set the `returnPolicySeasonalOverride` field (optional)
+    pub fn return_policy_seasonal_override(
+        mut self,
+        value: impl Into<Option<MerchantreturnpolicyReturnPolicySeasonalOverride<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.28 = value.into();
+        self
+    }
+    /// Set the `returnPolicySeasonalOverride` field to an Option value (optional)
+    pub fn maybe_return_policy_seasonal_override(
+        mut self,
+        value: Option<MerchantreturnpolicyReturnPolicySeasonalOverride<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.28 = value;
+        self
+    }
+}
+
+impl<'a, S: merchantreturnpolicy_state::State> MerchantreturnpolicyBuilder<'a, S> {
+    /// Set the `returnShippingFeesAmount` field (optional)
+    pub fn return_shipping_fees_amount(
+        mut self,
+        value: impl Into<Option<MerchantreturnpolicyReturnShippingFeesAmount<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.29 = value.into();
+        self
+    }
+    /// Set the `returnShippingFeesAmount` field to an Option value (optional)
+    pub fn maybe_return_shipping_fees_amount(
+        mut self,
+        value: Option<MerchantreturnpolicyReturnShippingFeesAmount<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.29 = value;
+        self
+    }
+}
+
+impl<'a, S: merchantreturnpolicy_state::State> MerchantreturnpolicyBuilder<'a, S> {
+    /// Set the `sameAs` field (optional)
+    pub fn same_as(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.30 = value.into();
+        self
+    }
+    /// Set the `sameAs` field to an Option value (optional)
+    pub fn maybe_same_as(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.30 = value;
+        self
+    }
+}
+
+impl<'a, S: merchantreturnpolicy_state::State> MerchantreturnpolicyBuilder<'a, S> {
+    /// Set the `subjectOf` field (optional)
+    pub fn subject_of(
+        mut self,
+        value: impl Into<Option<MerchantreturnpolicySubjectOf<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.31 = value.into();
+        self
+    }
+    /// Set the `subjectOf` field to an Option value (optional)
+    pub fn maybe_subject_of(
+        mut self,
+        value: Option<MerchantreturnpolicySubjectOf<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.31 = value;
+        self
+    }
+}
+
+impl<'a, S: merchantreturnpolicy_state::State> MerchantreturnpolicyBuilder<'a, S> {
+    /// Set the `url` field (optional)
+    pub fn url(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.32 = value.into();
+        self
+    }
+    /// Set the `url` field to an Option value (optional)
+    pub fn maybe_url(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.32 = value;
+        self
+    }
+}
+
+impl<'a, S: merchantreturnpolicy_state::State> MerchantreturnpolicyBuilder<'a, S> {
+    /// Set the `validForMemberTier` field (optional)
+    pub fn valid_for_member_tier(
+        mut self,
+        value: impl Into<Option<MerchantreturnpolicyValidForMemberTier<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.33 = value.into();
+        self
+    }
+    /// Set the `validForMemberTier` field to an Option value (optional)
+    pub fn maybe_valid_for_member_tier(
+        mut self,
+        value: Option<MerchantreturnpolicyValidForMemberTier<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.33 = value;
+        self
+    }
+}
+
+impl<'a, S> MerchantreturnpolicyBuilder<'a, S>
+where
+    S: merchantreturnpolicy_state::State,
+{
+    /// Build the final struct
+    pub fn build(self) -> Merchantreturnpolicy<'a> {
+        Merchantreturnpolicy {
+            additional_property: self.__unsafe_private_named.0,
+            additional_type: self.__unsafe_private_named.1,
+            alternate_name: self.__unsafe_private_named.2,
+            applicable_country: self.__unsafe_private_named.3,
+            customer_remorse_return_fees: self.__unsafe_private_named.4,
+            customer_remorse_return_label_source: self.__unsafe_private_named.5,
+            customer_remorse_return_shipping_fees_amount: self.__unsafe_private_named.6,
+            description: self.__unsafe_private_named.7,
+            disambiguating_description: self.__unsafe_private_named.8,
+            identifier: self.__unsafe_private_named.9,
+            image: self.__unsafe_private_named.10,
+            in_store_returns_offered: self.__unsafe_private_named.11,
+            item_condition: self.__unsafe_private_named.12,
+            item_defect_return_fees: self.__unsafe_private_named.13,
+            item_defect_return_label_source: self.__unsafe_private_named.14,
+            item_defect_return_shipping_fees_amount: self.__unsafe_private_named.15,
+            main_entity_of_page: self.__unsafe_private_named.16,
+            merchant_return_days: self.__unsafe_private_named.17,
+            merchant_return_link: self.__unsafe_private_named.18,
+            name: self.__unsafe_private_named.19,
+            potential_action: self.__unsafe_private_named.20,
+            refund_type: self.__unsafe_private_named.21,
+            restocking_fee: self.__unsafe_private_named.22,
+            return_fees: self.__unsafe_private_named.23,
+            return_label_source: self.__unsafe_private_named.24,
+            return_method: self.__unsafe_private_named.25,
+            return_policy_category: self.__unsafe_private_named.26,
+            return_policy_country: self.__unsafe_private_named.27,
+            return_policy_seasonal_override: self.__unsafe_private_named.28,
+            return_shipping_fees_amount: self.__unsafe_private_named.29,
+            same_as: self.__unsafe_private_named.30,
+            subject_of: self.__unsafe_private_named.31,
+            url: self.__unsafe_private_named.32,
+            valid_for_member_tier: self.__unsafe_private_named.33,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Merchantreturnpolicy<'a> {
+        Merchantreturnpolicy {
+            additional_property: self.__unsafe_private_named.0,
+            additional_type: self.__unsafe_private_named.1,
+            alternate_name: self.__unsafe_private_named.2,
+            applicable_country: self.__unsafe_private_named.3,
+            customer_remorse_return_fees: self.__unsafe_private_named.4,
+            customer_remorse_return_label_source: self.__unsafe_private_named.5,
+            customer_remorse_return_shipping_fees_amount: self.__unsafe_private_named.6,
+            description: self.__unsafe_private_named.7,
+            disambiguating_description: self.__unsafe_private_named.8,
+            identifier: self.__unsafe_private_named.9,
+            image: self.__unsafe_private_named.10,
+            in_store_returns_offered: self.__unsafe_private_named.11,
+            item_condition: self.__unsafe_private_named.12,
+            item_defect_return_fees: self.__unsafe_private_named.13,
+            item_defect_return_label_source: self.__unsafe_private_named.14,
+            item_defect_return_shipping_fees_amount: self.__unsafe_private_named.15,
+            main_entity_of_page: self.__unsafe_private_named.16,
+            merchant_return_days: self.__unsafe_private_named.17,
+            merchant_return_link: self.__unsafe_private_named.18,
+            name: self.__unsafe_private_named.19,
+            potential_action: self.__unsafe_private_named.20,
+            refund_type: self.__unsafe_private_named.21,
+            restocking_fee: self.__unsafe_private_named.22,
+            return_fees: self.__unsafe_private_named.23,
+            return_label_source: self.__unsafe_private_named.24,
+            return_method: self.__unsafe_private_named.25,
+            return_policy_category: self.__unsafe_private_named.26,
+            return_policy_country: self.__unsafe_private_named.27,
+            return_policy_seasonal_override: self.__unsafe_private_named.28,
+            return_shipping_fees_amount: self.__unsafe_private_named.29,
+            same_as: self.__unsafe_private_named.30,
+            subject_of: self.__unsafe_private_named.31,
+            url: self.__unsafe_private_named.32,
+            valid_for_member_tier: self.__unsafe_private_named.33,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Merchantreturnpolicy<'a> {

@@ -12,10 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetTaggedSuggestions {}
 #[jacquard_derive::lexicon]
@@ -31,7 +29,9 @@ pub struct GetTaggedSuggestions {}
 #[serde(rename_all = "camelCase")]
 pub struct GetTaggedSuggestionsOutput<'a> {
     #[serde(borrow)]
-    pub suggestions: Vec<jacquard_common::types::value::Data<'a>>,
+    pub suggestions: Vec<
+        crate::app_bsky::unspecced::get_tagged_suggestions::Suggestion<'a>,
+    >,
 }
 
 /// Response type for
@@ -68,19 +68,193 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetTaggedSuggestionsRequest {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Suggestion<'a> {
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::Uri<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub subject_type: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub tag: jacquard_common::CowStr<'a>,
+}
+
+pub mod suggestion_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Tag;
+        type SubjectType;
+        type Subject;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Tag = Unset;
+        type SubjectType = Unset;
+        type Subject = Unset;
+    }
+    ///State transition - sets the `tag` field to Set
+    pub struct SetTag<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTag<S> {}
+    impl<S: State> State for SetTag<S> {
+        type Tag = Set<members::tag>;
+        type SubjectType = S::SubjectType;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `subject_type` field to Set
+    pub struct SetSubjectType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubjectType<S> {}
+    impl<S: State> State for SetSubjectType<S> {
+        type Tag = S::Tag;
+        type SubjectType = Set<members::subject_type>;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type Tag = S::Tag;
+        type SubjectType = S::SubjectType;
+        type Subject = Set<members::subject>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `tag` field
+        pub struct tag(());
+        ///Marker type for the `subject_type` field
+        pub struct subject_type(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct SuggestionBuilder<'a, S: suggestion_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Suggestion<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> SuggestionBuilder<'a, suggestion_state::Empty> {
+        SuggestionBuilder::new()
+    }
+}
+
+impl<'a> SuggestionBuilder<'a, suggestion_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        SuggestionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SuggestionBuilder<'a, S>
+where
+    S: suggestion_state::State,
+    S::Subject: suggestion_state::IsUnset,
+{
+    /// Set the `subject` field (required)
+    pub fn subject(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+    ) -> SuggestionBuilder<'a, suggestion_state::SetSubject<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        SuggestionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SuggestionBuilder<'a, S>
+where
+    S: suggestion_state::State,
+    S::SubjectType: suggestion_state::IsUnset,
+{
+    /// Set the `subjectType` field (required)
+    pub fn subject_type(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> SuggestionBuilder<'a, suggestion_state::SetSubjectType<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        SuggestionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SuggestionBuilder<'a, S>
+where
+    S: suggestion_state::State,
+    S::Tag: suggestion_state::IsUnset,
+{
+    /// Set the `tag` field (required)
+    pub fn tag(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> SuggestionBuilder<'a, suggestion_state::SetTag<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        SuggestionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SuggestionBuilder<'a, S>
+where
+    S: suggestion_state::State,
+    S::Tag: suggestion_state::IsSet,
+    S::SubjectType: suggestion_state::IsSet,
+    S::Subject: suggestion_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Suggestion<'a> {
+        Suggestion {
+            subject: self.__unsafe_private_named.0.unwrap(),
+            subject_type: self.__unsafe_private_named.1.unwrap(),
+            tag: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Suggestion<'a> {
+        Suggestion {
+            subject: self.__unsafe_private_named.0.unwrap(),
+            subject_type: self.__unsafe_private_named.1.unwrap(),
+            tag: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_app_bsky_unspecced_getTaggedSuggestions() -> ::jacquard_lexicon::lexicon::LexiconDoc<

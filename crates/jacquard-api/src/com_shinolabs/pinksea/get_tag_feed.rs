@@ -12,10 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetTagFeed<'a> {
     ///(default: 50, min: 1, max: 50)
@@ -24,8 +22,134 @@ pub struct GetTagFeed<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub since: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
-    #[builder(into)]
     pub tag: jacquard_common::CowStr<'a>,
+}
+
+pub mod get_tag_feed_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Tag;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Tag = Unset;
+    }
+    ///State transition - sets the `tag` field to Set
+    pub struct SetTag<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTag<S> {}
+    impl<S: State> State for SetTag<S> {
+        type Tag = Set<members::tag>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `tag` field
+        pub struct tag(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetTagFeedBuilder<'a, S: get_tag_feed_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GetTagFeed<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GetTagFeedBuilder<'a, get_tag_feed_state::Empty> {
+        GetTagFeedBuilder::new()
+    }
+}
+
+impl<'a> GetTagFeedBuilder<'a, get_tag_feed_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetTagFeedBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: get_tag_feed_state::State> GetTagFeedBuilder<'a, S> {
+    /// Set the `limit` field (optional)
+    pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `limit` field to an Option value (optional)
+    pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: get_tag_feed_state::State> GetTagFeedBuilder<'a, S> {
+    /// Set the `since` field (optional)
+    pub fn since(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `since` field to an Option value (optional)
+    pub fn maybe_since(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> GetTagFeedBuilder<'a, S>
+where
+    S: get_tag_feed_state::State,
+    S::Tag: get_tag_feed_state::IsUnset,
+{
+    /// Set the `tag` field (required)
+    pub fn tag(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> GetTagFeedBuilder<'a, get_tag_feed_state::SetTag<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        GetTagFeedBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetTagFeedBuilder<'a, S>
+where
+    S: get_tag_feed_state::State,
+    S::Tag: get_tag_feed_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetTagFeed<'a> {
+        GetTagFeed {
+            limit: self.__unsafe_private_named.0,
+            since: self.__unsafe_private_named.1,
+            tag: self.__unsafe_private_named.2.unwrap(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

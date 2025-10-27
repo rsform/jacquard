@@ -12,21 +12,177 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct Compare<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub repo: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub rev1: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub rev2: jacquard_common::CowStr<'a>,
+}
+
+pub mod compare_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Repo;
+        type Rev1;
+        type Rev2;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Repo = Unset;
+        type Rev1 = Unset;
+        type Rev2 = Unset;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Repo = Set<members::repo>;
+        type Rev1 = S::Rev1;
+        type Rev2 = S::Rev2;
+    }
+    ///State transition - sets the `rev1` field to Set
+    pub struct SetRev1<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRev1<S> {}
+    impl<S: State> State for SetRev1<S> {
+        type Repo = S::Repo;
+        type Rev1 = Set<members::rev1>;
+        type Rev2 = S::Rev2;
+    }
+    ///State transition - sets the `rev2` field to Set
+    pub struct SetRev2<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRev2<S> {}
+    impl<S: State> State for SetRev2<S> {
+        type Repo = S::Repo;
+        type Rev1 = S::Rev1;
+        type Rev2 = Set<members::rev2>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `repo` field
+        pub struct repo(());
+        ///Marker type for the `rev1` field
+        pub struct rev1(());
+        ///Marker type for the `rev2` field
+        pub struct rev2(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct CompareBuilder<'a, S: compare_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Compare<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> CompareBuilder<'a, compare_state::Empty> {
+        CompareBuilder::new()
+    }
+}
+
+impl<'a> CompareBuilder<'a, compare_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        CompareBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CompareBuilder<'a, S>
+where
+    S: compare_state::State,
+    S::Repo: compare_state::IsUnset,
+{
+    /// Set the `repo` field (required)
+    pub fn repo(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> CompareBuilder<'a, compare_state::SetRepo<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        CompareBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CompareBuilder<'a, S>
+where
+    S: compare_state::State,
+    S::Rev1: compare_state::IsUnset,
+{
+    /// Set the `rev1` field (required)
+    pub fn rev1(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> CompareBuilder<'a, compare_state::SetRev1<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        CompareBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CompareBuilder<'a, S>
+where
+    S: compare_state::State,
+    S::Rev2: compare_state::IsUnset,
+{
+    /// Set the `rev2` field (required)
+    pub fn rev2(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> CompareBuilder<'a, compare_state::SetRev2<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        CompareBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CompareBuilder<'a, S>
+where
+    S: compare_state::State,
+    S::Repo: compare_state::IsSet,
+    S::Rev1: compare_state::IsSet,
+    S::Rev2: compare_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Compare<'a> {
+        Compare {
+            repo: self.__unsafe_private_named.0.unwrap(),
+            rev1: self.__unsafe_private_named.1.unwrap(),
+            rev2: self.__unsafe_private_named.2.unwrap(),
+        }
+    }
 }
 
 /// Compare output in application/json

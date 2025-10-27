@@ -13,13 +13,117 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BskyPost<'a> {
     #[serde(borrow)]
     pub post_ref: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+}
+
+pub mod bsky_post_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type PostRef;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type PostRef = Unset;
+    }
+    ///State transition - sets the `post_ref` field to Set
+    pub struct SetPostRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPostRef<S> {}
+    impl<S: State> State for SetPostRef<S> {
+        type PostRef = Set<members::post_ref>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `post_ref` field
+        pub struct post_ref(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct BskyPostBuilder<'a, S: bsky_post_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> BskyPost<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> BskyPostBuilder<'a, bsky_post_state::Empty> {
+        BskyPostBuilder::new()
+    }
+}
+
+impl<'a> BskyPostBuilder<'a, bsky_post_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        BskyPostBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BskyPostBuilder<'a, S>
+where
+    S: bsky_post_state::State,
+    S::PostRef: bsky_post_state::IsUnset,
+{
+    /// Set the `postRef` field (required)
+    pub fn post_ref(
+        mut self,
+        value: impl Into<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    ) -> BskyPostBuilder<'a, bsky_post_state::SetPostRef<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        BskyPostBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BskyPostBuilder<'a, S>
+where
+    S: bsky_post_state::State,
+    S::PostRef: bsky_post_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> BskyPost<'a> {
+        BskyPost {
+            post_ref: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> BskyPost<'a> {
+        BskyPost {
+            post_ref: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_pub_leaflet_blocks_bskyPost() -> ::jacquard_lexicon::lexicon::LexiconDoc<

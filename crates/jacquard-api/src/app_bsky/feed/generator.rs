@@ -14,42 +14,347 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Generator<'a> {
     /// Declaration that a feed accepts feedback interactions from a client through app.bsky.feed.sendInteractions
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub accepts_interactions: Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub avatar: Option<jacquard_common::types::blob::BlobRef<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub content_mode: Option<jacquard_common::CowStr<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub description: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub description_facets: Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub display_name: jacquard_common::CowStr<'a>,
     /// Self-label values
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub labels: Option<crate::com_atproto::label::SelfLabels<'a>>,
+}
+
+pub mod generator_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Did;
+        type DisplayName;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Did = Unset;
+        type DisplayName = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Did = Set<members::did>;
+        type DisplayName = S::DisplayName;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `display_name` field to Set
+    pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDisplayName<S> {}
+    impl<S: State> State for SetDisplayName<S> {
+        type Did = S::Did;
+        type DisplayName = Set<members::display_name>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Did = S::Did;
+        type DisplayName = S::DisplayName;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `display_name` field
+        pub struct display_name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct GeneratorBuilder<'a, S: generator_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<bool>,
+        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Generator<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GeneratorBuilder<'a, generator_state::Empty> {
+        GeneratorBuilder::new()
+    }
+}
+
+impl<'a> GeneratorBuilder<'a, generator_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GeneratorBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: generator_state::State> GeneratorBuilder<'a, S> {
+    /// Set the `acceptsInteractions` field (optional)
+    pub fn accepts_interactions(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `acceptsInteractions` field to an Option value (optional)
+    pub fn maybe_accepts_interactions(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: generator_state::State> GeneratorBuilder<'a, S> {
+    /// Set the `avatar` field (optional)
+    pub fn avatar(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::blob::BlobRef<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `avatar` field to an Option value (optional)
+    pub fn maybe_avatar(
+        mut self,
+        value: Option<jacquard_common::types::blob::BlobRef<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: generator_state::State> GeneratorBuilder<'a, S> {
+    /// Set the `contentMode` field (optional)
+    pub fn content_mode(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `contentMode` field to an Option value (optional)
+    pub fn maybe_content_mode(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> GeneratorBuilder<'a, S>
+where
+    S: generator_state::State,
+    S::CreatedAt: generator_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> GeneratorBuilder<'a, generator_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        GeneratorBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: generator_state::State> GeneratorBuilder<'a, S> {
+    /// Set the `description` field (optional)
+    pub fn description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `description` field to an Option value (optional)
+    pub fn maybe_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: generator_state::State> GeneratorBuilder<'a, S> {
+    /// Set the `descriptionFacets` field (optional)
+    pub fn description_facets(
+        mut self,
+        value: impl Into<Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `descriptionFacets` field to an Option value (optional)
+    pub fn maybe_description_facets(
+        mut self,
+        value: Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S> GeneratorBuilder<'a, S>
+where
+    S: generator_state::State,
+    S::Did: generator_state::IsUnset,
+{
+    /// Set the `did` field (required)
+    pub fn did(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> GeneratorBuilder<'a, generator_state::SetDid<S>> {
+        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        GeneratorBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GeneratorBuilder<'a, S>
+where
+    S: generator_state::State,
+    S::DisplayName: generator_state::IsUnset,
+{
+    /// Set the `displayName` field (required)
+    pub fn display_name(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> GeneratorBuilder<'a, generator_state::SetDisplayName<S>> {
+        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        GeneratorBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: generator_state::State> GeneratorBuilder<'a, S> {
+    /// Set the `labels` field (optional)
+    pub fn labels(
+        mut self,
+        value: impl Into<Option<crate::com_atproto::label::SelfLabels<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value.into();
+        self
+    }
+    /// Set the `labels` field to an Option value (optional)
+    pub fn maybe_labels(
+        mut self,
+        value: Option<crate::com_atproto::label::SelfLabels<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value;
+        self
+    }
+}
+
+impl<'a, S> GeneratorBuilder<'a, S>
+where
+    S: generator_state::State,
+    S::Did: generator_state::IsSet,
+    S::DisplayName: generator_state::IsSet,
+    S::CreatedAt: generator_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Generator<'a> {
+        Generator {
+            accepts_interactions: self.__unsafe_private_named.0,
+            avatar: self.__unsafe_private_named.1,
+            content_mode: self.__unsafe_private_named.2,
+            created_at: self.__unsafe_private_named.3.unwrap(),
+            description: self.__unsafe_private_named.4,
+            description_facets: self.__unsafe_private_named.5,
+            did: self.__unsafe_private_named.6.unwrap(),
+            display_name: self.__unsafe_private_named.7.unwrap(),
+            labels: self.__unsafe_private_named.8,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Generator<'a> {
+        Generator {
+            accepts_interactions: self.__unsafe_private_named.0,
+            avatar: self.__unsafe_private_named.1,
+            content_mode: self.__unsafe_private_named.2,
+            created_at: self.__unsafe_private_named.3.unwrap(),
+            description: self.__unsafe_private_named.4,
+            description_facets: self.__unsafe_private_named.5,
+            did: self.__unsafe_private_named.6.unwrap(),
+            display_name: self.__unsafe_private_named.7.unwrap(),
+            labels: self.__unsafe_private_named.8,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Generator<'a> {

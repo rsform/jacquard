@@ -37,46 +37,316 @@ pub mod search_starter_packs_skeleton;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AgeAssuranceEvent<'a> {
     /// The unique identifier for this instance of the age assurance flow, in UUID format.
     #[serde(borrow)]
-    #[builder(into)]
     pub attempt_id: jacquard_common::CowStr<'a>,
     /// The IP address used when completing the AA flow.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub complete_ip: Option<jacquard_common::CowStr<'a>>,
     /// The user agent used when completing the AA flow.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub complete_ua: Option<jacquard_common::CowStr<'a>>,
     /// The date and time of this write operation.
     pub created_at: jacquard_common::types::string::Datetime,
     /// The email used for AA.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub email: Option<jacquard_common::CowStr<'a>>,
     /// The IP address used when initiating the AA flow.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub init_ip: Option<jacquard_common::CowStr<'a>>,
     /// The user agent used when initiating the AA flow.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub init_ua: Option<jacquard_common::CowStr<'a>>,
     /// The status of the age assurance process.
     #[serde(borrow)]
-    #[builder(into)]
     pub status: jacquard_common::CowStr<'a>,
+}
+
+pub mod age_assurance_event_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type CreatedAt;
+        type Status;
+        type AttemptId;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type CreatedAt = Unset;
+        type Status = Unset;
+        type AttemptId = Unset;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
+        type Status = S::Status;
+        type AttemptId = S::AttemptId;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStatus<S> {}
+    impl<S: State> State for SetStatus<S> {
+        type CreatedAt = S::CreatedAt;
+        type Status = Set<members::status>;
+        type AttemptId = S::AttemptId;
+    }
+    ///State transition - sets the `attempt_id` field to Set
+    pub struct SetAttemptId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAttemptId<S> {}
+    impl<S: State> State for SetAttemptId<S> {
+        type CreatedAt = S::CreatedAt;
+        type Status = S::Status;
+        type AttemptId = Set<members::attempt_id>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `status` field
+        pub struct status(());
+        ///Marker type for the `attempt_id` field
+        pub struct attempt_id(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct AgeAssuranceEventBuilder<'a, S: age_assurance_event_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> AgeAssuranceEvent<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> AgeAssuranceEventBuilder<'a, age_assurance_event_state::Empty> {
+        AgeAssuranceEventBuilder::new()
+    }
+}
+
+impl<'a> AgeAssuranceEventBuilder<'a, age_assurance_event_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        AgeAssuranceEventBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AgeAssuranceEventBuilder<'a, S>
+where
+    S: age_assurance_event_state::State,
+    S::AttemptId: age_assurance_event_state::IsUnset,
+{
+    /// Set the `attemptId` field (required)
+    pub fn attempt_id(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> AgeAssuranceEventBuilder<'a, age_assurance_event_state::SetAttemptId<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        AgeAssuranceEventBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: age_assurance_event_state::State> AgeAssuranceEventBuilder<'a, S> {
+    /// Set the `completeIp` field (optional)
+    pub fn complete_ip(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `completeIp` field to an Option value (optional)
+    pub fn maybe_complete_ip(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: age_assurance_event_state::State> AgeAssuranceEventBuilder<'a, S> {
+    /// Set the `completeUa` field (optional)
+    pub fn complete_ua(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `completeUa` field to an Option value (optional)
+    pub fn maybe_complete_ua(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> AgeAssuranceEventBuilder<'a, S>
+where
+    S: age_assurance_event_state::State,
+    S::CreatedAt: age_assurance_event_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> AgeAssuranceEventBuilder<'a, age_assurance_event_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        AgeAssuranceEventBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: age_assurance_event_state::State> AgeAssuranceEventBuilder<'a, S> {
+    /// Set the `email` field (optional)
+    pub fn email(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `email` field to an Option value (optional)
+    pub fn maybe_email(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: age_assurance_event_state::State> AgeAssuranceEventBuilder<'a, S> {
+    /// Set the `initIp` field (optional)
+    pub fn init_ip(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `initIp` field to an Option value (optional)
+    pub fn maybe_init_ip(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S: age_assurance_event_state::State> AgeAssuranceEventBuilder<'a, S> {
+    /// Set the `initUa` field (optional)
+    pub fn init_ua(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `initUa` field to an Option value (optional)
+    pub fn maybe_init_ua(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S> AgeAssuranceEventBuilder<'a, S>
+where
+    S: age_assurance_event_state::State,
+    S::Status: age_assurance_event_state::IsUnset,
+{
+    /// Set the `status` field (required)
+    pub fn status(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> AgeAssuranceEventBuilder<'a, age_assurance_event_state::SetStatus<S>> {
+        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        AgeAssuranceEventBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AgeAssuranceEventBuilder<'a, S>
+where
+    S: age_assurance_event_state::State,
+    S::CreatedAt: age_assurance_event_state::IsSet,
+    S::Status: age_assurance_event_state::IsSet,
+    S::AttemptId: age_assurance_event_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> AgeAssuranceEvent<'a> {
+        AgeAssuranceEvent {
+            attempt_id: self.__unsafe_private_named.0.unwrap(),
+            complete_ip: self.__unsafe_private_named.1,
+            complete_ua: self.__unsafe_private_named.2,
+            created_at: self.__unsafe_private_named.3.unwrap(),
+            email: self.__unsafe_private_named.4,
+            init_ip: self.__unsafe_private_named.5,
+            init_ua: self.__unsafe_private_named.6,
+            status: self.__unsafe_private_named.7.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> AgeAssuranceEvent<'a> {
+        AgeAssuranceEvent {
+            attempt_id: self.__unsafe_private_named.0.unwrap(),
+            complete_ip: self.__unsafe_private_named.1,
+            complete_ua: self.__unsafe_private_named.2,
+            created_at: self.__unsafe_private_named.3.unwrap(),
+            email: self.__unsafe_private_named.4,
+            init_ip: self.__unsafe_private_named.5,
+            init_ua: self.__unsafe_private_named.6,
+            status: self.__unsafe_private_named.7.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_app_bsky_unspecced_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -1016,13 +1286,117 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AgeAssuranceState<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SkeletonSearchActor<'a> {
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
+}
+
+pub mod skeleton_search_actor_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Did;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Did = Unset;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Did = Set<members::did>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `did` field
+        pub struct did(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct SkeletonSearchActorBuilder<'a, S: skeleton_search_actor_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> SkeletonSearchActor<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> SkeletonSearchActorBuilder<'a, skeleton_search_actor_state::Empty> {
+        SkeletonSearchActorBuilder::new()
+    }
+}
+
+impl<'a> SkeletonSearchActorBuilder<'a, skeleton_search_actor_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        SkeletonSearchActorBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SkeletonSearchActorBuilder<'a, S>
+where
+    S: skeleton_search_actor_state::State,
+    S::Did: skeleton_search_actor_state::IsUnset,
+{
+    /// Set the `did` field (required)
+    pub fn did(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> SkeletonSearchActorBuilder<'a, skeleton_search_actor_state::SetDid<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        SkeletonSearchActorBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SkeletonSearchActorBuilder<'a, S>
+where
+    S: skeleton_search_actor_state::State,
+    S::Did: skeleton_search_actor_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> SkeletonSearchActor<'a> {
+        SkeletonSearchActor {
+            did: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> SkeletonSearchActor<'a> {
+        SkeletonSearchActor {
+            did: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SkeletonSearchActor<'a> {
@@ -1050,13 +1424,117 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SkeletonSearchActor<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SkeletonSearchPost<'a> {
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+pub mod skeleton_search_post_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Uri;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Uri = Unset;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Uri = Set<members::uri>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `uri` field
+        pub struct uri(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct SkeletonSearchPostBuilder<'a, S: skeleton_search_post_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> SkeletonSearchPost<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> SkeletonSearchPostBuilder<'a, skeleton_search_post_state::Empty> {
+        SkeletonSearchPostBuilder::new()
+    }
+}
+
+impl<'a> SkeletonSearchPostBuilder<'a, skeleton_search_post_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        SkeletonSearchPostBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SkeletonSearchPostBuilder<'a, S>
+where
+    S: skeleton_search_post_state::State,
+    S::Uri: skeleton_search_post_state::IsUnset,
+{
+    /// Set the `uri` field (required)
+    pub fn uri(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> SkeletonSearchPostBuilder<'a, skeleton_search_post_state::SetUri<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        SkeletonSearchPostBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SkeletonSearchPostBuilder<'a, S>
+where
+    S: skeleton_search_post_state::State,
+    S::Uri: skeleton_search_post_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> SkeletonSearchPost<'a> {
+        SkeletonSearchPost {
+            uri: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> SkeletonSearchPost<'a> {
+        SkeletonSearchPost {
+            uri: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SkeletonSearchPost<'a> {
@@ -1084,13 +1562,128 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SkeletonSearchPost<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SkeletonSearchStarterPack<'a> {
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+pub mod skeleton_search_starter_pack_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Uri;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Uri = Unset;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Uri = Set<members::uri>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `uri` field
+        pub struct uri(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct SkeletonSearchStarterPackBuilder<
+    'a,
+    S: skeleton_search_starter_pack_state::State,
+> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> SkeletonSearchStarterPack<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> SkeletonSearchStarterPackBuilder<
+        'a,
+        skeleton_search_starter_pack_state::Empty,
+    > {
+        SkeletonSearchStarterPackBuilder::new()
+    }
+}
+
+impl<
+    'a,
+> SkeletonSearchStarterPackBuilder<'a, skeleton_search_starter_pack_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        SkeletonSearchStarterPackBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SkeletonSearchStarterPackBuilder<'a, S>
+where
+    S: skeleton_search_starter_pack_state::State,
+    S::Uri: skeleton_search_starter_pack_state::IsUnset,
+{
+    /// Set the `uri` field (required)
+    pub fn uri(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> SkeletonSearchStarterPackBuilder<
+        'a,
+        skeleton_search_starter_pack_state::SetUri<S>,
+    > {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        SkeletonSearchStarterPackBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SkeletonSearchStarterPackBuilder<'a, S>
+where
+    S: skeleton_search_starter_pack_state::State,
+    S::Uri: skeleton_search_starter_pack_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> SkeletonSearchStarterPack<'a> {
+        SkeletonSearchStarterPack {
+            uri: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> SkeletonSearchStarterPack<'a> {
+        SkeletonSearchStarterPack {
+            uri: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SkeletonSearchStarterPack<'a> {
@@ -1118,32 +1711,364 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SkeletonSearchStarterPack
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SkeletonTrend<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub category: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub dids: Vec<jacquard_common::types::string::Did<'a>>,
     #[serde(borrow)]
-    #[builder(into)]
     pub display_name: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub link: jacquard_common::CowStr<'a>,
     pub post_count: i64,
     pub started_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub status: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
-    #[builder(into)]
     pub topic: jacquard_common::CowStr<'a>,
+}
+
+pub mod skeleton_trend_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Topic;
+        type DisplayName;
+        type Link;
+        type StartedAt;
+        type PostCount;
+        type Dids;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Topic = Unset;
+        type DisplayName = Unset;
+        type Link = Unset;
+        type StartedAt = Unset;
+        type PostCount = Unset;
+        type Dids = Unset;
+    }
+    ///State transition - sets the `topic` field to Set
+    pub struct SetTopic<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTopic<S> {}
+    impl<S: State> State for SetTopic<S> {
+        type Topic = Set<members::topic>;
+        type DisplayName = S::DisplayName;
+        type Link = S::Link;
+        type StartedAt = S::StartedAt;
+        type PostCount = S::PostCount;
+        type Dids = S::Dids;
+    }
+    ///State transition - sets the `display_name` field to Set
+    pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDisplayName<S> {}
+    impl<S: State> State for SetDisplayName<S> {
+        type Topic = S::Topic;
+        type DisplayName = Set<members::display_name>;
+        type Link = S::Link;
+        type StartedAt = S::StartedAt;
+        type PostCount = S::PostCount;
+        type Dids = S::Dids;
+    }
+    ///State transition - sets the `link` field to Set
+    pub struct SetLink<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLink<S> {}
+    impl<S: State> State for SetLink<S> {
+        type Topic = S::Topic;
+        type DisplayName = S::DisplayName;
+        type Link = Set<members::link>;
+        type StartedAt = S::StartedAt;
+        type PostCount = S::PostCount;
+        type Dids = S::Dids;
+    }
+    ///State transition - sets the `started_at` field to Set
+    pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStartedAt<S> {}
+    impl<S: State> State for SetStartedAt<S> {
+        type Topic = S::Topic;
+        type DisplayName = S::DisplayName;
+        type Link = S::Link;
+        type StartedAt = Set<members::started_at>;
+        type PostCount = S::PostCount;
+        type Dids = S::Dids;
+    }
+    ///State transition - sets the `post_count` field to Set
+    pub struct SetPostCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPostCount<S> {}
+    impl<S: State> State for SetPostCount<S> {
+        type Topic = S::Topic;
+        type DisplayName = S::DisplayName;
+        type Link = S::Link;
+        type StartedAt = S::StartedAt;
+        type PostCount = Set<members::post_count>;
+        type Dids = S::Dids;
+    }
+    ///State transition - sets the `dids` field to Set
+    pub struct SetDids<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDids<S> {}
+    impl<S: State> State for SetDids<S> {
+        type Topic = S::Topic;
+        type DisplayName = S::DisplayName;
+        type Link = S::Link;
+        type StartedAt = S::StartedAt;
+        type PostCount = S::PostCount;
+        type Dids = Set<members::dids>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `topic` field
+        pub struct topic(());
+        ///Marker type for the `display_name` field
+        pub struct display_name(());
+        ///Marker type for the `link` field
+        pub struct link(());
+        ///Marker type for the `started_at` field
+        pub struct started_at(());
+        ///Marker type for the `post_count` field
+        pub struct post_count(());
+        ///Marker type for the `dids` field
+        pub struct dids(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct SkeletonTrendBuilder<'a, S: skeleton_trend_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> SkeletonTrend<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> SkeletonTrendBuilder<'a, skeleton_trend_state::Empty> {
+        SkeletonTrendBuilder::new()
+    }
+}
+
+impl<'a> SkeletonTrendBuilder<'a, skeleton_trend_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        SkeletonTrendBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: skeleton_trend_state::State> SkeletonTrendBuilder<'a, S> {
+    /// Set the `category` field (optional)
+    pub fn category(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `category` field to an Option value (optional)
+    pub fn maybe_category(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> SkeletonTrendBuilder<'a, S>
+where
+    S: skeleton_trend_state::State,
+    S::Dids: skeleton_trend_state::IsUnset,
+{
+    /// Set the `dids` field (required)
+    pub fn dids(
+        mut self,
+        value: impl Into<Vec<jacquard_common::types::string::Did<'a>>>,
+    ) -> SkeletonTrendBuilder<'a, skeleton_trend_state::SetDids<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        SkeletonTrendBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SkeletonTrendBuilder<'a, S>
+where
+    S: skeleton_trend_state::State,
+    S::DisplayName: skeleton_trend_state::IsUnset,
+{
+    /// Set the `displayName` field (required)
+    pub fn display_name(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> SkeletonTrendBuilder<'a, skeleton_trend_state::SetDisplayName<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        SkeletonTrendBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SkeletonTrendBuilder<'a, S>
+where
+    S: skeleton_trend_state::State,
+    S::Link: skeleton_trend_state::IsUnset,
+{
+    /// Set the `link` field (required)
+    pub fn link(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> SkeletonTrendBuilder<'a, skeleton_trend_state::SetLink<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        SkeletonTrendBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SkeletonTrendBuilder<'a, S>
+where
+    S: skeleton_trend_state::State,
+    S::PostCount: skeleton_trend_state::IsUnset,
+{
+    /// Set the `postCount` field (required)
+    pub fn post_count(
+        mut self,
+        value: impl Into<i64>,
+    ) -> SkeletonTrendBuilder<'a, skeleton_trend_state::SetPostCount<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        SkeletonTrendBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SkeletonTrendBuilder<'a, S>
+where
+    S: skeleton_trend_state::State,
+    S::StartedAt: skeleton_trend_state::IsUnset,
+{
+    /// Set the `startedAt` field (required)
+    pub fn started_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> SkeletonTrendBuilder<'a, skeleton_trend_state::SetStartedAt<S>> {
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        SkeletonTrendBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: skeleton_trend_state::State> SkeletonTrendBuilder<'a, S> {
+    /// Set the `status` field (optional)
+    pub fn status(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `status` field to an Option value (optional)
+    pub fn maybe_status(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S> SkeletonTrendBuilder<'a, S>
+where
+    S: skeleton_trend_state::State,
+    S::Topic: skeleton_trend_state::IsUnset,
+{
+    /// Set the `topic` field (required)
+    pub fn topic(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> SkeletonTrendBuilder<'a, skeleton_trend_state::SetTopic<S>> {
+        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        SkeletonTrendBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SkeletonTrendBuilder<'a, S>
+where
+    S: skeleton_trend_state::State,
+    S::Topic: skeleton_trend_state::IsSet,
+    S::DisplayName: skeleton_trend_state::IsSet,
+    S::Link: skeleton_trend_state::IsSet,
+    S::StartedAt: skeleton_trend_state::IsSet,
+    S::PostCount: skeleton_trend_state::IsSet,
+    S::Dids: skeleton_trend_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> SkeletonTrend<'a> {
+        SkeletonTrend {
+            category: self.__unsafe_private_named.0,
+            dids: self.__unsafe_private_named.1.unwrap(),
+            display_name: self.__unsafe_private_named.2.unwrap(),
+            link: self.__unsafe_private_named.3.unwrap(),
+            post_count: self.__unsafe_private_named.4.unwrap(),
+            started_at: self.__unsafe_private_named.5.unwrap(),
+            status: self.__unsafe_private_named.6,
+            topic: self.__unsafe_private_named.7.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> SkeletonTrend<'a> {
+        SkeletonTrend {
+            category: self.__unsafe_private_named.0,
+            dids: self.__unsafe_private_named.1.unwrap(),
+            display_name: self.__unsafe_private_named.2.unwrap(),
+            link: self.__unsafe_private_named.3.unwrap(),
+            post_count: self.__unsafe_private_named.4.unwrap(),
+            started_at: self.__unsafe_private_named.5.unwrap(),
+            status: self.__unsafe_private_named.6,
+            topic: self.__unsafe_private_named.7.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SkeletonTrend<'a> {
@@ -1171,13 +2096,117 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SkeletonTrend<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ThreadItemBlocked<'a> {
     #[serde(borrow)]
     pub author: crate::app_bsky::feed::BlockedAuthor<'a>,
+}
+
+pub mod thread_item_blocked_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Author;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Author = Unset;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthor<S> {}
+    impl<S: State> State for SetAuthor<S> {
+        type Author = Set<members::author>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `author` field
+        pub struct author(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ThreadItemBlockedBuilder<'a, S: thread_item_blocked_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<crate::app_bsky::feed::BlockedAuthor<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ThreadItemBlocked<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ThreadItemBlockedBuilder<'a, thread_item_blocked_state::Empty> {
+        ThreadItemBlockedBuilder::new()
+    }
+}
+
+impl<'a> ThreadItemBlockedBuilder<'a, thread_item_blocked_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ThreadItemBlockedBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ThreadItemBlockedBuilder<'a, S>
+where
+    S: thread_item_blocked_state::State,
+    S::Author: thread_item_blocked_state::IsUnset,
+{
+    /// Set the `author` field (required)
+    pub fn author(
+        mut self,
+        value: impl Into<crate::app_bsky::feed::BlockedAuthor<'a>>,
+    ) -> ThreadItemBlockedBuilder<'a, thread_item_blocked_state::SetAuthor<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ThreadItemBlockedBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ThreadItemBlockedBuilder<'a, S>
+where
+    S: thread_item_blocked_state::State,
+    S::Author: thread_item_blocked_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> ThreadItemBlocked<'a> {
+        ThreadItemBlocked {
+            author: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> ThreadItemBlocked<'a> {
+        ThreadItemBlocked {
+            author: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThreadItemBlocked<'a> {
@@ -1265,8 +2294,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThreadItemNotFound<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ThreadItemPost<'a> {
@@ -1282,6 +2310,306 @@ pub struct ThreadItemPost<'a> {
     pub op_thread: bool,
     #[serde(borrow)]
     pub post: crate::app_bsky::feed::PostView<'a>,
+}
+
+pub mod thread_item_post_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Post;
+        type MoreParents;
+        type MoreReplies;
+        type OpThread;
+        type HiddenByThreadgate;
+        type MutedByViewer;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Post = Unset;
+        type MoreParents = Unset;
+        type MoreReplies = Unset;
+        type OpThread = Unset;
+        type HiddenByThreadgate = Unset;
+        type MutedByViewer = Unset;
+    }
+    ///State transition - sets the `post` field to Set
+    pub struct SetPost<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPost<S> {}
+    impl<S: State> State for SetPost<S> {
+        type Post = Set<members::post>;
+        type MoreParents = S::MoreParents;
+        type MoreReplies = S::MoreReplies;
+        type OpThread = S::OpThread;
+        type HiddenByThreadgate = S::HiddenByThreadgate;
+        type MutedByViewer = S::MutedByViewer;
+    }
+    ///State transition - sets the `more_parents` field to Set
+    pub struct SetMoreParents<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMoreParents<S> {}
+    impl<S: State> State for SetMoreParents<S> {
+        type Post = S::Post;
+        type MoreParents = Set<members::more_parents>;
+        type MoreReplies = S::MoreReplies;
+        type OpThread = S::OpThread;
+        type HiddenByThreadgate = S::HiddenByThreadgate;
+        type MutedByViewer = S::MutedByViewer;
+    }
+    ///State transition - sets the `more_replies` field to Set
+    pub struct SetMoreReplies<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMoreReplies<S> {}
+    impl<S: State> State for SetMoreReplies<S> {
+        type Post = S::Post;
+        type MoreParents = S::MoreParents;
+        type MoreReplies = Set<members::more_replies>;
+        type OpThread = S::OpThread;
+        type HiddenByThreadgate = S::HiddenByThreadgate;
+        type MutedByViewer = S::MutedByViewer;
+    }
+    ///State transition - sets the `op_thread` field to Set
+    pub struct SetOpThread<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOpThread<S> {}
+    impl<S: State> State for SetOpThread<S> {
+        type Post = S::Post;
+        type MoreParents = S::MoreParents;
+        type MoreReplies = S::MoreReplies;
+        type OpThread = Set<members::op_thread>;
+        type HiddenByThreadgate = S::HiddenByThreadgate;
+        type MutedByViewer = S::MutedByViewer;
+    }
+    ///State transition - sets the `hidden_by_threadgate` field to Set
+    pub struct SetHiddenByThreadgate<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHiddenByThreadgate<S> {}
+    impl<S: State> State for SetHiddenByThreadgate<S> {
+        type Post = S::Post;
+        type MoreParents = S::MoreParents;
+        type MoreReplies = S::MoreReplies;
+        type OpThread = S::OpThread;
+        type HiddenByThreadgate = Set<members::hidden_by_threadgate>;
+        type MutedByViewer = S::MutedByViewer;
+    }
+    ///State transition - sets the `muted_by_viewer` field to Set
+    pub struct SetMutedByViewer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMutedByViewer<S> {}
+    impl<S: State> State for SetMutedByViewer<S> {
+        type Post = S::Post;
+        type MoreParents = S::MoreParents;
+        type MoreReplies = S::MoreReplies;
+        type OpThread = S::OpThread;
+        type HiddenByThreadgate = S::HiddenByThreadgate;
+        type MutedByViewer = Set<members::muted_by_viewer>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `post` field
+        pub struct post(());
+        ///Marker type for the `more_parents` field
+        pub struct more_parents(());
+        ///Marker type for the `more_replies` field
+        pub struct more_replies(());
+        ///Marker type for the `op_thread` field
+        pub struct op_thread(());
+        ///Marker type for the `hidden_by_threadgate` field
+        pub struct hidden_by_threadgate(());
+        ///Marker type for the `muted_by_viewer` field
+        pub struct muted_by_viewer(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ThreadItemPostBuilder<'a, S: thread_item_post_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<bool>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<crate::app_bsky::feed::PostView<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ThreadItemPost<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ThreadItemPostBuilder<'a, thread_item_post_state::Empty> {
+        ThreadItemPostBuilder::new()
+    }
+}
+
+impl<'a> ThreadItemPostBuilder<'a, thread_item_post_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ThreadItemPostBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ThreadItemPostBuilder<'a, S>
+where
+    S: thread_item_post_state::State,
+    S::HiddenByThreadgate: thread_item_post_state::IsUnset,
+{
+    /// Set the `hiddenByThreadgate` field (required)
+    pub fn hidden_by_threadgate(
+        mut self,
+        value: impl Into<bool>,
+    ) -> ThreadItemPostBuilder<'a, thread_item_post_state::SetHiddenByThreadgate<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ThreadItemPostBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ThreadItemPostBuilder<'a, S>
+where
+    S: thread_item_post_state::State,
+    S::MoreParents: thread_item_post_state::IsUnset,
+{
+    /// Set the `moreParents` field (required)
+    pub fn more_parents(
+        mut self,
+        value: impl Into<bool>,
+    ) -> ThreadItemPostBuilder<'a, thread_item_post_state::SetMoreParents<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        ThreadItemPostBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ThreadItemPostBuilder<'a, S>
+where
+    S: thread_item_post_state::State,
+    S::MoreReplies: thread_item_post_state::IsUnset,
+{
+    /// Set the `moreReplies` field (required)
+    pub fn more_replies(
+        mut self,
+        value: impl Into<i64>,
+    ) -> ThreadItemPostBuilder<'a, thread_item_post_state::SetMoreReplies<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        ThreadItemPostBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ThreadItemPostBuilder<'a, S>
+where
+    S: thread_item_post_state::State,
+    S::MutedByViewer: thread_item_post_state::IsUnset,
+{
+    /// Set the `mutedByViewer` field (required)
+    pub fn muted_by_viewer(
+        mut self,
+        value: impl Into<bool>,
+    ) -> ThreadItemPostBuilder<'a, thread_item_post_state::SetMutedByViewer<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        ThreadItemPostBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ThreadItemPostBuilder<'a, S>
+where
+    S: thread_item_post_state::State,
+    S::OpThread: thread_item_post_state::IsUnset,
+{
+    /// Set the `opThread` field (required)
+    pub fn op_thread(
+        mut self,
+        value: impl Into<bool>,
+    ) -> ThreadItemPostBuilder<'a, thread_item_post_state::SetOpThread<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        ThreadItemPostBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ThreadItemPostBuilder<'a, S>
+where
+    S: thread_item_post_state::State,
+    S::Post: thread_item_post_state::IsUnset,
+{
+    /// Set the `post` field (required)
+    pub fn post(
+        mut self,
+        value: impl Into<crate::app_bsky::feed::PostView<'a>>,
+    ) -> ThreadItemPostBuilder<'a, thread_item_post_state::SetPost<S>> {
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        ThreadItemPostBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ThreadItemPostBuilder<'a, S>
+where
+    S: thread_item_post_state::State,
+    S::Post: thread_item_post_state::IsSet,
+    S::MoreParents: thread_item_post_state::IsSet,
+    S::MoreReplies: thread_item_post_state::IsSet,
+    S::OpThread: thread_item_post_state::IsSet,
+    S::HiddenByThreadgate: thread_item_post_state::IsSet,
+    S::MutedByViewer: thread_item_post_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> ThreadItemPost<'a> {
+        ThreadItemPost {
+            hidden_by_threadgate: self.__unsafe_private_named.0.unwrap(),
+            more_parents: self.__unsafe_private_named.1.unwrap(),
+            more_replies: self.__unsafe_private_named.2.unwrap(),
+            muted_by_viewer: self.__unsafe_private_named.3.unwrap(),
+            op_thread: self.__unsafe_private_named.4.unwrap(),
+            post: self.__unsafe_private_named.5.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> ThreadItemPost<'a> {
+        ThreadItemPost {
+            hidden_by_threadgate: self.__unsafe_private_named.0.unwrap(),
+            more_parents: self.__unsafe_private_named.1.unwrap(),
+            more_replies: self.__unsafe_private_named.2.unwrap(),
+            muted_by_viewer: self.__unsafe_private_named.3.unwrap(),
+            op_thread: self.__unsafe_private_named.4.unwrap(),
+            post: self.__unsafe_private_named.5.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThreadItemPost<'a> {
@@ -1309,32 +2637,364 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThreadItemPost<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TrendView<'a> {
     #[serde(borrow)]
     pub actors: Vec<crate::app_bsky::actor::ProfileViewBasic<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub category: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
-    #[builder(into)]
     pub display_name: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub link: jacquard_common::CowStr<'a>,
     pub post_count: i64,
     pub started_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub status: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
-    #[builder(into)]
     pub topic: jacquard_common::CowStr<'a>,
+}
+
+pub mod trend_view_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Topic;
+        type DisplayName;
+        type Link;
+        type StartedAt;
+        type PostCount;
+        type Actors;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Topic = Unset;
+        type DisplayName = Unset;
+        type Link = Unset;
+        type StartedAt = Unset;
+        type PostCount = Unset;
+        type Actors = Unset;
+    }
+    ///State transition - sets the `topic` field to Set
+    pub struct SetTopic<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTopic<S> {}
+    impl<S: State> State for SetTopic<S> {
+        type Topic = Set<members::topic>;
+        type DisplayName = S::DisplayName;
+        type Link = S::Link;
+        type StartedAt = S::StartedAt;
+        type PostCount = S::PostCount;
+        type Actors = S::Actors;
+    }
+    ///State transition - sets the `display_name` field to Set
+    pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDisplayName<S> {}
+    impl<S: State> State for SetDisplayName<S> {
+        type Topic = S::Topic;
+        type DisplayName = Set<members::display_name>;
+        type Link = S::Link;
+        type StartedAt = S::StartedAt;
+        type PostCount = S::PostCount;
+        type Actors = S::Actors;
+    }
+    ///State transition - sets the `link` field to Set
+    pub struct SetLink<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLink<S> {}
+    impl<S: State> State for SetLink<S> {
+        type Topic = S::Topic;
+        type DisplayName = S::DisplayName;
+        type Link = Set<members::link>;
+        type StartedAt = S::StartedAt;
+        type PostCount = S::PostCount;
+        type Actors = S::Actors;
+    }
+    ///State transition - sets the `started_at` field to Set
+    pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStartedAt<S> {}
+    impl<S: State> State for SetStartedAt<S> {
+        type Topic = S::Topic;
+        type DisplayName = S::DisplayName;
+        type Link = S::Link;
+        type StartedAt = Set<members::started_at>;
+        type PostCount = S::PostCount;
+        type Actors = S::Actors;
+    }
+    ///State transition - sets the `post_count` field to Set
+    pub struct SetPostCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPostCount<S> {}
+    impl<S: State> State for SetPostCount<S> {
+        type Topic = S::Topic;
+        type DisplayName = S::DisplayName;
+        type Link = S::Link;
+        type StartedAt = S::StartedAt;
+        type PostCount = Set<members::post_count>;
+        type Actors = S::Actors;
+    }
+    ///State transition - sets the `actors` field to Set
+    pub struct SetActors<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActors<S> {}
+    impl<S: State> State for SetActors<S> {
+        type Topic = S::Topic;
+        type DisplayName = S::DisplayName;
+        type Link = S::Link;
+        type StartedAt = S::StartedAt;
+        type PostCount = S::PostCount;
+        type Actors = Set<members::actors>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `topic` field
+        pub struct topic(());
+        ///Marker type for the `display_name` field
+        pub struct display_name(());
+        ///Marker type for the `link` field
+        pub struct link(());
+        ///Marker type for the `started_at` field
+        pub struct started_at(());
+        ///Marker type for the `post_count` field
+        pub struct post_count(());
+        ///Marker type for the `actors` field
+        pub struct actors(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct TrendViewBuilder<'a, S: trend_view_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<Vec<crate::app_bsky::actor::ProfileViewBasic<'a>>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> TrendView<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> TrendViewBuilder<'a, trend_view_state::Empty> {
+        TrendViewBuilder::new()
+    }
+}
+
+impl<'a> TrendViewBuilder<'a, trend_view_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        TrendViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TrendViewBuilder<'a, S>
+where
+    S: trend_view_state::State,
+    S::Actors: trend_view_state::IsUnset,
+{
+    /// Set the `actors` field (required)
+    pub fn actors(
+        mut self,
+        value: impl Into<Vec<crate::app_bsky::actor::ProfileViewBasic<'a>>>,
+    ) -> TrendViewBuilder<'a, trend_view_state::SetActors<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        TrendViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: trend_view_state::State> TrendViewBuilder<'a, S> {
+    /// Set the `category` field (optional)
+    pub fn category(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `category` field to an Option value (optional)
+    pub fn maybe_category(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> TrendViewBuilder<'a, S>
+where
+    S: trend_view_state::State,
+    S::DisplayName: trend_view_state::IsUnset,
+{
+    /// Set the `displayName` field (required)
+    pub fn display_name(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> TrendViewBuilder<'a, trend_view_state::SetDisplayName<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        TrendViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TrendViewBuilder<'a, S>
+where
+    S: trend_view_state::State,
+    S::Link: trend_view_state::IsUnset,
+{
+    /// Set the `link` field (required)
+    pub fn link(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> TrendViewBuilder<'a, trend_view_state::SetLink<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        TrendViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TrendViewBuilder<'a, S>
+where
+    S: trend_view_state::State,
+    S::PostCount: trend_view_state::IsUnset,
+{
+    /// Set the `postCount` field (required)
+    pub fn post_count(
+        mut self,
+        value: impl Into<i64>,
+    ) -> TrendViewBuilder<'a, trend_view_state::SetPostCount<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        TrendViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TrendViewBuilder<'a, S>
+where
+    S: trend_view_state::State,
+    S::StartedAt: trend_view_state::IsUnset,
+{
+    /// Set the `startedAt` field (required)
+    pub fn started_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> TrendViewBuilder<'a, trend_view_state::SetStartedAt<S>> {
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        TrendViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: trend_view_state::State> TrendViewBuilder<'a, S> {
+    /// Set the `status` field (optional)
+    pub fn status(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `status` field to an Option value (optional)
+    pub fn maybe_status(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S> TrendViewBuilder<'a, S>
+where
+    S: trend_view_state::State,
+    S::Topic: trend_view_state::IsUnset,
+{
+    /// Set the `topic` field (required)
+    pub fn topic(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> TrendViewBuilder<'a, trend_view_state::SetTopic<S>> {
+        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        TrendViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TrendViewBuilder<'a, S>
+where
+    S: trend_view_state::State,
+    S::Topic: trend_view_state::IsSet,
+    S::DisplayName: trend_view_state::IsSet,
+    S::Link: trend_view_state::IsSet,
+    S::StartedAt: trend_view_state::IsSet,
+    S::PostCount: trend_view_state::IsSet,
+    S::Actors: trend_view_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> TrendView<'a> {
+        TrendView {
+            actors: self.__unsafe_private_named.0.unwrap(),
+            category: self.__unsafe_private_named.1,
+            display_name: self.__unsafe_private_named.2.unwrap(),
+            link: self.__unsafe_private_named.3.unwrap(),
+            post_count: self.__unsafe_private_named.4.unwrap(),
+            started_at: self.__unsafe_private_named.5.unwrap(),
+            status: self.__unsafe_private_named.6,
+            topic: self.__unsafe_private_named.7.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> TrendView<'a> {
+        TrendView {
+            actors: self.__unsafe_private_named.0.unwrap(),
+            category: self.__unsafe_private_named.1,
+            display_name: self.__unsafe_private_named.2.unwrap(),
+            link: self.__unsafe_private_named.3.unwrap(),
+            post_count: self.__unsafe_private_named.4.unwrap(),
+            started_at: self.__unsafe_private_named.5.unwrap(),
+            status: self.__unsafe_private_named.6,
+            topic: self.__unsafe_private_named.7.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TrendView<'a> {

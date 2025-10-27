@@ -413,15 +413,167 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CommitCountBreakdown<'a> 
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct IndividualEmailCommitCount<'a> {
     pub count: i64,
     #[serde(borrow)]
-    #[builder(into)]
     pub email: jacquard_common::CowStr<'a>,
+}
+
+pub mod individual_email_commit_count_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Email;
+        type Count;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Email = Unset;
+        type Count = Unset;
+    }
+    ///State transition - sets the `email` field to Set
+    pub struct SetEmail<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEmail<S> {}
+    impl<S: State> State for SetEmail<S> {
+        type Email = Set<members::email>;
+        type Count = S::Count;
+    }
+    ///State transition - sets the `count` field to Set
+    pub struct SetCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCount<S> {}
+    impl<S: State> State for SetCount<S> {
+        type Email = S::Email;
+        type Count = Set<members::count>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `email` field
+        pub struct email(());
+        ///Marker type for the `count` field
+        pub struct count(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct IndividualEmailCommitCountBuilder<
+    'a,
+    S: individual_email_commit_count_state::State,
+> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> IndividualEmailCommitCount<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> IndividualEmailCommitCountBuilder<
+        'a,
+        individual_email_commit_count_state::Empty,
+    > {
+        IndividualEmailCommitCountBuilder::new()
+    }
+}
+
+impl<
+    'a,
+> IndividualEmailCommitCountBuilder<'a, individual_email_commit_count_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        IndividualEmailCommitCountBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> IndividualEmailCommitCountBuilder<'a, S>
+where
+    S: individual_email_commit_count_state::State,
+    S::Count: individual_email_commit_count_state::IsUnset,
+{
+    /// Set the `count` field (required)
+    pub fn count(
+        mut self,
+        value: impl Into<i64>,
+    ) -> IndividualEmailCommitCountBuilder<
+        'a,
+        individual_email_commit_count_state::SetCount<S>,
+    > {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        IndividualEmailCommitCountBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> IndividualEmailCommitCountBuilder<'a, S>
+where
+    S: individual_email_commit_count_state::State,
+    S::Email: individual_email_commit_count_state::IsUnset,
+{
+    /// Set the `email` field (required)
+    pub fn email(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> IndividualEmailCommitCountBuilder<
+        'a,
+        individual_email_commit_count_state::SetEmail<S>,
+    > {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        IndividualEmailCommitCountBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> IndividualEmailCommitCountBuilder<'a, S>
+where
+    S: individual_email_commit_count_state::State,
+    S::Email: individual_email_commit_count_state::IsSet,
+    S::Count: individual_email_commit_count_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> IndividualEmailCommitCount<'a> {
+        IndividualEmailCommitCount {
+            count: self.__unsafe_private_named.0.unwrap(),
+            email: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> IndividualEmailCommitCount<'a> {
+        IndividualEmailCommitCount {
+            count: self.__unsafe_private_named.0.unwrap(),
+            email: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for IndividualEmailCommitCount<'a> {
@@ -449,15 +601,156 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for IndividualEmailCommitCoun
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct IndividualLanguageSize<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub lang: jacquard_common::CowStr<'a>,
     pub size: i64,
+}
+
+pub mod individual_language_size_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Lang;
+        type Size;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Lang = Unset;
+        type Size = Unset;
+    }
+    ///State transition - sets the `lang` field to Set
+    pub struct SetLang<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLang<S> {}
+    impl<S: State> State for SetLang<S> {
+        type Lang = Set<members::lang>;
+        type Size = S::Size;
+    }
+    ///State transition - sets the `size` field to Set
+    pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSize<S> {}
+    impl<S: State> State for SetSize<S> {
+        type Lang = S::Lang;
+        type Size = Set<members::size>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `lang` field
+        pub struct lang(());
+        ///Marker type for the `size` field
+        pub struct size(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct IndividualLanguageSizeBuilder<'a, S: individual_language_size_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> IndividualLanguageSize<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> IndividualLanguageSizeBuilder<
+        'a,
+        individual_language_size_state::Empty,
+    > {
+        IndividualLanguageSizeBuilder::new()
+    }
+}
+
+impl<'a> IndividualLanguageSizeBuilder<'a, individual_language_size_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        IndividualLanguageSizeBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> IndividualLanguageSizeBuilder<'a, S>
+where
+    S: individual_language_size_state::State,
+    S::Lang: individual_language_size_state::IsUnset,
+{
+    /// Set the `lang` field (required)
+    pub fn lang(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> IndividualLanguageSizeBuilder<'a, individual_language_size_state::SetLang<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        IndividualLanguageSizeBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> IndividualLanguageSizeBuilder<'a, S>
+where
+    S: individual_language_size_state::State,
+    S::Size: individual_language_size_state::IsUnset,
+{
+    /// Set the `size` field (required)
+    pub fn size(
+        mut self,
+        value: impl Into<i64>,
+    ) -> IndividualLanguageSizeBuilder<'a, individual_language_size_state::SetSize<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        IndividualLanguageSizeBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> IndividualLanguageSizeBuilder<'a, S>
+where
+    S: individual_language_size_state::State,
+    S::Lang: individual_language_size_state::IsSet,
+    S::Size: individual_language_size_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> IndividualLanguageSize<'a> {
+        IndividualLanguageSize {
+            lang: self.__unsafe_private_named.0.unwrap(),
+            size: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> IndividualLanguageSize<'a> {
+        IndividualLanguageSize {
+            lang: self.__unsafe_private_named.0.unwrap(),
+            size: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for IndividualLanguageSize<'a> {
@@ -523,8 +816,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LangBreakdown<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RefUpdate<'a> {
@@ -535,23 +827,364 @@ pub struct RefUpdate<'a> {
     pub meta: crate::sh_tangled::git::ref_update::Meta<'a>,
     /// new SHA of this ref
     #[serde(borrow)]
-    #[builder(into)]
     pub new_sha: jacquard_common::CowStr<'a>,
     /// old SHA of this ref
     #[serde(borrow)]
-    #[builder(into)]
     pub old_sha: jacquard_common::CowStr<'a>,
     /// Ref being updated
     #[serde(borrow)]
-    #[builder(into)]
     pub r#ref: jacquard_common::CowStr<'a>,
     /// did of the owner of the repo
     #[serde(borrow)]
     pub repo_did: jacquard_common::types::string::Did<'a>,
     /// name of the repo
     #[serde(borrow)]
-    #[builder(into)]
     pub repo_name: jacquard_common::CowStr<'a>,
+}
+
+pub mod ref_update_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Ref;
+        type CommitterDid;
+        type RepoDid;
+        type RepoName;
+        type OldSha;
+        type NewSha;
+        type Meta;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Ref = Unset;
+        type CommitterDid = Unset;
+        type RepoDid = Unset;
+        type RepoName = Unset;
+        type OldSha = Unset;
+        type NewSha = Unset;
+        type Meta = Unset;
+    }
+    ///State transition - sets the `ref` field to Set
+    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRef<S> {}
+    impl<S: State> State for SetRef<S> {
+        type Ref = Set<members::r#ref>;
+        type CommitterDid = S::CommitterDid;
+        type RepoDid = S::RepoDid;
+        type RepoName = S::RepoName;
+        type OldSha = S::OldSha;
+        type NewSha = S::NewSha;
+        type Meta = S::Meta;
+    }
+    ///State transition - sets the `committer_did` field to Set
+    pub struct SetCommitterDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCommitterDid<S> {}
+    impl<S: State> State for SetCommitterDid<S> {
+        type Ref = S::Ref;
+        type CommitterDid = Set<members::committer_did>;
+        type RepoDid = S::RepoDid;
+        type RepoName = S::RepoName;
+        type OldSha = S::OldSha;
+        type NewSha = S::NewSha;
+        type Meta = S::Meta;
+    }
+    ///State transition - sets the `repo_did` field to Set
+    pub struct SetRepoDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepoDid<S> {}
+    impl<S: State> State for SetRepoDid<S> {
+        type Ref = S::Ref;
+        type CommitterDid = S::CommitterDid;
+        type RepoDid = Set<members::repo_did>;
+        type RepoName = S::RepoName;
+        type OldSha = S::OldSha;
+        type NewSha = S::NewSha;
+        type Meta = S::Meta;
+    }
+    ///State transition - sets the `repo_name` field to Set
+    pub struct SetRepoName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepoName<S> {}
+    impl<S: State> State for SetRepoName<S> {
+        type Ref = S::Ref;
+        type CommitterDid = S::CommitterDid;
+        type RepoDid = S::RepoDid;
+        type RepoName = Set<members::repo_name>;
+        type OldSha = S::OldSha;
+        type NewSha = S::NewSha;
+        type Meta = S::Meta;
+    }
+    ///State transition - sets the `old_sha` field to Set
+    pub struct SetOldSha<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOldSha<S> {}
+    impl<S: State> State for SetOldSha<S> {
+        type Ref = S::Ref;
+        type CommitterDid = S::CommitterDid;
+        type RepoDid = S::RepoDid;
+        type RepoName = S::RepoName;
+        type OldSha = Set<members::old_sha>;
+        type NewSha = S::NewSha;
+        type Meta = S::Meta;
+    }
+    ///State transition - sets the `new_sha` field to Set
+    pub struct SetNewSha<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNewSha<S> {}
+    impl<S: State> State for SetNewSha<S> {
+        type Ref = S::Ref;
+        type CommitterDid = S::CommitterDid;
+        type RepoDid = S::RepoDid;
+        type RepoName = S::RepoName;
+        type OldSha = S::OldSha;
+        type NewSha = Set<members::new_sha>;
+        type Meta = S::Meta;
+    }
+    ///State transition - sets the `meta` field to Set
+    pub struct SetMeta<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMeta<S> {}
+    impl<S: State> State for SetMeta<S> {
+        type Ref = S::Ref;
+        type CommitterDid = S::CommitterDid;
+        type RepoDid = S::RepoDid;
+        type RepoName = S::RepoName;
+        type OldSha = S::OldSha;
+        type NewSha = S::NewSha;
+        type Meta = Set<members::meta>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `ref` field
+        pub struct r#ref(());
+        ///Marker type for the `committer_did` field
+        pub struct committer_did(());
+        ///Marker type for the `repo_did` field
+        pub struct repo_did(());
+        ///Marker type for the `repo_name` field
+        pub struct repo_name(());
+        ///Marker type for the `old_sha` field
+        pub struct old_sha(());
+        ///Marker type for the `new_sha` field
+        pub struct new_sha(());
+        ///Marker type for the `meta` field
+        pub struct meta(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct RefUpdateBuilder<'a, S: ref_update_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<crate::sh_tangled::git::ref_update::Meta<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> RefUpdate<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> RefUpdateBuilder<'a, ref_update_state::Empty> {
+        RefUpdateBuilder::new()
+    }
+}
+
+impl<'a> RefUpdateBuilder<'a, ref_update_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        RefUpdateBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RefUpdateBuilder<'a, S>
+where
+    S: ref_update_state::State,
+    S::CommitterDid: ref_update_state::IsUnset,
+{
+    /// Set the `committerDid` field (required)
+    pub fn committer_did(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> RefUpdateBuilder<'a, ref_update_state::SetCommitterDid<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        RefUpdateBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RefUpdateBuilder<'a, S>
+where
+    S: ref_update_state::State,
+    S::Meta: ref_update_state::IsUnset,
+{
+    /// Set the `meta` field (required)
+    pub fn meta(
+        mut self,
+        value: impl Into<crate::sh_tangled::git::ref_update::Meta<'a>>,
+    ) -> RefUpdateBuilder<'a, ref_update_state::SetMeta<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        RefUpdateBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RefUpdateBuilder<'a, S>
+where
+    S: ref_update_state::State,
+    S::NewSha: ref_update_state::IsUnset,
+{
+    /// Set the `newSha` field (required)
+    pub fn new_sha(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> RefUpdateBuilder<'a, ref_update_state::SetNewSha<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        RefUpdateBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RefUpdateBuilder<'a, S>
+where
+    S: ref_update_state::State,
+    S::OldSha: ref_update_state::IsUnset,
+{
+    /// Set the `oldSha` field (required)
+    pub fn old_sha(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> RefUpdateBuilder<'a, ref_update_state::SetOldSha<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        RefUpdateBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RefUpdateBuilder<'a, S>
+where
+    S: ref_update_state::State,
+    S::Ref: ref_update_state::IsUnset,
+{
+    /// Set the `ref` field (required)
+    pub fn r#ref(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> RefUpdateBuilder<'a, ref_update_state::SetRef<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        RefUpdateBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RefUpdateBuilder<'a, S>
+where
+    S: ref_update_state::State,
+    S::RepoDid: ref_update_state::IsUnset,
+{
+    /// Set the `repoDid` field (required)
+    pub fn repo_did(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> RefUpdateBuilder<'a, ref_update_state::SetRepoDid<S>> {
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        RefUpdateBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RefUpdateBuilder<'a, S>
+where
+    S: ref_update_state::State,
+    S::RepoName: ref_update_state::IsUnset,
+{
+    /// Set the `repoName` field (required)
+    pub fn repo_name(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> RefUpdateBuilder<'a, ref_update_state::SetRepoName<S>> {
+        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        RefUpdateBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RefUpdateBuilder<'a, S>
+where
+    S: ref_update_state::State,
+    S::Ref: ref_update_state::IsSet,
+    S::CommitterDid: ref_update_state::IsSet,
+    S::RepoDid: ref_update_state::IsSet,
+    S::RepoName: ref_update_state::IsSet,
+    S::OldSha: ref_update_state::IsSet,
+    S::NewSha: ref_update_state::IsSet,
+    S::Meta: ref_update_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> RefUpdate<'a> {
+        RefUpdate {
+            committer_did: self.__unsafe_private_named.0.unwrap(),
+            meta: self.__unsafe_private_named.1.unwrap(),
+            new_sha: self.__unsafe_private_named.2.unwrap(),
+            old_sha: self.__unsafe_private_named.3.unwrap(),
+            r#ref: self.__unsafe_private_named.4.unwrap(),
+            repo_did: self.__unsafe_private_named.5.unwrap(),
+            repo_name: self.__unsafe_private_named.6.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> RefUpdate<'a> {
+        RefUpdate {
+            committer_did: self.__unsafe_private_named.0.unwrap(),
+            meta: self.__unsafe_private_named.1.unwrap(),
+            new_sha: self.__unsafe_private_named.2.unwrap(),
+            old_sha: self.__unsafe_private_named.3.unwrap(),
+            r#ref: self.__unsafe_private_named.4.unwrap(),
+            repo_did: self.__unsafe_private_named.5.unwrap(),
+            repo_name: self.__unsafe_private_named.6.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> RefUpdate<'a> {
@@ -724,8 +1357,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RefUpdate<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Meta<'a> {
@@ -733,9 +1365,172 @@ pub struct Meta<'a> {
     pub commit_count: crate::sh_tangled::git::ref_update::CommitCountBreakdown<'a>,
     pub is_default_ref: bool,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub lang_breakdown: Option<crate::sh_tangled::git::ref_update::LangBreakdown<'a>>,
+}
+
+pub mod meta_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type IsDefaultRef;
+        type CommitCount;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type IsDefaultRef = Unset;
+        type CommitCount = Unset;
+    }
+    ///State transition - sets the `is_default_ref` field to Set
+    pub struct SetIsDefaultRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIsDefaultRef<S> {}
+    impl<S: State> State for SetIsDefaultRef<S> {
+        type IsDefaultRef = Set<members::is_default_ref>;
+        type CommitCount = S::CommitCount;
+    }
+    ///State transition - sets the `commit_count` field to Set
+    pub struct SetCommitCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCommitCount<S> {}
+    impl<S: State> State for SetCommitCount<S> {
+        type IsDefaultRef = S::IsDefaultRef;
+        type CommitCount = Set<members::commit_count>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `is_default_ref` field
+        pub struct is_default_ref(());
+        ///Marker type for the `commit_count` field
+        pub struct commit_count(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct MetaBuilder<'a, S: meta_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<
+            crate::sh_tangled::git::ref_update::CommitCountBreakdown<'a>,
+        >,
+        ::core::option::Option<bool>,
+        ::core::option::Option<crate::sh_tangled::git::ref_update::LangBreakdown<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Meta<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> MetaBuilder<'a, meta_state::Empty> {
+        MetaBuilder::new()
+    }
+}
+
+impl<'a> MetaBuilder<'a, meta_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        MetaBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> MetaBuilder<'a, S>
+where
+    S: meta_state::State,
+    S::CommitCount: meta_state::IsUnset,
+{
+    /// Set the `commitCount` field (required)
+    pub fn commit_count(
+        mut self,
+        value: impl Into<crate::sh_tangled::git::ref_update::CommitCountBreakdown<'a>>,
+    ) -> MetaBuilder<'a, meta_state::SetCommitCount<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        MetaBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> MetaBuilder<'a, S>
+where
+    S: meta_state::State,
+    S::IsDefaultRef: meta_state::IsUnset,
+{
+    /// Set the `isDefaultRef` field (required)
+    pub fn is_default_ref(
+        mut self,
+        value: impl Into<bool>,
+    ) -> MetaBuilder<'a, meta_state::SetIsDefaultRef<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        MetaBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: meta_state::State> MetaBuilder<'a, S> {
+    /// Set the `langBreakdown` field (optional)
+    pub fn lang_breakdown(
+        mut self,
+        value: impl Into<Option<crate::sh_tangled::git::ref_update::LangBreakdown<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `langBreakdown` field to an Option value (optional)
+    pub fn maybe_lang_breakdown(
+        mut self,
+        value: Option<crate::sh_tangled::git::ref_update::LangBreakdown<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> MetaBuilder<'a, S>
+where
+    S: meta_state::State,
+    S::IsDefaultRef: meta_state::IsSet,
+    S::CommitCount: meta_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Meta<'a> {
+        Meta {
+            commit_count: self.__unsafe_private_named.0.unwrap(),
+            is_default_ref: self.__unsafe_private_named.1.unwrap(),
+            lang_breakdown: self.__unsafe_private_named.2,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Meta<'a> {
+        Meta {
+            commit_count: self.__unsafe_private_named.0.unwrap(),
+            is_default_ref: self.__unsafe_private_named.1.unwrap(),
+            lang_breakdown: self.__unsafe_private_named.2,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Meta<'a> {

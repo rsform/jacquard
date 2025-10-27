@@ -12,15 +12,12 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct SearchBooks<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    #[builder(into)]
     pub id: std::option::Option<jacquard_common::CowStr<'a>>,
     ///(default: 25, min: 1, max: 100)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -28,8 +25,143 @@ pub struct SearchBooks<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub offset: std::option::Option<i64>,
     #[serde(borrow)]
-    #[builder(into)]
     pub q: jacquard_common::CowStr<'a>,
+}
+
+pub mod search_books_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Q;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Q = Unset;
+    }
+    ///State transition - sets the `q` field to Set
+    pub struct SetQ<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetQ<S> {}
+    impl<S: State> State for SetQ<S> {
+        type Q = Set<members::q>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `q` field
+        pub struct q(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct SearchBooksBuilder<'a, S: search_books_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> SearchBooks<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> SearchBooksBuilder<'a, search_books_state::Empty> {
+        SearchBooksBuilder::new()
+    }
+}
+
+impl<'a> SearchBooksBuilder<'a, search_books_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        SearchBooksBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: search_books_state::State> SearchBooksBuilder<'a, S> {
+    /// Set the `id` field (optional)
+    pub fn id(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `id` field to an Option value (optional)
+    pub fn maybe_id(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: search_books_state::State> SearchBooksBuilder<'a, S> {
+    /// Set the `limit` field (optional)
+    pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `limit` field to an Option value (optional)
+    pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: search_books_state::State> SearchBooksBuilder<'a, S> {
+    /// Set the `offset` field (optional)
+    pub fn offset(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `offset` field to an Option value (optional)
+    pub fn maybe_offset(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> SearchBooksBuilder<'a, S>
+where
+    S: search_books_state::State,
+    S::Q: search_books_state::IsUnset,
+{
+    /// Set the `q` field (required)
+    pub fn q(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> SearchBooksBuilder<'a, search_books_state::SetQ<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        SearchBooksBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SearchBooksBuilder<'a, S>
+where
+    S: search_books_state::State,
+    S::Q: search_books_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> SearchBooks<'a> {
+        SearchBooks {
+            id: self.__unsafe_private_named.0,
+            limit: self.__unsafe_private_named.1,
+            offset: self.__unsafe_private_named.2,
+            q: self.__unsafe_private_named.3.unwrap(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

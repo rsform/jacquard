@@ -13,8 +13,7 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RecordWithMedia<'a> {
@@ -22,6 +21,146 @@ pub struct RecordWithMedia<'a> {
     pub media: RecordWithMediaMedia<'a>,
     #[serde(borrow)]
     pub record: crate::app_bsky::embed::record::Record<'a>,
+}
+
+pub mod record_with_media_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Record;
+        type Media;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Record = Unset;
+        type Media = Unset;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecord<S> {}
+    impl<S: State> State for SetRecord<S> {
+        type Record = Set<members::record>;
+        type Media = S::Media;
+    }
+    ///State transition - sets the `media` field to Set
+    pub struct SetMedia<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMedia<S> {}
+    impl<S: State> State for SetMedia<S> {
+        type Record = S::Record;
+        type Media = Set<members::media>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `record` field
+        pub struct record(());
+        ///Marker type for the `media` field
+        pub struct media(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct RecordWithMediaBuilder<'a, S: record_with_media_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<RecordWithMediaMedia<'a>>,
+        ::core::option::Option<crate::app_bsky::embed::record::Record<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> RecordWithMedia<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> RecordWithMediaBuilder<'a, record_with_media_state::Empty> {
+        RecordWithMediaBuilder::new()
+    }
+}
+
+impl<'a> RecordWithMediaBuilder<'a, record_with_media_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        RecordWithMediaBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RecordWithMediaBuilder<'a, S>
+where
+    S: record_with_media_state::State,
+    S::Media: record_with_media_state::IsUnset,
+{
+    /// Set the `media` field (required)
+    pub fn media(
+        mut self,
+        value: impl Into<RecordWithMediaMedia<'a>>,
+    ) -> RecordWithMediaBuilder<'a, record_with_media_state::SetMedia<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        RecordWithMediaBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RecordWithMediaBuilder<'a, S>
+where
+    S: record_with_media_state::State,
+    S::Record: record_with_media_state::IsUnset,
+{
+    /// Set the `record` field (required)
+    pub fn record(
+        mut self,
+        value: impl Into<crate::app_bsky::embed::record::Record<'a>>,
+    ) -> RecordWithMediaBuilder<'a, record_with_media_state::SetRecord<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        RecordWithMediaBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RecordWithMediaBuilder<'a, S>
+where
+    S: record_with_media_state::State,
+    S::Record: record_with_media_state::IsSet,
+    S::Media: record_with_media_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> RecordWithMedia<'a> {
+        RecordWithMedia {
+            media: self.__unsafe_private_named.0.unwrap(),
+            record: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> RecordWithMedia<'a> {
+        RecordWithMedia {
+            media: self.__unsafe_private_named.0.unwrap(),
+            record: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -163,8 +302,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RecordWithMedia<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct View<'a> {
@@ -172,6 +310,146 @@ pub struct View<'a> {
     pub media: ViewMedia<'a>,
     #[serde(borrow)]
     pub record: crate::app_bsky::embed::record::View<'a>,
+}
+
+pub mod view_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Record;
+        type Media;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Record = Unset;
+        type Media = Unset;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecord<S> {}
+    impl<S: State> State for SetRecord<S> {
+        type Record = Set<members::record>;
+        type Media = S::Media;
+    }
+    ///State transition - sets the `media` field to Set
+    pub struct SetMedia<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMedia<S> {}
+    impl<S: State> State for SetMedia<S> {
+        type Record = S::Record;
+        type Media = Set<members::media>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `record` field
+        pub struct record(());
+        ///Marker type for the `media` field
+        pub struct media(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ViewBuilder<'a, S: view_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<ViewMedia<'a>>,
+        ::core::option::Option<crate::app_bsky::embed::record::View<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> View<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ViewBuilder<'a, view_state::Empty> {
+        ViewBuilder::new()
+    }
+}
+
+impl<'a> ViewBuilder<'a, view_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ViewBuilder<'a, S>
+where
+    S: view_state::State,
+    S::Media: view_state::IsUnset,
+{
+    /// Set the `media` field (required)
+    pub fn media(
+        mut self,
+        value: impl Into<ViewMedia<'a>>,
+    ) -> ViewBuilder<'a, view_state::SetMedia<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ViewBuilder<'a, S>
+where
+    S: view_state::State,
+    S::Record: view_state::IsUnset,
+{
+    /// Set the `record` field (required)
+    pub fn record(
+        mut self,
+        value: impl Into<crate::app_bsky::embed::record::View<'a>>,
+    ) -> ViewBuilder<'a, view_state::SetRecord<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        ViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ViewBuilder<'a, S>
+where
+    S: view_state::State,
+    S::Record: view_state::IsSet,
+    S::Media: view_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> View<'a> {
+        View {
+            media: self.__unsafe_private_named.0.unwrap(),
+            record: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> View<'a> {
+        View {
+            media: self.__unsafe_private_named.0.unwrap(),
+            record: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]

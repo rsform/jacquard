@@ -14,8 +14,7 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Vote<'a> {
@@ -23,6 +22,146 @@ pub struct Vote<'a> {
     pub option: Vec<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub poll: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+}
+
+pub mod vote_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Poll;
+        type Option;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Poll = Unset;
+        type Option = Unset;
+    }
+    ///State transition - sets the `poll` field to Set
+    pub struct SetPoll<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPoll<S> {}
+    impl<S: State> State for SetPoll<S> {
+        type Poll = Set<members::poll>;
+        type Option = S::Option;
+    }
+    ///State transition - sets the `option` field to Set
+    pub struct SetOption<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOption<S> {}
+    impl<S: State> State for SetOption<S> {
+        type Poll = S::Poll;
+        type Option = Set<members::option>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `poll` field
+        pub struct poll(());
+        ///Marker type for the `option` field
+        pub struct option(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct VoteBuilder<'a, S: vote_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Vote<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> VoteBuilder<'a, vote_state::Empty> {
+        VoteBuilder::new()
+    }
+}
+
+impl<'a> VoteBuilder<'a, vote_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        VoteBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> VoteBuilder<'a, S>
+where
+    S: vote_state::State,
+    S::Option: vote_state::IsUnset,
+{
+    /// Set the `option` field (required)
+    pub fn option(
+        mut self,
+        value: impl Into<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> VoteBuilder<'a, vote_state::SetOption<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        VoteBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> VoteBuilder<'a, S>
+where
+    S: vote_state::State,
+    S::Poll: vote_state::IsUnset,
+{
+    /// Set the `poll` field (required)
+    pub fn poll(
+        mut self,
+        value: impl Into<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    ) -> VoteBuilder<'a, vote_state::SetPoll<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        VoteBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> VoteBuilder<'a, S>
+where
+    S: vote_state::State,
+    S::Poll: vote_state::IsSet,
+    S::Option: vote_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Vote<'a> {
+        Vote {
+            option: self.__unsafe_private_named.0.unwrap(),
+            poll: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Vote<'a> {
+        Vote {
+            option: self.__unsafe_private_named.0.unwrap(),
+            poll: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Vote<'a> {

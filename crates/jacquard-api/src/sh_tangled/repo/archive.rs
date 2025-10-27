@@ -12,27 +12,182 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct Archive<'a> {
     ///(default: "tar.gz")
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    #[builder(into)]
     pub format: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    #[builder(into)]
     pub prefix: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
-    #[builder(into)]
     pub r#ref: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub repo: jacquard_common::CowStr<'a>,
+}
+
+pub mod archive_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Repo;
+        type Ref;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Repo = Unset;
+        type Ref = Unset;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Repo = Set<members::repo>;
+        type Ref = S::Ref;
+    }
+    ///State transition - sets the `ref` field to Set
+    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRef<S> {}
+    impl<S: State> State for SetRef<S> {
+        type Repo = S::Repo;
+        type Ref = Set<members::r#ref>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `repo` field
+        pub struct repo(());
+        ///Marker type for the `ref` field
+        pub struct r#ref(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ArchiveBuilder<'a, S: archive_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Archive<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ArchiveBuilder<'a, archive_state::Empty> {
+        ArchiveBuilder::new()
+    }
+}
+
+impl<'a> ArchiveBuilder<'a, archive_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ArchiveBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: archive_state::State> ArchiveBuilder<'a, S> {
+    /// Set the `format` field (optional)
+    pub fn format(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `format` field to an Option value (optional)
+    pub fn maybe_format(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: archive_state::State> ArchiveBuilder<'a, S> {
+    /// Set the `prefix` field (optional)
+    pub fn prefix(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `prefix` field to an Option value (optional)
+    pub fn maybe_prefix(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> ArchiveBuilder<'a, S>
+where
+    S: archive_state::State,
+    S::Ref: archive_state::IsUnset,
+{
+    /// Set the `ref` field (required)
+    pub fn r#ref(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> ArchiveBuilder<'a, archive_state::SetRef<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        ArchiveBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ArchiveBuilder<'a, S>
+where
+    S: archive_state::State,
+    S::Repo: archive_state::IsUnset,
+{
+    /// Set the `repo` field (required)
+    pub fn repo(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> ArchiveBuilder<'a, archive_state::SetRepo<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        ArchiveBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ArchiveBuilder<'a, S>
+where
+    S: archive_state::State,
+    S::Repo: archive_state::IsSet,
+    S::Ref: archive_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Archive<'a> {
+        Archive {
+            format: self.__unsafe_private_named.0,
+            prefix: self.__unsafe_private_named.1,
+            r#ref: self.__unsafe_private_named.2.unwrap(),
+            repo: self.__unsafe_private_named.3.unwrap(),
+        }
+    }
 }
 
 /// Binary archive data

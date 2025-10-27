@@ -192,25 +192,206 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DisableRule<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Postgate<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     /// List of AT-URIs embedding this post that the author has detached from.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub detached_embedding_uris: Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
     /// List of rules defining who can embed this post. If value is an empty array or is undefined, no particular rules apply and anyone can embed.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub embedding_rules: Option<Vec<crate::app_bsky::feed::postgate::DisableRule<'a>>>,
     /// Reference (AT-URI) to the post record.
     #[serde(borrow)]
     pub post: jacquard_common::types::string::AtUri<'a>,
+}
+
+pub mod postgate_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Post;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Post = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `post` field to Set
+    pub struct SetPost<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPost<S> {}
+    impl<S: State> State for SetPost<S> {
+        type Post = Set<members::post>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Post = S::Post;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `post` field
+        pub struct post(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct PostgateBuilder<'a, S: postgate_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
+        ::core::option::Option<Vec<crate::app_bsky::feed::postgate::DisableRule<'a>>>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Postgate<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> PostgateBuilder<'a, postgate_state::Empty> {
+        PostgateBuilder::new()
+    }
+}
+
+impl<'a> PostgateBuilder<'a, postgate_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        PostgateBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PostgateBuilder<'a, S>
+where
+    S: postgate_state::State,
+    S::CreatedAt: postgate_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> PostgateBuilder<'a, postgate_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        PostgateBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: postgate_state::State> PostgateBuilder<'a, S> {
+    /// Set the `detachedEmbeddingUris` field (optional)
+    pub fn detached_embedding_uris(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::types::string::AtUri<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `detachedEmbeddingUris` field to an Option value (optional)
+    pub fn maybe_detached_embedding_uris(
+        mut self,
+        value: Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: postgate_state::State> PostgateBuilder<'a, S> {
+    /// Set the `embeddingRules` field (optional)
+    pub fn embedding_rules(
+        mut self,
+        value: impl Into<Option<Vec<crate::app_bsky::feed::postgate::DisableRule<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `embeddingRules` field to an Option value (optional)
+    pub fn maybe_embedding_rules(
+        mut self,
+        value: Option<Vec<crate::app_bsky::feed::postgate::DisableRule<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> PostgateBuilder<'a, S>
+where
+    S: postgate_state::State,
+    S::Post: postgate_state::IsUnset,
+{
+    /// Set the `post` field (required)
+    pub fn post(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> PostgateBuilder<'a, postgate_state::SetPost<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        PostgateBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PostgateBuilder<'a, S>
+where
+    S: postgate_state::State,
+    S::Post: postgate_state::IsSet,
+    S::CreatedAt: postgate_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Postgate<'a> {
+        Postgate {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            detached_embedding_uris: self.__unsafe_private_named.1,
+            embedding_rules: self.__unsafe_private_named.2,
+            post: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Postgate<'a> {
+        Postgate {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            detached_embedding_uris: self.__unsafe_private_named.1,
+            embedding_rules: self.__unsafe_private_named.2,
+            post: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Postgate<'a> {

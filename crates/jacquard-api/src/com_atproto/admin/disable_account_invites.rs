@@ -13,26 +13,143 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-#[builder(start_fn = new)]
 pub struct DisableAccountInvites<'a> {
     #[serde(borrow)]
     pub account: jacquard_common::types::string::Did<'a>,
     /// Optional reason for disabled invites.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub note: Option<jacquard_common::CowStr<'a>>,
-    #[serde(flatten)]
-    #[serde(borrow)]
-    #[builder(default)]
-    pub extra_data: ::std::collections::BTreeMap<
-        ::jacquard_common::smol_str::SmolStr,
-        ::jacquard_common::types::value::Data<'a>,
-    >,
+}
+
+pub mod disable_account_invites_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Account;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Account = Unset;
+    }
+    ///State transition - sets the `account` field to Set
+    pub struct SetAccount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAccount<S> {}
+    impl<S: State> State for SetAccount<S> {
+        type Account = Set<members::account>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `account` field
+        pub struct account(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct DisableAccountInvitesBuilder<'a, S: disable_account_invites_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> DisableAccountInvites<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> DisableAccountInvitesBuilder<
+        'a,
+        disable_account_invites_state::Empty,
+    > {
+        DisableAccountInvitesBuilder::new()
+    }
+}
+
+impl<'a> DisableAccountInvitesBuilder<'a, disable_account_invites_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        DisableAccountInvitesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DisableAccountInvitesBuilder<'a, S>
+where
+    S: disable_account_invites_state::State,
+    S::Account: disable_account_invites_state::IsUnset,
+{
+    /// Set the `account` field (required)
+    pub fn account(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> DisableAccountInvitesBuilder<'a, disable_account_invites_state::SetAccount<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        DisableAccountInvitesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: disable_account_invites_state::State> DisableAccountInvitesBuilder<'a, S> {
+    /// Set the `note` field (optional)
+    pub fn note(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `note` field to an Option value (optional)
+    pub fn maybe_note(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> DisableAccountInvitesBuilder<'a, S>
+where
+    S: disable_account_invites_state::State,
+    S::Account: disable_account_invites_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> DisableAccountInvites<'a> {
+        DisableAccountInvites {
+            account: self.__unsafe_private_named.0.unwrap(),
+            note: self.__unsafe_private_named.1,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> DisableAccountInvites<'a> {
+        DisableAccountInvites {
+            account: self.__unsafe_private_named.0.unwrap(),
+            note: self.__unsafe_private_named.1,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 /// Response type for

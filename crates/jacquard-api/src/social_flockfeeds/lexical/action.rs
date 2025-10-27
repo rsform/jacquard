@@ -14,137 +14,675 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Action<'a> {
     /// Description of the process by which the action was performed.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub action_process: Option<ActionActionProcess<'a>>,
     /// Indicates the current disposition of the Action.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub action_status: Option<ActionActionStatus<'a>>,
     /** An additional type for the item, typically used for adding more specific types from external vocabularies in microdata syntax. This is a relationship between something and a class that the thing is in. Typically the value is a URI-identified RDF class, and in this case corresponds to the
     use of rdf:type in RDF. Text values can be used sparingly, for cases where useful information can be added without their being an appropriate schema to reference. In the case of text values, the class label should follow the schema.org <a href="https://schema.org/docs/styleguide.html">style guide</a>.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub additional_type: Option<jacquard_common::CowStr<'a>>,
     /// The direct performer or driver of the action (animate or inanimate). E.g. *John* wrote a book.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub agent: Option<ActionAgent<'a>>,
     /// An alias for the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub alternate_name: Option<jacquard_common::CowStr<'a>>,
     /// A description of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub description: Option<ActionDescription<'a>>,
     /// A sub property of description. A short description of the item used to disambiguate from other, similar items. Information from other properties (in particular, name) may be necessary for the description to be useful for disambiguation.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub disambiguating_description: Option<jacquard_common::CowStr<'a>>,
     /// The endTime of something. For a reserved event or service (e.g. FoodEstablishmentReservation), the time that it is expected to end. For actions that span a period of time, when the action was performed. E.g. John wrote a book from January to *December*. For media, including audio and video, it's the time offset of the end of a clip within a larger file.\n\nNote that Event uses startDate/endDate instead of startTime/endTime, even when describing dates with times. This situation may be clarified in future revisions.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub end_time: Option<jacquard_common::CowStr<'a>>,
     /// For failed actions, more information on the cause of the failure.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub error: Option<ActionError<'a>>,
     /// The identifier property represents any kind of identifier for any kind of [[Thing]], such as ISBNs, GTIN codes, UUIDs etc. Schema.org provides dedicated properties for representing many of these, either as textual strings or as URL (URI) links. See [background notes](/docs/datamodel.html#identifierBg) for more details.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub identifier: Option<ActionIdentifier<'a>>,
     /// An image of the item. This can be a [[URL]] or a fully described [[ImageObject]].
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub image: Option<ActionImage<'a>>,
     /// The object that helped the agent perform the action. E.g. John wrote a book with *a pen*.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub instrument: Option<ActionInstrument<'a>>,
     /// The location of, for example, where an event is happening, where an organization is located, or where an action takes place.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub location: Option<ActionLocation<'a>>,
     /// Indicates a page (or other CreativeWork) for which this thing is the main entity being described. See [background notes](/docs/datamodel.html#mainEntityBackground) for details.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub main_entity_of_page: Option<ActionMainEntityOfPage<'a>>,
     /// The name of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub name: Option<jacquard_common::CowStr<'a>>,
     /// The object upon which the action is carried out, whose state is kept intact or changed. Also known as the semantic roles patient, affected or undergoer (which change their state) or theme (which doesn't). E.g. John read *a book*.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub object: Option<ActionObject<'a>>,
     /// Other co-agents that participated in the action indirectly. E.g. John wrote a book with *Steve*.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub participant: Option<ActionParticipant<'a>>,
     /// Indicates a potential Action, which describes an idealized action in which this thing would play an 'object' role.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub potential_action: Option<ActionPotentialAction<'a>>,
     /// The service provider, service operator, or service performer; the goods producer. Another party (a seller) may offer those services or goods on behalf of the provider. A provider may also serve as the seller.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub provider: Option<ActionProvider<'a>>,
     /// The result produced in the action. E.g. John wrote *a book*.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub result: Option<ActionResult<'a>>,
     /// URL of a reference Web page that unambiguously indicates the item's identity. E.g. the URL of the item's Wikipedia page, Wikidata entry, or official website.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub same_as: Option<jacquard_common::types::string::Uri<'a>>,
     /// The startTime of something. For a reserved event or service (e.g. FoodEstablishmentReservation), the time that it is expected to start. For actions that span a period of time, when the action was performed. E.g. John wrote a book from *January* to December. For media, including audio and video, it's the time offset of the start of a clip within a larger file.\n\nNote that Event uses startDate/endDate instead of startTime/endTime, even when describing dates with times. This situation may be clarified in future revisions.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub start_time: Option<jacquard_common::CowStr<'a>>,
     /// A CreativeWork or Event about this Thing.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub subject_of: Option<ActionSubjectOf<'a>>,
     /// Indicates a target EntryPoint, or url, for an Action.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub target: Option<ActionTarget<'a>>,
     /// URL of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub url: Option<jacquard_common::types::string::Uri<'a>>,
+}
+
+pub mod action_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {}
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {}
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {}
+}
+
+/// Builder for constructing an instance of this type
+pub struct ActionBuilder<'a, S: action_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<ActionActionProcess<'a>>,
+        ::core::option::Option<ActionActionStatus<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ActionAgent<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ActionDescription<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ActionError<'a>>,
+        ::core::option::Option<ActionIdentifier<'a>>,
+        ::core::option::Option<ActionImage<'a>>,
+        ::core::option::Option<ActionInstrument<'a>>,
+        ::core::option::Option<ActionLocation<'a>>,
+        ::core::option::Option<ActionMainEntityOfPage<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ActionObject<'a>>,
+        ::core::option::Option<ActionParticipant<'a>>,
+        ::core::option::Option<ActionPotentialAction<'a>>,
+        ::core::option::Option<ActionProvider<'a>>,
+        ::core::option::Option<ActionResult<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ActionSubjectOf<'a>>,
+        ::core::option::Option<ActionTarget<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Action<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ActionBuilder<'a, action_state::Empty> {
+        ActionBuilder::new()
+    }
+}
+
+impl<'a> ActionBuilder<'a, action_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ActionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: action_state::State> ActionBuilder<'a, S> {
+    /// Set the `actionProcess` field (optional)
+    pub fn action_process(
+        mut self,
+        value: impl Into<Option<ActionActionProcess<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `actionProcess` field to an Option value (optional)
+    pub fn maybe_action_process(
+        mut self,
+        value: Option<ActionActionProcess<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: action_state::State> ActionBuilder<'a, S> {
+    /// Set the `actionStatus` field (optional)
+    pub fn action_status(
+        mut self,
+        value: impl Into<Option<ActionActionStatus<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `actionStatus` field to an Option value (optional)
+    pub fn maybe_action_status(mut self, value: Option<ActionActionStatus<'a>>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: action_state::State> ActionBuilder<'a, S> {
+    /// Set the `additionalType` field (optional)
+    pub fn additional_type(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `additionalType` field to an Option value (optional)
+    pub fn maybe_additional_type(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: action_state::State> ActionBuilder<'a, S> {
+    /// Set the `agent` field (optional)
+    pub fn agent(mut self, value: impl Into<Option<ActionAgent<'a>>>) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `agent` field to an Option value (optional)
+    pub fn maybe_agent(mut self, value: Option<ActionAgent<'a>>) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: action_state::State> ActionBuilder<'a, S> {
+    /// Set the `alternateName` field (optional)
+    pub fn alternate_name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `alternateName` field to an Option value (optional)
+    pub fn maybe_alternate_name(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: action_state::State> ActionBuilder<'a, S> {
+    /// Set the `description` field (optional)
+    pub fn description(
+        mut self,
+        value: impl Into<Option<ActionDescription<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `description` field to an Option value (optional)
+    pub fn maybe_description(mut self, value: Option<ActionDescription<'a>>) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S: action_state::State> ActionBuilder<'a, S> {
+    /// Set the `disambiguatingDescription` field (optional)
+    pub fn disambiguating_description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `disambiguatingDescription` field to an Option value (optional)
+    pub fn maybe_disambiguating_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S: action_state::State> ActionBuilder<'a, S> {
+    /// Set the `endTime` field (optional)
+    pub fn end_time(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value.into();
+        self
+    }
+    /// Set the `endTime` field to an Option value (optional)
+    pub fn maybe_end_time(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.7 = value;
+        self
+    }
+}
+
+impl<'a, S: action_state::State> ActionBuilder<'a, S> {
+    /// Set the `error` field (optional)
+    pub fn error(mut self, value: impl Into<Option<ActionError<'a>>>) -> Self {
+        self.__unsafe_private_named.8 = value.into();
+        self
+    }
+    /// Set the `error` field to an Option value (optional)
+    pub fn maybe_error(mut self, value: Option<ActionError<'a>>) -> Self {
+        self.__unsafe_private_named.8 = value;
+        self
+    }
+}
+
+impl<'a, S: action_state::State> ActionBuilder<'a, S> {
+    /// Set the `identifier` field (optional)
+    pub fn identifier(mut self, value: impl Into<Option<ActionIdentifier<'a>>>) -> Self {
+        self.__unsafe_private_named.9 = value.into();
+        self
+    }
+    /// Set the `identifier` field to an Option value (optional)
+    pub fn maybe_identifier(mut self, value: Option<ActionIdentifier<'a>>) -> Self {
+        self.__unsafe_private_named.9 = value;
+        self
+    }
+}
+
+impl<'a, S: action_state::State> ActionBuilder<'a, S> {
+    /// Set the `image` field (optional)
+    pub fn image(mut self, value: impl Into<Option<ActionImage<'a>>>) -> Self {
+        self.__unsafe_private_named.10 = value.into();
+        self
+    }
+    /// Set the `image` field to an Option value (optional)
+    pub fn maybe_image(mut self, value: Option<ActionImage<'a>>) -> Self {
+        self.__unsafe_private_named.10 = value;
+        self
+    }
+}
+
+impl<'a, S: action_state::State> ActionBuilder<'a, S> {
+    /// Set the `instrument` field (optional)
+    pub fn instrument(mut self, value: impl Into<Option<ActionInstrument<'a>>>) -> Self {
+        self.__unsafe_private_named.11 = value.into();
+        self
+    }
+    /// Set the `instrument` field to an Option value (optional)
+    pub fn maybe_instrument(mut self, value: Option<ActionInstrument<'a>>) -> Self {
+        self.__unsafe_private_named.11 = value;
+        self
+    }
+}
+
+impl<'a, S: action_state::State> ActionBuilder<'a, S> {
+    /// Set the `location` field (optional)
+    pub fn location(mut self, value: impl Into<Option<ActionLocation<'a>>>) -> Self {
+        self.__unsafe_private_named.12 = value.into();
+        self
+    }
+    /// Set the `location` field to an Option value (optional)
+    pub fn maybe_location(mut self, value: Option<ActionLocation<'a>>) -> Self {
+        self.__unsafe_private_named.12 = value;
+        self
+    }
+}
+
+impl<'a, S: action_state::State> ActionBuilder<'a, S> {
+    /// Set the `mainEntityOfPage` field (optional)
+    pub fn main_entity_of_page(
+        mut self,
+        value: impl Into<Option<ActionMainEntityOfPage<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.13 = value.into();
+        self
+    }
+    /// Set the `mainEntityOfPage` field to an Option value (optional)
+    pub fn maybe_main_entity_of_page(
+        mut self,
+        value: Option<ActionMainEntityOfPage<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.13 = value;
+        self
+    }
+}
+
+impl<'a, S: action_state::State> ActionBuilder<'a, S> {
+    /// Set the `name` field (optional)
+    pub fn name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.14 = value.into();
+        self
+    }
+    /// Set the `name` field to an Option value (optional)
+    pub fn maybe_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.14 = value;
+        self
+    }
+}
+
+impl<'a, S: action_state::State> ActionBuilder<'a, S> {
+    /// Set the `object` field (optional)
+    pub fn object(mut self, value: impl Into<Option<ActionObject<'a>>>) -> Self {
+        self.__unsafe_private_named.15 = value.into();
+        self
+    }
+    /// Set the `object` field to an Option value (optional)
+    pub fn maybe_object(mut self, value: Option<ActionObject<'a>>) -> Self {
+        self.__unsafe_private_named.15 = value;
+        self
+    }
+}
+
+impl<'a, S: action_state::State> ActionBuilder<'a, S> {
+    /// Set the `participant` field (optional)
+    pub fn participant(
+        mut self,
+        value: impl Into<Option<ActionParticipant<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.16 = value.into();
+        self
+    }
+    /// Set the `participant` field to an Option value (optional)
+    pub fn maybe_participant(mut self, value: Option<ActionParticipant<'a>>) -> Self {
+        self.__unsafe_private_named.16 = value;
+        self
+    }
+}
+
+impl<'a, S: action_state::State> ActionBuilder<'a, S> {
+    /// Set the `potentialAction` field (optional)
+    pub fn potential_action(
+        mut self,
+        value: impl Into<Option<ActionPotentialAction<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.17 = value.into();
+        self
+    }
+    /// Set the `potentialAction` field to an Option value (optional)
+    pub fn maybe_potential_action(
+        mut self,
+        value: Option<ActionPotentialAction<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.17 = value;
+        self
+    }
+}
+
+impl<'a, S: action_state::State> ActionBuilder<'a, S> {
+    /// Set the `provider` field (optional)
+    pub fn provider(mut self, value: impl Into<Option<ActionProvider<'a>>>) -> Self {
+        self.__unsafe_private_named.18 = value.into();
+        self
+    }
+    /// Set the `provider` field to an Option value (optional)
+    pub fn maybe_provider(mut self, value: Option<ActionProvider<'a>>) -> Self {
+        self.__unsafe_private_named.18 = value;
+        self
+    }
+}
+
+impl<'a, S: action_state::State> ActionBuilder<'a, S> {
+    /// Set the `result` field (optional)
+    pub fn result(mut self, value: impl Into<Option<ActionResult<'a>>>) -> Self {
+        self.__unsafe_private_named.19 = value.into();
+        self
+    }
+    /// Set the `result` field to an Option value (optional)
+    pub fn maybe_result(mut self, value: Option<ActionResult<'a>>) -> Self {
+        self.__unsafe_private_named.19 = value;
+        self
+    }
+}
+
+impl<'a, S: action_state::State> ActionBuilder<'a, S> {
+    /// Set the `sameAs` field (optional)
+    pub fn same_as(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.20 = value.into();
+        self
+    }
+    /// Set the `sameAs` field to an Option value (optional)
+    pub fn maybe_same_as(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.20 = value;
+        self
+    }
+}
+
+impl<'a, S: action_state::State> ActionBuilder<'a, S> {
+    /// Set the `startTime` field (optional)
+    pub fn start_time(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.21 = value.into();
+        self
+    }
+    /// Set the `startTime` field to an Option value (optional)
+    pub fn maybe_start_time(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.21 = value;
+        self
+    }
+}
+
+impl<'a, S: action_state::State> ActionBuilder<'a, S> {
+    /// Set the `subjectOf` field (optional)
+    pub fn subject_of(mut self, value: impl Into<Option<ActionSubjectOf<'a>>>) -> Self {
+        self.__unsafe_private_named.22 = value.into();
+        self
+    }
+    /// Set the `subjectOf` field to an Option value (optional)
+    pub fn maybe_subject_of(mut self, value: Option<ActionSubjectOf<'a>>) -> Self {
+        self.__unsafe_private_named.22 = value;
+        self
+    }
+}
+
+impl<'a, S: action_state::State> ActionBuilder<'a, S> {
+    /// Set the `target` field (optional)
+    pub fn target(mut self, value: impl Into<Option<ActionTarget<'a>>>) -> Self {
+        self.__unsafe_private_named.23 = value.into();
+        self
+    }
+    /// Set the `target` field to an Option value (optional)
+    pub fn maybe_target(mut self, value: Option<ActionTarget<'a>>) -> Self {
+        self.__unsafe_private_named.23 = value;
+        self
+    }
+}
+
+impl<'a, S: action_state::State> ActionBuilder<'a, S> {
+    /// Set the `url` field (optional)
+    pub fn url(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.24 = value.into();
+        self
+    }
+    /// Set the `url` field to an Option value (optional)
+    pub fn maybe_url(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.24 = value;
+        self
+    }
+}
+
+impl<'a, S> ActionBuilder<'a, S>
+where
+    S: action_state::State,
+{
+    /// Build the final struct
+    pub fn build(self) -> Action<'a> {
+        Action {
+            action_process: self.__unsafe_private_named.0,
+            action_status: self.__unsafe_private_named.1,
+            additional_type: self.__unsafe_private_named.2,
+            agent: self.__unsafe_private_named.3,
+            alternate_name: self.__unsafe_private_named.4,
+            description: self.__unsafe_private_named.5,
+            disambiguating_description: self.__unsafe_private_named.6,
+            end_time: self.__unsafe_private_named.7,
+            error: self.__unsafe_private_named.8,
+            identifier: self.__unsafe_private_named.9,
+            image: self.__unsafe_private_named.10,
+            instrument: self.__unsafe_private_named.11,
+            location: self.__unsafe_private_named.12,
+            main_entity_of_page: self.__unsafe_private_named.13,
+            name: self.__unsafe_private_named.14,
+            object: self.__unsafe_private_named.15,
+            participant: self.__unsafe_private_named.16,
+            potential_action: self.__unsafe_private_named.17,
+            provider: self.__unsafe_private_named.18,
+            result: self.__unsafe_private_named.19,
+            same_as: self.__unsafe_private_named.20,
+            start_time: self.__unsafe_private_named.21,
+            subject_of: self.__unsafe_private_named.22,
+            target: self.__unsafe_private_named.23,
+            url: self.__unsafe_private_named.24,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Action<'a> {
+        Action {
+            action_process: self.__unsafe_private_named.0,
+            action_status: self.__unsafe_private_named.1,
+            additional_type: self.__unsafe_private_named.2,
+            agent: self.__unsafe_private_named.3,
+            alternate_name: self.__unsafe_private_named.4,
+            description: self.__unsafe_private_named.5,
+            disambiguating_description: self.__unsafe_private_named.6,
+            end_time: self.__unsafe_private_named.7,
+            error: self.__unsafe_private_named.8,
+            identifier: self.__unsafe_private_named.9,
+            image: self.__unsafe_private_named.10,
+            instrument: self.__unsafe_private_named.11,
+            location: self.__unsafe_private_named.12,
+            main_entity_of_page: self.__unsafe_private_named.13,
+            name: self.__unsafe_private_named.14,
+            object: self.__unsafe_private_named.15,
+            participant: self.__unsafe_private_named.16,
+            potential_action: self.__unsafe_private_named.17,
+            provider: self.__unsafe_private_named.18,
+            result: self.__unsafe_private_named.19,
+            same_as: self.__unsafe_private_named.20,
+            start_time: self.__unsafe_private_named.21,
+            subject_of: self.__unsafe_private_named.22,
+            target: self.__unsafe_private_named.23,
+            url: self.__unsafe_private_named.24,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Action<'a> {

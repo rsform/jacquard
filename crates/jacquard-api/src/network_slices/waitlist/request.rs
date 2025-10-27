@@ -14,8 +14,7 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Request<'a> {
@@ -24,6 +23,146 @@ pub struct Request<'a> {
     /// The AT URI of the slice being requested access to
     #[serde(borrow)]
     pub slice: jacquard_common::types::string::AtUri<'a>,
+}
+
+pub mod request_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Slice;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Slice = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `slice` field to Set
+    pub struct SetSlice<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSlice<S> {}
+    impl<S: State> State for SetSlice<S> {
+        type Slice = Set<members::slice>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Slice = S::Slice;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `slice` field
+        pub struct slice(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct RequestBuilder<'a, S: request_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Request<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> RequestBuilder<'a, request_state::Empty> {
+        RequestBuilder::new()
+    }
+}
+
+impl<'a> RequestBuilder<'a, request_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        RequestBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RequestBuilder<'a, S>
+where
+    S: request_state::State,
+    S::CreatedAt: request_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> RequestBuilder<'a, request_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        RequestBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RequestBuilder<'a, S>
+where
+    S: request_state::State,
+    S::Slice: request_state::IsUnset,
+{
+    /// Set the `slice` field (required)
+    pub fn slice(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> RequestBuilder<'a, request_state::SetSlice<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        RequestBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RequestBuilder<'a, S>
+where
+    S: request_state::State,
+    S::Slice: request_state::IsSet,
+    S::CreatedAt: request_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Request<'a> {
+        Request {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            slice: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Request<'a> {
+        Request {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            slice: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Request<'a> {

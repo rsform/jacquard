@@ -1003,72 +1003,57 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GameActions<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Session<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub activity_summary: Option<
         crate::net_anisota::beta::game::session::ActivitySummary<'a>,
     >,
     /// Version of the client application
     #[serde(borrow)]
-    #[builder(into)]
     pub client_version: jacquard_common::CowStr<'a>,
     /// When the session record was created
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub created_at: Option<jacquard_common::types::string::Datetime>,
     /// Total session duration in milliseconds (calculated when session ends)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub duration: Option<i64>,
     /// Why the session ended
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub end_reason: Option<jacquard_common::CowStr<'a>>,
     /// When the session ended (ISO 8601)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub ended_at: Option<jacquard_common::types::string::Datetime>,
     /// Timestamp of the last recorded activity in this session
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub last_activity_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub metadata: Option<crate::net_anisota::beta::game::session::Metadata<'a>>,
     /// URI of the previous session if this is a continuation (e.g., after brief inactivity)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub parent_session_uri: Option<jacquard_common::CowStr<'a>>,
     /// Platform where the session occurred
     #[serde(borrow)]
-    #[builder(into)]
     pub platform: jacquard_common::CowStr<'a>,
     /// URIs of log records that occurred during this session
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub related_log_uris: Option<Vec<jacquard_common::CowStr<'a>>>,
     /// URIs of progress records created during this session
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub related_progress_uris: Option<Vec<jacquard_common::CowStr<'a>>>,
     /// URIs of related sessions (e.g., same day, same device)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub related_session_uris: Option<Vec<jacquard_common::CowStr<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub session_context: Option<
         crate::net_anisota::beta::game::session::SessionContext<'a>,
@@ -1077,12 +1062,532 @@ pub struct Session<'a> {
     pub started_at: jacquard_common::types::string::Datetime,
     /// Current status of the session
     #[serde(borrow)]
-    #[builder(into)]
     pub status: jacquard_common::CowStr<'a>,
     /// When the session record was last updated
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub updated_at: Option<jacquard_common::types::string::Datetime>,
+}
+
+pub mod session_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type StartedAt;
+        type Status;
+        type Platform;
+        type ClientVersion;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type StartedAt = Unset;
+        type Status = Unset;
+        type Platform = Unset;
+        type ClientVersion = Unset;
+    }
+    ///State transition - sets the `started_at` field to Set
+    pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStartedAt<S> {}
+    impl<S: State> State for SetStartedAt<S> {
+        type StartedAt = Set<members::started_at>;
+        type Status = S::Status;
+        type Platform = S::Platform;
+        type ClientVersion = S::ClientVersion;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStatus<S> {}
+    impl<S: State> State for SetStatus<S> {
+        type StartedAt = S::StartedAt;
+        type Status = Set<members::status>;
+        type Platform = S::Platform;
+        type ClientVersion = S::ClientVersion;
+    }
+    ///State transition - sets the `platform` field to Set
+    pub struct SetPlatform<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPlatform<S> {}
+    impl<S: State> State for SetPlatform<S> {
+        type StartedAt = S::StartedAt;
+        type Status = S::Status;
+        type Platform = Set<members::platform>;
+        type ClientVersion = S::ClientVersion;
+    }
+    ///State transition - sets the `client_version` field to Set
+    pub struct SetClientVersion<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetClientVersion<S> {}
+    impl<S: State> State for SetClientVersion<S> {
+        type StartedAt = S::StartedAt;
+        type Status = S::Status;
+        type Platform = S::Platform;
+        type ClientVersion = Set<members::client_version>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `started_at` field
+        pub struct started_at(());
+        ///Marker type for the `status` field
+        pub struct status(());
+        ///Marker type for the `platform` field
+        pub struct platform(());
+        ///Marker type for the `client_version` field
+        pub struct client_version(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct SessionBuilder<'a, S: session_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<
+            crate::net_anisota::beta::game::session::ActivitySummary<'a>,
+        >,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<crate::net_anisota::beta::game::session::Metadata<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+        ::core::option::Option<
+            crate::net_anisota::beta::game::session::SessionContext<'a>,
+        >,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Session<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> SessionBuilder<'a, session_state::Empty> {
+        SessionBuilder::new()
+    }
+}
+
+impl<'a> SessionBuilder<'a, session_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        SessionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: session_state::State> SessionBuilder<'a, S> {
+    /// Set the `activitySummary` field (optional)
+    pub fn activity_summary(
+        mut self,
+        value: impl Into<
+            Option<crate::net_anisota::beta::game::session::ActivitySummary<'a>>,
+        >,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `activitySummary` field to an Option value (optional)
+    pub fn maybe_activity_summary(
+        mut self,
+        value: Option<crate::net_anisota::beta::game::session::ActivitySummary<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> SessionBuilder<'a, S>
+where
+    S: session_state::State,
+    S::ClientVersion: session_state::IsUnset,
+{
+    /// Set the `clientVersion` field (required)
+    pub fn client_version(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> SessionBuilder<'a, session_state::SetClientVersion<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        SessionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: session_state::State> SessionBuilder<'a, S> {
+    /// Set the `createdAt` field (optional)
+    pub fn created_at(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `createdAt` field to an Option value (optional)
+    pub fn maybe_created_at(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: session_state::State> SessionBuilder<'a, S> {
+    /// Set the `duration` field (optional)
+    pub fn duration(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `duration` field to an Option value (optional)
+    pub fn maybe_duration(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: session_state::State> SessionBuilder<'a, S> {
+    /// Set the `endReason` field (optional)
+    pub fn end_reason(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `endReason` field to an Option value (optional)
+    pub fn maybe_end_reason(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: session_state::State> SessionBuilder<'a, S> {
+    /// Set the `endedAt` field (optional)
+    pub fn ended_at(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `endedAt` field to an Option value (optional)
+    pub fn maybe_ended_at(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S: session_state::State> SessionBuilder<'a, S> {
+    /// Set the `lastActivityAt` field (optional)
+    pub fn last_activity_at(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `lastActivityAt` field to an Option value (optional)
+    pub fn maybe_last_activity_at(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S: session_state::State> SessionBuilder<'a, S> {
+    /// Set the `metadata` field (optional)
+    pub fn metadata(
+        mut self,
+        value: impl Into<Option<crate::net_anisota::beta::game::session::Metadata<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value.into();
+        self
+    }
+    /// Set the `metadata` field to an Option value (optional)
+    pub fn maybe_metadata(
+        mut self,
+        value: Option<crate::net_anisota::beta::game::session::Metadata<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value;
+        self
+    }
+}
+
+impl<'a, S: session_state::State> SessionBuilder<'a, S> {
+    /// Set the `parentSessionUri` field (optional)
+    pub fn parent_session_uri(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value.into();
+        self
+    }
+    /// Set the `parentSessionUri` field to an Option value (optional)
+    pub fn maybe_parent_session_uri(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value;
+        self
+    }
+}
+
+impl<'a, S> SessionBuilder<'a, S>
+where
+    S: session_state::State,
+    S::Platform: session_state::IsUnset,
+{
+    /// Set the `platform` field (required)
+    pub fn platform(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> SessionBuilder<'a, session_state::SetPlatform<S>> {
+        self.__unsafe_private_named.9 = ::core::option::Option::Some(value.into());
+        SessionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: session_state::State> SessionBuilder<'a, S> {
+    /// Set the `relatedLogUris` field (optional)
+    pub fn related_log_uris(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.10 = value.into();
+        self
+    }
+    /// Set the `relatedLogUris` field to an Option value (optional)
+    pub fn maybe_related_log_uris(
+        mut self,
+        value: Option<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.10 = value;
+        self
+    }
+}
+
+impl<'a, S: session_state::State> SessionBuilder<'a, S> {
+    /// Set the `relatedProgressUris` field (optional)
+    pub fn related_progress_uris(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.11 = value.into();
+        self
+    }
+    /// Set the `relatedProgressUris` field to an Option value (optional)
+    pub fn maybe_related_progress_uris(
+        mut self,
+        value: Option<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.11 = value;
+        self
+    }
+}
+
+impl<'a, S: session_state::State> SessionBuilder<'a, S> {
+    /// Set the `relatedSessionUris` field (optional)
+    pub fn related_session_uris(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.12 = value.into();
+        self
+    }
+    /// Set the `relatedSessionUris` field to an Option value (optional)
+    pub fn maybe_related_session_uris(
+        mut self,
+        value: Option<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.12 = value;
+        self
+    }
+}
+
+impl<'a, S: session_state::State> SessionBuilder<'a, S> {
+    /// Set the `sessionContext` field (optional)
+    pub fn session_context(
+        mut self,
+        value: impl Into<
+            Option<crate::net_anisota::beta::game::session::SessionContext<'a>>,
+        >,
+    ) -> Self {
+        self.__unsafe_private_named.13 = value.into();
+        self
+    }
+    /// Set the `sessionContext` field to an Option value (optional)
+    pub fn maybe_session_context(
+        mut self,
+        value: Option<crate::net_anisota::beta::game::session::SessionContext<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.13 = value;
+        self
+    }
+}
+
+impl<'a, S> SessionBuilder<'a, S>
+where
+    S: session_state::State,
+    S::StartedAt: session_state::IsUnset,
+{
+    /// Set the `startedAt` field (required)
+    pub fn started_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> SessionBuilder<'a, session_state::SetStartedAt<S>> {
+        self.__unsafe_private_named.14 = ::core::option::Option::Some(value.into());
+        SessionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SessionBuilder<'a, S>
+where
+    S: session_state::State,
+    S::Status: session_state::IsUnset,
+{
+    /// Set the `status` field (required)
+    pub fn status(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> SessionBuilder<'a, session_state::SetStatus<S>> {
+        self.__unsafe_private_named.15 = ::core::option::Option::Some(value.into());
+        SessionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: session_state::State> SessionBuilder<'a, S> {
+    /// Set the `updatedAt` field (optional)
+    pub fn updated_at(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.16 = value.into();
+        self
+    }
+    /// Set the `updatedAt` field to an Option value (optional)
+    pub fn maybe_updated_at(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.16 = value;
+        self
+    }
+}
+
+impl<'a, S> SessionBuilder<'a, S>
+where
+    S: session_state::State,
+    S::StartedAt: session_state::IsSet,
+    S::Status: session_state::IsSet,
+    S::Platform: session_state::IsSet,
+    S::ClientVersion: session_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Session<'a> {
+        Session {
+            activity_summary: self.__unsafe_private_named.0,
+            client_version: self.__unsafe_private_named.1.unwrap(),
+            created_at: self.__unsafe_private_named.2,
+            duration: self.__unsafe_private_named.3,
+            end_reason: self.__unsafe_private_named.4,
+            ended_at: self.__unsafe_private_named.5,
+            last_activity_at: self.__unsafe_private_named.6,
+            metadata: self.__unsafe_private_named.7,
+            parent_session_uri: self.__unsafe_private_named.8,
+            platform: self.__unsafe_private_named.9.unwrap(),
+            related_log_uris: self.__unsafe_private_named.10,
+            related_progress_uris: self.__unsafe_private_named.11,
+            related_session_uris: self.__unsafe_private_named.12,
+            session_context: self.__unsafe_private_named.13,
+            started_at: self.__unsafe_private_named.14.unwrap(),
+            status: self.__unsafe_private_named.15.unwrap(),
+            updated_at: self.__unsafe_private_named.16,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Session<'a> {
+        Session {
+            activity_summary: self.__unsafe_private_named.0,
+            client_version: self.__unsafe_private_named.1.unwrap(),
+            created_at: self.__unsafe_private_named.2,
+            duration: self.__unsafe_private_named.3,
+            end_reason: self.__unsafe_private_named.4,
+            ended_at: self.__unsafe_private_named.5,
+            last_activity_at: self.__unsafe_private_named.6,
+            metadata: self.__unsafe_private_named.7,
+            parent_session_uri: self.__unsafe_private_named.8,
+            platform: self.__unsafe_private_named.9.unwrap(),
+            related_log_uris: self.__unsafe_private_named.10,
+            related_progress_uris: self.__unsafe_private_named.11,
+            related_session_uris: self.__unsafe_private_named.12,
+            session_context: self.__unsafe_private_named.13,
+            started_at: self.__unsafe_private_named.14.unwrap(),
+            status: self.__unsafe_private_named.15.unwrap(),
+            updated_at: self.__unsafe_private_named.16,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Session<'a> {

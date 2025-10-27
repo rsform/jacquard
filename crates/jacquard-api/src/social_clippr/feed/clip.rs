@@ -14,8 +14,7 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Clip<'a> {
@@ -23,35 +22,377 @@ pub struct Clip<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     /// A description of the bookmark's content. This should be ripped from the URL metadata and be static for all records using the URL.
     #[serde(borrow)]
-    #[builder(into)]
     pub description: jacquard_common::CowStr<'a>,
     /// Indicates human language of the given URL
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub languages: Option<Vec<jacquard_common::types::string::Language>>,
     /// User-written notes for the bookmark. Public and personal.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub notes: Option<jacquard_common::CowStr<'a>>,
     /// An array of tags. A format of solely alphanumeric characters and dashes should be used.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub tags: Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
     /// The title of the bookmark. If left empty, reuse the URL.
     #[serde(borrow)]
-    #[builder(into)]
     pub title: jacquard_common::CowStr<'a>,
     /// Whether the bookmark can be used for feed indexing and aggregation
     pub unlisted: bool,
     /// Whether the bookmark has been read by the user
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub unread: Option<bool>,
     /// The URL of the bookmark. Cannot be left empty or be modified after creation.
     #[serde(borrow)]
     pub url: jacquard_common::types::string::Uri<'a>,
+}
+
+pub mod clip_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Url;
+        type Title;
+        type Description;
+        type Unlisted;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Url = Unset;
+        type Title = Unset;
+        type Description = Unset;
+        type Unlisted = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type Url = Set<members::url>;
+        type Title = S::Title;
+        type Description = S::Description;
+        type Unlisted = S::Unlisted;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Url = S::Url;
+        type Title = Set<members::title>;
+        type Description = S::Description;
+        type Unlisted = S::Unlisted;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDescription<S> {}
+    impl<S: State> State for SetDescription<S> {
+        type Url = S::Url;
+        type Title = S::Title;
+        type Description = Set<members::description>;
+        type Unlisted = S::Unlisted;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `unlisted` field to Set
+    pub struct SetUnlisted<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUnlisted<S> {}
+    impl<S: State> State for SetUnlisted<S> {
+        type Url = S::Url;
+        type Title = S::Title;
+        type Description = S::Description;
+        type Unlisted = Set<members::unlisted>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Url = S::Url;
+        type Title = S::Title;
+        type Description = S::Description;
+        type Unlisted = S::Unlisted;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `url` field
+        pub struct url(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `description` field
+        pub struct description(());
+        ///Marker type for the `unlisted` field
+        pub struct unlisted(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ClipBuilder<'a, S: clip_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<Vec<jacquard_common::types::string::Language>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Clip<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ClipBuilder<'a, clip_state::Empty> {
+        ClipBuilder::new()
+    }
+}
+
+impl<'a> ClipBuilder<'a, clip_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ClipBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ClipBuilder<'a, S>
+where
+    S: clip_state::State,
+    S::CreatedAt: clip_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> ClipBuilder<'a, clip_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ClipBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ClipBuilder<'a, S>
+where
+    S: clip_state::State,
+    S::Description: clip_state::IsUnset,
+{
+    /// Set the `description` field (required)
+    pub fn description(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> ClipBuilder<'a, clip_state::SetDescription<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        ClipBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `languages` field (optional)
+    pub fn languages(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::types::string::Language>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `languages` field to an Option value (optional)
+    pub fn maybe_languages(
+        mut self,
+        value: Option<Vec<jacquard_common::types::string::Language>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `notes` field (optional)
+    pub fn notes(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `notes` field to an Option value (optional)
+    pub fn maybe_notes(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `tags` field (optional)
+    pub fn tags(
+        mut self,
+        value: impl Into<
+            Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
+        >,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `tags` field to an Option value (optional)
+    pub fn maybe_tags(
+        mut self,
+        value: Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S> ClipBuilder<'a, S>
+where
+    S: clip_state::State,
+    S::Title: clip_state::IsUnset,
+{
+    /// Set the `title` field (required)
+    pub fn title(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> ClipBuilder<'a, clip_state::SetTitle<S>> {
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        ClipBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ClipBuilder<'a, S>
+where
+    S: clip_state::State,
+    S::Unlisted: clip_state::IsUnset,
+{
+    /// Set the `unlisted` field (required)
+    pub fn unlisted(
+        mut self,
+        value: impl Into<bool>,
+    ) -> ClipBuilder<'a, clip_state::SetUnlisted<S>> {
+        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        ClipBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `unread` field (optional)
+    pub fn unread(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.7 = value.into();
+        self
+    }
+    /// Set the `unread` field to an Option value (optional)
+    pub fn maybe_unread(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.7 = value;
+        self
+    }
+}
+
+impl<'a, S> ClipBuilder<'a, S>
+where
+    S: clip_state::State,
+    S::Url: clip_state::IsUnset,
+{
+    /// Set the `url` field (required)
+    pub fn url(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+    ) -> ClipBuilder<'a, clip_state::SetUrl<S>> {
+        self.__unsafe_private_named.8 = ::core::option::Option::Some(value.into());
+        ClipBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ClipBuilder<'a, S>
+where
+    S: clip_state::State,
+    S::Url: clip_state::IsSet,
+    S::Title: clip_state::IsSet,
+    S::Description: clip_state::IsSet,
+    S::Unlisted: clip_state::IsSet,
+    S::CreatedAt: clip_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Clip<'a> {
+        Clip {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            description: self.__unsafe_private_named.1.unwrap(),
+            languages: self.__unsafe_private_named.2,
+            notes: self.__unsafe_private_named.3,
+            tags: self.__unsafe_private_named.4,
+            title: self.__unsafe_private_named.5.unwrap(),
+            unlisted: self.__unsafe_private_named.6.unwrap(),
+            unread: self.__unsafe_private_named.7,
+            url: self.__unsafe_private_named.8.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Clip<'a> {
+        Clip {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            description: self.__unsafe_private_named.1.unwrap(),
+            languages: self.__unsafe_private_named.2,
+            notes: self.__unsafe_private_named.3,
+            tags: self.__unsafe_private_named.4,
+            title: self.__unsafe_private_named.5.unwrap(),
+            unlisted: self.__unsafe_private_named.6.unwrap(),
+            unread: self.__unsafe_private_named.7,
+            url: self.__unsafe_private_named.8.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Clip<'a> {

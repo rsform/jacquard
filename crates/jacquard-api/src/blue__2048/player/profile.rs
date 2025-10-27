@@ -14,8 +14,7 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Profile<'a> {
@@ -25,6 +24,183 @@ pub struct Profile<'a> {
     /// The sync status of this record with the users AT Protocol repo.
     #[serde(borrow)]
     pub sync_status: crate::blue__2048::SyncStatus<'a>,
+}
+
+pub mod profile_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type SoloPlay;
+        type SyncStatus;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type SoloPlay = Unset;
+        type SyncStatus = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `solo_play` field to Set
+    pub struct SetSoloPlay<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSoloPlay<S> {}
+    impl<S: State> State for SetSoloPlay<S> {
+        type SoloPlay = Set<members::solo_play>;
+        type SyncStatus = S::SyncStatus;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `sync_status` field to Set
+    pub struct SetSyncStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSyncStatus<S> {}
+    impl<S: State> State for SetSyncStatus<S> {
+        type SoloPlay = S::SoloPlay;
+        type SyncStatus = Set<members::sync_status>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type SoloPlay = S::SoloPlay;
+        type SyncStatus = S::SyncStatus;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `solo_play` field
+        pub struct solo_play(());
+        ///Marker type for the `sync_status` field
+        pub struct sync_status(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ProfileBuilder<'a, S: profile_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<crate::blue__2048::SyncStatus<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Profile<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ProfileBuilder<'a, profile_state::Empty> {
+        ProfileBuilder::new()
+    }
+}
+
+impl<'a> ProfileBuilder<'a, profile_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ProfileBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ProfileBuilder<'a, S>
+where
+    S: profile_state::State,
+    S::CreatedAt: profile_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> ProfileBuilder<'a, profile_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ProfileBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ProfileBuilder<'a, S>
+where
+    S: profile_state::State,
+    S::SoloPlay: profile_state::IsUnset,
+{
+    /// Set the `soloPlay` field (required)
+    pub fn solo_play(
+        mut self,
+        value: impl Into<bool>,
+    ) -> ProfileBuilder<'a, profile_state::SetSoloPlay<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        ProfileBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ProfileBuilder<'a, S>
+where
+    S: profile_state::State,
+    S::SyncStatus: profile_state::IsUnset,
+{
+    /// Set the `syncStatus` field (required)
+    pub fn sync_status(
+        mut self,
+        value: impl Into<crate::blue__2048::SyncStatus<'a>>,
+    ) -> ProfileBuilder<'a, profile_state::SetSyncStatus<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        ProfileBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ProfileBuilder<'a, S>
+where
+    S: profile_state::State,
+    S::SoloPlay: profile_state::IsSet,
+    S::SyncStatus: profile_state::IsSet,
+    S::CreatedAt: profile_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Profile<'a> {
+        Profile {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            solo_play: self.__unsafe_private_named.1.unwrap(),
+            sync_status: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Profile<'a> {
+        Profile {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            solo_play: self.__unsafe_private_named.1.unwrap(),
+            sync_status: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Profile<'a> {

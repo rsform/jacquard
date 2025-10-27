@@ -14,30 +14,25 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Product<'a> {
     /// A property-value pair representing an additional characteristic of the entity, e.g. a product feature or another characteristic for which there is no matching property in schema.org.\n\nNote: Publishers should be aware that applications designed to use specific schema.org properties (e.g. https://schema.org/width, https://schema.org/color, https://schema.org/gtin13, ...) will typically expect such data to be provided using those properties, rather than using the generic property/value mechanism.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub additional_property: Option<ProductAdditionalProperty<'a>>,
     /** An additional type for the item, typically used for adding more specific types from external vocabularies in microdata syntax. This is a relationship between something and a class that the thing is in. Typically the value is a URI-identified RDF class, and in this case corresponds to the
     use of rdf:type in RDF. Text values can be used sparingly, for cases where useful information can be added without their being an appropriate schema to reference. In the case of text values, the class label should follow the schema.org <a href="https://schema.org/docs/styleguide.html">style guide</a>.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub additional_type: Option<jacquard_common::CowStr<'a>>,
     /// The overall rating, based on a collection of reviews or ratings, of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub aggregate_rating: Option<ProductAggregateRating<'a>>,
     /// An alias for the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub alternate_name: Option<jacquard_common::CowStr<'a>>,
     /** An Amazon Standard Identification Number (ASIN) is a 10-character alphanumeric unique identifier assigned by Amazon.com and its partners for product identification within the Amazon organization (summary from [Wikipedia](https://en.wikipedia.org/wiki/Amazon_Standard_Identification_Number)'s article).
@@ -45,52 +40,42 @@ pub struct Product<'a> {
 Note also that this is a definition for how to include ASINs in Schema.org data, and not a definition of ASINs in general - see documentation from Amazon for authoritative details.
 ASINs are most commonly encoded as text strings, but the [asin] property supports URL/URI as potential values too.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub asin: Option<jacquard_common::CowStr<'a>>,
     /// An intended audience, i.e. a group for whom something was created.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub audience: Option<ProductAudience<'a>>,
     /// An award won by or for this item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub award: Option<jacquard_common::CowStr<'a>>,
     /// Awards won by or for this item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub awards: Option<jacquard_common::CowStr<'a>>,
     /// The brand(s) associated with a product or service, or the brand(s) maintained by an organization or business person.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub brand: Option<ProductBrand<'a>>,
     /// A category for the item. Greater signs or slashes can be used to informally indicate a category hierarchy.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub category: Option<ProductCategory<'a>>,
     /// The color of the product.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub color: Option<jacquard_common::CowStr<'a>>,
     /// A color swatch image, visualizing the color of a [[Product]]. Should match the textual description specified in the [[color]] property. This can be a URL or a fully described ImageObject.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub color_swatch: Option<ProductColorSwatch<'a>>,
     /// The place where the product was assembled.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub country_of_assembly: Option<jacquard_common::CowStr<'a>>,
     /// The place where the item (typically [[Product]]) was last processed and tested before importation.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub country_of_last_processing: Option<jacquard_common::CowStr<'a>>,
     /** The country of origin of something, including products as well as creative  works such as movie and TV content.
@@ -99,27 +84,22 @@ In the case of TV and movie, this would be the country of the principle offices 
 
 In the case of products, the country of origin of the product. The exact interpretation of this may vary by context and product type, and cannot be fully enumerated here.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub country_of_origin: Option<ProductCountryOfOrigin<'a>>,
     /// The depth of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub depth: Option<ProductDepth<'a>>,
     /// A description of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub description: Option<ProductDescription<'a>>,
     /// A sub property of description. A short description of the item used to disambiguate from other, similar items. Information from other properties (in particular, name) may be necessary for the description to be useful for disambiguation.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub disambiguating_description: Option<jacquard_common::CowStr<'a>>,
     /// A [[Grant]] that directly or indirectly provide funding or sponsorship for this item. See also [[ownershipFundingInfo]].
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub funding: Option<ProductFunding<'a>>,
     /** A Global Trade Item Number ([GTIN](https://www.gs1.org/standards/id-keys/gtin)). GTINs identify trade items, including products and services, using numeric identification codes.
@@ -131,158 +111,127 @@ Digital Links should be populated into the [[hasGS1DigitalLink]] attribute.
 
 Note also that this is a definition for how to include GTINs in Schema.org data, and not a definition of GTINs in general - see the GS1 documentation for authoritative details.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub gtin: Option<jacquard_common::CowStr<'a>>,
     /// The GTIN-12 code of the product, or the product to which the offer refers. The GTIN-12 is the 12-digit GS1 Identification Key composed of a U.P.C. Company Prefix, Item Reference, and Check Digit used to identify trade items. See [GS1 GTIN Summary](http://www.gs1.org/barcodes/technical/idkeys/gtin) for more details.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub gtin12: Option<jacquard_common::CowStr<'a>>,
     /// The GTIN-13 code of the product, or the product to which the offer refers. This is equivalent to 13-digit ISBN codes and EAN UCC-13. Former 12-digit UPC codes can be converted into a GTIN-13 code by simply adding a preceding zero. See [GS1 GTIN Summary](http://www.gs1.org/barcodes/technical/idkeys/gtin) for more details.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub gtin13: Option<jacquard_common::CowStr<'a>>,
     /// The GTIN-14 code of the product, or the product to which the offer refers. See [GS1 GTIN Summary](http://www.gs1.org/barcodes/technical/idkeys/gtin) for more details.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub gtin14: Option<jacquard_common::CowStr<'a>>,
     /// The GTIN-8 code of the product, or the product to which the offer refers. This code is also known as EAN/UCC-8 or 8-digit EAN. See [GS1 GTIN Summary](http://www.gs1.org/barcodes/technical/idkeys/gtin) for more details.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub gtin8: Option<jacquard_common::CowStr<'a>>,
     /// Used to tag an item to be intended or suitable for consumption or use by adults only.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub has_adult_consideration: Option<jacquard_common::CowStr<'a>>,
     /// Certification information about a product, organization, service, place, or person.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub has_certification: Option<ProductHasCertification<'a>>,
     /// Defines the energy efficiency Category (also known as "class" or "rating") for a product according to an international energy efficiency standard.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub has_energy_consumption_details: Option<ProductHasEnergyConsumptionDetails<'a>>,
     /// The <a href="https://www.gs1.org/standards/gs1-digital-link">GS1 digital link</a> associated with the object. This URL should conform to the particular requirements of digital links. The link should only contain the Application Identifiers (AIs) that are relevant for the entity being annotated, for instance a [[Product]] or an [[Organization]], and for the correct granularity. In particular, for products:<ul><li>A Digital Link that contains a serial number (AI <code>21</code>) should only be present on instances of [[IndividualProduct]]</li><li>A Digital Link that contains a lot number (AI <code>10</code>) should be annotated as [[SomeProduct]] if only products from that lot are sold, or [[IndividualProduct]] if there is only a specific product.</li><li>A Digital Link that contains a global model number (AI <code>8013</code>)  should be attached to a [[Product]] or a [[ProductModel]].</li></ul> Other item types should be adapted similarly.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub has_gs1_digital_link: Option<jacquard_common::types::string::Uri<'a>>,
     /// A measurement of an item, For example, the inseam of pants, the wheel size of a bicycle, the gauge of a screw, or the carbon footprint measured for certification by an authority. Usually an exact measurement, but can also be a range of measurements for adjustable products, for example belts and ski bindings.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub has_measurement: Option<ProductHasMeasurement<'a>>,
     /// Specifies a MerchantReturnPolicy that may be applicable.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub has_merchant_return_policy: Option<ProductHasMerchantReturnPolicy<'a>>,
     /// The height of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub height: Option<ProductHeight<'a>>,
     /// The identifier property represents any kind of identifier for any kind of [[Thing]], such as ISBNs, GTIN codes, UUIDs etc. Schema.org provides dedicated properties for representing many of these, either as textual strings or as URL (URI) links. See [background notes](/docs/datamodel.html#identifierBg) for more details.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub identifier: Option<ProductIdentifier<'a>>,
     /// An image of the item. This can be a [[URL]] or a fully described [[ImageObject]].
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub image: Option<ProductImage<'a>>,
     /// Indicates the [[productGroupID]] for a [[ProductGroup]] that this product [[isVariantOf]].
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub in_product_group_with_id: Option<jacquard_common::CowStr<'a>>,
     /// A pointer to another product (or multiple products) for which this product is an accessory or spare part.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub is_accessory_or_spare_part_for: Option<ProductIsAccessoryOrSparePartFor<'a>>,
     /// A pointer to another product (or multiple products) for which this product is a consumable.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub is_consumable_for: Option<ProductIsConsumableFor<'a>>,
     /// Indicates whether this content is family friendly.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub is_family_friendly: Option<bool>,
     /// A pointer to another, somehow related product (or multiple products).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub is_related_to: Option<ProductIsRelatedTo<'a>>,
     /// A pointer to another, functionally similar product (or multiple products).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub is_similar_to: Option<ProductIsSimilarTo<'a>>,
     /// Indicates the kind of product that this is a variant of. In the case of [[ProductModel]], this is a pointer (from a ProductModel) to a base product from which this product is a variant. It is safe to infer that the variant inherits all product features from the base model, unless defined locally. This is not transitive. In the case of a [[ProductGroup]], the group description also serves as a template, representing a set of Products that vary on explicitly defined, specific dimensions only (so it defines both a set of variants, as well as which values distinguish amongst those variants). When used with [[ProductGroup]], this property can apply to any [[Product]] included in the group.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub is_variant_of: Option<ProductIsVariantOf<'a>>,
     /// A predefined value from OfferItemCondition specifying the condition of the product or service, or the products or services included in the offer. Also used for product return policies to specify the condition of products accepted for returns.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub item_condition: Option<ProductItemCondition<'a>>,
     /// Keywords or tags used to describe some item. Multiple textual entries in a keywords list are typically delimited by commas, or by repeating the property.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub keywords: Option<ProductKeywords<'a>>,
     /// An associated logo.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub logo: Option<ProductLogo<'a>>,
     /// Indicates a page (or other CreativeWork) for which this thing is the main entity being described. See [background notes](/docs/datamodel.html#mainEntityBackground) for details.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub main_entity_of_page: Option<ProductMainEntityOfPage<'a>>,
     /// The manufacturer of the product.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub manufacturer: Option<ProductManufacturer<'a>>,
     /// A material that something is made from, e.g. leather, wool, cotton, paper.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub material: Option<ProductMaterial<'a>>,
     /** The [[mobileUrl]] property is provided for specific situations in which data consumers need to determine whether one of several provided URLs is a dedicated 'mobile site'.
 
 To discourage over-use, and reflecting intial usecases, the property is expected only on [[Product]] and [[Offer]], rather than [[Thing]]. The general trend in web technology is towards [responsive design](https://en.wikipedia.org/wiki/Responsive_web_design) in which content can be flexibly adapted to a wide range of browsing environments. Pages and sites referenced with the long-established [[url]] property should ideally also be usable on a wide variety of devices, including mobile phones. In most cases, it would be pointless and counter productive to attempt to update all [[url]] markup to use [[mobileUrl]] for more mobile-oriented pages. The property is intended for the case when items (primarily [[Product]] and [[Offer]]) have extra URLs hosted on an additional "mobile site" alongside the main one. It should not be taken as an endorsement of this publication style.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub mobile_url: Option<jacquard_common::types::string::Uri<'a>>,
     /// The model of the product. Use with the URL of a ProductModel or a textual representation of the model identifier. The URL of the ProductModel can be from an external source. It is recommended to additionally provide strong product identifiers via the gtin8/gtin13/gtin14 and mpn properties.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub model: Option<ProductModel<'a>>,
     /// The Manufacturer Part Number (MPN) of the product, or the product to which the offer refers.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub mpn: Option<jacquard_common::CowStr<'a>>,
     /// The name of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub name: Option<jacquard_common::CowStr<'a>>,
     /** Provides negative considerations regarding something, most typically in pro/con lists for reviews (alongside [[positiveNotes]]). For symmetry
@@ -292,22 +241,18 @@ tend to emphasise positive claims, it may be relatively unusual to find [[negati
 
 The property values can be expressed either as unstructured text (repeated as necessary), or if ordered, as a list (in which case the most negative is at the beginning of the list).*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub negative_notes: Option<ProductNegativeNotes<'a>>,
     /// Indicates the [NATO stock number](https://en.wikipedia.org/wiki/NATO_Stock_Number) (nsn) of a [[Product]].
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub nsn: Option<jacquard_common::CowStr<'a>>,
     /// An offer to provide this item&#x2014;for example, an offer to sell a product, rent the DVD of a movie, perform a service, or give away tickets to an event. Use [[businessFunction]] to indicate the kind of transaction offered, i.e. sell, lease, etc. This property can also be used to describe a [[Demand]]. While this property is listed as expected on a number of common types, it can be used in others. In that case, using a second type, such as Product or a subtype of Product, can clarify the nature of the offer.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub offers: Option<ProductOffers<'a>>,
     /// A pattern that something has, for example 'polka dot', 'striped', 'Canadian flag'. Values are typically expressed as text, although links to controlled value schemes are also supported.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub pattern: Option<ProductPattern<'a>>,
     /** Provides positive considerations regarding something, for example product highlights or (alongside [[negativeNotes]]) pro/con lists for reviews.
@@ -316,81 +261,1553 @@ In the case of a [[Review]], the property describes the [[itemReviewed]] from th
 
 The property values can be expressed either as unstructured text (repeated as necessary), or if ordered, as a list (in which case the most positive is at the beginning of the list).*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub positive_notes: Option<ProductPositiveNotes<'a>>,
     /// Indicates a potential Action, which describes an idealized action in which this thing would play an 'object' role.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub potential_action: Option<ProductPotentialAction<'a>>,
     /// The product identifier, such as ISBN. For example: ``` meta itemprop="productID" content="isbn:123-456-789" ```.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub product_id: Option<jacquard_common::CowStr<'a>>,
     /// The date of production of the item, e.g. vehicle.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub production_date: Option<jacquard_common::types::string::Datetime>,
     /// The date the item, e.g. vehicle, was purchased by the current owner.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub purchase_date: Option<jacquard_common::types::string::Datetime>,
     /// The release date of a product or product model. This can be used to distinguish the exact variant of a product.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub release_date: Option<jacquard_common::types::string::Datetime>,
     /// A review of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub review: Option<ProductReview<'a>>,
     /// Review of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub reviews: Option<ProductReviews<'a>>,
     /// URL of a reference Web page that unambiguously indicates the item's identity. E.g. the URL of the item's Wikipedia page, Wikidata entry, or official website.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub same_as: Option<jacquard_common::types::string::Uri<'a>>,
     /// A standardized size of a product or creative work, specified either through a simple textual string (for example 'XL', '32Wx34L'), a  QuantitativeValue with a unitCode, or a comprehensive and structured [[SizeSpecification]]; in other cases, the [[width]], [[height]], [[depth]] and [[weight]] properties may be more applicable.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub size: Option<ProductSize<'a>>,
     /// The Stock Keeping Unit (SKU), i.e. a merchant-specific identifier for a product or service, or the product to which the offer refers.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub sku: Option<jacquard_common::CowStr<'a>>,
     /// A slogan or motto associated with the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub slogan: Option<jacquard_common::CowStr<'a>>,
     /// A CreativeWork or Event about this Thing.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub subject_of: Option<ProductSubjectOf<'a>>,
     /// URL of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub url: Option<jacquard_common::types::string::Uri<'a>>,
     /// The weight of the product or person.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub weight: Option<ProductWeight<'a>>,
     /// The width of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub width: Option<ProductWidth<'a>>,
+}
+
+pub mod product_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {}
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {}
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {}
+}
+
+/// Builder for constructing an instance of this type
+pub struct ProductBuilder<'a, S: product_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<ProductAdditionalProperty<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ProductAggregateRating<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ProductAudience<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ProductBrand<'a>>,
+        ::core::option::Option<ProductCategory<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ProductColorSwatch<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ProductCountryOfOrigin<'a>>,
+        ::core::option::Option<ProductDepth<'a>>,
+        ::core::option::Option<ProductDescription<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ProductFunding<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ProductHasCertification<'a>>,
+        ::core::option::Option<ProductHasEnergyConsumptionDetails<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<ProductHasMeasurement<'a>>,
+        ::core::option::Option<ProductHasMerchantReturnPolicy<'a>>,
+        ::core::option::Option<ProductHeight<'a>>,
+        ::core::option::Option<ProductIdentifier<'a>>,
+        ::core::option::Option<ProductImage<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ProductIsAccessoryOrSparePartFor<'a>>,
+        ::core::option::Option<ProductIsConsumableFor<'a>>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<ProductIsRelatedTo<'a>>,
+        ::core::option::Option<ProductIsSimilarTo<'a>>,
+        ::core::option::Option<ProductIsVariantOf<'a>>,
+        ::core::option::Option<ProductItemCondition<'a>>,
+        ::core::option::Option<ProductKeywords<'a>>,
+        ::core::option::Option<ProductLogo<'a>>,
+        ::core::option::Option<ProductMainEntityOfPage<'a>>,
+        ::core::option::Option<ProductManufacturer<'a>>,
+        ::core::option::Option<ProductMaterial<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<ProductModel<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ProductNegativeNotes<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ProductOffers<'a>>,
+        ::core::option::Option<ProductPattern<'a>>,
+        ::core::option::Option<ProductPositiveNotes<'a>>,
+        ::core::option::Option<ProductPotentialAction<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<ProductReview<'a>>,
+        ::core::option::Option<ProductReviews<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<ProductSize<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ProductSubjectOf<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<ProductWeight<'a>>,
+        ::core::option::Option<ProductWidth<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Product<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ProductBuilder<'a, product_state::Empty> {
+        ProductBuilder::new()
+    }
+}
+
+impl<'a> ProductBuilder<'a, product_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ProductBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `additionalProperty` field (optional)
+    pub fn additional_property(
+        mut self,
+        value: impl Into<Option<ProductAdditionalProperty<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `additionalProperty` field to an Option value (optional)
+    pub fn maybe_additional_property(
+        mut self,
+        value: Option<ProductAdditionalProperty<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `additionalType` field (optional)
+    pub fn additional_type(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `additionalType` field to an Option value (optional)
+    pub fn maybe_additional_type(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `aggregateRating` field (optional)
+    pub fn aggregate_rating(
+        mut self,
+        value: impl Into<Option<ProductAggregateRating<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `aggregateRating` field to an Option value (optional)
+    pub fn maybe_aggregate_rating(
+        mut self,
+        value: Option<ProductAggregateRating<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `alternateName` field (optional)
+    pub fn alternate_name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `alternateName` field to an Option value (optional)
+    pub fn maybe_alternate_name(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `asin` field (optional)
+    pub fn asin(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `asin` field to an Option value (optional)
+    pub fn maybe_asin(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `audience` field (optional)
+    pub fn audience(mut self, value: impl Into<Option<ProductAudience<'a>>>) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `audience` field to an Option value (optional)
+    pub fn maybe_audience(mut self, value: Option<ProductAudience<'a>>) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `award` field (optional)
+    pub fn award(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `award` field to an Option value (optional)
+    pub fn maybe_award(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `awards` field (optional)
+    pub fn awards(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value.into();
+        self
+    }
+    /// Set the `awards` field to an Option value (optional)
+    pub fn maybe_awards(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.7 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `brand` field (optional)
+    pub fn brand(mut self, value: impl Into<Option<ProductBrand<'a>>>) -> Self {
+        self.__unsafe_private_named.8 = value.into();
+        self
+    }
+    /// Set the `brand` field to an Option value (optional)
+    pub fn maybe_brand(mut self, value: Option<ProductBrand<'a>>) -> Self {
+        self.__unsafe_private_named.8 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `category` field (optional)
+    pub fn category(mut self, value: impl Into<Option<ProductCategory<'a>>>) -> Self {
+        self.__unsafe_private_named.9 = value.into();
+        self
+    }
+    /// Set the `category` field to an Option value (optional)
+    pub fn maybe_category(mut self, value: Option<ProductCategory<'a>>) -> Self {
+        self.__unsafe_private_named.9 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `color` field (optional)
+    pub fn color(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.10 = value.into();
+        self
+    }
+    /// Set the `color` field to an Option value (optional)
+    pub fn maybe_color(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.10 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `colorSwatch` field (optional)
+    pub fn color_swatch(
+        mut self,
+        value: impl Into<Option<ProductColorSwatch<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.11 = value.into();
+        self
+    }
+    /// Set the `colorSwatch` field to an Option value (optional)
+    pub fn maybe_color_swatch(mut self, value: Option<ProductColorSwatch<'a>>) -> Self {
+        self.__unsafe_private_named.11 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `countryOfAssembly` field (optional)
+    pub fn country_of_assembly(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.12 = value.into();
+        self
+    }
+    /// Set the `countryOfAssembly` field to an Option value (optional)
+    pub fn maybe_country_of_assembly(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.12 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `countryOfLastProcessing` field (optional)
+    pub fn country_of_last_processing(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.13 = value.into();
+        self
+    }
+    /// Set the `countryOfLastProcessing` field to an Option value (optional)
+    pub fn maybe_country_of_last_processing(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.13 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `countryOfOrigin` field (optional)
+    pub fn country_of_origin(
+        mut self,
+        value: impl Into<Option<ProductCountryOfOrigin<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.14 = value.into();
+        self
+    }
+    /// Set the `countryOfOrigin` field to an Option value (optional)
+    pub fn maybe_country_of_origin(
+        mut self,
+        value: Option<ProductCountryOfOrigin<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.14 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `depth` field (optional)
+    pub fn depth(mut self, value: impl Into<Option<ProductDepth<'a>>>) -> Self {
+        self.__unsafe_private_named.15 = value.into();
+        self
+    }
+    /// Set the `depth` field to an Option value (optional)
+    pub fn maybe_depth(mut self, value: Option<ProductDepth<'a>>) -> Self {
+        self.__unsafe_private_named.15 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `description` field (optional)
+    pub fn description(
+        mut self,
+        value: impl Into<Option<ProductDescription<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.16 = value.into();
+        self
+    }
+    /// Set the `description` field to an Option value (optional)
+    pub fn maybe_description(mut self, value: Option<ProductDescription<'a>>) -> Self {
+        self.__unsafe_private_named.16 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `disambiguatingDescription` field (optional)
+    pub fn disambiguating_description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.17 = value.into();
+        self
+    }
+    /// Set the `disambiguatingDescription` field to an Option value (optional)
+    pub fn maybe_disambiguating_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.17 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `funding` field (optional)
+    pub fn funding(mut self, value: impl Into<Option<ProductFunding<'a>>>) -> Self {
+        self.__unsafe_private_named.18 = value.into();
+        self
+    }
+    /// Set the `funding` field to an Option value (optional)
+    pub fn maybe_funding(mut self, value: Option<ProductFunding<'a>>) -> Self {
+        self.__unsafe_private_named.18 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `gtin` field (optional)
+    pub fn gtin(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.19 = value.into();
+        self
+    }
+    /// Set the `gtin` field to an Option value (optional)
+    pub fn maybe_gtin(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.19 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `gtin12` field (optional)
+    pub fn gtin12(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.20 = value.into();
+        self
+    }
+    /// Set the `gtin12` field to an Option value (optional)
+    pub fn maybe_gtin12(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.20 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `gtin13` field (optional)
+    pub fn gtin13(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.21 = value.into();
+        self
+    }
+    /// Set the `gtin13` field to an Option value (optional)
+    pub fn maybe_gtin13(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.21 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `gtin14` field (optional)
+    pub fn gtin14(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.22 = value.into();
+        self
+    }
+    /// Set the `gtin14` field to an Option value (optional)
+    pub fn maybe_gtin14(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.22 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `gtin8` field (optional)
+    pub fn gtin8(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.23 = value.into();
+        self
+    }
+    /// Set the `gtin8` field to an Option value (optional)
+    pub fn maybe_gtin8(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.23 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `hasAdultConsideration` field (optional)
+    pub fn has_adult_consideration(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.24 = value.into();
+        self
+    }
+    /// Set the `hasAdultConsideration` field to an Option value (optional)
+    pub fn maybe_has_adult_consideration(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.24 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `hasCertification` field (optional)
+    pub fn has_certification(
+        mut self,
+        value: impl Into<Option<ProductHasCertification<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.25 = value.into();
+        self
+    }
+    /// Set the `hasCertification` field to an Option value (optional)
+    pub fn maybe_has_certification(
+        mut self,
+        value: Option<ProductHasCertification<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.25 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `hasEnergyConsumptionDetails` field (optional)
+    pub fn has_energy_consumption_details(
+        mut self,
+        value: impl Into<Option<ProductHasEnergyConsumptionDetails<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.26 = value.into();
+        self
+    }
+    /// Set the `hasEnergyConsumptionDetails` field to an Option value (optional)
+    pub fn maybe_has_energy_consumption_details(
+        mut self,
+        value: Option<ProductHasEnergyConsumptionDetails<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.26 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `hasGS1DigitalLink` field (optional)
+    pub fn has_gs1_digital_link(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.27 = value.into();
+        self
+    }
+    /// Set the `hasGS1DigitalLink` field to an Option value (optional)
+    pub fn maybe_has_gs1_digital_link(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.27 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `hasMeasurement` field (optional)
+    pub fn has_measurement(
+        mut self,
+        value: impl Into<Option<ProductHasMeasurement<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.28 = value.into();
+        self
+    }
+    /// Set the `hasMeasurement` field to an Option value (optional)
+    pub fn maybe_has_measurement(
+        mut self,
+        value: Option<ProductHasMeasurement<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.28 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `hasMerchantReturnPolicy` field (optional)
+    pub fn has_merchant_return_policy(
+        mut self,
+        value: impl Into<Option<ProductHasMerchantReturnPolicy<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.29 = value.into();
+        self
+    }
+    /// Set the `hasMerchantReturnPolicy` field to an Option value (optional)
+    pub fn maybe_has_merchant_return_policy(
+        mut self,
+        value: Option<ProductHasMerchantReturnPolicy<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.29 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `height` field (optional)
+    pub fn height(mut self, value: impl Into<Option<ProductHeight<'a>>>) -> Self {
+        self.__unsafe_private_named.30 = value.into();
+        self
+    }
+    /// Set the `height` field to an Option value (optional)
+    pub fn maybe_height(mut self, value: Option<ProductHeight<'a>>) -> Self {
+        self.__unsafe_private_named.30 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `identifier` field (optional)
+    pub fn identifier(
+        mut self,
+        value: impl Into<Option<ProductIdentifier<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.31 = value.into();
+        self
+    }
+    /// Set the `identifier` field to an Option value (optional)
+    pub fn maybe_identifier(mut self, value: Option<ProductIdentifier<'a>>) -> Self {
+        self.__unsafe_private_named.31 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `image` field (optional)
+    pub fn image(mut self, value: impl Into<Option<ProductImage<'a>>>) -> Self {
+        self.__unsafe_private_named.32 = value.into();
+        self
+    }
+    /// Set the `image` field to an Option value (optional)
+    pub fn maybe_image(mut self, value: Option<ProductImage<'a>>) -> Self {
+        self.__unsafe_private_named.32 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `inProductGroupWithID` field (optional)
+    pub fn in_product_group_with_id(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.33 = value.into();
+        self
+    }
+    /// Set the `inProductGroupWithID` field to an Option value (optional)
+    pub fn maybe_in_product_group_with_id(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.33 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `isAccessoryOrSparePartFor` field (optional)
+    pub fn is_accessory_or_spare_part_for(
+        mut self,
+        value: impl Into<Option<ProductIsAccessoryOrSparePartFor<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.34 = value.into();
+        self
+    }
+    /// Set the `isAccessoryOrSparePartFor` field to an Option value (optional)
+    pub fn maybe_is_accessory_or_spare_part_for(
+        mut self,
+        value: Option<ProductIsAccessoryOrSparePartFor<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.34 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `isConsumableFor` field (optional)
+    pub fn is_consumable_for(
+        mut self,
+        value: impl Into<Option<ProductIsConsumableFor<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.35 = value.into();
+        self
+    }
+    /// Set the `isConsumableFor` field to an Option value (optional)
+    pub fn maybe_is_consumable_for(
+        mut self,
+        value: Option<ProductIsConsumableFor<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.35 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `isFamilyFriendly` field (optional)
+    pub fn is_family_friendly(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.36 = value.into();
+        self
+    }
+    /// Set the `isFamilyFriendly` field to an Option value (optional)
+    pub fn maybe_is_family_friendly(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.36 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `isRelatedTo` field (optional)
+    pub fn is_related_to(
+        mut self,
+        value: impl Into<Option<ProductIsRelatedTo<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.37 = value.into();
+        self
+    }
+    /// Set the `isRelatedTo` field to an Option value (optional)
+    pub fn maybe_is_related_to(mut self, value: Option<ProductIsRelatedTo<'a>>) -> Self {
+        self.__unsafe_private_named.37 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `isSimilarTo` field (optional)
+    pub fn is_similar_to(
+        mut self,
+        value: impl Into<Option<ProductIsSimilarTo<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.38 = value.into();
+        self
+    }
+    /// Set the `isSimilarTo` field to an Option value (optional)
+    pub fn maybe_is_similar_to(mut self, value: Option<ProductIsSimilarTo<'a>>) -> Self {
+        self.__unsafe_private_named.38 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `isVariantOf` field (optional)
+    pub fn is_variant_of(
+        mut self,
+        value: impl Into<Option<ProductIsVariantOf<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.39 = value.into();
+        self
+    }
+    /// Set the `isVariantOf` field to an Option value (optional)
+    pub fn maybe_is_variant_of(mut self, value: Option<ProductIsVariantOf<'a>>) -> Self {
+        self.__unsafe_private_named.39 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `itemCondition` field (optional)
+    pub fn item_condition(
+        mut self,
+        value: impl Into<Option<ProductItemCondition<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.40 = value.into();
+        self
+    }
+    /// Set the `itemCondition` field to an Option value (optional)
+    pub fn maybe_item_condition(
+        mut self,
+        value: Option<ProductItemCondition<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.40 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `keywords` field (optional)
+    pub fn keywords(mut self, value: impl Into<Option<ProductKeywords<'a>>>) -> Self {
+        self.__unsafe_private_named.41 = value.into();
+        self
+    }
+    /// Set the `keywords` field to an Option value (optional)
+    pub fn maybe_keywords(mut self, value: Option<ProductKeywords<'a>>) -> Self {
+        self.__unsafe_private_named.41 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `logo` field (optional)
+    pub fn logo(mut self, value: impl Into<Option<ProductLogo<'a>>>) -> Self {
+        self.__unsafe_private_named.42 = value.into();
+        self
+    }
+    /// Set the `logo` field to an Option value (optional)
+    pub fn maybe_logo(mut self, value: Option<ProductLogo<'a>>) -> Self {
+        self.__unsafe_private_named.42 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `mainEntityOfPage` field (optional)
+    pub fn main_entity_of_page(
+        mut self,
+        value: impl Into<Option<ProductMainEntityOfPage<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.43 = value.into();
+        self
+    }
+    /// Set the `mainEntityOfPage` field to an Option value (optional)
+    pub fn maybe_main_entity_of_page(
+        mut self,
+        value: Option<ProductMainEntityOfPage<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.43 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `manufacturer` field (optional)
+    pub fn manufacturer(
+        mut self,
+        value: impl Into<Option<ProductManufacturer<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.44 = value.into();
+        self
+    }
+    /// Set the `manufacturer` field to an Option value (optional)
+    pub fn maybe_manufacturer(mut self, value: Option<ProductManufacturer<'a>>) -> Self {
+        self.__unsafe_private_named.44 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `material` field (optional)
+    pub fn material(mut self, value: impl Into<Option<ProductMaterial<'a>>>) -> Self {
+        self.__unsafe_private_named.45 = value.into();
+        self
+    }
+    /// Set the `material` field to an Option value (optional)
+    pub fn maybe_material(mut self, value: Option<ProductMaterial<'a>>) -> Self {
+        self.__unsafe_private_named.45 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `mobileUrl` field (optional)
+    pub fn mobile_url(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.46 = value.into();
+        self
+    }
+    /// Set the `mobileUrl` field to an Option value (optional)
+    pub fn maybe_mobile_url(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.46 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `model` field (optional)
+    pub fn model(mut self, value: impl Into<Option<ProductModel<'a>>>) -> Self {
+        self.__unsafe_private_named.47 = value.into();
+        self
+    }
+    /// Set the `model` field to an Option value (optional)
+    pub fn maybe_model(mut self, value: Option<ProductModel<'a>>) -> Self {
+        self.__unsafe_private_named.47 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `mpn` field (optional)
+    pub fn mpn(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+        self.__unsafe_private_named.48 = value.into();
+        self
+    }
+    /// Set the `mpn` field to an Option value (optional)
+    pub fn maybe_mpn(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.48 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `name` field (optional)
+    pub fn name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.49 = value.into();
+        self
+    }
+    /// Set the `name` field to an Option value (optional)
+    pub fn maybe_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.49 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `negativeNotes` field (optional)
+    pub fn negative_notes(
+        mut self,
+        value: impl Into<Option<ProductNegativeNotes<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.50 = value.into();
+        self
+    }
+    /// Set the `negativeNotes` field to an Option value (optional)
+    pub fn maybe_negative_notes(
+        mut self,
+        value: Option<ProductNegativeNotes<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.50 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `nsn` field (optional)
+    pub fn nsn(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+        self.__unsafe_private_named.51 = value.into();
+        self
+    }
+    /// Set the `nsn` field to an Option value (optional)
+    pub fn maybe_nsn(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.51 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `offers` field (optional)
+    pub fn offers(mut self, value: impl Into<Option<ProductOffers<'a>>>) -> Self {
+        self.__unsafe_private_named.52 = value.into();
+        self
+    }
+    /// Set the `offers` field to an Option value (optional)
+    pub fn maybe_offers(mut self, value: Option<ProductOffers<'a>>) -> Self {
+        self.__unsafe_private_named.52 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `pattern` field (optional)
+    pub fn pattern(mut self, value: impl Into<Option<ProductPattern<'a>>>) -> Self {
+        self.__unsafe_private_named.53 = value.into();
+        self
+    }
+    /// Set the `pattern` field to an Option value (optional)
+    pub fn maybe_pattern(mut self, value: Option<ProductPattern<'a>>) -> Self {
+        self.__unsafe_private_named.53 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `positiveNotes` field (optional)
+    pub fn positive_notes(
+        mut self,
+        value: impl Into<Option<ProductPositiveNotes<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.54 = value.into();
+        self
+    }
+    /// Set the `positiveNotes` field to an Option value (optional)
+    pub fn maybe_positive_notes(
+        mut self,
+        value: Option<ProductPositiveNotes<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.54 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `potentialAction` field (optional)
+    pub fn potential_action(
+        mut self,
+        value: impl Into<Option<ProductPotentialAction<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.55 = value.into();
+        self
+    }
+    /// Set the `potentialAction` field to an Option value (optional)
+    pub fn maybe_potential_action(
+        mut self,
+        value: Option<ProductPotentialAction<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.55 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `productID` field (optional)
+    pub fn product_id(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.56 = value.into();
+        self
+    }
+    /// Set the `productID` field to an Option value (optional)
+    pub fn maybe_product_id(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.56 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `productionDate` field (optional)
+    pub fn production_date(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.57 = value.into();
+        self
+    }
+    /// Set the `productionDate` field to an Option value (optional)
+    pub fn maybe_production_date(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.57 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `purchaseDate` field (optional)
+    pub fn purchase_date(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.58 = value.into();
+        self
+    }
+    /// Set the `purchaseDate` field to an Option value (optional)
+    pub fn maybe_purchase_date(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.58 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `releaseDate` field (optional)
+    pub fn release_date(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.59 = value.into();
+        self
+    }
+    /// Set the `releaseDate` field to an Option value (optional)
+    pub fn maybe_release_date(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.59 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `review` field (optional)
+    pub fn review(mut self, value: impl Into<Option<ProductReview<'a>>>) -> Self {
+        self.__unsafe_private_named.60 = value.into();
+        self
+    }
+    /// Set the `review` field to an Option value (optional)
+    pub fn maybe_review(mut self, value: Option<ProductReview<'a>>) -> Self {
+        self.__unsafe_private_named.60 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `reviews` field (optional)
+    pub fn reviews(mut self, value: impl Into<Option<ProductReviews<'a>>>) -> Self {
+        self.__unsafe_private_named.61 = value.into();
+        self
+    }
+    /// Set the `reviews` field to an Option value (optional)
+    pub fn maybe_reviews(mut self, value: Option<ProductReviews<'a>>) -> Self {
+        self.__unsafe_private_named.61 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `sameAs` field (optional)
+    pub fn same_as(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.62 = value.into();
+        self
+    }
+    /// Set the `sameAs` field to an Option value (optional)
+    pub fn maybe_same_as(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.62 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `size` field (optional)
+    pub fn size(mut self, value: impl Into<Option<ProductSize<'a>>>) -> Self {
+        self.__unsafe_private_named.63 = value.into();
+        self
+    }
+    /// Set the `size` field to an Option value (optional)
+    pub fn maybe_size(mut self, value: Option<ProductSize<'a>>) -> Self {
+        self.__unsafe_private_named.63 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `sku` field (optional)
+    pub fn sku(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+        self.__unsafe_private_named.64 = value.into();
+        self
+    }
+    /// Set the `sku` field to an Option value (optional)
+    pub fn maybe_sku(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.64 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `slogan` field (optional)
+    pub fn slogan(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.65 = value.into();
+        self
+    }
+    /// Set the `slogan` field to an Option value (optional)
+    pub fn maybe_slogan(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.65 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `subjectOf` field (optional)
+    pub fn subject_of(mut self, value: impl Into<Option<ProductSubjectOf<'a>>>) -> Self {
+        self.__unsafe_private_named.66 = value.into();
+        self
+    }
+    /// Set the `subjectOf` field to an Option value (optional)
+    pub fn maybe_subject_of(mut self, value: Option<ProductSubjectOf<'a>>) -> Self {
+        self.__unsafe_private_named.66 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `url` field (optional)
+    pub fn url(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.67 = value.into();
+        self
+    }
+    /// Set the `url` field to an Option value (optional)
+    pub fn maybe_url(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.67 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `weight` field (optional)
+    pub fn weight(mut self, value: impl Into<Option<ProductWeight<'a>>>) -> Self {
+        self.__unsafe_private_named.68 = value.into();
+        self
+    }
+    /// Set the `weight` field to an Option value (optional)
+    pub fn maybe_weight(mut self, value: Option<ProductWeight<'a>>) -> Self {
+        self.__unsafe_private_named.68 = value;
+        self
+    }
+}
+
+impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+    /// Set the `width` field (optional)
+    pub fn width(mut self, value: impl Into<Option<ProductWidth<'a>>>) -> Self {
+        self.__unsafe_private_named.69 = value.into();
+        self
+    }
+    /// Set the `width` field to an Option value (optional)
+    pub fn maybe_width(mut self, value: Option<ProductWidth<'a>>) -> Self {
+        self.__unsafe_private_named.69 = value;
+        self
+    }
+}
+
+impl<'a, S> ProductBuilder<'a, S>
+where
+    S: product_state::State,
+{
+    /// Build the final struct
+    pub fn build(self) -> Product<'a> {
+        Product {
+            additional_property: self.__unsafe_private_named.0,
+            additional_type: self.__unsafe_private_named.1,
+            aggregate_rating: self.__unsafe_private_named.2,
+            alternate_name: self.__unsafe_private_named.3,
+            asin: self.__unsafe_private_named.4,
+            audience: self.__unsafe_private_named.5,
+            award: self.__unsafe_private_named.6,
+            awards: self.__unsafe_private_named.7,
+            brand: self.__unsafe_private_named.8,
+            category: self.__unsafe_private_named.9,
+            color: self.__unsafe_private_named.10,
+            color_swatch: self.__unsafe_private_named.11,
+            country_of_assembly: self.__unsafe_private_named.12,
+            country_of_last_processing: self.__unsafe_private_named.13,
+            country_of_origin: self.__unsafe_private_named.14,
+            depth: self.__unsafe_private_named.15,
+            description: self.__unsafe_private_named.16,
+            disambiguating_description: self.__unsafe_private_named.17,
+            funding: self.__unsafe_private_named.18,
+            gtin: self.__unsafe_private_named.19,
+            gtin12: self.__unsafe_private_named.20,
+            gtin13: self.__unsafe_private_named.21,
+            gtin14: self.__unsafe_private_named.22,
+            gtin8: self.__unsafe_private_named.23,
+            has_adult_consideration: self.__unsafe_private_named.24,
+            has_certification: self.__unsafe_private_named.25,
+            has_energy_consumption_details: self.__unsafe_private_named.26,
+            has_gs1_digital_link: self.__unsafe_private_named.27,
+            has_measurement: self.__unsafe_private_named.28,
+            has_merchant_return_policy: self.__unsafe_private_named.29,
+            height: self.__unsafe_private_named.30,
+            identifier: self.__unsafe_private_named.31,
+            image: self.__unsafe_private_named.32,
+            in_product_group_with_id: self.__unsafe_private_named.33,
+            is_accessory_or_spare_part_for: self.__unsafe_private_named.34,
+            is_consumable_for: self.__unsafe_private_named.35,
+            is_family_friendly: self.__unsafe_private_named.36,
+            is_related_to: self.__unsafe_private_named.37,
+            is_similar_to: self.__unsafe_private_named.38,
+            is_variant_of: self.__unsafe_private_named.39,
+            item_condition: self.__unsafe_private_named.40,
+            keywords: self.__unsafe_private_named.41,
+            logo: self.__unsafe_private_named.42,
+            main_entity_of_page: self.__unsafe_private_named.43,
+            manufacturer: self.__unsafe_private_named.44,
+            material: self.__unsafe_private_named.45,
+            mobile_url: self.__unsafe_private_named.46,
+            model: self.__unsafe_private_named.47,
+            mpn: self.__unsafe_private_named.48,
+            name: self.__unsafe_private_named.49,
+            negative_notes: self.__unsafe_private_named.50,
+            nsn: self.__unsafe_private_named.51,
+            offers: self.__unsafe_private_named.52,
+            pattern: self.__unsafe_private_named.53,
+            positive_notes: self.__unsafe_private_named.54,
+            potential_action: self.__unsafe_private_named.55,
+            product_id: self.__unsafe_private_named.56,
+            production_date: self.__unsafe_private_named.57,
+            purchase_date: self.__unsafe_private_named.58,
+            release_date: self.__unsafe_private_named.59,
+            review: self.__unsafe_private_named.60,
+            reviews: self.__unsafe_private_named.61,
+            same_as: self.__unsafe_private_named.62,
+            size: self.__unsafe_private_named.63,
+            sku: self.__unsafe_private_named.64,
+            slogan: self.__unsafe_private_named.65,
+            subject_of: self.__unsafe_private_named.66,
+            url: self.__unsafe_private_named.67,
+            weight: self.__unsafe_private_named.68,
+            width: self.__unsafe_private_named.69,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Product<'a> {
+        Product {
+            additional_property: self.__unsafe_private_named.0,
+            additional_type: self.__unsafe_private_named.1,
+            aggregate_rating: self.__unsafe_private_named.2,
+            alternate_name: self.__unsafe_private_named.3,
+            asin: self.__unsafe_private_named.4,
+            audience: self.__unsafe_private_named.5,
+            award: self.__unsafe_private_named.6,
+            awards: self.__unsafe_private_named.7,
+            brand: self.__unsafe_private_named.8,
+            category: self.__unsafe_private_named.9,
+            color: self.__unsafe_private_named.10,
+            color_swatch: self.__unsafe_private_named.11,
+            country_of_assembly: self.__unsafe_private_named.12,
+            country_of_last_processing: self.__unsafe_private_named.13,
+            country_of_origin: self.__unsafe_private_named.14,
+            depth: self.__unsafe_private_named.15,
+            description: self.__unsafe_private_named.16,
+            disambiguating_description: self.__unsafe_private_named.17,
+            funding: self.__unsafe_private_named.18,
+            gtin: self.__unsafe_private_named.19,
+            gtin12: self.__unsafe_private_named.20,
+            gtin13: self.__unsafe_private_named.21,
+            gtin14: self.__unsafe_private_named.22,
+            gtin8: self.__unsafe_private_named.23,
+            has_adult_consideration: self.__unsafe_private_named.24,
+            has_certification: self.__unsafe_private_named.25,
+            has_energy_consumption_details: self.__unsafe_private_named.26,
+            has_gs1_digital_link: self.__unsafe_private_named.27,
+            has_measurement: self.__unsafe_private_named.28,
+            has_merchant_return_policy: self.__unsafe_private_named.29,
+            height: self.__unsafe_private_named.30,
+            identifier: self.__unsafe_private_named.31,
+            image: self.__unsafe_private_named.32,
+            in_product_group_with_id: self.__unsafe_private_named.33,
+            is_accessory_or_spare_part_for: self.__unsafe_private_named.34,
+            is_consumable_for: self.__unsafe_private_named.35,
+            is_family_friendly: self.__unsafe_private_named.36,
+            is_related_to: self.__unsafe_private_named.37,
+            is_similar_to: self.__unsafe_private_named.38,
+            is_variant_of: self.__unsafe_private_named.39,
+            item_condition: self.__unsafe_private_named.40,
+            keywords: self.__unsafe_private_named.41,
+            logo: self.__unsafe_private_named.42,
+            main_entity_of_page: self.__unsafe_private_named.43,
+            manufacturer: self.__unsafe_private_named.44,
+            material: self.__unsafe_private_named.45,
+            mobile_url: self.__unsafe_private_named.46,
+            model: self.__unsafe_private_named.47,
+            mpn: self.__unsafe_private_named.48,
+            name: self.__unsafe_private_named.49,
+            negative_notes: self.__unsafe_private_named.50,
+            nsn: self.__unsafe_private_named.51,
+            offers: self.__unsafe_private_named.52,
+            pattern: self.__unsafe_private_named.53,
+            positive_notes: self.__unsafe_private_named.54,
+            potential_action: self.__unsafe_private_named.55,
+            product_id: self.__unsafe_private_named.56,
+            production_date: self.__unsafe_private_named.57,
+            purchase_date: self.__unsafe_private_named.58,
+            release_date: self.__unsafe_private_named.59,
+            review: self.__unsafe_private_named.60,
+            reviews: self.__unsafe_private_named.61,
+            same_as: self.__unsafe_private_named.62,
+            size: self.__unsafe_private_named.63,
+            sku: self.__unsafe_private_named.64,
+            slogan: self.__unsafe_private_named.65,
+            subject_of: self.__unsafe_private_named.66,
+            url: self.__unsafe_private_named.67,
+            weight: self.__unsafe_private_named.68,
+            width: self.__unsafe_private_named.69,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Product<'a> {

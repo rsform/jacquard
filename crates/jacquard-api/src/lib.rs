@@ -35,6 +35,7 @@ pub mod blue_rito;
 
 #[cfg(feature = "blue_zio")]
 pub mod blue_zio;
+pub mod builder_types;
 
 #[cfg(feature = "buzz_bookhive")]
 pub mod buzz_bookhive;

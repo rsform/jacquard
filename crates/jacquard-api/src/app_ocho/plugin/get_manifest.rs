@@ -12,17 +12,139 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetManifest<'a> {
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub platform: jacquard_common::CowStr<'a>,
+}
+
+pub mod get_manifest_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Did;
+        type Platform;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Did = Unset;
+        type Platform = Unset;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Did = Set<members::did>;
+        type Platform = S::Platform;
+    }
+    ///State transition - sets the `platform` field to Set
+    pub struct SetPlatform<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPlatform<S> {}
+    impl<S: State> State for SetPlatform<S> {
+        type Did = S::Did;
+        type Platform = Set<members::platform>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `platform` field
+        pub struct platform(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetManifestBuilder<'a, S: get_manifest_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GetManifest<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GetManifestBuilder<'a, get_manifest_state::Empty> {
+        GetManifestBuilder::new()
+    }
+}
+
+impl<'a> GetManifestBuilder<'a, get_manifest_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetManifestBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetManifestBuilder<'a, S>
+where
+    S: get_manifest_state::State,
+    S::Did: get_manifest_state::IsUnset,
+{
+    /// Set the `did` field (required)
+    pub fn did(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> GetManifestBuilder<'a, get_manifest_state::SetDid<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        GetManifestBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetManifestBuilder<'a, S>
+where
+    S: get_manifest_state::State,
+    S::Platform: get_manifest_state::IsUnset,
+{
+    /// Set the `platform` field (required)
+    pub fn platform(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> GetManifestBuilder<'a, get_manifest_state::SetPlatform<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        GetManifestBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetManifestBuilder<'a, S>
+where
+    S: get_manifest_state::State,
+    S::Did: get_manifest_state::IsSet,
+    S::Platform: get_manifest_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetManifest<'a> {
+        GetManifest {
+            did: self.__unsafe_private_named.0.unwrap(),
+            platform: self.__unsafe_private_named.1.unwrap(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

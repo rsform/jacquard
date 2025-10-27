@@ -12,10 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetSegments<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -25,6 +23,133 @@ pub struct GetSegments<'a> {
     pub limit: std::option::Option<i64>,
     #[serde(borrow)]
     pub user_did: jacquard_common::types::string::Did<'a>,
+}
+
+pub mod get_segments_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type UserDid;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type UserDid = Unset;
+    }
+    ///State transition - sets the `user_did` field to Set
+    pub struct SetUserDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUserDid<S> {}
+    impl<S: State> State for SetUserDid<S> {
+        type UserDid = Set<members::user_did>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `user_did` field
+        pub struct user_did(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetSegmentsBuilder<'a, S: get_segments_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GetSegments<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GetSegmentsBuilder<'a, get_segments_state::Empty> {
+        GetSegmentsBuilder::new()
+    }
+}
+
+impl<'a> GetSegmentsBuilder<'a, get_segments_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetSegmentsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: get_segments_state::State> GetSegmentsBuilder<'a, S> {
+    /// Set the `before` field (optional)
+    pub fn before(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `before` field to an Option value (optional)
+    pub fn maybe_before(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: get_segments_state::State> GetSegmentsBuilder<'a, S> {
+    /// Set the `limit` field (optional)
+    pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `limit` field to an Option value (optional)
+    pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> GetSegmentsBuilder<'a, S>
+where
+    S: get_segments_state::State,
+    S::UserDid: get_segments_state::IsUnset,
+{
+    /// Set the `userDID` field (required)
+    pub fn user_did(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> GetSegmentsBuilder<'a, get_segments_state::SetUserDid<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        GetSegmentsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetSegmentsBuilder<'a, S>
+where
+    S: get_segments_state::State,
+    S::UserDid: get_segments_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetSegments<'a> {
+        GetSegments {
+            before: self.__unsafe_private_named.0,
+            limit: self.__unsafe_private_named.1,
+            user_did: self.__unsafe_private_named.2.unwrap(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

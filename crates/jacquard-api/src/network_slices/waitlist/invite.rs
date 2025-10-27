@@ -14,8 +14,7 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Invite<'a> {
@@ -26,11 +25,209 @@ pub struct Invite<'a> {
     pub did: jacquard_common::types::string::Did<'a>,
     /// Optional expiration date for this invitation
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub expires_at: Option<jacquard_common::types::string::Datetime>,
     /// The AT URI of the slice this invite is for
     #[serde(borrow)]
     pub slice: jacquard_common::types::string::AtUri<'a>,
+}
+
+pub mod invite_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Did;
+        type Slice;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Did = Unset;
+        type Slice = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Did = Set<members::did>;
+        type Slice = S::Slice;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `slice` field to Set
+    pub struct SetSlice<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSlice<S> {}
+    impl<S: State> State for SetSlice<S> {
+        type Did = S::Did;
+        type Slice = Set<members::slice>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Did = S::Did;
+        type Slice = S::Slice;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `slice` field
+        pub struct slice(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct InviteBuilder<'a, S: invite_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Invite<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> InviteBuilder<'a, invite_state::Empty> {
+        InviteBuilder::new()
+    }
+}
+
+impl<'a> InviteBuilder<'a, invite_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        InviteBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> InviteBuilder<'a, S>
+where
+    S: invite_state::State,
+    S::CreatedAt: invite_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> InviteBuilder<'a, invite_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        InviteBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> InviteBuilder<'a, S>
+where
+    S: invite_state::State,
+    S::Did: invite_state::IsUnset,
+{
+    /// Set the `did` field (required)
+    pub fn did(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> InviteBuilder<'a, invite_state::SetDid<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        InviteBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: invite_state::State> InviteBuilder<'a, S> {
+    /// Set the `expiresAt` field (optional)
+    pub fn expires_at(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `expiresAt` field to an Option value (optional)
+    pub fn maybe_expires_at(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> InviteBuilder<'a, S>
+where
+    S: invite_state::State,
+    S::Slice: invite_state::IsUnset,
+{
+    /// Set the `slice` field (required)
+    pub fn slice(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> InviteBuilder<'a, invite_state::SetSlice<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        InviteBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> InviteBuilder<'a, S>
+where
+    S: invite_state::State,
+    S::Did: invite_state::IsSet,
+    S::Slice: invite_state::IsSet,
+    S::CreatedAt: invite_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Invite<'a> {
+        Invite {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            did: self.__unsafe_private_named.1.unwrap(),
+            expires_at: self.__unsafe_private_named.2,
+            slice: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Invite<'a> {
+        Invite {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            did: self.__unsafe_private_named.1.unwrap(),
+            expires_at: self.__unsafe_private_named.2,
+            slice: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Invite<'a> {

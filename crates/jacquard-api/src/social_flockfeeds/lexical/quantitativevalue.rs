@@ -14,106 +14,572 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Quantitativevalue<'a> {
     /// A property-value pair representing an additional characteristic of the entity, e.g. a product feature or another characteristic for which there is no matching property in schema.org.\n\nNote: Publishers should be aware that applications designed to use specific schema.org properties (e.g. https://schema.org/width, https://schema.org/color, https://schema.org/gtin13, ...) will typically expect such data to be provided using those properties, rather than using the generic property/value mechanism.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub additional_property: Option<QuantitativevalueAdditionalProperty<'a>>,
     /** An additional type for the item, typically used for adding more specific types from external vocabularies in microdata syntax. This is a relationship between something and a class that the thing is in. Typically the value is a URI-identified RDF class, and in this case corresponds to the
     use of rdf:type in RDF. Text values can be used sparingly, for cases where useful information can be added without their being an appropriate schema to reference. In the case of text values, the class label should follow the schema.org <a href="https://schema.org/docs/styleguide.html">style guide</a>.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub additional_type: Option<jacquard_common::CowStr<'a>>,
     /// An alias for the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub alternate_name: Option<jacquard_common::CowStr<'a>>,
     /// A description of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub description: Option<QuantitativevalueDescription<'a>>,
     /// A sub property of description. A short description of the item used to disambiguate from other, similar items. Information from other properties (in particular, name) may be necessary for the description to be useful for disambiguation.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub disambiguating_description: Option<jacquard_common::CowStr<'a>>,
     /// The identifier property represents any kind of identifier for any kind of [[Thing]], such as ISBNs, GTIN codes, UUIDs etc. Schema.org provides dedicated properties for representing many of these, either as textual strings or as URL (URI) links. See [background notes](/docs/datamodel.html#identifierBg) for more details.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub identifier: Option<QuantitativevalueIdentifier<'a>>,
     /// An image of the item. This can be a [[URL]] or a fully described [[ImageObject]].
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub image: Option<QuantitativevalueImage<'a>>,
     /// Indicates a page (or other CreativeWork) for which this thing is the main entity being described. See [background notes](/docs/datamodel.html#mainEntityBackground) for details.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub main_entity_of_page: Option<QuantitativevalueMainEntityOfPage<'a>>,
     /// The upper value of some characteristic or property.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub max_value: Option<i64>,
     /// The lower value of some characteristic or property.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub min_value: Option<i64>,
     /// The name of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub name: Option<jacquard_common::CowStr<'a>>,
     /// Indicates a potential Action, which describes an idealized action in which this thing would play an 'object' role.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub potential_action: Option<QuantitativevaluePotentialAction<'a>>,
     /// URL of a reference Web page that unambiguously indicates the item's identity. E.g. the URL of the item's Wikipedia page, Wikidata entry, or official website.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub same_as: Option<jacquard_common::types::string::Uri<'a>>,
     /// A CreativeWork or Event about this Thing.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub subject_of: Option<QuantitativevalueSubjectOf<'a>>,
     /// The unit of measurement given using the UN/CEFACT Common Code (3 characters) or a URL. Other codes than the UN/CEFACT Common Code may be used with a prefix followed by a colon.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub unit_code: Option<jacquard_common::CowStr<'a>>,
     /** A string or text indicating the unit of measurement. Useful if you cannot provide a standard unit code for
 <a href='unitCode'>unitCode</a>.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub unit_text: Option<jacquard_common::CowStr<'a>>,
     /// URL of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub url: Option<jacquard_common::types::string::Uri<'a>>,
     /// The value of a [[QuantitativeValue]] (including [[Observation]]) or property value node.\n\n* For [[QuantitativeValue]] and [[MonetaryAmount]], the recommended type for values is 'Number'.\n* For [[PropertyValue]], it can be 'Text', 'Number', 'Boolean', or 'StructuredValue'.\n* Use values from 0123456789 (Unicode 'DIGIT ZERO' (U+0030) to 'DIGIT NINE' (U+0039)) rather than superficially similar Unicode symbols.\n* Use '.' (Unicode 'FULL STOP' (U+002E)) rather than ',' to indicate a decimal point. Avoid using these symbols as a readability separator.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub value: Option<QuantitativevalueValue<'a>>,
     /// A secondary value that provides additional information on the original value, e.g. a reference temperature or a type of measurement.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub value_reference: Option<QuantitativevalueValueReference<'a>>,
+}
+
+pub mod quantitativevalue_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {}
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {}
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {}
+}
+
+/// Builder for constructing an instance of this type
+pub struct QuantitativevalueBuilder<'a, S: quantitativevalue_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<QuantitativevalueAdditionalProperty<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<QuantitativevalueDescription<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<QuantitativevalueIdentifier<'a>>,
+        ::core::option::Option<QuantitativevalueImage<'a>>,
+        ::core::option::Option<QuantitativevalueMainEntityOfPage<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<QuantitativevaluePotentialAction<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<QuantitativevalueSubjectOf<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<QuantitativevalueValue<'a>>,
+        ::core::option::Option<QuantitativevalueValueReference<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Quantitativevalue<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> QuantitativevalueBuilder<'a, quantitativevalue_state::Empty> {
+        QuantitativevalueBuilder::new()
+    }
+}
+
+impl<'a> QuantitativevalueBuilder<'a, quantitativevalue_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        QuantitativevalueBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: quantitativevalue_state::State> QuantitativevalueBuilder<'a, S> {
+    /// Set the `additionalProperty` field (optional)
+    pub fn additional_property(
+        mut self,
+        value: impl Into<Option<QuantitativevalueAdditionalProperty<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `additionalProperty` field to an Option value (optional)
+    pub fn maybe_additional_property(
+        mut self,
+        value: Option<QuantitativevalueAdditionalProperty<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: quantitativevalue_state::State> QuantitativevalueBuilder<'a, S> {
+    /// Set the `additionalType` field (optional)
+    pub fn additional_type(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `additionalType` field to an Option value (optional)
+    pub fn maybe_additional_type(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: quantitativevalue_state::State> QuantitativevalueBuilder<'a, S> {
+    /// Set the `alternateName` field (optional)
+    pub fn alternate_name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `alternateName` field to an Option value (optional)
+    pub fn maybe_alternate_name(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: quantitativevalue_state::State> QuantitativevalueBuilder<'a, S> {
+    /// Set the `description` field (optional)
+    pub fn description(
+        mut self,
+        value: impl Into<Option<QuantitativevalueDescription<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `description` field to an Option value (optional)
+    pub fn maybe_description(
+        mut self,
+        value: Option<QuantitativevalueDescription<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: quantitativevalue_state::State> QuantitativevalueBuilder<'a, S> {
+    /// Set the `disambiguatingDescription` field (optional)
+    pub fn disambiguating_description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `disambiguatingDescription` field to an Option value (optional)
+    pub fn maybe_disambiguating_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: quantitativevalue_state::State> QuantitativevalueBuilder<'a, S> {
+    /// Set the `identifier` field (optional)
+    pub fn identifier(
+        mut self,
+        value: impl Into<Option<QuantitativevalueIdentifier<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `identifier` field to an Option value (optional)
+    pub fn maybe_identifier(
+        mut self,
+        value: Option<QuantitativevalueIdentifier<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S: quantitativevalue_state::State> QuantitativevalueBuilder<'a, S> {
+    /// Set the `image` field (optional)
+    pub fn image(
+        mut self,
+        value: impl Into<Option<QuantitativevalueImage<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `image` field to an Option value (optional)
+    pub fn maybe_image(mut self, value: Option<QuantitativevalueImage<'a>>) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S: quantitativevalue_state::State> QuantitativevalueBuilder<'a, S> {
+    /// Set the `mainEntityOfPage` field (optional)
+    pub fn main_entity_of_page(
+        mut self,
+        value: impl Into<Option<QuantitativevalueMainEntityOfPage<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value.into();
+        self
+    }
+    /// Set the `mainEntityOfPage` field to an Option value (optional)
+    pub fn maybe_main_entity_of_page(
+        mut self,
+        value: Option<QuantitativevalueMainEntityOfPage<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value;
+        self
+    }
+}
+
+impl<'a, S: quantitativevalue_state::State> QuantitativevalueBuilder<'a, S> {
+    /// Set the `maxValue` field (optional)
+    pub fn max_value(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.8 = value.into();
+        self
+    }
+    /// Set the `maxValue` field to an Option value (optional)
+    pub fn maybe_max_value(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.8 = value;
+        self
+    }
+}
+
+impl<'a, S: quantitativevalue_state::State> QuantitativevalueBuilder<'a, S> {
+    /// Set the `minValue` field (optional)
+    pub fn min_value(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.9 = value.into();
+        self
+    }
+    /// Set the `minValue` field to an Option value (optional)
+    pub fn maybe_min_value(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.9 = value;
+        self
+    }
+}
+
+impl<'a, S: quantitativevalue_state::State> QuantitativevalueBuilder<'a, S> {
+    /// Set the `name` field (optional)
+    pub fn name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.10 = value.into();
+        self
+    }
+    /// Set the `name` field to an Option value (optional)
+    pub fn maybe_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.10 = value;
+        self
+    }
+}
+
+impl<'a, S: quantitativevalue_state::State> QuantitativevalueBuilder<'a, S> {
+    /// Set the `potentialAction` field (optional)
+    pub fn potential_action(
+        mut self,
+        value: impl Into<Option<QuantitativevaluePotentialAction<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.11 = value.into();
+        self
+    }
+    /// Set the `potentialAction` field to an Option value (optional)
+    pub fn maybe_potential_action(
+        mut self,
+        value: Option<QuantitativevaluePotentialAction<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.11 = value;
+        self
+    }
+}
+
+impl<'a, S: quantitativevalue_state::State> QuantitativevalueBuilder<'a, S> {
+    /// Set the `sameAs` field (optional)
+    pub fn same_as(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.12 = value.into();
+        self
+    }
+    /// Set the `sameAs` field to an Option value (optional)
+    pub fn maybe_same_as(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.12 = value;
+        self
+    }
+}
+
+impl<'a, S: quantitativevalue_state::State> QuantitativevalueBuilder<'a, S> {
+    /// Set the `subjectOf` field (optional)
+    pub fn subject_of(
+        mut self,
+        value: impl Into<Option<QuantitativevalueSubjectOf<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.13 = value.into();
+        self
+    }
+    /// Set the `subjectOf` field to an Option value (optional)
+    pub fn maybe_subject_of(
+        mut self,
+        value: Option<QuantitativevalueSubjectOf<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.13 = value;
+        self
+    }
+}
+
+impl<'a, S: quantitativevalue_state::State> QuantitativevalueBuilder<'a, S> {
+    /// Set the `unitCode` field (optional)
+    pub fn unit_code(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.14 = value.into();
+        self
+    }
+    /// Set the `unitCode` field to an Option value (optional)
+    pub fn maybe_unit_code(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.14 = value;
+        self
+    }
+}
+
+impl<'a, S: quantitativevalue_state::State> QuantitativevalueBuilder<'a, S> {
+    /// Set the `unitText` field (optional)
+    pub fn unit_text(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.15 = value.into();
+        self
+    }
+    /// Set the `unitText` field to an Option value (optional)
+    pub fn maybe_unit_text(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.15 = value;
+        self
+    }
+}
+
+impl<'a, S: quantitativevalue_state::State> QuantitativevalueBuilder<'a, S> {
+    /// Set the `url` field (optional)
+    pub fn url(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.16 = value.into();
+        self
+    }
+    /// Set the `url` field to an Option value (optional)
+    pub fn maybe_url(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.16 = value;
+        self
+    }
+}
+
+impl<'a, S: quantitativevalue_state::State> QuantitativevalueBuilder<'a, S> {
+    /// Set the `value` field (optional)
+    pub fn value(
+        mut self,
+        value: impl Into<Option<QuantitativevalueValue<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.17 = value.into();
+        self
+    }
+    /// Set the `value` field to an Option value (optional)
+    pub fn maybe_value(mut self, value: Option<QuantitativevalueValue<'a>>) -> Self {
+        self.__unsafe_private_named.17 = value;
+        self
+    }
+}
+
+impl<'a, S: quantitativevalue_state::State> QuantitativevalueBuilder<'a, S> {
+    /// Set the `valueReference` field (optional)
+    pub fn value_reference(
+        mut self,
+        value: impl Into<Option<QuantitativevalueValueReference<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.18 = value.into();
+        self
+    }
+    /// Set the `valueReference` field to an Option value (optional)
+    pub fn maybe_value_reference(
+        mut self,
+        value: Option<QuantitativevalueValueReference<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.18 = value;
+        self
+    }
+}
+
+impl<'a, S> QuantitativevalueBuilder<'a, S>
+where
+    S: quantitativevalue_state::State,
+{
+    /// Build the final struct
+    pub fn build(self) -> Quantitativevalue<'a> {
+        Quantitativevalue {
+            additional_property: self.__unsafe_private_named.0,
+            additional_type: self.__unsafe_private_named.1,
+            alternate_name: self.__unsafe_private_named.2,
+            description: self.__unsafe_private_named.3,
+            disambiguating_description: self.__unsafe_private_named.4,
+            identifier: self.__unsafe_private_named.5,
+            image: self.__unsafe_private_named.6,
+            main_entity_of_page: self.__unsafe_private_named.7,
+            max_value: self.__unsafe_private_named.8,
+            min_value: self.__unsafe_private_named.9,
+            name: self.__unsafe_private_named.10,
+            potential_action: self.__unsafe_private_named.11,
+            same_as: self.__unsafe_private_named.12,
+            subject_of: self.__unsafe_private_named.13,
+            unit_code: self.__unsafe_private_named.14,
+            unit_text: self.__unsafe_private_named.15,
+            url: self.__unsafe_private_named.16,
+            value: self.__unsafe_private_named.17,
+            value_reference: self.__unsafe_private_named.18,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Quantitativevalue<'a> {
+        Quantitativevalue {
+            additional_property: self.__unsafe_private_named.0,
+            additional_type: self.__unsafe_private_named.1,
+            alternate_name: self.__unsafe_private_named.2,
+            description: self.__unsafe_private_named.3,
+            disambiguating_description: self.__unsafe_private_named.4,
+            identifier: self.__unsafe_private_named.5,
+            image: self.__unsafe_private_named.6,
+            main_entity_of_page: self.__unsafe_private_named.7,
+            max_value: self.__unsafe_private_named.8,
+            min_value: self.__unsafe_private_named.9,
+            name: self.__unsafe_private_named.10,
+            potential_action: self.__unsafe_private_named.11,
+            same_as: self.__unsafe_private_named.12,
+            subject_of: self.__unsafe_private_named.13,
+            unit_code: self.__unsafe_private_named.14,
+            unit_text: self.__unsafe_private_named.15,
+            url: self.__unsafe_private_named.16,
+            value: self.__unsafe_private_named.17,
+            value_reference: self.__unsafe_private_named.18,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Quantitativevalue<'a> {

@@ -18,112 +18,752 @@ pub mod get_songs;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Song<'a> {
     /// The album of the song.
     #[serde(borrow)]
-    #[builder(into)]
     pub album: jacquard_common::CowStr<'a>,
     /// The album art of the song.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub album_art: Option<jacquard_common::types::blob::BlobRef<'a>>,
     /// The album artist of the song.
     #[serde(borrow)]
-    #[builder(into)]
     pub album_artist: jacquard_common::CowStr<'a>,
     /// The Apple Music link of the song.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub apple_music_link: Option<jacquard_common::types::string::Uri<'a>>,
     /// The artist of the song.
     #[serde(borrow)]
-    #[builder(into)]
     pub artist: jacquard_common::CowStr<'a>,
     /// The composer of the song.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub composer: Option<jacquard_common::CowStr<'a>>,
     /// The copyright message of the song.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub copyright_message: Option<jacquard_common::CowStr<'a>>,
     /// The date when the song was created.
     pub created_at: jacquard_common::types::string::Datetime,
     /// The disc number of the song in the album.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub disc_number: Option<i64>,
     /// The duration of the song in seconds.
     pub duration: i64,
     /// The genre of the song.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub genre: Option<jacquard_common::CowStr<'a>>,
     /// The label of the song.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub label: Option<jacquard_common::CowStr<'a>>,
     /// The lyrics of the song.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub lyrics: Option<jacquard_common::CowStr<'a>>,
     /// The MusicBrainz ID of the song.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub mbid: Option<jacquard_common::CowStr<'a>>,
     /// The release date of the song.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub release_date: Option<jacquard_common::types::string::Datetime>,
     /// The Spotify link of the song.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub spotify_link: Option<jacquard_common::types::string::Uri<'a>>,
     /// The tags of the song.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub tags: Option<Vec<jacquard_common::CowStr<'a>>>,
     /// The Tidal link of the song.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub tidal_link: Option<jacquard_common::types::string::Uri<'a>>,
     /// The title of the song.
     #[serde(borrow)]
-    #[builder(into)]
     pub title: jacquard_common::CowStr<'a>,
     /// The track number of the song in the album.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub track_number: Option<i64>,
     /// Informations about the song
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub wiki: Option<jacquard_common::CowStr<'a>>,
     /// The year the song was released.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub year: Option<i64>,
     /// The YouTube link of the song.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub youtube_link: Option<jacquard_common::types::string::Uri<'a>>,
+}
+
+pub mod song_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Title;
+        type Artist;
+        type Album;
+        type AlbumArtist;
+        type Duration;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Title = Unset;
+        type Artist = Unset;
+        type Album = Unset;
+        type AlbumArtist = Unset;
+        type Duration = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Title = Set<members::title>;
+        type Artist = S::Artist;
+        type Album = S::Album;
+        type AlbumArtist = S::AlbumArtist;
+        type Duration = S::Duration;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `artist` field to Set
+    pub struct SetArtist<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetArtist<S> {}
+    impl<S: State> State for SetArtist<S> {
+        type Title = S::Title;
+        type Artist = Set<members::artist>;
+        type Album = S::Album;
+        type AlbumArtist = S::AlbumArtist;
+        type Duration = S::Duration;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `album` field to Set
+    pub struct SetAlbum<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAlbum<S> {}
+    impl<S: State> State for SetAlbum<S> {
+        type Title = S::Title;
+        type Artist = S::Artist;
+        type Album = Set<members::album>;
+        type AlbumArtist = S::AlbumArtist;
+        type Duration = S::Duration;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `album_artist` field to Set
+    pub struct SetAlbumArtist<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAlbumArtist<S> {}
+    impl<S: State> State for SetAlbumArtist<S> {
+        type Title = S::Title;
+        type Artist = S::Artist;
+        type Album = S::Album;
+        type AlbumArtist = Set<members::album_artist>;
+        type Duration = S::Duration;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `duration` field to Set
+    pub struct SetDuration<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDuration<S> {}
+    impl<S: State> State for SetDuration<S> {
+        type Title = S::Title;
+        type Artist = S::Artist;
+        type Album = S::Album;
+        type AlbumArtist = S::AlbumArtist;
+        type Duration = Set<members::duration>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Title = S::Title;
+        type Artist = S::Artist;
+        type Album = S::Album;
+        type AlbumArtist = S::AlbumArtist;
+        type Duration = S::Duration;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `artist` field
+        pub struct artist(());
+        ///Marker type for the `album` field
+        pub struct album(());
+        ///Marker type for the `album_artist` field
+        pub struct album_artist(());
+        ///Marker type for the `duration` field
+        pub struct duration(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct SongBuilder<'a, S: song_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Song<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> SongBuilder<'a, song_state::Empty> {
+        SongBuilder::new()
+    }
+}
+
+impl<'a> SongBuilder<'a, song_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        SongBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SongBuilder<'a, S>
+where
+    S: song_state::State,
+    S::Album: song_state::IsUnset,
+{
+    /// Set the `album` field (required)
+    pub fn album(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> SongBuilder<'a, song_state::SetAlbum<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        SongBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: song_state::State> SongBuilder<'a, S> {
+    /// Set the `albumArt` field (optional)
+    pub fn album_art(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::blob::BlobRef<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `albumArt` field to an Option value (optional)
+    pub fn maybe_album_art(
+        mut self,
+        value: Option<jacquard_common::types::blob::BlobRef<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> SongBuilder<'a, S>
+where
+    S: song_state::State,
+    S::AlbumArtist: song_state::IsUnset,
+{
+    /// Set the `albumArtist` field (required)
+    pub fn album_artist(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> SongBuilder<'a, song_state::SetAlbumArtist<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        SongBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: song_state::State> SongBuilder<'a, S> {
+    /// Set the `appleMusicLink` field (optional)
+    pub fn apple_music_link(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `appleMusicLink` field to an Option value (optional)
+    pub fn maybe_apple_music_link(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S> SongBuilder<'a, S>
+where
+    S: song_state::State,
+    S::Artist: song_state::IsUnset,
+{
+    /// Set the `artist` field (required)
+    pub fn artist(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> SongBuilder<'a, song_state::SetArtist<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        SongBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: song_state::State> SongBuilder<'a, S> {
+    /// Set the `composer` field (optional)
+    pub fn composer(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `composer` field to an Option value (optional)
+    pub fn maybe_composer(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S: song_state::State> SongBuilder<'a, S> {
+    /// Set the `copyrightMessage` field (optional)
+    pub fn copyright_message(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `copyrightMessage` field to an Option value (optional)
+    pub fn maybe_copyright_message(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S> SongBuilder<'a, S>
+where
+    S: song_state::State,
+    S::CreatedAt: song_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> SongBuilder<'a, song_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        SongBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: song_state::State> SongBuilder<'a, S> {
+    /// Set the `discNumber` field (optional)
+    pub fn disc_number(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.8 = value.into();
+        self
+    }
+    /// Set the `discNumber` field to an Option value (optional)
+    pub fn maybe_disc_number(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.8 = value;
+        self
+    }
+}
+
+impl<'a, S> SongBuilder<'a, S>
+where
+    S: song_state::State,
+    S::Duration: song_state::IsUnset,
+{
+    /// Set the `duration` field (required)
+    pub fn duration(
+        mut self,
+        value: impl Into<i64>,
+    ) -> SongBuilder<'a, song_state::SetDuration<S>> {
+        self.__unsafe_private_named.9 = ::core::option::Option::Some(value.into());
+        SongBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: song_state::State> SongBuilder<'a, S> {
+    /// Set the `genre` field (optional)
+    pub fn genre(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.10 = value.into();
+        self
+    }
+    /// Set the `genre` field to an Option value (optional)
+    pub fn maybe_genre(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.10 = value;
+        self
+    }
+}
+
+impl<'a, S: song_state::State> SongBuilder<'a, S> {
+    /// Set the `label` field (optional)
+    pub fn label(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.11 = value.into();
+        self
+    }
+    /// Set the `label` field to an Option value (optional)
+    pub fn maybe_label(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.11 = value;
+        self
+    }
+}
+
+impl<'a, S: song_state::State> SongBuilder<'a, S> {
+    /// Set the `lyrics` field (optional)
+    pub fn lyrics(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.12 = value.into();
+        self
+    }
+    /// Set the `lyrics` field to an Option value (optional)
+    pub fn maybe_lyrics(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.12 = value;
+        self
+    }
+}
+
+impl<'a, S: song_state::State> SongBuilder<'a, S> {
+    /// Set the `mbid` field (optional)
+    pub fn mbid(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.13 = value.into();
+        self
+    }
+    /// Set the `mbid` field to an Option value (optional)
+    pub fn maybe_mbid(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.13 = value;
+        self
+    }
+}
+
+impl<'a, S: song_state::State> SongBuilder<'a, S> {
+    /// Set the `releaseDate` field (optional)
+    pub fn release_date(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.14 = value.into();
+        self
+    }
+    /// Set the `releaseDate` field to an Option value (optional)
+    pub fn maybe_release_date(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.14 = value;
+        self
+    }
+}
+
+impl<'a, S: song_state::State> SongBuilder<'a, S> {
+    /// Set the `spotifyLink` field (optional)
+    pub fn spotify_link(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.15 = value.into();
+        self
+    }
+    /// Set the `spotifyLink` field to an Option value (optional)
+    pub fn maybe_spotify_link(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.15 = value;
+        self
+    }
+}
+
+impl<'a, S: song_state::State> SongBuilder<'a, S> {
+    /// Set the `tags` field (optional)
+    pub fn tags(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.16 = value.into();
+        self
+    }
+    /// Set the `tags` field to an Option value (optional)
+    pub fn maybe_tags(
+        mut self,
+        value: Option<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.16 = value;
+        self
+    }
+}
+
+impl<'a, S: song_state::State> SongBuilder<'a, S> {
+    /// Set the `tidalLink` field (optional)
+    pub fn tidal_link(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.17 = value.into();
+        self
+    }
+    /// Set the `tidalLink` field to an Option value (optional)
+    pub fn maybe_tidal_link(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.17 = value;
+        self
+    }
+}
+
+impl<'a, S> SongBuilder<'a, S>
+where
+    S: song_state::State,
+    S::Title: song_state::IsUnset,
+{
+    /// Set the `title` field (required)
+    pub fn title(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> SongBuilder<'a, song_state::SetTitle<S>> {
+        self.__unsafe_private_named.18 = ::core::option::Option::Some(value.into());
+        SongBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: song_state::State> SongBuilder<'a, S> {
+    /// Set the `trackNumber` field (optional)
+    pub fn track_number(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.19 = value.into();
+        self
+    }
+    /// Set the `trackNumber` field to an Option value (optional)
+    pub fn maybe_track_number(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.19 = value;
+        self
+    }
+}
+
+impl<'a, S: song_state::State> SongBuilder<'a, S> {
+    /// Set the `wiki` field (optional)
+    pub fn wiki(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.20 = value.into();
+        self
+    }
+    /// Set the `wiki` field to an Option value (optional)
+    pub fn maybe_wiki(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.20 = value;
+        self
+    }
+}
+
+impl<'a, S: song_state::State> SongBuilder<'a, S> {
+    /// Set the `year` field (optional)
+    pub fn year(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.21 = value.into();
+        self
+    }
+    /// Set the `year` field to an Option value (optional)
+    pub fn maybe_year(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.21 = value;
+        self
+    }
+}
+
+impl<'a, S: song_state::State> SongBuilder<'a, S> {
+    /// Set the `youtubeLink` field (optional)
+    pub fn youtube_link(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.22 = value.into();
+        self
+    }
+    /// Set the `youtubeLink` field to an Option value (optional)
+    pub fn maybe_youtube_link(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.22 = value;
+        self
+    }
+}
+
+impl<'a, S> SongBuilder<'a, S>
+where
+    S: song_state::State,
+    S::Title: song_state::IsSet,
+    S::Artist: song_state::IsSet,
+    S::Album: song_state::IsSet,
+    S::AlbumArtist: song_state::IsSet,
+    S::Duration: song_state::IsSet,
+    S::CreatedAt: song_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Song<'a> {
+        Song {
+            album: self.__unsafe_private_named.0.unwrap(),
+            album_art: self.__unsafe_private_named.1,
+            album_artist: self.__unsafe_private_named.2.unwrap(),
+            apple_music_link: self.__unsafe_private_named.3,
+            artist: self.__unsafe_private_named.4.unwrap(),
+            composer: self.__unsafe_private_named.5,
+            copyright_message: self.__unsafe_private_named.6,
+            created_at: self.__unsafe_private_named.7.unwrap(),
+            disc_number: self.__unsafe_private_named.8,
+            duration: self.__unsafe_private_named.9.unwrap(),
+            genre: self.__unsafe_private_named.10,
+            label: self.__unsafe_private_named.11,
+            lyrics: self.__unsafe_private_named.12,
+            mbid: self.__unsafe_private_named.13,
+            release_date: self.__unsafe_private_named.14,
+            spotify_link: self.__unsafe_private_named.15,
+            tags: self.__unsafe_private_named.16,
+            tidal_link: self.__unsafe_private_named.17,
+            title: self.__unsafe_private_named.18.unwrap(),
+            track_number: self.__unsafe_private_named.19,
+            wiki: self.__unsafe_private_named.20,
+            year: self.__unsafe_private_named.21,
+            youtube_link: self.__unsafe_private_named.22,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Song<'a> {
+        Song {
+            album: self.__unsafe_private_named.0.unwrap(),
+            album_art: self.__unsafe_private_named.1,
+            album_artist: self.__unsafe_private_named.2.unwrap(),
+            apple_music_link: self.__unsafe_private_named.3,
+            artist: self.__unsafe_private_named.4.unwrap(),
+            composer: self.__unsafe_private_named.5,
+            copyright_message: self.__unsafe_private_named.6,
+            created_at: self.__unsafe_private_named.7.unwrap(),
+            disc_number: self.__unsafe_private_named.8,
+            duration: self.__unsafe_private_named.9.unwrap(),
+            genre: self.__unsafe_private_named.10,
+            label: self.__unsafe_private_named.11,
+            lyrics: self.__unsafe_private_named.12,
+            mbid: self.__unsafe_private_named.13,
+            release_date: self.__unsafe_private_named.14,
+            spotify_link: self.__unsafe_private_named.15,
+            tags: self.__unsafe_private_named.16,
+            tidal_link: self.__unsafe_private_named.17,
+            title: self.__unsafe_private_named.18.unwrap(),
+            track_number: self.__unsafe_private_named.19,
+            wiki: self.__unsafe_private_named.20,
+            year: self.__unsafe_private_named.21,
+            youtube_link: self.__unsafe_private_named.22,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Song<'a> {

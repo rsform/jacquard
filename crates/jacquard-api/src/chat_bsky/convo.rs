@@ -31,33 +31,347 @@ pub mod update_read;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ConvoView<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub id: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub last_message: Option<ConvoViewLastMessage<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub last_reaction: Option<crate::chat_bsky::convo::MessageAndReactionView<'a>>,
     #[serde(borrow)]
     pub members: Vec<crate::chat_bsky::actor::ProfileViewBasic<'a>>,
     pub muted: bool,
     #[serde(borrow)]
-    #[builder(into)]
     pub rev: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub status: Option<jacquard_common::CowStr<'a>>,
     pub unread_count: i64,
+}
+
+pub mod convo_view_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Id;
+        type Rev;
+        type Members;
+        type Muted;
+        type UnreadCount;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Id = Unset;
+        type Rev = Unset;
+        type Members = Unset;
+        type Muted = Unset;
+        type UnreadCount = Unset;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Id = Set<members::id>;
+        type Rev = S::Rev;
+        type Members = S::Members;
+        type Muted = S::Muted;
+        type UnreadCount = S::UnreadCount;
+    }
+    ///State transition - sets the `rev` field to Set
+    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRev<S> {}
+    impl<S: State> State for SetRev<S> {
+        type Id = S::Id;
+        type Rev = Set<members::rev>;
+        type Members = S::Members;
+        type Muted = S::Muted;
+        type UnreadCount = S::UnreadCount;
+    }
+    ///State transition - sets the `members` field to Set
+    pub struct SetMembers<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMembers<S> {}
+    impl<S: State> State for SetMembers<S> {
+        type Id = S::Id;
+        type Rev = S::Rev;
+        type Members = Set<members::members>;
+        type Muted = S::Muted;
+        type UnreadCount = S::UnreadCount;
+    }
+    ///State transition - sets the `muted` field to Set
+    pub struct SetMuted<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMuted<S> {}
+    impl<S: State> State for SetMuted<S> {
+        type Id = S::Id;
+        type Rev = S::Rev;
+        type Members = S::Members;
+        type Muted = Set<members::muted>;
+        type UnreadCount = S::UnreadCount;
+    }
+    ///State transition - sets the `unread_count` field to Set
+    pub struct SetUnreadCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUnreadCount<S> {}
+    impl<S: State> State for SetUnreadCount<S> {
+        type Id = S::Id;
+        type Rev = S::Rev;
+        type Members = S::Members;
+        type Muted = S::Muted;
+        type UnreadCount = Set<members::unread_count>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `id` field
+        pub struct id(());
+        ///Marker type for the `rev` field
+        pub struct rev(());
+        ///Marker type for the `members` field
+        pub struct members(());
+        ///Marker type for the `muted` field
+        pub struct muted(());
+        ///Marker type for the `unread_count` field
+        pub struct unread_count(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ConvoViewBuilder<'a, S: convo_view_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ConvoViewLastMessage<'a>>,
+        ::core::option::Option<crate::chat_bsky::convo::MessageAndReactionView<'a>>,
+        ::core::option::Option<Vec<crate::chat_bsky::actor::ProfileViewBasic<'a>>>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ConvoView<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ConvoViewBuilder<'a, convo_view_state::Empty> {
+        ConvoViewBuilder::new()
+    }
+}
+
+impl<'a> ConvoViewBuilder<'a, convo_view_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ConvoViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ConvoViewBuilder<'a, S>
+where
+    S: convo_view_state::State,
+    S::Id: convo_view_state::IsUnset,
+{
+    /// Set the `id` field (required)
+    pub fn id(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> ConvoViewBuilder<'a, convo_view_state::SetId<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ConvoViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: convo_view_state::State> ConvoViewBuilder<'a, S> {
+    /// Set the `lastMessage` field (optional)
+    pub fn last_message(
+        mut self,
+        value: impl Into<Option<ConvoViewLastMessage<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `lastMessage` field to an Option value (optional)
+    pub fn maybe_last_message(
+        mut self,
+        value: Option<ConvoViewLastMessage<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: convo_view_state::State> ConvoViewBuilder<'a, S> {
+    /// Set the `lastReaction` field (optional)
+    pub fn last_reaction(
+        mut self,
+        value: impl Into<Option<crate::chat_bsky::convo::MessageAndReactionView<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `lastReaction` field to an Option value (optional)
+    pub fn maybe_last_reaction(
+        mut self,
+        value: Option<crate::chat_bsky::convo::MessageAndReactionView<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> ConvoViewBuilder<'a, S>
+where
+    S: convo_view_state::State,
+    S::Members: convo_view_state::IsUnset,
+{
+    /// Set the `members` field (required)
+    pub fn members(
+        mut self,
+        value: impl Into<Vec<crate::chat_bsky::actor::ProfileViewBasic<'a>>>,
+    ) -> ConvoViewBuilder<'a, convo_view_state::SetMembers<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        ConvoViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ConvoViewBuilder<'a, S>
+where
+    S: convo_view_state::State,
+    S::Muted: convo_view_state::IsUnset,
+{
+    /// Set the `muted` field (required)
+    pub fn muted(
+        mut self,
+        value: impl Into<bool>,
+    ) -> ConvoViewBuilder<'a, convo_view_state::SetMuted<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        ConvoViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ConvoViewBuilder<'a, S>
+where
+    S: convo_view_state::State,
+    S::Rev: convo_view_state::IsUnset,
+{
+    /// Set the `rev` field (required)
+    pub fn rev(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> ConvoViewBuilder<'a, convo_view_state::SetRev<S>> {
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        ConvoViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: convo_view_state::State> ConvoViewBuilder<'a, S> {
+    /// Set the `status` field (optional)
+    pub fn status(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `status` field to an Option value (optional)
+    pub fn maybe_status(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S> ConvoViewBuilder<'a, S>
+where
+    S: convo_view_state::State,
+    S::UnreadCount: convo_view_state::IsUnset,
+{
+    /// Set the `unreadCount` field (required)
+    pub fn unread_count(
+        mut self,
+        value: impl Into<i64>,
+    ) -> ConvoViewBuilder<'a, convo_view_state::SetUnreadCount<S>> {
+        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        ConvoViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ConvoViewBuilder<'a, S>
+where
+    S: convo_view_state::State,
+    S::Id: convo_view_state::IsSet,
+    S::Rev: convo_view_state::IsSet,
+    S::Members: convo_view_state::IsSet,
+    S::Muted: convo_view_state::IsSet,
+    S::UnreadCount: convo_view_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> ConvoView<'a> {
+        ConvoView {
+            id: self.__unsafe_private_named.0.unwrap(),
+            last_message: self.__unsafe_private_named.1,
+            last_reaction: self.__unsafe_private_named.2,
+            members: self.__unsafe_private_named.3.unwrap(),
+            muted: self.__unsafe_private_named.4.unwrap(),
+            rev: self.__unsafe_private_named.5.unwrap(),
+            status: self.__unsafe_private_named.6,
+            unread_count: self.__unsafe_private_named.7.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> ConvoView<'a> {
+        ConvoView {
+            id: self.__unsafe_private_named.0.unwrap(),
+            last_message: self.__unsafe_private_named.1,
+            last_reaction: self.__unsafe_private_named.2,
+            members: self.__unsafe_private_named.3.unwrap(),
+            muted: self.__unsafe_private_named.4.unwrap(),
+            rev: self.__unsafe_private_named.5.unwrap(),
+            status: self.__unsafe_private_named.6,
+            unread_count: self.__unsafe_private_named.7.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -1309,20 +1623,233 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ConvoView<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeletedMessageView<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub id: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub rev: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub sender: crate::chat_bsky::convo::MessageViewSender<'a>,
     pub sent_at: jacquard_common::types::string::Datetime,
+}
+
+pub mod deleted_message_view_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Id;
+        type Rev;
+        type Sender;
+        type SentAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Id = Unset;
+        type Rev = Unset;
+        type Sender = Unset;
+        type SentAt = Unset;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Id = Set<members::id>;
+        type Rev = S::Rev;
+        type Sender = S::Sender;
+        type SentAt = S::SentAt;
+    }
+    ///State transition - sets the `rev` field to Set
+    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRev<S> {}
+    impl<S: State> State for SetRev<S> {
+        type Id = S::Id;
+        type Rev = Set<members::rev>;
+        type Sender = S::Sender;
+        type SentAt = S::SentAt;
+    }
+    ///State transition - sets the `sender` field to Set
+    pub struct SetSender<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSender<S> {}
+    impl<S: State> State for SetSender<S> {
+        type Id = S::Id;
+        type Rev = S::Rev;
+        type Sender = Set<members::sender>;
+        type SentAt = S::SentAt;
+    }
+    ///State transition - sets the `sent_at` field to Set
+    pub struct SetSentAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSentAt<S> {}
+    impl<S: State> State for SetSentAt<S> {
+        type Id = S::Id;
+        type Rev = S::Rev;
+        type Sender = S::Sender;
+        type SentAt = Set<members::sent_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `id` field
+        pub struct id(());
+        ///Marker type for the `rev` field
+        pub struct rev(());
+        ///Marker type for the `sender` field
+        pub struct sender(());
+        ///Marker type for the `sent_at` field
+        pub struct sent_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct DeletedMessageViewBuilder<'a, S: deleted_message_view_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<crate::chat_bsky::convo::MessageViewSender<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> DeletedMessageView<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> DeletedMessageViewBuilder<'a, deleted_message_view_state::Empty> {
+        DeletedMessageViewBuilder::new()
+    }
+}
+
+impl<'a> DeletedMessageViewBuilder<'a, deleted_message_view_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        DeletedMessageViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DeletedMessageViewBuilder<'a, S>
+where
+    S: deleted_message_view_state::State,
+    S::Id: deleted_message_view_state::IsUnset,
+{
+    /// Set the `id` field (required)
+    pub fn id(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> DeletedMessageViewBuilder<'a, deleted_message_view_state::SetId<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        DeletedMessageViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DeletedMessageViewBuilder<'a, S>
+where
+    S: deleted_message_view_state::State,
+    S::Rev: deleted_message_view_state::IsUnset,
+{
+    /// Set the `rev` field (required)
+    pub fn rev(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> DeletedMessageViewBuilder<'a, deleted_message_view_state::SetRev<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        DeletedMessageViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DeletedMessageViewBuilder<'a, S>
+where
+    S: deleted_message_view_state::State,
+    S::Sender: deleted_message_view_state::IsUnset,
+{
+    /// Set the `sender` field (required)
+    pub fn sender(
+        mut self,
+        value: impl Into<crate::chat_bsky::convo::MessageViewSender<'a>>,
+    ) -> DeletedMessageViewBuilder<'a, deleted_message_view_state::SetSender<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        DeletedMessageViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DeletedMessageViewBuilder<'a, S>
+where
+    S: deleted_message_view_state::State,
+    S::SentAt: deleted_message_view_state::IsUnset,
+{
+    /// Set the `sentAt` field (required)
+    pub fn sent_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> DeletedMessageViewBuilder<'a, deleted_message_view_state::SetSentAt<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        DeletedMessageViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DeletedMessageViewBuilder<'a, S>
+where
+    S: deleted_message_view_state::State,
+    S::Id: deleted_message_view_state::IsSet,
+    S::Rev: deleted_message_view_state::IsSet,
+    S::Sender: deleted_message_view_state::IsSet,
+    S::SentAt: deleted_message_view_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> DeletedMessageView<'a> {
+        DeletedMessageView {
+            id: self.__unsafe_private_named.0.unwrap(),
+            rev: self.__unsafe_private_named.1.unwrap(),
+            sender: self.__unsafe_private_named.2.unwrap(),
+            sent_at: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> DeletedMessageView<'a> {
+        DeletedMessageView {
+            id: self.__unsafe_private_named.0.unwrap(),
+            rev: self.__unsafe_private_named.1.unwrap(),
+            sender: self.__unsafe_private_named.2.unwrap(),
+            sent_at: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DeletedMessageView<'a> {
@@ -1386,21 +1913,234 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LogAcceptConvo<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LogAddReaction<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub convo_id: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub message: LogAddReactionMessage<'a>,
     #[serde(borrow)]
     pub reaction: crate::chat_bsky::convo::ReactionView<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub rev: jacquard_common::CowStr<'a>,
+}
+
+pub mod log_add_reaction_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Rev;
+        type ConvoId;
+        type Message;
+        type Reaction;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Rev = Unset;
+        type ConvoId = Unset;
+        type Message = Unset;
+        type Reaction = Unset;
+    }
+    ///State transition - sets the `rev` field to Set
+    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRev<S> {}
+    impl<S: State> State for SetRev<S> {
+        type Rev = Set<members::rev>;
+        type ConvoId = S::ConvoId;
+        type Message = S::Message;
+        type Reaction = S::Reaction;
+    }
+    ///State transition - sets the `convo_id` field to Set
+    pub struct SetConvoId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetConvoId<S> {}
+    impl<S: State> State for SetConvoId<S> {
+        type Rev = S::Rev;
+        type ConvoId = Set<members::convo_id>;
+        type Message = S::Message;
+        type Reaction = S::Reaction;
+    }
+    ///State transition - sets the `message` field to Set
+    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMessage<S> {}
+    impl<S: State> State for SetMessage<S> {
+        type Rev = S::Rev;
+        type ConvoId = S::ConvoId;
+        type Message = Set<members::message>;
+        type Reaction = S::Reaction;
+    }
+    ///State transition - sets the `reaction` field to Set
+    pub struct SetReaction<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetReaction<S> {}
+    impl<S: State> State for SetReaction<S> {
+        type Rev = S::Rev;
+        type ConvoId = S::ConvoId;
+        type Message = S::Message;
+        type Reaction = Set<members::reaction>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `rev` field
+        pub struct rev(());
+        ///Marker type for the `convo_id` field
+        pub struct convo_id(());
+        ///Marker type for the `message` field
+        pub struct message(());
+        ///Marker type for the `reaction` field
+        pub struct reaction(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct LogAddReactionBuilder<'a, S: log_add_reaction_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<LogAddReactionMessage<'a>>,
+        ::core::option::Option<crate::chat_bsky::convo::ReactionView<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> LogAddReaction<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> LogAddReactionBuilder<'a, log_add_reaction_state::Empty> {
+        LogAddReactionBuilder::new()
+    }
+}
+
+impl<'a> LogAddReactionBuilder<'a, log_add_reaction_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        LogAddReactionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LogAddReactionBuilder<'a, S>
+where
+    S: log_add_reaction_state::State,
+    S::ConvoId: log_add_reaction_state::IsUnset,
+{
+    /// Set the `convoId` field (required)
+    pub fn convo_id(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> LogAddReactionBuilder<'a, log_add_reaction_state::SetConvoId<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        LogAddReactionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LogAddReactionBuilder<'a, S>
+where
+    S: log_add_reaction_state::State,
+    S::Message: log_add_reaction_state::IsUnset,
+{
+    /// Set the `message` field (required)
+    pub fn message(
+        mut self,
+        value: impl Into<LogAddReactionMessage<'a>>,
+    ) -> LogAddReactionBuilder<'a, log_add_reaction_state::SetMessage<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        LogAddReactionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LogAddReactionBuilder<'a, S>
+where
+    S: log_add_reaction_state::State,
+    S::Reaction: log_add_reaction_state::IsUnset,
+{
+    /// Set the `reaction` field (required)
+    pub fn reaction(
+        mut self,
+        value: impl Into<crate::chat_bsky::convo::ReactionView<'a>>,
+    ) -> LogAddReactionBuilder<'a, log_add_reaction_state::SetReaction<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        LogAddReactionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LogAddReactionBuilder<'a, S>
+where
+    S: log_add_reaction_state::State,
+    S::Rev: log_add_reaction_state::IsUnset,
+{
+    /// Set the `rev` field (required)
+    pub fn rev(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> LogAddReactionBuilder<'a, log_add_reaction_state::SetRev<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        LogAddReactionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LogAddReactionBuilder<'a, S>
+where
+    S: log_add_reaction_state::State,
+    S::Rev: log_add_reaction_state::IsSet,
+    S::ConvoId: log_add_reaction_state::IsSet,
+    S::Message: log_add_reaction_state::IsSet,
+    S::Reaction: log_add_reaction_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> LogAddReaction<'a> {
+        LogAddReaction {
+            convo_id: self.__unsafe_private_named.0.unwrap(),
+            message: self.__unsafe_private_named.1.unwrap(),
+            reaction: self.__unsafe_private_named.2.unwrap(),
+            rev: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> LogAddReaction<'a> {
+        LogAddReaction {
+            convo_id: self.__unsafe_private_named.0.unwrap(),
+            message: self.__unsafe_private_named.1.unwrap(),
+            reaction: self.__unsafe_private_named.2.unwrap(),
+            rev: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -1483,19 +2223,193 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LogBeginConvo<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LogCreateMessage<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub convo_id: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub message: LogCreateMessageMessage<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub rev: jacquard_common::CowStr<'a>,
+}
+
+pub mod log_create_message_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Rev;
+        type ConvoId;
+        type Message;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Rev = Unset;
+        type ConvoId = Unset;
+        type Message = Unset;
+    }
+    ///State transition - sets the `rev` field to Set
+    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRev<S> {}
+    impl<S: State> State for SetRev<S> {
+        type Rev = Set<members::rev>;
+        type ConvoId = S::ConvoId;
+        type Message = S::Message;
+    }
+    ///State transition - sets the `convo_id` field to Set
+    pub struct SetConvoId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetConvoId<S> {}
+    impl<S: State> State for SetConvoId<S> {
+        type Rev = S::Rev;
+        type ConvoId = Set<members::convo_id>;
+        type Message = S::Message;
+    }
+    ///State transition - sets the `message` field to Set
+    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMessage<S> {}
+    impl<S: State> State for SetMessage<S> {
+        type Rev = S::Rev;
+        type ConvoId = S::ConvoId;
+        type Message = Set<members::message>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `rev` field
+        pub struct rev(());
+        ///Marker type for the `convo_id` field
+        pub struct convo_id(());
+        ///Marker type for the `message` field
+        pub struct message(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct LogCreateMessageBuilder<'a, S: log_create_message_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<LogCreateMessageMessage<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> LogCreateMessage<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> LogCreateMessageBuilder<'a, log_create_message_state::Empty> {
+        LogCreateMessageBuilder::new()
+    }
+}
+
+impl<'a> LogCreateMessageBuilder<'a, log_create_message_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        LogCreateMessageBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LogCreateMessageBuilder<'a, S>
+where
+    S: log_create_message_state::State,
+    S::ConvoId: log_create_message_state::IsUnset,
+{
+    /// Set the `convoId` field (required)
+    pub fn convo_id(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> LogCreateMessageBuilder<'a, log_create_message_state::SetConvoId<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        LogCreateMessageBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LogCreateMessageBuilder<'a, S>
+where
+    S: log_create_message_state::State,
+    S::Message: log_create_message_state::IsUnset,
+{
+    /// Set the `message` field (required)
+    pub fn message(
+        mut self,
+        value: impl Into<LogCreateMessageMessage<'a>>,
+    ) -> LogCreateMessageBuilder<'a, log_create_message_state::SetMessage<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        LogCreateMessageBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LogCreateMessageBuilder<'a, S>
+where
+    S: log_create_message_state::State,
+    S::Rev: log_create_message_state::IsUnset,
+{
+    /// Set the `rev` field (required)
+    pub fn rev(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> LogCreateMessageBuilder<'a, log_create_message_state::SetRev<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        LogCreateMessageBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LogCreateMessageBuilder<'a, S>
+where
+    S: log_create_message_state::State,
+    S::Rev: log_create_message_state::IsSet,
+    S::ConvoId: log_create_message_state::IsSet,
+    S::Message: log_create_message_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> LogCreateMessage<'a> {
+        LogCreateMessage {
+            convo_id: self.__unsafe_private_named.0.unwrap(),
+            message: self.__unsafe_private_named.1.unwrap(),
+            rev: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> LogCreateMessage<'a> {
+        LogCreateMessage {
+            convo_id: self.__unsafe_private_named.0.unwrap(),
+            message: self.__unsafe_private_named.1.unwrap(),
+            rev: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -1542,19 +2456,193 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LogCreateMessage<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LogDeleteMessage<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub convo_id: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub message: LogDeleteMessageMessage<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub rev: jacquard_common::CowStr<'a>,
+}
+
+pub mod log_delete_message_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Rev;
+        type ConvoId;
+        type Message;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Rev = Unset;
+        type ConvoId = Unset;
+        type Message = Unset;
+    }
+    ///State transition - sets the `rev` field to Set
+    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRev<S> {}
+    impl<S: State> State for SetRev<S> {
+        type Rev = Set<members::rev>;
+        type ConvoId = S::ConvoId;
+        type Message = S::Message;
+    }
+    ///State transition - sets the `convo_id` field to Set
+    pub struct SetConvoId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetConvoId<S> {}
+    impl<S: State> State for SetConvoId<S> {
+        type Rev = S::Rev;
+        type ConvoId = Set<members::convo_id>;
+        type Message = S::Message;
+    }
+    ///State transition - sets the `message` field to Set
+    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMessage<S> {}
+    impl<S: State> State for SetMessage<S> {
+        type Rev = S::Rev;
+        type ConvoId = S::ConvoId;
+        type Message = Set<members::message>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `rev` field
+        pub struct rev(());
+        ///Marker type for the `convo_id` field
+        pub struct convo_id(());
+        ///Marker type for the `message` field
+        pub struct message(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct LogDeleteMessageBuilder<'a, S: log_delete_message_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<LogDeleteMessageMessage<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> LogDeleteMessage<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> LogDeleteMessageBuilder<'a, log_delete_message_state::Empty> {
+        LogDeleteMessageBuilder::new()
+    }
+}
+
+impl<'a> LogDeleteMessageBuilder<'a, log_delete_message_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        LogDeleteMessageBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LogDeleteMessageBuilder<'a, S>
+where
+    S: log_delete_message_state::State,
+    S::ConvoId: log_delete_message_state::IsUnset,
+{
+    /// Set the `convoId` field (required)
+    pub fn convo_id(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> LogDeleteMessageBuilder<'a, log_delete_message_state::SetConvoId<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        LogDeleteMessageBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LogDeleteMessageBuilder<'a, S>
+where
+    S: log_delete_message_state::State,
+    S::Message: log_delete_message_state::IsUnset,
+{
+    /// Set the `message` field (required)
+    pub fn message(
+        mut self,
+        value: impl Into<LogDeleteMessageMessage<'a>>,
+    ) -> LogDeleteMessageBuilder<'a, log_delete_message_state::SetMessage<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        LogDeleteMessageBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LogDeleteMessageBuilder<'a, S>
+where
+    S: log_delete_message_state::State,
+    S::Rev: log_delete_message_state::IsUnset,
+{
+    /// Set the `rev` field (required)
+    pub fn rev(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> LogDeleteMessageBuilder<'a, log_delete_message_state::SetRev<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        LogDeleteMessageBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LogDeleteMessageBuilder<'a, S>
+where
+    S: log_delete_message_state::State,
+    S::Rev: log_delete_message_state::IsSet,
+    S::ConvoId: log_delete_message_state::IsSet,
+    S::Message: log_delete_message_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> LogDeleteMessage<'a> {
+        LogDeleteMessage {
+            convo_id: self.__unsafe_private_named.0.unwrap(),
+            message: self.__unsafe_private_named.1.unwrap(),
+            rev: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> LogDeleteMessage<'a> {
+        LogDeleteMessage {
+            convo_id: self.__unsafe_private_named.0.unwrap(),
+            message: self.__unsafe_private_named.1.unwrap(),
+            rev: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -1673,19 +2761,193 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LogMuteConvo<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LogReadMessage<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub convo_id: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub message: LogReadMessageMessage<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub rev: jacquard_common::CowStr<'a>,
+}
+
+pub mod log_read_message_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Rev;
+        type ConvoId;
+        type Message;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Rev = Unset;
+        type ConvoId = Unset;
+        type Message = Unset;
+    }
+    ///State transition - sets the `rev` field to Set
+    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRev<S> {}
+    impl<S: State> State for SetRev<S> {
+        type Rev = Set<members::rev>;
+        type ConvoId = S::ConvoId;
+        type Message = S::Message;
+    }
+    ///State transition - sets the `convo_id` field to Set
+    pub struct SetConvoId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetConvoId<S> {}
+    impl<S: State> State for SetConvoId<S> {
+        type Rev = S::Rev;
+        type ConvoId = Set<members::convo_id>;
+        type Message = S::Message;
+    }
+    ///State transition - sets the `message` field to Set
+    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMessage<S> {}
+    impl<S: State> State for SetMessage<S> {
+        type Rev = S::Rev;
+        type ConvoId = S::ConvoId;
+        type Message = Set<members::message>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `rev` field
+        pub struct rev(());
+        ///Marker type for the `convo_id` field
+        pub struct convo_id(());
+        ///Marker type for the `message` field
+        pub struct message(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct LogReadMessageBuilder<'a, S: log_read_message_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<LogReadMessageMessage<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> LogReadMessage<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> LogReadMessageBuilder<'a, log_read_message_state::Empty> {
+        LogReadMessageBuilder::new()
+    }
+}
+
+impl<'a> LogReadMessageBuilder<'a, log_read_message_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        LogReadMessageBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LogReadMessageBuilder<'a, S>
+where
+    S: log_read_message_state::State,
+    S::ConvoId: log_read_message_state::IsUnset,
+{
+    /// Set the `convoId` field (required)
+    pub fn convo_id(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> LogReadMessageBuilder<'a, log_read_message_state::SetConvoId<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        LogReadMessageBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LogReadMessageBuilder<'a, S>
+where
+    S: log_read_message_state::State,
+    S::Message: log_read_message_state::IsUnset,
+{
+    /// Set the `message` field (required)
+    pub fn message(
+        mut self,
+        value: impl Into<LogReadMessageMessage<'a>>,
+    ) -> LogReadMessageBuilder<'a, log_read_message_state::SetMessage<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        LogReadMessageBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LogReadMessageBuilder<'a, S>
+where
+    S: log_read_message_state::State,
+    S::Rev: log_read_message_state::IsUnset,
+{
+    /// Set the `rev` field (required)
+    pub fn rev(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> LogReadMessageBuilder<'a, log_read_message_state::SetRev<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        LogReadMessageBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LogReadMessageBuilder<'a, S>
+where
+    S: log_read_message_state::State,
+    S::Rev: log_read_message_state::IsSet,
+    S::ConvoId: log_read_message_state::IsSet,
+    S::Message: log_read_message_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> LogReadMessage<'a> {
+        LogReadMessage {
+            convo_id: self.__unsafe_private_named.0.unwrap(),
+            message: self.__unsafe_private_named.1.unwrap(),
+            rev: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> LogReadMessage<'a> {
+        LogReadMessage {
+            convo_id: self.__unsafe_private_named.0.unwrap(),
+            message: self.__unsafe_private_named.1.unwrap(),
+            rev: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -1732,21 +2994,234 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LogReadMessage<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LogRemoveReaction<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub convo_id: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub message: LogRemoveReactionMessage<'a>,
     #[serde(borrow)]
     pub reaction: crate::chat_bsky::convo::ReactionView<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub rev: jacquard_common::CowStr<'a>,
+}
+
+pub mod log_remove_reaction_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Rev;
+        type ConvoId;
+        type Message;
+        type Reaction;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Rev = Unset;
+        type ConvoId = Unset;
+        type Message = Unset;
+        type Reaction = Unset;
+    }
+    ///State transition - sets the `rev` field to Set
+    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRev<S> {}
+    impl<S: State> State for SetRev<S> {
+        type Rev = Set<members::rev>;
+        type ConvoId = S::ConvoId;
+        type Message = S::Message;
+        type Reaction = S::Reaction;
+    }
+    ///State transition - sets the `convo_id` field to Set
+    pub struct SetConvoId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetConvoId<S> {}
+    impl<S: State> State for SetConvoId<S> {
+        type Rev = S::Rev;
+        type ConvoId = Set<members::convo_id>;
+        type Message = S::Message;
+        type Reaction = S::Reaction;
+    }
+    ///State transition - sets the `message` field to Set
+    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMessage<S> {}
+    impl<S: State> State for SetMessage<S> {
+        type Rev = S::Rev;
+        type ConvoId = S::ConvoId;
+        type Message = Set<members::message>;
+        type Reaction = S::Reaction;
+    }
+    ///State transition - sets the `reaction` field to Set
+    pub struct SetReaction<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetReaction<S> {}
+    impl<S: State> State for SetReaction<S> {
+        type Rev = S::Rev;
+        type ConvoId = S::ConvoId;
+        type Message = S::Message;
+        type Reaction = Set<members::reaction>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `rev` field
+        pub struct rev(());
+        ///Marker type for the `convo_id` field
+        pub struct convo_id(());
+        ///Marker type for the `message` field
+        pub struct message(());
+        ///Marker type for the `reaction` field
+        pub struct reaction(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct LogRemoveReactionBuilder<'a, S: log_remove_reaction_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<LogRemoveReactionMessage<'a>>,
+        ::core::option::Option<crate::chat_bsky::convo::ReactionView<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> LogRemoveReaction<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> LogRemoveReactionBuilder<'a, log_remove_reaction_state::Empty> {
+        LogRemoveReactionBuilder::new()
+    }
+}
+
+impl<'a> LogRemoveReactionBuilder<'a, log_remove_reaction_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        LogRemoveReactionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LogRemoveReactionBuilder<'a, S>
+where
+    S: log_remove_reaction_state::State,
+    S::ConvoId: log_remove_reaction_state::IsUnset,
+{
+    /// Set the `convoId` field (required)
+    pub fn convo_id(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> LogRemoveReactionBuilder<'a, log_remove_reaction_state::SetConvoId<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        LogRemoveReactionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LogRemoveReactionBuilder<'a, S>
+where
+    S: log_remove_reaction_state::State,
+    S::Message: log_remove_reaction_state::IsUnset,
+{
+    /// Set the `message` field (required)
+    pub fn message(
+        mut self,
+        value: impl Into<LogRemoveReactionMessage<'a>>,
+    ) -> LogRemoveReactionBuilder<'a, log_remove_reaction_state::SetMessage<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        LogRemoveReactionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LogRemoveReactionBuilder<'a, S>
+where
+    S: log_remove_reaction_state::State,
+    S::Reaction: log_remove_reaction_state::IsUnset,
+{
+    /// Set the `reaction` field (required)
+    pub fn reaction(
+        mut self,
+        value: impl Into<crate::chat_bsky::convo::ReactionView<'a>>,
+    ) -> LogRemoveReactionBuilder<'a, log_remove_reaction_state::SetReaction<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        LogRemoveReactionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LogRemoveReactionBuilder<'a, S>
+where
+    S: log_remove_reaction_state::State,
+    S::Rev: log_remove_reaction_state::IsUnset,
+{
+    /// Set the `rev` field (required)
+    pub fn rev(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> LogRemoveReactionBuilder<'a, log_remove_reaction_state::SetRev<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        LogRemoveReactionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LogRemoveReactionBuilder<'a, S>
+where
+    S: log_remove_reaction_state::State,
+    S::Rev: log_remove_reaction_state::IsSet,
+    S::ConvoId: log_remove_reaction_state::IsSet,
+    S::Message: log_remove_reaction_state::IsSet,
+    S::Reaction: log_remove_reaction_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> LogRemoveReaction<'a> {
+        LogRemoveReaction {
+            convo_id: self.__unsafe_private_named.0.unwrap(),
+            message: self.__unsafe_private_named.1.unwrap(),
+            reaction: self.__unsafe_private_named.2.unwrap(),
+            rev: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> LogRemoveReaction<'a> {
+        LogRemoveReaction {
+            convo_id: self.__unsafe_private_named.0.unwrap(),
+            message: self.__unsafe_private_named.1.unwrap(),
+            reaction: self.__unsafe_private_named.2.unwrap(),
+            rev: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -1829,8 +3304,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LogUnmuteConvo<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MessageAndReactionView<'a> {
@@ -1838,6 +3312,155 @@ pub struct MessageAndReactionView<'a> {
     pub message: crate::chat_bsky::convo::MessageView<'a>,
     #[serde(borrow)]
     pub reaction: crate::chat_bsky::convo::ReactionView<'a>,
+}
+
+pub mod message_and_reaction_view_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Message;
+        type Reaction;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Message = Unset;
+        type Reaction = Unset;
+    }
+    ///State transition - sets the `message` field to Set
+    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMessage<S> {}
+    impl<S: State> State for SetMessage<S> {
+        type Message = Set<members::message>;
+        type Reaction = S::Reaction;
+    }
+    ///State transition - sets the `reaction` field to Set
+    pub struct SetReaction<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetReaction<S> {}
+    impl<S: State> State for SetReaction<S> {
+        type Message = S::Message;
+        type Reaction = Set<members::reaction>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `message` field
+        pub struct message(());
+        ///Marker type for the `reaction` field
+        pub struct reaction(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct MessageAndReactionViewBuilder<'a, S: message_and_reaction_view_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<crate::chat_bsky::convo::MessageView<'a>>,
+        ::core::option::Option<crate::chat_bsky::convo::ReactionView<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> MessageAndReactionView<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> MessageAndReactionViewBuilder<
+        'a,
+        message_and_reaction_view_state::Empty,
+    > {
+        MessageAndReactionViewBuilder::new()
+    }
+}
+
+impl<'a> MessageAndReactionViewBuilder<'a, message_and_reaction_view_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        MessageAndReactionViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> MessageAndReactionViewBuilder<'a, S>
+where
+    S: message_and_reaction_view_state::State,
+    S::Message: message_and_reaction_view_state::IsUnset,
+{
+    /// Set the `message` field (required)
+    pub fn message(
+        mut self,
+        value: impl Into<crate::chat_bsky::convo::MessageView<'a>>,
+    ) -> MessageAndReactionViewBuilder<
+        'a,
+        message_and_reaction_view_state::SetMessage<S>,
+    > {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        MessageAndReactionViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> MessageAndReactionViewBuilder<'a, S>
+where
+    S: message_and_reaction_view_state::State,
+    S::Reaction: message_and_reaction_view_state::IsUnset,
+{
+    /// Set the `reaction` field (required)
+    pub fn reaction(
+        mut self,
+        value: impl Into<crate::chat_bsky::convo::ReactionView<'a>>,
+    ) -> MessageAndReactionViewBuilder<
+        'a,
+        message_and_reaction_view_state::SetReaction<S>,
+    > {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        MessageAndReactionViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> MessageAndReactionViewBuilder<'a, S>
+where
+    S: message_and_reaction_view_state::State,
+    S::Message: message_and_reaction_view_state::IsSet,
+    S::Reaction: message_and_reaction_view_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> MessageAndReactionView<'a> {
+        MessageAndReactionView {
+            message: self.__unsafe_private_named.0.unwrap(),
+            reaction: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> MessageAndReactionView<'a> {
+        MessageAndReactionView {
+            message: self.__unsafe_private_named.0.unwrap(),
+            reaction: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MessageAndReactionView<'a> {
@@ -1938,19 +3561,193 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MessageInput<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MessageRef<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub convo_id: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub message_id: jacquard_common::CowStr<'a>,
+}
+
+pub mod message_ref_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Did;
+        type MessageId;
+        type ConvoId;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Did = Unset;
+        type MessageId = Unset;
+        type ConvoId = Unset;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Did = Set<members::did>;
+        type MessageId = S::MessageId;
+        type ConvoId = S::ConvoId;
+    }
+    ///State transition - sets the `message_id` field to Set
+    pub struct SetMessageId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMessageId<S> {}
+    impl<S: State> State for SetMessageId<S> {
+        type Did = S::Did;
+        type MessageId = Set<members::message_id>;
+        type ConvoId = S::ConvoId;
+    }
+    ///State transition - sets the `convo_id` field to Set
+    pub struct SetConvoId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetConvoId<S> {}
+    impl<S: State> State for SetConvoId<S> {
+        type Did = S::Did;
+        type MessageId = S::MessageId;
+        type ConvoId = Set<members::convo_id>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `message_id` field
+        pub struct message_id(());
+        ///Marker type for the `convo_id` field
+        pub struct convo_id(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct MessageRefBuilder<'a, S: message_ref_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> MessageRef<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> MessageRefBuilder<'a, message_ref_state::Empty> {
+        MessageRefBuilder::new()
+    }
+}
+
+impl<'a> MessageRefBuilder<'a, message_ref_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        MessageRefBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> MessageRefBuilder<'a, S>
+where
+    S: message_ref_state::State,
+    S::ConvoId: message_ref_state::IsUnset,
+{
+    /// Set the `convoId` field (required)
+    pub fn convo_id(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> MessageRefBuilder<'a, message_ref_state::SetConvoId<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        MessageRefBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> MessageRefBuilder<'a, S>
+where
+    S: message_ref_state::State,
+    S::Did: message_ref_state::IsUnset,
+{
+    /// Set the `did` field (required)
+    pub fn did(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> MessageRefBuilder<'a, message_ref_state::SetDid<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        MessageRefBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> MessageRefBuilder<'a, S>
+where
+    S: message_ref_state::State,
+    S::MessageId: message_ref_state::IsUnset,
+{
+    /// Set the `messageId` field (required)
+    pub fn message_id(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> MessageRefBuilder<'a, message_ref_state::SetMessageId<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        MessageRefBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> MessageRefBuilder<'a, S>
+where
+    S: message_ref_state::State,
+    S::Did: message_ref_state::IsSet,
+    S::MessageId: message_ref_state::IsSet,
+    S::ConvoId: message_ref_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> MessageRef<'a> {
+        MessageRef {
+            convo_id: self.__unsafe_private_named.0.unwrap(),
+            did: self.__unsafe_private_named.1.unwrap(),
+            message_id: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> MessageRef<'a> {
+        MessageRef {
+            convo_id: self.__unsafe_private_named.0.unwrap(),
+            did: self.__unsafe_private_named.1.unwrap(),
+            message_id: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MessageRef<'a> {
@@ -1978,37 +3775,353 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MessageRef<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MessageView<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub embed: Option<crate::app_bsky::embed::record::View<'a>>,
     /// Annotations of text (mentions, URLs, hashtags, etc)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub facets: Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
     #[serde(borrow)]
-    #[builder(into)]
     pub id: jacquard_common::CowStr<'a>,
     /// Reactions to this message, in ascending order of creation time.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub reactions: Option<Vec<crate::chat_bsky::convo::ReactionView<'a>>>,
     #[serde(borrow)]
-    #[builder(into)]
     pub rev: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub sender: crate::chat_bsky::convo::MessageViewSender<'a>,
     pub sent_at: jacquard_common::types::string::Datetime,
     #[serde(borrow)]
-    #[builder(into)]
     pub text: jacquard_common::CowStr<'a>,
+}
+
+pub mod message_view_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Id;
+        type Rev;
+        type Text;
+        type Sender;
+        type SentAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Id = Unset;
+        type Rev = Unset;
+        type Text = Unset;
+        type Sender = Unset;
+        type SentAt = Unset;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Id = Set<members::id>;
+        type Rev = S::Rev;
+        type Text = S::Text;
+        type Sender = S::Sender;
+        type SentAt = S::SentAt;
+    }
+    ///State transition - sets the `rev` field to Set
+    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRev<S> {}
+    impl<S: State> State for SetRev<S> {
+        type Id = S::Id;
+        type Rev = Set<members::rev>;
+        type Text = S::Text;
+        type Sender = S::Sender;
+        type SentAt = S::SentAt;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetText<S> {}
+    impl<S: State> State for SetText<S> {
+        type Id = S::Id;
+        type Rev = S::Rev;
+        type Text = Set<members::text>;
+        type Sender = S::Sender;
+        type SentAt = S::SentAt;
+    }
+    ///State transition - sets the `sender` field to Set
+    pub struct SetSender<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSender<S> {}
+    impl<S: State> State for SetSender<S> {
+        type Id = S::Id;
+        type Rev = S::Rev;
+        type Text = S::Text;
+        type Sender = Set<members::sender>;
+        type SentAt = S::SentAt;
+    }
+    ///State transition - sets the `sent_at` field to Set
+    pub struct SetSentAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSentAt<S> {}
+    impl<S: State> State for SetSentAt<S> {
+        type Id = S::Id;
+        type Rev = S::Rev;
+        type Text = S::Text;
+        type Sender = S::Sender;
+        type SentAt = Set<members::sent_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `id` field
+        pub struct id(());
+        ///Marker type for the `rev` field
+        pub struct rev(());
+        ///Marker type for the `text` field
+        pub struct text(());
+        ///Marker type for the `sender` field
+        pub struct sender(());
+        ///Marker type for the `sent_at` field
+        pub struct sent_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct MessageViewBuilder<'a, S: message_view_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<crate::app_bsky::embed::record::View<'a>>,
+        ::core::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<Vec<crate::chat_bsky::convo::ReactionView<'a>>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<crate::chat_bsky::convo::MessageViewSender<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> MessageView<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> MessageViewBuilder<'a, message_view_state::Empty> {
+        MessageViewBuilder::new()
+    }
+}
+
+impl<'a> MessageViewBuilder<'a, message_view_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        MessageViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: message_view_state::State> MessageViewBuilder<'a, S> {
+    /// Set the `embed` field (optional)
+    pub fn embed(
+        mut self,
+        value: impl Into<Option<crate::app_bsky::embed::record::View<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `embed` field to an Option value (optional)
+    pub fn maybe_embed(
+        mut self,
+        value: Option<crate::app_bsky::embed::record::View<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: message_view_state::State> MessageViewBuilder<'a, S> {
+    /// Set the `facets` field (optional)
+    pub fn facets(
+        mut self,
+        value: impl Into<Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `facets` field to an Option value (optional)
+    pub fn maybe_facets(
+        mut self,
+        value: Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> MessageViewBuilder<'a, S>
+where
+    S: message_view_state::State,
+    S::Id: message_view_state::IsUnset,
+{
+    /// Set the `id` field (required)
+    pub fn id(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> MessageViewBuilder<'a, message_view_state::SetId<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        MessageViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: message_view_state::State> MessageViewBuilder<'a, S> {
+    /// Set the `reactions` field (optional)
+    pub fn reactions(
+        mut self,
+        value: impl Into<Option<Vec<crate::chat_bsky::convo::ReactionView<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `reactions` field to an Option value (optional)
+    pub fn maybe_reactions(
+        mut self,
+        value: Option<Vec<crate::chat_bsky::convo::ReactionView<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S> MessageViewBuilder<'a, S>
+where
+    S: message_view_state::State,
+    S::Rev: message_view_state::IsUnset,
+{
+    /// Set the `rev` field (required)
+    pub fn rev(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> MessageViewBuilder<'a, message_view_state::SetRev<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        MessageViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> MessageViewBuilder<'a, S>
+where
+    S: message_view_state::State,
+    S::Sender: message_view_state::IsUnset,
+{
+    /// Set the `sender` field (required)
+    pub fn sender(
+        mut self,
+        value: impl Into<crate::chat_bsky::convo::MessageViewSender<'a>>,
+    ) -> MessageViewBuilder<'a, message_view_state::SetSender<S>> {
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        MessageViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> MessageViewBuilder<'a, S>
+where
+    S: message_view_state::State,
+    S::SentAt: message_view_state::IsUnset,
+{
+    /// Set the `sentAt` field (required)
+    pub fn sent_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> MessageViewBuilder<'a, message_view_state::SetSentAt<S>> {
+        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        MessageViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> MessageViewBuilder<'a, S>
+where
+    S: message_view_state::State,
+    S::Text: message_view_state::IsUnset,
+{
+    /// Set the `text` field (required)
+    pub fn text(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> MessageViewBuilder<'a, message_view_state::SetText<S>> {
+        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        MessageViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> MessageViewBuilder<'a, S>
+where
+    S: message_view_state::State,
+    S::Id: message_view_state::IsSet,
+    S::Rev: message_view_state::IsSet,
+    S::Text: message_view_state::IsSet,
+    S::Sender: message_view_state::IsSet,
+    S::SentAt: message_view_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> MessageView<'a> {
+        MessageView {
+            embed: self.__unsafe_private_named.0,
+            facets: self.__unsafe_private_named.1,
+            id: self.__unsafe_private_named.2.unwrap(),
+            reactions: self.__unsafe_private_named.3,
+            rev: self.__unsafe_private_named.4.unwrap(),
+            sender: self.__unsafe_private_named.5.unwrap(),
+            sent_at: self.__unsafe_private_named.6.unwrap(),
+            text: self.__unsafe_private_named.7.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> MessageView<'a> {
+        MessageView {
+            embed: self.__unsafe_private_named.0,
+            facets: self.__unsafe_private_named.1,
+            id: self.__unsafe_private_named.2.unwrap(),
+            reactions: self.__unsafe_private_named.3,
+            rev: self.__unsafe_private_named.4.unwrap(),
+            sender: self.__unsafe_private_named.5.unwrap(),
+            sent_at: self.__unsafe_private_named.6.unwrap(),
+            text: self.__unsafe_private_named.7.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MessageView<'a> {
@@ -2068,13 +4181,117 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MessageView<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MessageViewSender<'a> {
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
+}
+
+pub mod message_view_sender_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Did;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Did = Unset;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Did = Set<members::did>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `did` field
+        pub struct did(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct MessageViewSenderBuilder<'a, S: message_view_sender_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> MessageViewSender<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> MessageViewSenderBuilder<'a, message_view_sender_state::Empty> {
+        MessageViewSenderBuilder::new()
+    }
+}
+
+impl<'a> MessageViewSenderBuilder<'a, message_view_sender_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        MessageViewSenderBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> MessageViewSenderBuilder<'a, S>
+where
+    S: message_view_sender_state::State,
+    S::Did: message_view_sender_state::IsUnset,
+{
+    /// Set the `did` field (required)
+    pub fn did(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> MessageViewSenderBuilder<'a, message_view_sender_state::SetDid<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        MessageViewSenderBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> MessageViewSenderBuilder<'a, S>
+where
+    S: message_view_sender_state::State,
+    S::Did: message_view_sender_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> MessageViewSender<'a> {
+        MessageViewSender {
+            did: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> MessageViewSender<'a> {
+        MessageViewSender {
+            did: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MessageViewSender<'a> {
@@ -2102,8 +4319,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MessageViewSender<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ReactionView<'a> {
@@ -2111,8 +4327,184 @@ pub struct ReactionView<'a> {
     #[serde(borrow)]
     pub sender: crate::chat_bsky::convo::ReactionViewSender<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub value: jacquard_common::CowStr<'a>,
+}
+
+pub mod reaction_view_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Value;
+        type Sender;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Value = Unset;
+        type Sender = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Value = Set<members::value>;
+        type Sender = S::Sender;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `sender` field to Set
+    pub struct SetSender<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSender<S> {}
+    impl<S: State> State for SetSender<S> {
+        type Value = S::Value;
+        type Sender = Set<members::sender>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Value = S::Value;
+        type Sender = S::Sender;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `value` field
+        pub struct value(());
+        ///Marker type for the `sender` field
+        pub struct sender(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ReactionViewBuilder<'a, S: reaction_view_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<crate::chat_bsky::convo::ReactionViewSender<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ReactionView<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ReactionViewBuilder<'a, reaction_view_state::Empty> {
+        ReactionViewBuilder::new()
+    }
+}
+
+impl<'a> ReactionViewBuilder<'a, reaction_view_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ReactionViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ReactionViewBuilder<'a, S>
+where
+    S: reaction_view_state::State,
+    S::CreatedAt: reaction_view_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> ReactionViewBuilder<'a, reaction_view_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ReactionViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ReactionViewBuilder<'a, S>
+where
+    S: reaction_view_state::State,
+    S::Sender: reaction_view_state::IsUnset,
+{
+    /// Set the `sender` field (required)
+    pub fn sender(
+        mut self,
+        value: impl Into<crate::chat_bsky::convo::ReactionViewSender<'a>>,
+    ) -> ReactionViewBuilder<'a, reaction_view_state::SetSender<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        ReactionViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ReactionViewBuilder<'a, S>
+where
+    S: reaction_view_state::State,
+    S::Value: reaction_view_state::IsUnset,
+{
+    /// Set the `value` field (required)
+    pub fn value(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> ReactionViewBuilder<'a, reaction_view_state::SetValue<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        ReactionViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ReactionViewBuilder<'a, S>
+where
+    S: reaction_view_state::State,
+    S::Value: reaction_view_state::IsSet,
+    S::Sender: reaction_view_state::IsSet,
+    S::CreatedAt: reaction_view_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> ReactionView<'a> {
+        ReactionView {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            sender: self.__unsafe_private_named.1.unwrap(),
+            value: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> ReactionView<'a> {
+        ReactionView {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            sender: self.__unsafe_private_named.1.unwrap(),
+            value: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReactionView<'a> {
@@ -2140,13 +4532,117 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReactionView<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ReactionViewSender<'a> {
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
+}
+
+pub mod reaction_view_sender_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Did;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Did = Unset;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Did = Set<members::did>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `did` field
+        pub struct did(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ReactionViewSenderBuilder<'a, S: reaction_view_sender_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ReactionViewSender<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ReactionViewSenderBuilder<'a, reaction_view_sender_state::Empty> {
+        ReactionViewSenderBuilder::new()
+    }
+}
+
+impl<'a> ReactionViewSenderBuilder<'a, reaction_view_sender_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ReactionViewSenderBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ReactionViewSenderBuilder<'a, S>
+where
+    S: reaction_view_sender_state::State,
+    S::Did: reaction_view_sender_state::IsUnset,
+{
+    /// Set the `did` field (required)
+    pub fn did(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> ReactionViewSenderBuilder<'a, reaction_view_sender_state::SetDid<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ReactionViewSenderBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ReactionViewSenderBuilder<'a, S>
+where
+    S: reaction_view_sender_state::State,
+    S::Did: reaction_view_sender_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> ReactionViewSender<'a> {
+        ReactionViewSender {
+            did: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> ReactionViewSender<'a> {
+        ReactionViewSender {
+            did: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReactionViewSender<'a> {

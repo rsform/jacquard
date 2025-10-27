@@ -12,18 +12,139 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct Diff<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub r#ref: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub repo: jacquard_common::CowStr<'a>,
+}
+
+pub mod diff_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Repo;
+        type Ref;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Repo = Unset;
+        type Ref = Unset;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Repo = Set<members::repo>;
+        type Ref = S::Ref;
+    }
+    ///State transition - sets the `ref` field to Set
+    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRef<S> {}
+    impl<S: State> State for SetRef<S> {
+        type Repo = S::Repo;
+        type Ref = Set<members::r#ref>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `repo` field
+        pub struct repo(());
+        ///Marker type for the `ref` field
+        pub struct r#ref(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct DiffBuilder<'a, S: diff_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Diff<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> DiffBuilder<'a, diff_state::Empty> {
+        DiffBuilder::new()
+    }
+}
+
+impl<'a> DiffBuilder<'a, diff_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        DiffBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DiffBuilder<'a, S>
+where
+    S: diff_state::State,
+    S::Ref: diff_state::IsUnset,
+{
+    /// Set the `ref` field (required)
+    pub fn r#ref(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> DiffBuilder<'a, diff_state::SetRef<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        DiffBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DiffBuilder<'a, S>
+where
+    S: diff_state::State,
+    S::Repo: diff_state::IsUnset,
+{
+    /// Set the `repo` field (required)
+    pub fn repo(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> DiffBuilder<'a, diff_state::SetRepo<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        DiffBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DiffBuilder<'a, S>
+where
+    S: diff_state::State,
+    S::Repo: diff_state::IsSet,
+    S::Ref: diff_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Diff<'a> {
+        Diff {
+            r#ref: self.__unsafe_private_named.0.unwrap(),
+            repo: self.__unsafe_private_named.1.unwrap(),
+        }
+    }
 }
 
 #[derive(

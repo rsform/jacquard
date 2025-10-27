@@ -13,41 +13,339 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct JobStatus<'a> {
     /// When the job completed
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub completed_at: Option<jacquard_common::types::string::Datetime>,
     /// When the job was created
     pub created_at: jacquard_common::types::string::Datetime,
     /// Error message if job failed
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub error: Option<jacquard_common::CowStr<'a>>,
     /// UUID of the job
     #[serde(borrow)]
-    #[builder(into)]
     pub job_id: jacquard_common::CowStr<'a>,
     /// Job result if completed successfully
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub result: Option<crate::network_slices::slice::get_job_status::SyncJobResult<'a>>,
     /// Number of times the job has been retried
     pub retry_count: i64,
     /// When the job started executing
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub started_at: Option<jacquard_common::types::string::Datetime>,
     /// Current status of the job
     #[serde(borrow)]
-    #[builder(into)]
     pub status: jacquard_common::CowStr<'a>,
+}
+
+pub mod job_status_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type JobId;
+        type Status;
+        type CreatedAt;
+        type RetryCount;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type JobId = Unset;
+        type Status = Unset;
+        type CreatedAt = Unset;
+        type RetryCount = Unset;
+    }
+    ///State transition - sets the `job_id` field to Set
+    pub struct SetJobId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetJobId<S> {}
+    impl<S: State> State for SetJobId<S> {
+        type JobId = Set<members::job_id>;
+        type Status = S::Status;
+        type CreatedAt = S::CreatedAt;
+        type RetryCount = S::RetryCount;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStatus<S> {}
+    impl<S: State> State for SetStatus<S> {
+        type JobId = S::JobId;
+        type Status = Set<members::status>;
+        type CreatedAt = S::CreatedAt;
+        type RetryCount = S::RetryCount;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type JobId = S::JobId;
+        type Status = S::Status;
+        type CreatedAt = Set<members::created_at>;
+        type RetryCount = S::RetryCount;
+    }
+    ///State transition - sets the `retry_count` field to Set
+    pub struct SetRetryCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRetryCount<S> {}
+    impl<S: State> State for SetRetryCount<S> {
+        type JobId = S::JobId;
+        type Status = S::Status;
+        type CreatedAt = S::CreatedAt;
+        type RetryCount = Set<members::retry_count>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `job_id` field
+        pub struct job_id(());
+        ///Marker type for the `status` field
+        pub struct status(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `retry_count` field
+        pub struct retry_count(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct JobStatusBuilder<'a, S: job_status_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<
+            crate::network_slices::slice::get_job_status::SyncJobResult<'a>,
+        >,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> JobStatus<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> JobStatusBuilder<'a, job_status_state::Empty> {
+        JobStatusBuilder::new()
+    }
+}
+
+impl<'a> JobStatusBuilder<'a, job_status_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        JobStatusBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: job_status_state::State> JobStatusBuilder<'a, S> {
+    /// Set the `completedAt` field (optional)
+    pub fn completed_at(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `completedAt` field to an Option value (optional)
+    pub fn maybe_completed_at(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> JobStatusBuilder<'a, S>
+where
+    S: job_status_state::State,
+    S::CreatedAt: job_status_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> JobStatusBuilder<'a, job_status_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        JobStatusBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: job_status_state::State> JobStatusBuilder<'a, S> {
+    /// Set the `error` field (optional)
+    pub fn error(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `error` field to an Option value (optional)
+    pub fn maybe_error(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> JobStatusBuilder<'a, S>
+where
+    S: job_status_state::State,
+    S::JobId: job_status_state::IsUnset,
+{
+    /// Set the `jobId` field (required)
+    pub fn job_id(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> JobStatusBuilder<'a, job_status_state::SetJobId<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        JobStatusBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: job_status_state::State> JobStatusBuilder<'a, S> {
+    /// Set the `result` field (optional)
+    pub fn result(
+        mut self,
+        value: impl Into<
+            Option<crate::network_slices::slice::get_job_status::SyncJobResult<'a>>,
+        >,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `result` field to an Option value (optional)
+    pub fn maybe_result(
+        mut self,
+        value: Option<crate::network_slices::slice::get_job_status::SyncJobResult<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S> JobStatusBuilder<'a, S>
+where
+    S: job_status_state::State,
+    S::RetryCount: job_status_state::IsUnset,
+{
+    /// Set the `retryCount` field (required)
+    pub fn retry_count(
+        mut self,
+        value: impl Into<i64>,
+    ) -> JobStatusBuilder<'a, job_status_state::SetRetryCount<S>> {
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        JobStatusBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: job_status_state::State> JobStatusBuilder<'a, S> {
+    /// Set the `startedAt` field (optional)
+    pub fn started_at(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `startedAt` field to an Option value (optional)
+    pub fn maybe_started_at(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S> JobStatusBuilder<'a, S>
+where
+    S: job_status_state::State,
+    S::Status: job_status_state::IsUnset,
+{
+    /// Set the `status` field (required)
+    pub fn status(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> JobStatusBuilder<'a, job_status_state::SetStatus<S>> {
+        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        JobStatusBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> JobStatusBuilder<'a, S>
+where
+    S: job_status_state::State,
+    S::JobId: job_status_state::IsSet,
+    S::Status: job_status_state::IsSet,
+    S::CreatedAt: job_status_state::IsSet,
+    S::RetryCount: job_status_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> JobStatus<'a> {
+        JobStatus {
+            completed_at: self.__unsafe_private_named.0,
+            created_at: self.__unsafe_private_named.1.unwrap(),
+            error: self.__unsafe_private_named.2,
+            job_id: self.__unsafe_private_named.3.unwrap(),
+            result: self.__unsafe_private_named.4,
+            retry_count: self.__unsafe_private_named.5.unwrap(),
+            started_at: self.__unsafe_private_named.6,
+            status: self.__unsafe_private_named.7.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> JobStatus<'a> {
+        JobStatus {
+            completed_at: self.__unsafe_private_named.0,
+            created_at: self.__unsafe_private_named.1.unwrap(),
+            error: self.__unsafe_private_named.2,
+            job_id: self.__unsafe_private_named.3.unwrap(),
+            result: self.__unsafe_private_named.4,
+            retry_count: self.__unsafe_private_named.5.unwrap(),
+            started_at: self.__unsafe_private_named.6,
+            status: self.__unsafe_private_named.7.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_network_slices_slice_getJobStatus() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -399,15 +697,101 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for JobStatus<'a> {
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetJobStatus<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub job_id: jacquard_common::CowStr<'a>,
+}
+
+pub mod get_job_status_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type JobId;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type JobId = Unset;
+    }
+    ///State transition - sets the `job_id` field to Set
+    pub struct SetJobId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetJobId<S> {}
+    impl<S: State> State for SetJobId<S> {
+        type JobId = Set<members::job_id>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `job_id` field
+        pub struct job_id(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetJobStatusBuilder<'a, S: get_job_status_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (::core::option::Option<jacquard_common::CowStr<'a>>,),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GetJobStatus<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GetJobStatusBuilder<'a, get_job_status_state::Empty> {
+        GetJobStatusBuilder::new()
+    }
+}
+
+impl<'a> GetJobStatusBuilder<'a, get_job_status_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetJobStatusBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetJobStatusBuilder<'a, S>
+where
+    S: get_job_status_state::State,
+    S::JobId: get_job_status_state::IsUnset,
+{
+    /// Set the `jobId` field (required)
+    pub fn job_id(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> GetJobStatusBuilder<'a, get_job_status_state::SetJobId<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        GetJobStatusBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetJobStatusBuilder<'a, S>
+where
+    S: get_job_status_state::State,
+    S::JobId: get_job_status_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetJobStatus<'a> {
+        GetJobStatus {
+            job_id: self.__unsafe_private_named.0.unwrap(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]
@@ -461,8 +845,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetJobStatusRequest {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SyncJobResult<'a> {
@@ -471,7 +854,6 @@ pub struct SyncJobResult<'a> {
     pub collections_synced: Vec<jacquard_common::types::string::Nsid<'a>>,
     /// Human-readable message about the job completion
     #[serde(borrow)]
-    #[builder(into)]
     pub message: jacquard_common::CowStr<'a>,
     /// Number of repositories processed
     pub repos_processed: i64,
@@ -479,6 +861,263 @@ pub struct SyncJobResult<'a> {
     pub success: bool,
     /// Total number of records synced
     pub total_records: i64,
+}
+
+pub mod sync_job_result_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Success;
+        type TotalRecords;
+        type CollectionsSynced;
+        type ReposProcessed;
+        type Message;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Success = Unset;
+        type TotalRecords = Unset;
+        type CollectionsSynced = Unset;
+        type ReposProcessed = Unset;
+        type Message = Unset;
+    }
+    ///State transition - sets the `success` field to Set
+    pub struct SetSuccess<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSuccess<S> {}
+    impl<S: State> State for SetSuccess<S> {
+        type Success = Set<members::success>;
+        type TotalRecords = S::TotalRecords;
+        type CollectionsSynced = S::CollectionsSynced;
+        type ReposProcessed = S::ReposProcessed;
+        type Message = S::Message;
+    }
+    ///State transition - sets the `total_records` field to Set
+    pub struct SetTotalRecords<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTotalRecords<S> {}
+    impl<S: State> State for SetTotalRecords<S> {
+        type Success = S::Success;
+        type TotalRecords = Set<members::total_records>;
+        type CollectionsSynced = S::CollectionsSynced;
+        type ReposProcessed = S::ReposProcessed;
+        type Message = S::Message;
+    }
+    ///State transition - sets the `collections_synced` field to Set
+    pub struct SetCollectionsSynced<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCollectionsSynced<S> {}
+    impl<S: State> State for SetCollectionsSynced<S> {
+        type Success = S::Success;
+        type TotalRecords = S::TotalRecords;
+        type CollectionsSynced = Set<members::collections_synced>;
+        type ReposProcessed = S::ReposProcessed;
+        type Message = S::Message;
+    }
+    ///State transition - sets the `repos_processed` field to Set
+    pub struct SetReposProcessed<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetReposProcessed<S> {}
+    impl<S: State> State for SetReposProcessed<S> {
+        type Success = S::Success;
+        type TotalRecords = S::TotalRecords;
+        type CollectionsSynced = S::CollectionsSynced;
+        type ReposProcessed = Set<members::repos_processed>;
+        type Message = S::Message;
+    }
+    ///State transition - sets the `message` field to Set
+    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMessage<S> {}
+    impl<S: State> State for SetMessage<S> {
+        type Success = S::Success;
+        type TotalRecords = S::TotalRecords;
+        type CollectionsSynced = S::CollectionsSynced;
+        type ReposProcessed = S::ReposProcessed;
+        type Message = Set<members::message>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `success` field
+        pub struct success(());
+        ///Marker type for the `total_records` field
+        pub struct total_records(());
+        ///Marker type for the `collections_synced` field
+        pub struct collections_synced(());
+        ///Marker type for the `repos_processed` field
+        pub struct repos_processed(());
+        ///Marker type for the `message` field
+        pub struct message(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct SyncJobResultBuilder<'a, S: sync_job_result_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<Vec<jacquard_common::types::string::Nsid<'a>>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<i64>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> SyncJobResult<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> SyncJobResultBuilder<'a, sync_job_result_state::Empty> {
+        SyncJobResultBuilder::new()
+    }
+}
+
+impl<'a> SyncJobResultBuilder<'a, sync_job_result_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        SyncJobResultBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SyncJobResultBuilder<'a, S>
+where
+    S: sync_job_result_state::State,
+    S::CollectionsSynced: sync_job_result_state::IsUnset,
+{
+    /// Set the `collectionsSynced` field (required)
+    pub fn collections_synced(
+        mut self,
+        value: impl Into<Vec<jacquard_common::types::string::Nsid<'a>>>,
+    ) -> SyncJobResultBuilder<'a, sync_job_result_state::SetCollectionsSynced<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        SyncJobResultBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SyncJobResultBuilder<'a, S>
+where
+    S: sync_job_result_state::State,
+    S::Message: sync_job_result_state::IsUnset,
+{
+    /// Set the `message` field (required)
+    pub fn message(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> SyncJobResultBuilder<'a, sync_job_result_state::SetMessage<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        SyncJobResultBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SyncJobResultBuilder<'a, S>
+where
+    S: sync_job_result_state::State,
+    S::ReposProcessed: sync_job_result_state::IsUnset,
+{
+    /// Set the `reposProcessed` field (required)
+    pub fn repos_processed(
+        mut self,
+        value: impl Into<i64>,
+    ) -> SyncJobResultBuilder<'a, sync_job_result_state::SetReposProcessed<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        SyncJobResultBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SyncJobResultBuilder<'a, S>
+where
+    S: sync_job_result_state::State,
+    S::Success: sync_job_result_state::IsUnset,
+{
+    /// Set the `success` field (required)
+    pub fn success(
+        mut self,
+        value: impl Into<bool>,
+    ) -> SyncJobResultBuilder<'a, sync_job_result_state::SetSuccess<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        SyncJobResultBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SyncJobResultBuilder<'a, S>
+where
+    S: sync_job_result_state::State,
+    S::TotalRecords: sync_job_result_state::IsUnset,
+{
+    /// Set the `totalRecords` field (required)
+    pub fn total_records(
+        mut self,
+        value: impl Into<i64>,
+    ) -> SyncJobResultBuilder<'a, sync_job_result_state::SetTotalRecords<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        SyncJobResultBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SyncJobResultBuilder<'a, S>
+where
+    S: sync_job_result_state::State,
+    S::Success: sync_job_result_state::IsSet,
+    S::TotalRecords: sync_job_result_state::IsSet,
+    S::CollectionsSynced: sync_job_result_state::IsSet,
+    S::ReposProcessed: sync_job_result_state::IsSet,
+    S::Message: sync_job_result_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> SyncJobResult<'a> {
+        SyncJobResult {
+            collections_synced: self.__unsafe_private_named.0.unwrap(),
+            message: self.__unsafe_private_named.1.unwrap(),
+            repos_processed: self.__unsafe_private_named.2.unwrap(),
+            success: self.__unsafe_private_named.3.unwrap(),
+            total_records: self.__unsafe_private_named.4.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> SyncJobResult<'a> {
+        SyncJobResult {
+            collections_synced: self.__unsafe_private_named.0.unwrap(),
+            message: self.__unsafe_private_named.1.unwrap(),
+            repos_processed: self.__unsafe_private_named.2.unwrap(),
+            success: self.__unsafe_private_named.3.unwrap(),
+            total_records: self.__unsafe_private_named.4.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SyncJobResult<'a> {

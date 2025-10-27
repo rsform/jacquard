@@ -12,17 +12,139 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetOekaki<'a> {
     #[serde(borrow)]
     pub did: jacquard_common::types::ident::AtIdentifier<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub rkey: jacquard_common::CowStr<'a>,
+}
+
+pub mod get_oekaki_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Did;
+        type Rkey;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Did = Unset;
+        type Rkey = Unset;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Did = Set<members::did>;
+        type Rkey = S::Rkey;
+    }
+    ///State transition - sets the `rkey` field to Set
+    pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRkey<S> {}
+    impl<S: State> State for SetRkey<S> {
+        type Did = S::Did;
+        type Rkey = Set<members::rkey>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `rkey` field
+        pub struct rkey(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetOekakiBuilder<'a, S: get_oekaki_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GetOekaki<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GetOekakiBuilder<'a, get_oekaki_state::Empty> {
+        GetOekakiBuilder::new()
+    }
+}
+
+impl<'a> GetOekakiBuilder<'a, get_oekaki_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetOekakiBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetOekakiBuilder<'a, S>
+where
+    S: get_oekaki_state::State,
+    S::Did: get_oekaki_state::IsUnset,
+{
+    /// Set the `did` field (required)
+    pub fn did(
+        mut self,
+        value: impl Into<jacquard_common::types::ident::AtIdentifier<'a>>,
+    ) -> GetOekakiBuilder<'a, get_oekaki_state::SetDid<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        GetOekakiBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetOekakiBuilder<'a, S>
+where
+    S: get_oekaki_state::State,
+    S::Rkey: get_oekaki_state::IsUnset,
+{
+    /// Set the `rkey` field (required)
+    pub fn rkey(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> GetOekakiBuilder<'a, get_oekaki_state::SetRkey<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        GetOekakiBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetOekakiBuilder<'a, S>
+where
+    S: get_oekaki_state::State,
+    S::Did: get_oekaki_state::IsSet,
+    S::Rkey: get_oekaki_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetOekaki<'a> {
+        GetOekaki {
+            did: self.__unsafe_private_named.0.unwrap(),
+            rkey: self.__unsafe_private_named.1.unwrap(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

@@ -47,13 +47,8 @@ impl<'c> CodeGenerator<'c> {
                         let union_name =
                             self.generate_field_type_name(nsid, parent_type_name, field_name, "");
                         let refs: Vec<_> = union.refs.iter().cloned().collect();
-                        let union_def = self.generate_union(
-                            nsid,
-                            &union_name,
-                            &refs,
-                            None,
-                            union.closed,
-                        )?;
+                        let union_def =
+                            self.generate_union(nsid, &union_name, &refs, None, union.closed)?;
                         nested.push(union_def);
                     }
                 }
@@ -74,13 +69,8 @@ impl<'c> CodeGenerator<'c> {
                                 "Item",
                             );
                             let refs: Vec<_> = union.refs.iter().cloned().collect();
-                            let union_def = self.generate_union(
-                                nsid,
-                                &union_name,
-                                &refs,
-                                None,
-                                union.closed,
-                            )?;
+                            let union_def =
+                                self.generate_union(nsid, &union_name, &refs, None, union.closed)?;
                             nested.push(union_def);
                         }
                     }
@@ -105,7 +95,7 @@ impl<'c> CodeGenerator<'c> {
 
                 // Records always get a lifetime since they have the #[lexicon] attribute
                 // which adds extra_data: BTreeMap<..., Data<'a>>
-                // Skip bon::Builder for types that conflict with the macro's unqualified type references
+                // Skip custom builder for types that conflict with the macro's unqualified type references
                 let has_builder =
                     !super::builder_heuristics::conflicts_with_builder_macro(&type_name);
 
@@ -113,26 +103,24 @@ impl<'c> CodeGenerator<'c> {
                 let fields = self.generate_object_fields(nsid, &type_name, obj, has_builder)?;
                 let doc = self.generate_doc_comment(record.description.as_ref());
 
-                let struct_def = if has_builder {
-                    quote! {
-                        #doc
-                        #[jacquard_derive::lexicon]
-                        #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic, bon::Builder)]
-                        #[serde(rename_all = "camelCase")]
-                        pub struct #ident<'a> {
-                            #fields
-                        }
+                let struct_def = quote! {
+                    #doc
+                    #[jacquard_derive::lexicon]
+                    #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic)]
+                    #[serde(rename_all = "camelCase")]
+                    pub struct #ident<'a> {
+                        #fields
                     }
+                };
+
+                // Generate custom builder if needed
+                let builder = if has_builder {
+                    let ctx = super::builder_gen::BuilderGenContext::from_object(
+                        self, nsid, &type_name, obj, true, // records always have lifetime
+                    );
+                    ctx.generate()
                 } else {
-                    quote! {
-                        #doc
-                        #[jacquard_derive::lexicon]
-                        #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic)]
-                        #[serde(rename_all = "camelCase")]
-                        pub struct #ident<'a> {
-                            #fields
-                        }
-                    }
+                    quote! {}
                 };
 
                 // Generate union types and nested object types for this record
@@ -208,6 +196,7 @@ impl<'c> CodeGenerator<'c> {
 
                 Ok(quote! {
                     #struct_def
+                    #builder
 
                     impl<'a> #ident<'a> {
                         pub fn uri(uri: impl Into<jacquard_common::CowStr<'a>>) -> Result<jacquard_common::types::uri::RecordUri<'a, #record_marker_ident>, jacquard_common::types::uri::UriError> {
@@ -243,7 +232,7 @@ impl<'c> CodeGenerator<'c> {
         // Smart heuristics for builder generation:
         // - 0 required fields: Default instead of builder
         // - All required fields are bare strings: Default instead of builder
-        // - 1+ required fields (not all strings): bon::Builder (but not if name conflicts)
+        // - 1+ required fields (not all strings): custom builder (but not if name conflicts)
         let decision = super::builder_heuristics::should_generate_builder(&type_name, obj);
         let has_builder = decision.has_builder;
         let has_default = decision.has_default;
@@ -251,17 +240,7 @@ impl<'c> CodeGenerator<'c> {
         let fields = self.generate_object_fields(nsid, &type_name, obj, has_builder)?;
         let doc = self.generate_doc_comment(obj.description.as_ref());
 
-        let struct_def = if has_builder {
-            quote! {
-                #doc
-                #[jacquard_derive::lexicon]
-                #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic, bon::Builder)]
-                #[serde(rename_all = "camelCase")]
-                pub struct #ident<'a> {
-                    #fields
-                }
-            }
-        } else if has_default {
+        let struct_def = if has_default {
             quote! {
                 #doc
                 #[jacquard_derive::lexicon]
@@ -283,6 +262,16 @@ impl<'c> CodeGenerator<'c> {
             }
         };
 
+        // Generate custom builder if needed
+        let builder = if has_builder {
+            let ctx = super::builder_gen::BuilderGenContext::from_object(
+                self, nsid, &type_name, obj, true, // objects always have lifetime
+            );
+            ctx.generate()
+        } else {
+            quote! {}
+        };
+
         // Generate union types and nested object types for this object
         let unions = self.generate_nested_types(nsid, &type_name, &obj.properties, true)?;
 
@@ -292,6 +281,7 @@ impl<'c> CodeGenerator<'c> {
 
         Ok(quote! {
             #struct_def
+            #builder
             #(#unions)*
             #shared_fn
             #schema_impl
@@ -347,9 +337,6 @@ impl<'c> CodeGenerator<'c> {
             self.property_to_rust_type(nsid, parent_type_name, field_name, field_type)?;
         let needs_lifetime = self.property_needs_lifetime(field_type);
 
-        // Check if this is a CowStr field for builder(into) attribute
-        let is_cowstr = matches!(field_type, LexObjectProperty::String(s) if s.format.is_none());
-
         let rust_type = if is_required {
             rust_type
         } else {
@@ -383,18 +370,9 @@ impl<'c> CodeGenerator<'c> {
             attrs.push(quote! { #[serde(skip_serializing_if = "std::option::Option::is_none")] });
         }
 
-        if is_builder && !is_required {
-            attrs.push(quote! { #[builder(into)] });
-        }
-
         // Add serde(borrow) to all fields with lifetimes
         if needs_lifetime {
             attrs.push(quote! { #[serde(borrow)] });
-        }
-
-        // Add builder(into) for CowStr fields to allow String, &str, etc., but only for builder structs
-        if is_builder && is_cowstr && is_required {
-            attrs.push(quote! { #[builder(into)] });
         }
 
         Ok(quote! {
@@ -422,7 +400,8 @@ impl<'c> CodeGenerator<'c> {
             current_nsid,
         };
 
-        let union_variants = ctx.build_union_variants(refs, |ref_str| self.ref_to_rust_type(ref_str))?;
+        let union_variants =
+            ctx.build_union_variants(refs, |ref_str| self.ref_to_rust_type(ref_str))?;
         let variants = super::union_codegen::generate_variant_tokens(&union_variants);
 
         let doc = description

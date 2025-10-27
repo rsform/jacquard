@@ -13,11 +13,9 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-#[builder(start_fn = new)]
 pub struct DeleteRecord<'a> {
     /// The NSID of the record collection.
     #[serde(borrow)]
@@ -32,21 +30,241 @@ pub struct DeleteRecord<'a> {
     >,
     /// Compare and swap with the previous commit by CID.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub swap_commit: Option<jacquard_common::types::string::Cid<'a>>,
     /// Compare and swap with the previous record by CID.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub swap_record: Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(flatten)]
-    #[serde(borrow)]
-    #[builder(default)]
-    pub extra_data: ::std::collections::BTreeMap<
-        ::jacquard_common::smol_str::SmolStr,
-        ::jacquard_common::types::value::Data<'a>,
-    >,
+}
+
+pub mod delete_record_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Repo;
+        type Collection;
+        type Rkey;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Repo = Unset;
+        type Collection = Unset;
+        type Rkey = Unset;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Repo = Set<members::repo>;
+        type Collection = S::Collection;
+        type Rkey = S::Rkey;
+    }
+    ///State transition - sets the `collection` field to Set
+    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCollection<S> {}
+    impl<S: State> State for SetCollection<S> {
+        type Repo = S::Repo;
+        type Collection = Set<members::collection>;
+        type Rkey = S::Rkey;
+    }
+    ///State transition - sets the `rkey` field to Set
+    pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRkey<S> {}
+    impl<S: State> State for SetRkey<S> {
+        type Repo = S::Repo;
+        type Collection = S::Collection;
+        type Rkey = Set<members::rkey>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `repo` field
+        pub struct repo(());
+        ///Marker type for the `collection` field
+        pub struct collection(());
+        ///Marker type for the `rkey` field
+        pub struct rkey(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct DeleteRecordBuilder<'a, S: delete_record_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Nsid<'a>>,
+        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
+        ::core::option::Option<
+            jacquard_common::types::string::RecordKey<
+                jacquard_common::types::string::Rkey<'a>,
+            >,
+        >,
+        ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> DeleteRecord<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> DeleteRecordBuilder<'a, delete_record_state::Empty> {
+        DeleteRecordBuilder::new()
+    }
+}
+
+impl<'a> DeleteRecordBuilder<'a, delete_record_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        DeleteRecordBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DeleteRecordBuilder<'a, S>
+where
+    S: delete_record_state::State,
+    S::Collection: delete_record_state::IsUnset,
+{
+    /// Set the `collection` field (required)
+    pub fn collection(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Nsid<'a>>,
+    ) -> DeleteRecordBuilder<'a, delete_record_state::SetCollection<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        DeleteRecordBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DeleteRecordBuilder<'a, S>
+where
+    S: delete_record_state::State,
+    S::Repo: delete_record_state::IsUnset,
+{
+    /// Set the `repo` field (required)
+    pub fn repo(
+        mut self,
+        value: impl Into<jacquard_common::types::ident::AtIdentifier<'a>>,
+    ) -> DeleteRecordBuilder<'a, delete_record_state::SetRepo<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        DeleteRecordBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DeleteRecordBuilder<'a, S>
+where
+    S: delete_record_state::State,
+    S::Rkey: delete_record_state::IsUnset,
+{
+    /// Set the `rkey` field (required)
+    pub fn rkey(
+        mut self,
+        value: impl Into<
+            jacquard_common::types::string::RecordKey<
+                jacquard_common::types::string::Rkey<'a>,
+            >,
+        >,
+    ) -> DeleteRecordBuilder<'a, delete_record_state::SetRkey<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        DeleteRecordBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: delete_record_state::State> DeleteRecordBuilder<'a, S> {
+    /// Set the `swapCommit` field (optional)
+    pub fn swap_commit(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Cid<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `swapCommit` field to an Option value (optional)
+    pub fn maybe_swap_commit(
+        mut self,
+        value: Option<jacquard_common::types::string::Cid<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: delete_record_state::State> DeleteRecordBuilder<'a, S> {
+    /// Set the `swapRecord` field (optional)
+    pub fn swap_record(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Cid<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `swapRecord` field to an Option value (optional)
+    pub fn maybe_swap_record(
+        mut self,
+        value: Option<jacquard_common::types::string::Cid<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S> DeleteRecordBuilder<'a, S>
+where
+    S: delete_record_state::State,
+    S::Repo: delete_record_state::IsSet,
+    S::Collection: delete_record_state::IsSet,
+    S::Rkey: delete_record_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> DeleteRecord<'a> {
+        DeleteRecord {
+            collection: self.__unsafe_private_named.0.unwrap(),
+            repo: self.__unsafe_private_named.1.unwrap(),
+            rkey: self.__unsafe_private_named.2.unwrap(),
+            swap_commit: self.__unsafe_private_named.3,
+            swap_record: self.__unsafe_private_named.4,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> DeleteRecord<'a> {
+        DeleteRecord {
+            collection: self.__unsafe_private_named.0.unwrap(),
+            repo: self.__unsafe_private_named.1.unwrap(),
+            rkey: self.__unsafe_private_named.2.unwrap(),
+            swap_commit: self.__unsafe_private_named.3,
+            swap_record: self.__unsafe_private_named.4,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

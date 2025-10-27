@@ -14,8 +14,7 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Account<'a> {
@@ -26,10 +25,244 @@ pub struct Account<'a> {
     pub seq: i64,
     /// If active=false, this optional field indicates a reason for why the account is not active.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub status: Option<jacquard_common::CowStr<'a>>,
     pub time: jacquard_common::types::string::Datetime,
+}
+
+pub mod account_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Seq;
+        type Did;
+        type Time;
+        type Active;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Seq = Unset;
+        type Did = Unset;
+        type Time = Unset;
+        type Active = Unset;
+    }
+    ///State transition - sets the `seq` field to Set
+    pub struct SetSeq<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSeq<S> {}
+    impl<S: State> State for SetSeq<S> {
+        type Seq = Set<members::seq>;
+        type Did = S::Did;
+        type Time = S::Time;
+        type Active = S::Active;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Seq = S::Seq;
+        type Did = Set<members::did>;
+        type Time = S::Time;
+        type Active = S::Active;
+    }
+    ///State transition - sets the `time` field to Set
+    pub struct SetTime<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTime<S> {}
+    impl<S: State> State for SetTime<S> {
+        type Seq = S::Seq;
+        type Did = S::Did;
+        type Time = Set<members::time>;
+        type Active = S::Active;
+    }
+    ///State transition - sets the `active` field to Set
+    pub struct SetActive<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActive<S> {}
+    impl<S: State> State for SetActive<S> {
+        type Seq = S::Seq;
+        type Did = S::Did;
+        type Time = S::Time;
+        type Active = Set<members::active>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `seq` field
+        pub struct seq(());
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `time` field
+        pub struct time(());
+        ///Marker type for the `active` field
+        pub struct active(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct AccountBuilder<'a, S: account_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<bool>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Account<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> AccountBuilder<'a, account_state::Empty> {
+        AccountBuilder::new()
+    }
+}
+
+impl<'a> AccountBuilder<'a, account_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        AccountBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AccountBuilder<'a, S>
+where
+    S: account_state::State,
+    S::Active: account_state::IsUnset,
+{
+    /// Set the `active` field (required)
+    pub fn active(
+        mut self,
+        value: impl Into<bool>,
+    ) -> AccountBuilder<'a, account_state::SetActive<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        AccountBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AccountBuilder<'a, S>
+where
+    S: account_state::State,
+    S::Did: account_state::IsUnset,
+{
+    /// Set the `did` field (required)
+    pub fn did(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> AccountBuilder<'a, account_state::SetDid<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        AccountBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AccountBuilder<'a, S>
+where
+    S: account_state::State,
+    S::Seq: account_state::IsUnset,
+{
+    /// Set the `seq` field (required)
+    pub fn seq(
+        mut self,
+        value: impl Into<i64>,
+    ) -> AccountBuilder<'a, account_state::SetSeq<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        AccountBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: account_state::State> AccountBuilder<'a, S> {
+    /// Set the `status` field (optional)
+    pub fn status(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `status` field to an Option value (optional)
+    pub fn maybe_status(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S> AccountBuilder<'a, S>
+where
+    S: account_state::State,
+    S::Time: account_state::IsUnset,
+{
+    /// Set the `time` field (required)
+    pub fn time(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> AccountBuilder<'a, account_state::SetTime<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        AccountBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AccountBuilder<'a, S>
+where
+    S: account_state::State,
+    S::Seq: account_state::IsSet,
+    S::Did: account_state::IsSet,
+    S::Time: account_state::IsSet,
+    S::Active: account_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Account<'a> {
+        Account {
+            active: self.__unsafe_private_named.0.unwrap(),
+            did: self.__unsafe_private_named.1.unwrap(),
+            seq: self.__unsafe_private_named.2.unwrap(),
+            status: self.__unsafe_private_named.3,
+            time: self.__unsafe_private_named.4.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Account<'a> {
+        Account {
+            active: self.__unsafe_private_named.0.unwrap(),
+            did: self.__unsafe_private_named.1.unwrap(),
+            seq: self.__unsafe_private_named.2.unwrap(),
+            status: self.__unsafe_private_named.3,
+            time: self.__unsafe_private_named.4.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_com_atproto_sync_subscribeRepos() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -689,8 +922,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Account<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Commit<'a> {
@@ -705,7 +937,6 @@ pub struct Commit<'a> {
     pub ops: Vec<crate::com_atproto::sync::subscribe_repos::RepoOp<'a>>,
     /// The root CID of the MST tree for the previous commit from this repo (indicated by the 'since' revision field in this message). Corresponds to the 'data' field in the repo commit object. NOTE: this field is effectively required for the 'inductive' version of firehose.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub prev_data: Option<jacquard_common::types::cid::CidLink<'a>>,
     /// DEPRECATED -- unused
@@ -723,6 +954,588 @@ pub struct Commit<'a> {
     pub time: jacquard_common::types::string::Datetime,
     /// DEPRECATED -- replaced by #sync event and data limits. Indicates that this commit contained too many ops, or data size was too large. Consumers will need to make a separate request to get missing data.
     pub too_big: bool,
+}
+
+pub mod commit_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Seq;
+        type Rebase;
+        type TooBig;
+        type Repo;
+        type Commit;
+        type Rev;
+        type Since;
+        type Blocks;
+        type Ops;
+        type Blobs;
+        type Time;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Seq = Unset;
+        type Rebase = Unset;
+        type TooBig = Unset;
+        type Repo = Unset;
+        type Commit = Unset;
+        type Rev = Unset;
+        type Since = Unset;
+        type Blocks = Unset;
+        type Ops = Unset;
+        type Blobs = Unset;
+        type Time = Unset;
+    }
+    ///State transition - sets the `seq` field to Set
+    pub struct SetSeq<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSeq<S> {}
+    impl<S: State> State for SetSeq<S> {
+        type Seq = Set<members::seq>;
+        type Rebase = S::Rebase;
+        type TooBig = S::TooBig;
+        type Repo = S::Repo;
+        type Commit = S::Commit;
+        type Rev = S::Rev;
+        type Since = S::Since;
+        type Blocks = S::Blocks;
+        type Ops = S::Ops;
+        type Blobs = S::Blobs;
+        type Time = S::Time;
+    }
+    ///State transition - sets the `rebase` field to Set
+    pub struct SetRebase<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRebase<S> {}
+    impl<S: State> State for SetRebase<S> {
+        type Seq = S::Seq;
+        type Rebase = Set<members::rebase>;
+        type TooBig = S::TooBig;
+        type Repo = S::Repo;
+        type Commit = S::Commit;
+        type Rev = S::Rev;
+        type Since = S::Since;
+        type Blocks = S::Blocks;
+        type Ops = S::Ops;
+        type Blobs = S::Blobs;
+        type Time = S::Time;
+    }
+    ///State transition - sets the `too_big` field to Set
+    pub struct SetTooBig<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTooBig<S> {}
+    impl<S: State> State for SetTooBig<S> {
+        type Seq = S::Seq;
+        type Rebase = S::Rebase;
+        type TooBig = Set<members::too_big>;
+        type Repo = S::Repo;
+        type Commit = S::Commit;
+        type Rev = S::Rev;
+        type Since = S::Since;
+        type Blocks = S::Blocks;
+        type Ops = S::Ops;
+        type Blobs = S::Blobs;
+        type Time = S::Time;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Seq = S::Seq;
+        type Rebase = S::Rebase;
+        type TooBig = S::TooBig;
+        type Repo = Set<members::repo>;
+        type Commit = S::Commit;
+        type Rev = S::Rev;
+        type Since = S::Since;
+        type Blocks = S::Blocks;
+        type Ops = S::Ops;
+        type Blobs = S::Blobs;
+        type Time = S::Time;
+    }
+    ///State transition - sets the `commit` field to Set
+    pub struct SetCommit<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCommit<S> {}
+    impl<S: State> State for SetCommit<S> {
+        type Seq = S::Seq;
+        type Rebase = S::Rebase;
+        type TooBig = S::TooBig;
+        type Repo = S::Repo;
+        type Commit = Set<members::commit>;
+        type Rev = S::Rev;
+        type Since = S::Since;
+        type Blocks = S::Blocks;
+        type Ops = S::Ops;
+        type Blobs = S::Blobs;
+        type Time = S::Time;
+    }
+    ///State transition - sets the `rev` field to Set
+    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRev<S> {}
+    impl<S: State> State for SetRev<S> {
+        type Seq = S::Seq;
+        type Rebase = S::Rebase;
+        type TooBig = S::TooBig;
+        type Repo = S::Repo;
+        type Commit = S::Commit;
+        type Rev = Set<members::rev>;
+        type Since = S::Since;
+        type Blocks = S::Blocks;
+        type Ops = S::Ops;
+        type Blobs = S::Blobs;
+        type Time = S::Time;
+    }
+    ///State transition - sets the `since` field to Set
+    pub struct SetSince<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSince<S> {}
+    impl<S: State> State for SetSince<S> {
+        type Seq = S::Seq;
+        type Rebase = S::Rebase;
+        type TooBig = S::TooBig;
+        type Repo = S::Repo;
+        type Commit = S::Commit;
+        type Rev = S::Rev;
+        type Since = Set<members::since>;
+        type Blocks = S::Blocks;
+        type Ops = S::Ops;
+        type Blobs = S::Blobs;
+        type Time = S::Time;
+    }
+    ///State transition - sets the `blocks` field to Set
+    pub struct SetBlocks<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlocks<S> {}
+    impl<S: State> State for SetBlocks<S> {
+        type Seq = S::Seq;
+        type Rebase = S::Rebase;
+        type TooBig = S::TooBig;
+        type Repo = S::Repo;
+        type Commit = S::Commit;
+        type Rev = S::Rev;
+        type Since = S::Since;
+        type Blocks = Set<members::blocks>;
+        type Ops = S::Ops;
+        type Blobs = S::Blobs;
+        type Time = S::Time;
+    }
+    ///State transition - sets the `ops` field to Set
+    pub struct SetOps<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOps<S> {}
+    impl<S: State> State for SetOps<S> {
+        type Seq = S::Seq;
+        type Rebase = S::Rebase;
+        type TooBig = S::TooBig;
+        type Repo = S::Repo;
+        type Commit = S::Commit;
+        type Rev = S::Rev;
+        type Since = S::Since;
+        type Blocks = S::Blocks;
+        type Ops = Set<members::ops>;
+        type Blobs = S::Blobs;
+        type Time = S::Time;
+    }
+    ///State transition - sets the `blobs` field to Set
+    pub struct SetBlobs<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlobs<S> {}
+    impl<S: State> State for SetBlobs<S> {
+        type Seq = S::Seq;
+        type Rebase = S::Rebase;
+        type TooBig = S::TooBig;
+        type Repo = S::Repo;
+        type Commit = S::Commit;
+        type Rev = S::Rev;
+        type Since = S::Since;
+        type Blocks = S::Blocks;
+        type Ops = S::Ops;
+        type Blobs = Set<members::blobs>;
+        type Time = S::Time;
+    }
+    ///State transition - sets the `time` field to Set
+    pub struct SetTime<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTime<S> {}
+    impl<S: State> State for SetTime<S> {
+        type Seq = S::Seq;
+        type Rebase = S::Rebase;
+        type TooBig = S::TooBig;
+        type Repo = S::Repo;
+        type Commit = S::Commit;
+        type Rev = S::Rev;
+        type Since = S::Since;
+        type Blocks = S::Blocks;
+        type Ops = S::Ops;
+        type Blobs = S::Blobs;
+        type Time = Set<members::time>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `seq` field
+        pub struct seq(());
+        ///Marker type for the `rebase` field
+        pub struct rebase(());
+        ///Marker type for the `too_big` field
+        pub struct too_big(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
+        ///Marker type for the `commit` field
+        pub struct commit(());
+        ///Marker type for the `rev` field
+        pub struct rev(());
+        ///Marker type for the `since` field
+        pub struct since(());
+        ///Marker type for the `blocks` field
+        pub struct blocks(());
+        ///Marker type for the `ops` field
+        pub struct ops(());
+        ///Marker type for the `blobs` field
+        pub struct blobs(());
+        ///Marker type for the `time` field
+        pub struct time(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct CommitBuilder<'a, S: commit_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<Vec<jacquard_common::types::cid::CidLink<'a>>>,
+        ::core::option::Option<bytes::Bytes>,
+        ::core::option::Option<jacquard_common::types::cid::CidLink<'a>>,
+        ::core::option::Option<
+            Vec<crate::com_atproto::sync::subscribe_repos::RepoOp<'a>>,
+        >,
+        ::core::option::Option<jacquard_common::types::cid::CidLink<'a>>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Tid>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::types::string::Tid>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<bool>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Commit<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> CommitBuilder<'a, commit_state::Empty> {
+        CommitBuilder::new()
+    }
+}
+
+impl<'a> CommitBuilder<'a, commit_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        CommitBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CommitBuilder<'a, S>
+where
+    S: commit_state::State,
+    S::Blobs: commit_state::IsUnset,
+{
+    /// Set the `blobs` field (required)
+    pub fn blobs(
+        mut self,
+        value: impl Into<Vec<jacquard_common::types::cid::CidLink<'a>>>,
+    ) -> CommitBuilder<'a, commit_state::SetBlobs<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        CommitBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CommitBuilder<'a, S>
+where
+    S: commit_state::State,
+    S::Blocks: commit_state::IsUnset,
+{
+    /// Set the `blocks` field (required)
+    pub fn blocks(
+        mut self,
+        value: impl Into<bytes::Bytes>,
+    ) -> CommitBuilder<'a, commit_state::SetBlocks<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        CommitBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CommitBuilder<'a, S>
+where
+    S: commit_state::State,
+    S::Commit: commit_state::IsUnset,
+{
+    /// Set the `commit` field (required)
+    pub fn commit(
+        mut self,
+        value: impl Into<jacquard_common::types::cid::CidLink<'a>>,
+    ) -> CommitBuilder<'a, commit_state::SetCommit<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        CommitBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CommitBuilder<'a, S>
+where
+    S: commit_state::State,
+    S::Ops: commit_state::IsUnset,
+{
+    /// Set the `ops` field (required)
+    pub fn ops(
+        mut self,
+        value: impl Into<Vec<crate::com_atproto::sync::subscribe_repos::RepoOp<'a>>>,
+    ) -> CommitBuilder<'a, commit_state::SetOps<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        CommitBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: commit_state::State> CommitBuilder<'a, S> {
+    /// Set the `prevData` field (optional)
+    pub fn prev_data(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::cid::CidLink<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `prevData` field to an Option value (optional)
+    pub fn maybe_prev_data(
+        mut self,
+        value: Option<jacquard_common::types::cid::CidLink<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S> CommitBuilder<'a, S>
+where
+    S: commit_state::State,
+    S::Rebase: commit_state::IsUnset,
+{
+    /// Set the `rebase` field (required)
+    pub fn rebase(
+        mut self,
+        value: impl Into<bool>,
+    ) -> CommitBuilder<'a, commit_state::SetRebase<S>> {
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        CommitBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CommitBuilder<'a, S>
+where
+    S: commit_state::State,
+    S::Repo: commit_state::IsUnset,
+{
+    /// Set the `repo` field (required)
+    pub fn repo(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> CommitBuilder<'a, commit_state::SetRepo<S>> {
+        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        CommitBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CommitBuilder<'a, S>
+where
+    S: commit_state::State,
+    S::Rev: commit_state::IsUnset,
+{
+    /// Set the `rev` field (required)
+    pub fn rev(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Tid>,
+    ) -> CommitBuilder<'a, commit_state::SetRev<S>> {
+        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        CommitBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CommitBuilder<'a, S>
+where
+    S: commit_state::State,
+    S::Seq: commit_state::IsUnset,
+{
+    /// Set the `seq` field (required)
+    pub fn seq(
+        mut self,
+        value: impl Into<i64>,
+    ) -> CommitBuilder<'a, commit_state::SetSeq<S>> {
+        self.__unsafe_private_named.8 = ::core::option::Option::Some(value.into());
+        CommitBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CommitBuilder<'a, S>
+where
+    S: commit_state::State,
+    S::Since: commit_state::IsUnset,
+{
+    /// Set the `since` field (required)
+    pub fn since(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Tid>,
+    ) -> CommitBuilder<'a, commit_state::SetSince<S>> {
+        self.__unsafe_private_named.9 = ::core::option::Option::Some(value.into());
+        CommitBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CommitBuilder<'a, S>
+where
+    S: commit_state::State,
+    S::Time: commit_state::IsUnset,
+{
+    /// Set the `time` field (required)
+    pub fn time(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> CommitBuilder<'a, commit_state::SetTime<S>> {
+        self.__unsafe_private_named.10 = ::core::option::Option::Some(value.into());
+        CommitBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CommitBuilder<'a, S>
+where
+    S: commit_state::State,
+    S::TooBig: commit_state::IsUnset,
+{
+    /// Set the `tooBig` field (required)
+    pub fn too_big(
+        mut self,
+        value: impl Into<bool>,
+    ) -> CommitBuilder<'a, commit_state::SetTooBig<S>> {
+        self.__unsafe_private_named.11 = ::core::option::Option::Some(value.into());
+        CommitBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CommitBuilder<'a, S>
+where
+    S: commit_state::State,
+    S::Seq: commit_state::IsSet,
+    S::Rebase: commit_state::IsSet,
+    S::TooBig: commit_state::IsSet,
+    S::Repo: commit_state::IsSet,
+    S::Commit: commit_state::IsSet,
+    S::Rev: commit_state::IsSet,
+    S::Since: commit_state::IsSet,
+    S::Blocks: commit_state::IsSet,
+    S::Ops: commit_state::IsSet,
+    S::Blobs: commit_state::IsSet,
+    S::Time: commit_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Commit<'a> {
+        Commit {
+            blobs: self.__unsafe_private_named.0.unwrap(),
+            blocks: self.__unsafe_private_named.1.unwrap(),
+            commit: self.__unsafe_private_named.2.unwrap(),
+            ops: self.__unsafe_private_named.3.unwrap(),
+            prev_data: self.__unsafe_private_named.4,
+            rebase: self.__unsafe_private_named.5.unwrap(),
+            repo: self.__unsafe_private_named.6.unwrap(),
+            rev: self.__unsafe_private_named.7.unwrap(),
+            seq: self.__unsafe_private_named.8.unwrap(),
+            since: self.__unsafe_private_named.9.unwrap(),
+            time: self.__unsafe_private_named.10.unwrap(),
+            too_big: self.__unsafe_private_named.11.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Commit<'a> {
+        Commit {
+            blobs: self.__unsafe_private_named.0.unwrap(),
+            blocks: self.__unsafe_private_named.1.unwrap(),
+            commit: self.__unsafe_private_named.2.unwrap(),
+            ops: self.__unsafe_private_named.3.unwrap(),
+            prev_data: self.__unsafe_private_named.4,
+            rebase: self.__unsafe_private_named.5.unwrap(),
+            repo: self.__unsafe_private_named.6.unwrap(),
+            rev: self.__unsafe_private_named.7.unwrap(),
+            seq: self.__unsafe_private_named.8.unwrap(),
+            since: self.__unsafe_private_named.9.unwrap(),
+            time: self.__unsafe_private_named.10.unwrap(),
+            too_big: self.__unsafe_private_named.11.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Commit<'a> {
@@ -764,8 +1577,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Commit<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Identity<'a> {
@@ -773,11 +1585,209 @@ pub struct Identity<'a> {
     pub did: jacquard_common::types::string::Did<'a>,
     /// The current handle for the account, or 'handle.invalid' if validation fails. This field is optional, might have been validated or passed-through from an upstream source. Semantics and behaviors for PDS vs Relay may evolve in the future; see atproto specs for more details.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub handle: Option<jacquard_common::types::string::Handle<'a>>,
     pub seq: i64,
     pub time: jacquard_common::types::string::Datetime,
+}
+
+pub mod identity_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Seq;
+        type Did;
+        type Time;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Seq = Unset;
+        type Did = Unset;
+        type Time = Unset;
+    }
+    ///State transition - sets the `seq` field to Set
+    pub struct SetSeq<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSeq<S> {}
+    impl<S: State> State for SetSeq<S> {
+        type Seq = Set<members::seq>;
+        type Did = S::Did;
+        type Time = S::Time;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Seq = S::Seq;
+        type Did = Set<members::did>;
+        type Time = S::Time;
+    }
+    ///State transition - sets the `time` field to Set
+    pub struct SetTime<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTime<S> {}
+    impl<S: State> State for SetTime<S> {
+        type Seq = S::Seq;
+        type Did = S::Did;
+        type Time = Set<members::time>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `seq` field
+        pub struct seq(());
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `time` field
+        pub struct time(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct IdentityBuilder<'a, S: identity_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Handle<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Identity<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> IdentityBuilder<'a, identity_state::Empty> {
+        IdentityBuilder::new()
+    }
+}
+
+impl<'a> IdentityBuilder<'a, identity_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        IdentityBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> IdentityBuilder<'a, S>
+where
+    S: identity_state::State,
+    S::Did: identity_state::IsUnset,
+{
+    /// Set the `did` field (required)
+    pub fn did(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> IdentityBuilder<'a, identity_state::SetDid<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        IdentityBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: identity_state::State> IdentityBuilder<'a, S> {
+    /// Set the `handle` field (optional)
+    pub fn handle(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Handle<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `handle` field to an Option value (optional)
+    pub fn maybe_handle(
+        mut self,
+        value: Option<jacquard_common::types::string::Handle<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> IdentityBuilder<'a, S>
+where
+    S: identity_state::State,
+    S::Seq: identity_state::IsUnset,
+{
+    /// Set the `seq` field (required)
+    pub fn seq(
+        mut self,
+        value: impl Into<i64>,
+    ) -> IdentityBuilder<'a, identity_state::SetSeq<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        IdentityBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> IdentityBuilder<'a, S>
+where
+    S: identity_state::State,
+    S::Time: identity_state::IsUnset,
+{
+    /// Set the `time` field (required)
+    pub fn time(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> IdentityBuilder<'a, identity_state::SetTime<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        IdentityBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> IdentityBuilder<'a, S>
+where
+    S: identity_state::State,
+    S::Seq: identity_state::IsSet,
+    S::Did: identity_state::IsSet,
+    S::Time: identity_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Identity<'a> {
+        Identity {
+            did: self.__unsafe_private_named.0.unwrap(),
+            handle: self.__unsafe_private_named.1,
+            seq: self.__unsafe_private_named.2.unwrap(),
+            time: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Identity<'a> {
+        Identity {
+            did: self.__unsafe_private_named.0.unwrap(),
+            handle: self.__unsafe_private_named.1,
+            seq: self.__unsafe_private_named.2.unwrap(),
+            time: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Identity<'a> {
@@ -841,14 +1851,79 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Info<'a> {
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct SubscribeRepos {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub cursor: std::option::Option<i64>,
+}
+
+pub mod subscribe_repos_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {}
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {}
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {}
+}
+
+/// Builder for constructing an instance of this type
+pub struct SubscribeReposBuilder<S: subscribe_repos_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (::core::option::Option<i64>,),
+}
+
+impl SubscribeRepos {
+    /// Create a new builder for this type
+    pub fn new() -> SubscribeReposBuilder<subscribe_repos_state::Empty> {
+        SubscribeReposBuilder::new()
+    }
+}
+
+impl SubscribeReposBuilder<subscribe_repos_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        SubscribeReposBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+        }
+    }
+}
+
+impl<S: subscribe_repos_state::State> SubscribeReposBuilder<S> {
+    /// Set the `cursor` field (optional)
+    pub fn cursor(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `cursor` field to an Option value (optional)
+    pub fn maybe_cursor(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<S> SubscribeReposBuilder<S>
+where
+    S: subscribe_repos_state::State,
+{
+    /// Build the final struct
+    pub fn build(self) -> SubscribeRepos {
+        SubscribeRepos {
+            cursor: self.__unsafe_private_named.0,
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -996,25 +2071,220 @@ impl jacquard_common::xrpc::SubscriptionEndpoint for SubscribeReposEndpoint {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RepoOp<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub action: jacquard_common::CowStr<'a>,
     /// For creates and updates, the new record CID. For deletions, null.
     #[serde(borrow)]
     pub cid: jacquard_common::types::cid::CidLink<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub path: jacquard_common::CowStr<'a>,
     /// For updates and deletes, the previous record CID (required for inductive firehose). For creations, field should not be defined.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub prev: Option<jacquard_common::types::cid::CidLink<'a>>,
+}
+
+pub mod repo_op_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Action;
+        type Path;
+        type Cid;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Action = Unset;
+        type Path = Unset;
+        type Cid = Unset;
+    }
+    ///State transition - sets the `action` field to Set
+    pub struct SetAction<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAction<S> {}
+    impl<S: State> State for SetAction<S> {
+        type Action = Set<members::action>;
+        type Path = S::Path;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `path` field to Set
+    pub struct SetPath<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPath<S> {}
+    impl<S: State> State for SetPath<S> {
+        type Action = S::Action;
+        type Path = Set<members::path>;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Action = S::Action;
+        type Path = S::Path;
+        type Cid = Set<members::cid>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `action` field
+        pub struct action(());
+        ///Marker type for the `path` field
+        pub struct path(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct RepoOpBuilder<'a, S: repo_op_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::cid::CidLink<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::cid::CidLink<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> RepoOp<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> RepoOpBuilder<'a, repo_op_state::Empty> {
+        RepoOpBuilder::new()
+    }
+}
+
+impl<'a> RepoOpBuilder<'a, repo_op_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        RepoOpBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RepoOpBuilder<'a, S>
+where
+    S: repo_op_state::State,
+    S::Action: repo_op_state::IsUnset,
+{
+    /// Set the `action` field (required)
+    pub fn action(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> RepoOpBuilder<'a, repo_op_state::SetAction<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        RepoOpBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RepoOpBuilder<'a, S>
+where
+    S: repo_op_state::State,
+    S::Cid: repo_op_state::IsUnset,
+{
+    /// Set the `cid` field (required)
+    pub fn cid(
+        mut self,
+        value: impl Into<jacquard_common::types::cid::CidLink<'a>>,
+    ) -> RepoOpBuilder<'a, repo_op_state::SetCid<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        RepoOpBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RepoOpBuilder<'a, S>
+where
+    S: repo_op_state::State,
+    S::Path: repo_op_state::IsUnset,
+{
+    /// Set the `path` field (required)
+    pub fn path(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> RepoOpBuilder<'a, repo_op_state::SetPath<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        RepoOpBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: repo_op_state::State> RepoOpBuilder<'a, S> {
+    /// Set the `prev` field (optional)
+    pub fn prev(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::cid::CidLink<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `prev` field to an Option value (optional)
+    pub fn maybe_prev(
+        mut self,
+        value: Option<jacquard_common::types::cid::CidLink<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S> RepoOpBuilder<'a, S>
+where
+    S: repo_op_state::State,
+    S::Action: repo_op_state::IsSet,
+    S::Path: repo_op_state::IsSet,
+    S::Cid: repo_op_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> RepoOp<'a> {
+        RepoOp {
+            action: self.__unsafe_private_named.0.unwrap(),
+            cid: self.__unsafe_private_named.1.unwrap(),
+            path: self.__unsafe_private_named.2.unwrap(),
+            prev: self.__unsafe_private_named.3,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> RepoOp<'a> {
+        RepoOp {
+            action: self.__unsafe_private_named.0.unwrap(),
+            cid: self.__unsafe_private_named.1.unwrap(),
+            path: self.__unsafe_private_named.2.unwrap(),
+            prev: self.__unsafe_private_named.3,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RepoOp<'a> {
@@ -1043,8 +2313,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RepoOp<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Sync<'a> {
@@ -1055,12 +2324,268 @@ pub struct Sync<'a> {
     pub did: jacquard_common::types::string::Did<'a>,
     /// The rev of the commit. This value must match that in the commit object.
     #[serde(borrow)]
-    #[builder(into)]
     pub rev: jacquard_common::CowStr<'a>,
     /// The stream sequence number of this message.
     pub seq: i64,
     /// Timestamp of when this message was originally broadcast.
     pub time: jacquard_common::types::string::Datetime,
+}
+
+pub mod sync_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Seq;
+        type Did;
+        type Blocks;
+        type Rev;
+        type Time;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Seq = Unset;
+        type Did = Unset;
+        type Blocks = Unset;
+        type Rev = Unset;
+        type Time = Unset;
+    }
+    ///State transition - sets the `seq` field to Set
+    pub struct SetSeq<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSeq<S> {}
+    impl<S: State> State for SetSeq<S> {
+        type Seq = Set<members::seq>;
+        type Did = S::Did;
+        type Blocks = S::Blocks;
+        type Rev = S::Rev;
+        type Time = S::Time;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Seq = S::Seq;
+        type Did = Set<members::did>;
+        type Blocks = S::Blocks;
+        type Rev = S::Rev;
+        type Time = S::Time;
+    }
+    ///State transition - sets the `blocks` field to Set
+    pub struct SetBlocks<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlocks<S> {}
+    impl<S: State> State for SetBlocks<S> {
+        type Seq = S::Seq;
+        type Did = S::Did;
+        type Blocks = Set<members::blocks>;
+        type Rev = S::Rev;
+        type Time = S::Time;
+    }
+    ///State transition - sets the `rev` field to Set
+    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRev<S> {}
+    impl<S: State> State for SetRev<S> {
+        type Seq = S::Seq;
+        type Did = S::Did;
+        type Blocks = S::Blocks;
+        type Rev = Set<members::rev>;
+        type Time = S::Time;
+    }
+    ///State transition - sets the `time` field to Set
+    pub struct SetTime<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTime<S> {}
+    impl<S: State> State for SetTime<S> {
+        type Seq = S::Seq;
+        type Did = S::Did;
+        type Blocks = S::Blocks;
+        type Rev = S::Rev;
+        type Time = Set<members::time>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `seq` field
+        pub struct seq(());
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `blocks` field
+        pub struct blocks(());
+        ///Marker type for the `rev` field
+        pub struct rev(());
+        ///Marker type for the `time` field
+        pub struct time(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct SyncBuilder<'a, S: sync_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<bytes::Bytes>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Sync<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> SyncBuilder<'a, sync_state::Empty> {
+        SyncBuilder::new()
+    }
+}
+
+impl<'a> SyncBuilder<'a, sync_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        SyncBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SyncBuilder<'a, S>
+where
+    S: sync_state::State,
+    S::Blocks: sync_state::IsUnset,
+{
+    /// Set the `blocks` field (required)
+    pub fn blocks(
+        mut self,
+        value: impl Into<bytes::Bytes>,
+    ) -> SyncBuilder<'a, sync_state::SetBlocks<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        SyncBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SyncBuilder<'a, S>
+where
+    S: sync_state::State,
+    S::Did: sync_state::IsUnset,
+{
+    /// Set the `did` field (required)
+    pub fn did(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> SyncBuilder<'a, sync_state::SetDid<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        SyncBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SyncBuilder<'a, S>
+where
+    S: sync_state::State,
+    S::Rev: sync_state::IsUnset,
+{
+    /// Set the `rev` field (required)
+    pub fn rev(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> SyncBuilder<'a, sync_state::SetRev<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        SyncBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SyncBuilder<'a, S>
+where
+    S: sync_state::State,
+    S::Seq: sync_state::IsUnset,
+{
+    /// Set the `seq` field (required)
+    pub fn seq(
+        mut self,
+        value: impl Into<i64>,
+    ) -> SyncBuilder<'a, sync_state::SetSeq<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        SyncBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SyncBuilder<'a, S>
+where
+    S: sync_state::State,
+    S::Time: sync_state::IsUnset,
+{
+    /// Set the `time` field (required)
+    pub fn time(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> SyncBuilder<'a, sync_state::SetTime<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        SyncBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SyncBuilder<'a, S>
+where
+    S: sync_state::State,
+    S::Seq: sync_state::IsSet,
+    S::Did: sync_state::IsSet,
+    S::Blocks: sync_state::IsSet,
+    S::Rev: sync_state::IsSet,
+    S::Time: sync_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Sync<'a> {
+        Sync {
+            blocks: self.__unsafe_private_named.0.unwrap(),
+            did: self.__unsafe_private_named.1.unwrap(),
+            rev: self.__unsafe_private_named.2.unwrap(),
+            seq: self.__unsafe_private_named.3.unwrap(),
+            time: self.__unsafe_private_named.4.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Sync<'a> {
+        Sync {
+            blocks: self.__unsafe_private_named.0.unwrap(),
+            did: self.__unsafe_private_named.1.unwrap(),
+            rev: self.__unsafe_private_named.2.unwrap(),
+            seq: self.__unsafe_private_named.3.unwrap(),
+            time: self.__unsafe_private_named.4.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sync<'a> {

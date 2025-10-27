@@ -13,18 +13,171 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AppPassword<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(borrow)]
-    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub privileged: Option<bool>,
+}
+
+pub mod app_password_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Name;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Name = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Name = Set<members::name>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Name = S::Name;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct AppPasswordBuilder<'a, S: app_password_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<bool>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> AppPassword<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> AppPasswordBuilder<'a, app_password_state::Empty> {
+        AppPasswordBuilder::new()
+    }
+}
+
+impl<'a> AppPasswordBuilder<'a, app_password_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        AppPasswordBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AppPasswordBuilder<'a, S>
+where
+    S: app_password_state::State,
+    S::CreatedAt: app_password_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> AppPasswordBuilder<'a, app_password_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        AppPasswordBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AppPasswordBuilder<'a, S>
+where
+    S: app_password_state::State,
+    S::Name: app_password_state::IsUnset,
+{
+    /// Set the `name` field (required)
+    pub fn name(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> AppPasswordBuilder<'a, app_password_state::SetName<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        AppPasswordBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: app_password_state::State> AppPasswordBuilder<'a, S> {
+    /// Set the `privileged` field (optional)
+    pub fn privileged(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `privileged` field to an Option value (optional)
+    pub fn maybe_privileged(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> AppPasswordBuilder<'a, S>
+where
+    S: app_password_state::State,
+    S::Name: app_password_state::IsSet,
+    S::CreatedAt: app_password_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> AppPassword<'a> {
+        AppPassword {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            name: self.__unsafe_private_named.1.unwrap(),
+            privileged: self.__unsafe_private_named.2,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> AppPassword<'a> {
+        AppPassword {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            name: self.__unsafe_private_named.1.unwrap(),
+            privileged: self.__unsafe_private_named.2,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_com_atproto_server_listAppPasswords() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -143,7 +296,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AppPassword<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct ListAppPasswordsOutput<'a> {
     #[serde(borrow)]
-    pub passwords: Vec<jacquard_common::types::value::Data<'a>>,
+    pub passwords: Vec<crate::com_atproto::server::list_app_passwords::AppPassword<'a>>,
 }
 
 #[jacquard_derive::open_union]

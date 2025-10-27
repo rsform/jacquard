@@ -274,25 +274,21 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContentTypes<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Mute<'a> {
     /// Types of content to mute from this account
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub content_types: Option<crate::net_anisota::graph::mute::ContentTypes<'a>>,
     /// When the mute was created
     pub created_at: jacquard_common::types::string::Datetime,
     /// When this mute expires. If not set, mute is permanent
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub expires_at: Option<jacquard_common::types::string::Datetime>,
     /// Optional reason for muting this account
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub reason: Option<jacquard_common::CowStr<'a>>,
     /// DID of the account to mute
@@ -300,9 +296,233 @@ pub struct Mute<'a> {
     pub subject: jacquard_common::types::string::Did<'a>,
     /// Specific feeds where this mute should apply. If empty, applies to all feeds
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub target_feeds: Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
+}
+
+pub mod mute_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Subject;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Subject = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type Subject = Set<members::subject>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Subject = S::Subject;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `subject` field
+        pub struct subject(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct MuteBuilder<'a, S: mute_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<crate::net_anisota::graph::mute::ContentTypes<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Mute<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> MuteBuilder<'a, mute_state::Empty> {
+        MuteBuilder::new()
+    }
+}
+
+impl<'a> MuteBuilder<'a, mute_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        MuteBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: mute_state::State> MuteBuilder<'a, S> {
+    /// Set the `contentTypes` field (optional)
+    pub fn content_types(
+        mut self,
+        value: impl Into<Option<crate::net_anisota::graph::mute::ContentTypes<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `contentTypes` field to an Option value (optional)
+    pub fn maybe_content_types(
+        mut self,
+        value: Option<crate::net_anisota::graph::mute::ContentTypes<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> MuteBuilder<'a, S>
+where
+    S: mute_state::State,
+    S::CreatedAt: mute_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> MuteBuilder<'a, mute_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        MuteBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: mute_state::State> MuteBuilder<'a, S> {
+    /// Set the `expiresAt` field (optional)
+    pub fn expires_at(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `expiresAt` field to an Option value (optional)
+    pub fn maybe_expires_at(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: mute_state::State> MuteBuilder<'a, S> {
+    /// Set the `reason` field (optional)
+    pub fn reason(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `reason` field to an Option value (optional)
+    pub fn maybe_reason(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S> MuteBuilder<'a, S>
+where
+    S: mute_state::State,
+    S::Subject: mute_state::IsUnset,
+{
+    /// Set the `subject` field (required)
+    pub fn subject(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> MuteBuilder<'a, mute_state::SetSubject<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        MuteBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: mute_state::State> MuteBuilder<'a, S> {
+    /// Set the `targetFeeds` field (optional)
+    pub fn target_feeds(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::types::string::AtUri<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `targetFeeds` field to an Option value (optional)
+    pub fn maybe_target_feeds(
+        mut self,
+        value: Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S> MuteBuilder<'a, S>
+where
+    S: mute_state::State,
+    S::Subject: mute_state::IsSet,
+    S::CreatedAt: mute_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Mute<'a> {
+        Mute {
+            content_types: self.__unsafe_private_named.0,
+            created_at: self.__unsafe_private_named.1.unwrap(),
+            expires_at: self.__unsafe_private_named.2,
+            reason: self.__unsafe_private_named.3,
+            subject: self.__unsafe_private_named.4.unwrap(),
+            target_feeds: self.__unsafe_private_named.5,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Mute<'a> {
+        Mute {
+            content_types: self.__unsafe_private_named.0,
+            created_at: self.__unsafe_private_named.1.unwrap(),
+            expires_at: self.__unsafe_private_named.2,
+            reason: self.__unsafe_private_named.3,
+            subject: self.__unsafe_private_named.4.unwrap(),
+            target_feeds: self.__unsafe_private_named.5,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Mute<'a> {

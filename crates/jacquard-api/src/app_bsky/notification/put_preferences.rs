@@ -13,20 +13,114 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-#[builder(start_fn = new)]
 pub struct PutPreferences<'a> {
     pub priority: bool,
-    #[serde(flatten)]
-    #[serde(borrow)]
-    #[builder(default)]
-    pub extra_data: ::std::collections::BTreeMap<
-        ::jacquard_common::smol_str::SmolStr,
-        ::jacquard_common::types::value::Data<'a>,
-    >,
+}
+
+pub mod put_preferences_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Priority;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Priority = Unset;
+    }
+    ///State transition - sets the `priority` field to Set
+    pub struct SetPriority<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPriority<S> {}
+    impl<S: State> State for SetPriority<S> {
+        type Priority = Set<members::priority>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `priority` field
+        pub struct priority(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct PutPreferencesBuilder<'a, S: put_preferences_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (::core::option::Option<bool>,),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> PutPreferences<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> PutPreferencesBuilder<'a, put_preferences_state::Empty> {
+        PutPreferencesBuilder::new()
+    }
+}
+
+impl<'a> PutPreferencesBuilder<'a, put_preferences_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        PutPreferencesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PutPreferencesBuilder<'a, S>
+where
+    S: put_preferences_state::State,
+    S::Priority: put_preferences_state::IsUnset,
+{
+    /// Set the `priority` field (required)
+    pub fn priority(
+        mut self,
+        value: impl Into<bool>,
+    ) -> PutPreferencesBuilder<'a, put_preferences_state::SetPriority<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        PutPreferencesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PutPreferencesBuilder<'a, S>
+where
+    S: put_preferences_state::State,
+    S::Priority: put_preferences_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> PutPreferences<'a> {
+        PutPreferences {
+            priority: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> PutPreferences<'a> {
+        PutPreferences {
+            priority: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 /// Response type for

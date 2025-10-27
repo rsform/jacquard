@@ -13,27 +13,144 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-#[builder(start_fn = new)]
 pub struct RevokeVerifications<'a> {
     /// Reason for revoking the verification. This is optional and can be omitted if not needed.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub revoke_reason: Option<jacquard_common::CowStr<'a>>,
     /// Array of verification record uris to revoke
     #[serde(borrow)]
     pub uris: Vec<jacquard_common::types::string::AtUri<'a>>,
-    #[serde(flatten)]
-    #[serde(borrow)]
-    #[builder(default)]
-    pub extra_data: ::std::collections::BTreeMap<
-        ::jacquard_common::smol_str::SmolStr,
-        ::jacquard_common::types::value::Data<'a>,
-    >,
+}
+
+pub mod revoke_verifications_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Uris;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Uris = Unset;
+    }
+    ///State transition - sets the `uris` field to Set
+    pub struct SetUris<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUris<S> {}
+    impl<S: State> State for SetUris<S> {
+        type Uris = Set<members::uris>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `uris` field
+        pub struct uris(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct RevokeVerificationsBuilder<'a, S: revoke_verifications_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> RevokeVerifications<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> RevokeVerificationsBuilder<'a, revoke_verifications_state::Empty> {
+        RevokeVerificationsBuilder::new()
+    }
+}
+
+impl<'a> RevokeVerificationsBuilder<'a, revoke_verifications_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        RevokeVerificationsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: revoke_verifications_state::State> RevokeVerificationsBuilder<'a, S> {
+    /// Set the `revokeReason` field (optional)
+    pub fn revoke_reason(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `revokeReason` field to an Option value (optional)
+    pub fn maybe_revoke_reason(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> RevokeVerificationsBuilder<'a, S>
+where
+    S: revoke_verifications_state::State,
+    S::Uris: revoke_verifications_state::IsUnset,
+{
+    /// Set the `uris` field (required)
+    pub fn uris(
+        mut self,
+        value: impl Into<Vec<jacquard_common::types::string::AtUri<'a>>>,
+    ) -> RevokeVerificationsBuilder<'a, revoke_verifications_state::SetUris<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        RevokeVerificationsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RevokeVerificationsBuilder<'a, S>
+where
+    S: revoke_verifications_state::State,
+    S::Uris: revoke_verifications_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> RevokeVerifications<'a> {
+        RevokeVerifications {
+            revoke_reason: self.__unsafe_private_named.0,
+            uris: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> RevokeVerifications<'a> {
+        RevokeVerifications {
+            revoke_reason: self.__unsafe_private_named.0,
+            uris: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]
@@ -50,7 +167,9 @@ pub struct RevokeVerifications<'a> {
 pub struct RevokeVerificationsOutput<'a> {
     /// List of verification uris that couldn't be revoked, including failure reasons
     #[serde(borrow)]
-    pub failed_revocations: Vec<jacquard_common::types::value::Data<'a>>,
+    pub failed_revocations: Vec<
+        crate::tools_ozone::verification::revoke_verifications::RevokeError<'a>,
+    >,
     /// List of verification uris successfully revoked
     #[serde(borrow)]
     pub revoked_verifications: Vec<jacquard_common::types::string::AtUri<'a>>,
@@ -95,18 +214,156 @@ impl jacquard_common::xrpc::XrpcEndpoint for RevokeVerificationsRequest {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RevokeError<'a> {
     /// Description of the error that occurred during revocation.
     #[serde(borrow)]
-    #[builder(into)]
     pub error: jacquard_common::CowStr<'a>,
     /// The AT-URI of the verification record that failed to revoke.
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+pub mod revoke_error_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Uri;
+        type Error;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Uri = Unset;
+        type Error = Unset;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Uri = Set<members::uri>;
+        type Error = S::Error;
+    }
+    ///State transition - sets the `error` field to Set
+    pub struct SetError<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetError<S> {}
+    impl<S: State> State for SetError<S> {
+        type Uri = S::Uri;
+        type Error = Set<members::error>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `error` field
+        pub struct error(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct RevokeErrorBuilder<'a, S: revoke_error_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> RevokeError<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> RevokeErrorBuilder<'a, revoke_error_state::Empty> {
+        RevokeErrorBuilder::new()
+    }
+}
+
+impl<'a> RevokeErrorBuilder<'a, revoke_error_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        RevokeErrorBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RevokeErrorBuilder<'a, S>
+where
+    S: revoke_error_state::State,
+    S::Error: revoke_error_state::IsUnset,
+{
+    /// Set the `error` field (required)
+    pub fn error(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> RevokeErrorBuilder<'a, revoke_error_state::SetError<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        RevokeErrorBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RevokeErrorBuilder<'a, S>
+where
+    S: revoke_error_state::State,
+    S::Uri: revoke_error_state::IsUnset,
+{
+    /// Set the `uri` field (required)
+    pub fn uri(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> RevokeErrorBuilder<'a, revoke_error_state::SetUri<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        RevokeErrorBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RevokeErrorBuilder<'a, S>
+where
+    S: revoke_error_state::State,
+    S::Uri: revoke_error_state::IsSet,
+    S::Error: revoke_error_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> RevokeError<'a> {
+        RevokeError {
+            error: self.__unsafe_private_named.0.unwrap(),
+            uri: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> RevokeError<'a> {
+        RevokeError {
+            error: self.__unsafe_private_named.0.unwrap(),
+            uri: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_tools_ozone_verification_revokeVerifications() -> ::jacquard_lexicon::lexicon::LexiconDoc<

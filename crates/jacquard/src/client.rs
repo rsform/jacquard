@@ -733,7 +733,7 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
             use jacquard_api::com_atproto::repo::upload_blob::UploadBlob;
 
             let bytes = data.into();
-            let request = UploadBlob::new().body(bytes).build();
+            let request = UploadBlob { body: bytes };
 
             // Override Content-Type header with actual mime type instead of */*
             let mut opts = self.opts().await;

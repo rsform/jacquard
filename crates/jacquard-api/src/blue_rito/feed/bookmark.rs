@@ -381,8 +381,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Locale<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Bookmark<'a> {
@@ -392,26 +391,287 @@ pub struct Bookmark<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     /// OGP Description
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub ogp_description: Option<jacquard_common::CowStr<'a>>,
     /// OGP Image Uri
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub ogp_image: Option<jacquard_common::types::string::Uri<'a>>,
     /// OGP Title
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub ogp_title: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::Uri<'a>,
     /// Tags describing the uri's description (max 10 tags, 25 charactors)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub tags: Option<Vec<jacquard_common::CowStr<'a>>>,
+}
+
+pub mod bookmark_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Comments;
+        type Subject;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Comments = Unset;
+        type Subject = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `comments` field to Set
+    pub struct SetComments<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetComments<S> {}
+    impl<S: State> State for SetComments<S> {
+        type Comments = Set<members::comments>;
+        type Subject = S::Subject;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type Comments = S::Comments;
+        type Subject = Set<members::subject>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Comments = S::Comments;
+        type Subject = S::Subject;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `comments` field
+        pub struct comments(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct BookmarkBuilder<'a, S: bookmark_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<Vec<crate::blue_rito::feed::bookmark::Locale<'a>>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Bookmark<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> BookmarkBuilder<'a, bookmark_state::Empty> {
+        BookmarkBuilder::new()
+    }
+}
+
+impl<'a> BookmarkBuilder<'a, bookmark_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        BookmarkBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BookmarkBuilder<'a, S>
+where
+    S: bookmark_state::State,
+    S::Comments: bookmark_state::IsUnset,
+{
+    /// Set the `comments` field (required)
+    pub fn comments(
+        mut self,
+        value: impl Into<Vec<crate::blue_rito::feed::bookmark::Locale<'a>>>,
+    ) -> BookmarkBuilder<'a, bookmark_state::SetComments<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        BookmarkBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BookmarkBuilder<'a, S>
+where
+    S: bookmark_state::State,
+    S::CreatedAt: bookmark_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> BookmarkBuilder<'a, bookmark_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        BookmarkBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: bookmark_state::State> BookmarkBuilder<'a, S> {
+    /// Set the `ogpDescription` field (optional)
+    pub fn ogp_description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `ogpDescription` field to an Option value (optional)
+    pub fn maybe_ogp_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: bookmark_state::State> BookmarkBuilder<'a, S> {
+    /// Set the `ogpImage` field (optional)
+    pub fn ogp_image(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `ogpImage` field to an Option value (optional)
+    pub fn maybe_ogp_image(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: bookmark_state::State> BookmarkBuilder<'a, S> {
+    /// Set the `ogpTitle` field (optional)
+    pub fn ogp_title(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `ogpTitle` field to an Option value (optional)
+    pub fn maybe_ogp_title(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S> BookmarkBuilder<'a, S>
+where
+    S: bookmark_state::State,
+    S::Subject: bookmark_state::IsUnset,
+{
+    /// Set the `subject` field (required)
+    pub fn subject(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+    ) -> BookmarkBuilder<'a, bookmark_state::SetSubject<S>> {
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        BookmarkBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: bookmark_state::State> BookmarkBuilder<'a, S> {
+    /// Set the `tags` field (optional)
+    pub fn tags(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `tags` field to an Option value (optional)
+    pub fn maybe_tags(
+        mut self,
+        value: Option<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S> BookmarkBuilder<'a, S>
+where
+    S: bookmark_state::State,
+    S::Comments: bookmark_state::IsSet,
+    S::Subject: bookmark_state::IsSet,
+    S::CreatedAt: bookmark_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Bookmark<'a> {
+        Bookmark {
+            comments: self.__unsafe_private_named.0.unwrap(),
+            created_at: self.__unsafe_private_named.1.unwrap(),
+            ogp_description: self.__unsafe_private_named.2,
+            ogp_image: self.__unsafe_private_named.3,
+            ogp_title: self.__unsafe_private_named.4,
+            subject: self.__unsafe_private_named.5.unwrap(),
+            tags: self.__unsafe_private_named.6,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Bookmark<'a> {
+        Bookmark {
+            comments: self.__unsafe_private_named.0.unwrap(),
+            created_at: self.__unsafe_private_named.1.unwrap(),
+            ogp_description: self.__unsafe_private_named.2,
+            ogp_image: self.__unsafe_private_named.3,
+            ogp_title: self.__unsafe_private_named.4,
+            subject: self.__unsafe_private_named.5.unwrap(),
+            tags: self.__unsafe_private_named.6,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Bookmark<'a> {

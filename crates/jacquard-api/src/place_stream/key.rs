@@ -14,8 +14,7 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Key<'a> {
@@ -23,13 +22,173 @@ pub struct Key<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     /// The name of the client that created this key.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub created_by: Option<jacquard_common::CowStr<'a>>,
     /// The did:key signing key for the stream.
     #[serde(borrow)]
-    #[builder(into)]
     pub signing_key: jacquard_common::CowStr<'a>,
+}
+
+pub mod key_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type SigningKey;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type SigningKey = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `signing_key` field to Set
+    pub struct SetSigningKey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSigningKey<S> {}
+    impl<S: State> State for SetSigningKey<S> {
+        type SigningKey = Set<members::signing_key>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type SigningKey = S::SigningKey;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `signing_key` field
+        pub struct signing_key(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct KeyBuilder<'a, S: key_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Key<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> KeyBuilder<'a, key_state::Empty> {
+        KeyBuilder::new()
+    }
+}
+
+impl<'a> KeyBuilder<'a, key_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        KeyBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> KeyBuilder<'a, S>
+where
+    S: key_state::State,
+    S::CreatedAt: key_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> KeyBuilder<'a, key_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        KeyBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: key_state::State> KeyBuilder<'a, S> {
+    /// Set the `createdBy` field (optional)
+    pub fn created_by(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `createdBy` field to an Option value (optional)
+    pub fn maybe_created_by(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> KeyBuilder<'a, S>
+where
+    S: key_state::State,
+    S::SigningKey: key_state::IsUnset,
+{
+    /// Set the `signingKey` field (required)
+    pub fn signing_key(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> KeyBuilder<'a, key_state::SetSigningKey<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        KeyBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> KeyBuilder<'a, S>
+where
+    S: key_state::State,
+    S::SigningKey: key_state::IsSet,
+    S::CreatedAt: key_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Key<'a> {
+        Key {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            created_by: self.__unsafe_private_named.1,
+            signing_key: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Key<'a> {
+        Key {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            created_by: self.__unsafe_private_named.1,
+            signing_key: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Key<'a> {

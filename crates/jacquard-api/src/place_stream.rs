@@ -24,8 +24,7 @@ pub mod server;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BlockView<'a> {
@@ -38,6 +37,263 @@ pub struct BlockView<'a> {
     pub record: crate::app_bsky::graph::block::Block<'a>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+pub mod block_view_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Uri;
+        type Cid;
+        type Blocker;
+        type Record;
+        type IndexedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Uri = Unset;
+        type Cid = Unset;
+        type Blocker = Unset;
+        type Record = Unset;
+        type IndexedAt = Unset;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Uri = Set<members::uri>;
+        type Cid = S::Cid;
+        type Blocker = S::Blocker;
+        type Record = S::Record;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Uri = S::Uri;
+        type Cid = Set<members::cid>;
+        type Blocker = S::Blocker;
+        type Record = S::Record;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `blocker` field to Set
+    pub struct SetBlocker<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlocker<S> {}
+    impl<S: State> State for SetBlocker<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Blocker = Set<members::blocker>;
+        type Record = S::Record;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecord<S> {}
+    impl<S: State> State for SetRecord<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Blocker = S::Blocker;
+        type Record = Set<members::record>;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Blocker = S::Blocker;
+        type Record = S::Record;
+        type IndexedAt = Set<members::indexed_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `blocker` field
+        pub struct blocker(());
+        ///Marker type for the `record` field
+        pub struct record(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct BlockViewBuilder<'a, S: block_view_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<crate::app_bsky::actor::ProfileViewBasic<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<crate::app_bsky::graph::block::Block<'a>>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> BlockView<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> BlockViewBuilder<'a, block_view_state::Empty> {
+        BlockViewBuilder::new()
+    }
+}
+
+impl<'a> BlockViewBuilder<'a, block_view_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        BlockViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BlockViewBuilder<'a, S>
+where
+    S: block_view_state::State,
+    S::Blocker: block_view_state::IsUnset,
+{
+    /// Set the `blocker` field (required)
+    pub fn blocker(
+        mut self,
+        value: impl Into<crate::app_bsky::actor::ProfileViewBasic<'a>>,
+    ) -> BlockViewBuilder<'a, block_view_state::SetBlocker<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        BlockViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BlockViewBuilder<'a, S>
+where
+    S: block_view_state::State,
+    S::Cid: block_view_state::IsUnset,
+{
+    /// Set the `cid` field (required)
+    pub fn cid(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Cid<'a>>,
+    ) -> BlockViewBuilder<'a, block_view_state::SetCid<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        BlockViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BlockViewBuilder<'a, S>
+where
+    S: block_view_state::State,
+    S::IndexedAt: block_view_state::IsUnset,
+{
+    /// Set the `indexedAt` field (required)
+    pub fn indexed_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> BlockViewBuilder<'a, block_view_state::SetIndexedAt<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        BlockViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BlockViewBuilder<'a, S>
+where
+    S: block_view_state::State,
+    S::Record: block_view_state::IsUnset,
+{
+    /// Set the `record` field (required)
+    pub fn record(
+        mut self,
+        value: impl Into<crate::app_bsky::graph::block::Block<'a>>,
+    ) -> BlockViewBuilder<'a, block_view_state::SetRecord<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        BlockViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BlockViewBuilder<'a, S>
+where
+    S: block_view_state::State,
+    S::Uri: block_view_state::IsUnset,
+{
+    /// Set the `uri` field (required)
+    pub fn uri(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> BlockViewBuilder<'a, block_view_state::SetUri<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        BlockViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BlockViewBuilder<'a, S>
+where
+    S: block_view_state::State,
+    S::Uri: block_view_state::IsSet,
+    S::Cid: block_view_state::IsSet,
+    S::Blocker: block_view_state::IsSet,
+    S::Record: block_view_state::IsSet,
+    S::IndexedAt: block_view_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> BlockView<'a> {
+        BlockView {
+            blocker: self.__unsafe_private_named.0.unwrap(),
+            cid: self.__unsafe_private_named.1.unwrap(),
+            indexed_at: self.__unsafe_private_named.2.unwrap(),
+            record: self.__unsafe_private_named.3.unwrap(),
+            uri: self.__unsafe_private_named.4.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> BlockView<'a> {
+        BlockView {
+            blocker: self.__unsafe_private_named.0.unwrap(),
+            cid: self.__unsafe_private_named.1.unwrap(),
+            indexed_at: self.__unsafe_private_named.2.unwrap(),
+            record: self.__unsafe_private_named.3.unwrap(),
+            uri: self.__unsafe_private_named.4.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_place_stream_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
@@ -265,13 +521,117 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Rendition<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Renditions<'a> {
     #[serde(borrow)]
     pub renditions: Vec<crate::place_stream::Rendition<'a>>,
+}
+
+pub mod renditions_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Renditions;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Renditions = Unset;
+    }
+    ///State transition - sets the `renditions` field to Set
+    pub struct SetRenditions<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRenditions<S> {}
+    impl<S: State> State for SetRenditions<S> {
+        type Renditions = Set<members::renditions>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `renditions` field
+        pub struct renditions(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct RenditionsBuilder<'a, S: renditions_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<Vec<crate::place_stream::Rendition<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Renditions<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> RenditionsBuilder<'a, renditions_state::Empty> {
+        RenditionsBuilder::new()
+    }
+}
+
+impl<'a> RenditionsBuilder<'a, renditions_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        RenditionsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RenditionsBuilder<'a, S>
+where
+    S: renditions_state::State,
+    S::Renditions: renditions_state::IsUnset,
+{
+    /// Set the `renditions` field (required)
+    pub fn renditions(
+        mut self,
+        value: impl Into<Vec<crate::place_stream::Rendition<'a>>>,
+    ) -> RenditionsBuilder<'a, renditions_state::SetRenditions<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        RenditionsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RenditionsBuilder<'a, S>
+where
+    S: renditions_state::State,
+    S::Renditions: renditions_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Renditions<'a> {
+        Renditions {
+            renditions: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Renditions<'a> {
+        Renditions {
+            renditions: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Renditions<'a> {

@@ -13,11 +13,9 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-#[builder(start_fn = new)]
 pub struct EmitEvent<'a> {
     #[serde(borrow)]
     pub created_by: jacquard_common::types::string::Did<'a>,
@@ -25,26 +23,259 @@ pub struct EmitEvent<'a> {
     pub event: EmitEventEvent<'a>,
     /// An optional external ID for the event, used to deduplicate events from external systems. Fails when an event of same type with the same external ID exists for the same subject.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub external_id: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub mod_tool: Option<crate::tools_ozone::moderation::ModTool<'a>>,
     #[serde(borrow)]
     pub subject: EmitEventSubject<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub subject_blob_cids: Option<Vec<jacquard_common::types::string::Cid<'a>>>,
-    #[serde(flatten)]
-    #[serde(borrow)]
-    #[builder(default)]
-    pub extra_data: ::std::collections::BTreeMap<
-        ::jacquard_common::smol_str::SmolStr,
-        ::jacquard_common::types::value::Data<'a>,
-    >,
+}
+
+pub mod emit_event_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Event;
+        type Subject;
+        type CreatedBy;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Event = Unset;
+        type Subject = Unset;
+        type CreatedBy = Unset;
+    }
+    ///State transition - sets the `event` field to Set
+    pub struct SetEvent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEvent<S> {}
+    impl<S: State> State for SetEvent<S> {
+        type Event = Set<members::event>;
+        type Subject = S::Subject;
+        type CreatedBy = S::CreatedBy;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type Event = S::Event;
+        type Subject = Set<members::subject>;
+        type CreatedBy = S::CreatedBy;
+    }
+    ///State transition - sets the `created_by` field to Set
+    pub struct SetCreatedBy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedBy<S> {}
+    impl<S: State> State for SetCreatedBy<S> {
+        type Event = S::Event;
+        type Subject = S::Subject;
+        type CreatedBy = Set<members::created_by>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `event` field
+        pub struct event(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
+        ///Marker type for the `created_by` field
+        pub struct created_by(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct EmitEventBuilder<'a, S: emit_event_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<EmitEventEvent<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<crate::tools_ozone::moderation::ModTool<'a>>,
+        ::core::option::Option<EmitEventSubject<'a>>,
+        ::core::option::Option<Vec<jacquard_common::types::string::Cid<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> EmitEvent<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> EmitEventBuilder<'a, emit_event_state::Empty> {
+        EmitEventBuilder::new()
+    }
+}
+
+impl<'a> EmitEventBuilder<'a, emit_event_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        EmitEventBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> EmitEventBuilder<'a, S>
+where
+    S: emit_event_state::State,
+    S::CreatedBy: emit_event_state::IsUnset,
+{
+    /// Set the `createdBy` field (required)
+    pub fn created_by(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> EmitEventBuilder<'a, emit_event_state::SetCreatedBy<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        EmitEventBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> EmitEventBuilder<'a, S>
+where
+    S: emit_event_state::State,
+    S::Event: emit_event_state::IsUnset,
+{
+    /// Set the `event` field (required)
+    pub fn event(
+        mut self,
+        value: impl Into<EmitEventEvent<'a>>,
+    ) -> EmitEventBuilder<'a, emit_event_state::SetEvent<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        EmitEventBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: emit_event_state::State> EmitEventBuilder<'a, S> {
+    /// Set the `externalId` field (optional)
+    pub fn external_id(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `externalId` field to an Option value (optional)
+    pub fn maybe_external_id(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: emit_event_state::State> EmitEventBuilder<'a, S> {
+    /// Set the `modTool` field (optional)
+    pub fn mod_tool(
+        mut self,
+        value: impl Into<Option<crate::tools_ozone::moderation::ModTool<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `modTool` field to an Option value (optional)
+    pub fn maybe_mod_tool(
+        mut self,
+        value: Option<crate::tools_ozone::moderation::ModTool<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S> EmitEventBuilder<'a, S>
+where
+    S: emit_event_state::State,
+    S::Subject: emit_event_state::IsUnset,
+{
+    /// Set the `subject` field (required)
+    pub fn subject(
+        mut self,
+        value: impl Into<EmitEventSubject<'a>>,
+    ) -> EmitEventBuilder<'a, emit_event_state::SetSubject<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        EmitEventBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: emit_event_state::State> EmitEventBuilder<'a, S> {
+    /// Set the `subjectBlobCids` field (optional)
+    pub fn subject_blob_cids(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::types::string::Cid<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `subjectBlobCids` field to an Option value (optional)
+    pub fn maybe_subject_blob_cids(
+        mut self,
+        value: Option<Vec<jacquard_common::types::string::Cid<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S> EmitEventBuilder<'a, S>
+where
+    S: emit_event_state::State,
+    S::Event: emit_event_state::IsSet,
+    S::Subject: emit_event_state::IsSet,
+    S::CreatedBy: emit_event_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> EmitEvent<'a> {
+        EmitEvent {
+            created_by: self.__unsafe_private_named.0.unwrap(),
+            event: self.__unsafe_private_named.1.unwrap(),
+            external_id: self.__unsafe_private_named.2,
+            mod_tool: self.__unsafe_private_named.3,
+            subject: self.__unsafe_private_named.4.unwrap(),
+            subject_blob_cids: self.__unsafe_private_named.5,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> EmitEvent<'a> {
+        EmitEvent {
+            created_by: self.__unsafe_private_named.0.unwrap(),
+            event: self.__unsafe_private_named.1.unwrap(),
+            external_id: self.__unsafe_private_named.2,
+            mod_tool: self.__unsafe_private_named.3,
+            subject: self.__unsafe_private_named.4.unwrap(),
+            subject_blob_cids: self.__unsafe_private_named.5,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]

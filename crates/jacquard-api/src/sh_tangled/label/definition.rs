@@ -13,24 +13,20 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Definition<'a> {
     /// The hex value for the background color for the label. Appviews may choose to respect this.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub color: Option<jacquard_common::CowStr<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
     /// Whether this label can be repeated for a given entity, eg.: [reviewer:foo, reviewer:bar]
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub multiple: Option<bool>,
     /// The display name of this label.
     #[serde(borrow)]
-    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
     /// The areas of the repo this label may apply to, eg.: sh.tangled.repo.issue. Appviews may choose to respect this.
     #[serde(borrow)]
@@ -38,6 +34,257 @@ pub struct Definition<'a> {
     /// The type definition of this label. Appviews may allow sorting for certain types.
     #[serde(borrow)]
     pub value_type: crate::sh_tangled::label::definition::ValueType<'a>,
+}
+
+pub mod definition_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Name;
+        type ValueType;
+        type Scope;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Name = Unset;
+        type ValueType = Unset;
+        type Scope = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Name = Set<members::name>;
+        type ValueType = S::ValueType;
+        type Scope = S::Scope;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `value_type` field to Set
+    pub struct SetValueType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValueType<S> {}
+    impl<S: State> State for SetValueType<S> {
+        type Name = S::Name;
+        type ValueType = Set<members::value_type>;
+        type Scope = S::Scope;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `scope` field to Set
+    pub struct SetScope<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetScope<S> {}
+    impl<S: State> State for SetScope<S> {
+        type Name = S::Name;
+        type ValueType = S::ValueType;
+        type Scope = Set<members::scope>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Name = S::Name;
+        type ValueType = S::ValueType;
+        type Scope = S::Scope;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `value_type` field
+        pub struct value_type(());
+        ///Marker type for the `scope` field
+        pub struct scope(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct DefinitionBuilder<'a, S: definition_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<Vec<jacquard_common::types::string::Nsid<'a>>>,
+        ::core::option::Option<crate::sh_tangled::label::definition::ValueType<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Definition<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> DefinitionBuilder<'a, definition_state::Empty> {
+        DefinitionBuilder::new()
+    }
+}
+
+impl<'a> DefinitionBuilder<'a, definition_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        DefinitionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: definition_state::State> DefinitionBuilder<'a, S> {
+    /// Set the `color` field (optional)
+    pub fn color(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `color` field to an Option value (optional)
+    pub fn maybe_color(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> DefinitionBuilder<'a, S>
+where
+    S: definition_state::State,
+    S::CreatedAt: definition_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> DefinitionBuilder<'a, definition_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        DefinitionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: definition_state::State> DefinitionBuilder<'a, S> {
+    /// Set the `multiple` field (optional)
+    pub fn multiple(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `multiple` field to an Option value (optional)
+    pub fn maybe_multiple(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> DefinitionBuilder<'a, S>
+where
+    S: definition_state::State,
+    S::Name: definition_state::IsUnset,
+{
+    /// Set the `name` field (required)
+    pub fn name(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> DefinitionBuilder<'a, definition_state::SetName<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        DefinitionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DefinitionBuilder<'a, S>
+where
+    S: definition_state::State,
+    S::Scope: definition_state::IsUnset,
+{
+    /// Set the `scope` field (required)
+    pub fn scope(
+        mut self,
+        value: impl Into<Vec<jacquard_common::types::string::Nsid<'a>>>,
+    ) -> DefinitionBuilder<'a, definition_state::SetScope<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        DefinitionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DefinitionBuilder<'a, S>
+where
+    S: definition_state::State,
+    S::ValueType: definition_state::IsUnset,
+{
+    /// Set the `valueType` field (required)
+    pub fn value_type(
+        mut self,
+        value: impl Into<crate::sh_tangled::label::definition::ValueType<'a>>,
+    ) -> DefinitionBuilder<'a, definition_state::SetValueType<S>> {
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        DefinitionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DefinitionBuilder<'a, S>
+where
+    S: definition_state::State,
+    S::Name: definition_state::IsSet,
+    S::ValueType: definition_state::IsSet,
+    S::Scope: definition_state::IsSet,
+    S::CreatedAt: definition_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Definition<'a> {
+        Definition {
+            color: self.__unsafe_private_named.0,
+            created_at: self.__unsafe_private_named.1.unwrap(),
+            multiple: self.__unsafe_private_named.2,
+            name: self.__unsafe_private_named.3.unwrap(),
+            scope: self.__unsafe_private_named.4.unwrap(),
+            value_type: self.__unsafe_private_named.5.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Definition<'a> {
+        Definition {
+            color: self.__unsafe_private_named.0,
+            created_at: self.__unsafe_private_named.1.unwrap(),
+            multiple: self.__unsafe_private_named.2,
+            name: self.__unsafe_private_named.3.unwrap(),
+            scope: self.__unsafe_private_named.4.unwrap(),
+            value_type: self.__unsafe_private_named.5.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Definition<'a> {

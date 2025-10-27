@@ -6,16 +6,8 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    bon::Builder,
-    jacquard_derive::IntoStatic
+    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetLiveUsers {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -23,6 +15,93 @@ pub struct GetLiveUsers {
     ///(default: 50, min: 1, max: 100)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
+}
+
+pub mod get_live_users_state {
+
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {}
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {}
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {}
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetLiveUsersBuilder<S: get_live_users_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<i64>,
+    ),
+}
+
+impl GetLiveUsers {
+    /// Create a new builder for this type
+    pub fn new() -> GetLiveUsersBuilder<get_live_users_state::Empty> {
+        GetLiveUsersBuilder::new()
+    }
+}
+
+impl GetLiveUsersBuilder<get_live_users_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetLiveUsersBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+        }
+    }
+}
+
+impl<S: get_live_users_state::State> GetLiveUsersBuilder<S> {
+    /// Set the `before` field (optional)
+    pub fn before(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `before` field to an Option value (optional)
+    pub fn maybe_before(mut self, value: Option<jacquard_common::types::string::Datetime>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<S: get_live_users_state::State> GetLiveUsersBuilder<S> {
+    /// Set the `limit` field (optional)
+    pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `limit` field to an Option value (optional)
+    pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<S> GetLiveUsersBuilder<S>
+where
+    S: get_live_users_state::State,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetLiveUsers {
+        GetLiveUsers {
+            before: self.__unsafe_private_named.0,
+            limit: self.__unsafe_private_named.1,
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]
@@ -34,15 +113,13 @@ pub struct GetLiveUsers {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default
+    Default,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetLiveUsersOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub streams: std::option::Option<
-        Vec<crate::place_stream::livestream::LivestreamView<'a>>,
-    >,
+    pub streams: std::option::Option<Vec<crate::place_stream::livestream::LivestreamView<'a>>>,
 }
 
 /// Response type for

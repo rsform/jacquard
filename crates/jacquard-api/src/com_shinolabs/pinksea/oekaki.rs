@@ -13,8 +13,7 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Image<'a> {
@@ -23,6 +22,146 @@ pub struct Image<'a> {
     pub blob: jacquard_common::types::blob::BlobRef<'a>,
     #[serde(borrow)]
     pub image_link: crate::com_shinolabs::pinksea::oekaki::ImageLink<'a>,
+}
+
+pub mod image_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Blob;
+        type ImageLink;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Blob = Unset;
+        type ImageLink = Unset;
+    }
+    ///State transition - sets the `blob` field to Set
+    pub struct SetBlob<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlob<S> {}
+    impl<S: State> State for SetBlob<S> {
+        type Blob = Set<members::blob>;
+        type ImageLink = S::ImageLink;
+    }
+    ///State transition - sets the `image_link` field to Set
+    pub struct SetImageLink<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetImageLink<S> {}
+    impl<S: State> State for SetImageLink<S> {
+        type Blob = S::Blob;
+        type ImageLink = Set<members::image_link>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `blob` field
+        pub struct blob(());
+        ///Marker type for the `image_link` field
+        pub struct image_link(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ImageBuilder<'a, S: image_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+        ::core::option::Option<crate::com_shinolabs::pinksea::oekaki::ImageLink<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Image<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ImageBuilder<'a, image_state::Empty> {
+        ImageBuilder::new()
+    }
+}
+
+impl<'a> ImageBuilder<'a, image_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ImageBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ImageBuilder<'a, S>
+where
+    S: image_state::State,
+    S::Blob: image_state::IsUnset,
+{
+    /// Set the `blob` field (required)
+    pub fn blob(
+        mut self,
+        value: impl Into<jacquard_common::types::blob::BlobRef<'a>>,
+    ) -> ImageBuilder<'a, image_state::SetBlob<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ImageBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ImageBuilder<'a, S>
+where
+    S: image_state::State,
+    S::ImageLink: image_state::IsUnset,
+{
+    /// Set the `imageLink` field (required)
+    pub fn image_link(
+        mut self,
+        value: impl Into<crate::com_shinolabs::pinksea::oekaki::ImageLink<'a>>,
+    ) -> ImageBuilder<'a, image_state::SetImageLink<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        ImageBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ImageBuilder<'a, S>
+where
+    S: image_state::State,
+    S::Blob: image_state::IsSet,
+    S::ImageLink: image_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Image<'a> {
+        Image {
+            blob: self.__unsafe_private_named.0.unwrap(),
+            image_link: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Image<'a> {
+        Image {
+            blob: self.__unsafe_private_named.0.unwrap(),
+            image_link: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_com_shinolabs_pinksea_oekaki() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -271,8 +410,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ImageLink<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Oekaki<'a> {
@@ -282,18 +420,215 @@ pub struct Oekaki<'a> {
     pub image: crate::com_shinolabs::pinksea::oekaki::Image<'a>,
     /// What this oekaki post is a response to.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub in_response_to: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     /// Is this oekaki NSFW?
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub nsfw: Option<bool>,
     /// An array of tags this image had.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub tags: Option<Vec<jacquard_common::CowStr<'a>>>,
+}
+
+pub mod oekaki_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Image;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Image = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `image` field to Set
+    pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetImage<S> {}
+    impl<S: State> State for SetImage<S> {
+        type Image = Set<members::image>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Image = S::Image;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `image` field
+        pub struct image(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct OekakiBuilder<'a, S: oekaki_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<crate::com_shinolabs::pinksea::oekaki::Image<'a>>,
+        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Oekaki<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> OekakiBuilder<'a, oekaki_state::Empty> {
+        OekakiBuilder::new()
+    }
+}
+
+impl<'a> OekakiBuilder<'a, oekaki_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        OekakiBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> OekakiBuilder<'a, S>
+where
+    S: oekaki_state::State,
+    S::CreatedAt: oekaki_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> OekakiBuilder<'a, oekaki_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        OekakiBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> OekakiBuilder<'a, S>
+where
+    S: oekaki_state::State,
+    S::Image: oekaki_state::IsUnset,
+{
+    /// Set the `image` field (required)
+    pub fn image(
+        mut self,
+        value: impl Into<crate::com_shinolabs::pinksea::oekaki::Image<'a>>,
+    ) -> OekakiBuilder<'a, oekaki_state::SetImage<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        OekakiBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: oekaki_state::State> OekakiBuilder<'a, S> {
+    /// Set the `inResponseTo` field (optional)
+    pub fn in_response_to(
+        mut self,
+        value: impl Into<Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `inResponseTo` field to an Option value (optional)
+    pub fn maybe_in_response_to(
+        mut self,
+        value: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: oekaki_state::State> OekakiBuilder<'a, S> {
+    /// Set the `nsfw` field (optional)
+    pub fn nsfw(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `nsfw` field to an Option value (optional)
+    pub fn maybe_nsfw(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: oekaki_state::State> OekakiBuilder<'a, S> {
+    /// Set the `tags` field (optional)
+    pub fn tags(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `tags` field to an Option value (optional)
+    pub fn maybe_tags(
+        mut self,
+        value: Option<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S> OekakiBuilder<'a, S>
+where
+    S: oekaki_state::State,
+    S::Image: oekaki_state::IsSet,
+    S::CreatedAt: oekaki_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Oekaki<'a> {
+        Oekaki {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            image: self.__unsafe_private_named.1.unwrap(),
+            in_response_to: self.__unsafe_private_named.2,
+            nsfw: self.__unsafe_private_named.3,
+            tags: self.__unsafe_private_named.4,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Oekaki<'a> {
+        Oekaki {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            image: self.__unsafe_private_named.1.unwrap(),
+            in_response_to: self.__unsafe_private_named.2,
+            nsfw: self.__unsafe_private_named.3,
+            tags: self.__unsafe_private_named.4,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Oekaki<'a> {

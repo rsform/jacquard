@@ -12,14 +12,103 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct ResolveHandle<'a> {
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
+}
+
+pub mod resolve_handle_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Handle;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Handle = Unset;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHandle<S> {}
+    impl<S: State> State for SetHandle<S> {
+        type Handle = Set<members::handle>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `handle` field
+        pub struct handle(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ResolveHandleBuilder<'a, S: resolve_handle_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Handle<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ResolveHandle<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ResolveHandleBuilder<'a, resolve_handle_state::Empty> {
+        ResolveHandleBuilder::new()
+    }
+}
+
+impl<'a> ResolveHandleBuilder<'a, resolve_handle_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ResolveHandleBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ResolveHandleBuilder<'a, S>
+where
+    S: resolve_handle_state::State,
+    S::Handle: resolve_handle_state::IsUnset,
+{
+    /// Set the `handle` field (required)
+    pub fn handle(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Handle<'a>>,
+    ) -> ResolveHandleBuilder<'a, resolve_handle_state::SetHandle<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ResolveHandleBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ResolveHandleBuilder<'a, S>
+where
+    S: resolve_handle_state::State,
+    S::Handle: resolve_handle_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> ResolveHandle<'a> {
+        ResolveHandle {
+            handle: self.__unsafe_private_named.0.unwrap(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

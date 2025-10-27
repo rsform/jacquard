@@ -14,23 +14,218 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Category<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub category_type: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub description: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub group: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
+}
+
+pub mod category_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Name;
+        type Group;
+        type CategoryType;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Name = Unset;
+        type Group = Unset;
+        type CategoryType = Unset;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Name = Set<members::name>;
+        type Group = S::Group;
+        type CategoryType = S::CategoryType;
+    }
+    ///State transition - sets the `group` field to Set
+    pub struct SetGroup<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGroup<S> {}
+    impl<S: State> State for SetGroup<S> {
+        type Name = S::Name;
+        type Group = Set<members::group>;
+        type CategoryType = S::CategoryType;
+    }
+    ///State transition - sets the `category_type` field to Set
+    pub struct SetCategoryType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCategoryType<S> {}
+    impl<S: State> State for SetCategoryType<S> {
+        type Name = S::Name;
+        type Group = S::Group;
+        type CategoryType = Set<members::category_type>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `group` field
+        pub struct group(());
+        ///Marker type for the `category_type` field
+        pub struct category_type(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct CategoryBuilder<'a, S: category_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Category<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> CategoryBuilder<'a, category_state::Empty> {
+        CategoryBuilder::new()
+    }
+}
+
+impl<'a> CategoryBuilder<'a, category_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        CategoryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CategoryBuilder<'a, S>
+where
+    S: category_state::State,
+    S::CategoryType: category_state::IsUnset,
+{
+    /// Set the `categoryType` field (required)
+    pub fn category_type(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> CategoryBuilder<'a, category_state::SetCategoryType<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        CategoryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: category_state::State> CategoryBuilder<'a, S> {
+    /// Set the `description` field (optional)
+    pub fn description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `description` field to an Option value (optional)
+    pub fn maybe_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> CategoryBuilder<'a, S>
+where
+    S: category_state::State,
+    S::Group: category_state::IsUnset,
+{
+    /// Set the `group` field (required)
+    pub fn group(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> CategoryBuilder<'a, category_state::SetGroup<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        CategoryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CategoryBuilder<'a, S>
+where
+    S: category_state::State,
+    S::Name: category_state::IsUnset,
+{
+    /// Set the `name` field (required)
+    pub fn name(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> CategoryBuilder<'a, category_state::SetName<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        CategoryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CategoryBuilder<'a, S>
+where
+    S: category_state::State,
+    S::Name: category_state::IsSet,
+    S::Group: category_state::IsSet,
+    S::CategoryType: category_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Category<'a> {
+        Category {
+            category_type: self.__unsafe_private_named.0.unwrap(),
+            description: self.__unsafe_private_named.1,
+            group: self.__unsafe_private_named.2.unwrap(),
+            name: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Category<'a> {
+        Category {
+            category_type: self.__unsafe_private_named.0.unwrap(),
+            description: self.__unsafe_private_named.1,
+            group: self.__unsafe_private_named.2.unwrap(),
+            name: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Category<'a> {

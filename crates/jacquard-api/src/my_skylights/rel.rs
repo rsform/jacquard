@@ -13,24 +13,191 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Rel<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub finished_at: Option<Vec<jacquard_common::types::string::Datetime>>,
     #[serde(borrow)]
     pub item: crate::my_skylights::Item<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub note: Option<crate::my_skylights::rel::Note<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub rating: Option<crate::my_skylights::rel::Rating<'a>>,
+}
+
+pub mod rel_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Item;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Item = Unset;
+    }
+    ///State transition - sets the `item` field to Set
+    pub struct SetItem<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetItem<S> {}
+    impl<S: State> State for SetItem<S> {
+        type Item = Set<members::item>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `item` field
+        pub struct item(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct RelBuilder<'a, S: rel_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<Vec<jacquard_common::types::string::Datetime>>,
+        ::core::option::Option<crate::my_skylights::Item<'a>>,
+        ::core::option::Option<crate::my_skylights::rel::Note<'a>>,
+        ::core::option::Option<crate::my_skylights::rel::Rating<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Rel<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> RelBuilder<'a, rel_state::Empty> {
+        RelBuilder::new()
+    }
+}
+
+impl<'a> RelBuilder<'a, rel_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        RelBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: rel_state::State> RelBuilder<'a, S> {
+    /// Set the `finishedAt` field (optional)
+    pub fn finished_at(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::types::string::Datetime>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `finishedAt` field to an Option value (optional)
+    pub fn maybe_finished_at(
+        mut self,
+        value: Option<Vec<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> RelBuilder<'a, S>
+where
+    S: rel_state::State,
+    S::Item: rel_state::IsUnset,
+{
+    /// Set the `item` field (required)
+    pub fn item(
+        mut self,
+        value: impl Into<crate::my_skylights::Item<'a>>,
+    ) -> RelBuilder<'a, rel_state::SetItem<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        RelBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: rel_state::State> RelBuilder<'a, S> {
+    /// Set the `note` field (optional)
+    pub fn note(
+        mut self,
+        value: impl Into<Option<crate::my_skylights::rel::Note<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `note` field to an Option value (optional)
+    pub fn maybe_note(
+        mut self,
+        value: Option<crate::my_skylights::rel::Note<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: rel_state::State> RelBuilder<'a, S> {
+    /// Set the `rating` field (optional)
+    pub fn rating(
+        mut self,
+        value: impl Into<Option<crate::my_skylights::rel::Rating<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `rating` field to an Option value (optional)
+    pub fn maybe_rating(
+        mut self,
+        value: Option<crate::my_skylights::rel::Rating<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S> RelBuilder<'a, S>
+where
+    S: rel_state::State,
+    S::Item: rel_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Rel<'a> {
+        Rel {
+            finished_at: self.__unsafe_private_named.0,
+            item: self.__unsafe_private_named.1.unwrap(),
+            note: self.__unsafe_private_named.2,
+            rating: self.__unsafe_private_named.3,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Rel<'a> {
+        Rel {
+            finished_at: self.__unsafe_private_named.0,
+            item: self.__unsafe_private_named.1.unwrap(),
+            note: self.__unsafe_private_named.2,
+            rating: self.__unsafe_private_named.3,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Rel<'a> {
@@ -320,16 +487,191 @@ fn lexicon_doc_my_skylights_rel() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Note<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     pub updated_at: jacquard_common::types::string::Datetime,
     #[serde(borrow)]
-    #[builder(into)]
     pub value: jacquard_common::CowStr<'a>,
+}
+
+pub mod note_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Value;
+        type CreatedAt;
+        type UpdatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Value = Unset;
+        type CreatedAt = Unset;
+        type UpdatedAt = Unset;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Value = Set<members::value>;
+        type CreatedAt = S::CreatedAt;
+        type UpdatedAt = S::UpdatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Value = S::Value;
+        type CreatedAt = Set<members::created_at>;
+        type UpdatedAt = S::UpdatedAt;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
+    impl<S: State> State for SetUpdatedAt<S> {
+        type Value = S::Value;
+        type CreatedAt = S::CreatedAt;
+        type UpdatedAt = Set<members::updated_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `value` field
+        pub struct value(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct NoteBuilder<'a, S: note_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Note<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> NoteBuilder<'a, note_state::Empty> {
+        NoteBuilder::new()
+    }
+}
+
+impl<'a> NoteBuilder<'a, note_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        NoteBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> NoteBuilder<'a, S>
+where
+    S: note_state::State,
+    S::CreatedAt: note_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> NoteBuilder<'a, note_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        NoteBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> NoteBuilder<'a, S>
+where
+    S: note_state::State,
+    S::UpdatedAt: note_state::IsUnset,
+{
+    /// Set the `updatedAt` field (required)
+    pub fn updated_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> NoteBuilder<'a, note_state::SetUpdatedAt<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        NoteBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> NoteBuilder<'a, S>
+where
+    S: note_state::State,
+    S::Value: note_state::IsUnset,
+{
+    /// Set the `value` field (required)
+    pub fn value(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> NoteBuilder<'a, note_state::SetValue<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        NoteBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> NoteBuilder<'a, S>
+where
+    S: note_state::State,
+    S::Value: note_state::IsSet,
+    S::CreatedAt: note_state::IsSet,
+    S::UpdatedAt: note_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Note<'a> {
+        Note {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            updated_at: self.__unsafe_private_named.1.unwrap(),
+            value: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Note<'a> {
+        Note {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            updated_at: self.__unsafe_private_named.1.unwrap(),
+            value: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Note<'a> {
@@ -357,13 +699,152 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Note<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Rating<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     pub value: i64,
+}
+
+pub mod rating_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Value;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Value = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Value = Set<members::value>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Value = S::Value;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `value` field
+        pub struct value(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct RatingBuilder<'a, S: rating_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<i64>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Rating<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> RatingBuilder<'a, rating_state::Empty> {
+        RatingBuilder::new()
+    }
+}
+
+impl<'a> RatingBuilder<'a, rating_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        RatingBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RatingBuilder<'a, S>
+where
+    S: rating_state::State,
+    S::CreatedAt: rating_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> RatingBuilder<'a, rating_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        RatingBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RatingBuilder<'a, S>
+where
+    S: rating_state::State,
+    S::Value: rating_state::IsUnset,
+{
+    /// Set the `value` field (required)
+    pub fn value(
+        mut self,
+        value: impl Into<i64>,
+    ) -> RatingBuilder<'a, rating_state::SetValue<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        RatingBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RatingBuilder<'a, S>
+where
+    S: rating_state::State,
+    S::Value: rating_state::IsSet,
+    S::CreatedAt: rating_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Rating<'a> {
+        Rating {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            value: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Rating<'a> {
+        Rating {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            value: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Rating<'a> {

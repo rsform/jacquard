@@ -14,33 +14,27 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Listing<'a> {
     /// URL where applicants can apply for the job.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub apply_link: Option<jacquard_common::types::string::Uri<'a>>,
     /// Larger horizontal image to display behind job listing view.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub banner: Option<jacquard_common::types::blob::BlobRef<'a>>,
     /// The description of the job listing.
     #[serde(borrow)]
-    #[builder(into)]
     pub description: jacquard_common::CowStr<'a>,
     /// Annotations of text (mentions, URLs, hashtags, etc).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub facets: Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
     /// Locations that are relevant to the job listing.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub locations: Option<Vec<crate::community_lexicon::location::hthree::Hthree<'a>>>,
     /// Client-declared timestamp when the job listing expires.
@@ -49,8 +43,315 @@ pub struct Listing<'a> {
     pub not_before: jacquard_common::types::string::Datetime,
     /// The title of the job listing.
     #[serde(borrow)]
-    #[builder(into)]
     pub title: jacquard_common::CowStr<'a>,
+}
+
+pub mod listing_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Title;
+        type NotBefore;
+        type NotAfter;
+        type Description;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Title = Unset;
+        type NotBefore = Unset;
+        type NotAfter = Unset;
+        type Description = Unset;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Title = Set<members::title>;
+        type NotBefore = S::NotBefore;
+        type NotAfter = S::NotAfter;
+        type Description = S::Description;
+    }
+    ///State transition - sets the `not_before` field to Set
+    pub struct SetNotBefore<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNotBefore<S> {}
+    impl<S: State> State for SetNotBefore<S> {
+        type Title = S::Title;
+        type NotBefore = Set<members::not_before>;
+        type NotAfter = S::NotAfter;
+        type Description = S::Description;
+    }
+    ///State transition - sets the `not_after` field to Set
+    pub struct SetNotAfter<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNotAfter<S> {}
+    impl<S: State> State for SetNotAfter<S> {
+        type Title = S::Title;
+        type NotBefore = S::NotBefore;
+        type NotAfter = Set<members::not_after>;
+        type Description = S::Description;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDescription<S> {}
+    impl<S: State> State for SetDescription<S> {
+        type Title = S::Title;
+        type NotBefore = S::NotBefore;
+        type NotAfter = S::NotAfter;
+        type Description = Set<members::description>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `not_before` field
+        pub struct not_before(());
+        ///Marker type for the `not_after` field
+        pub struct not_after(());
+        ///Marker type for the `description` field
+        pub struct description(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ListingBuilder<'a, S: listing_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
+        ::core::option::Option<
+            Vec<crate::community_lexicon::location::hthree::Hthree<'a>>,
+        >,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Listing<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ListingBuilder<'a, listing_state::Empty> {
+        ListingBuilder::new()
+    }
+}
+
+impl<'a> ListingBuilder<'a, listing_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ListingBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: listing_state::State> ListingBuilder<'a, S> {
+    /// Set the `applyLink` field (optional)
+    pub fn apply_link(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `applyLink` field to an Option value (optional)
+    pub fn maybe_apply_link(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: listing_state::State> ListingBuilder<'a, S> {
+    /// Set the `banner` field (optional)
+    pub fn banner(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::blob::BlobRef<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `banner` field to an Option value (optional)
+    pub fn maybe_banner(
+        mut self,
+        value: Option<jacquard_common::types::blob::BlobRef<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> ListingBuilder<'a, S>
+where
+    S: listing_state::State,
+    S::Description: listing_state::IsUnset,
+{
+    /// Set the `description` field (required)
+    pub fn description(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> ListingBuilder<'a, listing_state::SetDescription<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        ListingBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: listing_state::State> ListingBuilder<'a, S> {
+    /// Set the `facets` field (optional)
+    pub fn facets(
+        mut self,
+        value: impl Into<Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `facets` field to an Option value (optional)
+    pub fn maybe_facets(
+        mut self,
+        value: Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: listing_state::State> ListingBuilder<'a, S> {
+    /// Set the `locations` field (optional)
+    pub fn locations(
+        mut self,
+        value: impl Into<
+            Option<Vec<crate::community_lexicon::location::hthree::Hthree<'a>>>,
+        >,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `locations` field to an Option value (optional)
+    pub fn maybe_locations(
+        mut self,
+        value: Option<Vec<crate::community_lexicon::location::hthree::Hthree<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S> ListingBuilder<'a, S>
+where
+    S: listing_state::State,
+    S::NotAfter: listing_state::IsUnset,
+{
+    /// Set the `notAfter` field (required)
+    pub fn not_after(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> ListingBuilder<'a, listing_state::SetNotAfter<S>> {
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        ListingBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ListingBuilder<'a, S>
+where
+    S: listing_state::State,
+    S::NotBefore: listing_state::IsUnset,
+{
+    /// Set the `notBefore` field (required)
+    pub fn not_before(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> ListingBuilder<'a, listing_state::SetNotBefore<S>> {
+        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        ListingBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ListingBuilder<'a, S>
+where
+    S: listing_state::State,
+    S::Title: listing_state::IsUnset,
+{
+    /// Set the `title` field (required)
+    pub fn title(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> ListingBuilder<'a, listing_state::SetTitle<S>> {
+        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        ListingBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ListingBuilder<'a, S>
+where
+    S: listing_state::State,
+    S::Title: listing_state::IsSet,
+    S::NotBefore: listing_state::IsSet,
+    S::NotAfter: listing_state::IsSet,
+    S::Description: listing_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Listing<'a> {
+        Listing {
+            apply_link: self.__unsafe_private_named.0,
+            banner: self.__unsafe_private_named.1,
+            description: self.__unsafe_private_named.2.unwrap(),
+            facets: self.__unsafe_private_named.3,
+            locations: self.__unsafe_private_named.4,
+            not_after: self.__unsafe_private_named.5.unwrap(),
+            not_before: self.__unsafe_private_named.6.unwrap(),
+            title: self.__unsafe_private_named.7.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Listing<'a> {
+        Listing {
+            apply_link: self.__unsafe_private_named.0,
+            banner: self.__unsafe_private_named.1,
+            description: self.__unsafe_private_named.2.unwrap(),
+            facets: self.__unsafe_private_named.3,
+            locations: self.__unsafe_private_named.4,
+            not_after: self.__unsafe_private_named.5.unwrap(),
+            not_before: self.__unsafe_private_named.6.unwrap(),
+            title: self.__unsafe_private_named.7.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Listing<'a> {

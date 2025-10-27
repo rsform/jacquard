@@ -12,22 +12,142 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetValues<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    #[builder(into)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     ///(default: 100, min: 1, max: 1000)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
     #[serde(borrow)]
-    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
+}
+
+pub mod get_values_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Name;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Name = Unset;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Name = Set<members::name>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `name` field
+        pub struct name(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetValuesBuilder<'a, S: get_values_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GetValues<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GetValuesBuilder<'a, get_values_state::Empty> {
+        GetValuesBuilder::new()
+    }
+}
+
+impl<'a> GetValuesBuilder<'a, get_values_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetValuesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: get_values_state::State> GetValuesBuilder<'a, S> {
+    /// Set the `cursor` field (optional)
+    pub fn cursor(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `cursor` field to an Option value (optional)
+    pub fn maybe_cursor(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: get_values_state::State> GetValuesBuilder<'a, S> {
+    /// Set the `limit` field (optional)
+    pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `limit` field to an Option value (optional)
+    pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> GetValuesBuilder<'a, S>
+where
+    S: get_values_state::State,
+    S::Name: get_values_state::IsUnset,
+{
+    /// Set the `name` field (required)
+    pub fn name(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> GetValuesBuilder<'a, get_values_state::SetName<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        GetValuesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetValuesBuilder<'a, S>
+where
+    S: get_values_state::State,
+    S::Name: get_values_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetValues<'a> {
+        GetValues {
+            cursor: self.__unsafe_private_named.0,
+            limit: self.__unsafe_private_named.1,
+            name: self.__unsafe_private_named.2.unwrap(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

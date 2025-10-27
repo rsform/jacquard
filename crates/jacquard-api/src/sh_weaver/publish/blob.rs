@@ -14,14 +14,118 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Blob<'a> {
     /// Reference to the uploaded file
     #[serde(borrow)]
     pub upload: jacquard_common::types::blob::BlobRef<'a>,
+}
+
+pub mod blob_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Upload;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Upload = Unset;
+    }
+    ///State transition - sets the `upload` field to Set
+    pub struct SetUpload<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUpload<S> {}
+    impl<S: State> State for SetUpload<S> {
+        type Upload = Set<members::upload>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `upload` field
+        pub struct upload(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct BlobBuilder<'a, S: blob_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Blob<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> BlobBuilder<'a, blob_state::Empty> {
+        BlobBuilder::new()
+    }
+}
+
+impl<'a> BlobBuilder<'a, blob_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        BlobBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BlobBuilder<'a, S>
+where
+    S: blob_state::State,
+    S::Upload: blob_state::IsUnset,
+{
+    /// Set the `upload` field (required)
+    pub fn upload(
+        mut self,
+        value: impl Into<jacquard_common::types::blob::BlobRef<'a>>,
+    ) -> BlobBuilder<'a, blob_state::SetUpload<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        BlobBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BlobBuilder<'a, S>
+where
+    S: blob_state::State,
+    S::Upload: blob_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Blob<'a> {
+        Blob {
+            upload: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Blob<'a> {
+        Blob {
+            upload: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Blob<'a> {

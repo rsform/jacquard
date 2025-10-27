@@ -13,31 +13,26 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Vote<'a> {
     /// The persistent, anonymous identifier for the user casting the vote.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub aid: Option<jacquard_common::CowStr<'a>>,
     /// Optionally, CID specifying the specific version of 'uri' resource this vote applies to.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub cid: Option<jacquard_common::types::string::Cid<'a>>,
     /// Timestamp when this vote was created.
     pub cts: jacquard_common::types::string::Datetime,
     /// An optional array of predefined reasons justifying the vote.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub reasons: Option<Vec<jacquard_common::CowStr<'a>>>,
     /// Signature of dag-cbor encoded vote.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub sig: Option<bytes::Bytes>,
     /// the account creating the vote, not necessarily the same as the user who voted
     #[serde(borrow)]
@@ -47,6 +42,298 @@ pub struct Vote<'a> {
     pub uri: jacquard_common::types::string::Uri<'a>,
     /// The value of the vote. The exact meaning depends on what is being voted on, but generally '+1' means 'approval', -1 means 'disapproval', and 0 indicates 'neutrality'.
     pub val: i64,
+}
+
+pub mod vote_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Src;
+        type Uri;
+        type Val;
+        type Cts;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Src = Unset;
+        type Uri = Unset;
+        type Val = Unset;
+        type Cts = Unset;
+    }
+    ///State transition - sets the `src` field to Set
+    pub struct SetSrc<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSrc<S> {}
+    impl<S: State> State for SetSrc<S> {
+        type Src = Set<members::src>;
+        type Uri = S::Uri;
+        type Val = S::Val;
+        type Cts = S::Cts;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Src = S::Src;
+        type Uri = Set<members::uri>;
+        type Val = S::Val;
+        type Cts = S::Cts;
+    }
+    ///State transition - sets the `val` field to Set
+    pub struct SetVal<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVal<S> {}
+    impl<S: State> State for SetVal<S> {
+        type Src = S::Src;
+        type Uri = S::Uri;
+        type Val = Set<members::val>;
+        type Cts = S::Cts;
+    }
+    ///State transition - sets the `cts` field to Set
+    pub struct SetCts<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCts<S> {}
+    impl<S: State> State for SetCts<S> {
+        type Src = S::Src;
+        type Uri = S::Uri;
+        type Val = S::Val;
+        type Cts = Set<members::cts>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `src` field
+        pub struct src(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `val` field
+        pub struct val(());
+        ///Marker type for the `cts` field
+        pub struct cts(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct VoteBuilder<'a, S: vote_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+        ::core::option::Option<bytes::Bytes>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<i64>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Vote<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> VoteBuilder<'a, vote_state::Empty> {
+        VoteBuilder::new()
+    }
+}
+
+impl<'a> VoteBuilder<'a, vote_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        VoteBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: vote_state::State> VoteBuilder<'a, S> {
+    /// Set the `aid` field (optional)
+    pub fn aid(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `aid` field to an Option value (optional)
+    pub fn maybe_aid(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: vote_state::State> VoteBuilder<'a, S> {
+    /// Set the `cid` field (optional)
+    pub fn cid(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Cid<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `cid` field to an Option value (optional)
+    pub fn maybe_cid(
+        mut self,
+        value: Option<jacquard_common::types::string::Cid<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> VoteBuilder<'a, S>
+where
+    S: vote_state::State,
+    S::Cts: vote_state::IsUnset,
+{
+    /// Set the `cts` field (required)
+    pub fn cts(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> VoteBuilder<'a, vote_state::SetCts<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        VoteBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: vote_state::State> VoteBuilder<'a, S> {
+    /// Set the `reasons` field (optional)
+    pub fn reasons(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `reasons` field to an Option value (optional)
+    pub fn maybe_reasons(
+        mut self,
+        value: Option<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: vote_state::State> VoteBuilder<'a, S> {
+    /// Set the `sig` field (optional)
+    pub fn sig(mut self, value: impl Into<Option<bytes::Bytes>>) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `sig` field to an Option value (optional)
+    pub fn maybe_sig(mut self, value: Option<bytes::Bytes>) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S> VoteBuilder<'a, S>
+where
+    S: vote_state::State,
+    S::Src: vote_state::IsUnset,
+{
+    /// Set the `src` field (required)
+    pub fn src(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> VoteBuilder<'a, vote_state::SetSrc<S>> {
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        VoteBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> VoteBuilder<'a, S>
+where
+    S: vote_state::State,
+    S::Uri: vote_state::IsUnset,
+{
+    /// Set the `uri` field (required)
+    pub fn uri(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+    ) -> VoteBuilder<'a, vote_state::SetUri<S>> {
+        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        VoteBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> VoteBuilder<'a, S>
+where
+    S: vote_state::State,
+    S::Val: vote_state::IsUnset,
+{
+    /// Set the `val` field (required)
+    pub fn val(
+        mut self,
+        value: impl Into<i64>,
+    ) -> VoteBuilder<'a, vote_state::SetVal<S>> {
+        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        VoteBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> VoteBuilder<'a, S>
+where
+    S: vote_state::State,
+    S::Src: vote_state::IsSet,
+    S::Uri: vote_state::IsSet,
+    S::Val: vote_state::IsSet,
+    S::Cts: vote_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Vote<'a> {
+        Vote {
+            aid: self.__unsafe_private_named.0,
+            cid: self.__unsafe_private_named.1,
+            cts: self.__unsafe_private_named.2.unwrap(),
+            reasons: self.__unsafe_private_named.3,
+            sig: self.__unsafe_private_named.4,
+            src: self.__unsafe_private_named.5.unwrap(),
+            uri: self.__unsafe_private_named.6.unwrap(),
+            val: self.__unsafe_private_named.7.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Vote<'a> {
+        Vote {
+            aid: self.__unsafe_private_named.0,
+            cid: self.__unsafe_private_named.1,
+            cts: self.__unsafe_private_named.2.unwrap(),
+            reasons: self.__unsafe_private_named.3,
+            sig: self.__unsafe_private_named.4,
+            src: self.__unsafe_private_named.5.unwrap(),
+            uri: self.__unsafe_private_named.6.unwrap(),
+            val: self.__unsafe_private_named.7.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Vote<'a> {

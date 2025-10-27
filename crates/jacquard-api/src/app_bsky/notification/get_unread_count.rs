@@ -12,16 +12,104 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetUnreadCount {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub priority: std::option::Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub seen_at: std::option::Option<jacquard_common::types::string::Datetime>,
+}
+
+pub mod get_unread_count_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {}
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {}
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {}
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetUnreadCountBuilder<S: get_unread_count_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<bool>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+    ),
+}
+
+impl GetUnreadCount {
+    /// Create a new builder for this type
+    pub fn new() -> GetUnreadCountBuilder<get_unread_count_state::Empty> {
+        GetUnreadCountBuilder::new()
+    }
+}
+
+impl GetUnreadCountBuilder<get_unread_count_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetUnreadCountBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+        }
+    }
+}
+
+impl<S: get_unread_count_state::State> GetUnreadCountBuilder<S> {
+    /// Set the `priority` field (optional)
+    pub fn priority(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `priority` field to an Option value (optional)
+    pub fn maybe_priority(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<S: get_unread_count_state::State> GetUnreadCountBuilder<S> {
+    /// Set the `seenAt` field (optional)
+    pub fn seen_at(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `seenAt` field to an Option value (optional)
+    pub fn maybe_seen_at(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<S> GetUnreadCountBuilder<S>
+where
+    S: get_unread_count_state::State,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetUnreadCount {
+        GetUnreadCount {
+            priority: self.__unsafe_private_named.0,
+            seen_at: self.__unsafe_private_named.1,
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

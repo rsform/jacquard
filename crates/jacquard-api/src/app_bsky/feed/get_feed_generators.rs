@@ -12,14 +12,103 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetFeedGenerators<'a> {
     #[serde(borrow)]
     pub feeds: Vec<jacquard_common::types::string::AtUri<'a>>,
+}
+
+pub mod get_feed_generators_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Feeds;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Feeds = Unset;
+    }
+    ///State transition - sets the `feeds` field to Set
+    pub struct SetFeeds<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFeeds<S> {}
+    impl<S: State> State for SetFeeds<S> {
+        type Feeds = Set<members::feeds>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `feeds` field
+        pub struct feeds(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetFeedGeneratorsBuilder<'a, S: get_feed_generators_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GetFeedGenerators<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GetFeedGeneratorsBuilder<'a, get_feed_generators_state::Empty> {
+        GetFeedGeneratorsBuilder::new()
+    }
+}
+
+impl<'a> GetFeedGeneratorsBuilder<'a, get_feed_generators_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetFeedGeneratorsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetFeedGeneratorsBuilder<'a, S>
+where
+    S: get_feed_generators_state::State,
+    S::Feeds: get_feed_generators_state::IsUnset,
+{
+    /// Set the `feeds` field (required)
+    pub fn feeds(
+        mut self,
+        value: impl Into<Vec<jacquard_common::types::string::AtUri<'a>>>,
+    ) -> GetFeedGeneratorsBuilder<'a, get_feed_generators_state::SetFeeds<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        GetFeedGeneratorsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetFeedGeneratorsBuilder<'a, S>
+where
+    S: get_feed_generators_state::State,
+    S::Feeds: get_feed_generators_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetFeedGenerators<'a> {
+        GetFeedGenerators {
+            feeds: self.__unsafe_private_named.0.unwrap(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

@@ -12,14 +12,103 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct ResolveMiniDoc<'a> {
     #[serde(borrow)]
     pub identifier: jacquard_common::types::ident::AtIdentifier<'a>,
+}
+
+pub mod resolve_mini_doc_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Identifier;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Identifier = Unset;
+    }
+    ///State transition - sets the `identifier` field to Set
+    pub struct SetIdentifier<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIdentifier<S> {}
+    impl<S: State> State for SetIdentifier<S> {
+        type Identifier = Set<members::identifier>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `identifier` field
+        pub struct identifier(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ResolveMiniDocBuilder<'a, S: resolve_mini_doc_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ResolveMiniDoc<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ResolveMiniDocBuilder<'a, resolve_mini_doc_state::Empty> {
+        ResolveMiniDocBuilder::new()
+    }
+}
+
+impl<'a> ResolveMiniDocBuilder<'a, resolve_mini_doc_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ResolveMiniDocBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ResolveMiniDocBuilder<'a, S>
+where
+    S: resolve_mini_doc_state::State,
+    S::Identifier: resolve_mini_doc_state::IsUnset,
+{
+    /// Set the `identifier` field (required)
+    pub fn identifier(
+        mut self,
+        value: impl Into<jacquard_common::types::ident::AtIdentifier<'a>>,
+    ) -> ResolveMiniDocBuilder<'a, resolve_mini_doc_state::SetIdentifier<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ResolveMiniDocBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ResolveMiniDocBuilder<'a, S>
+where
+    S: resolve_mini_doc_state::State,
+    S::Identifier: resolve_mini_doc_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> ResolveMiniDoc<'a> {
+        ResolveMiniDoc {
+            identifier: self.__unsafe_private_named.0.unwrap(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

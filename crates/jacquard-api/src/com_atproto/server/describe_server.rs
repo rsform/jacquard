@@ -199,7 +199,9 @@ pub struct DescribeServerOutput<'a> {
     /// Contact information
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub contact: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub contact: std::option::Option<
+        crate::com_atproto::server::describe_server::Contact<'a>,
+    >,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     /// If true, an invite code must be supplied to create an account on this instance.
@@ -208,7 +210,9 @@ pub struct DescribeServerOutput<'a> {
     /// URLs of service policy documents.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub links: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub links: std::option::Option<
+        crate::com_atproto::server::describe_server::Links<'a>,
+    >,
     /// If true, a phone verification token must be supplied to create an account on this instance.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub phone_verification_required: std::option::Option<bool>,

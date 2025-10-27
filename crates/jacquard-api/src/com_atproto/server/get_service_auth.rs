@@ -12,10 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetServiceAuth<'a> {
     #[serde(borrow)]
@@ -25,6 +23,133 @@ pub struct GetServiceAuth<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub lxm: std::option::Option<jacquard_common::types::string::Nsid<'a>>,
+}
+
+pub mod get_service_auth_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Aud;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Aud = Unset;
+    }
+    ///State transition - sets the `aud` field to Set
+    pub struct SetAud<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAud<S> {}
+    impl<S: State> State for SetAud<S> {
+        type Aud = Set<members::aud>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `aud` field
+        pub struct aud(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetServiceAuthBuilder<'a, S: get_service_auth_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::types::string::Nsid<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GetServiceAuth<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GetServiceAuthBuilder<'a, get_service_auth_state::Empty> {
+        GetServiceAuthBuilder::new()
+    }
+}
+
+impl<'a> GetServiceAuthBuilder<'a, get_service_auth_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetServiceAuthBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetServiceAuthBuilder<'a, S>
+where
+    S: get_service_auth_state::State,
+    S::Aud: get_service_auth_state::IsUnset,
+{
+    /// Set the `aud` field (required)
+    pub fn aud(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> GetServiceAuthBuilder<'a, get_service_auth_state::SetAud<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        GetServiceAuthBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: get_service_auth_state::State> GetServiceAuthBuilder<'a, S> {
+    /// Set the `exp` field (optional)
+    pub fn exp(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `exp` field to an Option value (optional)
+    pub fn maybe_exp(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: get_service_auth_state::State> GetServiceAuthBuilder<'a, S> {
+    /// Set the `lxm` field (optional)
+    pub fn lxm(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Nsid<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `lxm` field to an Option value (optional)
+    pub fn maybe_lxm(
+        mut self,
+        value: Option<jacquard_common::types::string::Nsid<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> GetServiceAuthBuilder<'a, S>
+where
+    S: get_service_auth_state::State,
+    S::Aud: get_service_auth_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetServiceAuth<'a> {
+        GetServiceAuth {
+            aud: self.__unsafe_private_named.0.unwrap(),
+            exp: self.__unsafe_private_named.1,
+            lxm: self.__unsafe_private_named.2,
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

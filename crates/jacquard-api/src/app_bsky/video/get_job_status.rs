@@ -12,15 +12,101 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetJobStatus<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub job_id: jacquard_common::CowStr<'a>,
+}
+
+pub mod get_job_status_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type JobId;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type JobId = Unset;
+    }
+    ///State transition - sets the `job_id` field to Set
+    pub struct SetJobId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetJobId<S> {}
+    impl<S: State> State for SetJobId<S> {
+        type JobId = Set<members::job_id>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `job_id` field
+        pub struct job_id(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetJobStatusBuilder<'a, S: get_job_status_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (::core::option::Option<jacquard_common::CowStr<'a>>,),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GetJobStatus<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GetJobStatusBuilder<'a, get_job_status_state::Empty> {
+        GetJobStatusBuilder::new()
+    }
+}
+
+impl<'a> GetJobStatusBuilder<'a, get_job_status_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetJobStatusBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetJobStatusBuilder<'a, S>
+where
+    S: get_job_status_state::State,
+    S::JobId: get_job_status_state::IsUnset,
+{
+    /// Set the `jobId` field (required)
+    pub fn job_id(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> GetJobStatusBuilder<'a, get_job_status_state::SetJobId<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        GetJobStatusBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetJobStatusBuilder<'a, S>
+where
+    S: get_job_status_state::State,
+    S::JobId: get_job_status_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetJobStatus<'a> {
+        GetJobStatus {
+            job_id: self.__unsafe_private_named.0.unwrap(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

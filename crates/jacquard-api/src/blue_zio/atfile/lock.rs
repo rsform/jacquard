@@ -14,14 +14,95 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Lock<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub lock: Option<bool>,
+}
+
+pub mod lock_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {}
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {}
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {}
+}
+
+/// Builder for constructing an instance of this type
+pub struct LockBuilder<'a, S: lock_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (::core::option::Option<bool>,),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Lock<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> LockBuilder<'a, lock_state::Empty> {
+        LockBuilder::new()
+    }
+}
+
+impl<'a> LockBuilder<'a, lock_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        LockBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: lock_state::State> LockBuilder<'a, S> {
+    /// Set the `lock` field (optional)
+    pub fn lock(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `lock` field to an Option value (optional)
+    pub fn maybe_lock(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> LockBuilder<'a, S>
+where
+    S: lock_state::State,
+{
+    /// Build the final struct
+    pub fn build(self) -> Lock<'a> {
+        Lock {
+            lock: self.__unsafe_private_named.0,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Lock<'a> {
+        Lock {
+            lock: self.__unsafe_private_named.0,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Lock<'a> {

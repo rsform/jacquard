@@ -14,33 +14,256 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Service<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub labels: Option<crate::com_atproto::label::SelfLabels<'a>>,
     #[serde(borrow)]
     pub policies: crate::app_bsky::labeler::LabelerPolicies<'a>,
     /// The set of report reason 'codes' which are in-scope for this service to review and action. These usually align to policy categories. If not defined (distinct from empty array), all reason types are allowed.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub reason_types: Option<Vec<crate::com_atproto::moderation::ReasonType<'a>>>,
     /// Set of record types (collection NSIDs) which can be reported to this service. If not defined (distinct from empty array), default is any record type.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub subject_collections: Option<Vec<jacquard_common::types::string::Nsid<'a>>>,
     /// The set of subject types (account, record, etc) this service accepts reports on.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub subject_types: Option<Vec<crate::com_atproto::moderation::SubjectType<'a>>>,
+}
+
+pub mod service_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Policies;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Policies = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `policies` field to Set
+    pub struct SetPolicies<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPolicies<S> {}
+    impl<S: State> State for SetPolicies<S> {
+        type Policies = Set<members::policies>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Policies = S::Policies;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `policies` field
+        pub struct policies(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ServiceBuilder<'a, S: service_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
+        ::core::option::Option<crate::app_bsky::labeler::LabelerPolicies<'a>>,
+        ::core::option::Option<Vec<crate::com_atproto::moderation::ReasonType<'a>>>,
+        ::core::option::Option<Vec<jacquard_common::types::string::Nsid<'a>>>,
+        ::core::option::Option<Vec<crate::com_atproto::moderation::SubjectType<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Service<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ServiceBuilder<'a, service_state::Empty> {
+        ServiceBuilder::new()
+    }
+}
+
+impl<'a> ServiceBuilder<'a, service_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ServiceBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ServiceBuilder<'a, S>
+where
+    S: service_state::State,
+    S::CreatedAt: service_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> ServiceBuilder<'a, service_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ServiceBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
+    /// Set the `labels` field (optional)
+    pub fn labels(
+        mut self,
+        value: impl Into<Option<crate::com_atproto::label::SelfLabels<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `labels` field to an Option value (optional)
+    pub fn maybe_labels(
+        mut self,
+        value: Option<crate::com_atproto::label::SelfLabels<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> ServiceBuilder<'a, S>
+where
+    S: service_state::State,
+    S::Policies: service_state::IsUnset,
+{
+    /// Set the `policies` field (required)
+    pub fn policies(
+        mut self,
+        value: impl Into<crate::app_bsky::labeler::LabelerPolicies<'a>>,
+    ) -> ServiceBuilder<'a, service_state::SetPolicies<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        ServiceBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
+    /// Set the `reasonTypes` field (optional)
+    pub fn reason_types(
+        mut self,
+        value: impl Into<Option<Vec<crate::com_atproto::moderation::ReasonType<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `reasonTypes` field to an Option value (optional)
+    pub fn maybe_reason_types(
+        mut self,
+        value: Option<Vec<crate::com_atproto::moderation::ReasonType<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
+    /// Set the `subjectCollections` field (optional)
+    pub fn subject_collections(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::types::string::Nsid<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `subjectCollections` field to an Option value (optional)
+    pub fn maybe_subject_collections(
+        mut self,
+        value: Option<Vec<jacquard_common::types::string::Nsid<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
+    /// Set the `subjectTypes` field (optional)
+    pub fn subject_types(
+        mut self,
+        value: impl Into<Option<Vec<crate::com_atproto::moderation::SubjectType<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `subjectTypes` field to an Option value (optional)
+    pub fn maybe_subject_types(
+        mut self,
+        value: Option<Vec<crate::com_atproto::moderation::SubjectType<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S> ServiceBuilder<'a, S>
+where
+    S: service_state::State,
+    S::Policies: service_state::IsSet,
+    S::CreatedAt: service_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Service<'a> {
+        Service {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            labels: self.__unsafe_private_named.1,
+            policies: self.__unsafe_private_named.2.unwrap(),
+            reason_types: self.__unsafe_private_named.3,
+            subject_collections: self.__unsafe_private_named.4,
+            subject_types: self.__unsafe_private_named.5,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Service<'a> {
+        Service {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            labels: self.__unsafe_private_named.1,
+            policies: self.__unsafe_private_named.2.unwrap(),
+            reason_types: self.__unsafe_private_named.3,
+            subject_collections: self.__unsafe_private_named.4,
+            subject_types: self.__unsafe_private_named.5,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Service<'a> {

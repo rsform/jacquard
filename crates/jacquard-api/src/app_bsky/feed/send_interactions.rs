@@ -13,21 +13,117 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-#[builder(start_fn = new)]
 pub struct SendInteractions<'a> {
     #[serde(borrow)]
     pub interactions: Vec<crate::app_bsky::feed::Interaction<'a>>,
-    #[serde(flatten)]
-    #[serde(borrow)]
-    #[builder(default)]
-    pub extra_data: ::std::collections::BTreeMap<
-        ::jacquard_common::smol_str::SmolStr,
-        ::jacquard_common::types::value::Data<'a>,
-    >,
+}
+
+pub mod send_interactions_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Interactions;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Interactions = Unset;
+    }
+    ///State transition - sets the `interactions` field to Set
+    pub struct SetInteractions<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetInteractions<S> {}
+    impl<S: State> State for SetInteractions<S> {
+        type Interactions = Set<members::interactions>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `interactions` field
+        pub struct interactions(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct SendInteractionsBuilder<'a, S: send_interactions_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<Vec<crate::app_bsky::feed::Interaction<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> SendInteractions<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> SendInteractionsBuilder<'a, send_interactions_state::Empty> {
+        SendInteractionsBuilder::new()
+    }
+}
+
+impl<'a> SendInteractionsBuilder<'a, send_interactions_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        SendInteractionsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SendInteractionsBuilder<'a, S>
+where
+    S: send_interactions_state::State,
+    S::Interactions: send_interactions_state::IsUnset,
+{
+    /// Set the `interactions` field (required)
+    pub fn interactions(
+        mut self,
+        value: impl Into<Vec<crate::app_bsky::feed::Interaction<'a>>>,
+    ) -> SendInteractionsBuilder<'a, send_interactions_state::SetInteractions<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        SendInteractionsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SendInteractionsBuilder<'a, S>
+where
+    S: send_interactions_state::State,
+    S::Interactions: send_interactions_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> SendInteractions<'a> {
+        SendInteractions {
+            interactions: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> SendInteractions<'a> {
+        SendInteractions {
+            interactions: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

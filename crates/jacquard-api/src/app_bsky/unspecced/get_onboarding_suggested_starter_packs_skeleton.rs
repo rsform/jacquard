@@ -12,10 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetOnboardingSuggestedStarterPacksSkeleton<'a> {
     ///(default: 10, min: 1, max: 25)
@@ -24,6 +22,115 @@ pub struct GetOnboardingSuggestedStarterPacksSkeleton<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub viewer: std::option::Option<jacquard_common::types::string::Did<'a>>,
+}
+
+pub mod get_onboarding_suggested_starter_packs_skeleton_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {}
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {}
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {}
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetOnboardingSuggestedStarterPacksSkeletonBuilder<
+    'a,
+    S: get_onboarding_suggested_starter_packs_skeleton_state::State,
+> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GetOnboardingSuggestedStarterPacksSkeleton<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GetOnboardingSuggestedStarterPacksSkeletonBuilder<
+        'a,
+        get_onboarding_suggested_starter_packs_skeleton_state::Empty,
+    > {
+        GetOnboardingSuggestedStarterPacksSkeletonBuilder::new()
+    }
+}
+
+impl<
+    'a,
+> GetOnboardingSuggestedStarterPacksSkeletonBuilder<
+    'a,
+    get_onboarding_suggested_starter_packs_skeleton_state::Empty,
+> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetOnboardingSuggestedStarterPacksSkeletonBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<
+    'a,
+    S: get_onboarding_suggested_starter_packs_skeleton_state::State,
+> GetOnboardingSuggestedStarterPacksSkeletonBuilder<'a, S> {
+    /// Set the `limit` field (optional)
+    pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `limit` field to an Option value (optional)
+    pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<
+    'a,
+    S: get_onboarding_suggested_starter_packs_skeleton_state::State,
+> GetOnboardingSuggestedStarterPacksSkeletonBuilder<'a, S> {
+    /// Set the `viewer` field (optional)
+    pub fn viewer(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Did<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `viewer` field to an Option value (optional)
+    pub fn maybe_viewer(
+        mut self,
+        value: Option<jacquard_common::types::string::Did<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> GetOnboardingSuggestedStarterPacksSkeletonBuilder<'a, S>
+where
+    S: get_onboarding_suggested_starter_packs_skeleton_state::State,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetOnboardingSuggestedStarterPacksSkeleton<'a> {
+        GetOnboardingSuggestedStarterPacksSkeleton {
+            limit: self.__unsafe_private_named.0,
+            viewer: self.__unsafe_private_named.1,
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

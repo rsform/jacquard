@@ -14,8 +14,7 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Message<'a> {
@@ -23,11 +22,9 @@ pub struct Message<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     /// Annotations of text (mentions, URLs, etc)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub facets: Option<Vec<crate::place_stream::richtext::facet::Facet<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub reply: Option<crate::place_stream::chat::message::ReplyRef<'a>>,
     /// The DID of the streamer whose chat this is.
@@ -35,8 +32,228 @@ pub struct Message<'a> {
     pub streamer: jacquard_common::types::string::Did<'a>,
     /// The primary message content. May be an empty string, if there are embeds.
     #[serde(borrow)]
-    #[builder(into)]
     pub text: jacquard_common::CowStr<'a>,
+}
+
+pub mod message_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Text;
+        type CreatedAt;
+        type Streamer;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Text = Unset;
+        type CreatedAt = Unset;
+        type Streamer = Unset;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetText<S> {}
+    impl<S: State> State for SetText<S> {
+        type Text = Set<members::text>;
+        type CreatedAt = S::CreatedAt;
+        type Streamer = S::Streamer;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Text = S::Text;
+        type CreatedAt = Set<members::created_at>;
+        type Streamer = S::Streamer;
+    }
+    ///State transition - sets the `streamer` field to Set
+    pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStreamer<S> {}
+    impl<S: State> State for SetStreamer<S> {
+        type Text = S::Text;
+        type CreatedAt = S::CreatedAt;
+        type Streamer = Set<members::streamer>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `text` field
+        pub struct text(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `streamer` field
+        pub struct streamer(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct MessageBuilder<'a, S: message_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<Vec<crate::place_stream::richtext::facet::Facet<'a>>>,
+        ::core::option::Option<crate::place_stream::chat::message::ReplyRef<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Message<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> MessageBuilder<'a, message_state::Empty> {
+        MessageBuilder::new()
+    }
+}
+
+impl<'a> MessageBuilder<'a, message_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        MessageBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> MessageBuilder<'a, S>
+where
+    S: message_state::State,
+    S::CreatedAt: message_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> MessageBuilder<'a, message_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        MessageBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: message_state::State> MessageBuilder<'a, S> {
+    /// Set the `facets` field (optional)
+    pub fn facets(
+        mut self,
+        value: impl Into<Option<Vec<crate::place_stream::richtext::facet::Facet<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `facets` field to an Option value (optional)
+    pub fn maybe_facets(
+        mut self,
+        value: Option<Vec<crate::place_stream::richtext::facet::Facet<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: message_state::State> MessageBuilder<'a, S> {
+    /// Set the `reply` field (optional)
+    pub fn reply(
+        mut self,
+        value: impl Into<Option<crate::place_stream::chat::message::ReplyRef<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `reply` field to an Option value (optional)
+    pub fn maybe_reply(
+        mut self,
+        value: Option<crate::place_stream::chat::message::ReplyRef<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> MessageBuilder<'a, S>
+where
+    S: message_state::State,
+    S::Streamer: message_state::IsUnset,
+{
+    /// Set the `streamer` field (required)
+    pub fn streamer(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> MessageBuilder<'a, message_state::SetStreamer<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        MessageBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> MessageBuilder<'a, S>
+where
+    S: message_state::State,
+    S::Text: message_state::IsUnset,
+{
+    /// Set the `text` field (required)
+    pub fn text(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> MessageBuilder<'a, message_state::SetText<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        MessageBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> MessageBuilder<'a, S>
+where
+    S: message_state::State,
+    S::Text: message_state::IsSet,
+    S::CreatedAt: message_state::IsSet,
+    S::Streamer: message_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Message<'a> {
+        Message {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            facets: self.__unsafe_private_named.1,
+            reply: self.__unsafe_private_named.2,
+            streamer: self.__unsafe_private_named.3.unwrap(),
+            text: self.__unsafe_private_named.4.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Message<'a> {
+        Message {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            facets: self.__unsafe_private_named.1,
+            reply: self.__unsafe_private_named.2,
+            streamer: self.__unsafe_private_named.3.unwrap(),
+            text: self.__unsafe_private_named.4.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Message<'a> {
@@ -325,8 +542,7 @@ fn lexicon_doc_place_stream_chat_message() -> ::jacquard_lexicon::lexicon::Lexic
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ReplyRef<'a> {
@@ -334,6 +550,146 @@ pub struct ReplyRef<'a> {
     pub parent: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     #[serde(borrow)]
     pub root: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+}
+
+pub mod reply_ref_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Root;
+        type Parent;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Root = Unset;
+        type Parent = Unset;
+    }
+    ///State transition - sets the `root` field to Set
+    pub struct SetRoot<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRoot<S> {}
+    impl<S: State> State for SetRoot<S> {
+        type Root = Set<members::root>;
+        type Parent = S::Parent;
+    }
+    ///State transition - sets the `parent` field to Set
+    pub struct SetParent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetParent<S> {}
+    impl<S: State> State for SetParent<S> {
+        type Root = S::Root;
+        type Parent = Set<members::parent>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `root` field
+        pub struct root(());
+        ///Marker type for the `parent` field
+        pub struct parent(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ReplyRefBuilder<'a, S: reply_ref_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ReplyRef<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ReplyRefBuilder<'a, reply_ref_state::Empty> {
+        ReplyRefBuilder::new()
+    }
+}
+
+impl<'a> ReplyRefBuilder<'a, reply_ref_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ReplyRefBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ReplyRefBuilder<'a, S>
+where
+    S: reply_ref_state::State,
+    S::Parent: reply_ref_state::IsUnset,
+{
+    /// Set the `parent` field (required)
+    pub fn parent(
+        mut self,
+        value: impl Into<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    ) -> ReplyRefBuilder<'a, reply_ref_state::SetParent<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ReplyRefBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ReplyRefBuilder<'a, S>
+where
+    S: reply_ref_state::State,
+    S::Root: reply_ref_state::IsUnset,
+{
+    /// Set the `root` field (required)
+    pub fn root(
+        mut self,
+        value: impl Into<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    ) -> ReplyRefBuilder<'a, reply_ref_state::SetRoot<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        ReplyRefBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ReplyRefBuilder<'a, S>
+where
+    S: reply_ref_state::State,
+    S::Root: reply_ref_state::IsSet,
+    S::Parent: reply_ref_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> ReplyRef<'a> {
+        ReplyRef {
+            parent: self.__unsafe_private_named.0.unwrap(),
+            root: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> ReplyRef<'a> {
+        ReplyRef {
+            parent: self.__unsafe_private_named.0.unwrap(),
+            root: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReplyRef<'a> {

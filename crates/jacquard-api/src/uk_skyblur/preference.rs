@@ -14,13 +14,117 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Preference<'a> {
     #[serde(borrow)]
     pub my_page: crate::uk_skyblur::preference::MyPage<'a>,
+}
+
+pub mod preference_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type MyPage;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type MyPage = Unset;
+    }
+    ///State transition - sets the `my_page` field to Set
+    pub struct SetMyPage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMyPage<S> {}
+    impl<S: State> State for SetMyPage<S> {
+        type MyPage = Set<members::my_page>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `my_page` field
+        pub struct my_page(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct PreferenceBuilder<'a, S: preference_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<crate::uk_skyblur::preference::MyPage<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Preference<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> PreferenceBuilder<'a, preference_state::Empty> {
+        PreferenceBuilder::new()
+    }
+}
+
+impl<'a> PreferenceBuilder<'a, preference_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        PreferenceBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PreferenceBuilder<'a, S>
+where
+    S: preference_state::State,
+    S::MyPage: preference_state::IsUnset,
+{
+    /// Set the `myPage` field (required)
+    pub fn my_page(
+        mut self,
+        value: impl Into<crate::uk_skyblur::preference::MyPage<'a>>,
+    ) -> PreferenceBuilder<'a, preference_state::SetMyPage<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        PreferenceBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PreferenceBuilder<'a, S>
+where
+    S: preference_state::State,
+    S::MyPage: preference_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Preference<'a> {
+        Preference {
+            my_page: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Preference<'a> {
+        Preference {
+            my_page: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Preference<'a> {
@@ -207,18 +311,143 @@ fn lexicon_doc_uk_skyblur_preference() -> ::jacquard_lexicon::lexicon::LexiconDo
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MyPage<'a> {
     /// Define the description displayed on MyPage.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub description: Option<jacquard_common::CowStr<'a>>,
     /// If this item is true, MyPage will be displayed.
     pub is_use_my_page: bool,
+}
+
+pub mod my_page_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type IsUseMyPage;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type IsUseMyPage = Unset;
+    }
+    ///State transition - sets the `is_use_my_page` field to Set
+    pub struct SetIsUseMyPage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIsUseMyPage<S> {}
+    impl<S: State> State for SetIsUseMyPage<S> {
+        type IsUseMyPage = Set<members::is_use_my_page>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `is_use_my_page` field
+        pub struct is_use_my_page(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct MyPageBuilder<'a, S: my_page_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<bool>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> MyPage<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> MyPageBuilder<'a, my_page_state::Empty> {
+        MyPageBuilder::new()
+    }
+}
+
+impl<'a> MyPageBuilder<'a, my_page_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        MyPageBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: my_page_state::State> MyPageBuilder<'a, S> {
+    /// Set the `description` field (optional)
+    pub fn description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `description` field to an Option value (optional)
+    pub fn maybe_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> MyPageBuilder<'a, S>
+where
+    S: my_page_state::State,
+    S::IsUseMyPage: my_page_state::IsUnset,
+{
+    /// Set the `isUseMyPage` field (required)
+    pub fn is_use_my_page(
+        mut self,
+        value: impl Into<bool>,
+    ) -> MyPageBuilder<'a, my_page_state::SetIsUseMyPage<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        MyPageBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> MyPageBuilder<'a, S>
+where
+    S: my_page_state::State,
+    S::IsUseMyPage: my_page_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> MyPage<'a> {
+        MyPage {
+            description: self.__unsafe_private_named.0,
+            is_use_my_page: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> MyPage<'a> {
+        MyPage {
+            description: self.__unsafe_private_named.0,
+            is_use_my_page: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MyPage<'a> {

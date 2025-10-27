@@ -14,13 +14,115 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Schema<'a> {
     /// Indicates the 'version' of the Lexicon language. Must be '1' for the current atproto/Lexicon schema system.
     pub lexicon: i64,
+}
+
+pub mod schema_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Lexicon;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Lexicon = Unset;
+    }
+    ///State transition - sets the `lexicon` field to Set
+    pub struct SetLexicon<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLexicon<S> {}
+    impl<S: State> State for SetLexicon<S> {
+        type Lexicon = Set<members::lexicon>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `lexicon` field
+        pub struct lexicon(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct SchemaBuilder<'a, S: schema_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (::core::option::Option<i64>,),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Schema<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> SchemaBuilder<'a, schema_state::Empty> {
+        SchemaBuilder::new()
+    }
+}
+
+impl<'a> SchemaBuilder<'a, schema_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        SchemaBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SchemaBuilder<'a, S>
+where
+    S: schema_state::State,
+    S::Lexicon: schema_state::IsUnset,
+{
+    /// Set the `lexicon` field (required)
+    pub fn lexicon(
+        mut self,
+        value: impl Into<i64>,
+    ) -> SchemaBuilder<'a, schema_state::SetLexicon<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        SchemaBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SchemaBuilder<'a, S>
+where
+    S: schema_state::State,
+    S::Lexicon: schema_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Schema<'a> {
+        Schema {
+            lexicon: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Schema<'a> {
+        Schema {
+            lexicon: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Schema<'a> {

@@ -14,50 +14,41 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Offer<'a> {
     /// The payment method(s) that are accepted in general by an organization, or for some specific demand or offer.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub accepted_payment_method: Option<OfferAcceptedPaymentMethod<'a>>,
     /// An additional offer that can only be obtained in combination with the first base offer (e.g. supplements and extensions that are available for a surcharge).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub add_on: Option<OfferAddOn<'a>>,
     /// A property-value pair representing an additional characteristic of the entity, e.g. a product feature or another characteristic for which there is no matching property in schema.org.\n\nNote: Publishers should be aware that applications designed to use specific schema.org properties (e.g. https://schema.org/width, https://schema.org/color, https://schema.org/gtin13, ...) will typically expect such data to be provided using those properties, rather than using the generic property/value mechanism.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub additional_property: Option<OfferAdditionalProperty<'a>>,
     /** An additional type for the item, typically used for adding more specific types from external vocabularies in microdata syntax. This is a relationship between something and a class that the thing is in. Typically the value is a URI-identified RDF class, and in this case corresponds to the
     use of rdf:type in RDF. Text values can be used sparingly, for cases where useful information can be added without their being an appropriate schema to reference. In the case of text values, the class label should follow the schema.org <a href="https://schema.org/docs/styleguide.html">style guide</a>.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub additional_type: Option<jacquard_common::CowStr<'a>>,
     /// The amount of time that is required between accepting the offer and the actual usage of the resource or service.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub advance_booking_requirement: Option<OfferAdvanceBookingRequirement<'a>>,
     /// The overall rating, based on a collection of reviews or ratings, of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub aggregate_rating: Option<OfferAggregateRating<'a>>,
     /// An alias for the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub alternate_name: Option<jacquard_common::CowStr<'a>>,
     /// The geographic area where a service or offered item is provided.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub area_served: Option<OfferAreaServed<'a>>,
     /** An Amazon Standard Identification Number (ASIN) is a 10-character alphanumeric unique identifier assigned by Amazon.com and its partners for product identification within the Amazon organization (summary from [Wikipedia](https://en.wikipedia.org/wiki/Amazon_Standard_Identification_Number)'s article).
@@ -65,87 +56,70 @@ pub struct Offer<'a> {
 Note also that this is a definition for how to include ASINs in Schema.org data, and not a definition of ASINs in general - see documentation from Amazon for authoritative details.
 ASINs are most commonly encoded as text strings, but the [asin] property supports URL/URI as potential values too.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub asin: Option<jacquard_common::CowStr<'a>>,
     /// The availability of this item&#x2014;for example In stock, Out of stock, Pre-order, etc.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub availability: Option<OfferAvailability<'a>>,
     /// The end of the availability of the product or service included in the offer.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub availability_ends: Option<jacquard_common::CowStr<'a>>,
     /// The beginning of the availability of the product or service included in the offer.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub availability_starts: Option<jacquard_common::CowStr<'a>>,
     /// The place(s) from which the offer can be obtained (e.g. store locations).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub available_at_or_from: Option<OfferAvailableAtOrFrom<'a>>,
     /// The delivery method(s) available for this offer.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub available_delivery_method: Option<OfferAvailableDeliveryMethod<'a>>,
     /// The business function (e.g. sell, lease, repair, dispose) of the offer or component of a bundle (TypeAndQuantityNode). The default is http://purl.org/goodrelations/v1#Sell.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub business_function: Option<OfferBusinessFunction<'a>>,
     /// A category for the item. Greater signs or slashes can be used to informally indicate a category hierarchy.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub category: Option<OfferCategory<'a>>,
     /// A URL template (RFC 6570) for a checkout page for an offer. This approach allows merchants to specify a URL for online checkout of the offered product, by interpolating parameters such as the logged in user ID, product ID, quantity, discount code etc. Parameter naming and standardization are not specified here.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub checkout_page_url_template: Option<jacquard_common::CowStr<'a>>,
     /// The typical delay between the receipt of the order and the goods either leaving the warehouse or being prepared for pickup, in case the delivery method is on site pickup.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub delivery_lead_time: Option<OfferDeliveryLeadTime<'a>>,
     /// A description of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub description: Option<OfferDescription<'a>>,
     /// A sub property of description. A short description of the item used to disambiguate from other, similar items. Information from other properties (in particular, name) may be necessary for the description to be useful for disambiguation.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub disambiguating_description: Option<jacquard_common::CowStr<'a>>,
     /// The type(s) of customers for which the given offer is valid.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub eligible_customer_type: Option<OfferEligibleCustomerType<'a>>,
     /// The duration for which the given offer is valid.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub eligible_duration: Option<OfferEligibleDuration<'a>>,
     /// The interval and unit of measurement of ordering quantities for which the offer or price specification is valid. This allows e.g. specifying that a certain freight charge is valid only for a certain quantity.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub eligible_quantity: Option<OfferEligibleQuantity<'a>>,
     /// The ISO 3166-1 (ISO 3166-1 alpha-2) or ISO 3166-2 code, the place, or the GeoShape for the geo-political region(s) for which the offer or delivery charge specification is valid.\n\nSee also [[ineligibleRegion]].
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub eligible_region: Option<OfferEligibleRegion<'a>>,
     /// The transaction volume, in a monetary unit, for which the offer or price specification is valid, e.g. for indicating a minimal purchasing volume, to express free shipping above a certain order volume, or to limit the acceptance of credit cards to purchases to a certain minimal amount.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub eligible_transaction_volume: Option<OfferEligibleTransactionVolume<'a>>,
     /** A Global Trade Item Number ([GTIN](https://www.gs1.org/standards/id-keys/gtin)). GTINs identify trade items, including products and services, using numeric identification codes.
@@ -157,207 +131,1634 @@ Digital Links should be populated into the [[hasGS1DigitalLink]] attribute.
 
 Note also that this is a definition for how to include GTINs in Schema.org data, and not a definition of GTINs in general - see the GS1 documentation for authoritative details.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub gtin: Option<jacquard_common::CowStr<'a>>,
     /// The GTIN-12 code of the product, or the product to which the offer refers. The GTIN-12 is the 12-digit GS1 Identification Key composed of a U.P.C. Company Prefix, Item Reference, and Check Digit used to identify trade items. See [GS1 GTIN Summary](http://www.gs1.org/barcodes/technical/idkeys/gtin) for more details.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub gtin12: Option<jacquard_common::CowStr<'a>>,
     /// The GTIN-13 code of the product, or the product to which the offer refers. This is equivalent to 13-digit ISBN codes and EAN UCC-13. Former 12-digit UPC codes can be converted into a GTIN-13 code by simply adding a preceding zero. See [GS1 GTIN Summary](http://www.gs1.org/barcodes/technical/idkeys/gtin) for more details.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub gtin13: Option<jacquard_common::CowStr<'a>>,
     /// The GTIN-14 code of the product, or the product to which the offer refers. See [GS1 GTIN Summary](http://www.gs1.org/barcodes/technical/idkeys/gtin) for more details.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub gtin14: Option<jacquard_common::CowStr<'a>>,
     /// The GTIN-8 code of the product, or the product to which the offer refers. This code is also known as EAN/UCC-8 or 8-digit EAN. See [GS1 GTIN Summary](http://www.gs1.org/barcodes/technical/idkeys/gtin) for more details.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub gtin8: Option<jacquard_common::CowStr<'a>>,
     /// Used to tag an item to be intended or suitable for consumption or use by adults only.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub has_adult_consideration: Option<jacquard_common::CowStr<'a>>,
     /// The <a href="https://www.gs1.org/standards/gs1-digital-link">GS1 digital link</a> associated with the object. This URL should conform to the particular requirements of digital links. The link should only contain the Application Identifiers (AIs) that are relevant for the entity being annotated, for instance a [[Product]] or an [[Organization]], and for the correct granularity. In particular, for products:<ul><li>A Digital Link that contains a serial number (AI <code>21</code>) should only be present on instances of [[IndividualProduct]]</li><li>A Digital Link that contains a lot number (AI <code>10</code>) should be annotated as [[SomeProduct]] if only products from that lot are sold, or [[IndividualProduct]] if there is only a specific product.</li><li>A Digital Link that contains a global model number (AI <code>8013</code>)  should be attached to a [[Product]] or a [[ProductModel]].</li></ul> Other item types should be adapted similarly.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub has_gs1_digital_link: Option<jacquard_common::types::string::Uri<'a>>,
     /// A measurement of an item, For example, the inseam of pants, the wheel size of a bicycle, the gauge of a screw, or the carbon footprint measured for certification by an authority. Usually an exact measurement, but can also be a range of measurements for adjustable products, for example belts and ski bindings.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub has_measurement: Option<OfferHasMeasurement<'a>>,
     /// Specifies a MerchantReturnPolicy that may be applicable.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub has_merchant_return_policy: Option<OfferHasMerchantReturnPolicy<'a>>,
     /// The identifier property represents any kind of identifier for any kind of [[Thing]], such as ISBNs, GTIN codes, UUIDs etc. Schema.org provides dedicated properties for representing many of these, either as textual strings or as URL (URI) links. See [background notes](/docs/datamodel.html#identifierBg) for more details.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub identifier: Option<OfferIdentifier<'a>>,
     /// An image of the item. This can be a [[URL]] or a fully described [[ImageObject]].
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub image: Option<OfferImage<'a>>,
     /// This links to a node or nodes indicating the exact quantity of the products included in  an [[Offer]] or [[ProductCollection]].
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub includes_object: Option<OfferIncludesObject<'a>>,
     /// The ISO 3166-1 (ISO 3166-1 alpha-2) or ISO 3166-2 code, the place, or the GeoShape for the geo-political region(s) for which the offer or delivery charge specification is not valid, e.g. a region where the transaction is not allowed.\n\nSee also [[eligibleRegion]].
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub ineligible_region: Option<OfferIneligibleRegion<'a>>,
     /// The current approximate inventory level for the item or items.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub inventory_level: Option<OfferInventoryLevel<'a>>,
     /// Indicates whether this content is family friendly.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub is_family_friendly: Option<bool>,
     /// A predefined value from OfferItemCondition specifying the condition of the product or service, or the products or services included in the offer. Also used for product return policies to specify the condition of products accepted for returns.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub item_condition: Option<OfferItemCondition<'a>>,
     /// An item being offered (or demanded). The transactional nature of the offer or demand is documented using [[businessFunction]], e.g. sell, lease etc. While several common expected types are listed explicitly in this definition, others can be used. Using a second type, such as Product or a subtype of Product, can clarify the nature of the offer.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub item_offered: Option<OfferItemOffered<'a>>,
     /// Length of the lease for some [[Accommodation]], either particular to some [[Offer]] or in some cases intrinsic to the property.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub lease_length: Option<OfferLeaseLength<'a>>,
     /// Indicates a page (or other CreativeWork) for which this thing is the main entity being described. See [background notes](/docs/datamodel.html#mainEntityBackground) for details.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub main_entity_of_page: Option<OfferMainEntityOfPage<'a>>,
     /** The [[mobileUrl]] property is provided for specific situations in which data consumers need to determine whether one of several provided URLs is a dedicated 'mobile site'.
 
 To discourage over-use, and reflecting intial usecases, the property is expected only on [[Product]] and [[Offer]], rather than [[Thing]]. The general trend in web technology is towards [responsive design](https://en.wikipedia.org/wiki/Responsive_web_design) in which content can be flexibly adapted to a wide range of browsing environments. Pages and sites referenced with the long-established [[url]] property should ideally also be usable on a wide variety of devices, including mobile phones. In most cases, it would be pointless and counter productive to attempt to update all [[url]] markup to use [[mobileUrl]] for more mobile-oriented pages. The property is intended for the case when items (primarily [[Product]] and [[Offer]]) have extra URLs hosted on an additional "mobile site" alongside the main one. It should not be taken as an endorsement of this publication style.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub mobile_url: Option<jacquard_common::types::string::Uri<'a>>,
     /// The Manufacturer Part Number (MPN) of the product, or the product to which the offer refers.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub mpn: Option<jacquard_common::CowStr<'a>>,
     /// The name of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub name: Option<jacquard_common::CowStr<'a>>,
     /// A pointer to the organization or person making the offer.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub offered_by: Option<OfferOfferedBy<'a>>,
     /// Indicates a potential Action, which describes an idealized action in which this thing would play an 'object' role.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub potential_action: Option<OfferPotentialAction<'a>>,
     /// The offer price of a product, or of a price component when attached to PriceSpecification and its subtypes.\n\nUsage guidelines:\n\n* Use the [[priceCurrency]] property (with standard formats: [ISO 4217 currency format](http://en.wikipedia.org/wiki/ISO_4217), e.g. "USD"; [Ticker symbol](https://en.wikipedia.org/wiki/List_of_cryptocurrencies) for cryptocurrencies, e.g. "BTC"; well known names for [Local Exchange Trading Systems](https://en.wikipedia.org/wiki/Local_exchange_trading_system) (LETS) and other currency types, e.g. "Ithaca HOUR") instead of including [ambiguous symbols](http://en.wikipedia.org/wiki/Dollar_sign#Currencies_that_use_the_dollar_or_peso_sign) such as '$' in the value.\n* Use '.' (Unicode 'FULL STOP' (U+002E)) rather than ',' to indicate a decimal point. Avoid using these symbols as a readability separator.\n* Note that both [RDFa](http://www.w3.org/TR/xhtml-rdfa-primer/#using-the-content-attribute) and Microdata syntax allow the use of a "content=" attribute for publishing simple machine-readable values alongside more human-friendly formatting.\n* Use values from 0123456789 (Unicode 'DIGIT ZERO' (U+0030) to 'DIGIT NINE' (U+0039)) rather than superficially similar Unicode symbols.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub price: Option<jacquard_common::CowStr<'a>>,
     /// The currency of the price, or a price component when attached to [[PriceSpecification]] and its subtypes.\n\nUse standard formats: [ISO 4217 currency format](http://en.wikipedia.org/wiki/ISO_4217), e.g. "USD"; [Ticker symbol](https://en.wikipedia.org/wiki/List_of_cryptocurrencies) for cryptocurrencies, e.g. "BTC"; well known names for [Local Exchange Trading Systems](https://en.wikipedia.org/wiki/Local_exchange_trading_system) (LETS) and other currency types, e.g. "Ithaca HOUR".
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub price_currency: Option<jacquard_common::CowStr<'a>>,
     /// One or more detailed price specifications, indicating the unit price and delivery or payment charges.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub price_specification: Option<OfferPriceSpecification<'a>>,
     /// The date after which the price is no longer available.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub price_valid_until: Option<jacquard_common::types::string::Datetime>,
     /// A review of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub review: Option<OfferReview<'a>>,
     /// Review of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub reviews: Option<OfferReviews<'a>>,
     /// URL of a reference Web page that unambiguously indicates the item's identity. E.g. the URL of the item's Wikipedia page, Wikidata entry, or official website.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub same_as: Option<jacquard_common::types::string::Uri<'a>>,
     /// An entity which offers (sells / leases / lends / loans) the services / goods.  A seller may also be a provider.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub seller: Option<OfferSeller<'a>>,
     /// The serial number or any alphanumeric identifier of a particular product. When attached to an offer, it is a shortcut for the serial number of the product included in the offer.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub serial_number: Option<jacquard_common::CowStr<'a>>,
     /// Indicates information about the shipping policies and options associated with an [[Offer]].
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub shipping_details: Option<OfferShippingDetails<'a>>,
     /// The Stock Keeping Unit (SKU), i.e. a merchant-specific identifier for a product or service, or the product to which the offer refers.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub sku: Option<jacquard_common::CowStr<'a>>,
     /// A CreativeWork or Event about this Thing.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub subject_of: Option<OfferSubjectOf<'a>>,
     /// URL of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub url: Option<jacquard_common::types::string::Uri<'a>>,
     /// The membership program tier an Offer (or a PriceSpecification, OfferShippingDetails, or MerchantReturnPolicy under an Offer) is valid for.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub valid_for_member_tier: Option<OfferValidForMemberTier<'a>>,
     /// The date when the item becomes valid.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub valid_from: Option<jacquard_common::types::string::Datetime>,
     /// The date after when the item is not valid. For example the end of an offer, salary period, or a period of opening hours.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub valid_through: Option<jacquard_common::types::string::Datetime>,
     /// The warranty promise(s) included in the offer.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub warranty: Option<OfferWarranty<'a>>,
+}
+
+pub mod offer_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {}
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {}
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {}
+}
+
+/// Builder for constructing an instance of this type
+pub struct OfferBuilder<'a, S: offer_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<OfferAcceptedPaymentMethod<'a>>,
+        ::core::option::Option<OfferAddOn<'a>>,
+        ::core::option::Option<OfferAdditionalProperty<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<OfferAdvanceBookingRequirement<'a>>,
+        ::core::option::Option<OfferAggregateRating<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<OfferAreaServed<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<OfferAvailability<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<OfferAvailableAtOrFrom<'a>>,
+        ::core::option::Option<OfferAvailableDeliveryMethod<'a>>,
+        ::core::option::Option<OfferBusinessFunction<'a>>,
+        ::core::option::Option<OfferCategory<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<OfferDeliveryLeadTime<'a>>,
+        ::core::option::Option<OfferDescription<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<OfferEligibleCustomerType<'a>>,
+        ::core::option::Option<OfferEligibleDuration<'a>>,
+        ::core::option::Option<OfferEligibleQuantity<'a>>,
+        ::core::option::Option<OfferEligibleRegion<'a>>,
+        ::core::option::Option<OfferEligibleTransactionVolume<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<OfferHasMeasurement<'a>>,
+        ::core::option::Option<OfferHasMerchantReturnPolicy<'a>>,
+        ::core::option::Option<OfferIdentifier<'a>>,
+        ::core::option::Option<OfferImage<'a>>,
+        ::core::option::Option<OfferIncludesObject<'a>>,
+        ::core::option::Option<OfferIneligibleRegion<'a>>,
+        ::core::option::Option<OfferInventoryLevel<'a>>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<OfferItemCondition<'a>>,
+        ::core::option::Option<OfferItemOffered<'a>>,
+        ::core::option::Option<OfferLeaseLength<'a>>,
+        ::core::option::Option<OfferMainEntityOfPage<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<OfferOfferedBy<'a>>,
+        ::core::option::Option<OfferPotentialAction<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<OfferPriceSpecification<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<OfferReview<'a>>,
+        ::core::option::Option<OfferReviews<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<OfferSeller<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<OfferShippingDetails<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<OfferSubjectOf<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<OfferValidForMemberTier<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<OfferWarranty<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Offer<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> OfferBuilder<'a, offer_state::Empty> {
+        OfferBuilder::new()
+    }
+}
+
+impl<'a> OfferBuilder<'a, offer_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        OfferBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `acceptedPaymentMethod` field (optional)
+    pub fn accepted_payment_method(
+        mut self,
+        value: impl Into<Option<OfferAcceptedPaymentMethod<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `acceptedPaymentMethod` field to an Option value (optional)
+    pub fn maybe_accepted_payment_method(
+        mut self,
+        value: Option<OfferAcceptedPaymentMethod<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `addOn` field (optional)
+    pub fn add_on(mut self, value: impl Into<Option<OfferAddOn<'a>>>) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `addOn` field to an Option value (optional)
+    pub fn maybe_add_on(mut self, value: Option<OfferAddOn<'a>>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `additionalProperty` field (optional)
+    pub fn additional_property(
+        mut self,
+        value: impl Into<Option<OfferAdditionalProperty<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `additionalProperty` field to an Option value (optional)
+    pub fn maybe_additional_property(
+        mut self,
+        value: Option<OfferAdditionalProperty<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `additionalType` field (optional)
+    pub fn additional_type(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `additionalType` field to an Option value (optional)
+    pub fn maybe_additional_type(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `advanceBookingRequirement` field (optional)
+    pub fn advance_booking_requirement(
+        mut self,
+        value: impl Into<Option<OfferAdvanceBookingRequirement<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `advanceBookingRequirement` field to an Option value (optional)
+    pub fn maybe_advance_booking_requirement(
+        mut self,
+        value: Option<OfferAdvanceBookingRequirement<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `aggregateRating` field (optional)
+    pub fn aggregate_rating(
+        mut self,
+        value: impl Into<Option<OfferAggregateRating<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `aggregateRating` field to an Option value (optional)
+    pub fn maybe_aggregate_rating(
+        mut self,
+        value: Option<OfferAggregateRating<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `alternateName` field (optional)
+    pub fn alternate_name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `alternateName` field to an Option value (optional)
+    pub fn maybe_alternate_name(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `areaServed` field (optional)
+    pub fn area_served(mut self, value: impl Into<Option<OfferAreaServed<'a>>>) -> Self {
+        self.__unsafe_private_named.7 = value.into();
+        self
+    }
+    /// Set the `areaServed` field to an Option value (optional)
+    pub fn maybe_area_served(mut self, value: Option<OfferAreaServed<'a>>) -> Self {
+        self.__unsafe_private_named.7 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `asin` field (optional)
+    pub fn asin(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value.into();
+        self
+    }
+    /// Set the `asin` field to an Option value (optional)
+    pub fn maybe_asin(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.8 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `availability` field (optional)
+    pub fn availability(
+        mut self,
+        value: impl Into<Option<OfferAvailability<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.9 = value.into();
+        self
+    }
+    /// Set the `availability` field to an Option value (optional)
+    pub fn maybe_availability(mut self, value: Option<OfferAvailability<'a>>) -> Self {
+        self.__unsafe_private_named.9 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `availabilityEnds` field (optional)
+    pub fn availability_ends(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.10 = value.into();
+        self
+    }
+    /// Set the `availabilityEnds` field to an Option value (optional)
+    pub fn maybe_availability_ends(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.10 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `availabilityStarts` field (optional)
+    pub fn availability_starts(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.11 = value.into();
+        self
+    }
+    /// Set the `availabilityStarts` field to an Option value (optional)
+    pub fn maybe_availability_starts(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.11 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `availableAtOrFrom` field (optional)
+    pub fn available_at_or_from(
+        mut self,
+        value: impl Into<Option<OfferAvailableAtOrFrom<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.12 = value.into();
+        self
+    }
+    /// Set the `availableAtOrFrom` field to an Option value (optional)
+    pub fn maybe_available_at_or_from(
+        mut self,
+        value: Option<OfferAvailableAtOrFrom<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.12 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `availableDeliveryMethod` field (optional)
+    pub fn available_delivery_method(
+        mut self,
+        value: impl Into<Option<OfferAvailableDeliveryMethod<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.13 = value.into();
+        self
+    }
+    /// Set the `availableDeliveryMethod` field to an Option value (optional)
+    pub fn maybe_available_delivery_method(
+        mut self,
+        value: Option<OfferAvailableDeliveryMethod<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.13 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `businessFunction` field (optional)
+    pub fn business_function(
+        mut self,
+        value: impl Into<Option<OfferBusinessFunction<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.14 = value.into();
+        self
+    }
+    /// Set the `businessFunction` field to an Option value (optional)
+    pub fn maybe_business_function(
+        mut self,
+        value: Option<OfferBusinessFunction<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.14 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `category` field (optional)
+    pub fn category(mut self, value: impl Into<Option<OfferCategory<'a>>>) -> Self {
+        self.__unsafe_private_named.15 = value.into();
+        self
+    }
+    /// Set the `category` field to an Option value (optional)
+    pub fn maybe_category(mut self, value: Option<OfferCategory<'a>>) -> Self {
+        self.__unsafe_private_named.15 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `checkoutPageURLTemplate` field (optional)
+    pub fn checkout_page_url_template(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.16 = value.into();
+        self
+    }
+    /// Set the `checkoutPageURLTemplate` field to an Option value (optional)
+    pub fn maybe_checkout_page_url_template(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.16 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `deliveryLeadTime` field (optional)
+    pub fn delivery_lead_time(
+        mut self,
+        value: impl Into<Option<OfferDeliveryLeadTime<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.17 = value.into();
+        self
+    }
+    /// Set the `deliveryLeadTime` field to an Option value (optional)
+    pub fn maybe_delivery_lead_time(
+        mut self,
+        value: Option<OfferDeliveryLeadTime<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.17 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `description` field (optional)
+    pub fn description(
+        mut self,
+        value: impl Into<Option<OfferDescription<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.18 = value.into();
+        self
+    }
+    /// Set the `description` field to an Option value (optional)
+    pub fn maybe_description(mut self, value: Option<OfferDescription<'a>>) -> Self {
+        self.__unsafe_private_named.18 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `disambiguatingDescription` field (optional)
+    pub fn disambiguating_description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.19 = value.into();
+        self
+    }
+    /// Set the `disambiguatingDescription` field to an Option value (optional)
+    pub fn maybe_disambiguating_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.19 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `eligibleCustomerType` field (optional)
+    pub fn eligible_customer_type(
+        mut self,
+        value: impl Into<Option<OfferEligibleCustomerType<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.20 = value.into();
+        self
+    }
+    /// Set the `eligibleCustomerType` field to an Option value (optional)
+    pub fn maybe_eligible_customer_type(
+        mut self,
+        value: Option<OfferEligibleCustomerType<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.20 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `eligibleDuration` field (optional)
+    pub fn eligible_duration(
+        mut self,
+        value: impl Into<Option<OfferEligibleDuration<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.21 = value.into();
+        self
+    }
+    /// Set the `eligibleDuration` field to an Option value (optional)
+    pub fn maybe_eligible_duration(
+        mut self,
+        value: Option<OfferEligibleDuration<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.21 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `eligibleQuantity` field (optional)
+    pub fn eligible_quantity(
+        mut self,
+        value: impl Into<Option<OfferEligibleQuantity<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.22 = value.into();
+        self
+    }
+    /// Set the `eligibleQuantity` field to an Option value (optional)
+    pub fn maybe_eligible_quantity(
+        mut self,
+        value: Option<OfferEligibleQuantity<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.22 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `eligibleRegion` field (optional)
+    pub fn eligible_region(
+        mut self,
+        value: impl Into<Option<OfferEligibleRegion<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.23 = value.into();
+        self
+    }
+    /// Set the `eligibleRegion` field to an Option value (optional)
+    pub fn maybe_eligible_region(
+        mut self,
+        value: Option<OfferEligibleRegion<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.23 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `eligibleTransactionVolume` field (optional)
+    pub fn eligible_transaction_volume(
+        mut self,
+        value: impl Into<Option<OfferEligibleTransactionVolume<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.24 = value.into();
+        self
+    }
+    /// Set the `eligibleTransactionVolume` field to an Option value (optional)
+    pub fn maybe_eligible_transaction_volume(
+        mut self,
+        value: Option<OfferEligibleTransactionVolume<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.24 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `gtin` field (optional)
+    pub fn gtin(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.25 = value.into();
+        self
+    }
+    /// Set the `gtin` field to an Option value (optional)
+    pub fn maybe_gtin(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.25 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `gtin12` field (optional)
+    pub fn gtin12(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.26 = value.into();
+        self
+    }
+    /// Set the `gtin12` field to an Option value (optional)
+    pub fn maybe_gtin12(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.26 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `gtin13` field (optional)
+    pub fn gtin13(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.27 = value.into();
+        self
+    }
+    /// Set the `gtin13` field to an Option value (optional)
+    pub fn maybe_gtin13(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.27 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `gtin14` field (optional)
+    pub fn gtin14(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.28 = value.into();
+        self
+    }
+    /// Set the `gtin14` field to an Option value (optional)
+    pub fn maybe_gtin14(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.28 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `gtin8` field (optional)
+    pub fn gtin8(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.29 = value.into();
+        self
+    }
+    /// Set the `gtin8` field to an Option value (optional)
+    pub fn maybe_gtin8(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.29 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `hasAdultConsideration` field (optional)
+    pub fn has_adult_consideration(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.30 = value.into();
+        self
+    }
+    /// Set the `hasAdultConsideration` field to an Option value (optional)
+    pub fn maybe_has_adult_consideration(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.30 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `hasGS1DigitalLink` field (optional)
+    pub fn has_gs1_digital_link(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.31 = value.into();
+        self
+    }
+    /// Set the `hasGS1DigitalLink` field to an Option value (optional)
+    pub fn maybe_has_gs1_digital_link(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.31 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `hasMeasurement` field (optional)
+    pub fn has_measurement(
+        mut self,
+        value: impl Into<Option<OfferHasMeasurement<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.32 = value.into();
+        self
+    }
+    /// Set the `hasMeasurement` field to an Option value (optional)
+    pub fn maybe_has_measurement(
+        mut self,
+        value: Option<OfferHasMeasurement<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.32 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `hasMerchantReturnPolicy` field (optional)
+    pub fn has_merchant_return_policy(
+        mut self,
+        value: impl Into<Option<OfferHasMerchantReturnPolicy<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.33 = value.into();
+        self
+    }
+    /// Set the `hasMerchantReturnPolicy` field to an Option value (optional)
+    pub fn maybe_has_merchant_return_policy(
+        mut self,
+        value: Option<OfferHasMerchantReturnPolicy<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.33 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `identifier` field (optional)
+    pub fn identifier(mut self, value: impl Into<Option<OfferIdentifier<'a>>>) -> Self {
+        self.__unsafe_private_named.34 = value.into();
+        self
+    }
+    /// Set the `identifier` field to an Option value (optional)
+    pub fn maybe_identifier(mut self, value: Option<OfferIdentifier<'a>>) -> Self {
+        self.__unsafe_private_named.34 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `image` field (optional)
+    pub fn image(mut self, value: impl Into<Option<OfferImage<'a>>>) -> Self {
+        self.__unsafe_private_named.35 = value.into();
+        self
+    }
+    /// Set the `image` field to an Option value (optional)
+    pub fn maybe_image(mut self, value: Option<OfferImage<'a>>) -> Self {
+        self.__unsafe_private_named.35 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `includesObject` field (optional)
+    pub fn includes_object(
+        mut self,
+        value: impl Into<Option<OfferIncludesObject<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.36 = value.into();
+        self
+    }
+    /// Set the `includesObject` field to an Option value (optional)
+    pub fn maybe_includes_object(
+        mut self,
+        value: Option<OfferIncludesObject<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.36 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `ineligibleRegion` field (optional)
+    pub fn ineligible_region(
+        mut self,
+        value: impl Into<Option<OfferIneligibleRegion<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.37 = value.into();
+        self
+    }
+    /// Set the `ineligibleRegion` field to an Option value (optional)
+    pub fn maybe_ineligible_region(
+        mut self,
+        value: Option<OfferIneligibleRegion<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.37 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `inventoryLevel` field (optional)
+    pub fn inventory_level(
+        mut self,
+        value: impl Into<Option<OfferInventoryLevel<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.38 = value.into();
+        self
+    }
+    /// Set the `inventoryLevel` field to an Option value (optional)
+    pub fn maybe_inventory_level(
+        mut self,
+        value: Option<OfferInventoryLevel<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.38 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `isFamilyFriendly` field (optional)
+    pub fn is_family_friendly(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.39 = value.into();
+        self
+    }
+    /// Set the `isFamilyFriendly` field to an Option value (optional)
+    pub fn maybe_is_family_friendly(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.39 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `itemCondition` field (optional)
+    pub fn item_condition(
+        mut self,
+        value: impl Into<Option<OfferItemCondition<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.40 = value.into();
+        self
+    }
+    /// Set the `itemCondition` field to an Option value (optional)
+    pub fn maybe_item_condition(
+        mut self,
+        value: Option<OfferItemCondition<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.40 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `itemOffered` field (optional)
+    pub fn item_offered(
+        mut self,
+        value: impl Into<Option<OfferItemOffered<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.41 = value.into();
+        self
+    }
+    /// Set the `itemOffered` field to an Option value (optional)
+    pub fn maybe_item_offered(mut self, value: Option<OfferItemOffered<'a>>) -> Self {
+        self.__unsafe_private_named.41 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `leaseLength` field (optional)
+    pub fn lease_length(
+        mut self,
+        value: impl Into<Option<OfferLeaseLength<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.42 = value.into();
+        self
+    }
+    /// Set the `leaseLength` field to an Option value (optional)
+    pub fn maybe_lease_length(mut self, value: Option<OfferLeaseLength<'a>>) -> Self {
+        self.__unsafe_private_named.42 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `mainEntityOfPage` field (optional)
+    pub fn main_entity_of_page(
+        mut self,
+        value: impl Into<Option<OfferMainEntityOfPage<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.43 = value.into();
+        self
+    }
+    /// Set the `mainEntityOfPage` field to an Option value (optional)
+    pub fn maybe_main_entity_of_page(
+        mut self,
+        value: Option<OfferMainEntityOfPage<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.43 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `mobileUrl` field (optional)
+    pub fn mobile_url(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.44 = value.into();
+        self
+    }
+    /// Set the `mobileUrl` field to an Option value (optional)
+    pub fn maybe_mobile_url(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.44 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `mpn` field (optional)
+    pub fn mpn(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+        self.__unsafe_private_named.45 = value.into();
+        self
+    }
+    /// Set the `mpn` field to an Option value (optional)
+    pub fn maybe_mpn(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.45 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `name` field (optional)
+    pub fn name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.46 = value.into();
+        self
+    }
+    /// Set the `name` field to an Option value (optional)
+    pub fn maybe_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.46 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `offeredBy` field (optional)
+    pub fn offered_by(mut self, value: impl Into<Option<OfferOfferedBy<'a>>>) -> Self {
+        self.__unsafe_private_named.47 = value.into();
+        self
+    }
+    /// Set the `offeredBy` field to an Option value (optional)
+    pub fn maybe_offered_by(mut self, value: Option<OfferOfferedBy<'a>>) -> Self {
+        self.__unsafe_private_named.47 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `potentialAction` field (optional)
+    pub fn potential_action(
+        mut self,
+        value: impl Into<Option<OfferPotentialAction<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.48 = value.into();
+        self
+    }
+    /// Set the `potentialAction` field to an Option value (optional)
+    pub fn maybe_potential_action(
+        mut self,
+        value: Option<OfferPotentialAction<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.48 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `price` field (optional)
+    pub fn price(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.49 = value.into();
+        self
+    }
+    /// Set the `price` field to an Option value (optional)
+    pub fn maybe_price(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.49 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `priceCurrency` field (optional)
+    pub fn price_currency(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.50 = value.into();
+        self
+    }
+    /// Set the `priceCurrency` field to an Option value (optional)
+    pub fn maybe_price_currency(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.50 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `priceSpecification` field (optional)
+    pub fn price_specification(
+        mut self,
+        value: impl Into<Option<OfferPriceSpecification<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.51 = value.into();
+        self
+    }
+    /// Set the `priceSpecification` field to an Option value (optional)
+    pub fn maybe_price_specification(
+        mut self,
+        value: Option<OfferPriceSpecification<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.51 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `priceValidUntil` field (optional)
+    pub fn price_valid_until(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.52 = value.into();
+        self
+    }
+    /// Set the `priceValidUntil` field to an Option value (optional)
+    pub fn maybe_price_valid_until(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.52 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `review` field (optional)
+    pub fn review(mut self, value: impl Into<Option<OfferReview<'a>>>) -> Self {
+        self.__unsafe_private_named.53 = value.into();
+        self
+    }
+    /// Set the `review` field to an Option value (optional)
+    pub fn maybe_review(mut self, value: Option<OfferReview<'a>>) -> Self {
+        self.__unsafe_private_named.53 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `reviews` field (optional)
+    pub fn reviews(mut self, value: impl Into<Option<OfferReviews<'a>>>) -> Self {
+        self.__unsafe_private_named.54 = value.into();
+        self
+    }
+    /// Set the `reviews` field to an Option value (optional)
+    pub fn maybe_reviews(mut self, value: Option<OfferReviews<'a>>) -> Self {
+        self.__unsafe_private_named.54 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `sameAs` field (optional)
+    pub fn same_as(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.55 = value.into();
+        self
+    }
+    /// Set the `sameAs` field to an Option value (optional)
+    pub fn maybe_same_as(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.55 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `seller` field (optional)
+    pub fn seller(mut self, value: impl Into<Option<OfferSeller<'a>>>) -> Self {
+        self.__unsafe_private_named.56 = value.into();
+        self
+    }
+    /// Set the `seller` field to an Option value (optional)
+    pub fn maybe_seller(mut self, value: Option<OfferSeller<'a>>) -> Self {
+        self.__unsafe_private_named.56 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `serialNumber` field (optional)
+    pub fn serial_number(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.57 = value.into();
+        self
+    }
+    /// Set the `serialNumber` field to an Option value (optional)
+    pub fn maybe_serial_number(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.57 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `shippingDetails` field (optional)
+    pub fn shipping_details(
+        mut self,
+        value: impl Into<Option<OfferShippingDetails<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.58 = value.into();
+        self
+    }
+    /// Set the `shippingDetails` field to an Option value (optional)
+    pub fn maybe_shipping_details(
+        mut self,
+        value: Option<OfferShippingDetails<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.58 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `sku` field (optional)
+    pub fn sku(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+        self.__unsafe_private_named.59 = value.into();
+        self
+    }
+    /// Set the `sku` field to an Option value (optional)
+    pub fn maybe_sku(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.59 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `subjectOf` field (optional)
+    pub fn subject_of(mut self, value: impl Into<Option<OfferSubjectOf<'a>>>) -> Self {
+        self.__unsafe_private_named.60 = value.into();
+        self
+    }
+    /// Set the `subjectOf` field to an Option value (optional)
+    pub fn maybe_subject_of(mut self, value: Option<OfferSubjectOf<'a>>) -> Self {
+        self.__unsafe_private_named.60 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `url` field (optional)
+    pub fn url(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.61 = value.into();
+        self
+    }
+    /// Set the `url` field to an Option value (optional)
+    pub fn maybe_url(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.61 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `validForMemberTier` field (optional)
+    pub fn valid_for_member_tier(
+        mut self,
+        value: impl Into<Option<OfferValidForMemberTier<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.62 = value.into();
+        self
+    }
+    /// Set the `validForMemberTier` field to an Option value (optional)
+    pub fn maybe_valid_for_member_tier(
+        mut self,
+        value: Option<OfferValidForMemberTier<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.62 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `validFrom` field (optional)
+    pub fn valid_from(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.63 = value.into();
+        self
+    }
+    /// Set the `validFrom` field to an Option value (optional)
+    pub fn maybe_valid_from(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.63 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `validThrough` field (optional)
+    pub fn valid_through(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.64 = value.into();
+        self
+    }
+    /// Set the `validThrough` field to an Option value (optional)
+    pub fn maybe_valid_through(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.64 = value;
+        self
+    }
+}
+
+impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
+    /// Set the `warranty` field (optional)
+    pub fn warranty(mut self, value: impl Into<Option<OfferWarranty<'a>>>) -> Self {
+        self.__unsafe_private_named.65 = value.into();
+        self
+    }
+    /// Set the `warranty` field to an Option value (optional)
+    pub fn maybe_warranty(mut self, value: Option<OfferWarranty<'a>>) -> Self {
+        self.__unsafe_private_named.65 = value;
+        self
+    }
+}
+
+impl<'a, S> OfferBuilder<'a, S>
+where
+    S: offer_state::State,
+{
+    /// Build the final struct
+    pub fn build(self) -> Offer<'a> {
+        Offer {
+            accepted_payment_method: self.__unsafe_private_named.0,
+            add_on: self.__unsafe_private_named.1,
+            additional_property: self.__unsafe_private_named.2,
+            additional_type: self.__unsafe_private_named.3,
+            advance_booking_requirement: self.__unsafe_private_named.4,
+            aggregate_rating: self.__unsafe_private_named.5,
+            alternate_name: self.__unsafe_private_named.6,
+            area_served: self.__unsafe_private_named.7,
+            asin: self.__unsafe_private_named.8,
+            availability: self.__unsafe_private_named.9,
+            availability_ends: self.__unsafe_private_named.10,
+            availability_starts: self.__unsafe_private_named.11,
+            available_at_or_from: self.__unsafe_private_named.12,
+            available_delivery_method: self.__unsafe_private_named.13,
+            business_function: self.__unsafe_private_named.14,
+            category: self.__unsafe_private_named.15,
+            checkout_page_url_template: self.__unsafe_private_named.16,
+            delivery_lead_time: self.__unsafe_private_named.17,
+            description: self.__unsafe_private_named.18,
+            disambiguating_description: self.__unsafe_private_named.19,
+            eligible_customer_type: self.__unsafe_private_named.20,
+            eligible_duration: self.__unsafe_private_named.21,
+            eligible_quantity: self.__unsafe_private_named.22,
+            eligible_region: self.__unsafe_private_named.23,
+            eligible_transaction_volume: self.__unsafe_private_named.24,
+            gtin: self.__unsafe_private_named.25,
+            gtin12: self.__unsafe_private_named.26,
+            gtin13: self.__unsafe_private_named.27,
+            gtin14: self.__unsafe_private_named.28,
+            gtin8: self.__unsafe_private_named.29,
+            has_adult_consideration: self.__unsafe_private_named.30,
+            has_gs1_digital_link: self.__unsafe_private_named.31,
+            has_measurement: self.__unsafe_private_named.32,
+            has_merchant_return_policy: self.__unsafe_private_named.33,
+            identifier: self.__unsafe_private_named.34,
+            image: self.__unsafe_private_named.35,
+            includes_object: self.__unsafe_private_named.36,
+            ineligible_region: self.__unsafe_private_named.37,
+            inventory_level: self.__unsafe_private_named.38,
+            is_family_friendly: self.__unsafe_private_named.39,
+            item_condition: self.__unsafe_private_named.40,
+            item_offered: self.__unsafe_private_named.41,
+            lease_length: self.__unsafe_private_named.42,
+            main_entity_of_page: self.__unsafe_private_named.43,
+            mobile_url: self.__unsafe_private_named.44,
+            mpn: self.__unsafe_private_named.45,
+            name: self.__unsafe_private_named.46,
+            offered_by: self.__unsafe_private_named.47,
+            potential_action: self.__unsafe_private_named.48,
+            price: self.__unsafe_private_named.49,
+            price_currency: self.__unsafe_private_named.50,
+            price_specification: self.__unsafe_private_named.51,
+            price_valid_until: self.__unsafe_private_named.52,
+            review: self.__unsafe_private_named.53,
+            reviews: self.__unsafe_private_named.54,
+            same_as: self.__unsafe_private_named.55,
+            seller: self.__unsafe_private_named.56,
+            serial_number: self.__unsafe_private_named.57,
+            shipping_details: self.__unsafe_private_named.58,
+            sku: self.__unsafe_private_named.59,
+            subject_of: self.__unsafe_private_named.60,
+            url: self.__unsafe_private_named.61,
+            valid_for_member_tier: self.__unsafe_private_named.62,
+            valid_from: self.__unsafe_private_named.63,
+            valid_through: self.__unsafe_private_named.64,
+            warranty: self.__unsafe_private_named.65,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Offer<'a> {
+        Offer {
+            accepted_payment_method: self.__unsafe_private_named.0,
+            add_on: self.__unsafe_private_named.1,
+            additional_property: self.__unsafe_private_named.2,
+            additional_type: self.__unsafe_private_named.3,
+            advance_booking_requirement: self.__unsafe_private_named.4,
+            aggregate_rating: self.__unsafe_private_named.5,
+            alternate_name: self.__unsafe_private_named.6,
+            area_served: self.__unsafe_private_named.7,
+            asin: self.__unsafe_private_named.8,
+            availability: self.__unsafe_private_named.9,
+            availability_ends: self.__unsafe_private_named.10,
+            availability_starts: self.__unsafe_private_named.11,
+            available_at_or_from: self.__unsafe_private_named.12,
+            available_delivery_method: self.__unsafe_private_named.13,
+            business_function: self.__unsafe_private_named.14,
+            category: self.__unsafe_private_named.15,
+            checkout_page_url_template: self.__unsafe_private_named.16,
+            delivery_lead_time: self.__unsafe_private_named.17,
+            description: self.__unsafe_private_named.18,
+            disambiguating_description: self.__unsafe_private_named.19,
+            eligible_customer_type: self.__unsafe_private_named.20,
+            eligible_duration: self.__unsafe_private_named.21,
+            eligible_quantity: self.__unsafe_private_named.22,
+            eligible_region: self.__unsafe_private_named.23,
+            eligible_transaction_volume: self.__unsafe_private_named.24,
+            gtin: self.__unsafe_private_named.25,
+            gtin12: self.__unsafe_private_named.26,
+            gtin13: self.__unsafe_private_named.27,
+            gtin14: self.__unsafe_private_named.28,
+            gtin8: self.__unsafe_private_named.29,
+            has_adult_consideration: self.__unsafe_private_named.30,
+            has_gs1_digital_link: self.__unsafe_private_named.31,
+            has_measurement: self.__unsafe_private_named.32,
+            has_merchant_return_policy: self.__unsafe_private_named.33,
+            identifier: self.__unsafe_private_named.34,
+            image: self.__unsafe_private_named.35,
+            includes_object: self.__unsafe_private_named.36,
+            ineligible_region: self.__unsafe_private_named.37,
+            inventory_level: self.__unsafe_private_named.38,
+            is_family_friendly: self.__unsafe_private_named.39,
+            item_condition: self.__unsafe_private_named.40,
+            item_offered: self.__unsafe_private_named.41,
+            lease_length: self.__unsafe_private_named.42,
+            main_entity_of_page: self.__unsafe_private_named.43,
+            mobile_url: self.__unsafe_private_named.44,
+            mpn: self.__unsafe_private_named.45,
+            name: self.__unsafe_private_named.46,
+            offered_by: self.__unsafe_private_named.47,
+            potential_action: self.__unsafe_private_named.48,
+            price: self.__unsafe_private_named.49,
+            price_currency: self.__unsafe_private_named.50,
+            price_specification: self.__unsafe_private_named.51,
+            price_valid_until: self.__unsafe_private_named.52,
+            review: self.__unsafe_private_named.53,
+            reviews: self.__unsafe_private_named.54,
+            same_as: self.__unsafe_private_named.55,
+            seller: self.__unsafe_private_named.56,
+            serial_number: self.__unsafe_private_named.57,
+            shipping_details: self.__unsafe_private_named.58,
+            sku: self.__unsafe_private_named.59,
+            subject_of: self.__unsafe_private_named.60,
+            url: self.__unsafe_private_named.61,
+            valid_for_member_tier: self.__unsafe_private_named.62,
+            valid_from: self.__unsafe_private_named.63,
+            valid_through: self.__unsafe_private_named.64,
+            warranty: self.__unsafe_private_named.65,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Offer<'a> {

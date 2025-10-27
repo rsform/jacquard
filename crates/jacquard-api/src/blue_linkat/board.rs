@@ -176,14 +176,118 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Card<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Board<'a> {
     /// List of cards in the board.
     #[serde(borrow)]
     pub cards: Vec<crate::blue_linkat::board::Card<'a>>,
+}
+
+pub mod board_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Cards;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Cards = Unset;
+    }
+    ///State transition - sets the `cards` field to Set
+    pub struct SetCards<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCards<S> {}
+    impl<S: State> State for SetCards<S> {
+        type Cards = Set<members::cards>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `cards` field
+        pub struct cards(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct BoardBuilder<'a, S: board_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<Vec<crate::blue_linkat::board::Card<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Board<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> BoardBuilder<'a, board_state::Empty> {
+        BoardBuilder::new()
+    }
+}
+
+impl<'a> BoardBuilder<'a, board_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        BoardBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BoardBuilder<'a, S>
+where
+    S: board_state::State,
+    S::Cards: board_state::IsUnset,
+{
+    /// Set the `cards` field (required)
+    pub fn cards(
+        mut self,
+        value: impl Into<Vec<crate::blue_linkat::board::Card<'a>>>,
+    ) -> BoardBuilder<'a, board_state::SetCards<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        BoardBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BoardBuilder<'a, S>
+where
+    S: board_state::State,
+    S::Cards: board_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Board<'a> {
+        Board {
+            cards: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Board<'a> {
+        Board {
+            cards: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Board<'a> {

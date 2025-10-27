@@ -13,21 +13,117 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-#[builder(start_fn = new)]
 pub struct SubmitPlcOperation<'a> {
     #[serde(borrow)]
     pub operation: jacquard_common::types::value::Data<'a>,
-    #[serde(flatten)]
-    #[serde(borrow)]
-    #[builder(default)]
-    pub extra_data: ::std::collections::BTreeMap<
-        ::jacquard_common::smol_str::SmolStr,
-        ::jacquard_common::types::value::Data<'a>,
-    >,
+}
+
+pub mod submit_plc_operation_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Operation;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Operation = Unset;
+    }
+    ///State transition - sets the `operation` field to Set
+    pub struct SetOperation<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOperation<S> {}
+    impl<S: State> State for SetOperation<S> {
+        type Operation = Set<members::operation>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `operation` field
+        pub struct operation(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct SubmitPlcOperationBuilder<'a, S: submit_plc_operation_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> SubmitPlcOperation<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> SubmitPlcOperationBuilder<'a, submit_plc_operation_state::Empty> {
+        SubmitPlcOperationBuilder::new()
+    }
+}
+
+impl<'a> SubmitPlcOperationBuilder<'a, submit_plc_operation_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        SubmitPlcOperationBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SubmitPlcOperationBuilder<'a, S>
+where
+    S: submit_plc_operation_state::State,
+    S::Operation: submit_plc_operation_state::IsUnset,
+{
+    /// Set the `operation` field (required)
+    pub fn operation(
+        mut self,
+        value: impl Into<jacquard_common::types::value::Data<'a>>,
+    ) -> SubmitPlcOperationBuilder<'a, submit_plc_operation_state::SetOperation<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        SubmitPlcOperationBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SubmitPlcOperationBuilder<'a, S>
+where
+    S: submit_plc_operation_state::State,
+    S::Operation: submit_plc_operation_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> SubmitPlcOperation<'a> {
+        SubmitPlcOperation {
+            operation: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> SubmitPlcOperation<'a> {
+        SubmitPlcOperation {
+            operation: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 /// Response type for

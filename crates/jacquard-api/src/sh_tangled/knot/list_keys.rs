@@ -12,19 +12,105 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct ListKeys<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    #[builder(into)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     ///(default: 100, min: 1, max: 1000)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
+}
+
+pub mod list_keys_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {}
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {}
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {}
+}
+
+/// Builder for constructing an instance of this type
+pub struct ListKeysBuilder<'a, S: list_keys_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ListKeys<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ListKeysBuilder<'a, list_keys_state::Empty> {
+        ListKeysBuilder::new()
+    }
+}
+
+impl<'a> ListKeysBuilder<'a, list_keys_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ListKeysBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: list_keys_state::State> ListKeysBuilder<'a, S> {
+    /// Set the `cursor` field (optional)
+    pub fn cursor(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `cursor` field to an Option value (optional)
+    pub fn maybe_cursor(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: list_keys_state::State> ListKeysBuilder<'a, S> {
+    /// Set the `limit` field (optional)
+    pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `limit` field to an Option value (optional)
+    pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> ListKeysBuilder<'a, S>
+where
+    S: list_keys_state::State,
+{
+    /// Build the final struct
+    pub fn build(self) -> ListKeys<'a> {
+        ListKeys {
+            cursor: self.__unsafe_private_named.0,
+            limit: self.__unsafe_private_named.1,
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]
@@ -44,7 +130,7 @@ pub struct ListKeysOutput<'a> {
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
-    pub keys: Vec<jacquard_common::types::value::Data<'a>>,
+    pub keys: Vec<crate::sh_tangled::knot::list_keys::PublicKey<'a>>,
 }
 
 #[jacquard_derive::open_union]
@@ -116,8 +202,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for ListKeysRequest {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PublicKey<'a> {
@@ -128,8 +213,184 @@ pub struct PublicKey<'a> {
     pub did: jacquard_common::types::string::Did<'a>,
     /// Public key contents
     #[serde(borrow)]
-    #[builder(into)]
     pub key: jacquard_common::CowStr<'a>,
+}
+
+pub mod public_key_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Did;
+        type Key;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Did = Unset;
+        type Key = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Did = Set<members::did>;
+        type Key = S::Key;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `key` field to Set
+    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetKey<S> {}
+    impl<S: State> State for SetKey<S> {
+        type Did = S::Did;
+        type Key = Set<members::key>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Did = S::Did;
+        type Key = S::Key;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `key` field
+        pub struct key(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct PublicKeyBuilder<'a, S: public_key_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> PublicKey<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> PublicKeyBuilder<'a, public_key_state::Empty> {
+        PublicKeyBuilder::new()
+    }
+}
+
+impl<'a> PublicKeyBuilder<'a, public_key_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        PublicKeyBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PublicKeyBuilder<'a, S>
+where
+    S: public_key_state::State,
+    S::CreatedAt: public_key_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> PublicKeyBuilder<'a, public_key_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        PublicKeyBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PublicKeyBuilder<'a, S>
+where
+    S: public_key_state::State,
+    S::Did: public_key_state::IsUnset,
+{
+    /// Set the `did` field (required)
+    pub fn did(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> PublicKeyBuilder<'a, public_key_state::SetDid<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        PublicKeyBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PublicKeyBuilder<'a, S>
+where
+    S: public_key_state::State,
+    S::Key: public_key_state::IsUnset,
+{
+    /// Set the `key` field (required)
+    pub fn key(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> PublicKeyBuilder<'a, public_key_state::SetKey<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        PublicKeyBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PublicKeyBuilder<'a, S>
+where
+    S: public_key_state::State,
+    S::Did: public_key_state::IsSet,
+    S::Key: public_key_state::IsSet,
+    S::CreatedAt: public_key_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> PublicKey<'a> {
+        PublicKey {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            did: self.__unsafe_private_named.1.unwrap(),
+            key: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> PublicKey<'a> {
+        PublicKey {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            did: self.__unsafe_private_named.1.unwrap(),
+            key: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_sh_tangled_knot_listKeys() -> ::jacquard_lexicon::lexicon::LexiconDoc<

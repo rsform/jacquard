@@ -14,199 +14,160 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Recipe<'a> {
     /// The subject matter of the content.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub about: Option<RecipeAbout<'a>>,
     /// An abstract is a short description that summarizes a [[CreativeWork]].
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub r#abstract: Option<jacquard_common::CowStr<'a>>,
     /// The human sensory perceptual system or cognitive faculty through which a person may process or perceive information. Values should be drawn from the [approved vocabulary](https://www.w3.org/2021/a11y-discov-vocab/latest/#accessMode-vocabulary).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub access_mode: Option<jacquard_common::CowStr<'a>>,
     /// A list of single or combined accessModes that are sufficient to understand all the intellectual content of a resource. Values should be drawn from the [approved vocabulary](https://www.w3.org/2021/a11y-discov-vocab/latest/#accessModeSufficient-vocabulary).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub access_mode_sufficient: Option<
         crate::social_flockfeeds::lexical::itemlist::Itemlist<'a>,
     >,
     /// Indicates that the resource is compatible with the referenced accessibility API. Values should be drawn from the [approved vocabulary](https://www.w3.org/2021/a11y-discov-vocab/latest/#accessibilityAPI-vocabulary).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub accessibility_api: Option<jacquard_common::CowStr<'a>>,
     /// Identifies input methods that are sufficient to fully control the described resource. Values should be drawn from the [approved vocabulary](https://www.w3.org/2021/a11y-discov-vocab/latest/#accessibilityControl-vocabulary).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub accessibility_control: Option<jacquard_common::CowStr<'a>>,
     /// Content features of the resource, such as accessible media, alternatives and supported enhancements for accessibility. Values should be drawn from the [approved vocabulary](https://www.w3.org/2021/a11y-discov-vocab/latest/#accessibilityFeature-vocabulary).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub accessibility_feature: Option<jacquard_common::CowStr<'a>>,
     /// A characteristic of the described resource that is physiologically dangerous to some users. Related to WCAG 2.0 guideline 2.3. Values should be drawn from the [approved vocabulary](https://www.w3.org/2021/a11y-discov-vocab/latest/#accessibilityHazard-vocabulary).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub accessibility_hazard: Option<jacquard_common::CowStr<'a>>,
     /// A human-readable summary of specific accessibility features or deficiencies, consistent with the other accessibility metadata but expressing subtleties such as "short descriptions are present but long descriptions will be needed for non-visual users" or "short descriptions are present and no long descriptions are needed".
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub accessibility_summary: Option<jacquard_common::CowStr<'a>>,
     /// Specifies the Person that is legally accountable for the CreativeWork.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub accountable_person: Option<RecipeAccountablePerson<'a>>,
     /// Indicates a page documenting how licenses can be purchased or otherwise acquired, for the current item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub acquire_license_page: Option<RecipeAcquireLicensePage<'a>>,
     /** An additional type for the item, typically used for adding more specific types from external vocabularies in microdata syntax. This is a relationship between something and a class that the thing is in. Typically the value is a URI-identified RDF class, and in this case corresponds to the
     use of rdf:type in RDF. Text values can be used sparingly, for cases where useful information can be added without their being an appropriate schema to reference. In the case of text values, the class label should follow the schema.org <a href="https://schema.org/docs/styleguide.html">style guide</a>.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub additional_type: Option<jacquard_common::CowStr<'a>>,
     /// The overall rating, based on a collection of reviews or ratings, of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub aggregate_rating: Option<RecipeAggregateRating<'a>>,
     /// An alias for the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub alternate_name: Option<jacquard_common::CowStr<'a>>,
     /// A secondary title of the CreativeWork.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub alternative_headline: Option<jacquard_common::CowStr<'a>>,
     /// Indicates a page or other link involved in archival of a [[CreativeWork]]. In the case of [[MediaReview]], the items in a [[MediaReviewItem]] may often become inaccessible, but be archived by archival, journalistic, activist, or law enforcement organizations. In such cases, the referenced page may not directly publish the content.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub archived_at: Option<RecipeArchivedAt<'a>>,
     /// The item being described is intended to assess the competency or learning outcome defined by the referenced term.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub assesses: Option<RecipeAssesses<'a>>,
     /// A media object that encodes this CreativeWork. This property is a synonym for encoding.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub associated_media: Option<RecipeAssociatedMedia<'a>>,
     /// An intended audience, i.e. a group for whom something was created.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub audience: Option<RecipeAudience<'a>>,
     /// An embedded audio object.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub audio: Option<RecipeAudio<'a>>,
     /// The author of this content or rating. Please note that author is special in that HTML 5 provides a special mechanism for indicating authorship via the rel tag. That is equivalent to this and may be used interchangeably.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub author: Option<RecipeAuthor<'a>>,
     /// An award won by or for this item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub award: Option<jacquard_common::CowStr<'a>>,
     /// Awards won by or for this item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub awards: Option<jacquard_common::CowStr<'a>>,
     /// Fictional person connected with a creative work.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub character: Option<RecipeCharacter<'a>>,
     /// A citation or reference to another creative work, such as another publication, web page, scholarly article, etc.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub citation: Option<RecipeCitation<'a>>,
     /// Comments, typically from users.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub comment: Option<RecipeComment<'a>>,
     /// The number of comments this CreativeWork (e.g. Article, Question or Answer) has received. This is most applicable to works published in Web sites with commenting system; additional comments may exist elsewhere.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub comment_count: Option<i64>,
     /// Conditions that affect the availability of, or method(s) of access to, an item. Typically used for real world items such as an [[ArchiveComponent]] held by an [[ArchiveOrganization]]. This property is not suitable for use as a general Web access control mechanism. It is expressed only in natural language.\n\nFor example "Available by appointment from the Reading Room" or "Accessible only from logged-in accounts ".
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub conditions_of_access: Option<jacquard_common::CowStr<'a>>,
     /// The location depicted or described in the content. For example, the location in a photograph or painting.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub content_location: Option<RecipeContentLocation<'a>>,
     /// Official rating of a piece of content&#x2014;for example, 'MPAA PG-13'.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub content_rating: Option<RecipeContentRating<'a>>,
     /// The specific time described by a creative work, for works (e.g. articles, video objects etc.) that emphasise a particular moment within an Event.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub content_reference_time: Option<jacquard_common::types::string::Datetime>,
     /// A secondary contributor to the CreativeWork or Event.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub contributor: Option<RecipeContributor<'a>>,
     /// The time it takes to actually cook the dish, in [ISO 8601 duration format](http://en.wikipedia.org/wiki/ISO_8601).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub cook_time: Option<RecipeCookTime<'a>>,
     /// The method of cooking, such as Frying, Steaming, ...
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub cooking_method: Option<jacquard_common::CowStr<'a>>,
     /// The party holding the legal copyright to the CreativeWork.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub copyright_holder: Option<RecipeCopyrightHolder<'a>>,
     /// Text of a notice appropriate for describing the copyright aspects of this Creative Work, ideally indicating the owner of the copyright for the Work.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub copyright_notice: Option<jacquard_common::CowStr<'a>>,
     /// The year during which the claimed copyright for the CreativeWork was first asserted.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub copyright_year: Option<i64>,
     /// Indicates a correction to a [[CreativeWork]], either via a [[CorrectionComment]], textually or in another document.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub correction: Option<RecipeCorrection<'a>>,
     /** The country of origin of something, including products as well as creative  works such as movie and TV content.
@@ -215,54 +176,43 @@ In the case of TV and movie, this would be the country of the principle offices 
 
 In the case of products, the country of origin of the product. The exact interpretation of this may vary by context and product type, and cannot be fully enumerated here.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub country_of_origin: Option<RecipeCountryOfOrigin<'a>>,
     /// The status of a creative work in terms of its stage in a lifecycle. Example terms include Incomplete, Draft, Published, Obsolete. Some organizations define a set of terms for the stages of their publication lifecycle.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub creative_work_status: Option<RecipeCreativeWorkStatus<'a>>,
     /// The creator/author of this CreativeWork. This is the same as the Author property for CreativeWork.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub creator: Option<RecipeCreator<'a>>,
     /// Text that can be used to credit person(s) and/or organization(s) associated with a published Creative Work.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub credit_text: Option<jacquard_common::CowStr<'a>>,
     /// The date on which the CreativeWork was created or the item was added to a DataFeed.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub date_created: Option<jacquard_common::types::string::Datetime>,
     /// The date on which the CreativeWork was most recently modified or when the item's entry was modified within a DataFeed.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub date_modified: Option<jacquard_common::types::string::Datetime>,
     /// Date of first publication or broadcast. For example the date a [[CreativeWork]] was broadcast or a [[Certification]] was issued.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub date_published: Option<jacquard_common::types::string::Datetime>,
     /// A description of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub description: Option<RecipeDescription<'a>>,
     /// Indicates an IPTCDigitalSourceEnumeration code indicating the nature of the digital source(s) for some [[CreativeWork]].
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub digital_source_type: Option<jacquard_common::CowStr<'a>>,
     /// A sub property of description. A short description of the item used to disambiguate from other, similar items. Information from other properties (in particular, name) may be necessary for the description to be useful for disambiguation.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub disambiguating_description: Option<jacquard_common::CowStr<'a>>,
     /// A link to the page containing the comments of the CreativeWork.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub discussion_url: Option<jacquard_common::types::string::Uri<'a>>,
     /** An [EIDR](https://eidr.org/) (Entertainment Identifier Registry) [[identifier]] representing a specific edit / edition for a work of film or television.
@@ -271,34 +221,28 @@ For example, the motion picture known as "Ghostbusters" whose [[titleEIDR]] is "
 
 Since schema.org types like [[Movie]] and [[TVEpisode]] can be used for both works and their multiple expressions, it is possible to use [[titleEIDR]] alone (for a general description), or alongside [[editEIDR]] for a more edit-specific description.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub edit_eidr: Option<jacquard_common::CowStr<'a>>,
     /// Specifies the Person who edited the CreativeWork.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub editor: Option<RecipeEditor<'a>>,
     /** An alignment to an established educational framework.
 
 This property should not be used where the nature of the alignment can be described using a simple property, for example to express that a resource [[teaches]] or [[assesses]] a competency.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub educational_alignment: Option<RecipeEducationalAlignment<'a>>,
     /// The level in terms of progression through an educational or training context. Examples of educational levels include 'beginner', 'intermediate' or 'advanced', and formal sets of level indicators.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub educational_level: Option<RecipeEducationalLevel<'a>>,
     /// The purpose of a work in the context of education; for example, 'assignment', 'group work'.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub educational_use: Option<RecipeEducationalUse<'a>>,
     /// A media object that encodes this CreativeWork. This property is a synonym for associatedMedia.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub encoding: Option<RecipeEncoding<'a>>,
     /** Media type typically expressed using a MIME format (see [IANA site](http://www.iana.org/assignments/media-types/media-types.xhtml) and [MDN reference](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types)), e.g. application/zip for a SoftwareApplication binary, audio/mpeg for .mp3 etc.
@@ -307,366 +251,294 @@ In cases where a [[CreativeWork]] has several media type representations, [[enco
 
 Unregistered or niche encoding and file formats can be indicated instead via the most appropriate URL, e.g. defining Web page or a Wikipedia/Wikidata entry.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub encoding_format: Option<jacquard_common::CowStr<'a>>,
     /// A media object that encodes this CreativeWork.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub encodings: Option<RecipeEncodings<'a>>,
     /// The estimated cost of the supply or supplies consumed when performing instructions.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub estimated_cost: Option<RecipeEstimatedCost<'a>>,
     /// A creative work that this work is an example/instance/realization/derivation of.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub example_of_work: Option<RecipeExampleOfWork<'a>>,
     /// Date the content expires and is no longer useful or available. For example a [[VideoObject]] or [[NewsArticle]] whose availability or relevance is time-limited, a [[ClaimReview]] fact check whose publisher wants to indicate that it may no longer be relevant (or helpful to highlight) after some date, or a [[Certification]] the validity has expired.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub expires: Option<jacquard_common::types::string::Datetime>,
     /// Media type, typically MIME format (see [IANA site](http://www.iana.org/assignments/media-types/media-types.xhtml)) of the content, e.g. application/zip of a SoftwareApplication binary. In cases where a CreativeWork has several media type representations, 'encoding' can be used to indicate each MediaObject alongside particular fileFormat information. Unregistered or niche file formats can be indicated instead via the most appropriate URL, e.g. defining Web page or a Wikipedia entry.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub file_format: Option<jacquard_common::CowStr<'a>>,
     /// A person or organization that supports (sponsors) something through some kind of financial contribution.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub funder: Option<RecipeFunder<'a>>,
     /// A [[Grant]] that directly or indirectly provide funding or sponsorship for this item. See also [[ownershipFundingInfo]].
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub funding: Option<RecipeFunding<'a>>,
     /// Genre of the creative work, broadcast channel or group.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub genre: Option<jacquard_common::CowStr<'a>>,
     /// Indicates an item or CreativeWork that is part of this item, or CreativeWork (in some sense).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub has_part: Option<RecipeHasPart<'a>>,
     /// Headline of the article.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub headline: Option<jacquard_common::CowStr<'a>>,
     /// The identifier property represents any kind of identifier for any kind of [[Thing]], such as ISBNs, GTIN codes, UUIDs etc. Schema.org provides dedicated properties for representing many of these, either as textual strings or as URL (URI) links. See [background notes](/docs/datamodel.html#identifierBg) for more details.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub identifier: Option<RecipeIdentifier<'a>>,
     /// An image of the item. This can be a [[URL]] or a fully described [[ImageObject]].
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub image: Option<RecipeImage<'a>>,
     /// The language of the content or performance or used in an action. Please use one of the language codes from the [IETF BCP 47 standard](http://tools.ietf.org/html/bcp47). See also [[availableLanguage]].
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub in_language: Option<RecipeInLanguage<'a>>,
     /// A single ingredient used in the recipe, e.g. sugar, flour or garlic.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub ingredients: Option<jacquard_common::CowStr<'a>>,
     /// The number of interactions for the CreativeWork using the WebSite or SoftwareApplication. The most specific child type of InteractionCounter should be used.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub interaction_statistic: Option<RecipeInteractionStatistic<'a>>,
     /// The predominant mode of learning supported by the learning resource. Acceptable values are 'active', 'expositive', or 'mixed'.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub interactivity_type: Option<jacquard_common::CowStr<'a>>,
     /// Used to indicate a specific claim contained, implied, translated or refined from the content of a [[MediaObject]] or other [[CreativeWork]]. The interpreting party can be indicated using [[claimInterpreter]].
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub interpreted_as_claim: Option<RecipeInterpretedAsClaim<'a>>,
     /// A flag to signal that the item, event, or place is accessible for free.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub is_accessible_for_free: Option<bool>,
     /// A resource from which this work is derived or from which it is a modification or adaptation.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub is_based_on: Option<jacquard_common::types::string::Uri<'a>>,
     /// Indicates whether this content is family friendly.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub is_family_friendly: Option<bool>,
     /// Indicates an item or CreativeWork that this item, or CreativeWork (in some sense), is part of.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub is_part_of: Option<RecipeIsPartOf<'a>>,
     /// Keywords or tags used to describe some item. Multiple textual entries in a keywords list are typically delimited by commas, or by repeating the property.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub keywords: Option<RecipeKeywords<'a>>,
     /// The predominant type or kind characterizing the learning resource. For example, 'presentation', 'handout'.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub learning_resource_type: Option<RecipeLearningResourceType<'a>>,
     /// A license document that applies to this content, typically indicated by URL.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub license: Option<RecipeLicense<'a>>,
     /// The location where the CreativeWork was created, which may not be the same as the location depicted in the CreativeWork.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub location_created: Option<RecipeLocationCreated<'a>>,
     /// Indicates the primary entity described in some page or other CreativeWork.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub main_entity: Option<RecipeMainEntity<'a>>,
     /// Indicates a page (or other CreativeWork) for which this thing is the main entity being described. See [background notes](/docs/datamodel.html#mainEntityBackground) for details.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub main_entity_of_page: Option<RecipeMainEntityOfPage<'a>>,
     /// A maintainer of a [[Dataset]], software package ([[SoftwareApplication]]), or other [[Project]]. A maintainer is a [[Person]] or [[Organization]] that manages contributions to, and/or publication of, some (typically complex) artifact. It is common for distributions of software and data to be based on "upstream" sources. When [[maintainer]] is applied to a specific version of something e.g. a particular version or packaging of a [[Dataset]], it is always  possible that the upstream source has a different maintainer. The [[isBasedOn]] property can be used to indicate such relationships between datasets to make the different maintenance roles clear. Similarly in the case of software, a package may have dedicated maintainers working on integration into software distributions such as Ubuntu, as well as upstream maintainers of the underlying work.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub maintainer: Option<RecipeMaintainer<'a>>,
     /// A material that something is made from, e.g. leather, wool, cotton, paper.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub material: Option<RecipeMaterial<'a>>,
     /// The quantity of the materials being described or an expression of the physical space they occupy.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub material_extent: Option<RecipeMaterialExtent<'a>>,
     /// Indicates that the CreativeWork contains a reference to, but is not necessarily about a concept.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub mentions: Option<RecipeMentions<'a>>,
     /// The name of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub name: Option<jacquard_common::CowStr<'a>>,
     /// Nutrition information about the recipe or menu item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub nutrition: Option<RecipeNutrition<'a>>,
     /// An offer to provide this item&#x2014;for example, an offer to sell a product, rent the DVD of a movie, perform a service, or give away tickets to an event. Use [[businessFunction]] to indicate the kind of transaction offered, i.e. sell, lease, etc. This property can also be used to describe a [[Demand]]. While this property is listed as expected on a number of common types, it can be used in others. In that case, using a second type, such as Product or a subtype of Product, can clarify the nature of the offer.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub offers: Option<RecipeOffers<'a>>,
     /// A pattern that something has, for example 'polka dot', 'striped', 'Canadian flag'. Values are typically expressed as text, although links to controlled value schemes are also supported.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub pattern: Option<RecipePattern<'a>>,
     /// The length of time it takes to perform instructions or a direction (not including time to prepare the supplies), in [ISO 8601 duration format](http://en.wikipedia.org/wiki/ISO_8601).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub perform_time: Option<RecipePerformTime<'a>>,
     /// The position of an item in a series or sequence of items.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub position: Option<jacquard_common::CowStr<'a>>,
     /// Indicates a potential Action, which describes an idealized action in which this thing would play an 'object' role.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub potential_action: Option<RecipePotentialAction<'a>>,
     /// The length of time it takes to prepare the items to be used in instructions or a direction, in [ISO 8601 duration format](http://en.wikipedia.org/wiki/ISO_8601).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub prep_time: Option<RecipePrepTime<'a>>,
     /// The person or organization who produced the work (e.g. music album, movie, TV/radio series etc.).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub producer: Option<RecipeProducer<'a>>,
     /// The service provider, service operator, or service performer; the goods producer. Another party (a seller) may offer those services or goods on behalf of the provider. A provider may also serve as the seller.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub provider: Option<RecipeProvider<'a>>,
     /// A publication event associated with the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub publication: Option<RecipePublication<'a>>,
     /// The publisher of the article in question.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub publisher: Option<RecipePublisher<'a>>,
     /// The publishing division which published the comic.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub publisher_imprint: Option<RecipePublisherImprint<'a>>,
     /** The publishingPrinciples property indicates (typically via [[URL]]) a document describing the editorial principles of an [[Organization]] (or individual, e.g. a [[Person]] writing a blog) that relate to their activities as a publisher, e.g. ethics or diversity policies. When applied to a [[CreativeWork]] (e.g. [[NewsArticle]]) the principles are those of the party primarily responsible for the creation of the [[CreativeWork]].
 
 While such policies are most typically expressed in natural language, sometimes related information (e.g. indicating a [[funder]]) can be expressed using schema.org terminology.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub publishing_principles: Option<RecipePublishingPrinciples<'a>>,
     /// The category of the recipe—for example, appetizer, entree, etc.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub recipe_category: Option<jacquard_common::CowStr<'a>>,
     /// The cuisine of the recipe (for example, French or Ethiopian).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub recipe_cuisine: Option<jacquard_common::CowStr<'a>>,
     /// An ingredient or ordered list of ingredients and potentially quantities used in the recipe, e.g. 1 cup of sugar, flour or garlic.  The ingredients can be represented as free text or more structured values.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub recipe_ingredient: Option<RecipeRecipeIngredient<'a>>,
     /// A step in making the recipe, in the form of a single item (document, video, etc.) or an ordered list with HowToStep and/or HowToSection items.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub recipe_instructions: Option<RecipeRecipeInstructions<'a>>,
     /// The quantity produced by the recipe (for example, number of people served, number of servings, etc).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub recipe_yield: Option<RecipeRecipeYield<'a>>,
     /// The Event where the CreativeWork was recorded. The CreativeWork may capture all or part of the event.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub recorded_at: Option<RecipeRecordedAt<'a>>,
     /// The place and time the release was issued, expressed as a PublicationEvent.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub released_event: Option<RecipeReleasedEvent<'a>>,
     /// A review of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub review: Option<RecipeReview<'a>>,
     /// Review of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub reviews: Option<RecipeReviews<'a>>,
     /// URL of a reference Web page that unambiguously indicates the item's identity. E.g. the URL of the item's Wikipedia page, Wikidata entry, or official website.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub same_as: Option<jacquard_common::types::string::Uri<'a>>,
     /** Indicates (by URL or string) a particular version of a schema used in some CreativeWork. This property was created primarily to
     indicate the use of a specific schema.org release, e.g. ```10.0``` as a simple string, or more explicitly via URL, ```https://schema.org/docs/releases.html#v10.0```. There may be situations in which other schemas might usefully be referenced this way, e.g. ```http://dublincore.org/specifications/dublin-core/dces/1999-07-02/``` but this has not been carefully explored in the community.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub schema_version: Option<jacquard_common::CowStr<'a>>,
     /// Indicates the date on which the current structured data was generated / published. Typically used alongside [[sdPublisher]].
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub sd_date_published: Option<jacquard_common::types::string::Datetime>,
     /// A license document that applies to this structured data, typically indicated by URL.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub sd_license: Option<RecipeSdLicense<'a>>,
     /** Indicates the party responsible for generating and publishing the current structured data markup, typically in cases where the structured data is derived automatically from existing published content but published on a different site. For example, student projects and open data initiatives often re-publish existing content with more explicitly structured metadata. The
 [[sdPublisher]] property helps make such practices more explicit.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub sd_publisher: Option<RecipeSdPublisher<'a>>,
     /// A standardized size of a product or creative work, specified either through a simple textual string (for example 'XL', '32Wx34L'), a  QuantitativeValue with a unitCode, or a comprehensive and structured [[SizeSpecification]]; in other cases, the [[width]], [[height]], [[depth]] and [[weight]] properties may be more applicable.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub size: Option<RecipeSize<'a>>,
     /// The Organization on whose behalf the creator was working.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub source_organization: Option<RecipeSourceOrganization<'a>>,
     /** The "spatial" property can be used in cases when more specific properties
 (e.g. [[locationCreated]], [[spatialCoverage]], [[contentLocation]]) are not known to be appropriate.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub spatial: Option<RecipeSpatial<'a>>,
     /** The spatialCoverage of a CreativeWork indicates the place(s) which are the focus of the content. It is a subproperty of
       contentLocation intended primarily for more technical and detailed materials. For example with a Dataset, it indicates
       areas that the dataset describes: a dataset of New York weather would have spatialCoverage which was the place: the state of New York.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub spatial_coverage: Option<RecipeSpatialCoverage<'a>>,
     /// A person or organization that supports a thing through a pledge, promise, or financial contribution. E.g. a sponsor of a Medical Study or a corporate sponsor of an event.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub sponsor: Option<RecipeSponsor<'a>>,
     /// A single step item (as HowToStep, text, document, video, etc.) or a HowToSection.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub step: Option<RecipeStep<'a>>,
     /// A single step item (as HowToStep, text, document, video, etc.) or a HowToSection (originally misnamed 'steps'; 'step' is preferred).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub steps: Option<RecipeSteps<'a>>,
     /// A CreativeWork or Event about this Thing.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub subject_of: Option<RecipeSubjectOf<'a>>,
     /// Indicates a dietary restriction or guideline for which this recipe or menu item is suitable, e.g. diabetic, halal etc.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub suitable_for_diet: Option<RecipeSuitableForDiet<'a>>,
     /// A sub-property of instrument. A supply consumed when performing instructions or a direction.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub supply: Option<RecipeSupply<'a>>,
     /// The item being described is intended to help a person learn the competency or learning outcome defined by the referenced term.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub teaches: Option<RecipeTeaches<'a>>,
     /** The "temporal" property can be used in cases where more specific properties
 (e.g. [[temporalCoverage]], [[dateCreated]], [[dateModified]], [[datePublished]]) are not known to be appropriate.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub temporal: Option<jacquard_common::CowStr<'a>>,
     /** The temporalCoverage of a CreativeWork indicates the period that the content applies to, i.e. that it describes, either as a DateTime or as a textual string indicating a time period in [ISO 8601 time interval format](https://en.wikipedia.org/wiki/ISO_8601#Time_intervals). In
@@ -675,95 +547,3090 @@ While such policies are most typically expressed in natural language, sometimes 
 
 Open-ended date ranges can be written with ".." in place of the end date. For example, "2015-11/.." indicates a range beginning in November 2015 and with no specified final date. This is tentative and might be updated in future when ISO 8601 is officially updated.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub temporal_coverage: Option<jacquard_common::CowStr<'a>>,
     /// The textual content of this CreativeWork.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub text: Option<jacquard_common::CowStr<'a>>,
     /// Thumbnail image for an image or video.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub thumbnail: Option<RecipeThumbnail<'a>>,
     /// A thumbnail image relevant to the Thing.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub thumbnail_url: Option<jacquard_common::types::string::Uri<'a>>,
     /// Approximate or typical time it usually takes to work with or through the content of this work for the typical or target audience.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub time_required: Option<RecipeTimeRequired<'a>>,
     /// A sub property of instrument. An object used (but not consumed) when performing instructions or a direction.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub tool: Option<RecipeTool<'a>>,
     /// The total time required to perform instructions or a direction (including time to prepare the supplies), in [ISO 8601 duration format](http://en.wikipedia.org/wiki/ISO_8601).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub total_time: Option<RecipeTotalTime<'a>>,
     /// The work that this work has been translated from. E.g. 物种起源 is a translationOf “On the Origin of Species”.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub translation_of_work: Option<RecipeTranslationOfWork<'a>>,
     /// Organization or person who adapts a creative work to different languages, regional differences and technical requirements of a target market, or that translates during some event.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub translator: Option<RecipeTranslator<'a>>,
     /// The typical expected age range, e.g. '7-9', '11-'.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub typical_age_range: Option<jacquard_common::CowStr<'a>>,
     /// URL of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub url: Option<jacquard_common::types::string::Uri<'a>>,
     /** The schema.org [[usageInfo]] property indicates further information about a [[CreativeWork]]. This property is applicable both to works that are freely available and to those that require payment or other transactions. It can reference additional information, e.g. community expectations on preferred linking and citation conventions, as well as purchasing details. For something that can be commercially licensed, usageInfo can provide detailed, resource-specific information about licensing options.
 
 This property can be used alongside the license property which indicates license(s) applicable to some piece of content. The usageInfo property can provide information about other licensing options, e.g. acquiring commercial usage rights for an image that is also available under non-commercial creative commons licenses.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub usage_info: Option<RecipeUsageInfo<'a>>,
     /// The version of the CreativeWork embodied by a specified resource.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub version: Option<jacquard_common::CowStr<'a>>,
     /// An embedded video object.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub video: Option<RecipeVideo<'a>>,
     /// The number of words in the text of the CreativeWork such as an Article, Book, etc.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub word_count: Option<i64>,
     /// Example/instance/realization/derivation of the concept of this creative work. E.g. the paperback edition, first edition, or e-book.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub work_example: Option<RecipeWorkExample<'a>>,
     /// A work that is a translation of the content of this work. E.g. 西遊記 has an English workTranslation “Journey to the West”, a German workTranslation “Monkeys Pilgerfahrt” and a Vietnamese  translation Tây du ký bình khảo.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub work_translation: Option<RecipeWorkTranslation<'a>>,
     /// The quantity that results by performing instructions. For example, a paper airplane, 10 personalized candles.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub r#yield: Option<RecipeYield<'a>>,
+}
+
+pub mod recipe_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {}
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {}
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {}
+}
+
+/// Builder for constructing an instance of this type
+pub struct RecipeBuilder<'a, S: recipe_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<RecipeAbout<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<
+            crate::social_flockfeeds::lexical::itemlist::Itemlist<'a>,
+        >,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<RecipeAccountablePerson<'a>>,
+        ::core::option::Option<RecipeAcquireLicensePage<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<RecipeAggregateRating<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<RecipeArchivedAt<'a>>,
+        ::core::option::Option<RecipeAssesses<'a>>,
+        ::core::option::Option<RecipeAssociatedMedia<'a>>,
+        ::core::option::Option<RecipeAudience<'a>>,
+        ::core::option::Option<RecipeAudio<'a>>,
+        ::core::option::Option<RecipeAuthor<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<RecipeCharacter<'a>>,
+        ::core::option::Option<RecipeCitation<'a>>,
+        ::core::option::Option<RecipeComment<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<RecipeContentLocation<'a>>,
+        ::core::option::Option<RecipeContentRating<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<RecipeContributor<'a>>,
+        ::core::option::Option<RecipeCookTime<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<RecipeCopyrightHolder<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<RecipeCorrection<'a>>,
+        ::core::option::Option<RecipeCountryOfOrigin<'a>>,
+        ::core::option::Option<RecipeCreativeWorkStatus<'a>>,
+        ::core::option::Option<RecipeCreator<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<RecipeDescription<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<RecipeEditor<'a>>,
+        ::core::option::Option<RecipeEducationalAlignment<'a>>,
+        ::core::option::Option<RecipeEducationalLevel<'a>>,
+        ::core::option::Option<RecipeEducationalUse<'a>>,
+        ::core::option::Option<RecipeEncoding<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<RecipeEncodings<'a>>,
+        ::core::option::Option<RecipeEstimatedCost<'a>>,
+        ::core::option::Option<RecipeExampleOfWork<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<RecipeFunder<'a>>,
+        ::core::option::Option<RecipeFunding<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<RecipeHasPart<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<RecipeIdentifier<'a>>,
+        ::core::option::Option<RecipeImage<'a>>,
+        ::core::option::Option<RecipeInLanguage<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<RecipeInteractionStatistic<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<RecipeInterpretedAsClaim<'a>>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<RecipeIsPartOf<'a>>,
+        ::core::option::Option<RecipeKeywords<'a>>,
+        ::core::option::Option<RecipeLearningResourceType<'a>>,
+        ::core::option::Option<RecipeLicense<'a>>,
+        ::core::option::Option<RecipeLocationCreated<'a>>,
+        ::core::option::Option<RecipeMainEntity<'a>>,
+        ::core::option::Option<RecipeMainEntityOfPage<'a>>,
+        ::core::option::Option<RecipeMaintainer<'a>>,
+        ::core::option::Option<RecipeMaterial<'a>>,
+        ::core::option::Option<RecipeMaterialExtent<'a>>,
+        ::core::option::Option<RecipeMentions<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<RecipeNutrition<'a>>,
+        ::core::option::Option<RecipeOffers<'a>>,
+        ::core::option::Option<RecipePattern<'a>>,
+        ::core::option::Option<RecipePerformTime<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<RecipePotentialAction<'a>>,
+        ::core::option::Option<RecipePrepTime<'a>>,
+        ::core::option::Option<RecipeProducer<'a>>,
+        ::core::option::Option<RecipeProvider<'a>>,
+        ::core::option::Option<RecipePublication<'a>>,
+        ::core::option::Option<RecipePublisher<'a>>,
+        ::core::option::Option<RecipePublisherImprint<'a>>,
+        ::core::option::Option<RecipePublishingPrinciples<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<RecipeRecipeIngredient<'a>>,
+        ::core::option::Option<RecipeRecipeInstructions<'a>>,
+        ::core::option::Option<RecipeRecipeYield<'a>>,
+        ::core::option::Option<RecipeRecordedAt<'a>>,
+        ::core::option::Option<RecipeReleasedEvent<'a>>,
+        ::core::option::Option<RecipeReview<'a>>,
+        ::core::option::Option<RecipeReviews<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<RecipeSdLicense<'a>>,
+        ::core::option::Option<RecipeSdPublisher<'a>>,
+        ::core::option::Option<RecipeSize<'a>>,
+        ::core::option::Option<RecipeSourceOrganization<'a>>,
+        ::core::option::Option<RecipeSpatial<'a>>,
+        ::core::option::Option<RecipeSpatialCoverage<'a>>,
+        ::core::option::Option<RecipeSponsor<'a>>,
+        ::core::option::Option<RecipeStep<'a>>,
+        ::core::option::Option<RecipeSteps<'a>>,
+        ::core::option::Option<RecipeSubjectOf<'a>>,
+        ::core::option::Option<RecipeSuitableForDiet<'a>>,
+        ::core::option::Option<RecipeSupply<'a>>,
+        ::core::option::Option<RecipeTeaches<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<RecipeThumbnail<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<RecipeTimeRequired<'a>>,
+        ::core::option::Option<RecipeTool<'a>>,
+        ::core::option::Option<RecipeTotalTime<'a>>,
+        ::core::option::Option<RecipeTranslationOfWork<'a>>,
+        ::core::option::Option<RecipeTranslator<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<RecipeUsageInfo<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<RecipeVideo<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<RecipeWorkExample<'a>>,
+        ::core::option::Option<RecipeWorkTranslation<'a>>,
+        ::core::option::Option<RecipeYield<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Recipe<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> RecipeBuilder<'a, recipe_state::Empty> {
+        RecipeBuilder::new()
+    }
+}
+
+impl<'a> RecipeBuilder<'a, recipe_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        RecipeBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `about` field (optional)
+    pub fn about(mut self, value: impl Into<Option<RecipeAbout<'a>>>) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `about` field to an Option value (optional)
+    pub fn maybe_about(mut self, value: Option<RecipeAbout<'a>>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `abstract` field (optional)
+    pub fn r#abstract(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `abstract` field to an Option value (optional)
+    pub fn maybe_abstract(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `accessMode` field (optional)
+    pub fn access_mode(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `accessMode` field to an Option value (optional)
+    pub fn maybe_access_mode(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `accessModeSufficient` field (optional)
+    pub fn access_mode_sufficient(
+        mut self,
+        value: impl Into<
+            Option<crate::social_flockfeeds::lexical::itemlist::Itemlist<'a>>,
+        >,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `accessModeSufficient` field to an Option value (optional)
+    pub fn maybe_access_mode_sufficient(
+        mut self,
+        value: Option<crate::social_flockfeeds::lexical::itemlist::Itemlist<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `accessibilityAPI` field (optional)
+    pub fn accessibility_api(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `accessibilityAPI` field to an Option value (optional)
+    pub fn maybe_accessibility_api(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `accessibilityControl` field (optional)
+    pub fn accessibility_control(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `accessibilityControl` field to an Option value (optional)
+    pub fn maybe_accessibility_control(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `accessibilityFeature` field (optional)
+    pub fn accessibility_feature(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `accessibilityFeature` field to an Option value (optional)
+    pub fn maybe_accessibility_feature(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `accessibilityHazard` field (optional)
+    pub fn accessibility_hazard(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value.into();
+        self
+    }
+    /// Set the `accessibilityHazard` field to an Option value (optional)
+    pub fn maybe_accessibility_hazard(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `accessibilitySummary` field (optional)
+    pub fn accessibility_summary(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value.into();
+        self
+    }
+    /// Set the `accessibilitySummary` field to an Option value (optional)
+    pub fn maybe_accessibility_summary(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `accountablePerson` field (optional)
+    pub fn accountable_person(
+        mut self,
+        value: impl Into<Option<RecipeAccountablePerson<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.9 = value.into();
+        self
+    }
+    /// Set the `accountablePerson` field to an Option value (optional)
+    pub fn maybe_accountable_person(
+        mut self,
+        value: Option<RecipeAccountablePerson<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.9 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `acquireLicensePage` field (optional)
+    pub fn acquire_license_page(
+        mut self,
+        value: impl Into<Option<RecipeAcquireLicensePage<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.10 = value.into();
+        self
+    }
+    /// Set the `acquireLicensePage` field to an Option value (optional)
+    pub fn maybe_acquire_license_page(
+        mut self,
+        value: Option<RecipeAcquireLicensePage<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.10 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `additionalType` field (optional)
+    pub fn additional_type(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.11 = value.into();
+        self
+    }
+    /// Set the `additionalType` field to an Option value (optional)
+    pub fn maybe_additional_type(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.11 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `aggregateRating` field (optional)
+    pub fn aggregate_rating(
+        mut self,
+        value: impl Into<Option<RecipeAggregateRating<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.12 = value.into();
+        self
+    }
+    /// Set the `aggregateRating` field to an Option value (optional)
+    pub fn maybe_aggregate_rating(
+        mut self,
+        value: Option<RecipeAggregateRating<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.12 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `alternateName` field (optional)
+    pub fn alternate_name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.13 = value.into();
+        self
+    }
+    /// Set the `alternateName` field to an Option value (optional)
+    pub fn maybe_alternate_name(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.13 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `alternativeHeadline` field (optional)
+    pub fn alternative_headline(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.14 = value.into();
+        self
+    }
+    /// Set the `alternativeHeadline` field to an Option value (optional)
+    pub fn maybe_alternative_headline(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.14 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `archivedAt` field (optional)
+    pub fn archived_at(
+        mut self,
+        value: impl Into<Option<RecipeArchivedAt<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.15 = value.into();
+        self
+    }
+    /// Set the `archivedAt` field to an Option value (optional)
+    pub fn maybe_archived_at(mut self, value: Option<RecipeArchivedAt<'a>>) -> Self {
+        self.__unsafe_private_named.15 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `assesses` field (optional)
+    pub fn assesses(mut self, value: impl Into<Option<RecipeAssesses<'a>>>) -> Self {
+        self.__unsafe_private_named.16 = value.into();
+        self
+    }
+    /// Set the `assesses` field to an Option value (optional)
+    pub fn maybe_assesses(mut self, value: Option<RecipeAssesses<'a>>) -> Self {
+        self.__unsafe_private_named.16 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `associatedMedia` field (optional)
+    pub fn associated_media(
+        mut self,
+        value: impl Into<Option<RecipeAssociatedMedia<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.17 = value.into();
+        self
+    }
+    /// Set the `associatedMedia` field to an Option value (optional)
+    pub fn maybe_associated_media(
+        mut self,
+        value: Option<RecipeAssociatedMedia<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.17 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `audience` field (optional)
+    pub fn audience(mut self, value: impl Into<Option<RecipeAudience<'a>>>) -> Self {
+        self.__unsafe_private_named.18 = value.into();
+        self
+    }
+    /// Set the `audience` field to an Option value (optional)
+    pub fn maybe_audience(mut self, value: Option<RecipeAudience<'a>>) -> Self {
+        self.__unsafe_private_named.18 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `audio` field (optional)
+    pub fn audio(mut self, value: impl Into<Option<RecipeAudio<'a>>>) -> Self {
+        self.__unsafe_private_named.19 = value.into();
+        self
+    }
+    /// Set the `audio` field to an Option value (optional)
+    pub fn maybe_audio(mut self, value: Option<RecipeAudio<'a>>) -> Self {
+        self.__unsafe_private_named.19 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `author` field (optional)
+    pub fn author(mut self, value: impl Into<Option<RecipeAuthor<'a>>>) -> Self {
+        self.__unsafe_private_named.20 = value.into();
+        self
+    }
+    /// Set the `author` field to an Option value (optional)
+    pub fn maybe_author(mut self, value: Option<RecipeAuthor<'a>>) -> Self {
+        self.__unsafe_private_named.20 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `award` field (optional)
+    pub fn award(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.21 = value.into();
+        self
+    }
+    /// Set the `award` field to an Option value (optional)
+    pub fn maybe_award(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.21 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `awards` field (optional)
+    pub fn awards(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.22 = value.into();
+        self
+    }
+    /// Set the `awards` field to an Option value (optional)
+    pub fn maybe_awards(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.22 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `character` field (optional)
+    pub fn character(mut self, value: impl Into<Option<RecipeCharacter<'a>>>) -> Self {
+        self.__unsafe_private_named.23 = value.into();
+        self
+    }
+    /// Set the `character` field to an Option value (optional)
+    pub fn maybe_character(mut self, value: Option<RecipeCharacter<'a>>) -> Self {
+        self.__unsafe_private_named.23 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `citation` field (optional)
+    pub fn citation(mut self, value: impl Into<Option<RecipeCitation<'a>>>) -> Self {
+        self.__unsafe_private_named.24 = value.into();
+        self
+    }
+    /// Set the `citation` field to an Option value (optional)
+    pub fn maybe_citation(mut self, value: Option<RecipeCitation<'a>>) -> Self {
+        self.__unsafe_private_named.24 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `comment` field (optional)
+    pub fn comment(mut self, value: impl Into<Option<RecipeComment<'a>>>) -> Self {
+        self.__unsafe_private_named.25 = value.into();
+        self
+    }
+    /// Set the `comment` field to an Option value (optional)
+    pub fn maybe_comment(mut self, value: Option<RecipeComment<'a>>) -> Self {
+        self.__unsafe_private_named.25 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `commentCount` field (optional)
+    pub fn comment_count(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.26 = value.into();
+        self
+    }
+    /// Set the `commentCount` field to an Option value (optional)
+    pub fn maybe_comment_count(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.26 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `conditionsOfAccess` field (optional)
+    pub fn conditions_of_access(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.27 = value.into();
+        self
+    }
+    /// Set the `conditionsOfAccess` field to an Option value (optional)
+    pub fn maybe_conditions_of_access(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.27 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `contentLocation` field (optional)
+    pub fn content_location(
+        mut self,
+        value: impl Into<Option<RecipeContentLocation<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.28 = value.into();
+        self
+    }
+    /// Set the `contentLocation` field to an Option value (optional)
+    pub fn maybe_content_location(
+        mut self,
+        value: Option<RecipeContentLocation<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.28 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `contentRating` field (optional)
+    pub fn content_rating(
+        mut self,
+        value: impl Into<Option<RecipeContentRating<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.29 = value.into();
+        self
+    }
+    /// Set the `contentRating` field to an Option value (optional)
+    pub fn maybe_content_rating(
+        mut self,
+        value: Option<RecipeContentRating<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.29 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `contentReferenceTime` field (optional)
+    pub fn content_reference_time(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.30 = value.into();
+        self
+    }
+    /// Set the `contentReferenceTime` field to an Option value (optional)
+    pub fn maybe_content_reference_time(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.30 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `contributor` field (optional)
+    pub fn contributor(
+        mut self,
+        value: impl Into<Option<RecipeContributor<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.31 = value.into();
+        self
+    }
+    /// Set the `contributor` field to an Option value (optional)
+    pub fn maybe_contributor(mut self, value: Option<RecipeContributor<'a>>) -> Self {
+        self.__unsafe_private_named.31 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `cookTime` field (optional)
+    pub fn cook_time(mut self, value: impl Into<Option<RecipeCookTime<'a>>>) -> Self {
+        self.__unsafe_private_named.32 = value.into();
+        self
+    }
+    /// Set the `cookTime` field to an Option value (optional)
+    pub fn maybe_cook_time(mut self, value: Option<RecipeCookTime<'a>>) -> Self {
+        self.__unsafe_private_named.32 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `cookingMethod` field (optional)
+    pub fn cooking_method(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.33 = value.into();
+        self
+    }
+    /// Set the `cookingMethod` field to an Option value (optional)
+    pub fn maybe_cooking_method(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.33 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `copyrightHolder` field (optional)
+    pub fn copyright_holder(
+        mut self,
+        value: impl Into<Option<RecipeCopyrightHolder<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.34 = value.into();
+        self
+    }
+    /// Set the `copyrightHolder` field to an Option value (optional)
+    pub fn maybe_copyright_holder(
+        mut self,
+        value: Option<RecipeCopyrightHolder<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.34 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `copyrightNotice` field (optional)
+    pub fn copyright_notice(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.35 = value.into();
+        self
+    }
+    /// Set the `copyrightNotice` field to an Option value (optional)
+    pub fn maybe_copyright_notice(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.35 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `copyrightYear` field (optional)
+    pub fn copyright_year(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.36 = value.into();
+        self
+    }
+    /// Set the `copyrightYear` field to an Option value (optional)
+    pub fn maybe_copyright_year(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.36 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `correction` field (optional)
+    pub fn correction(mut self, value: impl Into<Option<RecipeCorrection<'a>>>) -> Self {
+        self.__unsafe_private_named.37 = value.into();
+        self
+    }
+    /// Set the `correction` field to an Option value (optional)
+    pub fn maybe_correction(mut self, value: Option<RecipeCorrection<'a>>) -> Self {
+        self.__unsafe_private_named.37 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `countryOfOrigin` field (optional)
+    pub fn country_of_origin(
+        mut self,
+        value: impl Into<Option<RecipeCountryOfOrigin<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.38 = value.into();
+        self
+    }
+    /// Set the `countryOfOrigin` field to an Option value (optional)
+    pub fn maybe_country_of_origin(
+        mut self,
+        value: Option<RecipeCountryOfOrigin<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.38 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `creativeWorkStatus` field (optional)
+    pub fn creative_work_status(
+        mut self,
+        value: impl Into<Option<RecipeCreativeWorkStatus<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.39 = value.into();
+        self
+    }
+    /// Set the `creativeWorkStatus` field to an Option value (optional)
+    pub fn maybe_creative_work_status(
+        mut self,
+        value: Option<RecipeCreativeWorkStatus<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.39 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `creator` field (optional)
+    pub fn creator(mut self, value: impl Into<Option<RecipeCreator<'a>>>) -> Self {
+        self.__unsafe_private_named.40 = value.into();
+        self
+    }
+    /// Set the `creator` field to an Option value (optional)
+    pub fn maybe_creator(mut self, value: Option<RecipeCreator<'a>>) -> Self {
+        self.__unsafe_private_named.40 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `creditText` field (optional)
+    pub fn credit_text(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.41 = value.into();
+        self
+    }
+    /// Set the `creditText` field to an Option value (optional)
+    pub fn maybe_credit_text(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.41 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `dateCreated` field (optional)
+    pub fn date_created(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.42 = value.into();
+        self
+    }
+    /// Set the `dateCreated` field to an Option value (optional)
+    pub fn maybe_date_created(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.42 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `dateModified` field (optional)
+    pub fn date_modified(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.43 = value.into();
+        self
+    }
+    /// Set the `dateModified` field to an Option value (optional)
+    pub fn maybe_date_modified(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.43 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `datePublished` field (optional)
+    pub fn date_published(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.44 = value.into();
+        self
+    }
+    /// Set the `datePublished` field to an Option value (optional)
+    pub fn maybe_date_published(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.44 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `description` field (optional)
+    pub fn description(
+        mut self,
+        value: impl Into<Option<RecipeDescription<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.45 = value.into();
+        self
+    }
+    /// Set the `description` field to an Option value (optional)
+    pub fn maybe_description(mut self, value: Option<RecipeDescription<'a>>) -> Self {
+        self.__unsafe_private_named.45 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `digitalSourceType` field (optional)
+    pub fn digital_source_type(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.46 = value.into();
+        self
+    }
+    /// Set the `digitalSourceType` field to an Option value (optional)
+    pub fn maybe_digital_source_type(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.46 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `disambiguatingDescription` field (optional)
+    pub fn disambiguating_description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.47 = value.into();
+        self
+    }
+    /// Set the `disambiguatingDescription` field to an Option value (optional)
+    pub fn maybe_disambiguating_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.47 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `discussionUrl` field (optional)
+    pub fn discussion_url(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.48 = value.into();
+        self
+    }
+    /// Set the `discussionUrl` field to an Option value (optional)
+    pub fn maybe_discussion_url(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.48 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `editEIDR` field (optional)
+    pub fn edit_eidr(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.49 = value.into();
+        self
+    }
+    /// Set the `editEIDR` field to an Option value (optional)
+    pub fn maybe_edit_eidr(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.49 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `editor` field (optional)
+    pub fn editor(mut self, value: impl Into<Option<RecipeEditor<'a>>>) -> Self {
+        self.__unsafe_private_named.50 = value.into();
+        self
+    }
+    /// Set the `editor` field to an Option value (optional)
+    pub fn maybe_editor(mut self, value: Option<RecipeEditor<'a>>) -> Self {
+        self.__unsafe_private_named.50 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `educationalAlignment` field (optional)
+    pub fn educational_alignment(
+        mut self,
+        value: impl Into<Option<RecipeEducationalAlignment<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.51 = value.into();
+        self
+    }
+    /// Set the `educationalAlignment` field to an Option value (optional)
+    pub fn maybe_educational_alignment(
+        mut self,
+        value: Option<RecipeEducationalAlignment<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.51 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `educationalLevel` field (optional)
+    pub fn educational_level(
+        mut self,
+        value: impl Into<Option<RecipeEducationalLevel<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.52 = value.into();
+        self
+    }
+    /// Set the `educationalLevel` field to an Option value (optional)
+    pub fn maybe_educational_level(
+        mut self,
+        value: Option<RecipeEducationalLevel<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.52 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `educationalUse` field (optional)
+    pub fn educational_use(
+        mut self,
+        value: impl Into<Option<RecipeEducationalUse<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.53 = value.into();
+        self
+    }
+    /// Set the `educationalUse` field to an Option value (optional)
+    pub fn maybe_educational_use(
+        mut self,
+        value: Option<RecipeEducationalUse<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.53 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `encoding` field (optional)
+    pub fn encoding(mut self, value: impl Into<Option<RecipeEncoding<'a>>>) -> Self {
+        self.__unsafe_private_named.54 = value.into();
+        self
+    }
+    /// Set the `encoding` field to an Option value (optional)
+    pub fn maybe_encoding(mut self, value: Option<RecipeEncoding<'a>>) -> Self {
+        self.__unsafe_private_named.54 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `encodingFormat` field (optional)
+    pub fn encoding_format(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.55 = value.into();
+        self
+    }
+    /// Set the `encodingFormat` field to an Option value (optional)
+    pub fn maybe_encoding_format(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.55 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `encodings` field (optional)
+    pub fn encodings(mut self, value: impl Into<Option<RecipeEncodings<'a>>>) -> Self {
+        self.__unsafe_private_named.56 = value.into();
+        self
+    }
+    /// Set the `encodings` field to an Option value (optional)
+    pub fn maybe_encodings(mut self, value: Option<RecipeEncodings<'a>>) -> Self {
+        self.__unsafe_private_named.56 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `estimatedCost` field (optional)
+    pub fn estimated_cost(
+        mut self,
+        value: impl Into<Option<RecipeEstimatedCost<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.57 = value.into();
+        self
+    }
+    /// Set the `estimatedCost` field to an Option value (optional)
+    pub fn maybe_estimated_cost(
+        mut self,
+        value: Option<RecipeEstimatedCost<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.57 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `exampleOfWork` field (optional)
+    pub fn example_of_work(
+        mut self,
+        value: impl Into<Option<RecipeExampleOfWork<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.58 = value.into();
+        self
+    }
+    /// Set the `exampleOfWork` field to an Option value (optional)
+    pub fn maybe_example_of_work(
+        mut self,
+        value: Option<RecipeExampleOfWork<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.58 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `expires` field (optional)
+    pub fn expires(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.59 = value.into();
+        self
+    }
+    /// Set the `expires` field to an Option value (optional)
+    pub fn maybe_expires(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.59 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `fileFormat` field (optional)
+    pub fn file_format(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.60 = value.into();
+        self
+    }
+    /// Set the `fileFormat` field to an Option value (optional)
+    pub fn maybe_file_format(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.60 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `funder` field (optional)
+    pub fn funder(mut self, value: impl Into<Option<RecipeFunder<'a>>>) -> Self {
+        self.__unsafe_private_named.61 = value.into();
+        self
+    }
+    /// Set the `funder` field to an Option value (optional)
+    pub fn maybe_funder(mut self, value: Option<RecipeFunder<'a>>) -> Self {
+        self.__unsafe_private_named.61 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `funding` field (optional)
+    pub fn funding(mut self, value: impl Into<Option<RecipeFunding<'a>>>) -> Self {
+        self.__unsafe_private_named.62 = value.into();
+        self
+    }
+    /// Set the `funding` field to an Option value (optional)
+    pub fn maybe_funding(mut self, value: Option<RecipeFunding<'a>>) -> Self {
+        self.__unsafe_private_named.62 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `genre` field (optional)
+    pub fn genre(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.63 = value.into();
+        self
+    }
+    /// Set the `genre` field to an Option value (optional)
+    pub fn maybe_genre(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.63 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `hasPart` field (optional)
+    pub fn has_part(mut self, value: impl Into<Option<RecipeHasPart<'a>>>) -> Self {
+        self.__unsafe_private_named.64 = value.into();
+        self
+    }
+    /// Set the `hasPart` field to an Option value (optional)
+    pub fn maybe_has_part(mut self, value: Option<RecipeHasPart<'a>>) -> Self {
+        self.__unsafe_private_named.64 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `headline` field (optional)
+    pub fn headline(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.65 = value.into();
+        self
+    }
+    /// Set the `headline` field to an Option value (optional)
+    pub fn maybe_headline(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.65 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `identifier` field (optional)
+    pub fn identifier(mut self, value: impl Into<Option<RecipeIdentifier<'a>>>) -> Self {
+        self.__unsafe_private_named.66 = value.into();
+        self
+    }
+    /// Set the `identifier` field to an Option value (optional)
+    pub fn maybe_identifier(mut self, value: Option<RecipeIdentifier<'a>>) -> Self {
+        self.__unsafe_private_named.66 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `image` field (optional)
+    pub fn image(mut self, value: impl Into<Option<RecipeImage<'a>>>) -> Self {
+        self.__unsafe_private_named.67 = value.into();
+        self
+    }
+    /// Set the `image` field to an Option value (optional)
+    pub fn maybe_image(mut self, value: Option<RecipeImage<'a>>) -> Self {
+        self.__unsafe_private_named.67 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `inLanguage` field (optional)
+    pub fn in_language(
+        mut self,
+        value: impl Into<Option<RecipeInLanguage<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.68 = value.into();
+        self
+    }
+    /// Set the `inLanguage` field to an Option value (optional)
+    pub fn maybe_in_language(mut self, value: Option<RecipeInLanguage<'a>>) -> Self {
+        self.__unsafe_private_named.68 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `ingredients` field (optional)
+    pub fn ingredients(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.69 = value.into();
+        self
+    }
+    /// Set the `ingredients` field to an Option value (optional)
+    pub fn maybe_ingredients(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.69 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `interactionStatistic` field (optional)
+    pub fn interaction_statistic(
+        mut self,
+        value: impl Into<Option<RecipeInteractionStatistic<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.70 = value.into();
+        self
+    }
+    /// Set the `interactionStatistic` field to an Option value (optional)
+    pub fn maybe_interaction_statistic(
+        mut self,
+        value: Option<RecipeInteractionStatistic<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.70 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `interactivityType` field (optional)
+    pub fn interactivity_type(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.71 = value.into();
+        self
+    }
+    /// Set the `interactivityType` field to an Option value (optional)
+    pub fn maybe_interactivity_type(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.71 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `interpretedAsClaim` field (optional)
+    pub fn interpreted_as_claim(
+        mut self,
+        value: impl Into<Option<RecipeInterpretedAsClaim<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.72 = value.into();
+        self
+    }
+    /// Set the `interpretedAsClaim` field to an Option value (optional)
+    pub fn maybe_interpreted_as_claim(
+        mut self,
+        value: Option<RecipeInterpretedAsClaim<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.72 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `isAccessibleForFree` field (optional)
+    pub fn is_accessible_for_free(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.73 = value.into();
+        self
+    }
+    /// Set the `isAccessibleForFree` field to an Option value (optional)
+    pub fn maybe_is_accessible_for_free(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.73 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `isBasedOn` field (optional)
+    pub fn is_based_on(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.74 = value.into();
+        self
+    }
+    /// Set the `isBasedOn` field to an Option value (optional)
+    pub fn maybe_is_based_on(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.74 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `isFamilyFriendly` field (optional)
+    pub fn is_family_friendly(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.75 = value.into();
+        self
+    }
+    /// Set the `isFamilyFriendly` field to an Option value (optional)
+    pub fn maybe_is_family_friendly(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.75 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `isPartOf` field (optional)
+    pub fn is_part_of(mut self, value: impl Into<Option<RecipeIsPartOf<'a>>>) -> Self {
+        self.__unsafe_private_named.76 = value.into();
+        self
+    }
+    /// Set the `isPartOf` field to an Option value (optional)
+    pub fn maybe_is_part_of(mut self, value: Option<RecipeIsPartOf<'a>>) -> Self {
+        self.__unsafe_private_named.76 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `keywords` field (optional)
+    pub fn keywords(mut self, value: impl Into<Option<RecipeKeywords<'a>>>) -> Self {
+        self.__unsafe_private_named.77 = value.into();
+        self
+    }
+    /// Set the `keywords` field to an Option value (optional)
+    pub fn maybe_keywords(mut self, value: Option<RecipeKeywords<'a>>) -> Self {
+        self.__unsafe_private_named.77 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `learningResourceType` field (optional)
+    pub fn learning_resource_type(
+        mut self,
+        value: impl Into<Option<RecipeLearningResourceType<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.78 = value.into();
+        self
+    }
+    /// Set the `learningResourceType` field to an Option value (optional)
+    pub fn maybe_learning_resource_type(
+        mut self,
+        value: Option<RecipeLearningResourceType<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.78 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `license` field (optional)
+    pub fn license(mut self, value: impl Into<Option<RecipeLicense<'a>>>) -> Self {
+        self.__unsafe_private_named.79 = value.into();
+        self
+    }
+    /// Set the `license` field to an Option value (optional)
+    pub fn maybe_license(mut self, value: Option<RecipeLicense<'a>>) -> Self {
+        self.__unsafe_private_named.79 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `locationCreated` field (optional)
+    pub fn location_created(
+        mut self,
+        value: impl Into<Option<RecipeLocationCreated<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.80 = value.into();
+        self
+    }
+    /// Set the `locationCreated` field to an Option value (optional)
+    pub fn maybe_location_created(
+        mut self,
+        value: Option<RecipeLocationCreated<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.80 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `mainEntity` field (optional)
+    pub fn main_entity(
+        mut self,
+        value: impl Into<Option<RecipeMainEntity<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.81 = value.into();
+        self
+    }
+    /// Set the `mainEntity` field to an Option value (optional)
+    pub fn maybe_main_entity(mut self, value: Option<RecipeMainEntity<'a>>) -> Self {
+        self.__unsafe_private_named.81 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `mainEntityOfPage` field (optional)
+    pub fn main_entity_of_page(
+        mut self,
+        value: impl Into<Option<RecipeMainEntityOfPage<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.82 = value.into();
+        self
+    }
+    /// Set the `mainEntityOfPage` field to an Option value (optional)
+    pub fn maybe_main_entity_of_page(
+        mut self,
+        value: Option<RecipeMainEntityOfPage<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.82 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `maintainer` field (optional)
+    pub fn maintainer(mut self, value: impl Into<Option<RecipeMaintainer<'a>>>) -> Self {
+        self.__unsafe_private_named.83 = value.into();
+        self
+    }
+    /// Set the `maintainer` field to an Option value (optional)
+    pub fn maybe_maintainer(mut self, value: Option<RecipeMaintainer<'a>>) -> Self {
+        self.__unsafe_private_named.83 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `material` field (optional)
+    pub fn material(mut self, value: impl Into<Option<RecipeMaterial<'a>>>) -> Self {
+        self.__unsafe_private_named.84 = value.into();
+        self
+    }
+    /// Set the `material` field to an Option value (optional)
+    pub fn maybe_material(mut self, value: Option<RecipeMaterial<'a>>) -> Self {
+        self.__unsafe_private_named.84 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `materialExtent` field (optional)
+    pub fn material_extent(
+        mut self,
+        value: impl Into<Option<RecipeMaterialExtent<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.85 = value.into();
+        self
+    }
+    /// Set the `materialExtent` field to an Option value (optional)
+    pub fn maybe_material_extent(
+        mut self,
+        value: Option<RecipeMaterialExtent<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.85 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `mentions` field (optional)
+    pub fn mentions(mut self, value: impl Into<Option<RecipeMentions<'a>>>) -> Self {
+        self.__unsafe_private_named.86 = value.into();
+        self
+    }
+    /// Set the `mentions` field to an Option value (optional)
+    pub fn maybe_mentions(mut self, value: Option<RecipeMentions<'a>>) -> Self {
+        self.__unsafe_private_named.86 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `name` field (optional)
+    pub fn name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.87 = value.into();
+        self
+    }
+    /// Set the `name` field to an Option value (optional)
+    pub fn maybe_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.87 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `nutrition` field (optional)
+    pub fn nutrition(mut self, value: impl Into<Option<RecipeNutrition<'a>>>) -> Self {
+        self.__unsafe_private_named.88 = value.into();
+        self
+    }
+    /// Set the `nutrition` field to an Option value (optional)
+    pub fn maybe_nutrition(mut self, value: Option<RecipeNutrition<'a>>) -> Self {
+        self.__unsafe_private_named.88 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `offers` field (optional)
+    pub fn offers(mut self, value: impl Into<Option<RecipeOffers<'a>>>) -> Self {
+        self.__unsafe_private_named.89 = value.into();
+        self
+    }
+    /// Set the `offers` field to an Option value (optional)
+    pub fn maybe_offers(mut self, value: Option<RecipeOffers<'a>>) -> Self {
+        self.__unsafe_private_named.89 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `pattern` field (optional)
+    pub fn pattern(mut self, value: impl Into<Option<RecipePattern<'a>>>) -> Self {
+        self.__unsafe_private_named.90 = value.into();
+        self
+    }
+    /// Set the `pattern` field to an Option value (optional)
+    pub fn maybe_pattern(mut self, value: Option<RecipePattern<'a>>) -> Self {
+        self.__unsafe_private_named.90 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `performTime` field (optional)
+    pub fn perform_time(
+        mut self,
+        value: impl Into<Option<RecipePerformTime<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.91 = value.into();
+        self
+    }
+    /// Set the `performTime` field to an Option value (optional)
+    pub fn maybe_perform_time(mut self, value: Option<RecipePerformTime<'a>>) -> Self {
+        self.__unsafe_private_named.91 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `position` field (optional)
+    pub fn position(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.92 = value.into();
+        self
+    }
+    /// Set the `position` field to an Option value (optional)
+    pub fn maybe_position(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.92 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `potentialAction` field (optional)
+    pub fn potential_action(
+        mut self,
+        value: impl Into<Option<RecipePotentialAction<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.93 = value.into();
+        self
+    }
+    /// Set the `potentialAction` field to an Option value (optional)
+    pub fn maybe_potential_action(
+        mut self,
+        value: Option<RecipePotentialAction<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.93 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `prepTime` field (optional)
+    pub fn prep_time(mut self, value: impl Into<Option<RecipePrepTime<'a>>>) -> Self {
+        self.__unsafe_private_named.94 = value.into();
+        self
+    }
+    /// Set the `prepTime` field to an Option value (optional)
+    pub fn maybe_prep_time(mut self, value: Option<RecipePrepTime<'a>>) -> Self {
+        self.__unsafe_private_named.94 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `producer` field (optional)
+    pub fn producer(mut self, value: impl Into<Option<RecipeProducer<'a>>>) -> Self {
+        self.__unsafe_private_named.95 = value.into();
+        self
+    }
+    /// Set the `producer` field to an Option value (optional)
+    pub fn maybe_producer(mut self, value: Option<RecipeProducer<'a>>) -> Self {
+        self.__unsafe_private_named.95 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `provider` field (optional)
+    pub fn provider(mut self, value: impl Into<Option<RecipeProvider<'a>>>) -> Self {
+        self.__unsafe_private_named.96 = value.into();
+        self
+    }
+    /// Set the `provider` field to an Option value (optional)
+    pub fn maybe_provider(mut self, value: Option<RecipeProvider<'a>>) -> Self {
+        self.__unsafe_private_named.96 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `publication` field (optional)
+    pub fn publication(
+        mut self,
+        value: impl Into<Option<RecipePublication<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.97 = value.into();
+        self
+    }
+    /// Set the `publication` field to an Option value (optional)
+    pub fn maybe_publication(mut self, value: Option<RecipePublication<'a>>) -> Self {
+        self.__unsafe_private_named.97 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `publisher` field (optional)
+    pub fn publisher(mut self, value: impl Into<Option<RecipePublisher<'a>>>) -> Self {
+        self.__unsafe_private_named.98 = value.into();
+        self
+    }
+    /// Set the `publisher` field to an Option value (optional)
+    pub fn maybe_publisher(mut self, value: Option<RecipePublisher<'a>>) -> Self {
+        self.__unsafe_private_named.98 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `publisherImprint` field (optional)
+    pub fn publisher_imprint(
+        mut self,
+        value: impl Into<Option<RecipePublisherImprint<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.99 = value.into();
+        self
+    }
+    /// Set the `publisherImprint` field to an Option value (optional)
+    pub fn maybe_publisher_imprint(
+        mut self,
+        value: Option<RecipePublisherImprint<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.99 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `publishingPrinciples` field (optional)
+    pub fn publishing_principles(
+        mut self,
+        value: impl Into<Option<RecipePublishingPrinciples<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.100 = value.into();
+        self
+    }
+    /// Set the `publishingPrinciples` field to an Option value (optional)
+    pub fn maybe_publishing_principles(
+        mut self,
+        value: Option<RecipePublishingPrinciples<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.100 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `recipeCategory` field (optional)
+    pub fn recipe_category(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.101 = value.into();
+        self
+    }
+    /// Set the `recipeCategory` field to an Option value (optional)
+    pub fn maybe_recipe_category(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.101 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `recipeCuisine` field (optional)
+    pub fn recipe_cuisine(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.102 = value.into();
+        self
+    }
+    /// Set the `recipeCuisine` field to an Option value (optional)
+    pub fn maybe_recipe_cuisine(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.102 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `recipeIngredient` field (optional)
+    pub fn recipe_ingredient(
+        mut self,
+        value: impl Into<Option<RecipeRecipeIngredient<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.103 = value.into();
+        self
+    }
+    /// Set the `recipeIngredient` field to an Option value (optional)
+    pub fn maybe_recipe_ingredient(
+        mut self,
+        value: Option<RecipeRecipeIngredient<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.103 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `recipeInstructions` field (optional)
+    pub fn recipe_instructions(
+        mut self,
+        value: impl Into<Option<RecipeRecipeInstructions<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.104 = value.into();
+        self
+    }
+    /// Set the `recipeInstructions` field to an Option value (optional)
+    pub fn maybe_recipe_instructions(
+        mut self,
+        value: Option<RecipeRecipeInstructions<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.104 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `recipeYield` field (optional)
+    pub fn recipe_yield(
+        mut self,
+        value: impl Into<Option<RecipeRecipeYield<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.105 = value.into();
+        self
+    }
+    /// Set the `recipeYield` field to an Option value (optional)
+    pub fn maybe_recipe_yield(mut self, value: Option<RecipeRecipeYield<'a>>) -> Self {
+        self.__unsafe_private_named.105 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `recordedAt` field (optional)
+    pub fn recorded_at(
+        mut self,
+        value: impl Into<Option<RecipeRecordedAt<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.106 = value.into();
+        self
+    }
+    /// Set the `recordedAt` field to an Option value (optional)
+    pub fn maybe_recorded_at(mut self, value: Option<RecipeRecordedAt<'a>>) -> Self {
+        self.__unsafe_private_named.106 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `releasedEvent` field (optional)
+    pub fn released_event(
+        mut self,
+        value: impl Into<Option<RecipeReleasedEvent<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.107 = value.into();
+        self
+    }
+    /// Set the `releasedEvent` field to an Option value (optional)
+    pub fn maybe_released_event(
+        mut self,
+        value: Option<RecipeReleasedEvent<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.107 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `review` field (optional)
+    pub fn review(mut self, value: impl Into<Option<RecipeReview<'a>>>) -> Self {
+        self.__unsafe_private_named.108 = value.into();
+        self
+    }
+    /// Set the `review` field to an Option value (optional)
+    pub fn maybe_review(mut self, value: Option<RecipeReview<'a>>) -> Self {
+        self.__unsafe_private_named.108 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `reviews` field (optional)
+    pub fn reviews(mut self, value: impl Into<Option<RecipeReviews<'a>>>) -> Self {
+        self.__unsafe_private_named.109 = value.into();
+        self
+    }
+    /// Set the `reviews` field to an Option value (optional)
+    pub fn maybe_reviews(mut self, value: Option<RecipeReviews<'a>>) -> Self {
+        self.__unsafe_private_named.109 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `sameAs` field (optional)
+    pub fn same_as(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.110 = value.into();
+        self
+    }
+    /// Set the `sameAs` field to an Option value (optional)
+    pub fn maybe_same_as(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.110 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `schemaVersion` field (optional)
+    pub fn schema_version(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.111 = value.into();
+        self
+    }
+    /// Set the `schemaVersion` field to an Option value (optional)
+    pub fn maybe_schema_version(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.111 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `sdDatePublished` field (optional)
+    pub fn sd_date_published(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.112 = value.into();
+        self
+    }
+    /// Set the `sdDatePublished` field to an Option value (optional)
+    pub fn maybe_sd_date_published(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.112 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `sdLicense` field (optional)
+    pub fn sd_license(mut self, value: impl Into<Option<RecipeSdLicense<'a>>>) -> Self {
+        self.__unsafe_private_named.113 = value.into();
+        self
+    }
+    /// Set the `sdLicense` field to an Option value (optional)
+    pub fn maybe_sd_license(mut self, value: Option<RecipeSdLicense<'a>>) -> Self {
+        self.__unsafe_private_named.113 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `sdPublisher` field (optional)
+    pub fn sd_publisher(
+        mut self,
+        value: impl Into<Option<RecipeSdPublisher<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.114 = value.into();
+        self
+    }
+    /// Set the `sdPublisher` field to an Option value (optional)
+    pub fn maybe_sd_publisher(mut self, value: Option<RecipeSdPublisher<'a>>) -> Self {
+        self.__unsafe_private_named.114 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `size` field (optional)
+    pub fn size(mut self, value: impl Into<Option<RecipeSize<'a>>>) -> Self {
+        self.__unsafe_private_named.115 = value.into();
+        self
+    }
+    /// Set the `size` field to an Option value (optional)
+    pub fn maybe_size(mut self, value: Option<RecipeSize<'a>>) -> Self {
+        self.__unsafe_private_named.115 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `sourceOrganization` field (optional)
+    pub fn source_organization(
+        mut self,
+        value: impl Into<Option<RecipeSourceOrganization<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.116 = value.into();
+        self
+    }
+    /// Set the `sourceOrganization` field to an Option value (optional)
+    pub fn maybe_source_organization(
+        mut self,
+        value: Option<RecipeSourceOrganization<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.116 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `spatial` field (optional)
+    pub fn spatial(mut self, value: impl Into<Option<RecipeSpatial<'a>>>) -> Self {
+        self.__unsafe_private_named.117 = value.into();
+        self
+    }
+    /// Set the `spatial` field to an Option value (optional)
+    pub fn maybe_spatial(mut self, value: Option<RecipeSpatial<'a>>) -> Self {
+        self.__unsafe_private_named.117 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `spatialCoverage` field (optional)
+    pub fn spatial_coverage(
+        mut self,
+        value: impl Into<Option<RecipeSpatialCoverage<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.118 = value.into();
+        self
+    }
+    /// Set the `spatialCoverage` field to an Option value (optional)
+    pub fn maybe_spatial_coverage(
+        mut self,
+        value: Option<RecipeSpatialCoverage<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.118 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `sponsor` field (optional)
+    pub fn sponsor(mut self, value: impl Into<Option<RecipeSponsor<'a>>>) -> Self {
+        self.__unsafe_private_named.119 = value.into();
+        self
+    }
+    /// Set the `sponsor` field to an Option value (optional)
+    pub fn maybe_sponsor(mut self, value: Option<RecipeSponsor<'a>>) -> Self {
+        self.__unsafe_private_named.119 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `step` field (optional)
+    pub fn step(mut self, value: impl Into<Option<RecipeStep<'a>>>) -> Self {
+        self.__unsafe_private_named.120 = value.into();
+        self
+    }
+    /// Set the `step` field to an Option value (optional)
+    pub fn maybe_step(mut self, value: Option<RecipeStep<'a>>) -> Self {
+        self.__unsafe_private_named.120 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `steps` field (optional)
+    pub fn steps(mut self, value: impl Into<Option<RecipeSteps<'a>>>) -> Self {
+        self.__unsafe_private_named.121 = value.into();
+        self
+    }
+    /// Set the `steps` field to an Option value (optional)
+    pub fn maybe_steps(mut self, value: Option<RecipeSteps<'a>>) -> Self {
+        self.__unsafe_private_named.121 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `subjectOf` field (optional)
+    pub fn subject_of(mut self, value: impl Into<Option<RecipeSubjectOf<'a>>>) -> Self {
+        self.__unsafe_private_named.122 = value.into();
+        self
+    }
+    /// Set the `subjectOf` field to an Option value (optional)
+    pub fn maybe_subject_of(mut self, value: Option<RecipeSubjectOf<'a>>) -> Self {
+        self.__unsafe_private_named.122 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `suitableForDiet` field (optional)
+    pub fn suitable_for_diet(
+        mut self,
+        value: impl Into<Option<RecipeSuitableForDiet<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.123 = value.into();
+        self
+    }
+    /// Set the `suitableForDiet` field to an Option value (optional)
+    pub fn maybe_suitable_for_diet(
+        mut self,
+        value: Option<RecipeSuitableForDiet<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.123 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `supply` field (optional)
+    pub fn supply(mut self, value: impl Into<Option<RecipeSupply<'a>>>) -> Self {
+        self.__unsafe_private_named.124 = value.into();
+        self
+    }
+    /// Set the `supply` field to an Option value (optional)
+    pub fn maybe_supply(mut self, value: Option<RecipeSupply<'a>>) -> Self {
+        self.__unsafe_private_named.124 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `teaches` field (optional)
+    pub fn teaches(mut self, value: impl Into<Option<RecipeTeaches<'a>>>) -> Self {
+        self.__unsafe_private_named.125 = value.into();
+        self
+    }
+    /// Set the `teaches` field to an Option value (optional)
+    pub fn maybe_teaches(mut self, value: Option<RecipeTeaches<'a>>) -> Self {
+        self.__unsafe_private_named.125 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `temporal` field (optional)
+    pub fn temporal(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.126 = value.into();
+        self
+    }
+    /// Set the `temporal` field to an Option value (optional)
+    pub fn maybe_temporal(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.126 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `temporalCoverage` field (optional)
+    pub fn temporal_coverage(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.127 = value.into();
+        self
+    }
+    /// Set the `temporalCoverage` field to an Option value (optional)
+    pub fn maybe_temporal_coverage(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.127 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `text` field (optional)
+    pub fn text(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.128 = value.into();
+        self
+    }
+    /// Set the `text` field to an Option value (optional)
+    pub fn maybe_text(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.128 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `thumbnail` field (optional)
+    pub fn thumbnail(mut self, value: impl Into<Option<RecipeThumbnail<'a>>>) -> Self {
+        self.__unsafe_private_named.129 = value.into();
+        self
+    }
+    /// Set the `thumbnail` field to an Option value (optional)
+    pub fn maybe_thumbnail(mut self, value: Option<RecipeThumbnail<'a>>) -> Self {
+        self.__unsafe_private_named.129 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `thumbnailUrl` field (optional)
+    pub fn thumbnail_url(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.130 = value.into();
+        self
+    }
+    /// Set the `thumbnailUrl` field to an Option value (optional)
+    pub fn maybe_thumbnail_url(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.130 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `timeRequired` field (optional)
+    pub fn time_required(
+        mut self,
+        value: impl Into<Option<RecipeTimeRequired<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.131 = value.into();
+        self
+    }
+    /// Set the `timeRequired` field to an Option value (optional)
+    pub fn maybe_time_required(mut self, value: Option<RecipeTimeRequired<'a>>) -> Self {
+        self.__unsafe_private_named.131 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `tool` field (optional)
+    pub fn tool(mut self, value: impl Into<Option<RecipeTool<'a>>>) -> Self {
+        self.__unsafe_private_named.132 = value.into();
+        self
+    }
+    /// Set the `tool` field to an Option value (optional)
+    pub fn maybe_tool(mut self, value: Option<RecipeTool<'a>>) -> Self {
+        self.__unsafe_private_named.132 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `totalTime` field (optional)
+    pub fn total_time(mut self, value: impl Into<Option<RecipeTotalTime<'a>>>) -> Self {
+        self.__unsafe_private_named.133 = value.into();
+        self
+    }
+    /// Set the `totalTime` field to an Option value (optional)
+    pub fn maybe_total_time(mut self, value: Option<RecipeTotalTime<'a>>) -> Self {
+        self.__unsafe_private_named.133 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `translationOfWork` field (optional)
+    pub fn translation_of_work(
+        mut self,
+        value: impl Into<Option<RecipeTranslationOfWork<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.134 = value.into();
+        self
+    }
+    /// Set the `translationOfWork` field to an Option value (optional)
+    pub fn maybe_translation_of_work(
+        mut self,
+        value: Option<RecipeTranslationOfWork<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.134 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `translator` field (optional)
+    pub fn translator(mut self, value: impl Into<Option<RecipeTranslator<'a>>>) -> Self {
+        self.__unsafe_private_named.135 = value.into();
+        self
+    }
+    /// Set the `translator` field to an Option value (optional)
+    pub fn maybe_translator(mut self, value: Option<RecipeTranslator<'a>>) -> Self {
+        self.__unsafe_private_named.135 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `typicalAgeRange` field (optional)
+    pub fn typical_age_range(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.136 = value.into();
+        self
+    }
+    /// Set the `typicalAgeRange` field to an Option value (optional)
+    pub fn maybe_typical_age_range(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.136 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `url` field (optional)
+    pub fn url(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.137 = value.into();
+        self
+    }
+    /// Set the `url` field to an Option value (optional)
+    pub fn maybe_url(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.137 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `usageInfo` field (optional)
+    pub fn usage_info(mut self, value: impl Into<Option<RecipeUsageInfo<'a>>>) -> Self {
+        self.__unsafe_private_named.138 = value.into();
+        self
+    }
+    /// Set the `usageInfo` field to an Option value (optional)
+    pub fn maybe_usage_info(mut self, value: Option<RecipeUsageInfo<'a>>) -> Self {
+        self.__unsafe_private_named.138 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `version` field (optional)
+    pub fn version(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.139 = value.into();
+        self
+    }
+    /// Set the `version` field to an Option value (optional)
+    pub fn maybe_version(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.139 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `video` field (optional)
+    pub fn video(mut self, value: impl Into<Option<RecipeVideo<'a>>>) -> Self {
+        self.__unsafe_private_named.140 = value.into();
+        self
+    }
+    /// Set the `video` field to an Option value (optional)
+    pub fn maybe_video(mut self, value: Option<RecipeVideo<'a>>) -> Self {
+        self.__unsafe_private_named.140 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `wordCount` field (optional)
+    pub fn word_count(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.141 = value.into();
+        self
+    }
+    /// Set the `wordCount` field to an Option value (optional)
+    pub fn maybe_word_count(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.141 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `workExample` field (optional)
+    pub fn work_example(
+        mut self,
+        value: impl Into<Option<RecipeWorkExample<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.142 = value.into();
+        self
+    }
+    /// Set the `workExample` field to an Option value (optional)
+    pub fn maybe_work_example(mut self, value: Option<RecipeWorkExample<'a>>) -> Self {
+        self.__unsafe_private_named.142 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `workTranslation` field (optional)
+    pub fn work_translation(
+        mut self,
+        value: impl Into<Option<RecipeWorkTranslation<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.143 = value.into();
+        self
+    }
+    /// Set the `workTranslation` field to an Option value (optional)
+    pub fn maybe_work_translation(
+        mut self,
+        value: Option<RecipeWorkTranslation<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.143 = value;
+        self
+    }
+}
+
+impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+    /// Set the `yield` field (optional)
+    pub fn r#yield(mut self, value: impl Into<Option<RecipeYield<'a>>>) -> Self {
+        self.__unsafe_private_named.144 = value.into();
+        self
+    }
+    /// Set the `yield` field to an Option value (optional)
+    pub fn maybe_yield(mut self, value: Option<RecipeYield<'a>>) -> Self {
+        self.__unsafe_private_named.144 = value;
+        self
+    }
+}
+
+impl<'a, S> RecipeBuilder<'a, S>
+where
+    S: recipe_state::State,
+{
+    /// Build the final struct
+    pub fn build(self) -> Recipe<'a> {
+        Recipe {
+            about: self.__unsafe_private_named.0,
+            r#abstract: self.__unsafe_private_named.1,
+            access_mode: self.__unsafe_private_named.2,
+            access_mode_sufficient: self.__unsafe_private_named.3,
+            accessibility_api: self.__unsafe_private_named.4,
+            accessibility_control: self.__unsafe_private_named.5,
+            accessibility_feature: self.__unsafe_private_named.6,
+            accessibility_hazard: self.__unsafe_private_named.7,
+            accessibility_summary: self.__unsafe_private_named.8,
+            accountable_person: self.__unsafe_private_named.9,
+            acquire_license_page: self.__unsafe_private_named.10,
+            additional_type: self.__unsafe_private_named.11,
+            aggregate_rating: self.__unsafe_private_named.12,
+            alternate_name: self.__unsafe_private_named.13,
+            alternative_headline: self.__unsafe_private_named.14,
+            archived_at: self.__unsafe_private_named.15,
+            assesses: self.__unsafe_private_named.16,
+            associated_media: self.__unsafe_private_named.17,
+            audience: self.__unsafe_private_named.18,
+            audio: self.__unsafe_private_named.19,
+            author: self.__unsafe_private_named.20,
+            award: self.__unsafe_private_named.21,
+            awards: self.__unsafe_private_named.22,
+            character: self.__unsafe_private_named.23,
+            citation: self.__unsafe_private_named.24,
+            comment: self.__unsafe_private_named.25,
+            comment_count: self.__unsafe_private_named.26,
+            conditions_of_access: self.__unsafe_private_named.27,
+            content_location: self.__unsafe_private_named.28,
+            content_rating: self.__unsafe_private_named.29,
+            content_reference_time: self.__unsafe_private_named.30,
+            contributor: self.__unsafe_private_named.31,
+            cook_time: self.__unsafe_private_named.32,
+            cooking_method: self.__unsafe_private_named.33,
+            copyright_holder: self.__unsafe_private_named.34,
+            copyright_notice: self.__unsafe_private_named.35,
+            copyright_year: self.__unsafe_private_named.36,
+            correction: self.__unsafe_private_named.37,
+            country_of_origin: self.__unsafe_private_named.38,
+            creative_work_status: self.__unsafe_private_named.39,
+            creator: self.__unsafe_private_named.40,
+            credit_text: self.__unsafe_private_named.41,
+            date_created: self.__unsafe_private_named.42,
+            date_modified: self.__unsafe_private_named.43,
+            date_published: self.__unsafe_private_named.44,
+            description: self.__unsafe_private_named.45,
+            digital_source_type: self.__unsafe_private_named.46,
+            disambiguating_description: self.__unsafe_private_named.47,
+            discussion_url: self.__unsafe_private_named.48,
+            edit_eidr: self.__unsafe_private_named.49,
+            editor: self.__unsafe_private_named.50,
+            educational_alignment: self.__unsafe_private_named.51,
+            educational_level: self.__unsafe_private_named.52,
+            educational_use: self.__unsafe_private_named.53,
+            encoding: self.__unsafe_private_named.54,
+            encoding_format: self.__unsafe_private_named.55,
+            encodings: self.__unsafe_private_named.56,
+            estimated_cost: self.__unsafe_private_named.57,
+            example_of_work: self.__unsafe_private_named.58,
+            expires: self.__unsafe_private_named.59,
+            file_format: self.__unsafe_private_named.60,
+            funder: self.__unsafe_private_named.61,
+            funding: self.__unsafe_private_named.62,
+            genre: self.__unsafe_private_named.63,
+            has_part: self.__unsafe_private_named.64,
+            headline: self.__unsafe_private_named.65,
+            identifier: self.__unsafe_private_named.66,
+            image: self.__unsafe_private_named.67,
+            in_language: self.__unsafe_private_named.68,
+            ingredients: self.__unsafe_private_named.69,
+            interaction_statistic: self.__unsafe_private_named.70,
+            interactivity_type: self.__unsafe_private_named.71,
+            interpreted_as_claim: self.__unsafe_private_named.72,
+            is_accessible_for_free: self.__unsafe_private_named.73,
+            is_based_on: self.__unsafe_private_named.74,
+            is_family_friendly: self.__unsafe_private_named.75,
+            is_part_of: self.__unsafe_private_named.76,
+            keywords: self.__unsafe_private_named.77,
+            learning_resource_type: self.__unsafe_private_named.78,
+            license: self.__unsafe_private_named.79,
+            location_created: self.__unsafe_private_named.80,
+            main_entity: self.__unsafe_private_named.81,
+            main_entity_of_page: self.__unsafe_private_named.82,
+            maintainer: self.__unsafe_private_named.83,
+            material: self.__unsafe_private_named.84,
+            material_extent: self.__unsafe_private_named.85,
+            mentions: self.__unsafe_private_named.86,
+            name: self.__unsafe_private_named.87,
+            nutrition: self.__unsafe_private_named.88,
+            offers: self.__unsafe_private_named.89,
+            pattern: self.__unsafe_private_named.90,
+            perform_time: self.__unsafe_private_named.91,
+            position: self.__unsafe_private_named.92,
+            potential_action: self.__unsafe_private_named.93,
+            prep_time: self.__unsafe_private_named.94,
+            producer: self.__unsafe_private_named.95,
+            provider: self.__unsafe_private_named.96,
+            publication: self.__unsafe_private_named.97,
+            publisher: self.__unsafe_private_named.98,
+            publisher_imprint: self.__unsafe_private_named.99,
+            publishing_principles: self.__unsafe_private_named.100,
+            recipe_category: self.__unsafe_private_named.101,
+            recipe_cuisine: self.__unsafe_private_named.102,
+            recipe_ingredient: self.__unsafe_private_named.103,
+            recipe_instructions: self.__unsafe_private_named.104,
+            recipe_yield: self.__unsafe_private_named.105,
+            recorded_at: self.__unsafe_private_named.106,
+            released_event: self.__unsafe_private_named.107,
+            review: self.__unsafe_private_named.108,
+            reviews: self.__unsafe_private_named.109,
+            same_as: self.__unsafe_private_named.110,
+            schema_version: self.__unsafe_private_named.111,
+            sd_date_published: self.__unsafe_private_named.112,
+            sd_license: self.__unsafe_private_named.113,
+            sd_publisher: self.__unsafe_private_named.114,
+            size: self.__unsafe_private_named.115,
+            source_organization: self.__unsafe_private_named.116,
+            spatial: self.__unsafe_private_named.117,
+            spatial_coverage: self.__unsafe_private_named.118,
+            sponsor: self.__unsafe_private_named.119,
+            step: self.__unsafe_private_named.120,
+            steps: self.__unsafe_private_named.121,
+            subject_of: self.__unsafe_private_named.122,
+            suitable_for_diet: self.__unsafe_private_named.123,
+            supply: self.__unsafe_private_named.124,
+            teaches: self.__unsafe_private_named.125,
+            temporal: self.__unsafe_private_named.126,
+            temporal_coverage: self.__unsafe_private_named.127,
+            text: self.__unsafe_private_named.128,
+            thumbnail: self.__unsafe_private_named.129,
+            thumbnail_url: self.__unsafe_private_named.130,
+            time_required: self.__unsafe_private_named.131,
+            tool: self.__unsafe_private_named.132,
+            total_time: self.__unsafe_private_named.133,
+            translation_of_work: self.__unsafe_private_named.134,
+            translator: self.__unsafe_private_named.135,
+            typical_age_range: self.__unsafe_private_named.136,
+            url: self.__unsafe_private_named.137,
+            usage_info: self.__unsafe_private_named.138,
+            version: self.__unsafe_private_named.139,
+            video: self.__unsafe_private_named.140,
+            word_count: self.__unsafe_private_named.141,
+            work_example: self.__unsafe_private_named.142,
+            work_translation: self.__unsafe_private_named.143,
+            r#yield: self.__unsafe_private_named.144,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Recipe<'a> {
+        Recipe {
+            about: self.__unsafe_private_named.0,
+            r#abstract: self.__unsafe_private_named.1,
+            access_mode: self.__unsafe_private_named.2,
+            access_mode_sufficient: self.__unsafe_private_named.3,
+            accessibility_api: self.__unsafe_private_named.4,
+            accessibility_control: self.__unsafe_private_named.5,
+            accessibility_feature: self.__unsafe_private_named.6,
+            accessibility_hazard: self.__unsafe_private_named.7,
+            accessibility_summary: self.__unsafe_private_named.8,
+            accountable_person: self.__unsafe_private_named.9,
+            acquire_license_page: self.__unsafe_private_named.10,
+            additional_type: self.__unsafe_private_named.11,
+            aggregate_rating: self.__unsafe_private_named.12,
+            alternate_name: self.__unsafe_private_named.13,
+            alternative_headline: self.__unsafe_private_named.14,
+            archived_at: self.__unsafe_private_named.15,
+            assesses: self.__unsafe_private_named.16,
+            associated_media: self.__unsafe_private_named.17,
+            audience: self.__unsafe_private_named.18,
+            audio: self.__unsafe_private_named.19,
+            author: self.__unsafe_private_named.20,
+            award: self.__unsafe_private_named.21,
+            awards: self.__unsafe_private_named.22,
+            character: self.__unsafe_private_named.23,
+            citation: self.__unsafe_private_named.24,
+            comment: self.__unsafe_private_named.25,
+            comment_count: self.__unsafe_private_named.26,
+            conditions_of_access: self.__unsafe_private_named.27,
+            content_location: self.__unsafe_private_named.28,
+            content_rating: self.__unsafe_private_named.29,
+            content_reference_time: self.__unsafe_private_named.30,
+            contributor: self.__unsafe_private_named.31,
+            cook_time: self.__unsafe_private_named.32,
+            cooking_method: self.__unsafe_private_named.33,
+            copyright_holder: self.__unsafe_private_named.34,
+            copyright_notice: self.__unsafe_private_named.35,
+            copyright_year: self.__unsafe_private_named.36,
+            correction: self.__unsafe_private_named.37,
+            country_of_origin: self.__unsafe_private_named.38,
+            creative_work_status: self.__unsafe_private_named.39,
+            creator: self.__unsafe_private_named.40,
+            credit_text: self.__unsafe_private_named.41,
+            date_created: self.__unsafe_private_named.42,
+            date_modified: self.__unsafe_private_named.43,
+            date_published: self.__unsafe_private_named.44,
+            description: self.__unsafe_private_named.45,
+            digital_source_type: self.__unsafe_private_named.46,
+            disambiguating_description: self.__unsafe_private_named.47,
+            discussion_url: self.__unsafe_private_named.48,
+            edit_eidr: self.__unsafe_private_named.49,
+            editor: self.__unsafe_private_named.50,
+            educational_alignment: self.__unsafe_private_named.51,
+            educational_level: self.__unsafe_private_named.52,
+            educational_use: self.__unsafe_private_named.53,
+            encoding: self.__unsafe_private_named.54,
+            encoding_format: self.__unsafe_private_named.55,
+            encodings: self.__unsafe_private_named.56,
+            estimated_cost: self.__unsafe_private_named.57,
+            example_of_work: self.__unsafe_private_named.58,
+            expires: self.__unsafe_private_named.59,
+            file_format: self.__unsafe_private_named.60,
+            funder: self.__unsafe_private_named.61,
+            funding: self.__unsafe_private_named.62,
+            genre: self.__unsafe_private_named.63,
+            has_part: self.__unsafe_private_named.64,
+            headline: self.__unsafe_private_named.65,
+            identifier: self.__unsafe_private_named.66,
+            image: self.__unsafe_private_named.67,
+            in_language: self.__unsafe_private_named.68,
+            ingredients: self.__unsafe_private_named.69,
+            interaction_statistic: self.__unsafe_private_named.70,
+            interactivity_type: self.__unsafe_private_named.71,
+            interpreted_as_claim: self.__unsafe_private_named.72,
+            is_accessible_for_free: self.__unsafe_private_named.73,
+            is_based_on: self.__unsafe_private_named.74,
+            is_family_friendly: self.__unsafe_private_named.75,
+            is_part_of: self.__unsafe_private_named.76,
+            keywords: self.__unsafe_private_named.77,
+            learning_resource_type: self.__unsafe_private_named.78,
+            license: self.__unsafe_private_named.79,
+            location_created: self.__unsafe_private_named.80,
+            main_entity: self.__unsafe_private_named.81,
+            main_entity_of_page: self.__unsafe_private_named.82,
+            maintainer: self.__unsafe_private_named.83,
+            material: self.__unsafe_private_named.84,
+            material_extent: self.__unsafe_private_named.85,
+            mentions: self.__unsafe_private_named.86,
+            name: self.__unsafe_private_named.87,
+            nutrition: self.__unsafe_private_named.88,
+            offers: self.__unsafe_private_named.89,
+            pattern: self.__unsafe_private_named.90,
+            perform_time: self.__unsafe_private_named.91,
+            position: self.__unsafe_private_named.92,
+            potential_action: self.__unsafe_private_named.93,
+            prep_time: self.__unsafe_private_named.94,
+            producer: self.__unsafe_private_named.95,
+            provider: self.__unsafe_private_named.96,
+            publication: self.__unsafe_private_named.97,
+            publisher: self.__unsafe_private_named.98,
+            publisher_imprint: self.__unsafe_private_named.99,
+            publishing_principles: self.__unsafe_private_named.100,
+            recipe_category: self.__unsafe_private_named.101,
+            recipe_cuisine: self.__unsafe_private_named.102,
+            recipe_ingredient: self.__unsafe_private_named.103,
+            recipe_instructions: self.__unsafe_private_named.104,
+            recipe_yield: self.__unsafe_private_named.105,
+            recorded_at: self.__unsafe_private_named.106,
+            released_event: self.__unsafe_private_named.107,
+            review: self.__unsafe_private_named.108,
+            reviews: self.__unsafe_private_named.109,
+            same_as: self.__unsafe_private_named.110,
+            schema_version: self.__unsafe_private_named.111,
+            sd_date_published: self.__unsafe_private_named.112,
+            sd_license: self.__unsafe_private_named.113,
+            sd_publisher: self.__unsafe_private_named.114,
+            size: self.__unsafe_private_named.115,
+            source_organization: self.__unsafe_private_named.116,
+            spatial: self.__unsafe_private_named.117,
+            spatial_coverage: self.__unsafe_private_named.118,
+            sponsor: self.__unsafe_private_named.119,
+            step: self.__unsafe_private_named.120,
+            steps: self.__unsafe_private_named.121,
+            subject_of: self.__unsafe_private_named.122,
+            suitable_for_diet: self.__unsafe_private_named.123,
+            supply: self.__unsafe_private_named.124,
+            teaches: self.__unsafe_private_named.125,
+            temporal: self.__unsafe_private_named.126,
+            temporal_coverage: self.__unsafe_private_named.127,
+            text: self.__unsafe_private_named.128,
+            thumbnail: self.__unsafe_private_named.129,
+            thumbnail_url: self.__unsafe_private_named.130,
+            time_required: self.__unsafe_private_named.131,
+            tool: self.__unsafe_private_named.132,
+            total_time: self.__unsafe_private_named.133,
+            translation_of_work: self.__unsafe_private_named.134,
+            translator: self.__unsafe_private_named.135,
+            typical_age_range: self.__unsafe_private_named.136,
+            url: self.__unsafe_private_named.137,
+            usage_info: self.__unsafe_private_named.138,
+            version: self.__unsafe_private_named.139,
+            video: self.__unsafe_private_named.140,
+            word_count: self.__unsafe_private_named.141,
+            work_example: self.__unsafe_private_named.142,
+            work_translation: self.__unsafe_private_named.143,
+            r#yield: self.__unsafe_private_named.144,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Recipe<'a> {

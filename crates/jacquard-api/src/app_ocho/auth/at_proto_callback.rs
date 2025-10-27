@@ -12,21 +12,177 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct AtProtoCallback<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub code: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub iss: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub state: jacquard_common::CowStr<'a>,
+}
+
+pub mod at_proto_callback_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Code;
+        type State;
+        type Iss;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Code = Unset;
+        type State = Unset;
+        type Iss = Unset;
+    }
+    ///State transition - sets the `code` field to Set
+    pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCode<S> {}
+    impl<S: State> State for SetCode<S> {
+        type Code = Set<members::code>;
+        type State = S::State;
+        type Iss = S::Iss;
+    }
+    ///State transition - sets the `state` field to Set
+    pub struct SetState<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetState<S> {}
+    impl<S: State> State for SetState<S> {
+        type Code = S::Code;
+        type State = Set<members::state>;
+        type Iss = S::Iss;
+    }
+    ///State transition - sets the `iss` field to Set
+    pub struct SetIss<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIss<S> {}
+    impl<S: State> State for SetIss<S> {
+        type Code = S::Code;
+        type State = S::State;
+        type Iss = Set<members::iss>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `code` field
+        pub struct code(());
+        ///Marker type for the `state` field
+        pub struct state(());
+        ///Marker type for the `iss` field
+        pub struct iss(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct AtProtoCallbackBuilder<'a, S: at_proto_callback_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> AtProtoCallback<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> AtProtoCallbackBuilder<'a, at_proto_callback_state::Empty> {
+        AtProtoCallbackBuilder::new()
+    }
+}
+
+impl<'a> AtProtoCallbackBuilder<'a, at_proto_callback_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        AtProtoCallbackBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AtProtoCallbackBuilder<'a, S>
+where
+    S: at_proto_callback_state::State,
+    S::Code: at_proto_callback_state::IsUnset,
+{
+    /// Set the `code` field (required)
+    pub fn code(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> AtProtoCallbackBuilder<'a, at_proto_callback_state::SetCode<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        AtProtoCallbackBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AtProtoCallbackBuilder<'a, S>
+where
+    S: at_proto_callback_state::State,
+    S::Iss: at_proto_callback_state::IsUnset,
+{
+    /// Set the `iss` field (required)
+    pub fn iss(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> AtProtoCallbackBuilder<'a, at_proto_callback_state::SetIss<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        AtProtoCallbackBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AtProtoCallbackBuilder<'a, S>
+where
+    S: at_proto_callback_state::State,
+    S::State: at_proto_callback_state::IsUnset,
+{
+    /// Set the `state` field (required)
+    pub fn state(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> AtProtoCallbackBuilder<'a, at_proto_callback_state::SetState<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        AtProtoCallbackBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AtProtoCallbackBuilder<'a, S>
+where
+    S: at_proto_callback_state::State,
+    S::Code: at_proto_callback_state::IsSet,
+    S::State: at_proto_callback_state::IsSet,
+    S::Iss: at_proto_callback_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> AtProtoCallback<'a> {
+        AtProtoCallback {
+            code: self.__unsafe_private_named.0.unwrap(),
+            iss: self.__unsafe_private_named.1.unwrap(),
+            state: self.__unsafe_private_named.2.unwrap(),
+        }
+    }
 }
 
 /// Response type for

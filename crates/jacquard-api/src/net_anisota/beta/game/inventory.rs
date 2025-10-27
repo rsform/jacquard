@@ -14,8 +14,7 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Inventory<'a> {
@@ -25,62 +24,504 @@ pub struct Inventory<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     /// Unique identifier for the item from gameItems.json
     #[serde(borrow)]
-    #[builder(into)]
     pub item_id: jacquard_common::CowStr<'a>,
     /// Display name of the item
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub item_name: Option<jacquard_common::CowStr<'a>>,
     /// Type category of the item (consumable, tool, equipment, etc.)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub item_type: Option<jacquard_common::CowStr<'a>>,
     /// Base value of the item in game currency
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub item_value: Option<i64>,
     /// When the record was last modified
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub last_modified: Option<jacquard_common::types::string::Datetime>,
     /// URI of the game.log record that documents the acquisition of this item
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub log_record_uri: Option<jacquard_common::CowStr<'a>>,
     /// Maximum stack size for this item
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub max_stack: Option<i64>,
     /// Additional item-specific data (stats, attributes, enchantments, etc.)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub metadata: Option<jacquard_common::types::value::Data<'a>>,
     /// Number of items in the stack
     pub quantity: i64,
     /// Rarity level of the item
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub rarity: Option<jacquard_common::CowStr<'a>>,
     /// How the item was acquired
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub source: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub source_details: Option<
         crate::net_anisota::beta::game::inventory::SourceDetails<'a>,
     >,
     /// Whether this item can be stacked with others of the same type
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub stackable: Option<bool>,
+}
+
+pub mod inventory_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type ItemId;
+        type Quantity;
+        type AcquiredAt;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type ItemId = Unset;
+        type Quantity = Unset;
+        type AcquiredAt = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `item_id` field to Set
+    pub struct SetItemId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetItemId<S> {}
+    impl<S: State> State for SetItemId<S> {
+        type ItemId = Set<members::item_id>;
+        type Quantity = S::Quantity;
+        type AcquiredAt = S::AcquiredAt;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `quantity` field to Set
+    pub struct SetQuantity<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetQuantity<S> {}
+    impl<S: State> State for SetQuantity<S> {
+        type ItemId = S::ItemId;
+        type Quantity = Set<members::quantity>;
+        type AcquiredAt = S::AcquiredAt;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `acquired_at` field to Set
+    pub struct SetAcquiredAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAcquiredAt<S> {}
+    impl<S: State> State for SetAcquiredAt<S> {
+        type ItemId = S::ItemId;
+        type Quantity = S::Quantity;
+        type AcquiredAt = Set<members::acquired_at>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type ItemId = S::ItemId;
+        type Quantity = S::Quantity;
+        type AcquiredAt = S::AcquiredAt;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `item_id` field
+        pub struct item_id(());
+        ///Marker type for the `quantity` field
+        pub struct quantity(());
+        ///Marker type for the `acquired_at` field
+        pub struct acquired_at(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct InventoryBuilder<'a, S: inventory_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<
+            crate::net_anisota::beta::game::inventory::SourceDetails<'a>,
+        >,
+        ::core::option::Option<bool>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Inventory<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> InventoryBuilder<'a, inventory_state::Empty> {
+        InventoryBuilder::new()
+    }
+}
+
+impl<'a> InventoryBuilder<'a, inventory_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        InventoryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> InventoryBuilder<'a, S>
+where
+    S: inventory_state::State,
+    S::AcquiredAt: inventory_state::IsUnset,
+{
+    /// Set the `acquiredAt` field (required)
+    pub fn acquired_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> InventoryBuilder<'a, inventory_state::SetAcquiredAt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        InventoryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> InventoryBuilder<'a, S>
+where
+    S: inventory_state::State,
+    S::CreatedAt: inventory_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> InventoryBuilder<'a, inventory_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        InventoryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> InventoryBuilder<'a, S>
+where
+    S: inventory_state::State,
+    S::ItemId: inventory_state::IsUnset,
+{
+    /// Set the `itemId` field (required)
+    pub fn item_id(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> InventoryBuilder<'a, inventory_state::SetItemId<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        InventoryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
+    /// Set the `itemName` field (optional)
+    pub fn item_name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `itemName` field to an Option value (optional)
+    pub fn maybe_item_name(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
+    /// Set the `itemType` field (optional)
+    pub fn item_type(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `itemType` field to an Option value (optional)
+    pub fn maybe_item_type(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
+    /// Set the `itemValue` field (optional)
+    pub fn item_value(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `itemValue` field to an Option value (optional)
+    pub fn maybe_item_value(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
+    /// Set the `lastModified` field (optional)
+    pub fn last_modified(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `lastModified` field to an Option value (optional)
+    pub fn maybe_last_modified(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
+    /// Set the `logRecordUri` field (optional)
+    pub fn log_record_uri(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value.into();
+        self
+    }
+    /// Set the `logRecordUri` field to an Option value (optional)
+    pub fn maybe_log_record_uri(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value;
+        self
+    }
+}
+
+impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
+    /// Set the `maxStack` field (optional)
+    pub fn max_stack(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.8 = value.into();
+        self
+    }
+    /// Set the `maxStack` field to an Option value (optional)
+    pub fn maybe_max_stack(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.8 = value;
+        self
+    }
+}
+
+impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
+    /// Set the `metadata` field (optional)
+    pub fn metadata(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::value::Data<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.9 = value.into();
+        self
+    }
+    /// Set the `metadata` field to an Option value (optional)
+    pub fn maybe_metadata(
+        mut self,
+        value: Option<jacquard_common::types::value::Data<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.9 = value;
+        self
+    }
+}
+
+impl<'a, S> InventoryBuilder<'a, S>
+where
+    S: inventory_state::State,
+    S::Quantity: inventory_state::IsUnset,
+{
+    /// Set the `quantity` field (required)
+    pub fn quantity(
+        mut self,
+        value: impl Into<i64>,
+    ) -> InventoryBuilder<'a, inventory_state::SetQuantity<S>> {
+        self.__unsafe_private_named.10 = ::core::option::Option::Some(value.into());
+        InventoryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
+    /// Set the `rarity` field (optional)
+    pub fn rarity(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.11 = value.into();
+        self
+    }
+    /// Set the `rarity` field to an Option value (optional)
+    pub fn maybe_rarity(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.11 = value;
+        self
+    }
+}
+
+impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
+    /// Set the `source` field (optional)
+    pub fn source(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.12 = value.into();
+        self
+    }
+    /// Set the `source` field to an Option value (optional)
+    pub fn maybe_source(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.12 = value;
+        self
+    }
+}
+
+impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
+    /// Set the `sourceDetails` field (optional)
+    pub fn source_details(
+        mut self,
+        value: impl Into<
+            Option<crate::net_anisota::beta::game::inventory::SourceDetails<'a>>,
+        >,
+    ) -> Self {
+        self.__unsafe_private_named.13 = value.into();
+        self
+    }
+    /// Set the `sourceDetails` field to an Option value (optional)
+    pub fn maybe_source_details(
+        mut self,
+        value: Option<crate::net_anisota::beta::game::inventory::SourceDetails<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.13 = value;
+        self
+    }
+}
+
+impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
+    /// Set the `stackable` field (optional)
+    pub fn stackable(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.14 = value.into();
+        self
+    }
+    /// Set the `stackable` field to an Option value (optional)
+    pub fn maybe_stackable(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.14 = value;
+        self
+    }
+}
+
+impl<'a, S> InventoryBuilder<'a, S>
+where
+    S: inventory_state::State,
+    S::ItemId: inventory_state::IsSet,
+    S::Quantity: inventory_state::IsSet,
+    S::AcquiredAt: inventory_state::IsSet,
+    S::CreatedAt: inventory_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Inventory<'a> {
+        Inventory {
+            acquired_at: self.__unsafe_private_named.0.unwrap(),
+            created_at: self.__unsafe_private_named.1.unwrap(),
+            item_id: self.__unsafe_private_named.2.unwrap(),
+            item_name: self.__unsafe_private_named.3,
+            item_type: self.__unsafe_private_named.4,
+            item_value: self.__unsafe_private_named.5,
+            last_modified: self.__unsafe_private_named.6,
+            log_record_uri: self.__unsafe_private_named.7,
+            max_stack: self.__unsafe_private_named.8,
+            metadata: self.__unsafe_private_named.9,
+            quantity: self.__unsafe_private_named.10.unwrap(),
+            rarity: self.__unsafe_private_named.11,
+            source: self.__unsafe_private_named.12,
+            source_details: self.__unsafe_private_named.13,
+            stackable: self.__unsafe_private_named.14,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Inventory<'a> {
+        Inventory {
+            acquired_at: self.__unsafe_private_named.0.unwrap(),
+            created_at: self.__unsafe_private_named.1.unwrap(),
+            item_id: self.__unsafe_private_named.2.unwrap(),
+            item_name: self.__unsafe_private_named.3,
+            item_type: self.__unsafe_private_named.4,
+            item_value: self.__unsafe_private_named.5,
+            last_modified: self.__unsafe_private_named.6,
+            log_record_uri: self.__unsafe_private_named.7,
+            max_stack: self.__unsafe_private_named.8,
+            metadata: self.__unsafe_private_named.9,
+            quantity: self.__unsafe_private_named.10.unwrap(),
+            rarity: self.__unsafe_private_named.11,
+            source: self.__unsafe_private_named.12,
+            source_details: self.__unsafe_private_named.13,
+            stackable: self.__unsafe_private_named.14,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Inventory<'a> {

@@ -13,20 +13,179 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct FailedScheduling<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub error: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub error_code: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::Did<'a>,
+}
+
+pub mod failed_scheduling_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Subject;
+        type Error;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Subject = Unset;
+        type Error = Unset;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type Subject = Set<members::subject>;
+        type Error = S::Error;
+    }
+    ///State transition - sets the `error` field to Set
+    pub struct SetError<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetError<S> {}
+    impl<S: State> State for SetError<S> {
+        type Subject = S::Subject;
+        type Error = Set<members::error>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `subject` field
+        pub struct subject(());
+        ///Marker type for the `error` field
+        pub struct error(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct FailedSchedulingBuilder<'a, S: failed_scheduling_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> FailedScheduling<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> FailedSchedulingBuilder<'a, failed_scheduling_state::Empty> {
+        FailedSchedulingBuilder::new()
+    }
+}
+
+impl<'a> FailedSchedulingBuilder<'a, failed_scheduling_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        FailedSchedulingBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> FailedSchedulingBuilder<'a, S>
+where
+    S: failed_scheduling_state::State,
+    S::Error: failed_scheduling_state::IsUnset,
+{
+    /// Set the `error` field (required)
+    pub fn error(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> FailedSchedulingBuilder<'a, failed_scheduling_state::SetError<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        FailedSchedulingBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: failed_scheduling_state::State> FailedSchedulingBuilder<'a, S> {
+    /// Set the `errorCode` field (optional)
+    pub fn error_code(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `errorCode` field to an Option value (optional)
+    pub fn maybe_error_code(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> FailedSchedulingBuilder<'a, S>
+where
+    S: failed_scheduling_state::State,
+    S::Subject: failed_scheduling_state::IsUnset,
+{
+    /// Set the `subject` field (required)
+    pub fn subject(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> FailedSchedulingBuilder<'a, failed_scheduling_state::SetSubject<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        FailedSchedulingBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> FailedSchedulingBuilder<'a, S>
+where
+    S: failed_scheduling_state::State,
+    S::Subject: failed_scheduling_state::IsSet,
+    S::Error: failed_scheduling_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> FailedScheduling<'a> {
+        FailedScheduling {
+            error: self.__unsafe_private_named.0.unwrap(),
+            error_code: self.__unsafe_private_named.1,
+            subject: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> FailedScheduling<'a> {
+        FailedScheduling {
+            error: self.__unsafe_private_named.0.unwrap(),
+            error_code: self.__unsafe_private_named.1,
+            subject: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -472,33 +631,269 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FailedScheduling<'a> {
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-#[builder(start_fn = new)]
 pub struct ScheduleAction<'a> {
     #[serde(borrow)]
-    pub action: jacquard_common::types::value::Data<'a>,
+    pub action: crate::tools_ozone::moderation::schedule_action::Takedown<'a>,
     #[serde(borrow)]
     pub created_by: jacquard_common::types::string::Did<'a>,
     /// This will be propagated to the moderation event when it is applied
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub mod_tool: Option<crate::tools_ozone::moderation::ModTool<'a>>,
     #[serde(borrow)]
-    pub scheduling: jacquard_common::types::value::Data<'a>,
+    pub scheduling: crate::tools_ozone::moderation::schedule_action::SchedulingConfig<
+        'a,
+    >,
     /// Array of DID subjects to schedule the action for
     #[serde(borrow)]
     pub subjects: Vec<jacquard_common::types::string::Did<'a>>,
-    #[serde(flatten)]
-    #[serde(borrow)]
-    #[builder(default)]
-    pub extra_data: ::std::collections::BTreeMap<
-        ::jacquard_common::smol_str::SmolStr,
-        ::jacquard_common::types::value::Data<'a>,
-    >,
+}
+
+pub mod schedule_action_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Action;
+        type Subjects;
+        type CreatedBy;
+        type Scheduling;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Action = Unset;
+        type Subjects = Unset;
+        type CreatedBy = Unset;
+        type Scheduling = Unset;
+    }
+    ///State transition - sets the `action` field to Set
+    pub struct SetAction<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAction<S> {}
+    impl<S: State> State for SetAction<S> {
+        type Action = Set<members::action>;
+        type Subjects = S::Subjects;
+        type CreatedBy = S::CreatedBy;
+        type Scheduling = S::Scheduling;
+    }
+    ///State transition - sets the `subjects` field to Set
+    pub struct SetSubjects<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubjects<S> {}
+    impl<S: State> State for SetSubjects<S> {
+        type Action = S::Action;
+        type Subjects = Set<members::subjects>;
+        type CreatedBy = S::CreatedBy;
+        type Scheduling = S::Scheduling;
+    }
+    ///State transition - sets the `created_by` field to Set
+    pub struct SetCreatedBy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedBy<S> {}
+    impl<S: State> State for SetCreatedBy<S> {
+        type Action = S::Action;
+        type Subjects = S::Subjects;
+        type CreatedBy = Set<members::created_by>;
+        type Scheduling = S::Scheduling;
+    }
+    ///State transition - sets the `scheduling` field to Set
+    pub struct SetScheduling<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetScheduling<S> {}
+    impl<S: State> State for SetScheduling<S> {
+        type Action = S::Action;
+        type Subjects = S::Subjects;
+        type CreatedBy = S::CreatedBy;
+        type Scheduling = Set<members::scheduling>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `action` field
+        pub struct action(());
+        ///Marker type for the `subjects` field
+        pub struct subjects(());
+        ///Marker type for the `created_by` field
+        pub struct created_by(());
+        ///Marker type for the `scheduling` field
+        pub struct scheduling(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ScheduleActionBuilder<'a, S: schedule_action_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<
+            crate::tools_ozone::moderation::schedule_action::Takedown<'a>,
+        >,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<crate::tools_ozone::moderation::ModTool<'a>>,
+        ::core::option::Option<
+            crate::tools_ozone::moderation::schedule_action::SchedulingConfig<'a>,
+        >,
+        ::core::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ScheduleAction<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ScheduleActionBuilder<'a, schedule_action_state::Empty> {
+        ScheduleActionBuilder::new()
+    }
+}
+
+impl<'a> ScheduleActionBuilder<'a, schedule_action_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ScheduleActionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ScheduleActionBuilder<'a, S>
+where
+    S: schedule_action_state::State,
+    S::Action: schedule_action_state::IsUnset,
+{
+    /// Set the `action` field (required)
+    pub fn action(
+        mut self,
+        value: impl Into<crate::tools_ozone::moderation::schedule_action::Takedown<'a>>,
+    ) -> ScheduleActionBuilder<'a, schedule_action_state::SetAction<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ScheduleActionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ScheduleActionBuilder<'a, S>
+where
+    S: schedule_action_state::State,
+    S::CreatedBy: schedule_action_state::IsUnset,
+{
+    /// Set the `createdBy` field (required)
+    pub fn created_by(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> ScheduleActionBuilder<'a, schedule_action_state::SetCreatedBy<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        ScheduleActionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: schedule_action_state::State> ScheduleActionBuilder<'a, S> {
+    /// Set the `modTool` field (optional)
+    pub fn mod_tool(
+        mut self,
+        value: impl Into<Option<crate::tools_ozone::moderation::ModTool<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `modTool` field to an Option value (optional)
+    pub fn maybe_mod_tool(
+        mut self,
+        value: Option<crate::tools_ozone::moderation::ModTool<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> ScheduleActionBuilder<'a, S>
+where
+    S: schedule_action_state::State,
+    S::Scheduling: schedule_action_state::IsUnset,
+{
+    /// Set the `scheduling` field (required)
+    pub fn scheduling(
+        mut self,
+        value: impl Into<
+            crate::tools_ozone::moderation::schedule_action::SchedulingConfig<'a>,
+        >,
+    ) -> ScheduleActionBuilder<'a, schedule_action_state::SetScheduling<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        ScheduleActionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ScheduleActionBuilder<'a, S>
+where
+    S: schedule_action_state::State,
+    S::Subjects: schedule_action_state::IsUnset,
+{
+    /// Set the `subjects` field (required)
+    pub fn subjects(
+        mut self,
+        value: impl Into<Vec<jacquard_common::types::string::Did<'a>>>,
+    ) -> ScheduleActionBuilder<'a, schedule_action_state::SetSubjects<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        ScheduleActionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ScheduleActionBuilder<'a, S>
+where
+    S: schedule_action_state::State,
+    S::Action: schedule_action_state::IsSet,
+    S::Subjects: schedule_action_state::IsSet,
+    S::CreatedBy: schedule_action_state::IsSet,
+    S::Scheduling: schedule_action_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> ScheduleAction<'a> {
+        ScheduleAction {
+            action: self.__unsafe_private_named.0.unwrap(),
+            created_by: self.__unsafe_private_named.1.unwrap(),
+            mod_tool: self.__unsafe_private_named.2,
+            scheduling: self.__unsafe_private_named.3.unwrap(),
+            subjects: self.__unsafe_private_named.4.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> ScheduleAction<'a> {
+        ScheduleAction {
+            action: self.__unsafe_private_named.0.unwrap(),
+            created_by: self.__unsafe_private_named.1.unwrap(),
+            mod_tool: self.__unsafe_private_named.2,
+            scheduling: self.__unsafe_private_named.3.unwrap(),
+            subjects: self.__unsafe_private_named.4.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]
@@ -556,8 +951,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for ScheduleActionRequest {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ScheduledActionResults<'a> {
@@ -567,6 +961,159 @@ pub struct ScheduledActionResults<'a> {
     >,
     #[serde(borrow)]
     pub succeeded: Vec<jacquard_common::types::string::Did<'a>>,
+}
+
+pub mod scheduled_action_results_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Succeeded;
+        type Failed;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Succeeded = Unset;
+        type Failed = Unset;
+    }
+    ///State transition - sets the `succeeded` field to Set
+    pub struct SetSucceeded<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSucceeded<S> {}
+    impl<S: State> State for SetSucceeded<S> {
+        type Succeeded = Set<members::succeeded>;
+        type Failed = S::Failed;
+    }
+    ///State transition - sets the `failed` field to Set
+    pub struct SetFailed<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFailed<S> {}
+    impl<S: State> State for SetFailed<S> {
+        type Succeeded = S::Succeeded;
+        type Failed = Set<members::failed>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `succeeded` field
+        pub struct succeeded(());
+        ///Marker type for the `failed` field
+        pub struct failed(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ScheduledActionResultsBuilder<'a, S: scheduled_action_results_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<
+            Vec<crate::tools_ozone::moderation::schedule_action::FailedScheduling<'a>>,
+        >,
+        ::core::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ScheduledActionResults<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ScheduledActionResultsBuilder<
+        'a,
+        scheduled_action_results_state::Empty,
+    > {
+        ScheduledActionResultsBuilder::new()
+    }
+}
+
+impl<'a> ScheduledActionResultsBuilder<'a, scheduled_action_results_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ScheduledActionResultsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ScheduledActionResultsBuilder<'a, S>
+where
+    S: scheduled_action_results_state::State,
+    S::Failed: scheduled_action_results_state::IsUnset,
+{
+    /// Set the `failed` field (required)
+    pub fn failed(
+        mut self,
+        value: impl Into<
+            Vec<crate::tools_ozone::moderation::schedule_action::FailedScheduling<'a>>,
+        >,
+    ) -> ScheduledActionResultsBuilder<
+        'a,
+        scheduled_action_results_state::SetFailed<S>,
+    > {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ScheduledActionResultsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ScheduledActionResultsBuilder<'a, S>
+where
+    S: scheduled_action_results_state::State,
+    S::Succeeded: scheduled_action_results_state::IsUnset,
+{
+    /// Set the `succeeded` field (required)
+    pub fn succeeded(
+        mut self,
+        value: impl Into<Vec<jacquard_common::types::string::Did<'a>>>,
+    ) -> ScheduledActionResultsBuilder<
+        'a,
+        scheduled_action_results_state::SetSucceeded<S>,
+    > {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        ScheduledActionResultsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ScheduledActionResultsBuilder<'a, S>
+where
+    S: scheduled_action_results_state::State,
+    S::Succeeded: scheduled_action_results_state::IsSet,
+    S::Failed: scheduled_action_results_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> ScheduledActionResults<'a> {
+        ScheduledActionResults {
+            failed: self.__unsafe_private_named.0.unwrap(),
+            succeeded: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> ScheduledActionResults<'a> {
+        ScheduledActionResults {
+            failed: self.__unsafe_private_named.0.unwrap(),
+            succeeded: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ScheduledActionResults<'a> {

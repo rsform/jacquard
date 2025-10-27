@@ -12,17 +12,121 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetServices<'a> {
-    ///(default: false)
+    /// (default: false)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub detailed: std::option::Option<bool>,
     #[serde(borrow)]
     pub dids: Vec<jacquard_common::types::string::Did<'a>>,
+}
+
+pub mod get_services_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Dids;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Dids = Unset;
+    }
+    ///State transition - sets the `dids` field to Set
+    pub struct SetDids<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDids<S> {}
+    impl<S: State> State for SetDids<S> {
+        type Dids = Set<members::dids>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `dids` field
+        pub struct dids(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetServicesBuilder<'a, S: get_services_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<bool>,
+        ::core::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GetServices<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GetServicesBuilder<'a, get_services_state::Empty> {
+        GetServicesBuilder::new()
+    }
+}
+
+impl<'a> GetServicesBuilder<'a, get_services_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetServicesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: get_services_state::State> GetServicesBuilder<'a, S> {
+    /// Set the `detailed` field (optional)
+    pub fn detailed(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `detailed` field to an Option value (optional)
+    pub fn maybe_detailed(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> GetServicesBuilder<'a, S>
+where
+    S: get_services_state::State,
+    S::Dids: get_services_state::IsUnset,
+{
+    /// Set the `dids` field (required)
+    pub fn dids(
+        mut self,
+        value: impl Into<Vec<jacquard_common::types::string::Did<'a>>>,
+    ) -> GetServicesBuilder<'a, get_services_state::SetDids<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        GetServicesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetServicesBuilder<'a, S>
+where
+    S: get_services_state::State,
+    S::Dids: get_services_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetServices<'a> {
+        GetServices {
+            detailed: self.__unsafe_private_named.0,
+            dids: self.__unsafe_private_named.1.unwrap(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

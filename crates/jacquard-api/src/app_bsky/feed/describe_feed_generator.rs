@@ -13,13 +13,117 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Feed<'a> {
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+pub mod feed_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Uri;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Uri = Unset;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Uri = Set<members::uri>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `uri` field
+        pub struct uri(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct FeedBuilder<'a, S: feed_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Feed<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> FeedBuilder<'a, feed_state::Empty> {
+        FeedBuilder::new()
+    }
+}
+
+impl<'a> FeedBuilder<'a, feed_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        FeedBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> FeedBuilder<'a, S>
+where
+    S: feed_state::State,
+    S::Uri: feed_state::IsUnset,
+{
+    /// Set the `uri` field (required)
+    pub fn uri(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> FeedBuilder<'a, feed_state::SetUri<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        FeedBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> FeedBuilder<'a, S>
+where
+    S: feed_state::State,
+    S::Uri: feed_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Feed<'a> {
+        Feed {
+            uri: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Feed<'a> {
+        Feed {
+            uri: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_app_bsky_feed_describeFeedGenerator() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -195,10 +299,12 @@ pub struct DescribeFeedGeneratorOutput<'a> {
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(borrow)]
-    pub feeds: Vec<jacquard_common::types::value::Data<'a>>,
+    pub feeds: Vec<crate::app_bsky::feed::describe_feed_generator::Feed<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub links: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub links: std::option::Option<
+        crate::app_bsky::feed::describe_feed_generator::Links<'a>,
+    >,
 }
 
 /// XRPC request marker type

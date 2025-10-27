@@ -25,13 +25,149 @@ pub mod update_seen;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ActivitySubscription<'a> {
     pub post: bool,
     pub reply: bool,
+}
+
+pub mod activity_subscription_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Post;
+        type Reply;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Post = Unset;
+        type Reply = Unset;
+    }
+    ///State transition - sets the `post` field to Set
+    pub struct SetPost<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPost<S> {}
+    impl<S: State> State for SetPost<S> {
+        type Post = Set<members::post>;
+        type Reply = S::Reply;
+    }
+    ///State transition - sets the `reply` field to Set
+    pub struct SetReply<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetReply<S> {}
+    impl<S: State> State for SetReply<S> {
+        type Post = S::Post;
+        type Reply = Set<members::reply>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `post` field
+        pub struct post(());
+        ///Marker type for the `reply` field
+        pub struct reply(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ActivitySubscriptionBuilder<'a, S: activity_subscription_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (::core::option::Option<bool>, ::core::option::Option<bool>),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ActivitySubscription<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ActivitySubscriptionBuilder<'a, activity_subscription_state::Empty> {
+        ActivitySubscriptionBuilder::new()
+    }
+}
+
+impl<'a> ActivitySubscriptionBuilder<'a, activity_subscription_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ActivitySubscriptionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ActivitySubscriptionBuilder<'a, S>
+where
+    S: activity_subscription_state::State,
+    S::Post: activity_subscription_state::IsUnset,
+{
+    /// Set the `post` field (required)
+    pub fn post(
+        mut self,
+        value: impl Into<bool>,
+    ) -> ActivitySubscriptionBuilder<'a, activity_subscription_state::SetPost<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ActivitySubscriptionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ActivitySubscriptionBuilder<'a, S>
+where
+    S: activity_subscription_state::State,
+    S::Reply: activity_subscription_state::IsUnset,
+{
+    /// Set the `reply` field (required)
+    pub fn reply(
+        mut self,
+        value: impl Into<bool>,
+    ) -> ActivitySubscriptionBuilder<'a, activity_subscription_state::SetReply<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        ActivitySubscriptionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ActivitySubscriptionBuilder<'a, S>
+where
+    S: activity_subscription_state::State,
+    S::Post: activity_subscription_state::IsSet,
+    S::Reply: activity_subscription_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> ActivitySubscription<'a> {
+        ActivitySubscription {
+            post: self.__unsafe_private_named.0.unwrap(),
+            reply: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> ActivitySubscription<'a> {
+        ActivitySubscription {
+            post: self.__unsafe_private_named.0.unwrap(),
+            reply: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_app_bsky_notification_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -446,15 +582,153 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ActivitySubscription<'a> 
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ChatPreference<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub include: jacquard_common::CowStr<'a>,
     pub push: bool,
+}
+
+pub mod chat_preference_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Include;
+        type Push;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Include = Unset;
+        type Push = Unset;
+    }
+    ///State transition - sets the `include` field to Set
+    pub struct SetInclude<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetInclude<S> {}
+    impl<S: State> State for SetInclude<S> {
+        type Include = Set<members::include>;
+        type Push = S::Push;
+    }
+    ///State transition - sets the `push` field to Set
+    pub struct SetPush<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPush<S> {}
+    impl<S: State> State for SetPush<S> {
+        type Include = S::Include;
+        type Push = Set<members::push>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `include` field
+        pub struct include(());
+        ///Marker type for the `push` field
+        pub struct push(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ChatPreferenceBuilder<'a, S: chat_preference_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<bool>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ChatPreference<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ChatPreferenceBuilder<'a, chat_preference_state::Empty> {
+        ChatPreferenceBuilder::new()
+    }
+}
+
+impl<'a> ChatPreferenceBuilder<'a, chat_preference_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ChatPreferenceBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ChatPreferenceBuilder<'a, S>
+where
+    S: chat_preference_state::State,
+    S::Include: chat_preference_state::IsUnset,
+{
+    /// Set the `include` field (required)
+    pub fn include(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> ChatPreferenceBuilder<'a, chat_preference_state::SetInclude<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ChatPreferenceBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ChatPreferenceBuilder<'a, S>
+where
+    S: chat_preference_state::State,
+    S::Push: chat_preference_state::IsUnset,
+{
+    /// Set the `push` field (required)
+    pub fn push(
+        mut self,
+        value: impl Into<bool>,
+    ) -> ChatPreferenceBuilder<'a, chat_preference_state::SetPush<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        ChatPreferenceBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ChatPreferenceBuilder<'a, S>
+where
+    S: chat_preference_state::State,
+    S::Include: chat_preference_state::IsSet,
+    S::Push: chat_preference_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> ChatPreference<'a> {
+        ChatPreference {
+            include: self.__unsafe_private_named.0.unwrap(),
+            push: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> ChatPreference<'a> {
+        ChatPreference {
+            include: self.__unsafe_private_named.0.unwrap(),
+            push: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ChatPreference<'a> {
@@ -482,16 +756,191 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ChatPreference<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct FilterablePreference<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub include: jacquard_common::CowStr<'a>,
     pub list: bool,
     pub push: bool,
+}
+
+pub mod filterable_preference_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Include;
+        type List;
+        type Push;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Include = Unset;
+        type List = Unset;
+        type Push = Unset;
+    }
+    ///State transition - sets the `include` field to Set
+    pub struct SetInclude<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetInclude<S> {}
+    impl<S: State> State for SetInclude<S> {
+        type Include = Set<members::include>;
+        type List = S::List;
+        type Push = S::Push;
+    }
+    ///State transition - sets the `list` field to Set
+    pub struct SetList<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetList<S> {}
+    impl<S: State> State for SetList<S> {
+        type Include = S::Include;
+        type List = Set<members::list>;
+        type Push = S::Push;
+    }
+    ///State transition - sets the `push` field to Set
+    pub struct SetPush<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPush<S> {}
+    impl<S: State> State for SetPush<S> {
+        type Include = S::Include;
+        type List = S::List;
+        type Push = Set<members::push>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `include` field
+        pub struct include(());
+        ///Marker type for the `list` field
+        pub struct list(());
+        ///Marker type for the `push` field
+        pub struct push(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct FilterablePreferenceBuilder<'a, S: filterable_preference_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<bool>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> FilterablePreference<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> FilterablePreferenceBuilder<'a, filterable_preference_state::Empty> {
+        FilterablePreferenceBuilder::new()
+    }
+}
+
+impl<'a> FilterablePreferenceBuilder<'a, filterable_preference_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        FilterablePreferenceBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> FilterablePreferenceBuilder<'a, S>
+where
+    S: filterable_preference_state::State,
+    S::Include: filterable_preference_state::IsUnset,
+{
+    /// Set the `include` field (required)
+    pub fn include(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> FilterablePreferenceBuilder<'a, filterable_preference_state::SetInclude<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        FilterablePreferenceBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> FilterablePreferenceBuilder<'a, S>
+where
+    S: filterable_preference_state::State,
+    S::List: filterable_preference_state::IsUnset,
+{
+    /// Set the `list` field (required)
+    pub fn list(
+        mut self,
+        value: impl Into<bool>,
+    ) -> FilterablePreferenceBuilder<'a, filterable_preference_state::SetList<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        FilterablePreferenceBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> FilterablePreferenceBuilder<'a, S>
+where
+    S: filterable_preference_state::State,
+    S::Push: filterable_preference_state::IsUnset,
+{
+    /// Set the `push` field (required)
+    pub fn push(
+        mut self,
+        value: impl Into<bool>,
+    ) -> FilterablePreferenceBuilder<'a, filterable_preference_state::SetPush<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        FilterablePreferenceBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> FilterablePreferenceBuilder<'a, S>
+where
+    S: filterable_preference_state::State,
+    S::Include: filterable_preference_state::IsSet,
+    S::List: filterable_preference_state::IsSet,
+    S::Push: filterable_preference_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> FilterablePreference<'a> {
+        FilterablePreference {
+            include: self.__unsafe_private_named.0.unwrap(),
+            list: self.__unsafe_private_named.1.unwrap(),
+            push: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> FilterablePreference<'a> {
+        FilterablePreference {
+            include: self.__unsafe_private_named.0.unwrap(),
+            list: self.__unsafe_private_named.1.unwrap(),
+            push: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FilterablePreference<'a> {
@@ -519,13 +968,149 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FilterablePreference<'a> 
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Preference<'a> {
     pub list: bool,
     pub push: bool,
+}
+
+pub mod preference_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type List;
+        type Push;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type List = Unset;
+        type Push = Unset;
+    }
+    ///State transition - sets the `list` field to Set
+    pub struct SetList<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetList<S> {}
+    impl<S: State> State for SetList<S> {
+        type List = Set<members::list>;
+        type Push = S::Push;
+    }
+    ///State transition - sets the `push` field to Set
+    pub struct SetPush<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPush<S> {}
+    impl<S: State> State for SetPush<S> {
+        type List = S::List;
+        type Push = Set<members::push>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `list` field
+        pub struct list(());
+        ///Marker type for the `push` field
+        pub struct push(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct PreferenceBuilder<'a, S: preference_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (::core::option::Option<bool>, ::core::option::Option<bool>),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Preference<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> PreferenceBuilder<'a, preference_state::Empty> {
+        PreferenceBuilder::new()
+    }
+}
+
+impl<'a> PreferenceBuilder<'a, preference_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        PreferenceBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PreferenceBuilder<'a, S>
+where
+    S: preference_state::State,
+    S::List: preference_state::IsUnset,
+{
+    /// Set the `list` field (required)
+    pub fn list(
+        mut self,
+        value: impl Into<bool>,
+    ) -> PreferenceBuilder<'a, preference_state::SetList<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        PreferenceBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PreferenceBuilder<'a, S>
+where
+    S: preference_state::State,
+    S::Push: preference_state::IsUnset,
+{
+    /// Set the `push` field (required)
+    pub fn push(
+        mut self,
+        value: impl Into<bool>,
+    ) -> PreferenceBuilder<'a, preference_state::SetPush<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        PreferenceBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PreferenceBuilder<'a, S>
+where
+    S: preference_state::State,
+    S::List: preference_state::IsSet,
+    S::Push: preference_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Preference<'a> {
+        Preference {
+            list: self.__unsafe_private_named.0.unwrap(),
+            push: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Preference<'a> {
+        Preference {
+            list: self.__unsafe_private_named.0.unwrap(),
+            push: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Preference<'a> {
@@ -553,8 +1138,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Preference<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Preferences<'a> {
@@ -584,6 +1168,677 @@ pub struct Preferences<'a> {
     pub unverified: crate::app_bsky::notification::Preference<'a>,
     #[serde(borrow)]
     pub verified: crate::app_bsky::notification::Preference<'a>,
+}
+
+pub mod preferences_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Chat;
+        type Follow;
+        type Like;
+        type LikeViaRepost;
+        type Mention;
+        type Quote;
+        type Reply;
+        type Repost;
+        type RepostViaRepost;
+        type StarterpackJoined;
+        type SubscribedPost;
+        type Unverified;
+        type Verified;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Chat = Unset;
+        type Follow = Unset;
+        type Like = Unset;
+        type LikeViaRepost = Unset;
+        type Mention = Unset;
+        type Quote = Unset;
+        type Reply = Unset;
+        type Repost = Unset;
+        type RepostViaRepost = Unset;
+        type StarterpackJoined = Unset;
+        type SubscribedPost = Unset;
+        type Unverified = Unset;
+        type Verified = Unset;
+    }
+    ///State transition - sets the `chat` field to Set
+    pub struct SetChat<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetChat<S> {}
+    impl<S: State> State for SetChat<S> {
+        type Chat = Set<members::chat>;
+        type Follow = S::Follow;
+        type Like = S::Like;
+        type LikeViaRepost = S::LikeViaRepost;
+        type Mention = S::Mention;
+        type Quote = S::Quote;
+        type Reply = S::Reply;
+        type Repost = S::Repost;
+        type RepostViaRepost = S::RepostViaRepost;
+        type StarterpackJoined = S::StarterpackJoined;
+        type SubscribedPost = S::SubscribedPost;
+        type Unverified = S::Unverified;
+        type Verified = S::Verified;
+    }
+    ///State transition - sets the `follow` field to Set
+    pub struct SetFollow<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFollow<S> {}
+    impl<S: State> State for SetFollow<S> {
+        type Chat = S::Chat;
+        type Follow = Set<members::follow>;
+        type Like = S::Like;
+        type LikeViaRepost = S::LikeViaRepost;
+        type Mention = S::Mention;
+        type Quote = S::Quote;
+        type Reply = S::Reply;
+        type Repost = S::Repost;
+        type RepostViaRepost = S::RepostViaRepost;
+        type StarterpackJoined = S::StarterpackJoined;
+        type SubscribedPost = S::SubscribedPost;
+        type Unverified = S::Unverified;
+        type Verified = S::Verified;
+    }
+    ///State transition - sets the `like` field to Set
+    pub struct SetLike<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLike<S> {}
+    impl<S: State> State for SetLike<S> {
+        type Chat = S::Chat;
+        type Follow = S::Follow;
+        type Like = Set<members::like>;
+        type LikeViaRepost = S::LikeViaRepost;
+        type Mention = S::Mention;
+        type Quote = S::Quote;
+        type Reply = S::Reply;
+        type Repost = S::Repost;
+        type RepostViaRepost = S::RepostViaRepost;
+        type StarterpackJoined = S::StarterpackJoined;
+        type SubscribedPost = S::SubscribedPost;
+        type Unverified = S::Unverified;
+        type Verified = S::Verified;
+    }
+    ///State transition - sets the `like_via_repost` field to Set
+    pub struct SetLikeViaRepost<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLikeViaRepost<S> {}
+    impl<S: State> State for SetLikeViaRepost<S> {
+        type Chat = S::Chat;
+        type Follow = S::Follow;
+        type Like = S::Like;
+        type LikeViaRepost = Set<members::like_via_repost>;
+        type Mention = S::Mention;
+        type Quote = S::Quote;
+        type Reply = S::Reply;
+        type Repost = S::Repost;
+        type RepostViaRepost = S::RepostViaRepost;
+        type StarterpackJoined = S::StarterpackJoined;
+        type SubscribedPost = S::SubscribedPost;
+        type Unverified = S::Unverified;
+        type Verified = S::Verified;
+    }
+    ///State transition - sets the `mention` field to Set
+    pub struct SetMention<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMention<S> {}
+    impl<S: State> State for SetMention<S> {
+        type Chat = S::Chat;
+        type Follow = S::Follow;
+        type Like = S::Like;
+        type LikeViaRepost = S::LikeViaRepost;
+        type Mention = Set<members::mention>;
+        type Quote = S::Quote;
+        type Reply = S::Reply;
+        type Repost = S::Repost;
+        type RepostViaRepost = S::RepostViaRepost;
+        type StarterpackJoined = S::StarterpackJoined;
+        type SubscribedPost = S::SubscribedPost;
+        type Unverified = S::Unverified;
+        type Verified = S::Verified;
+    }
+    ///State transition - sets the `quote` field to Set
+    pub struct SetQuote<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetQuote<S> {}
+    impl<S: State> State for SetQuote<S> {
+        type Chat = S::Chat;
+        type Follow = S::Follow;
+        type Like = S::Like;
+        type LikeViaRepost = S::LikeViaRepost;
+        type Mention = S::Mention;
+        type Quote = Set<members::quote>;
+        type Reply = S::Reply;
+        type Repost = S::Repost;
+        type RepostViaRepost = S::RepostViaRepost;
+        type StarterpackJoined = S::StarterpackJoined;
+        type SubscribedPost = S::SubscribedPost;
+        type Unverified = S::Unverified;
+        type Verified = S::Verified;
+    }
+    ///State transition - sets the `reply` field to Set
+    pub struct SetReply<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetReply<S> {}
+    impl<S: State> State for SetReply<S> {
+        type Chat = S::Chat;
+        type Follow = S::Follow;
+        type Like = S::Like;
+        type LikeViaRepost = S::LikeViaRepost;
+        type Mention = S::Mention;
+        type Quote = S::Quote;
+        type Reply = Set<members::reply>;
+        type Repost = S::Repost;
+        type RepostViaRepost = S::RepostViaRepost;
+        type StarterpackJoined = S::StarterpackJoined;
+        type SubscribedPost = S::SubscribedPost;
+        type Unverified = S::Unverified;
+        type Verified = S::Verified;
+    }
+    ///State transition - sets the `repost` field to Set
+    pub struct SetRepost<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepost<S> {}
+    impl<S: State> State for SetRepost<S> {
+        type Chat = S::Chat;
+        type Follow = S::Follow;
+        type Like = S::Like;
+        type LikeViaRepost = S::LikeViaRepost;
+        type Mention = S::Mention;
+        type Quote = S::Quote;
+        type Reply = S::Reply;
+        type Repost = Set<members::repost>;
+        type RepostViaRepost = S::RepostViaRepost;
+        type StarterpackJoined = S::StarterpackJoined;
+        type SubscribedPost = S::SubscribedPost;
+        type Unverified = S::Unverified;
+        type Verified = S::Verified;
+    }
+    ///State transition - sets the `repost_via_repost` field to Set
+    pub struct SetRepostViaRepost<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepostViaRepost<S> {}
+    impl<S: State> State for SetRepostViaRepost<S> {
+        type Chat = S::Chat;
+        type Follow = S::Follow;
+        type Like = S::Like;
+        type LikeViaRepost = S::LikeViaRepost;
+        type Mention = S::Mention;
+        type Quote = S::Quote;
+        type Reply = S::Reply;
+        type Repost = S::Repost;
+        type RepostViaRepost = Set<members::repost_via_repost>;
+        type StarterpackJoined = S::StarterpackJoined;
+        type SubscribedPost = S::SubscribedPost;
+        type Unverified = S::Unverified;
+        type Verified = S::Verified;
+    }
+    ///State transition - sets the `starterpack_joined` field to Set
+    pub struct SetStarterpackJoined<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStarterpackJoined<S> {}
+    impl<S: State> State for SetStarterpackJoined<S> {
+        type Chat = S::Chat;
+        type Follow = S::Follow;
+        type Like = S::Like;
+        type LikeViaRepost = S::LikeViaRepost;
+        type Mention = S::Mention;
+        type Quote = S::Quote;
+        type Reply = S::Reply;
+        type Repost = S::Repost;
+        type RepostViaRepost = S::RepostViaRepost;
+        type StarterpackJoined = Set<members::starterpack_joined>;
+        type SubscribedPost = S::SubscribedPost;
+        type Unverified = S::Unverified;
+        type Verified = S::Verified;
+    }
+    ///State transition - sets the `subscribed_post` field to Set
+    pub struct SetSubscribedPost<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubscribedPost<S> {}
+    impl<S: State> State for SetSubscribedPost<S> {
+        type Chat = S::Chat;
+        type Follow = S::Follow;
+        type Like = S::Like;
+        type LikeViaRepost = S::LikeViaRepost;
+        type Mention = S::Mention;
+        type Quote = S::Quote;
+        type Reply = S::Reply;
+        type Repost = S::Repost;
+        type RepostViaRepost = S::RepostViaRepost;
+        type StarterpackJoined = S::StarterpackJoined;
+        type SubscribedPost = Set<members::subscribed_post>;
+        type Unverified = S::Unverified;
+        type Verified = S::Verified;
+    }
+    ///State transition - sets the `unverified` field to Set
+    pub struct SetUnverified<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUnverified<S> {}
+    impl<S: State> State for SetUnverified<S> {
+        type Chat = S::Chat;
+        type Follow = S::Follow;
+        type Like = S::Like;
+        type LikeViaRepost = S::LikeViaRepost;
+        type Mention = S::Mention;
+        type Quote = S::Quote;
+        type Reply = S::Reply;
+        type Repost = S::Repost;
+        type RepostViaRepost = S::RepostViaRepost;
+        type StarterpackJoined = S::StarterpackJoined;
+        type SubscribedPost = S::SubscribedPost;
+        type Unverified = Set<members::unverified>;
+        type Verified = S::Verified;
+    }
+    ///State transition - sets the `verified` field to Set
+    pub struct SetVerified<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVerified<S> {}
+    impl<S: State> State for SetVerified<S> {
+        type Chat = S::Chat;
+        type Follow = S::Follow;
+        type Like = S::Like;
+        type LikeViaRepost = S::LikeViaRepost;
+        type Mention = S::Mention;
+        type Quote = S::Quote;
+        type Reply = S::Reply;
+        type Repost = S::Repost;
+        type RepostViaRepost = S::RepostViaRepost;
+        type StarterpackJoined = S::StarterpackJoined;
+        type SubscribedPost = S::SubscribedPost;
+        type Unverified = S::Unverified;
+        type Verified = Set<members::verified>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `chat` field
+        pub struct chat(());
+        ///Marker type for the `follow` field
+        pub struct follow(());
+        ///Marker type for the `like` field
+        pub struct like(());
+        ///Marker type for the `like_via_repost` field
+        pub struct like_via_repost(());
+        ///Marker type for the `mention` field
+        pub struct mention(());
+        ///Marker type for the `quote` field
+        pub struct quote(());
+        ///Marker type for the `reply` field
+        pub struct reply(());
+        ///Marker type for the `repost` field
+        pub struct repost(());
+        ///Marker type for the `repost_via_repost` field
+        pub struct repost_via_repost(());
+        ///Marker type for the `starterpack_joined` field
+        pub struct starterpack_joined(());
+        ///Marker type for the `subscribed_post` field
+        pub struct subscribed_post(());
+        ///Marker type for the `unverified` field
+        pub struct unverified(());
+        ///Marker type for the `verified` field
+        pub struct verified(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct PreferencesBuilder<'a, S: preferences_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<crate::app_bsky::notification::ChatPreference<'a>>,
+        ::core::option::Option<crate::app_bsky::notification::FilterablePreference<'a>>,
+        ::core::option::Option<crate::app_bsky::notification::FilterablePreference<'a>>,
+        ::core::option::Option<crate::app_bsky::notification::FilterablePreference<'a>>,
+        ::core::option::Option<crate::app_bsky::notification::FilterablePreference<'a>>,
+        ::core::option::Option<crate::app_bsky::notification::FilterablePreference<'a>>,
+        ::core::option::Option<crate::app_bsky::notification::FilterablePreference<'a>>,
+        ::core::option::Option<crate::app_bsky::notification::FilterablePreference<'a>>,
+        ::core::option::Option<crate::app_bsky::notification::FilterablePreference<'a>>,
+        ::core::option::Option<crate::app_bsky::notification::Preference<'a>>,
+        ::core::option::Option<crate::app_bsky::notification::Preference<'a>>,
+        ::core::option::Option<crate::app_bsky::notification::Preference<'a>>,
+        ::core::option::Option<crate::app_bsky::notification::Preference<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Preferences<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> PreferencesBuilder<'a, preferences_state::Empty> {
+        PreferencesBuilder::new()
+    }
+}
+
+impl<'a> PreferencesBuilder<'a, preferences_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        PreferencesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PreferencesBuilder<'a, S>
+where
+    S: preferences_state::State,
+    S::Chat: preferences_state::IsUnset,
+{
+    /// Set the `chat` field (required)
+    pub fn chat(
+        mut self,
+        value: impl Into<crate::app_bsky::notification::ChatPreference<'a>>,
+    ) -> PreferencesBuilder<'a, preferences_state::SetChat<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        PreferencesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PreferencesBuilder<'a, S>
+where
+    S: preferences_state::State,
+    S::Follow: preferences_state::IsUnset,
+{
+    /// Set the `follow` field (required)
+    pub fn follow(
+        mut self,
+        value: impl Into<crate::app_bsky::notification::FilterablePreference<'a>>,
+    ) -> PreferencesBuilder<'a, preferences_state::SetFollow<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        PreferencesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PreferencesBuilder<'a, S>
+where
+    S: preferences_state::State,
+    S::Like: preferences_state::IsUnset,
+{
+    /// Set the `like` field (required)
+    pub fn like(
+        mut self,
+        value: impl Into<crate::app_bsky::notification::FilterablePreference<'a>>,
+    ) -> PreferencesBuilder<'a, preferences_state::SetLike<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        PreferencesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PreferencesBuilder<'a, S>
+where
+    S: preferences_state::State,
+    S::LikeViaRepost: preferences_state::IsUnset,
+{
+    /// Set the `likeViaRepost` field (required)
+    pub fn like_via_repost(
+        mut self,
+        value: impl Into<crate::app_bsky::notification::FilterablePreference<'a>>,
+    ) -> PreferencesBuilder<'a, preferences_state::SetLikeViaRepost<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        PreferencesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PreferencesBuilder<'a, S>
+where
+    S: preferences_state::State,
+    S::Mention: preferences_state::IsUnset,
+{
+    /// Set the `mention` field (required)
+    pub fn mention(
+        mut self,
+        value: impl Into<crate::app_bsky::notification::FilterablePreference<'a>>,
+    ) -> PreferencesBuilder<'a, preferences_state::SetMention<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        PreferencesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PreferencesBuilder<'a, S>
+where
+    S: preferences_state::State,
+    S::Quote: preferences_state::IsUnset,
+{
+    /// Set the `quote` field (required)
+    pub fn quote(
+        mut self,
+        value: impl Into<crate::app_bsky::notification::FilterablePreference<'a>>,
+    ) -> PreferencesBuilder<'a, preferences_state::SetQuote<S>> {
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        PreferencesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PreferencesBuilder<'a, S>
+where
+    S: preferences_state::State,
+    S::Reply: preferences_state::IsUnset,
+{
+    /// Set the `reply` field (required)
+    pub fn reply(
+        mut self,
+        value: impl Into<crate::app_bsky::notification::FilterablePreference<'a>>,
+    ) -> PreferencesBuilder<'a, preferences_state::SetReply<S>> {
+        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        PreferencesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PreferencesBuilder<'a, S>
+where
+    S: preferences_state::State,
+    S::Repost: preferences_state::IsUnset,
+{
+    /// Set the `repost` field (required)
+    pub fn repost(
+        mut self,
+        value: impl Into<crate::app_bsky::notification::FilterablePreference<'a>>,
+    ) -> PreferencesBuilder<'a, preferences_state::SetRepost<S>> {
+        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        PreferencesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PreferencesBuilder<'a, S>
+where
+    S: preferences_state::State,
+    S::RepostViaRepost: preferences_state::IsUnset,
+{
+    /// Set the `repostViaRepost` field (required)
+    pub fn repost_via_repost(
+        mut self,
+        value: impl Into<crate::app_bsky::notification::FilterablePreference<'a>>,
+    ) -> PreferencesBuilder<'a, preferences_state::SetRepostViaRepost<S>> {
+        self.__unsafe_private_named.8 = ::core::option::Option::Some(value.into());
+        PreferencesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PreferencesBuilder<'a, S>
+where
+    S: preferences_state::State,
+    S::StarterpackJoined: preferences_state::IsUnset,
+{
+    /// Set the `starterpackJoined` field (required)
+    pub fn starterpack_joined(
+        mut self,
+        value: impl Into<crate::app_bsky::notification::Preference<'a>>,
+    ) -> PreferencesBuilder<'a, preferences_state::SetStarterpackJoined<S>> {
+        self.__unsafe_private_named.9 = ::core::option::Option::Some(value.into());
+        PreferencesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PreferencesBuilder<'a, S>
+where
+    S: preferences_state::State,
+    S::SubscribedPost: preferences_state::IsUnset,
+{
+    /// Set the `subscribedPost` field (required)
+    pub fn subscribed_post(
+        mut self,
+        value: impl Into<crate::app_bsky::notification::Preference<'a>>,
+    ) -> PreferencesBuilder<'a, preferences_state::SetSubscribedPost<S>> {
+        self.__unsafe_private_named.10 = ::core::option::Option::Some(value.into());
+        PreferencesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PreferencesBuilder<'a, S>
+where
+    S: preferences_state::State,
+    S::Unverified: preferences_state::IsUnset,
+{
+    /// Set the `unverified` field (required)
+    pub fn unverified(
+        mut self,
+        value: impl Into<crate::app_bsky::notification::Preference<'a>>,
+    ) -> PreferencesBuilder<'a, preferences_state::SetUnverified<S>> {
+        self.__unsafe_private_named.11 = ::core::option::Option::Some(value.into());
+        PreferencesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PreferencesBuilder<'a, S>
+where
+    S: preferences_state::State,
+    S::Verified: preferences_state::IsUnset,
+{
+    /// Set the `verified` field (required)
+    pub fn verified(
+        mut self,
+        value: impl Into<crate::app_bsky::notification::Preference<'a>>,
+    ) -> PreferencesBuilder<'a, preferences_state::SetVerified<S>> {
+        self.__unsafe_private_named.12 = ::core::option::Option::Some(value.into());
+        PreferencesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PreferencesBuilder<'a, S>
+where
+    S: preferences_state::State,
+    S::Chat: preferences_state::IsSet,
+    S::Follow: preferences_state::IsSet,
+    S::Like: preferences_state::IsSet,
+    S::LikeViaRepost: preferences_state::IsSet,
+    S::Mention: preferences_state::IsSet,
+    S::Quote: preferences_state::IsSet,
+    S::Reply: preferences_state::IsSet,
+    S::Repost: preferences_state::IsSet,
+    S::RepostViaRepost: preferences_state::IsSet,
+    S::StarterpackJoined: preferences_state::IsSet,
+    S::SubscribedPost: preferences_state::IsSet,
+    S::Unverified: preferences_state::IsSet,
+    S::Verified: preferences_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Preferences<'a> {
+        Preferences {
+            chat: self.__unsafe_private_named.0.unwrap(),
+            follow: self.__unsafe_private_named.1.unwrap(),
+            like: self.__unsafe_private_named.2.unwrap(),
+            like_via_repost: self.__unsafe_private_named.3.unwrap(),
+            mention: self.__unsafe_private_named.4.unwrap(),
+            quote: self.__unsafe_private_named.5.unwrap(),
+            reply: self.__unsafe_private_named.6.unwrap(),
+            repost: self.__unsafe_private_named.7.unwrap(),
+            repost_via_repost: self.__unsafe_private_named.8.unwrap(),
+            starterpack_joined: self.__unsafe_private_named.9.unwrap(),
+            subscribed_post: self.__unsafe_private_named.10.unwrap(),
+            unverified: self.__unsafe_private_named.11.unwrap(),
+            verified: self.__unsafe_private_named.12.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Preferences<'a> {
+        Preferences {
+            chat: self.__unsafe_private_named.0.unwrap(),
+            follow: self.__unsafe_private_named.1.unwrap(),
+            like: self.__unsafe_private_named.2.unwrap(),
+            like_via_repost: self.__unsafe_private_named.3.unwrap(),
+            mention: self.__unsafe_private_named.4.unwrap(),
+            quote: self.__unsafe_private_named.5.unwrap(),
+            reply: self.__unsafe_private_named.6.unwrap(),
+            repost: self.__unsafe_private_named.7.unwrap(),
+            repost_via_repost: self.__unsafe_private_named.8.unwrap(),
+            starterpack_joined: self.__unsafe_private_named.9.unwrap(),
+            subscribed_post: self.__unsafe_private_named.10.unwrap(),
+            unverified: self.__unsafe_private_named.11.unwrap(),
+            verified: self.__unsafe_private_named.12.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Preferences<'a> {
@@ -642,8 +1897,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RecordDeleted<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SubjectActivitySubscription<'a> {
@@ -651,6 +1905,160 @@ pub struct SubjectActivitySubscription<'a> {
     pub activity_subscription: crate::app_bsky::notification::ActivitySubscription<'a>,
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::Did<'a>,
+}
+
+pub mod subject_activity_subscription_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Subject;
+        type ActivitySubscription;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Subject = Unset;
+        type ActivitySubscription = Unset;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type Subject = Set<members::subject>;
+        type ActivitySubscription = S::ActivitySubscription;
+    }
+    ///State transition - sets the `activity_subscription` field to Set
+    pub struct SetActivitySubscription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActivitySubscription<S> {}
+    impl<S: State> State for SetActivitySubscription<S> {
+        type Subject = S::Subject;
+        type ActivitySubscription = Set<members::activity_subscription>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `subject` field
+        pub struct subject(());
+        ///Marker type for the `activity_subscription` field
+        pub struct activity_subscription(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct SubjectActivitySubscriptionBuilder<
+    'a,
+    S: subject_activity_subscription_state::State,
+> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<crate::app_bsky::notification::ActivitySubscription<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> SubjectActivitySubscription<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> SubjectActivitySubscriptionBuilder<
+        'a,
+        subject_activity_subscription_state::Empty,
+    > {
+        SubjectActivitySubscriptionBuilder::new()
+    }
+}
+
+impl<
+    'a,
+> SubjectActivitySubscriptionBuilder<'a, subject_activity_subscription_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        SubjectActivitySubscriptionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SubjectActivitySubscriptionBuilder<'a, S>
+where
+    S: subject_activity_subscription_state::State,
+    S::ActivitySubscription: subject_activity_subscription_state::IsUnset,
+{
+    /// Set the `activitySubscription` field (required)
+    pub fn activity_subscription(
+        mut self,
+        value: impl Into<crate::app_bsky::notification::ActivitySubscription<'a>>,
+    ) -> SubjectActivitySubscriptionBuilder<
+        'a,
+        subject_activity_subscription_state::SetActivitySubscription<S>,
+    > {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        SubjectActivitySubscriptionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SubjectActivitySubscriptionBuilder<'a, S>
+where
+    S: subject_activity_subscription_state::State,
+    S::Subject: subject_activity_subscription_state::IsUnset,
+{
+    /// Set the `subject` field (required)
+    pub fn subject(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> SubjectActivitySubscriptionBuilder<
+        'a,
+        subject_activity_subscription_state::SetSubject<S>,
+    > {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        SubjectActivitySubscriptionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SubjectActivitySubscriptionBuilder<'a, S>
+where
+    S: subject_activity_subscription_state::State,
+    S::Subject: subject_activity_subscription_state::IsSet,
+    S::ActivitySubscription: subject_activity_subscription_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> SubjectActivitySubscription<'a> {
+        SubjectActivitySubscription {
+            activity_subscription: self.__unsafe_private_named.0.unwrap(),
+            subject: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> SubjectActivitySubscription<'a> {
+        SubjectActivitySubscription {
+            activity_subscription: self.__unsafe_private_named.0.unwrap(),
+            subject: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SubjectActivitySubscription<'a> {

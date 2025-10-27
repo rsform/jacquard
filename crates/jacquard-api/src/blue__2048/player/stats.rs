@@ -14,8 +14,7 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Stats<'a> {
@@ -37,6 +36,471 @@ pub struct Stats<'a> {
     pub times_twenty_forty_eight_been_found: i64,
     /// Total score across all games
     pub total_score: i64,
+}
+
+pub mod stats_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type HighestScore;
+        type GamesPlayed;
+        type TotalScore;
+        type HighestNumberBlock;
+        type TimesTwentyFortyEightBeenFound;
+        type LeastMovesToFindTwentyFortyEight;
+        type AverageScore;
+        type SyncStatus;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type HighestScore = Unset;
+        type GamesPlayed = Unset;
+        type TotalScore = Unset;
+        type HighestNumberBlock = Unset;
+        type TimesTwentyFortyEightBeenFound = Unset;
+        type LeastMovesToFindTwentyFortyEight = Unset;
+        type AverageScore = Unset;
+        type SyncStatus = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `highest_score` field to Set
+    pub struct SetHighestScore<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHighestScore<S> {}
+    impl<S: State> State for SetHighestScore<S> {
+        type HighestScore = Set<members::highest_score>;
+        type GamesPlayed = S::GamesPlayed;
+        type TotalScore = S::TotalScore;
+        type HighestNumberBlock = S::HighestNumberBlock;
+        type TimesTwentyFortyEightBeenFound = S::TimesTwentyFortyEightBeenFound;
+        type LeastMovesToFindTwentyFortyEight = S::LeastMovesToFindTwentyFortyEight;
+        type AverageScore = S::AverageScore;
+        type SyncStatus = S::SyncStatus;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `games_played` field to Set
+    pub struct SetGamesPlayed<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGamesPlayed<S> {}
+    impl<S: State> State for SetGamesPlayed<S> {
+        type HighestScore = S::HighestScore;
+        type GamesPlayed = Set<members::games_played>;
+        type TotalScore = S::TotalScore;
+        type HighestNumberBlock = S::HighestNumberBlock;
+        type TimesTwentyFortyEightBeenFound = S::TimesTwentyFortyEightBeenFound;
+        type LeastMovesToFindTwentyFortyEight = S::LeastMovesToFindTwentyFortyEight;
+        type AverageScore = S::AverageScore;
+        type SyncStatus = S::SyncStatus;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `total_score` field to Set
+    pub struct SetTotalScore<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTotalScore<S> {}
+    impl<S: State> State for SetTotalScore<S> {
+        type HighestScore = S::HighestScore;
+        type GamesPlayed = S::GamesPlayed;
+        type TotalScore = Set<members::total_score>;
+        type HighestNumberBlock = S::HighestNumberBlock;
+        type TimesTwentyFortyEightBeenFound = S::TimesTwentyFortyEightBeenFound;
+        type LeastMovesToFindTwentyFortyEight = S::LeastMovesToFindTwentyFortyEight;
+        type AverageScore = S::AverageScore;
+        type SyncStatus = S::SyncStatus;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `highest_number_block` field to Set
+    pub struct SetHighestNumberBlock<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHighestNumberBlock<S> {}
+    impl<S: State> State for SetHighestNumberBlock<S> {
+        type HighestScore = S::HighestScore;
+        type GamesPlayed = S::GamesPlayed;
+        type TotalScore = S::TotalScore;
+        type HighestNumberBlock = Set<members::highest_number_block>;
+        type TimesTwentyFortyEightBeenFound = S::TimesTwentyFortyEightBeenFound;
+        type LeastMovesToFindTwentyFortyEight = S::LeastMovesToFindTwentyFortyEight;
+        type AverageScore = S::AverageScore;
+        type SyncStatus = S::SyncStatus;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `times_twenty_forty_eight_been_found` field to Set
+    pub struct SetTimesTwentyFortyEightBeenFound<S: State = Empty>(
+        PhantomData<fn() -> S>,
+    );
+    impl<S: State> sealed::Sealed for SetTimesTwentyFortyEightBeenFound<S> {}
+    impl<S: State> State for SetTimesTwentyFortyEightBeenFound<S> {
+        type HighestScore = S::HighestScore;
+        type GamesPlayed = S::GamesPlayed;
+        type TotalScore = S::TotalScore;
+        type HighestNumberBlock = S::HighestNumberBlock;
+        type TimesTwentyFortyEightBeenFound = Set<
+            members::times_twenty_forty_eight_been_found,
+        >;
+        type LeastMovesToFindTwentyFortyEight = S::LeastMovesToFindTwentyFortyEight;
+        type AverageScore = S::AverageScore;
+        type SyncStatus = S::SyncStatus;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `least_moves_to_find_twenty_forty_eight` field to Set
+    pub struct SetLeastMovesToFindTwentyFortyEight<S: State = Empty>(
+        PhantomData<fn() -> S>,
+    );
+    impl<S: State> sealed::Sealed for SetLeastMovesToFindTwentyFortyEight<S> {}
+    impl<S: State> State for SetLeastMovesToFindTwentyFortyEight<S> {
+        type HighestScore = S::HighestScore;
+        type GamesPlayed = S::GamesPlayed;
+        type TotalScore = S::TotalScore;
+        type HighestNumberBlock = S::HighestNumberBlock;
+        type TimesTwentyFortyEightBeenFound = S::TimesTwentyFortyEightBeenFound;
+        type LeastMovesToFindTwentyFortyEight = Set<
+            members::least_moves_to_find_twenty_forty_eight,
+        >;
+        type AverageScore = S::AverageScore;
+        type SyncStatus = S::SyncStatus;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `average_score` field to Set
+    pub struct SetAverageScore<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAverageScore<S> {}
+    impl<S: State> State for SetAverageScore<S> {
+        type HighestScore = S::HighestScore;
+        type GamesPlayed = S::GamesPlayed;
+        type TotalScore = S::TotalScore;
+        type HighestNumberBlock = S::HighestNumberBlock;
+        type TimesTwentyFortyEightBeenFound = S::TimesTwentyFortyEightBeenFound;
+        type LeastMovesToFindTwentyFortyEight = S::LeastMovesToFindTwentyFortyEight;
+        type AverageScore = Set<members::average_score>;
+        type SyncStatus = S::SyncStatus;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `sync_status` field to Set
+    pub struct SetSyncStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSyncStatus<S> {}
+    impl<S: State> State for SetSyncStatus<S> {
+        type HighestScore = S::HighestScore;
+        type GamesPlayed = S::GamesPlayed;
+        type TotalScore = S::TotalScore;
+        type HighestNumberBlock = S::HighestNumberBlock;
+        type TimesTwentyFortyEightBeenFound = S::TimesTwentyFortyEightBeenFound;
+        type LeastMovesToFindTwentyFortyEight = S::LeastMovesToFindTwentyFortyEight;
+        type AverageScore = S::AverageScore;
+        type SyncStatus = Set<members::sync_status>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type HighestScore = S::HighestScore;
+        type GamesPlayed = S::GamesPlayed;
+        type TotalScore = S::TotalScore;
+        type HighestNumberBlock = S::HighestNumberBlock;
+        type TimesTwentyFortyEightBeenFound = S::TimesTwentyFortyEightBeenFound;
+        type LeastMovesToFindTwentyFortyEight = S::LeastMovesToFindTwentyFortyEight;
+        type AverageScore = S::AverageScore;
+        type SyncStatus = S::SyncStatus;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `highest_score` field
+        pub struct highest_score(());
+        ///Marker type for the `games_played` field
+        pub struct games_played(());
+        ///Marker type for the `total_score` field
+        pub struct total_score(());
+        ///Marker type for the `highest_number_block` field
+        pub struct highest_number_block(());
+        ///Marker type for the `times_twenty_forty_eight_been_found` field
+        pub struct times_twenty_forty_eight_been_found(());
+        ///Marker type for the `least_moves_to_find_twenty_forty_eight` field
+        pub struct least_moves_to_find_twenty_forty_eight(());
+        ///Marker type for the `average_score` field
+        pub struct average_score(());
+        ///Marker type for the `sync_status` field
+        pub struct sync_status(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct StatsBuilder<'a, S: stats_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<crate::blue__2048::SyncStatus<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<i64>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Stats<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> StatsBuilder<'a, stats_state::Empty> {
+        StatsBuilder::new()
+    }
+}
+
+impl<'a> StatsBuilder<'a, stats_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        StatsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> StatsBuilder<'a, S>
+where
+    S: stats_state::State,
+    S::AverageScore: stats_state::IsUnset,
+{
+    /// Set the `averageScore` field (required)
+    pub fn average_score(
+        mut self,
+        value: impl Into<i64>,
+    ) -> StatsBuilder<'a, stats_state::SetAverageScore<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        StatsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> StatsBuilder<'a, S>
+where
+    S: stats_state::State,
+    S::CreatedAt: stats_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> StatsBuilder<'a, stats_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        StatsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> StatsBuilder<'a, S>
+where
+    S: stats_state::State,
+    S::GamesPlayed: stats_state::IsUnset,
+{
+    /// Set the `gamesPlayed` field (required)
+    pub fn games_played(
+        mut self,
+        value: impl Into<i64>,
+    ) -> StatsBuilder<'a, stats_state::SetGamesPlayed<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        StatsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> StatsBuilder<'a, S>
+where
+    S: stats_state::State,
+    S::HighestNumberBlock: stats_state::IsUnset,
+{
+    /// Set the `highestNumberBlock` field (required)
+    pub fn highest_number_block(
+        mut self,
+        value: impl Into<i64>,
+    ) -> StatsBuilder<'a, stats_state::SetHighestNumberBlock<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        StatsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> StatsBuilder<'a, S>
+where
+    S: stats_state::State,
+    S::HighestScore: stats_state::IsUnset,
+{
+    /// Set the `highestScore` field (required)
+    pub fn highest_score(
+        mut self,
+        value: impl Into<i64>,
+    ) -> StatsBuilder<'a, stats_state::SetHighestScore<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        StatsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> StatsBuilder<'a, S>
+where
+    S: stats_state::State,
+    S::LeastMovesToFindTwentyFortyEight: stats_state::IsUnset,
+{
+    /// Set the `leastMovesToFindTwentyFortyEight` field (required)
+    pub fn least_moves_to_find_twenty_forty_eight(
+        mut self,
+        value: impl Into<i64>,
+    ) -> StatsBuilder<'a, stats_state::SetLeastMovesToFindTwentyFortyEight<S>> {
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        StatsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> StatsBuilder<'a, S>
+where
+    S: stats_state::State,
+    S::SyncStatus: stats_state::IsUnset,
+{
+    /// Set the `syncStatus` field (required)
+    pub fn sync_status(
+        mut self,
+        value: impl Into<crate::blue__2048::SyncStatus<'a>>,
+    ) -> StatsBuilder<'a, stats_state::SetSyncStatus<S>> {
+        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        StatsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> StatsBuilder<'a, S>
+where
+    S: stats_state::State,
+    S::TimesTwentyFortyEightBeenFound: stats_state::IsUnset,
+{
+    /// Set the `timesTwentyFortyEightBeenFound` field (required)
+    pub fn times_twenty_forty_eight_been_found(
+        mut self,
+        value: impl Into<i64>,
+    ) -> StatsBuilder<'a, stats_state::SetTimesTwentyFortyEightBeenFound<S>> {
+        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        StatsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> StatsBuilder<'a, S>
+where
+    S: stats_state::State,
+    S::TotalScore: stats_state::IsUnset,
+{
+    /// Set the `totalScore` field (required)
+    pub fn total_score(
+        mut self,
+        value: impl Into<i64>,
+    ) -> StatsBuilder<'a, stats_state::SetTotalScore<S>> {
+        self.__unsafe_private_named.8 = ::core::option::Option::Some(value.into());
+        StatsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> StatsBuilder<'a, S>
+where
+    S: stats_state::State,
+    S::HighestScore: stats_state::IsSet,
+    S::GamesPlayed: stats_state::IsSet,
+    S::TotalScore: stats_state::IsSet,
+    S::HighestNumberBlock: stats_state::IsSet,
+    S::TimesTwentyFortyEightBeenFound: stats_state::IsSet,
+    S::LeastMovesToFindTwentyFortyEight: stats_state::IsSet,
+    S::AverageScore: stats_state::IsSet,
+    S::SyncStatus: stats_state::IsSet,
+    S::CreatedAt: stats_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Stats<'a> {
+        Stats {
+            average_score: self.__unsafe_private_named.0.unwrap(),
+            created_at: self.__unsafe_private_named.1.unwrap(),
+            games_played: self.__unsafe_private_named.2.unwrap(),
+            highest_number_block: self.__unsafe_private_named.3.unwrap(),
+            highest_score: self.__unsafe_private_named.4.unwrap(),
+            least_moves_to_find_twenty_forty_eight: self
+                .__unsafe_private_named
+                .5
+                .unwrap(),
+            sync_status: self.__unsafe_private_named.6.unwrap(),
+            times_twenty_forty_eight_been_found: self.__unsafe_private_named.7.unwrap(),
+            total_score: self.__unsafe_private_named.8.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Stats<'a> {
+        Stats {
+            average_score: self.__unsafe_private_named.0.unwrap(),
+            created_at: self.__unsafe_private_named.1.unwrap(),
+            games_played: self.__unsafe_private_named.2.unwrap(),
+            highest_number_block: self.__unsafe_private_named.3.unwrap(),
+            highest_score: self.__unsafe_private_named.4.unwrap(),
+            least_moves_to_find_twenty_forty_eight: self
+                .__unsafe_private_named
+                .5
+                .unwrap(),
+            sync_status: self.__unsafe_private_named.6.unwrap(),
+            times_twenty_forty_eight_been_found: self.__unsafe_private_named.7.unwrap(),
+            total_score: self.__unsafe_private_named.8.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Stats<'a> {

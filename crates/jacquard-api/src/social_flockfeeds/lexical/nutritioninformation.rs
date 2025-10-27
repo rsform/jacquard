@@ -14,132 +14,723 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Nutritioninformation<'a> {
     /** An additional type for the item, typically used for adding more specific types from external vocabularies in microdata syntax. This is a relationship between something and a class that the thing is in. Typically the value is a URI-identified RDF class, and in this case corresponds to the
     use of rdf:type in RDF. Text values can be used sparingly, for cases where useful information can be added without their being an appropriate schema to reference. In the case of text values, the class label should follow the schema.org <a href="https://schema.org/docs/styleguide.html">style guide</a>.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub additional_type: Option<jacquard_common::CowStr<'a>>,
     /// An alias for the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub alternate_name: Option<jacquard_common::CowStr<'a>>,
     /// The number of calories.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub calories: Option<NutritioninformationCalories<'a>>,
     /// The number of grams of carbohydrates.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub carbohydrate_content: Option<NutritioninformationCarbohydrateContent<'a>>,
     /// The number of milligrams of cholesterol.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub cholesterol_content: Option<NutritioninformationCholesterolContent<'a>>,
     /// A description of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub description: Option<NutritioninformationDescription<'a>>,
     /// A sub property of description. A short description of the item used to disambiguate from other, similar items. Information from other properties (in particular, name) may be necessary for the description to be useful for disambiguation.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub disambiguating_description: Option<jacquard_common::CowStr<'a>>,
     /// The number of grams of fat.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub fat_content: Option<NutritioninformationFatContent<'a>>,
     /// The number of grams of fiber.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub fiber_content: Option<NutritioninformationFiberContent<'a>>,
     /// The identifier property represents any kind of identifier for any kind of [[Thing]], such as ISBNs, GTIN codes, UUIDs etc. Schema.org provides dedicated properties for representing many of these, either as textual strings or as URL (URI) links. See [background notes](/docs/datamodel.html#identifierBg) for more details.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub identifier: Option<NutritioninformationIdentifier<'a>>,
     /// An image of the item. This can be a [[URL]] or a fully described [[ImageObject]].
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub image: Option<NutritioninformationImage<'a>>,
     /// Indicates a page (or other CreativeWork) for which this thing is the main entity being described. See [background notes](/docs/datamodel.html#mainEntityBackground) for details.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub main_entity_of_page: Option<NutritioninformationMainEntityOfPage<'a>>,
     /// The name of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub name: Option<jacquard_common::CowStr<'a>>,
     /// Indicates a potential Action, which describes an idealized action in which this thing would play an 'object' role.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub potential_action: Option<NutritioninformationPotentialAction<'a>>,
     /// The number of grams of protein.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub protein_content: Option<NutritioninformationProteinContent<'a>>,
     /// URL of a reference Web page that unambiguously indicates the item's identity. E.g. the URL of the item's Wikipedia page, Wikidata entry, or official website.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub same_as: Option<jacquard_common::types::string::Uri<'a>>,
     /// The number of grams of saturated fat.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub saturated_fat_content: Option<NutritioninformationSaturatedFatContent<'a>>,
     /// The serving size, in terms of the number of volume or mass.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub serving_size: Option<jacquard_common::CowStr<'a>>,
     /// The number of milligrams of sodium.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub sodium_content: Option<NutritioninformationSodiumContent<'a>>,
     /// A CreativeWork or Event about this Thing.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub subject_of: Option<NutritioninformationSubjectOf<'a>>,
     /// The number of grams of sugar.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub sugar_content: Option<NutritioninformationSugarContent<'a>>,
     /// The number of grams of trans fat.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub trans_fat_content: Option<NutritioninformationTransFatContent<'a>>,
     /// The number of grams of unsaturated fat.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub unsaturated_fat_content: Option<NutritioninformationUnsaturatedFatContent<'a>>,
     /// URL of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub url: Option<jacquard_common::types::string::Uri<'a>>,
+}
+
+pub mod nutritioninformation_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {}
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {}
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {}
+}
+
+/// Builder for constructing an instance of this type
+pub struct NutritioninformationBuilder<'a, S: nutritioninformation_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<NutritioninformationCalories<'a>>,
+        ::core::option::Option<NutritioninformationCarbohydrateContent<'a>>,
+        ::core::option::Option<NutritioninformationCholesterolContent<'a>>,
+        ::core::option::Option<NutritioninformationDescription<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<NutritioninformationFatContent<'a>>,
+        ::core::option::Option<NutritioninformationFiberContent<'a>>,
+        ::core::option::Option<NutritioninformationIdentifier<'a>>,
+        ::core::option::Option<NutritioninformationImage<'a>>,
+        ::core::option::Option<NutritioninformationMainEntityOfPage<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<NutritioninformationPotentialAction<'a>>,
+        ::core::option::Option<NutritioninformationProteinContent<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<NutritioninformationSaturatedFatContent<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<NutritioninformationSodiumContent<'a>>,
+        ::core::option::Option<NutritioninformationSubjectOf<'a>>,
+        ::core::option::Option<NutritioninformationSugarContent<'a>>,
+        ::core::option::Option<NutritioninformationTransFatContent<'a>>,
+        ::core::option::Option<NutritioninformationUnsaturatedFatContent<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Nutritioninformation<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> NutritioninformationBuilder<'a, nutritioninformation_state::Empty> {
+        NutritioninformationBuilder::new()
+    }
+}
+
+impl<'a> NutritioninformationBuilder<'a, nutritioninformation_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        NutritioninformationBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: nutritioninformation_state::State> NutritioninformationBuilder<'a, S> {
+    /// Set the `additionalType` field (optional)
+    pub fn additional_type(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `additionalType` field to an Option value (optional)
+    pub fn maybe_additional_type(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: nutritioninformation_state::State> NutritioninformationBuilder<'a, S> {
+    /// Set the `alternateName` field (optional)
+    pub fn alternate_name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `alternateName` field to an Option value (optional)
+    pub fn maybe_alternate_name(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: nutritioninformation_state::State> NutritioninformationBuilder<'a, S> {
+    /// Set the `calories` field (optional)
+    pub fn calories(
+        mut self,
+        value: impl Into<Option<NutritioninformationCalories<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `calories` field to an Option value (optional)
+    pub fn maybe_calories(
+        mut self,
+        value: Option<NutritioninformationCalories<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: nutritioninformation_state::State> NutritioninformationBuilder<'a, S> {
+    /// Set the `carbohydrateContent` field (optional)
+    pub fn carbohydrate_content(
+        mut self,
+        value: impl Into<Option<NutritioninformationCarbohydrateContent<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `carbohydrateContent` field to an Option value (optional)
+    pub fn maybe_carbohydrate_content(
+        mut self,
+        value: Option<NutritioninformationCarbohydrateContent<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: nutritioninformation_state::State> NutritioninformationBuilder<'a, S> {
+    /// Set the `cholesterolContent` field (optional)
+    pub fn cholesterol_content(
+        mut self,
+        value: impl Into<Option<NutritioninformationCholesterolContent<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `cholesterolContent` field to an Option value (optional)
+    pub fn maybe_cholesterol_content(
+        mut self,
+        value: Option<NutritioninformationCholesterolContent<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: nutritioninformation_state::State> NutritioninformationBuilder<'a, S> {
+    /// Set the `description` field (optional)
+    pub fn description(
+        mut self,
+        value: impl Into<Option<NutritioninformationDescription<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `description` field to an Option value (optional)
+    pub fn maybe_description(
+        mut self,
+        value: Option<NutritioninformationDescription<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S: nutritioninformation_state::State> NutritioninformationBuilder<'a, S> {
+    /// Set the `disambiguatingDescription` field (optional)
+    pub fn disambiguating_description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `disambiguatingDescription` field to an Option value (optional)
+    pub fn maybe_disambiguating_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S: nutritioninformation_state::State> NutritioninformationBuilder<'a, S> {
+    /// Set the `fatContent` field (optional)
+    pub fn fat_content(
+        mut self,
+        value: impl Into<Option<NutritioninformationFatContent<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value.into();
+        self
+    }
+    /// Set the `fatContent` field to an Option value (optional)
+    pub fn maybe_fat_content(
+        mut self,
+        value: Option<NutritioninformationFatContent<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value;
+        self
+    }
+}
+
+impl<'a, S: nutritioninformation_state::State> NutritioninformationBuilder<'a, S> {
+    /// Set the `fiberContent` field (optional)
+    pub fn fiber_content(
+        mut self,
+        value: impl Into<Option<NutritioninformationFiberContent<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value.into();
+        self
+    }
+    /// Set the `fiberContent` field to an Option value (optional)
+    pub fn maybe_fiber_content(
+        mut self,
+        value: Option<NutritioninformationFiberContent<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value;
+        self
+    }
+}
+
+impl<'a, S: nutritioninformation_state::State> NutritioninformationBuilder<'a, S> {
+    /// Set the `identifier` field (optional)
+    pub fn identifier(
+        mut self,
+        value: impl Into<Option<NutritioninformationIdentifier<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.9 = value.into();
+        self
+    }
+    /// Set the `identifier` field to an Option value (optional)
+    pub fn maybe_identifier(
+        mut self,
+        value: Option<NutritioninformationIdentifier<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.9 = value;
+        self
+    }
+}
+
+impl<'a, S: nutritioninformation_state::State> NutritioninformationBuilder<'a, S> {
+    /// Set the `image` field (optional)
+    pub fn image(
+        mut self,
+        value: impl Into<Option<NutritioninformationImage<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.10 = value.into();
+        self
+    }
+    /// Set the `image` field to an Option value (optional)
+    pub fn maybe_image(mut self, value: Option<NutritioninformationImage<'a>>) -> Self {
+        self.__unsafe_private_named.10 = value;
+        self
+    }
+}
+
+impl<'a, S: nutritioninformation_state::State> NutritioninformationBuilder<'a, S> {
+    /// Set the `mainEntityOfPage` field (optional)
+    pub fn main_entity_of_page(
+        mut self,
+        value: impl Into<Option<NutritioninformationMainEntityOfPage<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.11 = value.into();
+        self
+    }
+    /// Set the `mainEntityOfPage` field to an Option value (optional)
+    pub fn maybe_main_entity_of_page(
+        mut self,
+        value: Option<NutritioninformationMainEntityOfPage<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.11 = value;
+        self
+    }
+}
+
+impl<'a, S: nutritioninformation_state::State> NutritioninformationBuilder<'a, S> {
+    /// Set the `name` field (optional)
+    pub fn name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.12 = value.into();
+        self
+    }
+    /// Set the `name` field to an Option value (optional)
+    pub fn maybe_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.12 = value;
+        self
+    }
+}
+
+impl<'a, S: nutritioninformation_state::State> NutritioninformationBuilder<'a, S> {
+    /// Set the `potentialAction` field (optional)
+    pub fn potential_action(
+        mut self,
+        value: impl Into<Option<NutritioninformationPotentialAction<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.13 = value.into();
+        self
+    }
+    /// Set the `potentialAction` field to an Option value (optional)
+    pub fn maybe_potential_action(
+        mut self,
+        value: Option<NutritioninformationPotentialAction<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.13 = value;
+        self
+    }
+}
+
+impl<'a, S: nutritioninformation_state::State> NutritioninformationBuilder<'a, S> {
+    /// Set the `proteinContent` field (optional)
+    pub fn protein_content(
+        mut self,
+        value: impl Into<Option<NutritioninformationProteinContent<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.14 = value.into();
+        self
+    }
+    /// Set the `proteinContent` field to an Option value (optional)
+    pub fn maybe_protein_content(
+        mut self,
+        value: Option<NutritioninformationProteinContent<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.14 = value;
+        self
+    }
+}
+
+impl<'a, S: nutritioninformation_state::State> NutritioninformationBuilder<'a, S> {
+    /// Set the `sameAs` field (optional)
+    pub fn same_as(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.15 = value.into();
+        self
+    }
+    /// Set the `sameAs` field to an Option value (optional)
+    pub fn maybe_same_as(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.15 = value;
+        self
+    }
+}
+
+impl<'a, S: nutritioninformation_state::State> NutritioninformationBuilder<'a, S> {
+    /// Set the `saturatedFatContent` field (optional)
+    pub fn saturated_fat_content(
+        mut self,
+        value: impl Into<Option<NutritioninformationSaturatedFatContent<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.16 = value.into();
+        self
+    }
+    /// Set the `saturatedFatContent` field to an Option value (optional)
+    pub fn maybe_saturated_fat_content(
+        mut self,
+        value: Option<NutritioninformationSaturatedFatContent<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.16 = value;
+        self
+    }
+}
+
+impl<'a, S: nutritioninformation_state::State> NutritioninformationBuilder<'a, S> {
+    /// Set the `servingSize` field (optional)
+    pub fn serving_size(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.17 = value.into();
+        self
+    }
+    /// Set the `servingSize` field to an Option value (optional)
+    pub fn maybe_serving_size(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.17 = value;
+        self
+    }
+}
+
+impl<'a, S: nutritioninformation_state::State> NutritioninformationBuilder<'a, S> {
+    /// Set the `sodiumContent` field (optional)
+    pub fn sodium_content(
+        mut self,
+        value: impl Into<Option<NutritioninformationSodiumContent<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.18 = value.into();
+        self
+    }
+    /// Set the `sodiumContent` field to an Option value (optional)
+    pub fn maybe_sodium_content(
+        mut self,
+        value: Option<NutritioninformationSodiumContent<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.18 = value;
+        self
+    }
+}
+
+impl<'a, S: nutritioninformation_state::State> NutritioninformationBuilder<'a, S> {
+    /// Set the `subjectOf` field (optional)
+    pub fn subject_of(
+        mut self,
+        value: impl Into<Option<NutritioninformationSubjectOf<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.19 = value.into();
+        self
+    }
+    /// Set the `subjectOf` field to an Option value (optional)
+    pub fn maybe_subject_of(
+        mut self,
+        value: Option<NutritioninformationSubjectOf<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.19 = value;
+        self
+    }
+}
+
+impl<'a, S: nutritioninformation_state::State> NutritioninformationBuilder<'a, S> {
+    /// Set the `sugarContent` field (optional)
+    pub fn sugar_content(
+        mut self,
+        value: impl Into<Option<NutritioninformationSugarContent<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.20 = value.into();
+        self
+    }
+    /// Set the `sugarContent` field to an Option value (optional)
+    pub fn maybe_sugar_content(
+        mut self,
+        value: Option<NutritioninformationSugarContent<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.20 = value;
+        self
+    }
+}
+
+impl<'a, S: nutritioninformation_state::State> NutritioninformationBuilder<'a, S> {
+    /// Set the `transFatContent` field (optional)
+    pub fn trans_fat_content(
+        mut self,
+        value: impl Into<Option<NutritioninformationTransFatContent<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.21 = value.into();
+        self
+    }
+    /// Set the `transFatContent` field to an Option value (optional)
+    pub fn maybe_trans_fat_content(
+        mut self,
+        value: Option<NutritioninformationTransFatContent<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.21 = value;
+        self
+    }
+}
+
+impl<'a, S: nutritioninformation_state::State> NutritioninformationBuilder<'a, S> {
+    /// Set the `unsaturatedFatContent` field (optional)
+    pub fn unsaturated_fat_content(
+        mut self,
+        value: impl Into<Option<NutritioninformationUnsaturatedFatContent<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.22 = value.into();
+        self
+    }
+    /// Set the `unsaturatedFatContent` field to an Option value (optional)
+    pub fn maybe_unsaturated_fat_content(
+        mut self,
+        value: Option<NutritioninformationUnsaturatedFatContent<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.22 = value;
+        self
+    }
+}
+
+impl<'a, S: nutritioninformation_state::State> NutritioninformationBuilder<'a, S> {
+    /// Set the `url` field (optional)
+    pub fn url(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.23 = value.into();
+        self
+    }
+    /// Set the `url` field to an Option value (optional)
+    pub fn maybe_url(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.23 = value;
+        self
+    }
+}
+
+impl<'a, S> NutritioninformationBuilder<'a, S>
+where
+    S: nutritioninformation_state::State,
+{
+    /// Build the final struct
+    pub fn build(self) -> Nutritioninformation<'a> {
+        Nutritioninformation {
+            additional_type: self.__unsafe_private_named.0,
+            alternate_name: self.__unsafe_private_named.1,
+            calories: self.__unsafe_private_named.2,
+            carbohydrate_content: self.__unsafe_private_named.3,
+            cholesterol_content: self.__unsafe_private_named.4,
+            description: self.__unsafe_private_named.5,
+            disambiguating_description: self.__unsafe_private_named.6,
+            fat_content: self.__unsafe_private_named.7,
+            fiber_content: self.__unsafe_private_named.8,
+            identifier: self.__unsafe_private_named.9,
+            image: self.__unsafe_private_named.10,
+            main_entity_of_page: self.__unsafe_private_named.11,
+            name: self.__unsafe_private_named.12,
+            potential_action: self.__unsafe_private_named.13,
+            protein_content: self.__unsafe_private_named.14,
+            same_as: self.__unsafe_private_named.15,
+            saturated_fat_content: self.__unsafe_private_named.16,
+            serving_size: self.__unsafe_private_named.17,
+            sodium_content: self.__unsafe_private_named.18,
+            subject_of: self.__unsafe_private_named.19,
+            sugar_content: self.__unsafe_private_named.20,
+            trans_fat_content: self.__unsafe_private_named.21,
+            unsaturated_fat_content: self.__unsafe_private_named.22,
+            url: self.__unsafe_private_named.23,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Nutritioninformation<'a> {
+        Nutritioninformation {
+            additional_type: self.__unsafe_private_named.0,
+            alternate_name: self.__unsafe_private_named.1,
+            calories: self.__unsafe_private_named.2,
+            carbohydrate_content: self.__unsafe_private_named.3,
+            cholesterol_content: self.__unsafe_private_named.4,
+            description: self.__unsafe_private_named.5,
+            disambiguating_description: self.__unsafe_private_named.6,
+            fat_content: self.__unsafe_private_named.7,
+            fiber_content: self.__unsafe_private_named.8,
+            identifier: self.__unsafe_private_named.9,
+            image: self.__unsafe_private_named.10,
+            main_entity_of_page: self.__unsafe_private_named.11,
+            name: self.__unsafe_private_named.12,
+            potential_action: self.__unsafe_private_named.13,
+            protein_content: self.__unsafe_private_named.14,
+            same_as: self.__unsafe_private_named.15,
+            saturated_fat_content: self.__unsafe_private_named.16,
+            serving_size: self.__unsafe_private_named.17,
+            sodium_content: self.__unsafe_private_named.18,
+            subject_of: self.__unsafe_private_named.19,
+            sugar_content: self.__unsafe_private_named.20,
+            trans_fat_content: self.__unsafe_private_named.21,
+            unsaturated_fat_content: self.__unsafe_private_named.22,
+            url: self.__unsafe_private_named.23,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Nutritioninformation<'a> {

@@ -12,15 +12,101 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetHostStatus<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub hostname: jacquard_common::CowStr<'a>,
+}
+
+pub mod get_host_status_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Hostname;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Hostname = Unset;
+    }
+    ///State transition - sets the `hostname` field to Set
+    pub struct SetHostname<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHostname<S> {}
+    impl<S: State> State for SetHostname<S> {
+        type Hostname = Set<members::hostname>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `hostname` field
+        pub struct hostname(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetHostStatusBuilder<'a, S: get_host_status_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (::core::option::Option<jacquard_common::CowStr<'a>>,),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GetHostStatus<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GetHostStatusBuilder<'a, get_host_status_state::Empty> {
+        GetHostStatusBuilder::new()
+    }
+}
+
+impl<'a> GetHostStatusBuilder<'a, get_host_status_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetHostStatusBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetHostStatusBuilder<'a, S>
+where
+    S: get_host_status_state::State,
+    S::Hostname: get_host_status_state::IsUnset,
+{
+    /// Set the `hostname` field (required)
+    pub fn hostname(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> GetHostStatusBuilder<'a, get_host_status_state::SetHostname<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        GetHostStatusBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetHostStatusBuilder<'a, S>
+where
+    S: get_host_status_state::State,
+    S::Hostname: get_host_status_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetHostStatus<'a> {
+        GetHostStatus {
+            hostname: self.__unsafe_private_named.0.unwrap(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

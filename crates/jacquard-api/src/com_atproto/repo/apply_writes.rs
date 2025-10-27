@@ -14,8 +14,7 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Create<'a> {
@@ -23,7 +22,6 @@ pub struct Create<'a> {
     pub collection: jacquard_common::types::string::Nsid<'a>,
     /// NOTE: maxLength is redundant with record-key format. Keeping it temporarily to ensure backwards compatibility.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub rkey: Option<
         jacquard_common::types::string::RecordKey<
@@ -32,6 +30,182 @@ pub struct Create<'a> {
     >,
     #[serde(borrow)]
     pub value: jacquard_common::types::value::Data<'a>,
+}
+
+pub mod create_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Collection;
+        type Value;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Collection = Unset;
+        type Value = Unset;
+    }
+    ///State transition - sets the `collection` field to Set
+    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCollection<S> {}
+    impl<S: State> State for SetCollection<S> {
+        type Collection = Set<members::collection>;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Collection = S::Collection;
+        type Value = Set<members::value>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `collection` field
+        pub struct collection(());
+        ///Marker type for the `value` field
+        pub struct value(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct CreateBuilder<'a, S: create_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Nsid<'a>>,
+        ::core::option::Option<
+            jacquard_common::types::string::RecordKey<
+                jacquard_common::types::string::Rkey<'a>,
+            >,
+        >,
+        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Create<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> CreateBuilder<'a, create_state::Empty> {
+        CreateBuilder::new()
+    }
+}
+
+impl<'a> CreateBuilder<'a, create_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        CreateBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CreateBuilder<'a, S>
+where
+    S: create_state::State,
+    S::Collection: create_state::IsUnset,
+{
+    /// Set the `collection` field (required)
+    pub fn collection(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Nsid<'a>>,
+    ) -> CreateBuilder<'a, create_state::SetCollection<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        CreateBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: create_state::State> CreateBuilder<'a, S> {
+    /// Set the `rkey` field (optional)
+    pub fn rkey(
+        mut self,
+        value: impl Into<
+            Option<
+                jacquard_common::types::string::RecordKey<
+                    jacquard_common::types::string::Rkey<'a>,
+                >,
+            >,
+        >,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `rkey` field to an Option value (optional)
+    pub fn maybe_rkey(
+        mut self,
+        value: Option<
+            jacquard_common::types::string::RecordKey<
+                jacquard_common::types::string::Rkey<'a>,
+            >,
+        >,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> CreateBuilder<'a, S>
+where
+    S: create_state::State,
+    S::Value: create_state::IsUnset,
+{
+    /// Set the `value` field (required)
+    pub fn value(
+        mut self,
+        value: impl Into<jacquard_common::types::value::Data<'a>>,
+    ) -> CreateBuilder<'a, create_state::SetValue<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        CreateBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CreateBuilder<'a, S>
+where
+    S: create_state::State,
+    S::Collection: create_state::IsSet,
+    S::Value: create_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Create<'a> {
+        Create {
+            collection: self.__unsafe_private_named.0.unwrap(),
+            rkey: self.__unsafe_private_named.1,
+            value: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Create<'a> {
+        Create {
+            collection: self.__unsafe_private_named.0.unwrap(),
+            rkey: self.__unsafe_private_named.1,
+            value: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_com_atproto_repo_applyWrites() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -531,8 +705,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Create<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreateResult<'a> {
@@ -541,9 +714,170 @@ pub struct CreateResult<'a> {
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub validation_status: Option<jacquard_common::CowStr<'a>>,
+}
+
+pub mod create_result_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Uri;
+        type Cid;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Uri = Unset;
+        type Cid = Unset;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Uri = Set<members::uri>;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Uri = S::Uri;
+        type Cid = Set<members::cid>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct CreateResultBuilder<'a, S: create_result_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> CreateResult<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> CreateResultBuilder<'a, create_result_state::Empty> {
+        CreateResultBuilder::new()
+    }
+}
+
+impl<'a> CreateResultBuilder<'a, create_result_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        CreateResultBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CreateResultBuilder<'a, S>
+where
+    S: create_result_state::State,
+    S::Cid: create_result_state::IsUnset,
+{
+    /// Set the `cid` field (required)
+    pub fn cid(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Cid<'a>>,
+    ) -> CreateResultBuilder<'a, create_result_state::SetCid<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        CreateResultBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CreateResultBuilder<'a, S>
+where
+    S: create_result_state::State,
+    S::Uri: create_result_state::IsUnset,
+{
+    /// Set the `uri` field (required)
+    pub fn uri(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> CreateResultBuilder<'a, create_result_state::SetUri<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        CreateResultBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: create_result_state::State> CreateResultBuilder<'a, S> {
+    /// Set the `validationStatus` field (optional)
+    pub fn validation_status(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `validationStatus` field to an Option value (optional)
+    pub fn maybe_validation_status(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> CreateResultBuilder<'a, S>
+where
+    S: create_result_state::State,
+    S::Uri: create_result_state::IsSet,
+    S::Cid: create_result_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> CreateResult<'a> {
+        CreateResult {
+            cid: self.__unsafe_private_named.0.unwrap(),
+            uri: self.__unsafe_private_named.1.unwrap(),
+            validation_status: self.__unsafe_private_named.2,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> CreateResult<'a> {
+        CreateResult {
+            cid: self.__unsafe_private_named.0.unwrap(),
+            uri: self.__unsafe_private_named.1.unwrap(),
+            validation_status: self.__unsafe_private_named.2,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CreateResult<'a> {
@@ -572,8 +906,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CreateResult<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Delete<'a> {
@@ -583,6 +916,154 @@ pub struct Delete<'a> {
     pub rkey: jacquard_common::types::string::RecordKey<
         jacquard_common::types::string::Rkey<'a>,
     >,
+}
+
+pub mod delete_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Collection;
+        type Rkey;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Collection = Unset;
+        type Rkey = Unset;
+    }
+    ///State transition - sets the `collection` field to Set
+    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCollection<S> {}
+    impl<S: State> State for SetCollection<S> {
+        type Collection = Set<members::collection>;
+        type Rkey = S::Rkey;
+    }
+    ///State transition - sets the `rkey` field to Set
+    pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRkey<S> {}
+    impl<S: State> State for SetRkey<S> {
+        type Collection = S::Collection;
+        type Rkey = Set<members::rkey>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `collection` field
+        pub struct collection(());
+        ///Marker type for the `rkey` field
+        pub struct rkey(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct DeleteBuilder<'a, S: delete_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Nsid<'a>>,
+        ::core::option::Option<
+            jacquard_common::types::string::RecordKey<
+                jacquard_common::types::string::Rkey<'a>,
+            >,
+        >,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Delete<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> DeleteBuilder<'a, delete_state::Empty> {
+        DeleteBuilder::new()
+    }
+}
+
+impl<'a> DeleteBuilder<'a, delete_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        DeleteBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DeleteBuilder<'a, S>
+where
+    S: delete_state::State,
+    S::Collection: delete_state::IsUnset,
+{
+    /// Set the `collection` field (required)
+    pub fn collection(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Nsid<'a>>,
+    ) -> DeleteBuilder<'a, delete_state::SetCollection<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        DeleteBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DeleteBuilder<'a, S>
+where
+    S: delete_state::State,
+    S::Rkey: delete_state::IsUnset,
+{
+    /// Set the `rkey` field (required)
+    pub fn rkey(
+        mut self,
+        value: impl Into<
+            jacquard_common::types::string::RecordKey<
+                jacquard_common::types::string::Rkey<'a>,
+            >,
+        >,
+    ) -> DeleteBuilder<'a, delete_state::SetRkey<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        DeleteBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DeleteBuilder<'a, S>
+where
+    S: delete_state::State,
+    S::Collection: delete_state::IsSet,
+    S::Rkey: delete_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Delete<'a> {
+        Delete {
+            collection: self.__unsafe_private_named.0.unwrap(),
+            rkey: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Delete<'a> {
+        Delete {
+            collection: self.__unsafe_private_named.0.unwrap(),
+            rkey: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Delete<'a> {
@@ -640,33 +1121,200 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DeleteResult<'a> {
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-#[builder(start_fn = new)]
 pub struct ApplyWrites<'a> {
     /// The handle or DID of the repo (aka, current account).
     #[serde(borrow)]
     pub repo: jacquard_common::types::ident::AtIdentifier<'a>,
     /// If provided, the entire operation will fail if the current repo commit CID does not match this value. Used to prevent conflicting repo mutations.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub swap_commit: Option<jacquard_common::types::string::Cid<'a>>,
     /// Can be set to 'false' to skip Lexicon schema validation of record data across all operations, 'true' to require it, or leave unset to validate only for known Lexicons.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub validate: Option<bool>,
     #[serde(borrow)]
     pub writes: Vec<ApplyWritesWritesItem<'a>>,
-    #[serde(flatten)]
-    #[serde(borrow)]
-    #[builder(default)]
-    pub extra_data: ::std::collections::BTreeMap<
-        ::jacquard_common::smol_str::SmolStr,
-        ::jacquard_common::types::value::Data<'a>,
-    >,
+}
+
+pub mod apply_writes_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Repo;
+        type Writes;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Repo = Unset;
+        type Writes = Unset;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Repo = Set<members::repo>;
+        type Writes = S::Writes;
+    }
+    ///State transition - sets the `writes` field to Set
+    pub struct SetWrites<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWrites<S> {}
+    impl<S: State> State for SetWrites<S> {
+        type Repo = S::Repo;
+        type Writes = Set<members::writes>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `repo` field
+        pub struct repo(());
+        ///Marker type for the `writes` field
+        pub struct writes(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ApplyWritesBuilder<'a, S: apply_writes_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<Vec<ApplyWritesWritesItem<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ApplyWrites<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ApplyWritesBuilder<'a, apply_writes_state::Empty> {
+        ApplyWritesBuilder::new()
+    }
+}
+
+impl<'a> ApplyWritesBuilder<'a, apply_writes_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ApplyWritesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ApplyWritesBuilder<'a, S>
+where
+    S: apply_writes_state::State,
+    S::Repo: apply_writes_state::IsUnset,
+{
+    /// Set the `repo` field (required)
+    pub fn repo(
+        mut self,
+        value: impl Into<jacquard_common::types::ident::AtIdentifier<'a>>,
+    ) -> ApplyWritesBuilder<'a, apply_writes_state::SetRepo<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ApplyWritesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: apply_writes_state::State> ApplyWritesBuilder<'a, S> {
+    /// Set the `swapCommit` field (optional)
+    pub fn swap_commit(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Cid<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `swapCommit` field to an Option value (optional)
+    pub fn maybe_swap_commit(
+        mut self,
+        value: Option<jacquard_common::types::string::Cid<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: apply_writes_state::State> ApplyWritesBuilder<'a, S> {
+    /// Set the `validate` field (optional)
+    pub fn validate(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `validate` field to an Option value (optional)
+    pub fn maybe_validate(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> ApplyWritesBuilder<'a, S>
+where
+    S: apply_writes_state::State,
+    S::Writes: apply_writes_state::IsUnset,
+{
+    /// Set the `writes` field (required)
+    pub fn writes(
+        mut self,
+        value: impl Into<Vec<ApplyWritesWritesItem<'a>>>,
+    ) -> ApplyWritesBuilder<'a, apply_writes_state::SetWrites<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        ApplyWritesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ApplyWritesBuilder<'a, S>
+where
+    S: apply_writes_state::State,
+    S::Repo: apply_writes_state::IsSet,
+    S::Writes: apply_writes_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> ApplyWrites<'a> {
+        ApplyWrites {
+            repo: self.__unsafe_private_named.0.unwrap(),
+            swap_commit: self.__unsafe_private_named.1,
+            validate: self.__unsafe_private_named.2,
+            writes: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> ApplyWrites<'a> {
+        ApplyWrites {
+            repo: self.__unsafe_private_named.0.unwrap(),
+            swap_commit: self.__unsafe_private_named.1,
+            validate: self.__unsafe_private_named.2,
+            writes: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 #[derive(
@@ -804,8 +1452,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for ApplyWritesRequest {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Update<'a> {
@@ -817,6 +1464,191 @@ pub struct Update<'a> {
     >,
     #[serde(borrow)]
     pub value: jacquard_common::types::value::Data<'a>,
+}
+
+pub mod update_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Collection;
+        type Rkey;
+        type Value;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Collection = Unset;
+        type Rkey = Unset;
+        type Value = Unset;
+    }
+    ///State transition - sets the `collection` field to Set
+    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCollection<S> {}
+    impl<S: State> State for SetCollection<S> {
+        type Collection = Set<members::collection>;
+        type Rkey = S::Rkey;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `rkey` field to Set
+    pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRkey<S> {}
+    impl<S: State> State for SetRkey<S> {
+        type Collection = S::Collection;
+        type Rkey = Set<members::rkey>;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Collection = S::Collection;
+        type Rkey = S::Rkey;
+        type Value = Set<members::value>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `collection` field
+        pub struct collection(());
+        ///Marker type for the `rkey` field
+        pub struct rkey(());
+        ///Marker type for the `value` field
+        pub struct value(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct UpdateBuilder<'a, S: update_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Nsid<'a>>,
+        ::core::option::Option<
+            jacquard_common::types::string::RecordKey<
+                jacquard_common::types::string::Rkey<'a>,
+            >,
+        >,
+        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Update<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> UpdateBuilder<'a, update_state::Empty> {
+        UpdateBuilder::new()
+    }
+}
+
+impl<'a> UpdateBuilder<'a, update_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        UpdateBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> UpdateBuilder<'a, S>
+where
+    S: update_state::State,
+    S::Collection: update_state::IsUnset,
+{
+    /// Set the `collection` field (required)
+    pub fn collection(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Nsid<'a>>,
+    ) -> UpdateBuilder<'a, update_state::SetCollection<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        UpdateBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> UpdateBuilder<'a, S>
+where
+    S: update_state::State,
+    S::Rkey: update_state::IsUnset,
+{
+    /// Set the `rkey` field (required)
+    pub fn rkey(
+        mut self,
+        value: impl Into<
+            jacquard_common::types::string::RecordKey<
+                jacquard_common::types::string::Rkey<'a>,
+            >,
+        >,
+    ) -> UpdateBuilder<'a, update_state::SetRkey<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        UpdateBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> UpdateBuilder<'a, S>
+where
+    S: update_state::State,
+    S::Value: update_state::IsUnset,
+{
+    /// Set the `value` field (required)
+    pub fn value(
+        mut self,
+        value: impl Into<jacquard_common::types::value::Data<'a>>,
+    ) -> UpdateBuilder<'a, update_state::SetValue<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        UpdateBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> UpdateBuilder<'a, S>
+where
+    S: update_state::State,
+    S::Collection: update_state::IsSet,
+    S::Rkey: update_state::IsSet,
+    S::Value: update_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Update<'a> {
+        Update {
+            collection: self.__unsafe_private_named.0.unwrap(),
+            rkey: self.__unsafe_private_named.1.unwrap(),
+            value: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Update<'a> {
+        Update {
+            collection: self.__unsafe_private_named.0.unwrap(),
+            rkey: self.__unsafe_private_named.1.unwrap(),
+            value: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Update<'a> {
@@ -844,8 +1676,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Update<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateResult<'a> {
@@ -854,9 +1685,170 @@ pub struct UpdateResult<'a> {
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub validation_status: Option<jacquard_common::CowStr<'a>>,
+}
+
+pub mod update_result_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Uri;
+        type Cid;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Uri = Unset;
+        type Cid = Unset;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Uri = Set<members::uri>;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Uri = S::Uri;
+        type Cid = Set<members::cid>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct UpdateResultBuilder<'a, S: update_result_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> UpdateResult<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> UpdateResultBuilder<'a, update_result_state::Empty> {
+        UpdateResultBuilder::new()
+    }
+}
+
+impl<'a> UpdateResultBuilder<'a, update_result_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        UpdateResultBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> UpdateResultBuilder<'a, S>
+where
+    S: update_result_state::State,
+    S::Cid: update_result_state::IsUnset,
+{
+    /// Set the `cid` field (required)
+    pub fn cid(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Cid<'a>>,
+    ) -> UpdateResultBuilder<'a, update_result_state::SetCid<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        UpdateResultBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> UpdateResultBuilder<'a, S>
+where
+    S: update_result_state::State,
+    S::Uri: update_result_state::IsUnset,
+{
+    /// Set the `uri` field (required)
+    pub fn uri(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> UpdateResultBuilder<'a, update_result_state::SetUri<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        UpdateResultBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: update_result_state::State> UpdateResultBuilder<'a, S> {
+    /// Set the `validationStatus` field (optional)
+    pub fn validation_status(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `validationStatus` field to an Option value (optional)
+    pub fn maybe_validation_status(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> UpdateResultBuilder<'a, S>
+where
+    S: update_result_state::State,
+    S::Uri: update_result_state::IsSet,
+    S::Cid: update_result_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> UpdateResult<'a> {
+        UpdateResult {
+            cid: self.__unsafe_private_named.0.unwrap(),
+            uri: self.__unsafe_private_named.1.unwrap(),
+            validation_status: self.__unsafe_private_named.2,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> UpdateResult<'a> {
+        UpdateResult {
+            cid: self.__unsafe_private_named.0.unwrap(),
+            uri: self.__unsafe_private_named.1.unwrap(),
+            validation_status: self.__unsafe_private_named.2,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UpdateResult<'a> {

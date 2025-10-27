@@ -30,8 +30,7 @@ pub mod update_o_auth_client;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Slice<'a> {
@@ -39,12 +38,187 @@ pub struct Slice<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     /// Primary domain namespace for this slice (e.g. social.grain)
     #[serde(borrow)]
-    #[builder(into)]
     pub domain: jacquard_common::CowStr<'a>,
     /// Name of the slice
     #[serde(borrow)]
-    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
+}
+
+pub mod slice_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Name;
+        type Domain;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Name = Unset;
+        type Domain = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Name = Set<members::name>;
+        type Domain = S::Domain;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `domain` field to Set
+    pub struct SetDomain<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDomain<S> {}
+    impl<S: State> State for SetDomain<S> {
+        type Name = S::Name;
+        type Domain = Set<members::domain>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Name = S::Name;
+        type Domain = S::Domain;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `domain` field
+        pub struct domain(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct SliceBuilder<'a, S: slice_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Slice<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> SliceBuilder<'a, slice_state::Empty> {
+        SliceBuilder::new()
+    }
+}
+
+impl<'a> SliceBuilder<'a, slice_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        SliceBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SliceBuilder<'a, S>
+where
+    S: slice_state::State,
+    S::CreatedAt: slice_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> SliceBuilder<'a, slice_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        SliceBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SliceBuilder<'a, S>
+where
+    S: slice_state::State,
+    S::Domain: slice_state::IsUnset,
+{
+    /// Set the `domain` field (required)
+    pub fn domain(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> SliceBuilder<'a, slice_state::SetDomain<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        SliceBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SliceBuilder<'a, S>
+where
+    S: slice_state::State,
+    S::Name: slice_state::IsUnset,
+{
+    /// Set the `name` field (required)
+    pub fn name(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> SliceBuilder<'a, slice_state::SetName<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        SliceBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SliceBuilder<'a, S>
+where
+    S: slice_state::State,
+    S::Name: slice_state::IsSet,
+    S::Domain: slice_state::IsSet,
+    S::CreatedAt: slice_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Slice<'a> {
+        Slice {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            domain: self.__unsafe_private_named.1.unwrap(),
+            name: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Slice<'a> {
+        Slice {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            domain: self.__unsafe_private_named.1.unwrap(),
+            name: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Slice<'a> {
@@ -256,8 +430,7 @@ fn lexicon_doc_network_slices_slice() -> ::jacquard_lexicon::lexicon::LexiconDoc
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SliceView<'a> {
@@ -269,39 +442,446 @@ pub struct SliceView<'a> {
     pub creator: crate::network_slices::actor::ProfileViewBasic<'a>,
     /// Primary domain namespace for this slice (e.g. social.grain)
     #[serde(borrow)]
-    #[builder(into)]
     pub domain: jacquard_common::CowStr<'a>,
     /// Total number of unique indexed actors in this slice
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub indexed_actor_count: Option<i64>,
     /// Number of collections with indexed records
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub indexed_collection_count: Option<i64>,
     /// Total number of indexed records in this slice
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub indexed_record_count: Option<i64>,
     /// Display name of the slice
     #[serde(borrow)]
-    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
     /// Recent activity sparkline data points for the last 24 hours
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub sparkline: Option<Vec<crate::network_slices::slice::SparklinePoint<'a>>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     /// Total number of waitlist invites for this slice
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub waitlist_invite_count: Option<i64>,
     /// Total number of waitlist requests for this slice
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub waitlist_request_count: Option<i64>,
+}
+
+pub mod slice_view_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Uri;
+        type Cid;
+        type Name;
+        type Domain;
+        type Creator;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Uri = Unset;
+        type Cid = Unset;
+        type Name = Unset;
+        type Domain = Unset;
+        type Creator = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Uri = Set<members::uri>;
+        type Cid = S::Cid;
+        type Name = S::Name;
+        type Domain = S::Domain;
+        type Creator = S::Creator;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Uri = S::Uri;
+        type Cid = Set<members::cid>;
+        type Name = S::Name;
+        type Domain = S::Domain;
+        type Creator = S::Creator;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Name = Set<members::name>;
+        type Domain = S::Domain;
+        type Creator = S::Creator;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `domain` field to Set
+    pub struct SetDomain<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDomain<S> {}
+    impl<S: State> State for SetDomain<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Name = S::Name;
+        type Domain = Set<members::domain>;
+        type Creator = S::Creator;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `creator` field to Set
+    pub struct SetCreator<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreator<S> {}
+    impl<S: State> State for SetCreator<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Name = S::Name;
+        type Domain = S::Domain;
+        type Creator = Set<members::creator>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Name = S::Name;
+        type Domain = S::Domain;
+        type Creator = S::Creator;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `domain` field
+        pub struct domain(());
+        ///Marker type for the `creator` field
+        pub struct creator(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct SliceViewBuilder<'a, S: slice_view_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<crate::network_slices::actor::ProfileViewBasic<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<Vec<crate::network_slices::slice::SparklinePoint<'a>>>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<i64>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> SliceView<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> SliceViewBuilder<'a, slice_view_state::Empty> {
+        SliceViewBuilder::new()
+    }
+}
+
+impl<'a> SliceViewBuilder<'a, slice_view_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        SliceViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SliceViewBuilder<'a, S>
+where
+    S: slice_view_state::State,
+    S::Cid: slice_view_state::IsUnset,
+{
+    /// Set the `cid` field (required)
+    pub fn cid(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Cid<'a>>,
+    ) -> SliceViewBuilder<'a, slice_view_state::SetCid<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        SliceViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SliceViewBuilder<'a, S>
+where
+    S: slice_view_state::State,
+    S::CreatedAt: slice_view_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> SliceViewBuilder<'a, slice_view_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        SliceViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SliceViewBuilder<'a, S>
+where
+    S: slice_view_state::State,
+    S::Creator: slice_view_state::IsUnset,
+{
+    /// Set the `creator` field (required)
+    pub fn creator(
+        mut self,
+        value: impl Into<crate::network_slices::actor::ProfileViewBasic<'a>>,
+    ) -> SliceViewBuilder<'a, slice_view_state::SetCreator<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        SliceViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SliceViewBuilder<'a, S>
+where
+    S: slice_view_state::State,
+    S::Domain: slice_view_state::IsUnset,
+{
+    /// Set the `domain` field (required)
+    pub fn domain(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> SliceViewBuilder<'a, slice_view_state::SetDomain<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        SliceViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: slice_view_state::State> SliceViewBuilder<'a, S> {
+    /// Set the `indexedActorCount` field (optional)
+    pub fn indexed_actor_count(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `indexedActorCount` field to an Option value (optional)
+    pub fn maybe_indexed_actor_count(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: slice_view_state::State> SliceViewBuilder<'a, S> {
+    /// Set the `indexedCollectionCount` field (optional)
+    pub fn indexed_collection_count(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `indexedCollectionCount` field to an Option value (optional)
+    pub fn maybe_indexed_collection_count(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S: slice_view_state::State> SliceViewBuilder<'a, S> {
+    /// Set the `indexedRecordCount` field (optional)
+    pub fn indexed_record_count(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `indexedRecordCount` field to an Option value (optional)
+    pub fn maybe_indexed_record_count(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S> SliceViewBuilder<'a, S>
+where
+    S: slice_view_state::State,
+    S::Name: slice_view_state::IsUnset,
+{
+    /// Set the `name` field (required)
+    pub fn name(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> SliceViewBuilder<'a, slice_view_state::SetName<S>> {
+        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        SliceViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: slice_view_state::State> SliceViewBuilder<'a, S> {
+    /// Set the `sparkline` field (optional)
+    pub fn sparkline(
+        mut self,
+        value: impl Into<Option<Vec<crate::network_slices::slice::SparklinePoint<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value.into();
+        self
+    }
+    /// Set the `sparkline` field to an Option value (optional)
+    pub fn maybe_sparkline(
+        mut self,
+        value: Option<Vec<crate::network_slices::slice::SparklinePoint<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value;
+        self
+    }
+}
+
+impl<'a, S> SliceViewBuilder<'a, S>
+where
+    S: slice_view_state::State,
+    S::Uri: slice_view_state::IsUnset,
+{
+    /// Set the `uri` field (required)
+    pub fn uri(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> SliceViewBuilder<'a, slice_view_state::SetUri<S>> {
+        self.__unsafe_private_named.9 = ::core::option::Option::Some(value.into());
+        SliceViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: slice_view_state::State> SliceViewBuilder<'a, S> {
+    /// Set the `waitlistInviteCount` field (optional)
+    pub fn waitlist_invite_count(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.10 = value.into();
+        self
+    }
+    /// Set the `waitlistInviteCount` field to an Option value (optional)
+    pub fn maybe_waitlist_invite_count(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.10 = value;
+        self
+    }
+}
+
+impl<'a, S: slice_view_state::State> SliceViewBuilder<'a, S> {
+    /// Set the `waitlistRequestCount` field (optional)
+    pub fn waitlist_request_count(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.11 = value.into();
+        self
+    }
+    /// Set the `waitlistRequestCount` field to an Option value (optional)
+    pub fn maybe_waitlist_request_count(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.11 = value;
+        self
+    }
+}
+
+impl<'a, S> SliceViewBuilder<'a, S>
+where
+    S: slice_view_state::State,
+    S::Uri: slice_view_state::IsSet,
+    S::Cid: slice_view_state::IsSet,
+    S::Name: slice_view_state::IsSet,
+    S::Domain: slice_view_state::IsSet,
+    S::Creator: slice_view_state::IsSet,
+    S::CreatedAt: slice_view_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> SliceView<'a> {
+        SliceView {
+            cid: self.__unsafe_private_named.0.unwrap(),
+            created_at: self.__unsafe_private_named.1.unwrap(),
+            creator: self.__unsafe_private_named.2.unwrap(),
+            domain: self.__unsafe_private_named.3.unwrap(),
+            indexed_actor_count: self.__unsafe_private_named.4,
+            indexed_collection_count: self.__unsafe_private_named.5,
+            indexed_record_count: self.__unsafe_private_named.6,
+            name: self.__unsafe_private_named.7.unwrap(),
+            sparkline: self.__unsafe_private_named.8,
+            uri: self.__unsafe_private_named.9.unwrap(),
+            waitlist_invite_count: self.__unsafe_private_named.10,
+            waitlist_request_count: self.__unsafe_private_named.11,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> SliceView<'a> {
+        SliceView {
+            cid: self.__unsafe_private_named.0.unwrap(),
+            created_at: self.__unsafe_private_named.1.unwrap(),
+            creator: self.__unsafe_private_named.2.unwrap(),
+            domain: self.__unsafe_private_named.3.unwrap(),
+            indexed_actor_count: self.__unsafe_private_named.4,
+            indexed_collection_count: self.__unsafe_private_named.5,
+            indexed_record_count: self.__unsafe_private_named.6,
+            name: self.__unsafe_private_named.7.unwrap(),
+            sparkline: self.__unsafe_private_named.8,
+            uri: self.__unsafe_private_named.9.unwrap(),
+            waitlist_invite_count: self.__unsafe_private_named.10,
+            waitlist_request_count: self.__unsafe_private_named.11,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_network_slices_slice_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -599,13 +1179,152 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SliceView<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SparklinePoint<'a> {
     pub count: i64,
     pub timestamp: jacquard_common::types::string::Datetime,
+}
+
+pub mod sparkline_point_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Timestamp;
+        type Count;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Timestamp = Unset;
+        type Count = Unset;
+    }
+    ///State transition - sets the `timestamp` field to Set
+    pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTimestamp<S> {}
+    impl<S: State> State for SetTimestamp<S> {
+        type Timestamp = Set<members::timestamp>;
+        type Count = S::Count;
+    }
+    ///State transition - sets the `count` field to Set
+    pub struct SetCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCount<S> {}
+    impl<S: State> State for SetCount<S> {
+        type Timestamp = S::Timestamp;
+        type Count = Set<members::count>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `timestamp` field
+        pub struct timestamp(());
+        ///Marker type for the `count` field
+        pub struct count(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct SparklinePointBuilder<'a, S: sparkline_point_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> SparklinePoint<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> SparklinePointBuilder<'a, sparkline_point_state::Empty> {
+        SparklinePointBuilder::new()
+    }
+}
+
+impl<'a> SparklinePointBuilder<'a, sparkline_point_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        SparklinePointBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SparklinePointBuilder<'a, S>
+where
+    S: sparkline_point_state::State,
+    S::Count: sparkline_point_state::IsUnset,
+{
+    /// Set the `count` field (required)
+    pub fn count(
+        mut self,
+        value: impl Into<i64>,
+    ) -> SparklinePointBuilder<'a, sparkline_point_state::SetCount<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        SparklinePointBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SparklinePointBuilder<'a, S>
+where
+    S: sparkline_point_state::State,
+    S::Timestamp: sparkline_point_state::IsUnset,
+{
+    /// Set the `timestamp` field (required)
+    pub fn timestamp(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> SparklinePointBuilder<'a, sparkline_point_state::SetTimestamp<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        SparklinePointBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SparklinePointBuilder<'a, S>
+where
+    S: sparkline_point_state::State,
+    S::Timestamp: sparkline_point_state::IsSet,
+    S::Count: sparkline_point_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> SparklinePoint<'a> {
+        SparklinePoint {
+            count: self.__unsafe_private_named.0.unwrap(),
+            timestamp: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> SparklinePoint<'a> {
+        SparklinePoint {
+            count: self.__unsafe_private_named.0.unwrap(),
+            timestamp: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SparklinePoint<'a> {

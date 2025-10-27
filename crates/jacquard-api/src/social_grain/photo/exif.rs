@@ -14,49 +14,378 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Exif<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub date_time_original: Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub exposure_time: Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub f_number: Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub flash: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub focal_length_in35mm_format: Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub i_so: Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub lens_make: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub lens_model: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub make: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub model: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub photo: jacquard_common::types::string::AtUri<'a>,
+}
+
+pub mod exif_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Photo;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Photo = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `photo` field to Set
+    pub struct SetPhoto<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPhoto<S> {}
+    impl<S: State> State for SetPhoto<S> {
+        type Photo = Set<members::photo>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Photo = S::Photo;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `photo` field
+        pub struct photo(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ExifBuilder<'a, S: exif_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Exif<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ExifBuilder<'a, exif_state::Empty> {
+        ExifBuilder::new()
+    }
+}
+
+impl<'a> ExifBuilder<'a, exif_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ExifBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ExifBuilder<'a, S>
+where
+    S: exif_state::State,
+    S::CreatedAt: exif_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> ExifBuilder<'a, exif_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ExifBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
+    /// Set the `dateTimeOriginal` field (optional)
+    pub fn date_time_original(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `dateTimeOriginal` field to an Option value (optional)
+    pub fn maybe_date_time_original(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
+    /// Set the `exposureTime` field (optional)
+    pub fn exposure_time(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `exposureTime` field to an Option value (optional)
+    pub fn maybe_exposure_time(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
+    /// Set the `fNumber` field (optional)
+    pub fn f_number(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `fNumber` field to an Option value (optional)
+    pub fn maybe_f_number(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
+    /// Set the `flash` field (optional)
+    pub fn flash(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `flash` field to an Option value (optional)
+    pub fn maybe_flash(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
+    /// Set the `focalLengthIn35mmFormat` field (optional)
+    pub fn focal_length_in35mm_format(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `focalLengthIn35mmFormat` field to an Option value (optional)
+    pub fn maybe_focal_length_in35mm_format(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
+    /// Set the `iSO` field (optional)
+    pub fn i_so(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `iSO` field to an Option value (optional)
+    pub fn maybe_i_so(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
+    /// Set the `lensMake` field (optional)
+    pub fn lens_make(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value.into();
+        self
+    }
+    /// Set the `lensMake` field to an Option value (optional)
+    pub fn maybe_lens_make(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value;
+        self
+    }
+}
+
+impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
+    /// Set the `lensModel` field (optional)
+    pub fn lens_model(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value.into();
+        self
+    }
+    /// Set the `lensModel` field to an Option value (optional)
+    pub fn maybe_lens_model(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value;
+        self
+    }
+}
+
+impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
+    /// Set the `make` field (optional)
+    pub fn make(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.9 = value.into();
+        self
+    }
+    /// Set the `make` field to an Option value (optional)
+    pub fn maybe_make(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.9 = value;
+        self
+    }
+}
+
+impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
+    /// Set the `model` field (optional)
+    pub fn model(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.10 = value.into();
+        self
+    }
+    /// Set the `model` field to an Option value (optional)
+    pub fn maybe_model(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.10 = value;
+        self
+    }
+}
+
+impl<'a, S> ExifBuilder<'a, S>
+where
+    S: exif_state::State,
+    S::Photo: exif_state::IsUnset,
+{
+    /// Set the `photo` field (required)
+    pub fn photo(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> ExifBuilder<'a, exif_state::SetPhoto<S>> {
+        self.__unsafe_private_named.11 = ::core::option::Option::Some(value.into());
+        ExifBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ExifBuilder<'a, S>
+where
+    S: exif_state::State,
+    S::Photo: exif_state::IsSet,
+    S::CreatedAt: exif_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Exif<'a> {
+        Exif {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            date_time_original: self.__unsafe_private_named.1,
+            exposure_time: self.__unsafe_private_named.2,
+            f_number: self.__unsafe_private_named.3,
+            flash: self.__unsafe_private_named.4,
+            focal_length_in35mm_format: self.__unsafe_private_named.5,
+            i_so: self.__unsafe_private_named.6,
+            lens_make: self.__unsafe_private_named.7,
+            lens_model: self.__unsafe_private_named.8,
+            make: self.__unsafe_private_named.9,
+            model: self.__unsafe_private_named.10,
+            photo: self.__unsafe_private_named.11.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Exif<'a> {
+        Exif {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            date_time_original: self.__unsafe_private_named.1,
+            exposure_time: self.__unsafe_private_named.2,
+            f_number: self.__unsafe_private_named.3,
+            flash: self.__unsafe_private_named.4,
+            focal_length_in35mm_format: self.__unsafe_private_named.5,
+            i_so: self.__unsafe_private_named.6,
+            lens_make: self.__unsafe_private_named.7,
+            lens_model: self.__unsafe_private_named.8,
+            make: self.__unsafe_private_named.9,
+            model: self.__unsafe_private_named.10,
+            photo: self.__unsafe_private_named.11.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Exif<'a> {

@@ -17,13 +17,115 @@ pub mod root;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DocRef<'a> {
     #[serde(borrow)]
     pub value: DocRefValue<'a>,
+}
+
+pub mod doc_ref_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Value;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Value = Unset;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Value = Set<members::value>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `value` field
+        pub struct value(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct DocRefBuilder<'a, S: doc_ref_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (::core::option::Option<DocRefValue<'a>>,),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> DocRef<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> DocRefBuilder<'a, doc_ref_state::Empty> {
+        DocRefBuilder::new()
+    }
+}
+
+impl<'a> DocRefBuilder<'a, doc_ref_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        DocRefBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DocRefBuilder<'a, S>
+where
+    S: doc_ref_state::State,
+    S::Value: doc_ref_state::IsUnset,
+{
+    /// Set the `value` field (required)
+    pub fn value(
+        mut self,
+        value: impl Into<DocRefValue<'a>>,
+    ) -> DocRefBuilder<'a, doc_ref_state::SetValue<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        DocRefBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DocRefBuilder<'a, S>
+where
+    S: doc_ref_state::State,
+    S::Value: doc_ref_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> DocRef<'a> {
+        DocRef {
+            value: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> DocRef<'a> {
+        DocRef {
+            value: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -163,13 +265,117 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DocRef<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct EntryRef<'a> {
     #[serde(borrow)]
     pub notebook: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+}
+
+pub mod entry_ref_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Notebook;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Notebook = Unset;
+    }
+    ///State transition - sets the `notebook` field to Set
+    pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNotebook<S> {}
+    impl<S: State> State for SetNotebook<S> {
+        type Notebook = Set<members::notebook>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `notebook` field
+        pub struct notebook(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct EntryRefBuilder<'a, S: entry_ref_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> EntryRef<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> EntryRefBuilder<'a, entry_ref_state::Empty> {
+        EntryRefBuilder::new()
+    }
+}
+
+impl<'a> EntryRefBuilder<'a, entry_ref_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        EntryRefBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> EntryRefBuilder<'a, S>
+where
+    S: entry_ref_state::State,
+    S::Notebook: entry_ref_state::IsUnset,
+{
+    /// Set the `notebook` field (required)
+    pub fn notebook(
+        mut self,
+        value: impl Into<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    ) -> EntryRefBuilder<'a, entry_ref_state::SetNotebook<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        EntryRefBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> EntryRefBuilder<'a, S>
+where
+    S: entry_ref_state::State,
+    S::Notebook: entry_ref_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> EntryRef<'a> {
+        EntryRef {
+            notebook: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> EntryRef<'a> {
+        EntryRef {
+            notebook: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EntryRef<'a> {
@@ -197,13 +403,117 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EntryRef<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct NotebookRef<'a> {
     #[serde(borrow)]
     pub notebook: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+}
+
+pub mod notebook_ref_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Notebook;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Notebook = Unset;
+    }
+    ///State transition - sets the `notebook` field to Set
+    pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNotebook<S> {}
+    impl<S: State> State for SetNotebook<S> {
+        type Notebook = Set<members::notebook>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `notebook` field
+        pub struct notebook(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct NotebookRefBuilder<'a, S: notebook_ref_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> NotebookRef<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> NotebookRefBuilder<'a, notebook_ref_state::Empty> {
+        NotebookRefBuilder::new()
+    }
+}
+
+impl<'a> NotebookRefBuilder<'a, notebook_ref_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        NotebookRefBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> NotebookRefBuilder<'a, S>
+where
+    S: notebook_ref_state::State,
+    S::Notebook: notebook_ref_state::IsUnset,
+{
+    /// Set the `notebook` field (required)
+    pub fn notebook(
+        mut self,
+        value: impl Into<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    ) -> NotebookRefBuilder<'a, notebook_ref_state::SetNotebook<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        NotebookRefBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> NotebookRefBuilder<'a, S>
+where
+    S: notebook_ref_state::State,
+    S::Notebook: notebook_ref_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> NotebookRef<'a> {
+        NotebookRef {
+            notebook: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> NotebookRef<'a> {
+        NotebookRef {
+            notebook: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NotebookRef<'a> {

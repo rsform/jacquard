@@ -12,10 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetArtistTracks<'a> {
     ///(min: 1)
@@ -27,6 +25,113 @@ pub struct GetArtistTracks<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+}
+
+pub mod get_artist_tracks_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {}
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {}
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {}
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetArtistTracksBuilder<'a, S: get_artist_tracks_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<i64>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GetArtistTracks<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GetArtistTracksBuilder<'a, get_artist_tracks_state::Empty> {
+        GetArtistTracksBuilder::new()
+    }
+}
+
+impl<'a> GetArtistTracksBuilder<'a, get_artist_tracks_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetArtistTracksBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: get_artist_tracks_state::State> GetArtistTracksBuilder<'a, S> {
+    /// Set the `limit` field (optional)
+    pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `limit` field to an Option value (optional)
+    pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: get_artist_tracks_state::State> GetArtistTracksBuilder<'a, S> {
+    /// Set the `offset` field (optional)
+    pub fn offset(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `offset` field to an Option value (optional)
+    pub fn maybe_offset(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: get_artist_tracks_state::State> GetArtistTracksBuilder<'a, S> {
+    /// Set the `uri` field (optional)
+    pub fn uri(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::AtUri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `uri` field to an Option value (optional)
+    pub fn maybe_uri(
+        mut self,
+        value: Option<jacquard_common::types::string::AtUri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> GetArtistTracksBuilder<'a, S>
+where
+    S: get_artist_tracks_state::State,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetArtistTracks<'a> {
+        GetArtistTracks {
+            limit: self.__unsafe_private_named.0,
+            offset: self.__unsafe_private_named.1,
+            uri: self.__unsafe_private_named.2,
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

@@ -14,23 +14,168 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileStatus<'a> {
     /// The onboarding completion status
     #[serde(borrow)]
-    #[builder(into)]
     pub completed_onboarding: jacquard_common::CowStr<'a>,
     /// The timestamp when this status was created
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub created_at: Option<jacquard_common::types::string::Datetime>,
     /// The timestamp when this status was last updated
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub updated_at: Option<jacquard_common::types::string::Datetime>,
+}
+
+pub mod profile_status_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type CompletedOnboarding;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type CompletedOnboarding = Unset;
+    }
+    ///State transition - sets the `completed_onboarding` field to Set
+    pub struct SetCompletedOnboarding<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCompletedOnboarding<S> {}
+    impl<S: State> State for SetCompletedOnboarding<S> {
+        type CompletedOnboarding = Set<members::completed_onboarding>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `completed_onboarding` field
+        pub struct completed_onboarding(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ProfileStatusBuilder<'a, S: profile_status_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ProfileStatus<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ProfileStatusBuilder<'a, profile_status_state::Empty> {
+        ProfileStatusBuilder::new()
+    }
+}
+
+impl<'a> ProfileStatusBuilder<'a, profile_status_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ProfileStatusBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ProfileStatusBuilder<'a, S>
+where
+    S: profile_status_state::State,
+    S::CompletedOnboarding: profile_status_state::IsUnset,
+{
+    /// Set the `completedOnboarding` field (required)
+    pub fn completed_onboarding(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> ProfileStatusBuilder<'a, profile_status_state::SetCompletedOnboarding<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ProfileStatusBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: profile_status_state::State> ProfileStatusBuilder<'a, S> {
+    /// Set the `createdAt` field (optional)
+    pub fn created_at(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `createdAt` field to an Option value (optional)
+    pub fn maybe_created_at(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: profile_status_state::State> ProfileStatusBuilder<'a, S> {
+    /// Set the `updatedAt` field (optional)
+    pub fn updated_at(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `updatedAt` field to an Option value (optional)
+    pub fn maybe_updated_at(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> ProfileStatusBuilder<'a, S>
+where
+    S: profile_status_state::State,
+    S::CompletedOnboarding: profile_status_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> ProfileStatus<'a> {
+        ProfileStatus {
+            completed_onboarding: self.__unsafe_private_named.0.unwrap(),
+            created_at: self.__unsafe_private_named.1,
+            updated_at: self.__unsafe_private_named.2,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> ProfileStatus<'a> {
+        ProfileStatus {
+            completed_onboarding: self.__unsafe_private_named.0.unwrap(),
+            created_at: self.__unsafe_private_named.1,
+            updated_at: self.__unsafe_private_named.2,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ProfileStatus<'a> {

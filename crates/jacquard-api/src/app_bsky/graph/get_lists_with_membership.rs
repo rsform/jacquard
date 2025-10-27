@@ -14,17 +14,142 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListWithMembership<'a> {
     #[serde(borrow)]
     pub list: crate::app_bsky::graph::ListView<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub list_item: Option<crate::app_bsky::graph::ListItemView<'a>>,
+}
+
+pub mod list_with_membership_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type List;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type List = Unset;
+    }
+    ///State transition - sets the `list` field to Set
+    pub struct SetList<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetList<S> {}
+    impl<S: State> State for SetList<S> {
+        type List = Set<members::list>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `list` field
+        pub struct list(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ListWithMembershipBuilder<'a, S: list_with_membership_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<crate::app_bsky::graph::ListView<'a>>,
+        ::core::option::Option<crate::app_bsky::graph::ListItemView<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ListWithMembership<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ListWithMembershipBuilder<'a, list_with_membership_state::Empty> {
+        ListWithMembershipBuilder::new()
+    }
+}
+
+impl<'a> ListWithMembershipBuilder<'a, list_with_membership_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ListWithMembershipBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ListWithMembershipBuilder<'a, S>
+where
+    S: list_with_membership_state::State,
+    S::List: list_with_membership_state::IsUnset,
+{
+    /// Set the `list` field (required)
+    pub fn list(
+        mut self,
+        value: impl Into<crate::app_bsky::graph::ListView<'a>>,
+    ) -> ListWithMembershipBuilder<'a, list_with_membership_state::SetList<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ListWithMembershipBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: list_with_membership_state::State> ListWithMembershipBuilder<'a, S> {
+    /// Set the `listItem` field (optional)
+    pub fn list_item(
+        mut self,
+        value: impl Into<Option<crate::app_bsky::graph::ListItemView<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `listItem` field to an Option value (optional)
+    pub fn maybe_list_item(
+        mut self,
+        value: Option<crate::app_bsky::graph::ListItemView<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> ListWithMembershipBuilder<'a, S>
+where
+    S: list_with_membership_state::State,
+    S::List: list_with_membership_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> ListWithMembership<'a> {
+        ListWithMembership {
+            list: self.__unsafe_private_named.0.unwrap(),
+            list_item: self.__unsafe_private_named.1,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> ListWithMembership<'a> {
+        ListWithMembership {
+            list: self.__unsafe_private_named.0.unwrap(),
+            list_item: self.__unsafe_private_named.1,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_app_bsky_graph_getListsWithMembership() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -197,17 +322,14 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListWithMembership<'a> {
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetListsWithMembership<'a> {
     #[serde(borrow)]
     pub actor: jacquard_common::types::ident::AtIdentifier<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    #[builder(into)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     ///(default: 50, min: 1, max: 100)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -215,6 +337,166 @@ pub struct GetListsWithMembership<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub purposes: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+}
+
+pub mod get_lists_with_membership_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Actor;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Actor = Unset;
+    }
+    ///State transition - sets the `actor` field to Set
+    pub struct SetActor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActor<S> {}
+    impl<S: State> State for SetActor<S> {
+        type Actor = Set<members::actor>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `actor` field
+        pub struct actor(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetListsWithMembershipBuilder<'a, S: get_lists_with_membership_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GetListsWithMembership<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GetListsWithMembershipBuilder<
+        'a,
+        get_lists_with_membership_state::Empty,
+    > {
+        GetListsWithMembershipBuilder::new()
+    }
+}
+
+impl<'a> GetListsWithMembershipBuilder<'a, get_lists_with_membership_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetListsWithMembershipBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetListsWithMembershipBuilder<'a, S>
+where
+    S: get_lists_with_membership_state::State,
+    S::Actor: get_lists_with_membership_state::IsUnset,
+{
+    /// Set the `actor` field (required)
+    pub fn actor(
+        mut self,
+        value: impl Into<jacquard_common::types::ident::AtIdentifier<'a>>,
+    ) -> GetListsWithMembershipBuilder<
+        'a,
+        get_lists_with_membership_state::SetActor<S>,
+    > {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        GetListsWithMembershipBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<
+    'a,
+    S: get_lists_with_membership_state::State,
+> GetListsWithMembershipBuilder<'a, S> {
+    /// Set the `cursor` field (optional)
+    pub fn cursor(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `cursor` field to an Option value (optional)
+    pub fn maybe_cursor(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<
+    'a,
+    S: get_lists_with_membership_state::State,
+> GetListsWithMembershipBuilder<'a, S> {
+    /// Set the `limit` field (optional)
+    pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `limit` field to an Option value (optional)
+    pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<
+    'a,
+    S: get_lists_with_membership_state::State,
+> GetListsWithMembershipBuilder<'a, S> {
+    /// Set the `purposes` field (optional)
+    pub fn purposes(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `purposes` field to an Option value (optional)
+    pub fn maybe_purposes(
+        mut self,
+        value: Option<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S> GetListsWithMembershipBuilder<'a, S>
+where
+    S: get_lists_with_membership_state::State,
+    S::Actor: get_lists_with_membership_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetListsWithMembership<'a> {
+        GetListsWithMembership {
+            actor: self.__unsafe_private_named.0.unwrap(),
+            cursor: self.__unsafe_private_named.1,
+            limit: self.__unsafe_private_named.2,
+            purposes: self.__unsafe_private_named.3,
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]
@@ -233,7 +515,9 @@ pub struct GetListsWithMembershipOutput<'a> {
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
-    pub lists_with_membership: Vec<jacquard_common::types::value::Data<'a>>,
+    pub lists_with_membership: Vec<
+        crate::app_bsky::graph::get_lists_with_membership::ListWithMembership<'a>,
+    >,
 }
 
 /// Response type for

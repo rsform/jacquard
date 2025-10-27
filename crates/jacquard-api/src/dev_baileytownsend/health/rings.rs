@@ -14,8 +14,7 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Rings<'a> {
@@ -32,6 +31,351 @@ pub struct Rings<'a> {
     pub stand_goal: i64,
     /// The number of hours the user stood up and moved around.
     pub stand_hours: i64,
+}
+
+pub mod rings_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Move;
+        type MoveGoal;
+        type Exercise;
+        type ExerciseGoal;
+        type StandHours;
+        type StandGoal;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Move = Unset;
+        type MoveGoal = Unset;
+        type Exercise = Unset;
+        type ExerciseGoal = Unset;
+        type StandHours = Unset;
+        type StandGoal = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `move` field to Set
+    pub struct SetMove<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMove<S> {}
+    impl<S: State> State for SetMove<S> {
+        type Move = Set<members::r#move>;
+        type MoveGoal = S::MoveGoal;
+        type Exercise = S::Exercise;
+        type ExerciseGoal = S::ExerciseGoal;
+        type StandHours = S::StandHours;
+        type StandGoal = S::StandGoal;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `move_goal` field to Set
+    pub struct SetMoveGoal<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMoveGoal<S> {}
+    impl<S: State> State for SetMoveGoal<S> {
+        type Move = S::Move;
+        type MoveGoal = Set<members::move_goal>;
+        type Exercise = S::Exercise;
+        type ExerciseGoal = S::ExerciseGoal;
+        type StandHours = S::StandHours;
+        type StandGoal = S::StandGoal;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `exercise` field to Set
+    pub struct SetExercise<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetExercise<S> {}
+    impl<S: State> State for SetExercise<S> {
+        type Move = S::Move;
+        type MoveGoal = S::MoveGoal;
+        type Exercise = Set<members::exercise>;
+        type ExerciseGoal = S::ExerciseGoal;
+        type StandHours = S::StandHours;
+        type StandGoal = S::StandGoal;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `exercise_goal` field to Set
+    pub struct SetExerciseGoal<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetExerciseGoal<S> {}
+    impl<S: State> State for SetExerciseGoal<S> {
+        type Move = S::Move;
+        type MoveGoal = S::MoveGoal;
+        type Exercise = S::Exercise;
+        type ExerciseGoal = Set<members::exercise_goal>;
+        type StandHours = S::StandHours;
+        type StandGoal = S::StandGoal;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `stand_hours` field to Set
+    pub struct SetStandHours<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStandHours<S> {}
+    impl<S: State> State for SetStandHours<S> {
+        type Move = S::Move;
+        type MoveGoal = S::MoveGoal;
+        type Exercise = S::Exercise;
+        type ExerciseGoal = S::ExerciseGoal;
+        type StandHours = Set<members::stand_hours>;
+        type StandGoal = S::StandGoal;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `stand_goal` field to Set
+    pub struct SetStandGoal<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStandGoal<S> {}
+    impl<S: State> State for SetStandGoal<S> {
+        type Move = S::Move;
+        type MoveGoal = S::MoveGoal;
+        type Exercise = S::Exercise;
+        type ExerciseGoal = S::ExerciseGoal;
+        type StandHours = S::StandHours;
+        type StandGoal = Set<members::stand_goal>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Move = S::Move;
+        type MoveGoal = S::MoveGoal;
+        type Exercise = S::Exercise;
+        type ExerciseGoal = S::ExerciseGoal;
+        type StandHours = S::StandHours;
+        type StandGoal = S::StandGoal;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `move` field
+        pub struct r#move(());
+        ///Marker type for the `move_goal` field
+        pub struct move_goal(());
+        ///Marker type for the `exercise` field
+        pub struct exercise(());
+        ///Marker type for the `exercise_goal` field
+        pub struct exercise_goal(());
+        ///Marker type for the `stand_hours` field
+        pub struct stand_hours(());
+        ///Marker type for the `stand_goal` field
+        pub struct stand_goal(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct RingsBuilder<'a, S: rings_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<i64>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Rings<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> RingsBuilder<'a, rings_state::Empty> {
+        RingsBuilder::new()
+    }
+}
+
+impl<'a> RingsBuilder<'a, rings_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        RingsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RingsBuilder<'a, S>
+where
+    S: rings_state::State,
+    S::CreatedAt: rings_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> RingsBuilder<'a, rings_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        RingsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RingsBuilder<'a, S>
+where
+    S: rings_state::State,
+    S::Exercise: rings_state::IsUnset,
+{
+    /// Set the `exercise` field (required)
+    pub fn exercise(
+        mut self,
+        value: impl Into<i64>,
+    ) -> RingsBuilder<'a, rings_state::SetExercise<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        RingsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RingsBuilder<'a, S>
+where
+    S: rings_state::State,
+    S::ExerciseGoal: rings_state::IsUnset,
+{
+    /// Set the `exerciseGoal` field (required)
+    pub fn exercise_goal(
+        mut self,
+        value: impl Into<i64>,
+    ) -> RingsBuilder<'a, rings_state::SetExerciseGoal<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        RingsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RingsBuilder<'a, S>
+where
+    S: rings_state::State,
+    S::Move: rings_state::IsUnset,
+{
+    /// Set the `move` field (required)
+    pub fn r#move(
+        mut self,
+        value: impl Into<i64>,
+    ) -> RingsBuilder<'a, rings_state::SetMove<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        RingsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RingsBuilder<'a, S>
+where
+    S: rings_state::State,
+    S::MoveGoal: rings_state::IsUnset,
+{
+    /// Set the `moveGoal` field (required)
+    pub fn move_goal(
+        mut self,
+        value: impl Into<i64>,
+    ) -> RingsBuilder<'a, rings_state::SetMoveGoal<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        RingsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RingsBuilder<'a, S>
+where
+    S: rings_state::State,
+    S::StandGoal: rings_state::IsUnset,
+{
+    /// Set the `standGoal` field (required)
+    pub fn stand_goal(
+        mut self,
+        value: impl Into<i64>,
+    ) -> RingsBuilder<'a, rings_state::SetStandGoal<S>> {
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        RingsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RingsBuilder<'a, S>
+where
+    S: rings_state::State,
+    S::StandHours: rings_state::IsUnset,
+{
+    /// Set the `standHours` field (required)
+    pub fn stand_hours(
+        mut self,
+        value: impl Into<i64>,
+    ) -> RingsBuilder<'a, rings_state::SetStandHours<S>> {
+        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        RingsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RingsBuilder<'a, S>
+where
+    S: rings_state::State,
+    S::Move: rings_state::IsSet,
+    S::MoveGoal: rings_state::IsSet,
+    S::Exercise: rings_state::IsSet,
+    S::ExerciseGoal: rings_state::IsSet,
+    S::StandHours: rings_state::IsSet,
+    S::StandGoal: rings_state::IsSet,
+    S::CreatedAt: rings_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Rings<'a> {
+        Rings {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            exercise: self.__unsafe_private_named.1.unwrap(),
+            exercise_goal: self.__unsafe_private_named.2.unwrap(),
+            r#move: self.__unsafe_private_named.3.unwrap(),
+            move_goal: self.__unsafe_private_named.4.unwrap(),
+            stand_goal: self.__unsafe_private_named.5.unwrap(),
+            stand_hours: self.__unsafe_private_named.6.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Rings<'a> {
+        Rings {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            exercise: self.__unsafe_private_named.1.unwrap(),
+            exercise_goal: self.__unsafe_private_named.2.unwrap(),
+            r#move: self.__unsafe_private_named.3.unwrap(),
+            move_goal: self.__unsafe_private_named.4.unwrap(),
+            stand_goal: self.__unsafe_private_named.5.unwrap(),
+            stand_hours: self.__unsafe_private_named.6.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Rings<'a> {

@@ -38,17 +38,142 @@ pub mod threadgate;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BlockedAuthor<'a> {
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub viewer: Option<crate::app_bsky::actor::ViewerState<'a>>,
+}
+
+pub mod blocked_author_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Did;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Did = Unset;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Did = Set<members::did>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `did` field
+        pub struct did(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct BlockedAuthorBuilder<'a, S: blocked_author_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<crate::app_bsky::actor::ViewerState<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> BlockedAuthor<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> BlockedAuthorBuilder<'a, blocked_author_state::Empty> {
+        BlockedAuthorBuilder::new()
+    }
+}
+
+impl<'a> BlockedAuthorBuilder<'a, blocked_author_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        BlockedAuthorBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BlockedAuthorBuilder<'a, S>
+where
+    S: blocked_author_state::State,
+    S::Did: blocked_author_state::IsUnset,
+{
+    /// Set the `did` field (required)
+    pub fn did(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> BlockedAuthorBuilder<'a, blocked_author_state::SetDid<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        BlockedAuthorBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: blocked_author_state::State> BlockedAuthorBuilder<'a, S> {
+    /// Set the `viewer` field (optional)
+    pub fn viewer(
+        mut self,
+        value: impl Into<Option<crate::app_bsky::actor::ViewerState<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `viewer` field to an Option value (optional)
+    pub fn maybe_viewer(
+        mut self,
+        value: Option<crate::app_bsky::actor::ViewerState<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> BlockedAuthorBuilder<'a, S>
+where
+    S: blocked_author_state::State,
+    S::Did: blocked_author_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> BlockedAuthor<'a> {
+        BlockedAuthor {
+            did: self.__unsafe_private_named.0.unwrap(),
+            viewer: self.__unsafe_private_named.1,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> BlockedAuthor<'a> {
+        BlockedAuthor {
+            did: self.__unsafe_private_named.0.unwrap(),
+            viewer: self.__unsafe_private_named.1,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_app_bsky_feed_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
@@ -1457,8 +1582,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BlockedAuthor<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BlockedPost<'a> {
@@ -1467,6 +1591,183 @@ pub struct BlockedPost<'a> {
     pub blocked: bool,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+pub mod blocked_post_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Uri;
+        type Blocked;
+        type Author;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Uri = Unset;
+        type Blocked = Unset;
+        type Author = Unset;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Uri = Set<members::uri>;
+        type Blocked = S::Blocked;
+        type Author = S::Author;
+    }
+    ///State transition - sets the `blocked` field to Set
+    pub struct SetBlocked<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlocked<S> {}
+    impl<S: State> State for SetBlocked<S> {
+        type Uri = S::Uri;
+        type Blocked = Set<members::blocked>;
+        type Author = S::Author;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthor<S> {}
+    impl<S: State> State for SetAuthor<S> {
+        type Uri = S::Uri;
+        type Blocked = S::Blocked;
+        type Author = Set<members::author>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `blocked` field
+        pub struct blocked(());
+        ///Marker type for the `author` field
+        pub struct author(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct BlockedPostBuilder<'a, S: blocked_post_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<crate::app_bsky::feed::BlockedAuthor<'a>>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> BlockedPost<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> BlockedPostBuilder<'a, blocked_post_state::Empty> {
+        BlockedPostBuilder::new()
+    }
+}
+
+impl<'a> BlockedPostBuilder<'a, blocked_post_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        BlockedPostBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BlockedPostBuilder<'a, S>
+where
+    S: blocked_post_state::State,
+    S::Author: blocked_post_state::IsUnset,
+{
+    /// Set the `author` field (required)
+    pub fn author(
+        mut self,
+        value: impl Into<crate::app_bsky::feed::BlockedAuthor<'a>>,
+    ) -> BlockedPostBuilder<'a, blocked_post_state::SetAuthor<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        BlockedPostBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BlockedPostBuilder<'a, S>
+where
+    S: blocked_post_state::State,
+    S::Blocked: blocked_post_state::IsUnset,
+{
+    /// Set the `blocked` field (required)
+    pub fn blocked(
+        mut self,
+        value: impl Into<bool>,
+    ) -> BlockedPostBuilder<'a, blocked_post_state::SetBlocked<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        BlockedPostBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BlockedPostBuilder<'a, S>
+where
+    S: blocked_post_state::State,
+    S::Uri: blocked_post_state::IsUnset,
+{
+    /// Set the `uri` field (required)
+    pub fn uri(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> BlockedPostBuilder<'a, blocked_post_state::SetUri<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        BlockedPostBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BlockedPostBuilder<'a, S>
+where
+    S: blocked_post_state::State,
+    S::Uri: blocked_post_state::IsSet,
+    S::Blocked: blocked_post_state::IsSet,
+    S::Author: blocked_post_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> BlockedPost<'a> {
+        BlockedPost {
+            author: self.__unsafe_private_named.0.unwrap(),
+            blocked: self.__unsafe_private_named.1.unwrap(),
+            uri: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> BlockedPost<'a> {
+        BlockedPost {
+            author: self.__unsafe_private_named.0.unwrap(),
+            blocked: self.__unsafe_private_named.1.unwrap(),
+            uri: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BlockedPost<'a> {
@@ -1602,31 +1903,210 @@ impl std::fmt::Display for ContentModeVideo {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct FeedViewPost<'a> {
     /// Context provided by feed generator that may be passed back alongside interactions.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub feed_context: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub post: crate::app_bsky::feed::PostView<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub reason: Option<FeedViewPostReason<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub reply: Option<crate::app_bsky::feed::ReplyRef<'a>>,
     /// Unique identifier per request that may be passed back alongside interactions.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub req_id: Option<jacquard_common::CowStr<'a>>,
+}
+
+pub mod feed_view_post_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Post;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Post = Unset;
+    }
+    ///State transition - sets the `post` field to Set
+    pub struct SetPost<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPost<S> {}
+    impl<S: State> State for SetPost<S> {
+        type Post = Set<members::post>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `post` field
+        pub struct post(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct FeedViewPostBuilder<'a, S: feed_view_post_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<crate::app_bsky::feed::PostView<'a>>,
+        ::core::option::Option<FeedViewPostReason<'a>>,
+        ::core::option::Option<crate::app_bsky::feed::ReplyRef<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> FeedViewPost<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> FeedViewPostBuilder<'a, feed_view_post_state::Empty> {
+        FeedViewPostBuilder::new()
+    }
+}
+
+impl<'a> FeedViewPostBuilder<'a, feed_view_post_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        FeedViewPostBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: feed_view_post_state::State> FeedViewPostBuilder<'a, S> {
+    /// Set the `feedContext` field (optional)
+    pub fn feed_context(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `feedContext` field to an Option value (optional)
+    pub fn maybe_feed_context(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> FeedViewPostBuilder<'a, S>
+where
+    S: feed_view_post_state::State,
+    S::Post: feed_view_post_state::IsUnset,
+{
+    /// Set the `post` field (required)
+    pub fn post(
+        mut self,
+        value: impl Into<crate::app_bsky::feed::PostView<'a>>,
+    ) -> FeedViewPostBuilder<'a, feed_view_post_state::SetPost<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        FeedViewPostBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: feed_view_post_state::State> FeedViewPostBuilder<'a, S> {
+    /// Set the `reason` field (optional)
+    pub fn reason(mut self, value: impl Into<Option<FeedViewPostReason<'a>>>) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `reason` field to an Option value (optional)
+    pub fn maybe_reason(mut self, value: Option<FeedViewPostReason<'a>>) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: feed_view_post_state::State> FeedViewPostBuilder<'a, S> {
+    /// Set the `reply` field (optional)
+    pub fn reply(
+        mut self,
+        value: impl Into<Option<crate::app_bsky::feed::ReplyRef<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `reply` field to an Option value (optional)
+    pub fn maybe_reply(
+        mut self,
+        value: Option<crate::app_bsky::feed::ReplyRef<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: feed_view_post_state::State> FeedViewPostBuilder<'a, S> {
+    /// Set the `reqId` field (optional)
+    pub fn req_id(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `reqId` field to an Option value (optional)
+    pub fn maybe_req_id(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S> FeedViewPostBuilder<'a, S>
+where
+    S: feed_view_post_state::State,
+    S::Post: feed_view_post_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> FeedViewPost<'a> {
+        FeedViewPost {
+            feed_context: self.__unsafe_private_named.0,
+            post: self.__unsafe_private_named.1.unwrap(),
+            reason: self.__unsafe_private_named.2,
+            reply: self.__unsafe_private_named.3,
+            req_id: self.__unsafe_private_named.4,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> FeedViewPost<'a> {
+        FeedViewPost {
+            feed_context: self.__unsafe_private_named.0,
+            post: self.__unsafe_private_named.1.unwrap(),
+            reason: self.__unsafe_private_named.2,
+            reply: self.__unsafe_private_named.3,
+            req_id: self.__unsafe_private_named.4,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -1697,53 +2177,522 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FeedViewPost<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GeneratorView<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub accepts_interactions: Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub avatar: Option<jacquard_common::types::string::Uri<'a>>,
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub content_mode: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub creator: crate::app_bsky::actor::ProfileView<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub description: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub description_facets: Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub display_name: jacquard_common::CowStr<'a>,
     pub indexed_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub labels: Option<Vec<crate::com_atproto::label::Label<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub like_count: Option<i64>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub viewer: Option<crate::app_bsky::feed::GeneratorViewerState<'a>>,
+}
+
+pub mod generator_view_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Uri;
+        type Cid;
+        type Did;
+        type Creator;
+        type DisplayName;
+        type IndexedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Uri = Unset;
+        type Cid = Unset;
+        type Did = Unset;
+        type Creator = Unset;
+        type DisplayName = Unset;
+        type IndexedAt = Unset;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Uri = Set<members::uri>;
+        type Cid = S::Cid;
+        type Did = S::Did;
+        type Creator = S::Creator;
+        type DisplayName = S::DisplayName;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Uri = S::Uri;
+        type Cid = Set<members::cid>;
+        type Did = S::Did;
+        type Creator = S::Creator;
+        type DisplayName = S::DisplayName;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Did = Set<members::did>;
+        type Creator = S::Creator;
+        type DisplayName = S::DisplayName;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `creator` field to Set
+    pub struct SetCreator<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreator<S> {}
+    impl<S: State> State for SetCreator<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Did = S::Did;
+        type Creator = Set<members::creator>;
+        type DisplayName = S::DisplayName;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `display_name` field to Set
+    pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDisplayName<S> {}
+    impl<S: State> State for SetDisplayName<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Did = S::Did;
+        type Creator = S::Creator;
+        type DisplayName = Set<members::display_name>;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Did = S::Did;
+        type Creator = S::Creator;
+        type DisplayName = S::DisplayName;
+        type IndexedAt = Set<members::indexed_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `creator` field
+        pub struct creator(());
+        ///Marker type for the `display_name` field
+        pub struct display_name(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct GeneratorViewBuilder<'a, S: generator_view_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<bool>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<crate::app_bsky::actor::ProfileView<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+        ::core::option::Option<crate::app_bsky::feed::GeneratorViewerState<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GeneratorView<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GeneratorViewBuilder<'a, generator_view_state::Empty> {
+        GeneratorViewBuilder::new()
+    }
+}
+
+impl<'a> GeneratorViewBuilder<'a, generator_view_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GeneratorViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: generator_view_state::State> GeneratorViewBuilder<'a, S> {
+    /// Set the `acceptsInteractions` field (optional)
+    pub fn accepts_interactions(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `acceptsInteractions` field to an Option value (optional)
+    pub fn maybe_accepts_interactions(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: generator_view_state::State> GeneratorViewBuilder<'a, S> {
+    /// Set the `avatar` field (optional)
+    pub fn avatar(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `avatar` field to an Option value (optional)
+    pub fn maybe_avatar(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> GeneratorViewBuilder<'a, S>
+where
+    S: generator_view_state::State,
+    S::Cid: generator_view_state::IsUnset,
+{
+    /// Set the `cid` field (required)
+    pub fn cid(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Cid<'a>>,
+    ) -> GeneratorViewBuilder<'a, generator_view_state::SetCid<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        GeneratorViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: generator_view_state::State> GeneratorViewBuilder<'a, S> {
+    /// Set the `contentMode` field (optional)
+    pub fn content_mode(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `contentMode` field to an Option value (optional)
+    pub fn maybe_content_mode(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S> GeneratorViewBuilder<'a, S>
+where
+    S: generator_view_state::State,
+    S::Creator: generator_view_state::IsUnset,
+{
+    /// Set the `creator` field (required)
+    pub fn creator(
+        mut self,
+        value: impl Into<crate::app_bsky::actor::ProfileView<'a>>,
+    ) -> GeneratorViewBuilder<'a, generator_view_state::SetCreator<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        GeneratorViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: generator_view_state::State> GeneratorViewBuilder<'a, S> {
+    /// Set the `description` field (optional)
+    pub fn description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `description` field to an Option value (optional)
+    pub fn maybe_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S: generator_view_state::State> GeneratorViewBuilder<'a, S> {
+    /// Set the `descriptionFacets` field (optional)
+    pub fn description_facets(
+        mut self,
+        value: impl Into<Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `descriptionFacets` field to an Option value (optional)
+    pub fn maybe_description_facets(
+        mut self,
+        value: Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S> GeneratorViewBuilder<'a, S>
+where
+    S: generator_view_state::State,
+    S::Did: generator_view_state::IsUnset,
+{
+    /// Set the `did` field (required)
+    pub fn did(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> GeneratorViewBuilder<'a, generator_view_state::SetDid<S>> {
+        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        GeneratorViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GeneratorViewBuilder<'a, S>
+where
+    S: generator_view_state::State,
+    S::DisplayName: generator_view_state::IsUnset,
+{
+    /// Set the `displayName` field (required)
+    pub fn display_name(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> GeneratorViewBuilder<'a, generator_view_state::SetDisplayName<S>> {
+        self.__unsafe_private_named.8 = ::core::option::Option::Some(value.into());
+        GeneratorViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GeneratorViewBuilder<'a, S>
+where
+    S: generator_view_state::State,
+    S::IndexedAt: generator_view_state::IsUnset,
+{
+    /// Set the `indexedAt` field (required)
+    pub fn indexed_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> GeneratorViewBuilder<'a, generator_view_state::SetIndexedAt<S>> {
+        self.__unsafe_private_named.9 = ::core::option::Option::Some(value.into());
+        GeneratorViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: generator_view_state::State> GeneratorViewBuilder<'a, S> {
+    /// Set the `labels` field (optional)
+    pub fn labels(
+        mut self,
+        value: impl Into<Option<Vec<crate::com_atproto::label::Label<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.10 = value.into();
+        self
+    }
+    /// Set the `labels` field to an Option value (optional)
+    pub fn maybe_labels(
+        mut self,
+        value: Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.10 = value;
+        self
+    }
+}
+
+impl<'a, S: generator_view_state::State> GeneratorViewBuilder<'a, S> {
+    /// Set the `likeCount` field (optional)
+    pub fn like_count(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.11 = value.into();
+        self
+    }
+    /// Set the `likeCount` field to an Option value (optional)
+    pub fn maybe_like_count(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.11 = value;
+        self
+    }
+}
+
+impl<'a, S> GeneratorViewBuilder<'a, S>
+where
+    S: generator_view_state::State,
+    S::Uri: generator_view_state::IsUnset,
+{
+    /// Set the `uri` field (required)
+    pub fn uri(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> GeneratorViewBuilder<'a, generator_view_state::SetUri<S>> {
+        self.__unsafe_private_named.12 = ::core::option::Option::Some(value.into());
+        GeneratorViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: generator_view_state::State> GeneratorViewBuilder<'a, S> {
+    /// Set the `viewer` field (optional)
+    pub fn viewer(
+        mut self,
+        value: impl Into<Option<crate::app_bsky::feed::GeneratorViewerState<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.13 = value.into();
+        self
+    }
+    /// Set the `viewer` field to an Option value (optional)
+    pub fn maybe_viewer(
+        mut self,
+        value: Option<crate::app_bsky::feed::GeneratorViewerState<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.13 = value;
+        self
+    }
+}
+
+impl<'a, S> GeneratorViewBuilder<'a, S>
+where
+    S: generator_view_state::State,
+    S::Uri: generator_view_state::IsSet,
+    S::Cid: generator_view_state::IsSet,
+    S::Did: generator_view_state::IsSet,
+    S::Creator: generator_view_state::IsSet,
+    S::DisplayName: generator_view_state::IsSet,
+    S::IndexedAt: generator_view_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> GeneratorView<'a> {
+        GeneratorView {
+            accepts_interactions: self.__unsafe_private_named.0,
+            avatar: self.__unsafe_private_named.1,
+            cid: self.__unsafe_private_named.2.unwrap(),
+            content_mode: self.__unsafe_private_named.3,
+            creator: self.__unsafe_private_named.4.unwrap(),
+            description: self.__unsafe_private_named.5,
+            description_facets: self.__unsafe_private_named.6,
+            did: self.__unsafe_private_named.7.unwrap(),
+            display_name: self.__unsafe_private_named.8.unwrap(),
+            indexed_at: self.__unsafe_private_named.9.unwrap(),
+            labels: self.__unsafe_private_named.10,
+            like_count: self.__unsafe_private_named.11,
+            uri: self.__unsafe_private_named.12.unwrap(),
+            viewer: self.__unsafe_private_named.13,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> GeneratorView<'a> {
+        GeneratorView {
+            accepts_interactions: self.__unsafe_private_named.0,
+            avatar: self.__unsafe_private_named.1,
+            cid: self.__unsafe_private_named.2.unwrap(),
+            content_mode: self.__unsafe_private_named.3,
+            creator: self.__unsafe_private_named.4.unwrap(),
+            description: self.__unsafe_private_named.5,
+            description_facets: self.__unsafe_private_named.6,
+            did: self.__unsafe_private_named.7.unwrap(),
+            display_name: self.__unsafe_private_named.8.unwrap(),
+            indexed_at: self.__unsafe_private_named.9.unwrap(),
+            labels: self.__unsafe_private_named.10,
+            like_count: self.__unsafe_private_named.11,
+            uri: self.__unsafe_private_named.12.unwrap(),
+            viewer: self.__unsafe_private_named.13,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GeneratorView<'a> {
@@ -2025,14 +2974,153 @@ impl std::fmt::Display for InteractionShare {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct NotFoundPost<'a> {
     pub not_found: bool,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+pub mod not_found_post_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Uri;
+        type NotFound;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Uri = Unset;
+        type NotFound = Unset;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Uri = Set<members::uri>;
+        type NotFound = S::NotFound;
+    }
+    ///State transition - sets the `not_found` field to Set
+    pub struct SetNotFound<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNotFound<S> {}
+    impl<S: State> State for SetNotFound<S> {
+        type Uri = S::Uri;
+        type NotFound = Set<members::not_found>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `not_found` field
+        pub struct not_found(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct NotFoundPostBuilder<'a, S: not_found_post_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<bool>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> NotFoundPost<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> NotFoundPostBuilder<'a, not_found_post_state::Empty> {
+        NotFoundPostBuilder::new()
+    }
+}
+
+impl<'a> NotFoundPostBuilder<'a, not_found_post_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        NotFoundPostBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> NotFoundPostBuilder<'a, S>
+where
+    S: not_found_post_state::State,
+    S::NotFound: not_found_post_state::IsUnset,
+{
+    /// Set the `notFound` field (required)
+    pub fn not_found(
+        mut self,
+        value: impl Into<bool>,
+    ) -> NotFoundPostBuilder<'a, not_found_post_state::SetNotFound<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        NotFoundPostBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> NotFoundPostBuilder<'a, S>
+where
+    S: not_found_post_state::State,
+    S::Uri: not_found_post_state::IsUnset,
+{
+    /// Set the `uri` field (required)
+    pub fn uri(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> NotFoundPostBuilder<'a, not_found_post_state::SetUri<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        NotFoundPostBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> NotFoundPostBuilder<'a, S>
+where
+    S: not_found_post_state::State,
+    S::Uri: not_found_post_state::IsSet,
+    S::NotFound: not_found_post_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> NotFoundPost<'a> {
+        NotFoundPost {
+            not_found: self.__unsafe_private_named.0.unwrap(),
+            uri: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> NotFoundPost<'a> {
+        NotFoundPost {
+            not_found: self.__unsafe_private_named.0.unwrap(),
+            uri: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NotFoundPost<'a> {
@@ -2060,51 +3148,475 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NotFoundPost<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PostView<'a> {
     #[serde(borrow)]
     pub author: crate::app_bsky::actor::ProfileViewBasic<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub bookmark_count: Option<i64>,
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub embed: Option<PostViewEmbed<'a>>,
     pub indexed_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub labels: Option<Vec<crate::com_atproto::label::Label<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub like_count: Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub quote_count: Option<i64>,
     #[serde(borrow)]
     pub record: jacquard_common::types::value::Data<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub reply_count: Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub repost_count: Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub threadgate: Option<crate::app_bsky::feed::ThreadgateView<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub viewer: Option<crate::app_bsky::feed::ViewerState<'a>>,
+}
+
+pub mod post_view_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Uri;
+        type Cid;
+        type Author;
+        type Record;
+        type IndexedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Uri = Unset;
+        type Cid = Unset;
+        type Author = Unset;
+        type Record = Unset;
+        type IndexedAt = Unset;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Uri = Set<members::uri>;
+        type Cid = S::Cid;
+        type Author = S::Author;
+        type Record = S::Record;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Uri = S::Uri;
+        type Cid = Set<members::cid>;
+        type Author = S::Author;
+        type Record = S::Record;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthor<S> {}
+    impl<S: State> State for SetAuthor<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Author = Set<members::author>;
+        type Record = S::Record;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecord<S> {}
+    impl<S: State> State for SetRecord<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Author = S::Author;
+        type Record = Set<members::record>;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Author = S::Author;
+        type Record = S::Record;
+        type IndexedAt = Set<members::indexed_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `author` field
+        pub struct author(());
+        ///Marker type for the `record` field
+        pub struct record(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct PostViewBuilder<'a, S: post_view_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<crate::app_bsky::actor::ProfileViewBasic<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
+        ::core::option::Option<PostViewEmbed<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<crate::app_bsky::feed::ThreadgateView<'a>>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+        ::core::option::Option<crate::app_bsky::feed::ViewerState<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> PostView<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> PostViewBuilder<'a, post_view_state::Empty> {
+        PostViewBuilder::new()
+    }
+}
+
+impl<'a> PostViewBuilder<'a, post_view_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        PostViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PostViewBuilder<'a, S>
+where
+    S: post_view_state::State,
+    S::Author: post_view_state::IsUnset,
+{
+    /// Set the `author` field (required)
+    pub fn author(
+        mut self,
+        value: impl Into<crate::app_bsky::actor::ProfileViewBasic<'a>>,
+    ) -> PostViewBuilder<'a, post_view_state::SetAuthor<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        PostViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
+    /// Set the `bookmarkCount` field (optional)
+    pub fn bookmark_count(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `bookmarkCount` field to an Option value (optional)
+    pub fn maybe_bookmark_count(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> PostViewBuilder<'a, S>
+where
+    S: post_view_state::State,
+    S::Cid: post_view_state::IsUnset,
+{
+    /// Set the `cid` field (required)
+    pub fn cid(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Cid<'a>>,
+    ) -> PostViewBuilder<'a, post_view_state::SetCid<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        PostViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
+    /// Set the `embed` field (optional)
+    pub fn embed(mut self, value: impl Into<Option<PostViewEmbed<'a>>>) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `embed` field to an Option value (optional)
+    pub fn maybe_embed(mut self, value: Option<PostViewEmbed<'a>>) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S> PostViewBuilder<'a, S>
+where
+    S: post_view_state::State,
+    S::IndexedAt: post_view_state::IsUnset,
+{
+    /// Set the `indexedAt` field (required)
+    pub fn indexed_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> PostViewBuilder<'a, post_view_state::SetIndexedAt<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        PostViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
+    /// Set the `labels` field (optional)
+    pub fn labels(
+        mut self,
+        value: impl Into<Option<Vec<crate::com_atproto::label::Label<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `labels` field to an Option value (optional)
+    pub fn maybe_labels(
+        mut self,
+        value: Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
+    /// Set the `likeCount` field (optional)
+    pub fn like_count(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `likeCount` field to an Option value (optional)
+    pub fn maybe_like_count(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
+    /// Set the `quoteCount` field (optional)
+    pub fn quote_count(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.7 = value.into();
+        self
+    }
+    /// Set the `quoteCount` field to an Option value (optional)
+    pub fn maybe_quote_count(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.7 = value;
+        self
+    }
+}
+
+impl<'a, S> PostViewBuilder<'a, S>
+where
+    S: post_view_state::State,
+    S::Record: post_view_state::IsUnset,
+{
+    /// Set the `record` field (required)
+    pub fn record(
+        mut self,
+        value: impl Into<jacquard_common::types::value::Data<'a>>,
+    ) -> PostViewBuilder<'a, post_view_state::SetRecord<S>> {
+        self.__unsafe_private_named.8 = ::core::option::Option::Some(value.into());
+        PostViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
+    /// Set the `replyCount` field (optional)
+    pub fn reply_count(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.9 = value.into();
+        self
+    }
+    /// Set the `replyCount` field to an Option value (optional)
+    pub fn maybe_reply_count(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.9 = value;
+        self
+    }
+}
+
+impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
+    /// Set the `repostCount` field (optional)
+    pub fn repost_count(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.10 = value.into();
+        self
+    }
+    /// Set the `repostCount` field to an Option value (optional)
+    pub fn maybe_repost_count(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.10 = value;
+        self
+    }
+}
+
+impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
+    /// Set the `threadgate` field (optional)
+    pub fn threadgate(
+        mut self,
+        value: impl Into<Option<crate::app_bsky::feed::ThreadgateView<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.11 = value.into();
+        self
+    }
+    /// Set the `threadgate` field to an Option value (optional)
+    pub fn maybe_threadgate(
+        mut self,
+        value: Option<crate::app_bsky::feed::ThreadgateView<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.11 = value;
+        self
+    }
+}
+
+impl<'a, S> PostViewBuilder<'a, S>
+where
+    S: post_view_state::State,
+    S::Uri: post_view_state::IsUnset,
+{
+    /// Set the `uri` field (required)
+    pub fn uri(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> PostViewBuilder<'a, post_view_state::SetUri<S>> {
+        self.__unsafe_private_named.12 = ::core::option::Option::Some(value.into());
+        PostViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
+    /// Set the `viewer` field (optional)
+    pub fn viewer(
+        mut self,
+        value: impl Into<Option<crate::app_bsky::feed::ViewerState<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.13 = value.into();
+        self
+    }
+    /// Set the `viewer` field to an Option value (optional)
+    pub fn maybe_viewer(
+        mut self,
+        value: Option<crate::app_bsky::feed::ViewerState<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.13 = value;
+        self
+    }
+}
+
+impl<'a, S> PostViewBuilder<'a, S>
+where
+    S: post_view_state::State,
+    S::Uri: post_view_state::IsSet,
+    S::Cid: post_view_state::IsSet,
+    S::Author: post_view_state::IsSet,
+    S::Record: post_view_state::IsSet,
+    S::IndexedAt: post_view_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> PostView<'a> {
+        PostView {
+            author: self.__unsafe_private_named.0.unwrap(),
+            bookmark_count: self.__unsafe_private_named.1,
+            cid: self.__unsafe_private_named.2.unwrap(),
+            embed: self.__unsafe_private_named.3,
+            indexed_at: self.__unsafe_private_named.4.unwrap(),
+            labels: self.__unsafe_private_named.5,
+            like_count: self.__unsafe_private_named.6,
+            quote_count: self.__unsafe_private_named.7,
+            record: self.__unsafe_private_named.8.unwrap(),
+            reply_count: self.__unsafe_private_named.9,
+            repost_count: self.__unsafe_private_named.10,
+            threadgate: self.__unsafe_private_named.11,
+            uri: self.__unsafe_private_named.12.unwrap(),
+            viewer: self.__unsafe_private_named.13,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> PostView<'a> {
+        PostView {
+            author: self.__unsafe_private_named.0.unwrap(),
+            bookmark_count: self.__unsafe_private_named.1,
+            cid: self.__unsafe_private_named.2.unwrap(),
+            embed: self.__unsafe_private_named.3,
+            indexed_at: self.__unsafe_private_named.4.unwrap(),
+            labels: self.__unsafe_private_named.5,
+            like_count: self.__unsafe_private_named.6,
+            quote_count: self.__unsafe_private_named.7,
+            record: self.__unsafe_private_named.8.unwrap(),
+            reply_count: self.__unsafe_private_named.9,
+            repost_count: self.__unsafe_private_named.10,
+            threadgate: self.__unsafe_private_named.11,
+            uri: self.__unsafe_private_named.12.unwrap(),
+            viewer: self.__unsafe_private_named.13,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -2187,22 +3699,203 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReasonPin<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ReasonRepost<'a> {
     #[serde(borrow)]
     pub by: crate::app_bsky::actor::ProfileViewBasic<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub cid: Option<jacquard_common::types::string::Cid<'a>>,
     pub indexed_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub uri: Option<jacquard_common::types::string::AtUri<'a>>,
+}
+
+pub mod reason_repost_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type By;
+        type IndexedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type By = Unset;
+        type IndexedAt = Unset;
+    }
+    ///State transition - sets the `by` field to Set
+    pub struct SetBy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBy<S> {}
+    impl<S: State> State for SetBy<S> {
+        type By = Set<members::by>;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type By = S::By;
+        type IndexedAt = Set<members::indexed_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `by` field
+        pub struct by(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ReasonRepostBuilder<'a, S: reason_repost_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<crate::app_bsky::actor::ProfileViewBasic<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ReasonRepost<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ReasonRepostBuilder<'a, reason_repost_state::Empty> {
+        ReasonRepostBuilder::new()
+    }
+}
+
+impl<'a> ReasonRepostBuilder<'a, reason_repost_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ReasonRepostBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ReasonRepostBuilder<'a, S>
+where
+    S: reason_repost_state::State,
+    S::By: reason_repost_state::IsUnset,
+{
+    /// Set the `by` field (required)
+    pub fn by(
+        mut self,
+        value: impl Into<crate::app_bsky::actor::ProfileViewBasic<'a>>,
+    ) -> ReasonRepostBuilder<'a, reason_repost_state::SetBy<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ReasonRepostBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: reason_repost_state::State> ReasonRepostBuilder<'a, S> {
+    /// Set the `cid` field (optional)
+    pub fn cid(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Cid<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `cid` field to an Option value (optional)
+    pub fn maybe_cid(
+        mut self,
+        value: Option<jacquard_common::types::string::Cid<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> ReasonRepostBuilder<'a, S>
+where
+    S: reason_repost_state::State,
+    S::IndexedAt: reason_repost_state::IsUnset,
+{
+    /// Set the `indexedAt` field (required)
+    pub fn indexed_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> ReasonRepostBuilder<'a, reason_repost_state::SetIndexedAt<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        ReasonRepostBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: reason_repost_state::State> ReasonRepostBuilder<'a, S> {
+    /// Set the `uri` field (optional)
+    pub fn uri(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::AtUri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `uri` field to an Option value (optional)
+    pub fn maybe_uri(
+        mut self,
+        value: Option<jacquard_common::types::string::AtUri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S> ReasonRepostBuilder<'a, S>
+where
+    S: reason_repost_state::State,
+    S::By: reason_repost_state::IsSet,
+    S::IndexedAt: reason_repost_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> ReasonRepost<'a> {
+        ReasonRepost {
+            by: self.__unsafe_private_named.0.unwrap(),
+            cid: self.__unsafe_private_named.1,
+            indexed_at: self.__unsafe_private_named.2.unwrap(),
+            uri: self.__unsafe_private_named.3,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> ReasonRepost<'a> {
+        ReasonRepost {
+            by: self.__unsafe_private_named.0.unwrap(),
+            cid: self.__unsafe_private_named.1,
+            indexed_at: self.__unsafe_private_named.2.unwrap(),
+            uri: self.__unsafe_private_named.3,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReasonRepost<'a> {
@@ -2230,20 +3923,180 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReasonRepost<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ReplyRef<'a> {
     /// When parent is a reply to another post, this is the author of that post.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub grandparent_author: Option<crate::app_bsky::actor::ProfileViewBasic<'a>>,
     #[serde(borrow)]
     pub parent: ReplyRefParent<'a>,
     #[serde(borrow)]
     pub root: ReplyRefRoot<'a>,
+}
+
+pub mod reply_ref_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Root;
+        type Parent;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Root = Unset;
+        type Parent = Unset;
+    }
+    ///State transition - sets the `root` field to Set
+    pub struct SetRoot<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRoot<S> {}
+    impl<S: State> State for SetRoot<S> {
+        type Root = Set<members::root>;
+        type Parent = S::Parent;
+    }
+    ///State transition - sets the `parent` field to Set
+    pub struct SetParent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetParent<S> {}
+    impl<S: State> State for SetParent<S> {
+        type Root = S::Root;
+        type Parent = Set<members::parent>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `root` field
+        pub struct root(());
+        ///Marker type for the `parent` field
+        pub struct parent(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ReplyRefBuilder<'a, S: reply_ref_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<crate::app_bsky::actor::ProfileViewBasic<'a>>,
+        ::core::option::Option<ReplyRefParent<'a>>,
+        ::core::option::Option<ReplyRefRoot<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ReplyRef<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ReplyRefBuilder<'a, reply_ref_state::Empty> {
+        ReplyRefBuilder::new()
+    }
+}
+
+impl<'a> ReplyRefBuilder<'a, reply_ref_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ReplyRefBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: reply_ref_state::State> ReplyRefBuilder<'a, S> {
+    /// Set the `grandparentAuthor` field (optional)
+    pub fn grandparent_author(
+        mut self,
+        value: impl Into<Option<crate::app_bsky::actor::ProfileViewBasic<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `grandparentAuthor` field to an Option value (optional)
+    pub fn maybe_grandparent_author(
+        mut self,
+        value: Option<crate::app_bsky::actor::ProfileViewBasic<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> ReplyRefBuilder<'a, S>
+where
+    S: reply_ref_state::State,
+    S::Parent: reply_ref_state::IsUnset,
+{
+    /// Set the `parent` field (required)
+    pub fn parent(
+        mut self,
+        value: impl Into<ReplyRefParent<'a>>,
+    ) -> ReplyRefBuilder<'a, reply_ref_state::SetParent<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        ReplyRefBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ReplyRefBuilder<'a, S>
+where
+    S: reply_ref_state::State,
+    S::Root: reply_ref_state::IsUnset,
+{
+    /// Set the `root` field (required)
+    pub fn root(
+        mut self,
+        value: impl Into<ReplyRefRoot<'a>>,
+    ) -> ReplyRefBuilder<'a, reply_ref_state::SetRoot<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        ReplyRefBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ReplyRefBuilder<'a, S>
+where
+    S: reply_ref_state::State,
+    S::Root: reply_ref_state::IsSet,
+    S::Parent: reply_ref_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> ReplyRef<'a> {
+        ReplyRef {
+            grandparent_author: self.__unsafe_private_named.0,
+            parent: self.__unsafe_private_named.1.unwrap(),
+            root: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> ReplyRef<'a> {
+        ReplyRef {
+            grandparent_author: self.__unsafe_private_named.0,
+            parent: self.__unsafe_private_named.1.unwrap(),
+            root: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -2349,22 +4202,165 @@ impl std::fmt::Display for RequestMore {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SkeletonFeedPost<'a> {
     /// Context that will be passed through to client and may be passed to feed generator back alongside interactions.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub feed_context: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub post: jacquard_common::types::string::AtUri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub reason: Option<SkeletonFeedPostReason<'a>>,
+}
+
+pub mod skeleton_feed_post_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Post;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Post = Unset;
+    }
+    ///State transition - sets the `post` field to Set
+    pub struct SetPost<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPost<S> {}
+    impl<S: State> State for SetPost<S> {
+        type Post = Set<members::post>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `post` field
+        pub struct post(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct SkeletonFeedPostBuilder<'a, S: skeleton_feed_post_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+        ::core::option::Option<SkeletonFeedPostReason<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> SkeletonFeedPost<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> SkeletonFeedPostBuilder<'a, skeleton_feed_post_state::Empty> {
+        SkeletonFeedPostBuilder::new()
+    }
+}
+
+impl<'a> SkeletonFeedPostBuilder<'a, skeleton_feed_post_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        SkeletonFeedPostBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: skeleton_feed_post_state::State> SkeletonFeedPostBuilder<'a, S> {
+    /// Set the `feedContext` field (optional)
+    pub fn feed_context(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `feedContext` field to an Option value (optional)
+    pub fn maybe_feed_context(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> SkeletonFeedPostBuilder<'a, S>
+where
+    S: skeleton_feed_post_state::State,
+    S::Post: skeleton_feed_post_state::IsUnset,
+{
+    /// Set the `post` field (required)
+    pub fn post(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> SkeletonFeedPostBuilder<'a, skeleton_feed_post_state::SetPost<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        SkeletonFeedPostBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: skeleton_feed_post_state::State> SkeletonFeedPostBuilder<'a, S> {
+    /// Set the `reason` field (optional)
+    pub fn reason(
+        mut self,
+        value: impl Into<Option<SkeletonFeedPostReason<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `reason` field to an Option value (optional)
+    pub fn maybe_reason(mut self, value: Option<SkeletonFeedPostReason<'a>>) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> SkeletonFeedPostBuilder<'a, S>
+where
+    S: skeleton_feed_post_state::State,
+    S::Post: skeleton_feed_post_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> SkeletonFeedPost<'a> {
+        SkeletonFeedPost {
+            feed_context: self.__unsafe_private_named.0,
+            post: self.__unsafe_private_named.1.unwrap(),
+            reason: self.__unsafe_private_named.2,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> SkeletonFeedPost<'a> {
+        SkeletonFeedPost {
+            feed_context: self.__unsafe_private_named.0,
+            post: self.__unsafe_private_named.1.unwrap(),
+            reason: self.__unsafe_private_named.2,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -2453,13 +4449,120 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SkeletonReasonPin<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SkeletonReasonRepost<'a> {
     #[serde(borrow)]
     pub repost: jacquard_common::types::string::AtUri<'a>,
+}
+
+pub mod skeleton_reason_repost_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Repost;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Repost = Unset;
+    }
+    ///State transition - sets the `repost` field to Set
+    pub struct SetRepost<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepost<S> {}
+    impl<S: State> State for SetRepost<S> {
+        type Repost = Set<members::repost>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `repost` field
+        pub struct repost(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct SkeletonReasonRepostBuilder<'a, S: skeleton_reason_repost_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> SkeletonReasonRepost<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> SkeletonReasonRepostBuilder<
+        'a,
+        skeleton_reason_repost_state::Empty,
+    > {
+        SkeletonReasonRepostBuilder::new()
+    }
+}
+
+impl<'a> SkeletonReasonRepostBuilder<'a, skeleton_reason_repost_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        SkeletonReasonRepostBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SkeletonReasonRepostBuilder<'a, S>
+where
+    S: skeleton_reason_repost_state::State,
+    S::Repost: skeleton_reason_repost_state::IsUnset,
+{
+    /// Set the `repost` field (required)
+    pub fn repost(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> SkeletonReasonRepostBuilder<'a, skeleton_reason_repost_state::SetRepost<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        SkeletonReasonRepostBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SkeletonReasonRepostBuilder<'a, S>
+where
+    S: skeleton_reason_repost_state::State,
+    S::Repost: skeleton_reason_repost_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> SkeletonReasonRepost<'a> {
+        SkeletonReasonRepost {
+            repost: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> SkeletonReasonRepost<'a> {
+        SkeletonReasonRepost {
+            repost: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SkeletonReasonRepost<'a> {
@@ -2523,25 +4626,186 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThreadContext<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ThreadViewPost<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub parent: Option<ThreadViewPostParent<'a>>,
     #[serde(borrow)]
     pub post: crate::app_bsky::feed::PostView<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub replies: Option<Vec<ThreadViewPostRepliesItem<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub thread_context: Option<crate::app_bsky::feed::ThreadContext<'a>>,
+}
+
+pub mod thread_view_post_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Post;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Post = Unset;
+    }
+    ///State transition - sets the `post` field to Set
+    pub struct SetPost<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPost<S> {}
+    impl<S: State> State for SetPost<S> {
+        type Post = Set<members::post>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `post` field
+        pub struct post(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ThreadViewPostBuilder<'a, S: thread_view_post_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<ThreadViewPostParent<'a>>,
+        ::core::option::Option<crate::app_bsky::feed::PostView<'a>>,
+        ::core::option::Option<Vec<ThreadViewPostRepliesItem<'a>>>,
+        ::core::option::Option<crate::app_bsky::feed::ThreadContext<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ThreadViewPost<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ThreadViewPostBuilder<'a, thread_view_post_state::Empty> {
+        ThreadViewPostBuilder::new()
+    }
+}
+
+impl<'a> ThreadViewPostBuilder<'a, thread_view_post_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ThreadViewPostBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: thread_view_post_state::State> ThreadViewPostBuilder<'a, S> {
+    /// Set the `parent` field (optional)
+    pub fn parent(mut self, value: impl Into<Option<ThreadViewPostParent<'a>>>) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `parent` field to an Option value (optional)
+    pub fn maybe_parent(mut self, value: Option<ThreadViewPostParent<'a>>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> ThreadViewPostBuilder<'a, S>
+where
+    S: thread_view_post_state::State,
+    S::Post: thread_view_post_state::IsUnset,
+{
+    /// Set the `post` field (required)
+    pub fn post(
+        mut self,
+        value: impl Into<crate::app_bsky::feed::PostView<'a>>,
+    ) -> ThreadViewPostBuilder<'a, thread_view_post_state::SetPost<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        ThreadViewPostBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: thread_view_post_state::State> ThreadViewPostBuilder<'a, S> {
+    /// Set the `replies` field (optional)
+    pub fn replies(
+        mut self,
+        value: impl Into<Option<Vec<ThreadViewPostRepliesItem<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `replies` field to an Option value (optional)
+    pub fn maybe_replies(
+        mut self,
+        value: Option<Vec<ThreadViewPostRepliesItem<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: thread_view_post_state::State> ThreadViewPostBuilder<'a, S> {
+    /// Set the `threadContext` field (optional)
+    pub fn thread_context(
+        mut self,
+        value: impl Into<Option<crate::app_bsky::feed::ThreadContext<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `threadContext` field to an Option value (optional)
+    pub fn maybe_thread_context(
+        mut self,
+        value: Option<crate::app_bsky::feed::ThreadContext<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S> ThreadViewPostBuilder<'a, S>
+where
+    S: thread_view_post_state::State,
+    S::Post: thread_view_post_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> ThreadViewPost<'a> {
+        ThreadViewPost {
+            parent: self.__unsafe_private_named.0,
+            post: self.__unsafe_private_named.1.unwrap(),
+            replies: self.__unsafe_private_named.2,
+            thread_context: self.__unsafe_private_named.3,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> ThreadViewPost<'a> {
+        ThreadViewPost {
+            parent: self.__unsafe_private_named.0,
+            post: self.__unsafe_private_named.1.unwrap(),
+            replies: self.__unsafe_private_named.2,
+            thread_context: self.__unsafe_private_named.3,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]

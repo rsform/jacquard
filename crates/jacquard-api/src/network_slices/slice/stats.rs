@@ -13,8 +13,7 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CollectionStats<'a> {
@@ -25,6 +24,183 @@ pub struct CollectionStats<'a> {
     pub record_count: i64,
     /// Number of unique actors with records in this collection
     pub unique_actors: i64,
+}
+
+pub mod collection_stats_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Collection;
+        type RecordCount;
+        type UniqueActors;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Collection = Unset;
+        type RecordCount = Unset;
+        type UniqueActors = Unset;
+    }
+    ///State transition - sets the `collection` field to Set
+    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCollection<S> {}
+    impl<S: State> State for SetCollection<S> {
+        type Collection = Set<members::collection>;
+        type RecordCount = S::RecordCount;
+        type UniqueActors = S::UniqueActors;
+    }
+    ///State transition - sets the `record_count` field to Set
+    pub struct SetRecordCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecordCount<S> {}
+    impl<S: State> State for SetRecordCount<S> {
+        type Collection = S::Collection;
+        type RecordCount = Set<members::record_count>;
+        type UniqueActors = S::UniqueActors;
+    }
+    ///State transition - sets the `unique_actors` field to Set
+    pub struct SetUniqueActors<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUniqueActors<S> {}
+    impl<S: State> State for SetUniqueActors<S> {
+        type Collection = S::Collection;
+        type RecordCount = S::RecordCount;
+        type UniqueActors = Set<members::unique_actors>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `collection` field
+        pub struct collection(());
+        ///Marker type for the `record_count` field
+        pub struct record_count(());
+        ///Marker type for the `unique_actors` field
+        pub struct unique_actors(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct CollectionStatsBuilder<'a, S: collection_stats_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Nsid<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<i64>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> CollectionStats<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> CollectionStatsBuilder<'a, collection_stats_state::Empty> {
+        CollectionStatsBuilder::new()
+    }
+}
+
+impl<'a> CollectionStatsBuilder<'a, collection_stats_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        CollectionStatsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CollectionStatsBuilder<'a, S>
+where
+    S: collection_stats_state::State,
+    S::Collection: collection_stats_state::IsUnset,
+{
+    /// Set the `collection` field (required)
+    pub fn collection(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Nsid<'a>>,
+    ) -> CollectionStatsBuilder<'a, collection_stats_state::SetCollection<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        CollectionStatsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CollectionStatsBuilder<'a, S>
+where
+    S: collection_stats_state::State,
+    S::RecordCount: collection_stats_state::IsUnset,
+{
+    /// Set the `recordCount` field (required)
+    pub fn record_count(
+        mut self,
+        value: impl Into<i64>,
+    ) -> CollectionStatsBuilder<'a, collection_stats_state::SetRecordCount<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        CollectionStatsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CollectionStatsBuilder<'a, S>
+where
+    S: collection_stats_state::State,
+    S::UniqueActors: collection_stats_state::IsUnset,
+{
+    /// Set the `uniqueActors` field (required)
+    pub fn unique_actors(
+        mut self,
+        value: impl Into<i64>,
+    ) -> CollectionStatsBuilder<'a, collection_stats_state::SetUniqueActors<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        CollectionStatsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CollectionStatsBuilder<'a, S>
+where
+    S: collection_stats_state::State,
+    S::Collection: collection_stats_state::IsSet,
+    S::RecordCount: collection_stats_state::IsSet,
+    S::UniqueActors: collection_stats_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> CollectionStats<'a> {
+        CollectionStats {
+            collection: self.__unsafe_private_named.0.unwrap(),
+            record_count: self.__unsafe_private_named.1.unwrap(),
+            unique_actors: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> CollectionStats<'a> {
+        CollectionStats {
+            collection: self.__unsafe_private_named.0.unwrap(),
+            record_count: self.__unsafe_private_named.1.unwrap(),
+            unique_actors: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_network_slices_slice_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -174,15 +350,101 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CollectionStats<'a> {
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct Stats<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub slice: jacquard_common::CowStr<'a>,
+}
+
+pub mod stats_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Slice;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Slice = Unset;
+    }
+    ///State transition - sets the `slice` field to Set
+    pub struct SetSlice<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSlice<S> {}
+    impl<S: State> State for SetSlice<S> {
+        type Slice = Set<members::slice>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `slice` field
+        pub struct slice(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct StatsBuilder<'a, S: stats_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (::core::option::Option<jacquard_common::CowStr<'a>>,),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Stats<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> StatsBuilder<'a, stats_state::Empty> {
+        StatsBuilder::new()
+    }
+}
+
+impl<'a> StatsBuilder<'a, stats_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        StatsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> StatsBuilder<'a, S>
+where
+    S: stats_state::State,
+    S::Slice: stats_state::IsUnset,
+{
+    /// Set the `slice` field (required)
+    pub fn slice(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> StatsBuilder<'a, stats_state::SetSlice<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        StatsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> StatsBuilder<'a, S>
+where
+    S: stats_state::State,
+    S::Slice: stats_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Stats<'a> {
+        Stats {
+            slice: self.__unsafe_private_named.0.unwrap(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]
@@ -199,7 +461,7 @@ pub struct Stats<'a> {
 pub struct StatsOutput<'a> {
     /// Per-collection statistics
     #[serde(borrow)]
-    pub collection_stats: Vec<jacquard_common::types::value::Data<'a>>,
+    pub collection_stats: Vec<crate::network_slices::slice::stats::CollectionStats<'a>>,
     /// List of collection NSIDs indexed in this slice
     #[serde(borrow)]
     pub collections: Vec<jacquard_common::types::string::Nsid<'a>>,

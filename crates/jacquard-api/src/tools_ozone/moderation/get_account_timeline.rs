@@ -12,14 +12,103 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetAccountTimeline<'a> {
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
+}
+
+pub mod get_account_timeline_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Did;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Did = Unset;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Did = Set<members::did>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `did` field
+        pub struct did(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetAccountTimelineBuilder<'a, S: get_account_timeline_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GetAccountTimeline<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GetAccountTimelineBuilder<'a, get_account_timeline_state::Empty> {
+        GetAccountTimelineBuilder::new()
+    }
+}
+
+impl<'a> GetAccountTimelineBuilder<'a, get_account_timeline_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetAccountTimelineBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetAccountTimelineBuilder<'a, S>
+where
+    S: get_account_timeline_state::State,
+    S::Did: get_account_timeline_state::IsUnset,
+{
+    /// Set the `did` field (required)
+    pub fn did(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> GetAccountTimelineBuilder<'a, get_account_timeline_state::SetDid<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        GetAccountTimelineBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetAccountTimelineBuilder<'a, S>
+where
+    S: get_account_timeline_state::State,
+    S::Did: get_account_timeline_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetAccountTimeline<'a> {
+        GetAccountTimeline {
+            did: self.__unsafe_private_named.0.unwrap(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]
@@ -35,7 +124,9 @@ pub struct GetAccountTimeline<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct GetAccountTimelineOutput<'a> {
     #[serde(borrow)]
-    pub timeline: Vec<jacquard_common::types::value::Data<'a>>,
+    pub timeline: Vec<
+        crate::tools_ozone::moderation::get_account_timeline::TimelineItem<'a>,
+    >,
 }
 
 #[jacquard_derive::open_union]
@@ -106,18 +197,168 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetAccountTimelineRequest {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TimelineItem<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub day: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub summary: Vec<
         crate::tools_ozone::moderation::get_account_timeline::TimelineItemSummary<'a>,
     >,
+}
+
+pub mod timeline_item_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Day;
+        type Summary;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Day = Unset;
+        type Summary = Unset;
+    }
+    ///State transition - sets the `day` field to Set
+    pub struct SetDay<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDay<S> {}
+    impl<S: State> State for SetDay<S> {
+        type Day = Set<members::day>;
+        type Summary = S::Summary;
+    }
+    ///State transition - sets the `summary` field to Set
+    pub struct SetSummary<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSummary<S> {}
+    impl<S: State> State for SetSummary<S> {
+        type Day = S::Day;
+        type Summary = Set<members::summary>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `day` field
+        pub struct day(());
+        ///Marker type for the `summary` field
+        pub struct summary(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct TimelineItemBuilder<'a, S: timeline_item_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<
+            Vec<
+                crate::tools_ozone::moderation::get_account_timeline::TimelineItemSummary<
+                    'a,
+                >,
+            >,
+        >,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> TimelineItem<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> TimelineItemBuilder<'a, timeline_item_state::Empty> {
+        TimelineItemBuilder::new()
+    }
+}
+
+impl<'a> TimelineItemBuilder<'a, timeline_item_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        TimelineItemBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TimelineItemBuilder<'a, S>
+where
+    S: timeline_item_state::State,
+    S::Day: timeline_item_state::IsUnset,
+{
+    /// Set the `day` field (required)
+    pub fn day(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> TimelineItemBuilder<'a, timeline_item_state::SetDay<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        TimelineItemBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TimelineItemBuilder<'a, S>
+where
+    S: timeline_item_state::State,
+    S::Summary: timeline_item_state::IsUnset,
+{
+    /// Set the `summary` field (required)
+    pub fn summary(
+        mut self,
+        value: impl Into<
+            Vec<
+                crate::tools_ozone::moderation::get_account_timeline::TimelineItemSummary<
+                    'a,
+                >,
+            >,
+        >,
+    ) -> TimelineItemBuilder<'a, timeline_item_state::SetSummary<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        TimelineItemBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TimelineItemBuilder<'a, S>
+where
+    S: timeline_item_state::State,
+    S::Day: timeline_item_state::IsSet,
+    S::Summary: timeline_item_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> TimelineItem<'a> {
+        TimelineItem {
+            day: self.__unsafe_private_named.0.unwrap(),
+            summary: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> TimelineItem<'a> {
+        TimelineItem {
+            day: self.__unsafe_private_named.0.unwrap(),
+            summary: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_tools_ozone_moderation_getAccountTimeline() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -313,18 +554,195 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TimelineItem<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TimelineItemSummary<'a> {
     pub count: i64,
     #[serde(borrow)]
-    #[builder(into)]
     pub event_subject_type: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub event_type: jacquard_common::CowStr<'a>,
+}
+
+pub mod timeline_item_summary_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type EventSubjectType;
+        type EventType;
+        type Count;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type EventSubjectType = Unset;
+        type EventType = Unset;
+        type Count = Unset;
+    }
+    ///State transition - sets the `event_subject_type` field to Set
+    pub struct SetEventSubjectType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEventSubjectType<S> {}
+    impl<S: State> State for SetEventSubjectType<S> {
+        type EventSubjectType = Set<members::event_subject_type>;
+        type EventType = S::EventType;
+        type Count = S::Count;
+    }
+    ///State transition - sets the `event_type` field to Set
+    pub struct SetEventType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEventType<S> {}
+    impl<S: State> State for SetEventType<S> {
+        type EventSubjectType = S::EventSubjectType;
+        type EventType = Set<members::event_type>;
+        type Count = S::Count;
+    }
+    ///State transition - sets the `count` field to Set
+    pub struct SetCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCount<S> {}
+    impl<S: State> State for SetCount<S> {
+        type EventSubjectType = S::EventSubjectType;
+        type EventType = S::EventType;
+        type Count = Set<members::count>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `event_subject_type` field
+        pub struct event_subject_type(());
+        ///Marker type for the `event_type` field
+        pub struct event_type(());
+        ///Marker type for the `count` field
+        pub struct count(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct TimelineItemSummaryBuilder<'a, S: timeline_item_summary_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> TimelineItemSummary<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> TimelineItemSummaryBuilder<'a, timeline_item_summary_state::Empty> {
+        TimelineItemSummaryBuilder::new()
+    }
+}
+
+impl<'a> TimelineItemSummaryBuilder<'a, timeline_item_summary_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        TimelineItemSummaryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TimelineItemSummaryBuilder<'a, S>
+where
+    S: timeline_item_summary_state::State,
+    S::Count: timeline_item_summary_state::IsUnset,
+{
+    /// Set the `count` field (required)
+    pub fn count(
+        mut self,
+        value: impl Into<i64>,
+    ) -> TimelineItemSummaryBuilder<'a, timeline_item_summary_state::SetCount<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        TimelineItemSummaryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TimelineItemSummaryBuilder<'a, S>
+where
+    S: timeline_item_summary_state::State,
+    S::EventSubjectType: timeline_item_summary_state::IsUnset,
+{
+    /// Set the `eventSubjectType` field (required)
+    pub fn event_subject_type(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> TimelineItemSummaryBuilder<
+        'a,
+        timeline_item_summary_state::SetEventSubjectType<S>,
+    > {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        TimelineItemSummaryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TimelineItemSummaryBuilder<'a, S>
+where
+    S: timeline_item_summary_state::State,
+    S::EventType: timeline_item_summary_state::IsUnset,
+{
+    /// Set the `eventType` field (required)
+    pub fn event_type(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> TimelineItemSummaryBuilder<'a, timeline_item_summary_state::SetEventType<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        TimelineItemSummaryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TimelineItemSummaryBuilder<'a, S>
+where
+    S: timeline_item_summary_state::State,
+    S::EventSubjectType: timeline_item_summary_state::IsSet,
+    S::EventType: timeline_item_summary_state::IsSet,
+    S::Count: timeline_item_summary_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> TimelineItemSummary<'a> {
+        TimelineItemSummary {
+            count: self.__unsafe_private_named.0.unwrap(),
+            event_subject_type: self.__unsafe_private_named.1.unwrap(),
+            event_type: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> TimelineItemSummary<'a> {
+        TimelineItemSummary {
+            count: self.__unsafe_private_named.0.unwrap(),
+            event_subject_type: self.__unsafe_private_named.1.unwrap(),
+            event_type: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TimelineItemSummary<'a> {

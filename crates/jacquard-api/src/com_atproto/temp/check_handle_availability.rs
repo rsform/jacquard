@@ -12,20 +12,162 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct CheckHandleAvailability<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub birth_date: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    #[builder(into)]
     pub email: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
+}
+
+pub mod check_handle_availability_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Handle;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Handle = Unset;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHandle<S> {}
+    impl<S: State> State for SetHandle<S> {
+        type Handle = Set<members::handle>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `handle` field
+        pub struct handle(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct CheckHandleAvailabilityBuilder<
+    'a,
+    S: check_handle_availability_state::State,
+> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Handle<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> CheckHandleAvailability<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> CheckHandleAvailabilityBuilder<
+        'a,
+        check_handle_availability_state::Empty,
+    > {
+        CheckHandleAvailabilityBuilder::new()
+    }
+}
+
+impl<'a> CheckHandleAvailabilityBuilder<'a, check_handle_availability_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        CheckHandleAvailabilityBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<
+    'a,
+    S: check_handle_availability_state::State,
+> CheckHandleAvailabilityBuilder<'a, S> {
+    /// Set the `birthDate` field (optional)
+    pub fn birth_date(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `birthDate` field to an Option value (optional)
+    pub fn maybe_birth_date(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<
+    'a,
+    S: check_handle_availability_state::State,
+> CheckHandleAvailabilityBuilder<'a, S> {
+    /// Set the `email` field (optional)
+    pub fn email(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `email` field to an Option value (optional)
+    pub fn maybe_email(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> CheckHandleAvailabilityBuilder<'a, S>
+where
+    S: check_handle_availability_state::State,
+    S::Handle: check_handle_availability_state::IsUnset,
+{
+    /// Set the `handle` field (required)
+    pub fn handle(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Handle<'a>>,
+    ) -> CheckHandleAvailabilityBuilder<
+        'a,
+        check_handle_availability_state::SetHandle<S>,
+    > {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        CheckHandleAvailabilityBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CheckHandleAvailabilityBuilder<'a, S>
+where
+    S: check_handle_availability_state::State,
+    S::Handle: check_handle_availability_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> CheckHandleAvailability<'a> {
+        CheckHandleAvailability {
+            birth_date: self.__unsafe_private_named.0,
+            email: self.__unsafe_private_named.1,
+            handle: self.__unsafe_private_named.2.unwrap(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]
@@ -384,8 +526,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ResultAvailable<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ResultUnavailable<'a> {
@@ -394,6 +535,115 @@ pub struct ResultUnavailable<'a> {
     pub suggestions: Vec<
         crate::com_atproto::temp::check_handle_availability::Suggestion<'a>,
     >,
+}
+
+pub mod result_unavailable_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Suggestions;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Suggestions = Unset;
+    }
+    ///State transition - sets the `suggestions` field to Set
+    pub struct SetSuggestions<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSuggestions<S> {}
+    impl<S: State> State for SetSuggestions<S> {
+        type Suggestions = Set<members::suggestions>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `suggestions` field
+        pub struct suggestions(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ResultUnavailableBuilder<'a, S: result_unavailable_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<
+            Vec<crate::com_atproto::temp::check_handle_availability::Suggestion<'a>>,
+        >,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ResultUnavailable<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ResultUnavailableBuilder<'a, result_unavailable_state::Empty> {
+        ResultUnavailableBuilder::new()
+    }
+}
+
+impl<'a> ResultUnavailableBuilder<'a, result_unavailable_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ResultUnavailableBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ResultUnavailableBuilder<'a, S>
+where
+    S: result_unavailable_state::State,
+    S::Suggestions: result_unavailable_state::IsUnset,
+{
+    /// Set the `suggestions` field (required)
+    pub fn suggestions(
+        mut self,
+        value: impl Into<
+            Vec<crate::com_atproto::temp::check_handle_availability::Suggestion<'a>>,
+        >,
+    ) -> ResultUnavailableBuilder<'a, result_unavailable_state::SetSuggestions<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ResultUnavailableBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ResultUnavailableBuilder<'a, S>
+where
+    S: result_unavailable_state::State,
+    S::Suggestions: result_unavailable_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> ResultUnavailable<'a> {
+        ResultUnavailable {
+            suggestions: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> ResultUnavailable<'a> {
+        ResultUnavailable {
+            suggestions: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ResultUnavailable<'a> {
@@ -421,8 +671,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ResultUnavailable<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Suggestion<'a> {
@@ -430,8 +679,147 @@ pub struct Suggestion<'a> {
     pub handle: jacquard_common::types::string::Handle<'a>,
     /// Method used to build this suggestion. Should be considered opaque to clients. Can be used for metrics.
     #[serde(borrow)]
-    #[builder(into)]
     pub method: jacquard_common::CowStr<'a>,
+}
+
+pub mod suggestion_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Handle;
+        type Method;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Handle = Unset;
+        type Method = Unset;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHandle<S> {}
+    impl<S: State> State for SetHandle<S> {
+        type Handle = Set<members::handle>;
+        type Method = S::Method;
+    }
+    ///State transition - sets the `method` field to Set
+    pub struct SetMethod<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMethod<S> {}
+    impl<S: State> State for SetMethod<S> {
+        type Handle = S::Handle;
+        type Method = Set<members::method>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `handle` field
+        pub struct handle(());
+        ///Marker type for the `method` field
+        pub struct method(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct SuggestionBuilder<'a, S: suggestion_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Handle<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Suggestion<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> SuggestionBuilder<'a, suggestion_state::Empty> {
+        SuggestionBuilder::new()
+    }
+}
+
+impl<'a> SuggestionBuilder<'a, suggestion_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        SuggestionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SuggestionBuilder<'a, S>
+where
+    S: suggestion_state::State,
+    S::Handle: suggestion_state::IsUnset,
+{
+    /// Set the `handle` field (required)
+    pub fn handle(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Handle<'a>>,
+    ) -> SuggestionBuilder<'a, suggestion_state::SetHandle<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        SuggestionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SuggestionBuilder<'a, S>
+where
+    S: suggestion_state::State,
+    S::Method: suggestion_state::IsUnset,
+{
+    /// Set the `method` field (required)
+    pub fn method(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> SuggestionBuilder<'a, suggestion_state::SetMethod<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        SuggestionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SuggestionBuilder<'a, S>
+where
+    S: suggestion_state::State,
+    S::Handle: suggestion_state::IsSet,
+    S::Method: suggestion_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Suggestion<'a> {
+        Suggestion {
+            handle: self.__unsafe_private_named.0.unwrap(),
+            method: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Suggestion<'a> {
+        Suggestion {
+            handle: self.__unsafe_private_named.0.unwrap(),
+            method: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Suggestion<'a> {

@@ -15,14 +15,190 @@ pub mod status;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CloneOpts<'a> {
     pub depth: i64,
     pub skip: bool,
     pub submodules: bool,
+}
+
+pub mod clone_opts_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Skip;
+        type Depth;
+        type Submodules;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Skip = Unset;
+        type Depth = Unset;
+        type Submodules = Unset;
+    }
+    ///State transition - sets the `skip` field to Set
+    pub struct SetSkip<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSkip<S> {}
+    impl<S: State> State for SetSkip<S> {
+        type Skip = Set<members::skip>;
+        type Depth = S::Depth;
+        type Submodules = S::Submodules;
+    }
+    ///State transition - sets the `depth` field to Set
+    pub struct SetDepth<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDepth<S> {}
+    impl<S: State> State for SetDepth<S> {
+        type Skip = S::Skip;
+        type Depth = Set<members::depth>;
+        type Submodules = S::Submodules;
+    }
+    ///State transition - sets the `submodules` field to Set
+    pub struct SetSubmodules<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubmodules<S> {}
+    impl<S: State> State for SetSubmodules<S> {
+        type Skip = S::Skip;
+        type Depth = S::Depth;
+        type Submodules = Set<members::submodules>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `skip` field
+        pub struct skip(());
+        ///Marker type for the `depth` field
+        pub struct depth(());
+        ///Marker type for the `submodules` field
+        pub struct submodules(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct CloneOptsBuilder<'a, S: clone_opts_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<i64>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<bool>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> CloneOpts<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> CloneOptsBuilder<'a, clone_opts_state::Empty> {
+        CloneOptsBuilder::new()
+    }
+}
+
+impl<'a> CloneOptsBuilder<'a, clone_opts_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        CloneOptsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CloneOptsBuilder<'a, S>
+where
+    S: clone_opts_state::State,
+    S::Depth: clone_opts_state::IsUnset,
+{
+    /// Set the `depth` field (required)
+    pub fn depth(
+        mut self,
+        value: impl Into<i64>,
+    ) -> CloneOptsBuilder<'a, clone_opts_state::SetDepth<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        CloneOptsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CloneOptsBuilder<'a, S>
+where
+    S: clone_opts_state::State,
+    S::Skip: clone_opts_state::IsUnset,
+{
+    /// Set the `skip` field (required)
+    pub fn skip(
+        mut self,
+        value: impl Into<bool>,
+    ) -> CloneOptsBuilder<'a, clone_opts_state::SetSkip<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        CloneOptsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CloneOptsBuilder<'a, S>
+where
+    S: clone_opts_state::State,
+    S::Submodules: clone_opts_state::IsUnset,
+{
+    /// Set the `submodules` field (required)
+    pub fn submodules(
+        mut self,
+        value: impl Into<bool>,
+    ) -> CloneOptsBuilder<'a, clone_opts_state::SetSubmodules<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        CloneOptsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CloneOptsBuilder<'a, S>
+where
+    S: clone_opts_state::State,
+    S::Skip: clone_opts_state::IsSet,
+    S::Depth: clone_opts_state::IsSet,
+    S::Submodules: clone_opts_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> CloneOpts<'a> {
+        CloneOpts {
+            depth: self.__unsafe_private_named.0.unwrap(),
+            skip: self.__unsafe_private_named.1.unwrap(),
+            submodules: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> CloneOpts<'a> {
+        CloneOpts {
+            depth: self.__unsafe_private_named.0.unwrap(),
+            skip: self.__unsafe_private_named.1.unwrap(),
+            submodules: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_sh_tangled_pipeline() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -610,8 +786,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CloneOpts<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Pipeline<'a> {
@@ -619,6 +794,146 @@ pub struct Pipeline<'a> {
     pub trigger_metadata: crate::sh_tangled::pipeline::TriggerMetadata<'a>,
     #[serde(borrow)]
     pub workflows: Vec<crate::sh_tangled::pipeline::Workflow<'a>>,
+}
+
+pub mod pipeline_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type TriggerMetadata;
+        type Workflows;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type TriggerMetadata = Unset;
+        type Workflows = Unset;
+    }
+    ///State transition - sets the `trigger_metadata` field to Set
+    pub struct SetTriggerMetadata<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTriggerMetadata<S> {}
+    impl<S: State> State for SetTriggerMetadata<S> {
+        type TriggerMetadata = Set<members::trigger_metadata>;
+        type Workflows = S::Workflows;
+    }
+    ///State transition - sets the `workflows` field to Set
+    pub struct SetWorkflows<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWorkflows<S> {}
+    impl<S: State> State for SetWorkflows<S> {
+        type TriggerMetadata = S::TriggerMetadata;
+        type Workflows = Set<members::workflows>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `trigger_metadata` field
+        pub struct trigger_metadata(());
+        ///Marker type for the `workflows` field
+        pub struct workflows(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct PipelineBuilder<'a, S: pipeline_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<crate::sh_tangled::pipeline::TriggerMetadata<'a>>,
+        ::core::option::Option<Vec<crate::sh_tangled::pipeline::Workflow<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Pipeline<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> PipelineBuilder<'a, pipeline_state::Empty> {
+        PipelineBuilder::new()
+    }
+}
+
+impl<'a> PipelineBuilder<'a, pipeline_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        PipelineBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PipelineBuilder<'a, S>
+where
+    S: pipeline_state::State,
+    S::TriggerMetadata: pipeline_state::IsUnset,
+{
+    /// Set the `triggerMetadata` field (required)
+    pub fn trigger_metadata(
+        mut self,
+        value: impl Into<crate::sh_tangled::pipeline::TriggerMetadata<'a>>,
+    ) -> PipelineBuilder<'a, pipeline_state::SetTriggerMetadata<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        PipelineBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PipelineBuilder<'a, S>
+where
+    S: pipeline_state::State,
+    S::Workflows: pipeline_state::IsUnset,
+{
+    /// Set the `workflows` field (required)
+    pub fn workflows(
+        mut self,
+        value: impl Into<Vec<crate::sh_tangled::pipeline::Workflow<'a>>>,
+    ) -> PipelineBuilder<'a, pipeline_state::SetWorkflows<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        PipelineBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PipelineBuilder<'a, S>
+where
+    S: pipeline_state::State,
+    S::TriggerMetadata: pipeline_state::IsSet,
+    S::Workflows: pipeline_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Pipeline<'a> {
+        Pipeline {
+            trigger_metadata: self.__unsafe_private_named.0.unwrap(),
+            workflows: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Pipeline<'a> {
+        Pipeline {
+            trigger_metadata: self.__unsafe_private_named.0.unwrap(),
+            workflows: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Pipeline<'a> {
@@ -934,28 +1249,229 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PushTriggerData<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TriggerMetadata<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub kind: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub manual: Option<crate::sh_tangled::pipeline::ManualTriggerData<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub pull_request: Option<crate::sh_tangled::pipeline::PullRequestTriggerData<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub push: Option<crate::sh_tangled::pipeline::PushTriggerData<'a>>,
     #[serde(borrow)]
     pub repo: crate::sh_tangled::pipeline::TriggerRepo<'a>,
+}
+
+pub mod trigger_metadata_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Kind;
+        type Repo;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Kind = Unset;
+        type Repo = Unset;
+    }
+    ///State transition - sets the `kind` field to Set
+    pub struct SetKind<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetKind<S> {}
+    impl<S: State> State for SetKind<S> {
+        type Kind = Set<members::kind>;
+        type Repo = S::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Kind = S::Kind;
+        type Repo = Set<members::repo>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `kind` field
+        pub struct kind(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct TriggerMetadataBuilder<'a, S: trigger_metadata_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<crate::sh_tangled::pipeline::ManualTriggerData<'a>>,
+        ::core::option::Option<crate::sh_tangled::pipeline::PullRequestTriggerData<'a>>,
+        ::core::option::Option<crate::sh_tangled::pipeline::PushTriggerData<'a>>,
+        ::core::option::Option<crate::sh_tangled::pipeline::TriggerRepo<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> TriggerMetadata<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> TriggerMetadataBuilder<'a, trigger_metadata_state::Empty> {
+        TriggerMetadataBuilder::new()
+    }
+}
+
+impl<'a> TriggerMetadataBuilder<'a, trigger_metadata_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        TriggerMetadataBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TriggerMetadataBuilder<'a, S>
+where
+    S: trigger_metadata_state::State,
+    S::Kind: trigger_metadata_state::IsUnset,
+{
+    /// Set the `kind` field (required)
+    pub fn kind(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> TriggerMetadataBuilder<'a, trigger_metadata_state::SetKind<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        TriggerMetadataBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: trigger_metadata_state::State> TriggerMetadataBuilder<'a, S> {
+    /// Set the `manual` field (optional)
+    pub fn manual(
+        mut self,
+        value: impl Into<Option<crate::sh_tangled::pipeline::ManualTriggerData<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `manual` field to an Option value (optional)
+    pub fn maybe_manual(
+        mut self,
+        value: Option<crate::sh_tangled::pipeline::ManualTriggerData<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: trigger_metadata_state::State> TriggerMetadataBuilder<'a, S> {
+    /// Set the `pullRequest` field (optional)
+    pub fn pull_request(
+        mut self,
+        value: impl Into<Option<crate::sh_tangled::pipeline::PullRequestTriggerData<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `pullRequest` field to an Option value (optional)
+    pub fn maybe_pull_request(
+        mut self,
+        value: Option<crate::sh_tangled::pipeline::PullRequestTriggerData<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: trigger_metadata_state::State> TriggerMetadataBuilder<'a, S> {
+    /// Set the `push` field (optional)
+    pub fn push(
+        mut self,
+        value: impl Into<Option<crate::sh_tangled::pipeline::PushTriggerData<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `push` field to an Option value (optional)
+    pub fn maybe_push(
+        mut self,
+        value: Option<crate::sh_tangled::pipeline::PushTriggerData<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S> TriggerMetadataBuilder<'a, S>
+where
+    S: trigger_metadata_state::State,
+    S::Repo: trigger_metadata_state::IsUnset,
+{
+    /// Set the `repo` field (required)
+    pub fn repo(
+        mut self,
+        value: impl Into<crate::sh_tangled::pipeline::TriggerRepo<'a>>,
+    ) -> TriggerMetadataBuilder<'a, trigger_metadata_state::SetRepo<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        TriggerMetadataBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TriggerMetadataBuilder<'a, S>
+where
+    S: trigger_metadata_state::State,
+    S::Kind: trigger_metadata_state::IsSet,
+    S::Repo: trigger_metadata_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> TriggerMetadata<'a> {
+        TriggerMetadata {
+            kind: self.__unsafe_private_named.0.unwrap(),
+            manual: self.__unsafe_private_named.1,
+            pull_request: self.__unsafe_private_named.2,
+            push: self.__unsafe_private_named.3,
+            repo: self.__unsafe_private_named.4.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> TriggerMetadata<'a> {
+        TriggerMetadata {
+            kind: self.__unsafe_private_named.0.unwrap(),
+            manual: self.__unsafe_private_named.1,
+            pull_request: self.__unsafe_private_named.2,
+            push: self.__unsafe_private_named.3,
+            repo: self.__unsafe_private_named.4.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TriggerMetadata<'a> {
@@ -983,22 +1499,234 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TriggerMetadata<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TriggerRepo<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub default_branch: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub knot: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub repo: jacquard_common::CowStr<'a>,
+}
+
+pub mod trigger_repo_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Knot;
+        type Did;
+        type Repo;
+        type DefaultBranch;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Knot = Unset;
+        type Did = Unset;
+        type Repo = Unset;
+        type DefaultBranch = Unset;
+    }
+    ///State transition - sets the `knot` field to Set
+    pub struct SetKnot<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetKnot<S> {}
+    impl<S: State> State for SetKnot<S> {
+        type Knot = Set<members::knot>;
+        type Did = S::Did;
+        type Repo = S::Repo;
+        type DefaultBranch = S::DefaultBranch;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Knot = S::Knot;
+        type Did = Set<members::did>;
+        type Repo = S::Repo;
+        type DefaultBranch = S::DefaultBranch;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Knot = S::Knot;
+        type Did = S::Did;
+        type Repo = Set<members::repo>;
+        type DefaultBranch = S::DefaultBranch;
+    }
+    ///State transition - sets the `default_branch` field to Set
+    pub struct SetDefaultBranch<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDefaultBranch<S> {}
+    impl<S: State> State for SetDefaultBranch<S> {
+        type Knot = S::Knot;
+        type Did = S::Did;
+        type Repo = S::Repo;
+        type DefaultBranch = Set<members::default_branch>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `knot` field
+        pub struct knot(());
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
+        ///Marker type for the `default_branch` field
+        pub struct default_branch(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct TriggerRepoBuilder<'a, S: trigger_repo_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> TriggerRepo<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> TriggerRepoBuilder<'a, trigger_repo_state::Empty> {
+        TriggerRepoBuilder::new()
+    }
+}
+
+impl<'a> TriggerRepoBuilder<'a, trigger_repo_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        TriggerRepoBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TriggerRepoBuilder<'a, S>
+where
+    S: trigger_repo_state::State,
+    S::DefaultBranch: trigger_repo_state::IsUnset,
+{
+    /// Set the `defaultBranch` field (required)
+    pub fn default_branch(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> TriggerRepoBuilder<'a, trigger_repo_state::SetDefaultBranch<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        TriggerRepoBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TriggerRepoBuilder<'a, S>
+where
+    S: trigger_repo_state::State,
+    S::Did: trigger_repo_state::IsUnset,
+{
+    /// Set the `did` field (required)
+    pub fn did(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> TriggerRepoBuilder<'a, trigger_repo_state::SetDid<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        TriggerRepoBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TriggerRepoBuilder<'a, S>
+where
+    S: trigger_repo_state::State,
+    S::Knot: trigger_repo_state::IsUnset,
+{
+    /// Set the `knot` field (required)
+    pub fn knot(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> TriggerRepoBuilder<'a, trigger_repo_state::SetKnot<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        TriggerRepoBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TriggerRepoBuilder<'a, S>
+where
+    S: trigger_repo_state::State,
+    S::Repo: trigger_repo_state::IsUnset,
+{
+    /// Set the `repo` field (required)
+    pub fn repo(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> TriggerRepoBuilder<'a, trigger_repo_state::SetRepo<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        TriggerRepoBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TriggerRepoBuilder<'a, S>
+where
+    S: trigger_repo_state::State,
+    S::Knot: trigger_repo_state::IsSet,
+    S::Did: trigger_repo_state::IsSet,
+    S::Repo: trigger_repo_state::IsSet,
+    S::DefaultBranch: trigger_repo_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> TriggerRepo<'a> {
+        TriggerRepo {
+            default_branch: self.__unsafe_private_named.0.unwrap(),
+            did: self.__unsafe_private_named.1.unwrap(),
+            knot: self.__unsafe_private_named.2.unwrap(),
+            repo: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> TriggerRepo<'a> {
+        TriggerRepo {
+            default_branch: self.__unsafe_private_named.0.unwrap(),
+            did: self.__unsafe_private_named.1.unwrap(),
+            knot: self.__unsafe_private_named.2.unwrap(),
+            repo: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TriggerRepo<'a> {
@@ -1026,22 +1754,234 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TriggerRepo<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Workflow<'a> {
     #[serde(borrow)]
     pub clone: crate::sh_tangled::pipeline::CloneOpts<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub engine: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub raw: jacquard_common::CowStr<'a>,
+}
+
+pub mod workflow_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Name;
+        type Engine;
+        type Clone;
+        type Raw;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Name = Unset;
+        type Engine = Unset;
+        type Clone = Unset;
+        type Raw = Unset;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Name = Set<members::name>;
+        type Engine = S::Engine;
+        type Clone = S::Clone;
+        type Raw = S::Raw;
+    }
+    ///State transition - sets the `engine` field to Set
+    pub struct SetEngine<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEngine<S> {}
+    impl<S: State> State for SetEngine<S> {
+        type Name = S::Name;
+        type Engine = Set<members::engine>;
+        type Clone = S::Clone;
+        type Raw = S::Raw;
+    }
+    ///State transition - sets the `clone` field to Set
+    pub struct SetClone<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetClone<S> {}
+    impl<S: State> State for SetClone<S> {
+        type Name = S::Name;
+        type Engine = S::Engine;
+        type Clone = Set<members::clone>;
+        type Raw = S::Raw;
+    }
+    ///State transition - sets the `raw` field to Set
+    pub struct SetRaw<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRaw<S> {}
+    impl<S: State> State for SetRaw<S> {
+        type Name = S::Name;
+        type Engine = S::Engine;
+        type Clone = S::Clone;
+        type Raw = Set<members::raw>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `engine` field
+        pub struct engine(());
+        ///Marker type for the `clone` field
+        pub struct clone(());
+        ///Marker type for the `raw` field
+        pub struct raw(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct WorkflowBuilder<'a, S: workflow_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<crate::sh_tangled::pipeline::CloneOpts<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Workflow<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> WorkflowBuilder<'a, workflow_state::Empty> {
+        WorkflowBuilder::new()
+    }
+}
+
+impl<'a> WorkflowBuilder<'a, workflow_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        WorkflowBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> WorkflowBuilder<'a, S>
+where
+    S: workflow_state::State,
+    S::Clone: workflow_state::IsUnset,
+{
+    /// Set the `clone` field (required)
+    pub fn clone(
+        mut self,
+        value: impl Into<crate::sh_tangled::pipeline::CloneOpts<'a>>,
+    ) -> WorkflowBuilder<'a, workflow_state::SetClone<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        WorkflowBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> WorkflowBuilder<'a, S>
+where
+    S: workflow_state::State,
+    S::Engine: workflow_state::IsUnset,
+{
+    /// Set the `engine` field (required)
+    pub fn engine(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> WorkflowBuilder<'a, workflow_state::SetEngine<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        WorkflowBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> WorkflowBuilder<'a, S>
+where
+    S: workflow_state::State,
+    S::Name: workflow_state::IsUnset,
+{
+    /// Set the `name` field (required)
+    pub fn name(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> WorkflowBuilder<'a, workflow_state::SetName<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        WorkflowBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> WorkflowBuilder<'a, S>
+where
+    S: workflow_state::State,
+    S::Raw: workflow_state::IsUnset,
+{
+    /// Set the `raw` field (required)
+    pub fn raw(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> WorkflowBuilder<'a, workflow_state::SetRaw<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        WorkflowBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> WorkflowBuilder<'a, S>
+where
+    S: workflow_state::State,
+    S::Name: workflow_state::IsSet,
+    S::Engine: workflow_state::IsSet,
+    S::Clone: workflow_state::IsSet,
+    S::Raw: workflow_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Workflow<'a> {
+        Workflow {
+            clone: self.__unsafe_private_named.0.unwrap(),
+            engine: self.__unsafe_private_named.1.unwrap(),
+            name: self.__unsafe_private_named.2.unwrap(),
+            raw: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Workflow<'a> {
+        Workflow {
+            clone: self.__unsafe_private_named.0.unwrap(),
+            engine: self.__unsafe_private_named.1.unwrap(),
+            name: self.__unsafe_private_named.2.unwrap(),
+            raw: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Workflow<'a> {

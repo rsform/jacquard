@@ -19,17 +19,139 @@ pub mod notify_of_new_entry;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BlobMetadata<'a> {
     #[serde(borrow)]
     pub blobref: jacquard_common::types::blob::BlobRef<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub name: Option<jacquard_common::CowStr<'a>>,
+}
+
+pub mod blob_metadata_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Blobref;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Blobref = Unset;
+    }
+    ///State transition - sets the `blobref` field to Set
+    pub struct SetBlobref<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlobref<S> {}
+    impl<S: State> State for SetBlobref<S> {
+        type Blobref = Set<members::blobref>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `blobref` field
+        pub struct blobref(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct BlobMetadataBuilder<'a, S: blob_metadata_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> BlobMetadata<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> BlobMetadataBuilder<'a, blob_metadata_state::Empty> {
+        BlobMetadataBuilder::new()
+    }
+}
+
+impl<'a> BlobMetadataBuilder<'a, blob_metadata_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        BlobMetadataBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BlobMetadataBuilder<'a, S>
+where
+    S: blob_metadata_state::State,
+    S::Blobref: blob_metadata_state::IsUnset,
+{
+    /// Set the `blobref` field (required)
+    pub fn blobref(
+        mut self,
+        value: impl Into<jacquard_common::types::blob::BlobRef<'a>>,
+    ) -> BlobMetadataBuilder<'a, blob_metadata_state::SetBlobref<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        BlobMetadataBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: blob_metadata_state::State> BlobMetadataBuilder<'a, S> {
+    /// Set the `name` field (optional)
+    pub fn name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `name` field to an Option value (optional)
+    pub fn maybe_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> BlobMetadataBuilder<'a, S>
+where
+    S: blob_metadata_state::State,
+    S::Blobref: blob_metadata_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> BlobMetadata<'a> {
+        BlobMetadata {
+            blobref: self.__unsafe_private_named.0.unwrap(),
+            name: self.__unsafe_private_named.1,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> BlobMetadata<'a> {
+        BlobMetadata {
+            blobref: self.__unsafe_private_named.0.unwrap(),
+            name: self.__unsafe_private_named.1,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_com_whtwnd_blog_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -312,16 +434,154 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BlogEntry<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Comment<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub content: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub entry_uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+pub mod comment_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Content;
+        type EntryUri;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Content = Unset;
+        type EntryUri = Unset;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type Content = Set<members::content>;
+        type EntryUri = S::EntryUri;
+    }
+    ///State transition - sets the `entry_uri` field to Set
+    pub struct SetEntryUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEntryUri<S> {}
+    impl<S: State> State for SetEntryUri<S> {
+        type Content = S::Content;
+        type EntryUri = Set<members::entry_uri>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `content` field
+        pub struct content(());
+        ///Marker type for the `entry_uri` field
+        pub struct entry_uri(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct CommentBuilder<'a, S: comment_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Comment<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> CommentBuilder<'a, comment_state::Empty> {
+        CommentBuilder::new()
+    }
+}
+
+impl<'a> CommentBuilder<'a, comment_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        CommentBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CommentBuilder<'a, S>
+where
+    S: comment_state::State,
+    S::Content: comment_state::IsUnset,
+{
+    /// Set the `content` field (required)
+    pub fn content(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> CommentBuilder<'a, comment_state::SetContent<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        CommentBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CommentBuilder<'a, S>
+where
+    S: comment_state::State,
+    S::EntryUri: comment_state::IsUnset,
+{
+    /// Set the `entryUri` field (required)
+    pub fn entry_uri(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> CommentBuilder<'a, comment_state::SetEntryUri<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        CommentBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CommentBuilder<'a, S>
+where
+    S: comment_state::State,
+    S::Content: comment_state::IsSet,
+    S::EntryUri: comment_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Comment<'a> {
+        Comment {
+            content: self.__unsafe_private_named.0.unwrap(),
+            entry_uri: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Comment<'a> {
+        Comment {
+            content: self.__unsafe_private_named.0.unwrap(),
+            entry_uri: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Comment<'a> {
@@ -362,19 +622,153 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Comment<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Ogp<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub height: Option<i64>,
     #[serde(borrow)]
     pub url: jacquard_common::types::string::Uri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub width: Option<i64>,
+}
+
+pub mod ogp_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Url;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Url = Unset;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type Url = Set<members::url>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `url` field
+        pub struct url(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct OgpBuilder<'a, S: ogp_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<i64>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Ogp<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> OgpBuilder<'a, ogp_state::Empty> {
+        OgpBuilder::new()
+    }
+}
+
+impl<'a> OgpBuilder<'a, ogp_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        OgpBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: ogp_state::State> OgpBuilder<'a, S> {
+    /// Set the `height` field (optional)
+    pub fn height(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `height` field to an Option value (optional)
+    pub fn maybe_height(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> OgpBuilder<'a, S>
+where
+    S: ogp_state::State,
+    S::Url: ogp_state::IsUnset,
+{
+    /// Set the `url` field (required)
+    pub fn url(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+    ) -> OgpBuilder<'a, ogp_state::SetUrl<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        OgpBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: ogp_state::State> OgpBuilder<'a, S> {
+    /// Set the `width` field (optional)
+    pub fn width(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `width` field to an Option value (optional)
+    pub fn maybe_width(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> OgpBuilder<'a, S>
+where
+    S: ogp_state::State,
+    S::Url: ogp_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Ogp<'a> {
+        Ogp {
+            height: self.__unsafe_private_named.0,
+            url: self.__unsafe_private_named.1.unwrap(),
+            width: self.__unsafe_private_named.2,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Ogp<'a> {
+        Ogp {
+            height: self.__unsafe_private_named.0,
+            url: self.__unsafe_private_named.1.unwrap(),
+            width: self.__unsafe_private_named.2,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Ogp<'a> {

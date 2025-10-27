@@ -13,88 +13,514 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Play<'a> {
     /// Array of Musicbrainz artist IDs. Prefer using 'artists'.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub artist_mb_ids: Option<Vec<jacquard_common::CowStr<'a>>>,
     /// Array of artist names in order of original appearance. Prefer using 'artists'.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub artist_names: Option<Vec<jacquard_common::CowStr<'a>>>,
     /// Array of artists in order of original appearance.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub artists: Option<Vec<crate::fm_teal::alpha::feed::Artist<'a>>>,
     /// The length of the track in seconds
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub duration: Option<i64>,
     /// The ISRC code associated with the recording
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub isrc: Option<jacquard_common::CowStr<'a>>,
     /// The base domain of the music service. e.g. music.apple.com, tidal.com, spotify.com. Defaults to 'local' if unavailable or not provided.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub music_service_base_domain: Option<jacquard_common::CowStr<'a>>,
     /// The URL associated with this track
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub origin_url: Option<jacquard_common::CowStr<'a>>,
     /// The unix timestamp of when the track was played
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub played_time: Option<jacquard_common::types::string::Datetime>,
     /// The Musicbrainz recording ID of the track
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub recording_mb_id: Option<jacquard_common::CowStr<'a>>,
     /// Distinguishing information for release variants (e.g. 'Deluxe Edition', 'Remastered', '2023 Remaster', 'Special Edition'). Used to differentiate between different versions of the same base release while maintaining grouping capabilities.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub release_discriminant: Option<jacquard_common::CowStr<'a>>,
     /// The Musicbrainz release ID
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub release_mb_id: Option<jacquard_common::CowStr<'a>>,
     /// The name of the release/album
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub release_name: Option<jacquard_common::CowStr<'a>>,
     /// A metadata string specifying the user agent where the format is `<app-identifier>/<version> (<kernel/OS-base>; <platform/OS-version>; <device-model>)`. If string is provided, only `app-identifier` and `version` are required. `app-identifier` is recommended to be in reverse dns format. Defaults to 'manual/unknown' if unavailable or not provided.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub submission_client_agent: Option<jacquard_common::CowStr<'a>>,
     /// Distinguishing information for track variants (e.g. 'Acoustic Version', 'Live at Wembley', 'Radio Edit', 'Demo'). Used to differentiate between different versions of the same base track while maintaining grouping capabilities.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub track_discriminant: Option<jacquard_common::CowStr<'a>>,
     /// The Musicbrainz ID of the track
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub track_mb_id: Option<jacquard_common::CowStr<'a>>,
     /// The name of the track
     #[serde(borrow)]
-    #[builder(into)]
     pub track_name: jacquard_common::CowStr<'a>,
+}
+
+pub mod play_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type TrackName;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type TrackName = Unset;
+    }
+    ///State transition - sets the `track_name` field to Set
+    pub struct SetTrackName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTrackName<S> {}
+    impl<S: State> State for SetTrackName<S> {
+        type TrackName = Set<members::track_name>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `track_name` field
+        pub struct track_name(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct PlayBuilder<'a, S: play_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+        ::core::option::Option<Vec<crate::fm_teal::alpha::feed::Artist<'a>>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Play<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> PlayBuilder<'a, play_state::Empty> {
+        PlayBuilder::new()
+    }
+}
+
+impl<'a> PlayBuilder<'a, play_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        PlayBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: play_state::State> PlayBuilder<'a, S> {
+    /// Set the `artistMbIds` field (optional)
+    pub fn artist_mb_ids(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `artistMbIds` field to an Option value (optional)
+    pub fn maybe_artist_mb_ids(
+        mut self,
+        value: Option<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: play_state::State> PlayBuilder<'a, S> {
+    /// Set the `artistNames` field (optional)
+    pub fn artist_names(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `artistNames` field to an Option value (optional)
+    pub fn maybe_artist_names(
+        mut self,
+        value: Option<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: play_state::State> PlayBuilder<'a, S> {
+    /// Set the `artists` field (optional)
+    pub fn artists(
+        mut self,
+        value: impl Into<Option<Vec<crate::fm_teal::alpha::feed::Artist<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `artists` field to an Option value (optional)
+    pub fn maybe_artists(
+        mut self,
+        value: Option<Vec<crate::fm_teal::alpha::feed::Artist<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: play_state::State> PlayBuilder<'a, S> {
+    /// Set the `duration` field (optional)
+    pub fn duration(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `duration` field to an Option value (optional)
+    pub fn maybe_duration(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: play_state::State> PlayBuilder<'a, S> {
+    /// Set the `isrc` field (optional)
+    pub fn isrc(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `isrc` field to an Option value (optional)
+    pub fn maybe_isrc(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: play_state::State> PlayBuilder<'a, S> {
+    /// Set the `musicServiceBaseDomain` field (optional)
+    pub fn music_service_base_domain(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `musicServiceBaseDomain` field to an Option value (optional)
+    pub fn maybe_music_service_base_domain(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S: play_state::State> PlayBuilder<'a, S> {
+    /// Set the `originUrl` field (optional)
+    pub fn origin_url(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `originUrl` field to an Option value (optional)
+    pub fn maybe_origin_url(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S: play_state::State> PlayBuilder<'a, S> {
+    /// Set the `playedTime` field (optional)
+    pub fn played_time(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value.into();
+        self
+    }
+    /// Set the `playedTime` field to an Option value (optional)
+    pub fn maybe_played_time(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value;
+        self
+    }
+}
+
+impl<'a, S: play_state::State> PlayBuilder<'a, S> {
+    /// Set the `recordingMbId` field (optional)
+    pub fn recording_mb_id(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value.into();
+        self
+    }
+    /// Set the `recordingMbId` field to an Option value (optional)
+    pub fn maybe_recording_mb_id(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value;
+        self
+    }
+}
+
+impl<'a, S: play_state::State> PlayBuilder<'a, S> {
+    /// Set the `releaseDiscriminant` field (optional)
+    pub fn release_discriminant(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.9 = value.into();
+        self
+    }
+    /// Set the `releaseDiscriminant` field to an Option value (optional)
+    pub fn maybe_release_discriminant(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.9 = value;
+        self
+    }
+}
+
+impl<'a, S: play_state::State> PlayBuilder<'a, S> {
+    /// Set the `releaseMbId` field (optional)
+    pub fn release_mb_id(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.10 = value.into();
+        self
+    }
+    /// Set the `releaseMbId` field to an Option value (optional)
+    pub fn maybe_release_mb_id(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.10 = value;
+        self
+    }
+}
+
+impl<'a, S: play_state::State> PlayBuilder<'a, S> {
+    /// Set the `releaseName` field (optional)
+    pub fn release_name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.11 = value.into();
+        self
+    }
+    /// Set the `releaseName` field to an Option value (optional)
+    pub fn maybe_release_name(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.11 = value;
+        self
+    }
+}
+
+impl<'a, S: play_state::State> PlayBuilder<'a, S> {
+    /// Set the `submissionClientAgent` field (optional)
+    pub fn submission_client_agent(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.12 = value.into();
+        self
+    }
+    /// Set the `submissionClientAgent` field to an Option value (optional)
+    pub fn maybe_submission_client_agent(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.12 = value;
+        self
+    }
+}
+
+impl<'a, S: play_state::State> PlayBuilder<'a, S> {
+    /// Set the `trackDiscriminant` field (optional)
+    pub fn track_discriminant(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.13 = value.into();
+        self
+    }
+    /// Set the `trackDiscriminant` field to an Option value (optional)
+    pub fn maybe_track_discriminant(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.13 = value;
+        self
+    }
+}
+
+impl<'a, S: play_state::State> PlayBuilder<'a, S> {
+    /// Set the `trackMbId` field (optional)
+    pub fn track_mb_id(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.14 = value.into();
+        self
+    }
+    /// Set the `trackMbId` field to an Option value (optional)
+    pub fn maybe_track_mb_id(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.14 = value;
+        self
+    }
+}
+
+impl<'a, S> PlayBuilder<'a, S>
+where
+    S: play_state::State,
+    S::TrackName: play_state::IsUnset,
+{
+    /// Set the `trackName` field (required)
+    pub fn track_name(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> PlayBuilder<'a, play_state::SetTrackName<S>> {
+        self.__unsafe_private_named.15 = ::core::option::Option::Some(value.into());
+        PlayBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PlayBuilder<'a, S>
+where
+    S: play_state::State,
+    S::TrackName: play_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Play<'a> {
+        Play {
+            artist_mb_ids: self.__unsafe_private_named.0,
+            artist_names: self.__unsafe_private_named.1,
+            artists: self.__unsafe_private_named.2,
+            duration: self.__unsafe_private_named.3,
+            isrc: self.__unsafe_private_named.4,
+            music_service_base_domain: self.__unsafe_private_named.5,
+            origin_url: self.__unsafe_private_named.6,
+            played_time: self.__unsafe_private_named.7,
+            recording_mb_id: self.__unsafe_private_named.8,
+            release_discriminant: self.__unsafe_private_named.9,
+            release_mb_id: self.__unsafe_private_named.10,
+            release_name: self.__unsafe_private_named.11,
+            submission_client_agent: self.__unsafe_private_named.12,
+            track_discriminant: self.__unsafe_private_named.13,
+            track_mb_id: self.__unsafe_private_named.14,
+            track_name: self.__unsafe_private_named.15.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Play<'a> {
+        Play {
+            artist_mb_ids: self.__unsafe_private_named.0,
+            artist_names: self.__unsafe_private_named.1,
+            artists: self.__unsafe_private_named.2,
+            duration: self.__unsafe_private_named.3,
+            isrc: self.__unsafe_private_named.4,
+            music_service_base_domain: self.__unsafe_private_named.5,
+            origin_url: self.__unsafe_private_named.6,
+            played_time: self.__unsafe_private_named.7,
+            recording_mb_id: self.__unsafe_private_named.8,
+            release_discriminant: self.__unsafe_private_named.9,
+            release_mb_id: self.__unsafe_private_named.10,
+            release_name: self.__unsafe_private_named.11,
+            submission_client_agent: self.__unsafe_private_named.12,
+            track_discriminant: self.__unsafe_private_named.13,
+            track_mb_id: self.__unsafe_private_named.14,
+            track_name: self.__unsafe_private_named.15.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Play<'a> {

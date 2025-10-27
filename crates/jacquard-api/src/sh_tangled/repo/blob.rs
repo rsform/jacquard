@@ -13,30 +13,246 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LastCommit<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub author: Option<crate::sh_tangled::repo::blob::Signature<'a>>,
     /// Commit hash
     #[serde(borrow)]
-    #[builder(into)]
     pub hash: jacquard_common::CowStr<'a>,
     /// Commit message
     #[serde(borrow)]
-    #[builder(into)]
     pub message: jacquard_common::CowStr<'a>,
     /// Short commit hash
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub short_hash: Option<jacquard_common::CowStr<'a>>,
     /// Commit timestamp
     pub when: jacquard_common::types::string::Datetime,
+}
+
+pub mod last_commit_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Hash;
+        type Message;
+        type When;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Hash = Unset;
+        type Message = Unset;
+        type When = Unset;
+    }
+    ///State transition - sets the `hash` field to Set
+    pub struct SetHash<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHash<S> {}
+    impl<S: State> State for SetHash<S> {
+        type Hash = Set<members::hash>;
+        type Message = S::Message;
+        type When = S::When;
+    }
+    ///State transition - sets the `message` field to Set
+    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMessage<S> {}
+    impl<S: State> State for SetMessage<S> {
+        type Hash = S::Hash;
+        type Message = Set<members::message>;
+        type When = S::When;
+    }
+    ///State transition - sets the `when` field to Set
+    pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWhen<S> {}
+    impl<S: State> State for SetWhen<S> {
+        type Hash = S::Hash;
+        type Message = S::Message;
+        type When = Set<members::when>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `hash` field
+        pub struct hash(());
+        ///Marker type for the `message` field
+        pub struct message(());
+        ///Marker type for the `when` field
+        pub struct when(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct LastCommitBuilder<'a, S: last_commit_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<crate::sh_tangled::repo::blob::Signature<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> LastCommit<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> LastCommitBuilder<'a, last_commit_state::Empty> {
+        LastCommitBuilder::new()
+    }
+}
+
+impl<'a> LastCommitBuilder<'a, last_commit_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        LastCommitBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: last_commit_state::State> LastCommitBuilder<'a, S> {
+    /// Set the `author` field (optional)
+    pub fn author(
+        mut self,
+        value: impl Into<Option<crate::sh_tangled::repo::blob::Signature<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `author` field to an Option value (optional)
+    pub fn maybe_author(
+        mut self,
+        value: Option<crate::sh_tangled::repo::blob::Signature<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> LastCommitBuilder<'a, S>
+where
+    S: last_commit_state::State,
+    S::Hash: last_commit_state::IsUnset,
+{
+    /// Set the `hash` field (required)
+    pub fn hash(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> LastCommitBuilder<'a, last_commit_state::SetHash<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        LastCommitBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LastCommitBuilder<'a, S>
+where
+    S: last_commit_state::State,
+    S::Message: last_commit_state::IsUnset,
+{
+    /// Set the `message` field (required)
+    pub fn message(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> LastCommitBuilder<'a, last_commit_state::SetMessage<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        LastCommitBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: last_commit_state::State> LastCommitBuilder<'a, S> {
+    /// Set the `shortHash` field (optional)
+    pub fn short_hash(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `shortHash` field to an Option value (optional)
+    pub fn maybe_short_hash(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S> LastCommitBuilder<'a, S>
+where
+    S: last_commit_state::State,
+    S::When: last_commit_state::IsUnset,
+{
+    /// Set the `when` field (required)
+    pub fn when(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> LastCommitBuilder<'a, last_commit_state::SetWhen<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        LastCommitBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LastCommitBuilder<'a, S>
+where
+    S: last_commit_state::State,
+    S::Hash: last_commit_state::IsSet,
+    S::Message: last_commit_state::IsSet,
+    S::When: last_commit_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> LastCommit<'a> {
+        LastCommit {
+            author: self.__unsafe_private_named.0,
+            hash: self.__unsafe_private_named.1.unwrap(),
+            message: self.__unsafe_private_named.2.unwrap(),
+            short_hash: self.__unsafe_private_named.3,
+            when: self.__unsafe_private_named.4.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> LastCommit<'a> {
+        LastCommit {
+            author: self.__unsafe_private_named.0,
+            hash: self.__unsafe_private_named.1.unwrap(),
+            message: self.__unsafe_private_named.2.unwrap(),
+            short_hash: self.__unsafe_private_named.3,
+            when: self.__unsafe_private_named.4.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_sh_tangled_repo_blob() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -338,24 +554,195 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LastCommit<'a> {
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct Blob<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub path: jacquard_common::CowStr<'a>,
-    ///(default: false)
+    /// (default: false)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub raw: std::option::Option<bool>,
     #[serde(borrow)]
-    #[builder(into)]
     pub r#ref: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub repo: jacquard_common::CowStr<'a>,
+}
+
+pub mod blob_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Repo;
+        type Ref;
+        type Path;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Repo = Unset;
+        type Ref = Unset;
+        type Path = Unset;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Repo = Set<members::repo>;
+        type Ref = S::Ref;
+        type Path = S::Path;
+    }
+    ///State transition - sets the `ref` field to Set
+    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRef<S> {}
+    impl<S: State> State for SetRef<S> {
+        type Repo = S::Repo;
+        type Ref = Set<members::r#ref>;
+        type Path = S::Path;
+    }
+    ///State transition - sets the `path` field to Set
+    pub struct SetPath<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPath<S> {}
+    impl<S: State> State for SetPath<S> {
+        type Repo = S::Repo;
+        type Ref = S::Ref;
+        type Path = Set<members::path>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `repo` field
+        pub struct repo(());
+        ///Marker type for the `ref` field
+        pub struct r#ref(());
+        ///Marker type for the `path` field
+        pub struct path(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct BlobBuilder<'a, S: blob_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Blob<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> BlobBuilder<'a, blob_state::Empty> {
+        BlobBuilder::new()
+    }
+}
+
+impl<'a> BlobBuilder<'a, blob_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        BlobBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BlobBuilder<'a, S>
+where
+    S: blob_state::State,
+    S::Path: blob_state::IsUnset,
+{
+    /// Set the `path` field (required)
+    pub fn path(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> BlobBuilder<'a, blob_state::SetPath<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        BlobBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: blob_state::State> BlobBuilder<'a, S> {
+    /// Set the `raw` field (optional)
+    pub fn raw(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `raw` field to an Option value (optional)
+    pub fn maybe_raw(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> BlobBuilder<'a, S>
+where
+    S: blob_state::State,
+    S::Ref: blob_state::IsUnset,
+{
+    /// Set the `ref` field (required)
+    pub fn r#ref(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> BlobBuilder<'a, blob_state::SetRef<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        BlobBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BlobBuilder<'a, S>
+where
+    S: blob_state::State,
+    S::Repo: blob_state::IsUnset,
+{
+    /// Set the `repo` field (required)
+    pub fn repo(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> BlobBuilder<'a, blob_state::SetRepo<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        BlobBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BlobBuilder<'a, S>
+where
+    S: blob_state::State,
+    S::Repo: blob_state::IsSet,
+    S::Ref: blob_state::IsSet,
+    S::Path: blob_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Blob<'a> {
+        Blob {
+            path: self.__unsafe_private_named.0.unwrap(),
+            raw: self.__unsafe_private_named.1,
+            r#ref: self.__unsafe_private_named.2.unwrap(),
+            repo: self.__unsafe_private_named.3.unwrap(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]
@@ -383,7 +770,7 @@ pub struct BlobOutput<'a> {
     pub is_binary: std::option::Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub last_commit: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub last_commit: std::option::Option<crate::sh_tangled::repo::blob::LastCommit<'a>>,
     /// MIME type of the file
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -498,21 +885,195 @@ impl jacquard_common::xrpc::XrpcEndpoint for BlobRequest {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Signature<'a> {
     /// Author email
     #[serde(borrow)]
-    #[builder(into)]
     pub email: jacquard_common::CowStr<'a>,
     /// Author name
     #[serde(borrow)]
-    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
     /// Author timestamp
     pub when: jacquard_common::types::string::Datetime,
+}
+
+pub mod signature_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Name;
+        type Email;
+        type When;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Name = Unset;
+        type Email = Unset;
+        type When = Unset;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Name = Set<members::name>;
+        type Email = S::Email;
+        type When = S::When;
+    }
+    ///State transition - sets the `email` field to Set
+    pub struct SetEmail<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEmail<S> {}
+    impl<S: State> State for SetEmail<S> {
+        type Name = S::Name;
+        type Email = Set<members::email>;
+        type When = S::When;
+    }
+    ///State transition - sets the `when` field to Set
+    pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWhen<S> {}
+    impl<S: State> State for SetWhen<S> {
+        type Name = S::Name;
+        type Email = S::Email;
+        type When = Set<members::when>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `email` field
+        pub struct email(());
+        ///Marker type for the `when` field
+        pub struct when(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct SignatureBuilder<'a, S: signature_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Signature<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> SignatureBuilder<'a, signature_state::Empty> {
+        SignatureBuilder::new()
+    }
+}
+
+impl<'a> SignatureBuilder<'a, signature_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        SignatureBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SignatureBuilder<'a, S>
+where
+    S: signature_state::State,
+    S::Email: signature_state::IsUnset,
+{
+    /// Set the `email` field (required)
+    pub fn email(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> SignatureBuilder<'a, signature_state::SetEmail<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        SignatureBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SignatureBuilder<'a, S>
+where
+    S: signature_state::State,
+    S::Name: signature_state::IsUnset,
+{
+    /// Set the `name` field (required)
+    pub fn name(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> SignatureBuilder<'a, signature_state::SetName<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        SignatureBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SignatureBuilder<'a, S>
+where
+    S: signature_state::State,
+    S::When: signature_state::IsUnset,
+{
+    /// Set the `when` field (required)
+    pub fn when(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> SignatureBuilder<'a, signature_state::SetWhen<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        SignatureBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SignatureBuilder<'a, S>
+where
+    S: signature_state::State,
+    S::Name: signature_state::IsSet,
+    S::Email: signature_state::IsSet,
+    S::When: signature_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Signature<'a> {
+        Signature {
+            email: self.__unsafe_private_named.0.unwrap(),
+            name: self.__unsafe_private_named.1.unwrap(),
+            when: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Signature<'a> {
+        Signature {
+            email: self.__unsafe_private_named.0.unwrap(),
+            name: self.__unsafe_private_named.1.unwrap(),
+            when: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Signature<'a> {

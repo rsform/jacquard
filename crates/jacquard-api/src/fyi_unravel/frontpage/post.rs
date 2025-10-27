@@ -14,8 +14,7 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Post<'a> {
@@ -23,11 +22,187 @@ pub struct Post<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     /// The title of the post.
     #[serde(borrow)]
-    #[builder(into)]
     pub title: jacquard_common::CowStr<'a>,
     /// The URL of the post.
     #[serde(borrow)]
     pub url: jacquard_common::types::string::Uri<'a>,
+}
+
+pub mod post_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Title;
+        type Url;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Title = Unset;
+        type Url = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Title = Set<members::title>;
+        type Url = S::Url;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type Title = S::Title;
+        type Url = Set<members::url>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Title = S::Title;
+        type Url = S::Url;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `url` field
+        pub struct url(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct PostBuilder<'a, S: post_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Post<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> PostBuilder<'a, post_state::Empty> {
+        PostBuilder::new()
+    }
+}
+
+impl<'a> PostBuilder<'a, post_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        PostBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PostBuilder<'a, S>
+where
+    S: post_state::State,
+    S::CreatedAt: post_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> PostBuilder<'a, post_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        PostBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PostBuilder<'a, S>
+where
+    S: post_state::State,
+    S::Title: post_state::IsUnset,
+{
+    /// Set the `title` field (required)
+    pub fn title(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> PostBuilder<'a, post_state::SetTitle<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        PostBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PostBuilder<'a, S>
+where
+    S: post_state::State,
+    S::Url: post_state::IsUnset,
+{
+    /// Set the `url` field (required)
+    pub fn url(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+    ) -> PostBuilder<'a, post_state::SetUrl<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        PostBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PostBuilder<'a, S>
+where
+    S: post_state::State,
+    S::Title: post_state::IsSet,
+    S::Url: post_state::IsSet,
+    S::CreatedAt: post_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Post<'a> {
+        Post {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            title: self.__unsafe_private_named.1.unwrap(),
+            url: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Post<'a> {
+        Post {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            title: self.__unsafe_private_named.1.unwrap(),
+            url: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Post<'a> {

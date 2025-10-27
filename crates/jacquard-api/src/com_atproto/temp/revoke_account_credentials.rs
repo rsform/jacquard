@@ -13,21 +13,126 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-#[builder(start_fn = new)]
 pub struct RevokeAccountCredentials<'a> {
     #[serde(borrow)]
     pub account: jacquard_common::types::ident::AtIdentifier<'a>,
-    #[serde(flatten)]
-    #[serde(borrow)]
-    #[builder(default)]
-    pub extra_data: ::std::collections::BTreeMap<
-        ::jacquard_common::smol_str::SmolStr,
-        ::jacquard_common::types::value::Data<'a>,
-    >,
+}
+
+pub mod revoke_account_credentials_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Account;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Account = Unset;
+    }
+    ///State transition - sets the `account` field to Set
+    pub struct SetAccount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAccount<S> {}
+    impl<S: State> State for SetAccount<S> {
+        type Account = Set<members::account>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `account` field
+        pub struct account(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct RevokeAccountCredentialsBuilder<
+    'a,
+    S: revoke_account_credentials_state::State,
+> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> RevokeAccountCredentials<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> RevokeAccountCredentialsBuilder<
+        'a,
+        revoke_account_credentials_state::Empty,
+    > {
+        RevokeAccountCredentialsBuilder::new()
+    }
+}
+
+impl<'a> RevokeAccountCredentialsBuilder<'a, revoke_account_credentials_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        RevokeAccountCredentialsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RevokeAccountCredentialsBuilder<'a, S>
+where
+    S: revoke_account_credentials_state::State,
+    S::Account: revoke_account_credentials_state::IsUnset,
+{
+    /// Set the `account` field (required)
+    pub fn account(
+        mut self,
+        value: impl Into<jacquard_common::types::ident::AtIdentifier<'a>>,
+    ) -> RevokeAccountCredentialsBuilder<
+        'a,
+        revoke_account_credentials_state::SetAccount<S>,
+    > {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        RevokeAccountCredentialsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RevokeAccountCredentialsBuilder<'a, S>
+where
+    S: revoke_account_credentials_state::State,
+    S::Account: revoke_account_credentials_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> RevokeAccountCredentials<'a> {
+        RevokeAccountCredentials {
+            account: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> RevokeAccountCredentials<'a> {
+        RevokeAccountCredentials {
+            account: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 /// Response type for

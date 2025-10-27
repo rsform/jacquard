@@ -14,8 +14,7 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Post<'a> {
@@ -23,13 +22,173 @@ pub struct Post<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     /// The piece of content that this Frontpage post is about.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub subject: Option<crate::fyi_frontpage::feed::post::UrlSubject<'a>>,
     /// The title of the post.
     #[serde(borrow)]
-    #[builder(into)]
     pub title: jacquard_common::CowStr<'a>,
+}
+
+pub mod post_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Title;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Title = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Title = Set<members::title>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Title = S::Title;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct PostBuilder<'a, S: post_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<crate::fyi_frontpage::feed::post::UrlSubject<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Post<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> PostBuilder<'a, post_state::Empty> {
+        PostBuilder::new()
+    }
+}
+
+impl<'a> PostBuilder<'a, post_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        PostBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PostBuilder<'a, S>
+where
+    S: post_state::State,
+    S::CreatedAt: post_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> PostBuilder<'a, post_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        PostBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: post_state::State> PostBuilder<'a, S> {
+    /// Set the `subject` field (optional)
+    pub fn subject(
+        mut self,
+        value: impl Into<Option<crate::fyi_frontpage::feed::post::UrlSubject<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `subject` field to an Option value (optional)
+    pub fn maybe_subject(
+        mut self,
+        value: Option<crate::fyi_frontpage::feed::post::UrlSubject<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> PostBuilder<'a, S>
+where
+    S: post_state::State,
+    S::Title: post_state::IsUnset,
+{
+    /// Set the `title` field (required)
+    pub fn title(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> PostBuilder<'a, post_state::SetTitle<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        PostBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PostBuilder<'a, S>
+where
+    S: post_state::State,
+    S::Title: post_state::IsSet,
+    S::CreatedAt: post_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Post<'a> {
+        Post {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            subject: self.__unsafe_private_named.1,
+            title: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Post<'a> {
+        Post {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            subject: self.__unsafe_private_named.1,
+            title: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Post<'a> {
@@ -279,13 +438,117 @@ fn lexicon_doc_fyi_frontpage_feed_post() -> ::jacquard_lexicon::lexicon::Lexicon
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UrlSubject<'a> {
     #[serde(borrow)]
     pub url: jacquard_common::types::string::Uri<'a>,
+}
+
+pub mod url_subject_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Url;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Url = Unset;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type Url = Set<members::url>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `url` field
+        pub struct url(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct UrlSubjectBuilder<'a, S: url_subject_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> UrlSubject<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> UrlSubjectBuilder<'a, url_subject_state::Empty> {
+        UrlSubjectBuilder::new()
+    }
+}
+
+impl<'a> UrlSubjectBuilder<'a, url_subject_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        UrlSubjectBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> UrlSubjectBuilder<'a, S>
+where
+    S: url_subject_state::State,
+    S::Url: url_subject_state::IsUnset,
+{
+    /// Set the `url` field (required)
+    pub fn url(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+    ) -> UrlSubjectBuilder<'a, url_subject_state::SetUrl<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        UrlSubjectBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> UrlSubjectBuilder<'a, S>
+where
+    S: url_subject_state::State,
+    S::Url: url_subject_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> UrlSubject<'a> {
+        UrlSubject {
+            url: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> UrlSubject<'a> {
+        UrlSubject {
+            url: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UrlSubject<'a> {

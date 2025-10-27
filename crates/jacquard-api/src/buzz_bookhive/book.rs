@@ -14,50 +14,387 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Book<'a> {
     /// The authors of the book (tab separated)
     #[serde(borrow)]
-    #[builder(into)]
     pub authors: jacquard_common::CowStr<'a>,
     /// Cover image of the book
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub cover: Option<jacquard_common::types::blob::BlobRef<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
     /// The date the user finished reading the book
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub finished_at: Option<jacquard_common::types::string::Datetime>,
     /// The book's hive id, used to correlate user's books with the hive
     #[serde(borrow)]
-    #[builder(into)]
     pub hive_id: jacquard_common::CowStr<'a>,
     /// The book's review
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub review: Option<jacquard_common::CowStr<'a>>,
     /// Number of stars given to the book (1-10) which will be mapped to 1-5 stars
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub stars: Option<i64>,
     /// The date the user started reading the book
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub started_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub status: Option<jacquard_common::CowStr<'a>>,
     /// The title of the book
     #[serde(borrow)]
-    #[builder(into)]
     pub title: jacquard_common::CowStr<'a>,
+}
+
+pub mod book_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Title;
+        type Authors;
+        type HiveId;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Title = Unset;
+        type Authors = Unset;
+        type HiveId = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Title = Set<members::title>;
+        type Authors = S::Authors;
+        type HiveId = S::HiveId;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `authors` field to Set
+    pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthors<S> {}
+    impl<S: State> State for SetAuthors<S> {
+        type Title = S::Title;
+        type Authors = Set<members::authors>;
+        type HiveId = S::HiveId;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `hive_id` field to Set
+    pub struct SetHiveId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHiveId<S> {}
+    impl<S: State> State for SetHiveId<S> {
+        type Title = S::Title;
+        type Authors = S::Authors;
+        type HiveId = Set<members::hive_id>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Title = S::Title;
+        type Authors = S::Authors;
+        type HiveId = S::HiveId;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `authors` field
+        pub struct authors(());
+        ///Marker type for the `hive_id` field
+        pub struct hive_id(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct BookBuilder<'a, S: book_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Book<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> BookBuilder<'a, book_state::Empty> {
+        BookBuilder::new()
+    }
+}
+
+impl<'a> BookBuilder<'a, book_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        BookBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BookBuilder<'a, S>
+where
+    S: book_state::State,
+    S::Authors: book_state::IsUnset,
+{
+    /// Set the `authors` field (required)
+    pub fn authors(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> BookBuilder<'a, book_state::SetAuthors<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        BookBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: book_state::State> BookBuilder<'a, S> {
+    /// Set the `cover` field (optional)
+    pub fn cover(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::blob::BlobRef<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `cover` field to an Option value (optional)
+    pub fn maybe_cover(
+        mut self,
+        value: Option<jacquard_common::types::blob::BlobRef<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> BookBuilder<'a, S>
+where
+    S: book_state::State,
+    S::CreatedAt: book_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> BookBuilder<'a, book_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        BookBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: book_state::State> BookBuilder<'a, S> {
+    /// Set the `finishedAt` field (optional)
+    pub fn finished_at(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `finishedAt` field to an Option value (optional)
+    pub fn maybe_finished_at(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S> BookBuilder<'a, S>
+where
+    S: book_state::State,
+    S::HiveId: book_state::IsUnset,
+{
+    /// Set the `hiveId` field (required)
+    pub fn hive_id(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> BookBuilder<'a, book_state::SetHiveId<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        BookBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: book_state::State> BookBuilder<'a, S> {
+    /// Set the `review` field (optional)
+    pub fn review(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `review` field to an Option value (optional)
+    pub fn maybe_review(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S: book_state::State> BookBuilder<'a, S> {
+    /// Set the `stars` field (optional)
+    pub fn stars(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `stars` field to an Option value (optional)
+    pub fn maybe_stars(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S: book_state::State> BookBuilder<'a, S> {
+    /// Set the `startedAt` field (optional)
+    pub fn started_at(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value.into();
+        self
+    }
+    /// Set the `startedAt` field to an Option value (optional)
+    pub fn maybe_started_at(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value;
+        self
+    }
+}
+
+impl<'a, S: book_state::State> BookBuilder<'a, S> {
+    /// Set the `status` field (optional)
+    pub fn status(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value.into();
+        self
+    }
+    /// Set the `status` field to an Option value (optional)
+    pub fn maybe_status(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.8 = value;
+        self
+    }
+}
+
+impl<'a, S> BookBuilder<'a, S>
+where
+    S: book_state::State,
+    S::Title: book_state::IsUnset,
+{
+    /// Set the `title` field (required)
+    pub fn title(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> BookBuilder<'a, book_state::SetTitle<S>> {
+        self.__unsafe_private_named.9 = ::core::option::Option::Some(value.into());
+        BookBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BookBuilder<'a, S>
+where
+    S: book_state::State,
+    S::Title: book_state::IsSet,
+    S::Authors: book_state::IsSet,
+    S::HiveId: book_state::IsSet,
+    S::CreatedAt: book_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Book<'a> {
+        Book {
+            authors: self.__unsafe_private_named.0.unwrap(),
+            cover: self.__unsafe_private_named.1,
+            created_at: self.__unsafe_private_named.2.unwrap(),
+            finished_at: self.__unsafe_private_named.3,
+            hive_id: self.__unsafe_private_named.4.unwrap(),
+            review: self.__unsafe_private_named.5,
+            stars: self.__unsafe_private_named.6,
+            started_at: self.__unsafe_private_named.7,
+            status: self.__unsafe_private_named.8,
+            title: self.__unsafe_private_named.9.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Book<'a> {
+        Book {
+            authors: self.__unsafe_private_named.0.unwrap(),
+            cover: self.__unsafe_private_named.1,
+            created_at: self.__unsafe_private_named.2.unwrap(),
+            finished_at: self.__unsafe_private_named.3,
+            hive_id: self.__unsafe_private_named.4.unwrap(),
+            review: self.__unsafe_private_named.5,
+            stars: self.__unsafe_private_named.6,
+            started_at: self.__unsafe_private_named.7,
+            status: self.__unsafe_private_named.8,
+            title: self.__unsafe_private_named.9.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Book<'a> {

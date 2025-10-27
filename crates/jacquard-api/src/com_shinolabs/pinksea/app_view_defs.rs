@@ -14,8 +14,7 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Author<'a> {
@@ -25,6 +24,146 @@ pub struct Author<'a> {
     /// The handle of the author.
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
+}
+
+pub mod author_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Did;
+        type Handle;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Did = Unset;
+        type Handle = Unset;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Did = Set<members::did>;
+        type Handle = S::Handle;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHandle<S> {}
+    impl<S: State> State for SetHandle<S> {
+        type Did = S::Did;
+        type Handle = Set<members::handle>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `handle` field
+        pub struct handle(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct AuthorBuilder<'a, S: author_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Handle<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Author<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> AuthorBuilder<'a, author_state::Empty> {
+        AuthorBuilder::new()
+    }
+}
+
+impl<'a> AuthorBuilder<'a, author_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        AuthorBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AuthorBuilder<'a, S>
+where
+    S: author_state::State,
+    S::Did: author_state::IsUnset,
+{
+    /// Set the `did` field (required)
+    pub fn did(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> AuthorBuilder<'a, author_state::SetDid<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        AuthorBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AuthorBuilder<'a, S>
+where
+    S: author_state::State,
+    S::Handle: author_state::IsUnset,
+{
+    /// Set the `handle` field (required)
+    pub fn handle(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Handle<'a>>,
+    ) -> AuthorBuilder<'a, author_state::SetHandle<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        AuthorBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AuthorBuilder<'a, S>
+where
+    S: author_state::State,
+    S::Did: author_state::IsSet,
+    S::Handle: author_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Author<'a> {
+        Author {
+            did: self.__unsafe_private_named.0.unwrap(),
+            handle: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Author<'a> {
+        Author {
+            did: self.__unsafe_private_named.0.unwrap(),
+            handle: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_com_shinolabs_pinksea_appViewDefs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -338,14 +477,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Author<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct HydratedOekaki<'a> {
     /// Alt text description of the image, for accessibility.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub alt: Option<jacquard_common::CowStr<'a>>,
     /// The AT protocol link.
@@ -365,9 +502,346 @@ pub struct HydratedOekaki<'a> {
     pub nsfw: bool,
     /// An array of tags this image had.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub tags: Option<Vec<jacquard_common::CowStr<'a>>>,
+}
+
+pub mod hydrated_oekaki_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Author;
+        type Image;
+        type At;
+        type Cid;
+        type CreationTime;
+        type Nsfw;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Author = Unset;
+        type Image = Unset;
+        type At = Unset;
+        type Cid = Unset;
+        type CreationTime = Unset;
+        type Nsfw = Unset;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthor<S> {}
+    impl<S: State> State for SetAuthor<S> {
+        type Author = Set<members::author>;
+        type Image = S::Image;
+        type At = S::At;
+        type Cid = S::Cid;
+        type CreationTime = S::CreationTime;
+        type Nsfw = S::Nsfw;
+    }
+    ///State transition - sets the `image` field to Set
+    pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetImage<S> {}
+    impl<S: State> State for SetImage<S> {
+        type Author = S::Author;
+        type Image = Set<members::image>;
+        type At = S::At;
+        type Cid = S::Cid;
+        type CreationTime = S::CreationTime;
+        type Nsfw = S::Nsfw;
+    }
+    ///State transition - sets the `at` field to Set
+    pub struct SetAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAt<S> {}
+    impl<S: State> State for SetAt<S> {
+        type Author = S::Author;
+        type Image = S::Image;
+        type At = Set<members::at>;
+        type Cid = S::Cid;
+        type CreationTime = S::CreationTime;
+        type Nsfw = S::Nsfw;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Author = S::Author;
+        type Image = S::Image;
+        type At = S::At;
+        type Cid = Set<members::cid>;
+        type CreationTime = S::CreationTime;
+        type Nsfw = S::Nsfw;
+    }
+    ///State transition - sets the `creation_time` field to Set
+    pub struct SetCreationTime<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreationTime<S> {}
+    impl<S: State> State for SetCreationTime<S> {
+        type Author = S::Author;
+        type Image = S::Image;
+        type At = S::At;
+        type Cid = S::Cid;
+        type CreationTime = Set<members::creation_time>;
+        type Nsfw = S::Nsfw;
+    }
+    ///State transition - sets the `nsfw` field to Set
+    pub struct SetNsfw<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNsfw<S> {}
+    impl<S: State> State for SetNsfw<S> {
+        type Author = S::Author;
+        type Image = S::Image;
+        type At = S::At;
+        type Cid = S::Cid;
+        type CreationTime = S::CreationTime;
+        type Nsfw = Set<members::nsfw>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `author` field
+        pub struct author(());
+        ///Marker type for the `image` field
+        pub struct image(());
+        ///Marker type for the `at` field
+        pub struct at(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `creation_time` field
+        pub struct creation_time(());
+        ///Marker type for the `nsfw` field
+        pub struct nsfw(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct HydratedOekakiBuilder<'a, S: hydrated_oekaki_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<crate::com_shinolabs::pinksea::app_view_defs::Author<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> HydratedOekaki<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> HydratedOekakiBuilder<'a, hydrated_oekaki_state::Empty> {
+        HydratedOekakiBuilder::new()
+    }
+}
+
+impl<'a> HydratedOekakiBuilder<'a, hydrated_oekaki_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        HydratedOekakiBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: hydrated_oekaki_state::State> HydratedOekakiBuilder<'a, S> {
+    /// Set the `alt` field (optional)
+    pub fn alt(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `alt` field to an Option value (optional)
+    pub fn maybe_alt(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> HydratedOekakiBuilder<'a, S>
+where
+    S: hydrated_oekaki_state::State,
+    S::At: hydrated_oekaki_state::IsUnset,
+{
+    /// Set the `at` field (required)
+    pub fn at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+    ) -> HydratedOekakiBuilder<'a, hydrated_oekaki_state::SetAt<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        HydratedOekakiBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> HydratedOekakiBuilder<'a, S>
+where
+    S: hydrated_oekaki_state::State,
+    S::Author: hydrated_oekaki_state::IsUnset,
+{
+    /// Set the `author` field (required)
+    pub fn author(
+        mut self,
+        value: impl Into<crate::com_shinolabs::pinksea::app_view_defs::Author<'a>>,
+    ) -> HydratedOekakiBuilder<'a, hydrated_oekaki_state::SetAuthor<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        HydratedOekakiBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> HydratedOekakiBuilder<'a, S>
+where
+    S: hydrated_oekaki_state::State,
+    S::Cid: hydrated_oekaki_state::IsUnset,
+{
+    /// Set the `cid` field (required)
+    pub fn cid(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Cid<'a>>,
+    ) -> HydratedOekakiBuilder<'a, hydrated_oekaki_state::SetCid<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        HydratedOekakiBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> HydratedOekakiBuilder<'a, S>
+where
+    S: hydrated_oekaki_state::State,
+    S::CreationTime: hydrated_oekaki_state::IsUnset,
+{
+    /// Set the `creationTime` field (required)
+    pub fn creation_time(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> HydratedOekakiBuilder<'a, hydrated_oekaki_state::SetCreationTime<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        HydratedOekakiBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> HydratedOekakiBuilder<'a, S>
+where
+    S: hydrated_oekaki_state::State,
+    S::Image: hydrated_oekaki_state::IsUnset,
+{
+    /// Set the `image` field (required)
+    pub fn image(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+    ) -> HydratedOekakiBuilder<'a, hydrated_oekaki_state::SetImage<S>> {
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        HydratedOekakiBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> HydratedOekakiBuilder<'a, S>
+where
+    S: hydrated_oekaki_state::State,
+    S::Nsfw: hydrated_oekaki_state::IsUnset,
+{
+    /// Set the `nsfw` field (required)
+    pub fn nsfw(
+        mut self,
+        value: impl Into<bool>,
+    ) -> HydratedOekakiBuilder<'a, hydrated_oekaki_state::SetNsfw<S>> {
+        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        HydratedOekakiBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: hydrated_oekaki_state::State> HydratedOekakiBuilder<'a, S> {
+    /// Set the `tags` field (optional)
+    pub fn tags(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value.into();
+        self
+    }
+    /// Set the `tags` field to an Option value (optional)
+    pub fn maybe_tags(
+        mut self,
+        value: Option<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value;
+        self
+    }
+}
+
+impl<'a, S> HydratedOekakiBuilder<'a, S>
+where
+    S: hydrated_oekaki_state::State,
+    S::Author: hydrated_oekaki_state::IsSet,
+    S::Image: hydrated_oekaki_state::IsSet,
+    S::At: hydrated_oekaki_state::IsSet,
+    S::Cid: hydrated_oekaki_state::IsSet,
+    S::CreationTime: hydrated_oekaki_state::IsSet,
+    S::Nsfw: hydrated_oekaki_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> HydratedOekaki<'a> {
+        HydratedOekaki {
+            alt: self.__unsafe_private_named.0,
+            at: self.__unsafe_private_named.1.unwrap(),
+            author: self.__unsafe_private_named.2.unwrap(),
+            cid: self.__unsafe_private_named.3.unwrap(),
+            creation_time: self.__unsafe_private_named.4.unwrap(),
+            image: self.__unsafe_private_named.5.unwrap(),
+            nsfw: self.__unsafe_private_named.6.unwrap(),
+            tags: self.__unsafe_private_named.7,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> HydratedOekaki<'a> {
+        HydratedOekaki {
+            alt: self.__unsafe_private_named.0,
+            at: self.__unsafe_private_named.1.unwrap(),
+            author: self.__unsafe_private_named.2.unwrap(),
+            cid: self.__unsafe_private_named.3.unwrap(),
+            creation_time: self.__unsafe_private_named.4.unwrap(),
+            image: self.__unsafe_private_named.5.unwrap(),
+            nsfw: self.__unsafe_private_named.6.unwrap(),
+            tags: self.__unsafe_private_named.7,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HydratedOekaki<'a> {
@@ -408,14 +882,118 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HydratedOekaki<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct OekakiTombstone<'a> {
     /// The AT uri of the former oekaki.
     #[serde(borrow)]
     pub former_at: jacquard_common::types::string::AtUri<'a>,
+}
+
+pub mod oekaki_tombstone_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type FormerAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type FormerAt = Unset;
+    }
+    ///State transition - sets the `former_at` field to Set
+    pub struct SetFormerAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFormerAt<S> {}
+    impl<S: State> State for SetFormerAt<S> {
+        type FormerAt = Set<members::former_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `former_at` field
+        pub struct former_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct OekakiTombstoneBuilder<'a, S: oekaki_tombstone_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> OekakiTombstone<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> OekakiTombstoneBuilder<'a, oekaki_tombstone_state::Empty> {
+        OekakiTombstoneBuilder::new()
+    }
+}
+
+impl<'a> OekakiTombstoneBuilder<'a, oekaki_tombstone_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        OekakiTombstoneBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> OekakiTombstoneBuilder<'a, S>
+where
+    S: oekaki_tombstone_state::State,
+    S::FormerAt: oekaki_tombstone_state::IsUnset,
+{
+    /// Set the `formerAt` field (required)
+    pub fn former_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> OekakiTombstoneBuilder<'a, oekaki_tombstone_state::SetFormerAt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        OekakiTombstoneBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> OekakiTombstoneBuilder<'a, S>
+where
+    S: oekaki_tombstone_state::State,
+    S::FormerAt: oekaki_tombstone_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> OekakiTombstone<'a> {
+        OekakiTombstone {
+            former_at: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> OekakiTombstone<'a> {
+        OekakiTombstone {
+            former_at: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for OekakiTombstone<'a> {

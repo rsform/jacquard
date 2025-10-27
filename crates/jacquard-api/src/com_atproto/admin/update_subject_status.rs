@@ -13,29 +13,167 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-#[builder(start_fn = new)]
 pub struct UpdateSubjectStatus<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub deactivated: Option<crate::com_atproto::admin::StatusAttr<'a>>,
     #[serde(borrow)]
     pub subject: UpdateSubjectStatusSubject<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub takedown: Option<crate::com_atproto::admin::StatusAttr<'a>>,
-    #[serde(flatten)]
-    #[serde(borrow)]
-    #[builder(default)]
-    pub extra_data: ::std::collections::BTreeMap<
-        ::jacquard_common::smol_str::SmolStr,
-        ::jacquard_common::types::value::Data<'a>,
-    >,
+}
+
+pub mod update_subject_status_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Subject;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Subject = Unset;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type Subject = Set<members::subject>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `subject` field
+        pub struct subject(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct UpdateSubjectStatusBuilder<'a, S: update_subject_status_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<crate::com_atproto::admin::StatusAttr<'a>>,
+        ::core::option::Option<UpdateSubjectStatusSubject<'a>>,
+        ::core::option::Option<crate::com_atproto::admin::StatusAttr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> UpdateSubjectStatus<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> UpdateSubjectStatusBuilder<'a, update_subject_status_state::Empty> {
+        UpdateSubjectStatusBuilder::new()
+    }
+}
+
+impl<'a> UpdateSubjectStatusBuilder<'a, update_subject_status_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        UpdateSubjectStatusBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: update_subject_status_state::State> UpdateSubjectStatusBuilder<'a, S> {
+    /// Set the `deactivated` field (optional)
+    pub fn deactivated(
+        mut self,
+        value: impl Into<Option<crate::com_atproto::admin::StatusAttr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `deactivated` field to an Option value (optional)
+    pub fn maybe_deactivated(
+        mut self,
+        value: Option<crate::com_atproto::admin::StatusAttr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> UpdateSubjectStatusBuilder<'a, S>
+where
+    S: update_subject_status_state::State,
+    S::Subject: update_subject_status_state::IsUnset,
+{
+    /// Set the `subject` field (required)
+    pub fn subject(
+        mut self,
+        value: impl Into<UpdateSubjectStatusSubject<'a>>,
+    ) -> UpdateSubjectStatusBuilder<'a, update_subject_status_state::SetSubject<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        UpdateSubjectStatusBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: update_subject_status_state::State> UpdateSubjectStatusBuilder<'a, S> {
+    /// Set the `takedown` field (optional)
+    pub fn takedown(
+        mut self,
+        value: impl Into<Option<crate::com_atproto::admin::StatusAttr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `takedown` field to an Option value (optional)
+    pub fn maybe_takedown(
+        mut self,
+        value: Option<crate::com_atproto::admin::StatusAttr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> UpdateSubjectStatusBuilder<'a, S>
+where
+    S: update_subject_status_state::State,
+    S::Subject: update_subject_status_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> UpdateSubjectStatus<'a> {
+        UpdateSubjectStatus {
+            deactivated: self.__unsafe_private_named.0,
+            subject: self.__unsafe_private_named.1.unwrap(),
+            takedown: self.__unsafe_private_named.2,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> UpdateSubjectStatus<'a> {
+        UpdateSubjectStatus {
+            deactivated: self.__unsafe_private_named.0,
+            subject: self.__unsafe_private_named.1.unwrap(),
+            takedown: self.__unsafe_private_named.2,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]

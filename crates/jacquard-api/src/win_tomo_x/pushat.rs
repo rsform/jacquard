@@ -17,16 +17,191 @@ pub type DeviceList<'a> = Vec<crate::win_tomo_x::pushat::DeviceListItem<'a>>;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeviceListItem<'a> {
     pub current: bool,
     pub id: jacquard_common::types::string::Tid,
     #[serde(borrow)]
-    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
+}
+
+pub mod device_list_item_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Name;
+        type Id;
+        type Current;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Name = Unset;
+        type Id = Unset;
+        type Current = Unset;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Name = Set<members::name>;
+        type Id = S::Id;
+        type Current = S::Current;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Name = S::Name;
+        type Id = Set<members::id>;
+        type Current = S::Current;
+    }
+    ///State transition - sets the `current` field to Set
+    pub struct SetCurrent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCurrent<S> {}
+    impl<S: State> State for SetCurrent<S> {
+        type Name = S::Name;
+        type Id = S::Id;
+        type Current = Set<members::current>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `id` field
+        pub struct id(());
+        ///Marker type for the `current` field
+        pub struct current(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct DeviceListItemBuilder<'a, S: device_list_item_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<bool>,
+        ::core::option::Option<jacquard_common::types::string::Tid>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> DeviceListItem<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> DeviceListItemBuilder<'a, device_list_item_state::Empty> {
+        DeviceListItemBuilder::new()
+    }
+}
+
+impl<'a> DeviceListItemBuilder<'a, device_list_item_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        DeviceListItemBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DeviceListItemBuilder<'a, S>
+where
+    S: device_list_item_state::State,
+    S::Current: device_list_item_state::IsUnset,
+{
+    /// Set the `current` field (required)
+    pub fn current(
+        mut self,
+        value: impl Into<bool>,
+    ) -> DeviceListItemBuilder<'a, device_list_item_state::SetCurrent<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        DeviceListItemBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DeviceListItemBuilder<'a, S>
+where
+    S: device_list_item_state::State,
+    S::Id: device_list_item_state::IsUnset,
+{
+    /// Set the `id` field (required)
+    pub fn id(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Tid>,
+    ) -> DeviceListItemBuilder<'a, device_list_item_state::SetId<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        DeviceListItemBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DeviceListItemBuilder<'a, S>
+where
+    S: device_list_item_state::State,
+    S::Name: device_list_item_state::IsUnset,
+{
+    /// Set the `name` field (required)
+    pub fn name(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> DeviceListItemBuilder<'a, device_list_item_state::SetName<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        DeviceListItemBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DeviceListItemBuilder<'a, S>
+where
+    S: device_list_item_state::State,
+    S::Name: device_list_item_state::IsSet,
+    S::Id: device_list_item_state::IsSet,
+    S::Current: device_list_item_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> DeviceListItem<'a> {
+        DeviceListItem {
+            current: self.__unsafe_private_named.0.unwrap(),
+            id: self.__unsafe_private_named.1.unwrap(),
+            name: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> DeviceListItem<'a> {
+        DeviceListItem {
+            current: self.__unsafe_private_named.0.unwrap(),
+            id: self.__unsafe_private_named.1.unwrap(),
+            name: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_win_tomo_x_pushat_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<

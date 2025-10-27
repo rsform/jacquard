@@ -19,29 +19,24 @@ pub mod subscribe_labels;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Label<'a> {
     /// Optionally, CID specifying the specific version of 'uri' resource this label applies to.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub cid: Option<jacquard_common::types::string::Cid<'a>>,
     /// Timestamp when this label was created.
     pub cts: jacquard_common::types::string::Datetime,
     /// Timestamp at which this label expires (no longer applies).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub exp: Option<jacquard_common::types::string::Datetime>,
     /// If true, this is a negation label, overwriting a previous label.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub neg: Option<bool>,
     /// Signature of dag-cbor encoded label.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub sig: Option<bytes::Bytes>,
     /// DID of the actor who created this label.
     #[serde(borrow)]
@@ -51,12 +46,328 @@ pub struct Label<'a> {
     pub uri: jacquard_common::types::string::Uri<'a>,
     /// The short string name of the value or type of this label.
     #[serde(borrow)]
-    #[builder(into)]
     pub val: jacquard_common::CowStr<'a>,
     /// The AT Protocol version of the label object.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub ver: Option<i64>,
+}
+
+pub mod label_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Src;
+        type Uri;
+        type Val;
+        type Cts;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Src = Unset;
+        type Uri = Unset;
+        type Val = Unset;
+        type Cts = Unset;
+    }
+    ///State transition - sets the `src` field to Set
+    pub struct SetSrc<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSrc<S> {}
+    impl<S: State> State for SetSrc<S> {
+        type Src = Set<members::src>;
+        type Uri = S::Uri;
+        type Val = S::Val;
+        type Cts = S::Cts;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Src = S::Src;
+        type Uri = Set<members::uri>;
+        type Val = S::Val;
+        type Cts = S::Cts;
+    }
+    ///State transition - sets the `val` field to Set
+    pub struct SetVal<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVal<S> {}
+    impl<S: State> State for SetVal<S> {
+        type Src = S::Src;
+        type Uri = S::Uri;
+        type Val = Set<members::val>;
+        type Cts = S::Cts;
+    }
+    ///State transition - sets the `cts` field to Set
+    pub struct SetCts<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCts<S> {}
+    impl<S: State> State for SetCts<S> {
+        type Src = S::Src;
+        type Uri = S::Uri;
+        type Val = S::Val;
+        type Cts = Set<members::cts>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `src` field
+        pub struct src(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `val` field
+        pub struct val(());
+        ///Marker type for the `cts` field
+        pub struct cts(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct LabelBuilder<'a, S: label_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<bytes::Bytes>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Label<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> LabelBuilder<'a, label_state::Empty> {
+        LabelBuilder::new()
+    }
+}
+
+impl<'a> LabelBuilder<'a, label_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        LabelBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: label_state::State> LabelBuilder<'a, S> {
+    /// Set the `cid` field (optional)
+    pub fn cid(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Cid<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `cid` field to an Option value (optional)
+    pub fn maybe_cid(
+        mut self,
+        value: Option<jacquard_common::types::string::Cid<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> LabelBuilder<'a, S>
+where
+    S: label_state::State,
+    S::Cts: label_state::IsUnset,
+{
+    /// Set the `cts` field (required)
+    pub fn cts(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> LabelBuilder<'a, label_state::SetCts<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        LabelBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: label_state::State> LabelBuilder<'a, S> {
+    /// Set the `exp` field (optional)
+    pub fn exp(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `exp` field to an Option value (optional)
+    pub fn maybe_exp(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: label_state::State> LabelBuilder<'a, S> {
+    /// Set the `neg` field (optional)
+    pub fn neg(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `neg` field to an Option value (optional)
+    pub fn maybe_neg(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: label_state::State> LabelBuilder<'a, S> {
+    /// Set the `sig` field (optional)
+    pub fn sig(mut self, value: impl Into<Option<bytes::Bytes>>) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `sig` field to an Option value (optional)
+    pub fn maybe_sig(mut self, value: Option<bytes::Bytes>) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S> LabelBuilder<'a, S>
+where
+    S: label_state::State,
+    S::Src: label_state::IsUnset,
+{
+    /// Set the `src` field (required)
+    pub fn src(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> LabelBuilder<'a, label_state::SetSrc<S>> {
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        LabelBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LabelBuilder<'a, S>
+where
+    S: label_state::State,
+    S::Uri: label_state::IsUnset,
+{
+    /// Set the `uri` field (required)
+    pub fn uri(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+    ) -> LabelBuilder<'a, label_state::SetUri<S>> {
+        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        LabelBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LabelBuilder<'a, S>
+where
+    S: label_state::State,
+    S::Val: label_state::IsUnset,
+{
+    /// Set the `val` field (required)
+    pub fn val(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> LabelBuilder<'a, label_state::SetVal<S>> {
+        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        LabelBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: label_state::State> LabelBuilder<'a, S> {
+    /// Set the `ver` field (optional)
+    pub fn ver(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.8 = value.into();
+        self
+    }
+    /// Set the `ver` field to an Option value (optional)
+    pub fn maybe_ver(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.8 = value;
+        self
+    }
+}
+
+impl<'a, S> LabelBuilder<'a, S>
+where
+    S: label_state::State,
+    S::Src: label_state::IsSet,
+    S::Uri: label_state::IsSet,
+    S::Val: label_state::IsSet,
+    S::Cts: label_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Label<'a> {
+        Label {
+            cid: self.__unsafe_private_named.0,
+            cts: self.__unsafe_private_named.1.unwrap(),
+            exp: self.__unsafe_private_named.2,
+            neg: self.__unsafe_private_named.3,
+            sig: self.__unsafe_private_named.4,
+            src: self.__unsafe_private_named.5.unwrap(),
+            uri: self.__unsafe_private_named.6.unwrap(),
+            val: self.__unsafe_private_named.7.unwrap(),
+            ver: self.__unsafe_private_named.8,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Label<'a> {
+        Label {
+            cid: self.__unsafe_private_named.0,
+            cts: self.__unsafe_private_named.1.unwrap(),
+            exp: self.__unsafe_private_named.2,
+            neg: self.__unsafe_private_named.3,
+            sig: self.__unsafe_private_named.4,
+            src: self.__unsafe_private_named.5.unwrap(),
+            uri: self.__unsafe_private_named.6.unwrap(),
+            val: self.__unsafe_private_named.7.unwrap(),
+            ver: self.__unsafe_private_named.8,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_com_atproto_label_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -707,34 +1018,290 @@ impl jacquard_common::IntoStatic for LabelValue<'_> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LabelValueDefinition<'a> {
     /// Does the user need to have adult content enabled in order to configure this label?
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub adult_only: Option<bool>,
     /// What should this label hide in the UI, if applied? 'content' hides all of the target; 'media' hides the images/video/audio; 'none' hides nothing.
     #[serde(borrow)]
-    #[builder(into)]
     pub blurs: jacquard_common::CowStr<'a>,
     /// The default setting for this label.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub default_setting: Option<jacquard_common::CowStr<'a>>,
     /// The value of the label being defined. Must only include lowercase ascii and the '-' character ([a-z-]+).
     #[serde(borrow)]
-    #[builder(into)]
     pub identifier: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub locales: Vec<crate::com_atproto::label::LabelValueDefinitionStrings<'a>>,
     /// How should a client visually convey this label? 'inform' means neutral and informational; 'alert' means negative and warning; 'none' means show nothing.
     #[serde(borrow)]
-    #[builder(into)]
     pub severity: jacquard_common::CowStr<'a>,
+}
+
+pub mod label_value_definition_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Identifier;
+        type Severity;
+        type Blurs;
+        type Locales;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Identifier = Unset;
+        type Severity = Unset;
+        type Blurs = Unset;
+        type Locales = Unset;
+    }
+    ///State transition - sets the `identifier` field to Set
+    pub struct SetIdentifier<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIdentifier<S> {}
+    impl<S: State> State for SetIdentifier<S> {
+        type Identifier = Set<members::identifier>;
+        type Severity = S::Severity;
+        type Blurs = S::Blurs;
+        type Locales = S::Locales;
+    }
+    ///State transition - sets the `severity` field to Set
+    pub struct SetSeverity<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSeverity<S> {}
+    impl<S: State> State for SetSeverity<S> {
+        type Identifier = S::Identifier;
+        type Severity = Set<members::severity>;
+        type Blurs = S::Blurs;
+        type Locales = S::Locales;
+    }
+    ///State transition - sets the `blurs` field to Set
+    pub struct SetBlurs<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlurs<S> {}
+    impl<S: State> State for SetBlurs<S> {
+        type Identifier = S::Identifier;
+        type Severity = S::Severity;
+        type Blurs = Set<members::blurs>;
+        type Locales = S::Locales;
+    }
+    ///State transition - sets the `locales` field to Set
+    pub struct SetLocales<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLocales<S> {}
+    impl<S: State> State for SetLocales<S> {
+        type Identifier = S::Identifier;
+        type Severity = S::Severity;
+        type Blurs = S::Blurs;
+        type Locales = Set<members::locales>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `identifier` field
+        pub struct identifier(());
+        ///Marker type for the `severity` field
+        pub struct severity(());
+        ///Marker type for the `blurs` field
+        pub struct blurs(());
+        ///Marker type for the `locales` field
+        pub struct locales(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct LabelValueDefinitionBuilder<'a, S: label_value_definition_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<bool>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<
+            Vec<crate::com_atproto::label::LabelValueDefinitionStrings<'a>>,
+        >,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> LabelValueDefinition<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> LabelValueDefinitionBuilder<
+        'a,
+        label_value_definition_state::Empty,
+    > {
+        LabelValueDefinitionBuilder::new()
+    }
+}
+
+impl<'a> LabelValueDefinitionBuilder<'a, label_value_definition_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        LabelValueDefinitionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: label_value_definition_state::State> LabelValueDefinitionBuilder<'a, S> {
+    /// Set the `adultOnly` field (optional)
+    pub fn adult_only(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `adultOnly` field to an Option value (optional)
+    pub fn maybe_adult_only(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> LabelValueDefinitionBuilder<'a, S>
+where
+    S: label_value_definition_state::State,
+    S::Blurs: label_value_definition_state::IsUnset,
+{
+    /// Set the `blurs` field (required)
+    pub fn blurs(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> LabelValueDefinitionBuilder<'a, label_value_definition_state::SetBlurs<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        LabelValueDefinitionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: label_value_definition_state::State> LabelValueDefinitionBuilder<'a, S> {
+    /// Set the `defaultSetting` field (optional)
+    pub fn default_setting(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `defaultSetting` field to an Option value (optional)
+    pub fn maybe_default_setting(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> LabelValueDefinitionBuilder<'a, S>
+where
+    S: label_value_definition_state::State,
+    S::Identifier: label_value_definition_state::IsUnset,
+{
+    /// Set the `identifier` field (required)
+    pub fn identifier(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> LabelValueDefinitionBuilder<
+        'a,
+        label_value_definition_state::SetIdentifier<S>,
+    > {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        LabelValueDefinitionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LabelValueDefinitionBuilder<'a, S>
+where
+    S: label_value_definition_state::State,
+    S::Locales: label_value_definition_state::IsUnset,
+{
+    /// Set the `locales` field (required)
+    pub fn locales(
+        mut self,
+        value: impl Into<Vec<crate::com_atproto::label::LabelValueDefinitionStrings<'a>>>,
+    ) -> LabelValueDefinitionBuilder<'a, label_value_definition_state::SetLocales<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        LabelValueDefinitionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LabelValueDefinitionBuilder<'a, S>
+where
+    S: label_value_definition_state::State,
+    S::Severity: label_value_definition_state::IsUnset,
+{
+    /// Set the `severity` field (required)
+    pub fn severity(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> LabelValueDefinitionBuilder<'a, label_value_definition_state::SetSeverity<S>> {
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        LabelValueDefinitionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LabelValueDefinitionBuilder<'a, S>
+where
+    S: label_value_definition_state::State,
+    S::Identifier: label_value_definition_state::IsSet,
+    S::Severity: label_value_definition_state::IsSet,
+    S::Blurs: label_value_definition_state::IsSet,
+    S::Locales: label_value_definition_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> LabelValueDefinition<'a> {
+        LabelValueDefinition {
+            adult_only: self.__unsafe_private_named.0,
+            blurs: self.__unsafe_private_named.1.unwrap(),
+            default_setting: self.__unsafe_private_named.2,
+            identifier: self.__unsafe_private_named.3.unwrap(),
+            locales: self.__unsafe_private_named.4.unwrap(),
+            severity: self.__unsafe_private_named.5.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> LabelValueDefinition<'a> {
+        LabelValueDefinition {
+            adult_only: self.__unsafe_private_named.0,
+            blurs: self.__unsafe_private_named.1.unwrap(),
+            default_setting: self.__unsafe_private_named.2,
+            identifier: self.__unsafe_private_named.3.unwrap(),
+            locales: self.__unsafe_private_named.4.unwrap(),
+            severity: self.__unsafe_private_named.5.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LabelValueDefinition<'a> {
@@ -795,21 +1362,212 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LabelValueDefinition<'a> 
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LabelValueDefinitionStrings<'a> {
     /// A longer description of what the label means and why it might be applied.
     #[serde(borrow)]
-    #[builder(into)]
     pub description: jacquard_common::CowStr<'a>,
     /// The code of the language these strings are written in.
     pub lang: jacquard_common::types::string::Language,
     /// A short human-readable name for the label.
     #[serde(borrow)]
-    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
+}
+
+pub mod label_value_definition_strings_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Lang;
+        type Name;
+        type Description;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Lang = Unset;
+        type Name = Unset;
+        type Description = Unset;
+    }
+    ///State transition - sets the `lang` field to Set
+    pub struct SetLang<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLang<S> {}
+    impl<S: State> State for SetLang<S> {
+        type Lang = Set<members::lang>;
+        type Name = S::Name;
+        type Description = S::Description;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Lang = S::Lang;
+        type Name = Set<members::name>;
+        type Description = S::Description;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDescription<S> {}
+    impl<S: State> State for SetDescription<S> {
+        type Lang = S::Lang;
+        type Name = S::Name;
+        type Description = Set<members::description>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `lang` field
+        pub struct lang(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `description` field
+        pub struct description(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct LabelValueDefinitionStringsBuilder<
+    'a,
+    S: label_value_definition_strings_state::State,
+> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Language>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> LabelValueDefinitionStrings<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> LabelValueDefinitionStringsBuilder<
+        'a,
+        label_value_definition_strings_state::Empty,
+    > {
+        LabelValueDefinitionStringsBuilder::new()
+    }
+}
+
+impl<
+    'a,
+> LabelValueDefinitionStringsBuilder<'a, label_value_definition_strings_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        LabelValueDefinitionStringsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LabelValueDefinitionStringsBuilder<'a, S>
+where
+    S: label_value_definition_strings_state::State,
+    S::Description: label_value_definition_strings_state::IsUnset,
+{
+    /// Set the `description` field (required)
+    pub fn description(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> LabelValueDefinitionStringsBuilder<
+        'a,
+        label_value_definition_strings_state::SetDescription<S>,
+    > {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        LabelValueDefinitionStringsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LabelValueDefinitionStringsBuilder<'a, S>
+where
+    S: label_value_definition_strings_state::State,
+    S::Lang: label_value_definition_strings_state::IsUnset,
+{
+    /// Set the `lang` field (required)
+    pub fn lang(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Language>,
+    ) -> LabelValueDefinitionStringsBuilder<
+        'a,
+        label_value_definition_strings_state::SetLang<S>,
+    > {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        LabelValueDefinitionStringsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LabelValueDefinitionStringsBuilder<'a, S>
+where
+    S: label_value_definition_strings_state::State,
+    S::Name: label_value_definition_strings_state::IsUnset,
+{
+    /// Set the `name` field (required)
+    pub fn name(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> LabelValueDefinitionStringsBuilder<
+        'a,
+        label_value_definition_strings_state::SetName<S>,
+    > {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        LabelValueDefinitionStringsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LabelValueDefinitionStringsBuilder<'a, S>
+where
+    S: label_value_definition_strings_state::State,
+    S::Lang: label_value_definition_strings_state::IsSet,
+    S::Name: label_value_definition_strings_state::IsSet,
+    S::Description: label_value_definition_strings_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> LabelValueDefinitionStrings<'a> {
+        LabelValueDefinitionStrings {
+            description: self.__unsafe_private_named.0.unwrap(),
+            lang: self.__unsafe_private_named.1.unwrap(),
+            name: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> LabelValueDefinitionStrings<'a> {
+        LabelValueDefinitionStrings {
+            description: self.__unsafe_private_named.0.unwrap(),
+            lang: self.__unsafe_private_named.1.unwrap(),
+            name: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LabelValueDefinitionStrings<'a> {
@@ -951,13 +1709,117 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SelfLabel<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SelfLabels<'a> {
     #[serde(borrow)]
     pub values: Vec<crate::com_atproto::label::SelfLabel<'a>>,
+}
+
+pub mod self_labels_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Values;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Values = Unset;
+    }
+    ///State transition - sets the `values` field to Set
+    pub struct SetValues<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValues<S> {}
+    impl<S: State> State for SetValues<S> {
+        type Values = Set<members::values>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `values` field
+        pub struct values(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct SelfLabelsBuilder<'a, S: self_labels_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<Vec<crate::com_atproto::label::SelfLabel<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> SelfLabels<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> SelfLabelsBuilder<'a, self_labels_state::Empty> {
+        SelfLabelsBuilder::new()
+    }
+}
+
+impl<'a> SelfLabelsBuilder<'a, self_labels_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        SelfLabelsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SelfLabelsBuilder<'a, S>
+where
+    S: self_labels_state::State,
+    S::Values: self_labels_state::IsUnset,
+{
+    /// Set the `values` field (required)
+    pub fn values(
+        mut self,
+        value: impl Into<Vec<crate::com_atproto::label::SelfLabel<'a>>>,
+    ) -> SelfLabelsBuilder<'a, self_labels_state::SetValues<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        SelfLabelsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SelfLabelsBuilder<'a, S>
+where
+    S: self_labels_state::State,
+    S::Values: self_labels_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> SelfLabels<'a> {
+        SelfLabels {
+            values: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> SelfLabels<'a> {
+        SelfLabels {
+            values: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SelfLabels<'a> {

@@ -14,21 +14,233 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Tag<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(borrow)]
-    #[builder(into)]
     pub description: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub slug: jacquard_common::CowStr<'a>,
+}
+
+pub mod tag_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Name;
+        type Slug;
+        type Description;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Name = Unset;
+        type Slug = Unset;
+        type Description = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Name = Set<members::name>;
+        type Slug = S::Slug;
+        type Description = S::Description;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `slug` field to Set
+    pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSlug<S> {}
+    impl<S: State> State for SetSlug<S> {
+        type Name = S::Name;
+        type Slug = Set<members::slug>;
+        type Description = S::Description;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDescription<S> {}
+    impl<S: State> State for SetDescription<S> {
+        type Name = S::Name;
+        type Slug = S::Slug;
+        type Description = Set<members::description>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Name = S::Name;
+        type Slug = S::Slug;
+        type Description = S::Description;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `slug` field
+        pub struct slug(());
+        ///Marker type for the `description` field
+        pub struct description(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct TagBuilder<'a, S: tag_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Tag<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> TagBuilder<'a, tag_state::Empty> {
+        TagBuilder::new()
+    }
+}
+
+impl<'a> TagBuilder<'a, tag_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        TagBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TagBuilder<'a, S>
+where
+    S: tag_state::State,
+    S::CreatedAt: tag_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> TagBuilder<'a, tag_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        TagBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TagBuilder<'a, S>
+where
+    S: tag_state::State,
+    S::Description: tag_state::IsUnset,
+{
+    /// Set the `description` field (required)
+    pub fn description(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> TagBuilder<'a, tag_state::SetDescription<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        TagBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TagBuilder<'a, S>
+where
+    S: tag_state::State,
+    S::Name: tag_state::IsUnset,
+{
+    /// Set the `name` field (required)
+    pub fn name(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> TagBuilder<'a, tag_state::SetName<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        TagBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TagBuilder<'a, S>
+where
+    S: tag_state::State,
+    S::Slug: tag_state::IsUnset,
+{
+    /// Set the `slug` field (required)
+    pub fn slug(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> TagBuilder<'a, tag_state::SetSlug<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        TagBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TagBuilder<'a, S>
+where
+    S: tag_state::State,
+    S::Name: tag_state::IsSet,
+    S::Slug: tag_state::IsSet,
+    S::Description: tag_state::IsSet,
+    S::CreatedAt: tag_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Tag<'a> {
+        Tag {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            description: self.__unsafe_private_named.1.unwrap(),
+            name: self.__unsafe_private_named.2.unwrap(),
+            slug: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Tag<'a> {
+        Tag {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            description: self.__unsafe_private_named.1.unwrap(),
+            name: self.__unsafe_private_named.2.unwrap(),
+            slug: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Tag<'a> {

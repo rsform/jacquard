@@ -18,8 +18,7 @@ pub mod revoke_verifications;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct VerificationView<'a> {
@@ -27,7 +26,6 @@ pub struct VerificationView<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     /// Display name of the subject the verification applies to at the moment of verifying, which might not be the same at the time of viewing. The verification is only valid if the current displayName matches the one at the time of verifying.
     #[serde(borrow)]
-    #[builder(into)]
     pub display_name: jacquard_common::CowStr<'a>,
     /// Handle of the subject the verification applies to at the moment of verifying, which might not be the same at the time of viewing. The verification is only valid if the current handle matches the one at the time of verifying.
     #[serde(borrow)]
@@ -36,41 +34,502 @@ pub struct VerificationView<'a> {
     #[serde(borrow)]
     pub issuer: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub issuer_profile: Option<jacquard_common::types::value::Data<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub issuer_repo: Option<VerificationViewIssuerRepo<'a>>,
     /// Describes the reason for revocation, also indicating that the verification is no longer valid.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub revoke_reason: Option<jacquard_common::CowStr<'a>>,
     /// Timestamp when the verification was revoked.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub revoked_at: Option<jacquard_common::types::string::Datetime>,
     /// The user who revoked this verification.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub revoked_by: Option<jacquard_common::types::string::Did<'a>>,
     /// The subject of the verification.
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub subject_profile: Option<jacquard_common::types::value::Data<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub subject_repo: Option<VerificationViewSubjectRepo<'a>>,
     /// The AT-URI of the verification record.
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+pub mod verification_view_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Issuer;
+        type Uri;
+        type Subject;
+        type Handle;
+        type DisplayName;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Issuer = Unset;
+        type Uri = Unset;
+        type Subject = Unset;
+        type Handle = Unset;
+        type DisplayName = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `issuer` field to Set
+    pub struct SetIssuer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIssuer<S> {}
+    impl<S: State> State for SetIssuer<S> {
+        type Issuer = Set<members::issuer>;
+        type Uri = S::Uri;
+        type Subject = S::Subject;
+        type Handle = S::Handle;
+        type DisplayName = S::DisplayName;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Issuer = S::Issuer;
+        type Uri = Set<members::uri>;
+        type Subject = S::Subject;
+        type Handle = S::Handle;
+        type DisplayName = S::DisplayName;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type Issuer = S::Issuer;
+        type Uri = S::Uri;
+        type Subject = Set<members::subject>;
+        type Handle = S::Handle;
+        type DisplayName = S::DisplayName;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHandle<S> {}
+    impl<S: State> State for SetHandle<S> {
+        type Issuer = S::Issuer;
+        type Uri = S::Uri;
+        type Subject = S::Subject;
+        type Handle = Set<members::handle>;
+        type DisplayName = S::DisplayName;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `display_name` field to Set
+    pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDisplayName<S> {}
+    impl<S: State> State for SetDisplayName<S> {
+        type Issuer = S::Issuer;
+        type Uri = S::Uri;
+        type Subject = S::Subject;
+        type Handle = S::Handle;
+        type DisplayName = Set<members::display_name>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Issuer = S::Issuer;
+        type Uri = S::Uri;
+        type Subject = S::Subject;
+        type Handle = S::Handle;
+        type DisplayName = S::DisplayName;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `issuer` field
+        pub struct issuer(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
+        ///Marker type for the `handle` field
+        pub struct handle(());
+        ///Marker type for the `display_name` field
+        pub struct display_name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct VerificationViewBuilder<'a, S: verification_view_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Handle<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
+        ::core::option::Option<VerificationViewIssuerRepo<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
+        ::core::option::Option<VerificationViewSubjectRepo<'a>>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> VerificationView<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> VerificationViewBuilder<'a, verification_view_state::Empty> {
+        VerificationViewBuilder::new()
+    }
+}
+
+impl<'a> VerificationViewBuilder<'a, verification_view_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        VerificationViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> VerificationViewBuilder<'a, S>
+where
+    S: verification_view_state::State,
+    S::CreatedAt: verification_view_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> VerificationViewBuilder<'a, verification_view_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        VerificationViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> VerificationViewBuilder<'a, S>
+where
+    S: verification_view_state::State,
+    S::DisplayName: verification_view_state::IsUnset,
+{
+    /// Set the `displayName` field (required)
+    pub fn display_name(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> VerificationViewBuilder<'a, verification_view_state::SetDisplayName<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        VerificationViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> VerificationViewBuilder<'a, S>
+where
+    S: verification_view_state::State,
+    S::Handle: verification_view_state::IsUnset,
+{
+    /// Set the `handle` field (required)
+    pub fn handle(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Handle<'a>>,
+    ) -> VerificationViewBuilder<'a, verification_view_state::SetHandle<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        VerificationViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> VerificationViewBuilder<'a, S>
+where
+    S: verification_view_state::State,
+    S::Issuer: verification_view_state::IsUnset,
+{
+    /// Set the `issuer` field (required)
+    pub fn issuer(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> VerificationViewBuilder<'a, verification_view_state::SetIssuer<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        VerificationViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: verification_view_state::State> VerificationViewBuilder<'a, S> {
+    /// Set the `issuerProfile` field (optional)
+    pub fn issuer_profile(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::value::Data<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `issuerProfile` field to an Option value (optional)
+    pub fn maybe_issuer_profile(
+        mut self,
+        value: Option<jacquard_common::types::value::Data<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: verification_view_state::State> VerificationViewBuilder<'a, S> {
+    /// Set the `issuerRepo` field (optional)
+    pub fn issuer_repo(
+        mut self,
+        value: impl Into<Option<VerificationViewIssuerRepo<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `issuerRepo` field to an Option value (optional)
+    pub fn maybe_issuer_repo(
+        mut self,
+        value: Option<VerificationViewIssuerRepo<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S: verification_view_state::State> VerificationViewBuilder<'a, S> {
+    /// Set the `revokeReason` field (optional)
+    pub fn revoke_reason(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `revokeReason` field to an Option value (optional)
+    pub fn maybe_revoke_reason(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S: verification_view_state::State> VerificationViewBuilder<'a, S> {
+    /// Set the `revokedAt` field (optional)
+    pub fn revoked_at(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value.into();
+        self
+    }
+    /// Set the `revokedAt` field to an Option value (optional)
+    pub fn maybe_revoked_at(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value;
+        self
+    }
+}
+
+impl<'a, S: verification_view_state::State> VerificationViewBuilder<'a, S> {
+    /// Set the `revokedBy` field (optional)
+    pub fn revoked_by(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Did<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value.into();
+        self
+    }
+    /// Set the `revokedBy` field to an Option value (optional)
+    pub fn maybe_revoked_by(
+        mut self,
+        value: Option<jacquard_common::types::string::Did<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value;
+        self
+    }
+}
+
+impl<'a, S> VerificationViewBuilder<'a, S>
+where
+    S: verification_view_state::State,
+    S::Subject: verification_view_state::IsUnset,
+{
+    /// Set the `subject` field (required)
+    pub fn subject(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> VerificationViewBuilder<'a, verification_view_state::SetSubject<S>> {
+        self.__unsafe_private_named.9 = ::core::option::Option::Some(value.into());
+        VerificationViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: verification_view_state::State> VerificationViewBuilder<'a, S> {
+    /// Set the `subjectProfile` field (optional)
+    pub fn subject_profile(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::value::Data<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.10 = value.into();
+        self
+    }
+    /// Set the `subjectProfile` field to an Option value (optional)
+    pub fn maybe_subject_profile(
+        mut self,
+        value: Option<jacquard_common::types::value::Data<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.10 = value;
+        self
+    }
+}
+
+impl<'a, S: verification_view_state::State> VerificationViewBuilder<'a, S> {
+    /// Set the `subjectRepo` field (optional)
+    pub fn subject_repo(
+        mut self,
+        value: impl Into<Option<VerificationViewSubjectRepo<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.11 = value.into();
+        self
+    }
+    /// Set the `subjectRepo` field to an Option value (optional)
+    pub fn maybe_subject_repo(
+        mut self,
+        value: Option<VerificationViewSubjectRepo<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.11 = value;
+        self
+    }
+}
+
+impl<'a, S> VerificationViewBuilder<'a, S>
+where
+    S: verification_view_state::State,
+    S::Uri: verification_view_state::IsUnset,
+{
+    /// Set the `uri` field (required)
+    pub fn uri(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> VerificationViewBuilder<'a, verification_view_state::SetUri<S>> {
+        self.__unsafe_private_named.12 = ::core::option::Option::Some(value.into());
+        VerificationViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> VerificationViewBuilder<'a, S>
+where
+    S: verification_view_state::State,
+    S::Issuer: verification_view_state::IsSet,
+    S::Uri: verification_view_state::IsSet,
+    S::Subject: verification_view_state::IsSet,
+    S::Handle: verification_view_state::IsSet,
+    S::DisplayName: verification_view_state::IsSet,
+    S::CreatedAt: verification_view_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> VerificationView<'a> {
+        VerificationView {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            display_name: self.__unsafe_private_named.1.unwrap(),
+            handle: self.__unsafe_private_named.2.unwrap(),
+            issuer: self.__unsafe_private_named.3.unwrap(),
+            issuer_profile: self.__unsafe_private_named.4,
+            issuer_repo: self.__unsafe_private_named.5,
+            revoke_reason: self.__unsafe_private_named.6,
+            revoked_at: self.__unsafe_private_named.7,
+            revoked_by: self.__unsafe_private_named.8,
+            subject: self.__unsafe_private_named.9.unwrap(),
+            subject_profile: self.__unsafe_private_named.10,
+            subject_repo: self.__unsafe_private_named.11,
+            uri: self.__unsafe_private_named.12.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> VerificationView<'a> {
+        VerificationView {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            display_name: self.__unsafe_private_named.1.unwrap(),
+            handle: self.__unsafe_private_named.2.unwrap(),
+            issuer: self.__unsafe_private_named.3.unwrap(),
+            issuer_profile: self.__unsafe_private_named.4,
+            issuer_repo: self.__unsafe_private_named.5,
+            revoke_reason: self.__unsafe_private_named.6,
+            revoked_at: self.__unsafe_private_named.7,
+            revoked_by: self.__unsafe_private_named.8,
+            subject: self.__unsafe_private_named.9.unwrap(),
+            subject_profile: self.__unsafe_private_named.10,
+            subject_repo: self.__unsafe_private_named.11,
+            uri: self.__unsafe_private_named.12.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]

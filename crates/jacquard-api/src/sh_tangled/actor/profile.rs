@@ -14,8 +14,7 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Profile<'a> {
@@ -23,27 +22,234 @@ pub struct Profile<'a> {
     pub bluesky: bool,
     /// Free-form profile description text.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub description: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub links: Option<Vec<jacquard_common::types::string::Uri<'a>>>,
     /// Free-form location text.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub location: Option<jacquard_common::CowStr<'a>>,
     /// Any ATURI, it is up to appviews to validate these fields.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub pinned_repositories: Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub stats: Option<Vec<jacquard_common::CowStr<'a>>>,
+}
+
+pub mod profile_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Bluesky;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Bluesky = Unset;
+    }
+    ///State transition - sets the `bluesky` field to Set
+    pub struct SetBluesky<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBluesky<S> {}
+    impl<S: State> State for SetBluesky<S> {
+        type Bluesky = Set<members::bluesky>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `bluesky` field
+        pub struct bluesky(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ProfileBuilder<'a, S: profile_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<bool>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<Vec<jacquard_common::types::string::Uri<'a>>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
+        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Profile<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ProfileBuilder<'a, profile_state::Empty> {
+        ProfileBuilder::new()
+    }
+}
+
+impl<'a> ProfileBuilder<'a, profile_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ProfileBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ProfileBuilder<'a, S>
+where
+    S: profile_state::State,
+    S::Bluesky: profile_state::IsUnset,
+{
+    /// Set the `bluesky` field (required)
+    pub fn bluesky(
+        mut self,
+        value: impl Into<bool>,
+    ) -> ProfileBuilder<'a, profile_state::SetBluesky<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ProfileBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
+    /// Set the `description` field (optional)
+    pub fn description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `description` field to an Option value (optional)
+    pub fn maybe_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
+    /// Set the `links` field (optional)
+    pub fn links(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::types::string::Uri<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `links` field to an Option value (optional)
+    pub fn maybe_links(
+        mut self,
+        value: Option<Vec<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
+    /// Set the `location` field (optional)
+    pub fn location(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `location` field to an Option value (optional)
+    pub fn maybe_location(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
+    /// Set the `pinnedRepositories` field (optional)
+    pub fn pinned_repositories(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::types::string::AtUri<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `pinnedRepositories` field to an Option value (optional)
+    pub fn maybe_pinned_repositories(
+        mut self,
+        value: Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
+    /// Set the `stats` field (optional)
+    pub fn stats(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `stats` field to an Option value (optional)
+    pub fn maybe_stats(
+        mut self,
+        value: Option<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S> ProfileBuilder<'a, S>
+where
+    S: profile_state::State,
+    S::Bluesky: profile_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Profile<'a> {
+        Profile {
+            bluesky: self.__unsafe_private_named.0.unwrap(),
+            description: self.__unsafe_private_named.1,
+            links: self.__unsafe_private_named.2,
+            location: self.__unsafe_private_named.3,
+            pinned_repositories: self.__unsafe_private_named.4,
+            stats: self.__unsafe_private_named.5,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Profile<'a> {
+        Profile {
+            bluesky: self.__unsafe_private_named.0.unwrap(),
+            description: self.__unsafe_private_named.1,
+            links: self.__unsafe_private_named.2,
+            location: self.__unsafe_private_named.3,
+            pinned_repositories: self.__unsafe_private_named.4,
+            stats: self.__unsafe_private_named.5,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Profile<'a> {

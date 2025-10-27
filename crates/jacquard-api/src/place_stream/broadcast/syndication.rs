@@ -14,8 +14,7 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Syndication<'a> {
@@ -27,6 +26,183 @@ pub struct Syndication<'a> {
     /// DID of the streamer whose livestream is being replicated
     #[serde(borrow)]
     pub streamer: jacquard_common::types::string::Did<'a>,
+}
+
+pub mod syndication_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Broadcaster;
+        type Streamer;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Broadcaster = Unset;
+        type Streamer = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `broadcaster` field to Set
+    pub struct SetBroadcaster<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBroadcaster<S> {}
+    impl<S: State> State for SetBroadcaster<S> {
+        type Broadcaster = Set<members::broadcaster>;
+        type Streamer = S::Streamer;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `streamer` field to Set
+    pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStreamer<S> {}
+    impl<S: State> State for SetStreamer<S> {
+        type Broadcaster = S::Broadcaster;
+        type Streamer = Set<members::streamer>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Broadcaster = S::Broadcaster;
+        type Streamer = S::Streamer;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `broadcaster` field
+        pub struct broadcaster(());
+        ///Marker type for the `streamer` field
+        pub struct streamer(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct SyndicationBuilder<'a, S: syndication_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Syndication<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> SyndicationBuilder<'a, syndication_state::Empty> {
+        SyndicationBuilder::new()
+    }
+}
+
+impl<'a> SyndicationBuilder<'a, syndication_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        SyndicationBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SyndicationBuilder<'a, S>
+where
+    S: syndication_state::State,
+    S::Broadcaster: syndication_state::IsUnset,
+{
+    /// Set the `broadcaster` field (required)
+    pub fn broadcaster(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> SyndicationBuilder<'a, syndication_state::SetBroadcaster<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        SyndicationBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SyndicationBuilder<'a, S>
+where
+    S: syndication_state::State,
+    S::CreatedAt: syndication_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> SyndicationBuilder<'a, syndication_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        SyndicationBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SyndicationBuilder<'a, S>
+where
+    S: syndication_state::State,
+    S::Streamer: syndication_state::IsUnset,
+{
+    /// Set the `streamer` field (required)
+    pub fn streamer(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> SyndicationBuilder<'a, syndication_state::SetStreamer<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        SyndicationBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SyndicationBuilder<'a, S>
+where
+    S: syndication_state::State,
+    S::Broadcaster: syndication_state::IsSet,
+    S::Streamer: syndication_state::IsSet,
+    S::CreatedAt: syndication_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Syndication<'a> {
+        Syndication {
+            broadcaster: self.__unsafe_private_named.0.unwrap(),
+            created_at: self.__unsafe_private_named.1.unwrap(),
+            streamer: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Syndication<'a> {
+        Syndication {
+            broadcaster: self.__unsafe_private_named.0.unwrap(),
+            created_at: self.__unsafe_private_named.1.unwrap(),
+            streamer: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Syndication<'a> {

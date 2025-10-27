@@ -13,22 +13,118 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-#[builder(start_fn = new)]
 pub struct PutPreferences<'a> {
     /// A ref to the user's preferences
     #[serde(borrow)]
     pub preferences: crate::social_clippr::actor::Preferences<'a>,
-    #[serde(flatten)]
-    #[serde(borrow)]
-    #[builder(default)]
-    pub extra_data: ::std::collections::BTreeMap<
-        ::jacquard_common::smol_str::SmolStr,
-        ::jacquard_common::types::value::Data<'a>,
-    >,
+}
+
+pub mod put_preferences_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Preferences;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Preferences = Unset;
+    }
+    ///State transition - sets the `preferences` field to Set
+    pub struct SetPreferences<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPreferences<S> {}
+    impl<S: State> State for SetPreferences<S> {
+        type Preferences = Set<members::preferences>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `preferences` field
+        pub struct preferences(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct PutPreferencesBuilder<'a, S: put_preferences_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<crate::social_clippr::actor::Preferences<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> PutPreferences<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> PutPreferencesBuilder<'a, put_preferences_state::Empty> {
+        PutPreferencesBuilder::new()
+    }
+}
+
+impl<'a> PutPreferencesBuilder<'a, put_preferences_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        PutPreferencesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PutPreferencesBuilder<'a, S>
+where
+    S: put_preferences_state::State,
+    S::Preferences: put_preferences_state::IsUnset,
+{
+    /// Set the `preferences` field (required)
+    pub fn preferences(
+        mut self,
+        value: impl Into<crate::social_clippr::actor::Preferences<'a>>,
+    ) -> PutPreferencesBuilder<'a, put_preferences_state::SetPreferences<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        PutPreferencesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PutPreferencesBuilder<'a, S>
+where
+    S: put_preferences_state::State,
+    S::Preferences: put_preferences_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> PutPreferences<'a> {
+        PutPreferences {
+            preferences: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> PutPreferences<'a> {
+        PutPreferences {
+            preferences: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 /// Response type for

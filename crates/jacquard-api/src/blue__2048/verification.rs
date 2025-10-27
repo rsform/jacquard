@@ -17,8 +17,7 @@ pub mod stats;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct VerificationRef<'a> {
@@ -31,11 +30,267 @@ pub struct VerificationRef<'a> {
     pub record_ref: jacquard_common::types::string::AtUri<'a>,
     /// The public verifiable signature of the record. Serialization of the records valued
     #[serde(borrow)]
-    #[builder(into)]
     pub signature: jacquard_common::CowStr<'a>,
     /// DID of the subject the verification applies to.
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::Did<'a>,
+}
+
+pub mod verification_ref_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type KeyRef;
+        type RecordRef;
+        type Subject;
+        type Signature;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type KeyRef = Unset;
+        type RecordRef = Unset;
+        type Subject = Unset;
+        type Signature = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `key_ref` field to Set
+    pub struct SetKeyRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetKeyRef<S> {}
+    impl<S: State> State for SetKeyRef<S> {
+        type KeyRef = Set<members::key_ref>;
+        type RecordRef = S::RecordRef;
+        type Subject = S::Subject;
+        type Signature = S::Signature;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `record_ref` field to Set
+    pub struct SetRecordRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecordRef<S> {}
+    impl<S: State> State for SetRecordRef<S> {
+        type KeyRef = S::KeyRef;
+        type RecordRef = Set<members::record_ref>;
+        type Subject = S::Subject;
+        type Signature = S::Signature;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type KeyRef = S::KeyRef;
+        type RecordRef = S::RecordRef;
+        type Subject = Set<members::subject>;
+        type Signature = S::Signature;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `signature` field to Set
+    pub struct SetSignature<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSignature<S> {}
+    impl<S: State> State for SetSignature<S> {
+        type KeyRef = S::KeyRef;
+        type RecordRef = S::RecordRef;
+        type Subject = S::Subject;
+        type Signature = Set<members::signature>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type KeyRef = S::KeyRef;
+        type RecordRef = S::RecordRef;
+        type Subject = S::Subject;
+        type Signature = S::Signature;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `key_ref` field
+        pub struct key_ref(());
+        ///Marker type for the `record_ref` field
+        pub struct record_ref(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
+        ///Marker type for the `signature` field
+        pub struct signature(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct VerificationRefBuilder<'a, S: verification_ref_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> VerificationRef<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> VerificationRefBuilder<'a, verification_ref_state::Empty> {
+        VerificationRefBuilder::new()
+    }
+}
+
+impl<'a> VerificationRefBuilder<'a, verification_ref_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        VerificationRefBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> VerificationRefBuilder<'a, S>
+where
+    S: verification_ref_state::State,
+    S::CreatedAt: verification_ref_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> VerificationRefBuilder<'a, verification_ref_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        VerificationRefBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> VerificationRefBuilder<'a, S>
+where
+    S: verification_ref_state::State,
+    S::KeyRef: verification_ref_state::IsUnset,
+{
+    /// Set the `keyRef` field (required)
+    pub fn key_ref(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> VerificationRefBuilder<'a, verification_ref_state::SetKeyRef<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        VerificationRefBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> VerificationRefBuilder<'a, S>
+where
+    S: verification_ref_state::State,
+    S::RecordRef: verification_ref_state::IsUnset,
+{
+    /// Set the `recordRef` field (required)
+    pub fn record_ref(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> VerificationRefBuilder<'a, verification_ref_state::SetRecordRef<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        VerificationRefBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> VerificationRefBuilder<'a, S>
+where
+    S: verification_ref_state::State,
+    S::Signature: verification_ref_state::IsUnset,
+{
+    /// Set the `signature` field (required)
+    pub fn signature(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> VerificationRefBuilder<'a, verification_ref_state::SetSignature<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        VerificationRefBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> VerificationRefBuilder<'a, S>
+where
+    S: verification_ref_state::State,
+    S::Subject: verification_ref_state::IsUnset,
+{
+    /// Set the `subject` field (required)
+    pub fn subject(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> VerificationRefBuilder<'a, verification_ref_state::SetSubject<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        VerificationRefBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> VerificationRefBuilder<'a, S>
+where
+    S: verification_ref_state::State,
+    S::KeyRef: verification_ref_state::IsSet,
+    S::RecordRef: verification_ref_state::IsSet,
+    S::Subject: verification_ref_state::IsSet,
+    S::Signature: verification_ref_state::IsSet,
+    S::CreatedAt: verification_ref_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> VerificationRef<'a> {
+        VerificationRef {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            key_ref: self.__unsafe_private_named.1.unwrap(),
+            record_ref: self.__unsafe_private_named.2.unwrap(),
+            signature: self.__unsafe_private_named.3.unwrap(),
+            subject: self.__unsafe_private_named.4.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> VerificationRef<'a> {
+        VerificationRef {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            key_ref: self.__unsafe_private_named.1.unwrap(),
+            record_ref: self.__unsafe_private_named.2.unwrap(),
+            signature: self.__unsafe_private_named.3.unwrap(),
+            subject: self.__unsafe_private_named.4.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_blue_2048_verification_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<

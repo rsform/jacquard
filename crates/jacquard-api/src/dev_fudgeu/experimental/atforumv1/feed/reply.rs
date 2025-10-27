@@ -14,20 +14,216 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Reply<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub content: jacquard_common::CowStr<'a>,
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(borrow)]
     pub root: jacquard_common::types::string::AtUri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub updated_at: Option<jacquard_common::types::string::Datetime>,
+}
+
+pub mod reply_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Content;
+        type CreatedAt;
+        type Root;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Content = Unset;
+        type CreatedAt = Unset;
+        type Root = Unset;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type Content = Set<members::content>;
+        type CreatedAt = S::CreatedAt;
+        type Root = S::Root;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Content = S::Content;
+        type CreatedAt = Set<members::created_at>;
+        type Root = S::Root;
+    }
+    ///State transition - sets the `root` field to Set
+    pub struct SetRoot<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRoot<S> {}
+    impl<S: State> State for SetRoot<S> {
+        type Content = S::Content;
+        type CreatedAt = S::CreatedAt;
+        type Root = Set<members::root>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `content` field
+        pub struct content(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `root` field
+        pub struct root(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ReplyBuilder<'a, S: reply_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Reply<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ReplyBuilder<'a, reply_state::Empty> {
+        ReplyBuilder::new()
+    }
+}
+
+impl<'a> ReplyBuilder<'a, reply_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ReplyBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ReplyBuilder<'a, S>
+where
+    S: reply_state::State,
+    S::Content: reply_state::IsUnset,
+{
+    /// Set the `content` field (required)
+    pub fn content(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> ReplyBuilder<'a, reply_state::SetContent<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ReplyBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ReplyBuilder<'a, S>
+where
+    S: reply_state::State,
+    S::CreatedAt: reply_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> ReplyBuilder<'a, reply_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        ReplyBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ReplyBuilder<'a, S>
+where
+    S: reply_state::State,
+    S::Root: reply_state::IsUnset,
+{
+    /// Set the `root` field (required)
+    pub fn root(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> ReplyBuilder<'a, reply_state::SetRoot<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        ReplyBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: reply_state::State> ReplyBuilder<'a, S> {
+    /// Set the `updatedAt` field (optional)
+    pub fn updated_at(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `updatedAt` field to an Option value (optional)
+    pub fn maybe_updated_at(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S> ReplyBuilder<'a, S>
+where
+    S: reply_state::State,
+    S::Content: reply_state::IsSet,
+    S::CreatedAt: reply_state::IsSet,
+    S::Root: reply_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Reply<'a> {
+        Reply {
+            content: self.__unsafe_private_named.0.unwrap(),
+            created_at: self.__unsafe_private_named.1.unwrap(),
+            root: self.__unsafe_private_named.2.unwrap(),
+            updated_at: self.__unsafe_private_named.3,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Reply<'a> {
+        Reply {
+            content: self.__unsafe_private_named.0.unwrap(),
+            created_at: self.__unsafe_private_named.1.unwrap(),
+            root: self.__unsafe_private_named.2.unwrap(),
+            updated_at: self.__unsafe_private_named.3,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Reply<'a> {

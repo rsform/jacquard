@@ -13,19 +13,15 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-#[builder(start_fn = new)]
 pub struct CreateReport<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
-    pub mod_tool: Option<jacquard_common::types::value::Data<'a>>,
+    pub mod_tool: Option<crate::com_atproto::moderation::create_report::ModTool<'a>>,
     /// Additional context about the content and violation.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub reason: Option<jacquard_common::CowStr<'a>>,
     /// Indicates the broad category of violation the report is for.
@@ -33,13 +29,191 @@ pub struct CreateReport<'a> {
     pub reason_type: crate::com_atproto::moderation::ReasonType<'a>,
     #[serde(borrow)]
     pub subject: CreateReportSubject<'a>,
-    #[serde(flatten)]
-    #[serde(borrow)]
-    #[builder(default)]
-    pub extra_data: ::std::collections::BTreeMap<
-        ::jacquard_common::smol_str::SmolStr,
-        ::jacquard_common::types::value::Data<'a>,
-    >,
+}
+
+pub mod create_report_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type ReasonType;
+        type Subject;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type ReasonType = Unset;
+        type Subject = Unset;
+    }
+    ///State transition - sets the `reason_type` field to Set
+    pub struct SetReasonType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetReasonType<S> {}
+    impl<S: State> State for SetReasonType<S> {
+        type ReasonType = Set<members::reason_type>;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type ReasonType = S::ReasonType;
+        type Subject = Set<members::subject>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `reason_type` field
+        pub struct reason_type(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct CreateReportBuilder<'a, S: create_report_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<
+            crate::com_atproto::moderation::create_report::ModTool<'a>,
+        >,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<crate::com_atproto::moderation::ReasonType<'a>>,
+        ::core::option::Option<CreateReportSubject<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> CreateReport<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> CreateReportBuilder<'a, create_report_state::Empty> {
+        CreateReportBuilder::new()
+    }
+}
+
+impl<'a> CreateReportBuilder<'a, create_report_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        CreateReportBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: create_report_state::State> CreateReportBuilder<'a, S> {
+    /// Set the `modTool` field (optional)
+    pub fn mod_tool(
+        mut self,
+        value: impl Into<
+            Option<crate::com_atproto::moderation::create_report::ModTool<'a>>,
+        >,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `modTool` field to an Option value (optional)
+    pub fn maybe_mod_tool(
+        mut self,
+        value: Option<crate::com_atproto::moderation::create_report::ModTool<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: create_report_state::State> CreateReportBuilder<'a, S> {
+    /// Set the `reason` field (optional)
+    pub fn reason(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `reason` field to an Option value (optional)
+    pub fn maybe_reason(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> CreateReportBuilder<'a, S>
+where
+    S: create_report_state::State,
+    S::ReasonType: create_report_state::IsUnset,
+{
+    /// Set the `reasonType` field (required)
+    pub fn reason_type(
+        mut self,
+        value: impl Into<crate::com_atproto::moderation::ReasonType<'a>>,
+    ) -> CreateReportBuilder<'a, create_report_state::SetReasonType<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        CreateReportBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CreateReportBuilder<'a, S>
+where
+    S: create_report_state::State,
+    S::Subject: create_report_state::IsUnset,
+{
+    /// Set the `subject` field (required)
+    pub fn subject(
+        mut self,
+        value: impl Into<CreateReportSubject<'a>>,
+    ) -> CreateReportBuilder<'a, create_report_state::SetSubject<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        CreateReportBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CreateReportBuilder<'a, S>
+where
+    S: create_report_state::State,
+    S::ReasonType: create_report_state::IsSet,
+    S::Subject: create_report_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> CreateReport<'a> {
+        CreateReport {
+            mod_tool: self.__unsafe_private_named.0,
+            reason: self.__unsafe_private_named.1,
+            reason_type: self.__unsafe_private_named.2.unwrap(),
+            subject: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> CreateReport<'a> {
+        CreateReport {
+            mod_tool: self.__unsafe_private_named.0,
+            reason: self.__unsafe_private_named.1,
+            reason_type: self.__unsafe_private_named.2.unwrap(),
+            subject: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]

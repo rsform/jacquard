@@ -12,17 +12,139 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetPlay<'a> {
     #[serde(borrow)]
     pub author_did: jacquard_common::types::ident::AtIdentifier<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub rkey: jacquard_common::CowStr<'a>,
+}
+
+pub mod get_play_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type AuthorDid;
+        type Rkey;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type AuthorDid = Unset;
+        type Rkey = Unset;
+    }
+    ///State transition - sets the `author_did` field to Set
+    pub struct SetAuthorDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthorDid<S> {}
+    impl<S: State> State for SetAuthorDid<S> {
+        type AuthorDid = Set<members::author_did>;
+        type Rkey = S::Rkey;
+    }
+    ///State transition - sets the `rkey` field to Set
+    pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRkey<S> {}
+    impl<S: State> State for SetRkey<S> {
+        type AuthorDid = S::AuthorDid;
+        type Rkey = Set<members::rkey>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `author_did` field
+        pub struct author_did(());
+        ///Marker type for the `rkey` field
+        pub struct rkey(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetPlayBuilder<'a, S: get_play_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GetPlay<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GetPlayBuilder<'a, get_play_state::Empty> {
+        GetPlayBuilder::new()
+    }
+}
+
+impl<'a> GetPlayBuilder<'a, get_play_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetPlayBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetPlayBuilder<'a, S>
+where
+    S: get_play_state::State,
+    S::AuthorDid: get_play_state::IsUnset,
+{
+    /// Set the `authorDID` field (required)
+    pub fn author_did(
+        mut self,
+        value: impl Into<jacquard_common::types::ident::AtIdentifier<'a>>,
+    ) -> GetPlayBuilder<'a, get_play_state::SetAuthorDid<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        GetPlayBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetPlayBuilder<'a, S>
+where
+    S: get_play_state::State,
+    S::Rkey: get_play_state::IsUnset,
+{
+    /// Set the `rkey` field (required)
+    pub fn rkey(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> GetPlayBuilder<'a, get_play_state::SetRkey<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        GetPlayBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetPlayBuilder<'a, S>
+where
+    S: get_play_state::State,
+    S::AuthorDid: get_play_state::IsSet,
+    S::Rkey: get_play_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetPlay<'a> {
+        GetPlay {
+            author_did: self.__unsafe_private_named.0.unwrap(),
+            rkey: self.__unsafe_private_named.1.unwrap(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

@@ -13,21 +13,217 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Comment<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub body: jacquard_common::CowStr<'a>,
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(borrow)]
     pub issue: jacquard_common::types::string::AtUri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub reply_to: Option<jacquard_common::types::string::AtUri<'a>>,
+}
+
+pub mod comment_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Issue;
+        type Body;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Issue = Unset;
+        type Body = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `issue` field to Set
+    pub struct SetIssue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIssue<S> {}
+    impl<S: State> State for SetIssue<S> {
+        type Issue = Set<members::issue>;
+        type Body = S::Body;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `body` field to Set
+    pub struct SetBody<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBody<S> {}
+    impl<S: State> State for SetBody<S> {
+        type Issue = S::Issue;
+        type Body = Set<members::body>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Issue = S::Issue;
+        type Body = S::Body;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `issue` field
+        pub struct issue(());
+        ///Marker type for the `body` field
+        pub struct body(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct CommentBuilder<'a, S: comment_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Comment<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> CommentBuilder<'a, comment_state::Empty> {
+        CommentBuilder::new()
+    }
+}
+
+impl<'a> CommentBuilder<'a, comment_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        CommentBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CommentBuilder<'a, S>
+where
+    S: comment_state::State,
+    S::Body: comment_state::IsUnset,
+{
+    /// Set the `body` field (required)
+    pub fn body(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> CommentBuilder<'a, comment_state::SetBody<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        CommentBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CommentBuilder<'a, S>
+where
+    S: comment_state::State,
+    S::CreatedAt: comment_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> CommentBuilder<'a, comment_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        CommentBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CommentBuilder<'a, S>
+where
+    S: comment_state::State,
+    S::Issue: comment_state::IsUnset,
+{
+    /// Set the `issue` field (required)
+    pub fn issue(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> CommentBuilder<'a, comment_state::SetIssue<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        CommentBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: comment_state::State> CommentBuilder<'a, S> {
+    /// Set the `replyTo` field (optional)
+    pub fn reply_to(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::AtUri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `replyTo` field to an Option value (optional)
+    pub fn maybe_reply_to(
+        mut self,
+        value: Option<jacquard_common::types::string::AtUri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S> CommentBuilder<'a, S>
+where
+    S: comment_state::State,
+    S::Issue: comment_state::IsSet,
+    S::Body: comment_state::IsSet,
+    S::CreatedAt: comment_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Comment<'a> {
+        Comment {
+            body: self.__unsafe_private_named.0.unwrap(),
+            created_at: self.__unsafe_private_named.1.unwrap(),
+            issue: self.__unsafe_private_named.2.unwrap(),
+            reply_to: self.__unsafe_private_named.3,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Comment<'a> {
+        Comment {
+            body: self.__unsafe_private_named.0.unwrap(),
+            created_at: self.__unsafe_private_named.1.unwrap(),
+            issue: self.__unsafe_private_named.2.unwrap(),
+            reply_to: self.__unsafe_private_named.3,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Comment<'a> {

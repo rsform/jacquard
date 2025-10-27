@@ -1331,71 +1331,495 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ItemUsageData<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Log<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub collection_data: Option<crate::net_anisota::beta::game::log::CollectionData<'a>>,
     /// When the log record was created
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub created_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub daily_rewards_data: Option<
         crate::net_anisota::beta::game::log::DailyRewardsData<'a>,
     >,
     /// Type of event being logged
     #[serde(borrow)]
-    #[builder(into)]
     pub event_type: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub feed_context: Option<crate::net_anisota::beta::game::log::FeedContext<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub game_card_data: Option<crate::net_anisota::beta::game::log::GameCardData<'a>>,
     /// Unique ID of the game card this event relates to
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub game_card_id: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub item_usage_data: Option<crate::net_anisota::beta::game::log::ItemUsageData<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub metadata: Option<crate::net_anisota::beta::game::log::Metadata<'a>>,
     /// URI of the parent log record that triggered this event
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub parent_log_uri: Option<jacquard_common::CowStr<'a>>,
     /// URI of the root log record in this event chain
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub root_log_uri: Option<jacquard_common::CowStr<'a>>,
     /// Unique session identifier to group related events
     #[serde(borrow)]
-    #[builder(into)]
     pub session_id: jacquard_common::CowStr<'a>,
     /// URI of the session record this event belongs to (at://did/collection/rkey)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub session_uri: Option<jacquard_common::CowStr<'a>>,
     /// When the event occurred (ISO 8601)
     pub timestamp: jacquard_common::types::string::Datetime,
+}
+
+pub mod log_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type EventType;
+        type Timestamp;
+        type SessionId;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type EventType = Unset;
+        type Timestamp = Unset;
+        type SessionId = Unset;
+    }
+    ///State transition - sets the `event_type` field to Set
+    pub struct SetEventType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEventType<S> {}
+    impl<S: State> State for SetEventType<S> {
+        type EventType = Set<members::event_type>;
+        type Timestamp = S::Timestamp;
+        type SessionId = S::SessionId;
+    }
+    ///State transition - sets the `timestamp` field to Set
+    pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTimestamp<S> {}
+    impl<S: State> State for SetTimestamp<S> {
+        type EventType = S::EventType;
+        type Timestamp = Set<members::timestamp>;
+        type SessionId = S::SessionId;
+    }
+    ///State transition - sets the `session_id` field to Set
+    pub struct SetSessionId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSessionId<S> {}
+    impl<S: State> State for SetSessionId<S> {
+        type EventType = S::EventType;
+        type Timestamp = S::Timestamp;
+        type SessionId = Set<members::session_id>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `event_type` field
+        pub struct event_type(());
+        ///Marker type for the `timestamp` field
+        pub struct timestamp(());
+        ///Marker type for the `session_id` field
+        pub struct session_id(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct LogBuilder<'a, S: log_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<crate::net_anisota::beta::game::log::CollectionData<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<
+            crate::net_anisota::beta::game::log::DailyRewardsData<'a>,
+        >,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<crate::net_anisota::beta::game::log::FeedContext<'a>>,
+        ::core::option::Option<crate::net_anisota::beta::game::log::GameCardData<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<crate::net_anisota::beta::game::log::ItemUsageData<'a>>,
+        ::core::option::Option<crate::net_anisota::beta::game::log::Metadata<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Log<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> LogBuilder<'a, log_state::Empty> {
+        LogBuilder::new()
+    }
+}
+
+impl<'a> LogBuilder<'a, log_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        LogBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: log_state::State> LogBuilder<'a, S> {
+    /// Set the `collectionData` field (optional)
+    pub fn collection_data(
+        mut self,
+        value: impl Into<Option<crate::net_anisota::beta::game::log::CollectionData<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `collectionData` field to an Option value (optional)
+    pub fn maybe_collection_data(
+        mut self,
+        value: Option<crate::net_anisota::beta::game::log::CollectionData<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: log_state::State> LogBuilder<'a, S> {
+    /// Set the `createdAt` field (optional)
+    pub fn created_at(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `createdAt` field to an Option value (optional)
+    pub fn maybe_created_at(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: log_state::State> LogBuilder<'a, S> {
+    /// Set the `dailyRewardsData` field (optional)
+    pub fn daily_rewards_data(
+        mut self,
+        value: impl Into<
+            Option<crate::net_anisota::beta::game::log::DailyRewardsData<'a>>,
+        >,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `dailyRewardsData` field to an Option value (optional)
+    pub fn maybe_daily_rewards_data(
+        mut self,
+        value: Option<crate::net_anisota::beta::game::log::DailyRewardsData<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> LogBuilder<'a, S>
+where
+    S: log_state::State,
+    S::EventType: log_state::IsUnset,
+{
+    /// Set the `eventType` field (required)
+    pub fn event_type(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> LogBuilder<'a, log_state::SetEventType<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        LogBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: log_state::State> LogBuilder<'a, S> {
+    /// Set the `feedContext` field (optional)
+    pub fn feed_context(
+        mut self,
+        value: impl Into<Option<crate::net_anisota::beta::game::log::FeedContext<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `feedContext` field to an Option value (optional)
+    pub fn maybe_feed_context(
+        mut self,
+        value: Option<crate::net_anisota::beta::game::log::FeedContext<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: log_state::State> LogBuilder<'a, S> {
+    /// Set the `gameCardData` field (optional)
+    pub fn game_card_data(
+        mut self,
+        value: impl Into<Option<crate::net_anisota::beta::game::log::GameCardData<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `gameCardData` field to an Option value (optional)
+    pub fn maybe_game_card_data(
+        mut self,
+        value: Option<crate::net_anisota::beta::game::log::GameCardData<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S: log_state::State> LogBuilder<'a, S> {
+    /// Set the `gameCardId` field (optional)
+    pub fn game_card_id(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `gameCardId` field to an Option value (optional)
+    pub fn maybe_game_card_id(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S: log_state::State> LogBuilder<'a, S> {
+    /// Set the `itemUsageData` field (optional)
+    pub fn item_usage_data(
+        mut self,
+        value: impl Into<Option<crate::net_anisota::beta::game::log::ItemUsageData<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value.into();
+        self
+    }
+    /// Set the `itemUsageData` field to an Option value (optional)
+    pub fn maybe_item_usage_data(
+        mut self,
+        value: Option<crate::net_anisota::beta::game::log::ItemUsageData<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value;
+        self
+    }
+}
+
+impl<'a, S: log_state::State> LogBuilder<'a, S> {
+    /// Set the `metadata` field (optional)
+    pub fn metadata(
+        mut self,
+        value: impl Into<Option<crate::net_anisota::beta::game::log::Metadata<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value.into();
+        self
+    }
+    /// Set the `metadata` field to an Option value (optional)
+    pub fn maybe_metadata(
+        mut self,
+        value: Option<crate::net_anisota::beta::game::log::Metadata<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value;
+        self
+    }
+}
+
+impl<'a, S: log_state::State> LogBuilder<'a, S> {
+    /// Set the `parentLogUri` field (optional)
+    pub fn parent_log_uri(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.9 = value.into();
+        self
+    }
+    /// Set the `parentLogUri` field to an Option value (optional)
+    pub fn maybe_parent_log_uri(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.9 = value;
+        self
+    }
+}
+
+impl<'a, S: log_state::State> LogBuilder<'a, S> {
+    /// Set the `rootLogUri` field (optional)
+    pub fn root_log_uri(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.10 = value.into();
+        self
+    }
+    /// Set the `rootLogUri` field to an Option value (optional)
+    pub fn maybe_root_log_uri(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.10 = value;
+        self
+    }
+}
+
+impl<'a, S> LogBuilder<'a, S>
+where
+    S: log_state::State,
+    S::SessionId: log_state::IsUnset,
+{
+    /// Set the `sessionId` field (required)
+    pub fn session_id(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> LogBuilder<'a, log_state::SetSessionId<S>> {
+        self.__unsafe_private_named.11 = ::core::option::Option::Some(value.into());
+        LogBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: log_state::State> LogBuilder<'a, S> {
+    /// Set the `sessionUri` field (optional)
+    pub fn session_uri(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.12 = value.into();
+        self
+    }
+    /// Set the `sessionUri` field to an Option value (optional)
+    pub fn maybe_session_uri(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.12 = value;
+        self
+    }
+}
+
+impl<'a, S> LogBuilder<'a, S>
+where
+    S: log_state::State,
+    S::Timestamp: log_state::IsUnset,
+{
+    /// Set the `timestamp` field (required)
+    pub fn timestamp(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> LogBuilder<'a, log_state::SetTimestamp<S>> {
+        self.__unsafe_private_named.13 = ::core::option::Option::Some(value.into());
+        LogBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LogBuilder<'a, S>
+where
+    S: log_state::State,
+    S::EventType: log_state::IsSet,
+    S::Timestamp: log_state::IsSet,
+    S::SessionId: log_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Log<'a> {
+        Log {
+            collection_data: self.__unsafe_private_named.0,
+            created_at: self.__unsafe_private_named.1,
+            daily_rewards_data: self.__unsafe_private_named.2,
+            event_type: self.__unsafe_private_named.3.unwrap(),
+            feed_context: self.__unsafe_private_named.4,
+            game_card_data: self.__unsafe_private_named.5,
+            game_card_id: self.__unsafe_private_named.6,
+            item_usage_data: self.__unsafe_private_named.7,
+            metadata: self.__unsafe_private_named.8,
+            parent_log_uri: self.__unsafe_private_named.9,
+            root_log_uri: self.__unsafe_private_named.10,
+            session_id: self.__unsafe_private_named.11.unwrap(),
+            session_uri: self.__unsafe_private_named.12,
+            timestamp: self.__unsafe_private_named.13.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Log<'a> {
+        Log {
+            collection_data: self.__unsafe_private_named.0,
+            created_at: self.__unsafe_private_named.1,
+            daily_rewards_data: self.__unsafe_private_named.2,
+            event_type: self.__unsafe_private_named.3.unwrap(),
+            feed_context: self.__unsafe_private_named.4,
+            game_card_data: self.__unsafe_private_named.5,
+            game_card_id: self.__unsafe_private_named.6,
+            item_usage_data: self.__unsafe_private_named.7,
+            metadata: self.__unsafe_private_named.8,
+            parent_log_uri: self.__unsafe_private_named.9,
+            root_log_uri: self.__unsafe_private_named.10,
+            session_id: self.__unsafe_private_named.11.unwrap(),
+            session_uri: self.__unsafe_private_named.12,
+            timestamp: self.__unsafe_private_named.13.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Log<'a> {

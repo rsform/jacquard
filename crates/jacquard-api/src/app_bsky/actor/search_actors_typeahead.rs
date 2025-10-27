@@ -12,10 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct SearchActorsTypeahead<'a> {
     ///(default: 10, min: 1, max: 100)
@@ -23,12 +21,117 @@ pub struct SearchActorsTypeahead<'a> {
     pub limit: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    #[builder(into)]
     pub q: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    #[builder(into)]
     pub term: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+pub mod search_actors_typeahead_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {}
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {}
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {}
+}
+
+/// Builder for constructing an instance of this type
+pub struct SearchActorsTypeaheadBuilder<'a, S: search_actors_typeahead_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> SearchActorsTypeahead<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> SearchActorsTypeaheadBuilder<
+        'a,
+        search_actors_typeahead_state::Empty,
+    > {
+        SearchActorsTypeaheadBuilder::new()
+    }
+}
+
+impl<'a> SearchActorsTypeaheadBuilder<'a, search_actors_typeahead_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        SearchActorsTypeaheadBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: search_actors_typeahead_state::State> SearchActorsTypeaheadBuilder<'a, S> {
+    /// Set the `limit` field (optional)
+    pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `limit` field to an Option value (optional)
+    pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: search_actors_typeahead_state::State> SearchActorsTypeaheadBuilder<'a, S> {
+    /// Set the `q` field (optional)
+    pub fn q(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `q` field to an Option value (optional)
+    pub fn maybe_q(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: search_actors_typeahead_state::State> SearchActorsTypeaheadBuilder<'a, S> {
+    /// Set the `term` field (optional)
+    pub fn term(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `term` field to an Option value (optional)
+    pub fn maybe_term(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> SearchActorsTypeaheadBuilder<'a, S>
+where
+    S: search_actors_typeahead_state::State,
+{
+    /// Build the final struct
+    pub fn build(self) -> SearchActorsTypeahead<'a> {
+        SearchActorsTypeahead {
+            limit: self.__unsafe_private_named.0,
+            q: self.__unsafe_private_named.1,
+            term: self.__unsafe_private_named.2,
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

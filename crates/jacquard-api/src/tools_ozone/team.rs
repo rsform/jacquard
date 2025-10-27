@@ -18,33 +18,270 @@ pub mod update_member;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Member<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub created_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub disabled: Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub last_updated_by: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub profile: Option<crate::app_bsky::actor::ProfileViewDetailed<'a>>,
     #[serde(borrow)]
-    #[builder(into)]
     pub role: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub updated_at: Option<jacquard_common::types::string::Datetime>,
+}
+
+pub mod member_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Did;
+        type Role;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Did = Unset;
+        type Role = Unset;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Did = Set<members::did>;
+        type Role = S::Role;
+    }
+    ///State transition - sets the `role` field to Set
+    pub struct SetRole<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRole<S> {}
+    impl<S: State> State for SetRole<S> {
+        type Did = S::Did;
+        type Role = Set<members::role>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `role` field
+        pub struct role(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct MemberBuilder<'a, S: member_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<crate::app_bsky::actor::ProfileViewDetailed<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Member<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> MemberBuilder<'a, member_state::Empty> {
+        MemberBuilder::new()
+    }
+}
+
+impl<'a> MemberBuilder<'a, member_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        MemberBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: member_state::State> MemberBuilder<'a, S> {
+    /// Set the `createdAt` field (optional)
+    pub fn created_at(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `createdAt` field to an Option value (optional)
+    pub fn maybe_created_at(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> MemberBuilder<'a, S>
+where
+    S: member_state::State,
+    S::Did: member_state::IsUnset,
+{
+    /// Set the `did` field (required)
+    pub fn did(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> MemberBuilder<'a, member_state::SetDid<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        MemberBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: member_state::State> MemberBuilder<'a, S> {
+    /// Set the `disabled` field (optional)
+    pub fn disabled(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `disabled` field to an Option value (optional)
+    pub fn maybe_disabled(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: member_state::State> MemberBuilder<'a, S> {
+    /// Set the `lastUpdatedBy` field (optional)
+    pub fn last_updated_by(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `lastUpdatedBy` field to an Option value (optional)
+    pub fn maybe_last_updated_by(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: member_state::State> MemberBuilder<'a, S> {
+    /// Set the `profile` field (optional)
+    pub fn profile(
+        mut self,
+        value: impl Into<Option<crate::app_bsky::actor::ProfileViewDetailed<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `profile` field to an Option value (optional)
+    pub fn maybe_profile(
+        mut self,
+        value: Option<crate::app_bsky::actor::ProfileViewDetailed<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S> MemberBuilder<'a, S>
+where
+    S: member_state::State,
+    S::Role: member_state::IsUnset,
+{
+    /// Set the `role` field (required)
+    pub fn role(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> MemberBuilder<'a, member_state::SetRole<S>> {
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        MemberBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: member_state::State> MemberBuilder<'a, S> {
+    /// Set the `updatedAt` field (optional)
+    pub fn updated_at(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `updatedAt` field to an Option value (optional)
+    pub fn maybe_updated_at(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S> MemberBuilder<'a, S>
+where
+    S: member_state::State,
+    S::Did: member_state::IsSet,
+    S::Role: member_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Member<'a> {
+        Member {
+            created_at: self.__unsafe_private_named.0,
+            did: self.__unsafe_private_named.1.unwrap(),
+            disabled: self.__unsafe_private_named.2,
+            last_updated_by: self.__unsafe_private_named.3,
+            profile: self.__unsafe_private_named.4,
+            role: self.__unsafe_private_named.5.unwrap(),
+            updated_at: self.__unsafe_private_named.6,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Member<'a> {
+        Member {
+            created_at: self.__unsafe_private_named.0,
+            did: self.__unsafe_private_named.1.unwrap(),
+            disabled: self.__unsafe_private_named.2,
+            last_updated_by: self.__unsafe_private_named.3,
+            profile: self.__unsafe_private_named.4,
+            role: self.__unsafe_private_named.5.unwrap(),
+            updated_at: self.__unsafe_private_named.6,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_tools_ozone_team_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<

@@ -12,15 +12,101 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct SwapLaunchToken<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub launch_token: jacquard_common::CowStr<'a>,
+}
+
+pub mod swap_launch_token_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type LaunchToken;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type LaunchToken = Unset;
+    }
+    ///State transition - sets the `launch_token` field to Set
+    pub struct SetLaunchToken<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLaunchToken<S> {}
+    impl<S: State> State for SetLaunchToken<S> {
+        type LaunchToken = Set<members::launch_token>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `launch_token` field
+        pub struct launch_token(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct SwapLaunchTokenBuilder<'a, S: swap_launch_token_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (::core::option::Option<jacquard_common::CowStr<'a>>,),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> SwapLaunchToken<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> SwapLaunchTokenBuilder<'a, swap_launch_token_state::Empty> {
+        SwapLaunchTokenBuilder::new()
+    }
+}
+
+impl<'a> SwapLaunchTokenBuilder<'a, swap_launch_token_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        SwapLaunchTokenBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SwapLaunchTokenBuilder<'a, S>
+where
+    S: swap_launch_token_state::State,
+    S::LaunchToken: swap_launch_token_state::IsUnset,
+{
+    /// Set the `launchToken` field (required)
+    pub fn launch_token(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> SwapLaunchTokenBuilder<'a, swap_launch_token_state::SetLaunchToken<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        SwapLaunchTokenBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SwapLaunchTokenBuilder<'a, S>
+where
+    S: swap_launch_token_state::State,
+    S::LaunchToken: swap_launch_token_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> SwapLaunchToken<'a> {
+        SwapLaunchToken {
+            launch_token: self.__unsafe_private_named.0.unwrap(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

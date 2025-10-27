@@ -13,21 +13,195 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LastCommit<'a> {
     /// Commit hash
     #[serde(borrow)]
-    #[builder(into)]
     pub hash: jacquard_common::CowStr<'a>,
     /// Commit message
     #[serde(borrow)]
-    #[builder(into)]
     pub message: jacquard_common::CowStr<'a>,
     /// Commit timestamp
     pub when: jacquard_common::types::string::Datetime,
+}
+
+pub mod last_commit_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Hash;
+        type Message;
+        type When;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Hash = Unset;
+        type Message = Unset;
+        type When = Unset;
+    }
+    ///State transition - sets the `hash` field to Set
+    pub struct SetHash<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHash<S> {}
+    impl<S: State> State for SetHash<S> {
+        type Hash = Set<members::hash>;
+        type Message = S::Message;
+        type When = S::When;
+    }
+    ///State transition - sets the `message` field to Set
+    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMessage<S> {}
+    impl<S: State> State for SetMessage<S> {
+        type Hash = S::Hash;
+        type Message = Set<members::message>;
+        type When = S::When;
+    }
+    ///State transition - sets the `when` field to Set
+    pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWhen<S> {}
+    impl<S: State> State for SetWhen<S> {
+        type Hash = S::Hash;
+        type Message = S::Message;
+        type When = Set<members::when>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `hash` field
+        pub struct hash(());
+        ///Marker type for the `message` field
+        pub struct message(());
+        ///Marker type for the `when` field
+        pub struct when(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct LastCommitBuilder<'a, S: last_commit_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> LastCommit<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> LastCommitBuilder<'a, last_commit_state::Empty> {
+        LastCommitBuilder::new()
+    }
+}
+
+impl<'a> LastCommitBuilder<'a, last_commit_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        LastCommitBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LastCommitBuilder<'a, S>
+where
+    S: last_commit_state::State,
+    S::Hash: last_commit_state::IsUnset,
+{
+    /// Set the `hash` field (required)
+    pub fn hash(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> LastCommitBuilder<'a, last_commit_state::SetHash<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        LastCommitBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LastCommitBuilder<'a, S>
+where
+    S: last_commit_state::State,
+    S::Message: last_commit_state::IsUnset,
+{
+    /// Set the `message` field (required)
+    pub fn message(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> LastCommitBuilder<'a, last_commit_state::SetMessage<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        LastCommitBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LastCommitBuilder<'a, S>
+where
+    S: last_commit_state::State,
+    S::When: last_commit_state::IsUnset,
+{
+    /// Set the `when` field (required)
+    pub fn when(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> LastCommitBuilder<'a, last_commit_state::SetWhen<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        LastCommitBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LastCommitBuilder<'a, S>
+where
+    S: last_commit_state::State,
+    S::Hash: last_commit_state::IsSet,
+    S::Message: last_commit_state::IsSet,
+    S::When: last_commit_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> LastCommit<'a> {
+        LastCommit {
+            hash: self.__unsafe_private_named.0.unwrap(),
+            message: self.__unsafe_private_named.1.unwrap(),
+            when: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> LastCommit<'a> {
+        LastCommit {
+            hash: self.__unsafe_private_named.0.unwrap(),
+            message: self.__unsafe_private_named.1.unwrap(),
+            when: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_sh_tangled_repo_tree() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -373,23 +547,161 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LastCommit<'a> {
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct Tree<'a> {
     ///(default: "")
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    #[builder(into)]
     pub path: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
-    #[builder(into)]
     pub r#ref: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub repo: jacquard_common::CowStr<'a>,
+}
+
+pub mod tree_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Repo;
+        type Ref;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Repo = Unset;
+        type Ref = Unset;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Repo = Set<members::repo>;
+        type Ref = S::Ref;
+    }
+    ///State transition - sets the `ref` field to Set
+    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRef<S> {}
+    impl<S: State> State for SetRef<S> {
+        type Repo = S::Repo;
+        type Ref = Set<members::r#ref>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `repo` field
+        pub struct repo(());
+        ///Marker type for the `ref` field
+        pub struct r#ref(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct TreeBuilder<'a, S: tree_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Tree<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> TreeBuilder<'a, tree_state::Empty> {
+        TreeBuilder::new()
+    }
+}
+
+impl<'a> TreeBuilder<'a, tree_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        TreeBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: tree_state::State> TreeBuilder<'a, S> {
+    /// Set the `path` field (optional)
+    pub fn path(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `path` field to an Option value (optional)
+    pub fn maybe_path(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> TreeBuilder<'a, S>
+where
+    S: tree_state::State,
+    S::Ref: tree_state::IsUnset,
+{
+    /// Set the `ref` field (required)
+    pub fn r#ref(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> TreeBuilder<'a, tree_state::SetRef<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        TreeBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TreeBuilder<'a, S>
+where
+    S: tree_state::State,
+    S::Repo: tree_state::IsUnset,
+{
+    /// Set the `repo` field (required)
+    pub fn repo(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> TreeBuilder<'a, tree_state::SetRepo<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        TreeBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TreeBuilder<'a, S>
+where
+    S: tree_state::State,
+    S::Repo: tree_state::IsSet,
+    S::Ref: tree_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Tree<'a> {
+        Tree {
+            path: self.__unsafe_private_named.0,
+            r#ref: self.__unsafe_private_named.1.unwrap(),
+            repo: self.__unsafe_private_named.2.unwrap(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]
@@ -409,7 +721,7 @@ pub struct TreeOutput<'a> {
     #[serde(borrow)]
     pub dotdot: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
-    pub files: Vec<jacquard_common::types::value::Data<'a>>,
+    pub files: Vec<crate::sh_tangled::repo::tree::TreeEntry<'a>>,
     /// The parent path in the tree
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -417,7 +729,7 @@ pub struct TreeOutput<'a> {
     /// Readme for this file tree
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub readme: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub readme: std::option::Option<crate::sh_tangled::repo::tree::Readme<'a>>,
     /// The git reference used
     #[serde(borrow)]
     pub r#ref: jacquard_common::CowStr<'a>,
@@ -560,8 +872,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Readme<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TreeEntry<'a> {
@@ -570,19 +881,295 @@ pub struct TreeEntry<'a> {
     /// Whether this entry is a directory/subtree
     pub is_subtree: bool,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub last_commit: Option<crate::sh_tangled::repo::tree::LastCommit<'a>>,
     /// File mode
     #[serde(borrow)]
-    #[builder(into)]
     pub mode: jacquard_common::CowStr<'a>,
     /// Relative file or directory name
     #[serde(borrow)]
-    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
     /// File size in bytes
     pub size: i64,
+}
+
+pub mod tree_entry_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Name;
+        type Mode;
+        type Size;
+        type IsFile;
+        type IsSubtree;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Name = Unset;
+        type Mode = Unset;
+        type Size = Unset;
+        type IsFile = Unset;
+        type IsSubtree = Unset;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Name = Set<members::name>;
+        type Mode = S::Mode;
+        type Size = S::Size;
+        type IsFile = S::IsFile;
+        type IsSubtree = S::IsSubtree;
+    }
+    ///State transition - sets the `mode` field to Set
+    pub struct SetMode<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMode<S> {}
+    impl<S: State> State for SetMode<S> {
+        type Name = S::Name;
+        type Mode = Set<members::mode>;
+        type Size = S::Size;
+        type IsFile = S::IsFile;
+        type IsSubtree = S::IsSubtree;
+    }
+    ///State transition - sets the `size` field to Set
+    pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSize<S> {}
+    impl<S: State> State for SetSize<S> {
+        type Name = S::Name;
+        type Mode = S::Mode;
+        type Size = Set<members::size>;
+        type IsFile = S::IsFile;
+        type IsSubtree = S::IsSubtree;
+    }
+    ///State transition - sets the `is_file` field to Set
+    pub struct SetIsFile<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIsFile<S> {}
+    impl<S: State> State for SetIsFile<S> {
+        type Name = S::Name;
+        type Mode = S::Mode;
+        type Size = S::Size;
+        type IsFile = Set<members::is_file>;
+        type IsSubtree = S::IsSubtree;
+    }
+    ///State transition - sets the `is_subtree` field to Set
+    pub struct SetIsSubtree<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIsSubtree<S> {}
+    impl<S: State> State for SetIsSubtree<S> {
+        type Name = S::Name;
+        type Mode = S::Mode;
+        type Size = S::Size;
+        type IsFile = S::IsFile;
+        type IsSubtree = Set<members::is_subtree>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `mode` field
+        pub struct mode(());
+        ///Marker type for the `size` field
+        pub struct size(());
+        ///Marker type for the `is_file` field
+        pub struct is_file(());
+        ///Marker type for the `is_subtree` field
+        pub struct is_subtree(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct TreeEntryBuilder<'a, S: tree_entry_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<bool>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<crate::sh_tangled::repo::tree::LastCommit<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> TreeEntry<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> TreeEntryBuilder<'a, tree_entry_state::Empty> {
+        TreeEntryBuilder::new()
+    }
+}
+
+impl<'a> TreeEntryBuilder<'a, tree_entry_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        TreeEntryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TreeEntryBuilder<'a, S>
+where
+    S: tree_entry_state::State,
+    S::IsFile: tree_entry_state::IsUnset,
+{
+    /// Set the `is_file` field (required)
+    pub fn is_file(
+        mut self,
+        value: impl Into<bool>,
+    ) -> TreeEntryBuilder<'a, tree_entry_state::SetIsFile<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        TreeEntryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TreeEntryBuilder<'a, S>
+where
+    S: tree_entry_state::State,
+    S::IsSubtree: tree_entry_state::IsUnset,
+{
+    /// Set the `is_subtree` field (required)
+    pub fn is_subtree(
+        mut self,
+        value: impl Into<bool>,
+    ) -> TreeEntryBuilder<'a, tree_entry_state::SetIsSubtree<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        TreeEntryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: tree_entry_state::State> TreeEntryBuilder<'a, S> {
+    /// Set the `last_commit` field (optional)
+    pub fn last_commit(
+        mut self,
+        value: impl Into<Option<crate::sh_tangled::repo::tree::LastCommit<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `last_commit` field to an Option value (optional)
+    pub fn maybe_last_commit(
+        mut self,
+        value: Option<crate::sh_tangled::repo::tree::LastCommit<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> TreeEntryBuilder<'a, S>
+where
+    S: tree_entry_state::State,
+    S::Mode: tree_entry_state::IsUnset,
+{
+    /// Set the `mode` field (required)
+    pub fn mode(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> TreeEntryBuilder<'a, tree_entry_state::SetMode<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        TreeEntryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TreeEntryBuilder<'a, S>
+where
+    S: tree_entry_state::State,
+    S::Name: tree_entry_state::IsUnset,
+{
+    /// Set the `name` field (required)
+    pub fn name(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> TreeEntryBuilder<'a, tree_entry_state::SetName<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        TreeEntryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TreeEntryBuilder<'a, S>
+where
+    S: tree_entry_state::State,
+    S::Size: tree_entry_state::IsUnset,
+{
+    /// Set the `size` field (required)
+    pub fn size(
+        mut self,
+        value: impl Into<i64>,
+    ) -> TreeEntryBuilder<'a, tree_entry_state::SetSize<S>> {
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        TreeEntryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TreeEntryBuilder<'a, S>
+where
+    S: tree_entry_state::State,
+    S::Name: tree_entry_state::IsSet,
+    S::Mode: tree_entry_state::IsSet,
+    S::Size: tree_entry_state::IsSet,
+    S::IsFile: tree_entry_state::IsSet,
+    S::IsSubtree: tree_entry_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> TreeEntry<'a> {
+        TreeEntry {
+            is_file: self.__unsafe_private_named.0.unwrap(),
+            is_subtree: self.__unsafe_private_named.1.unwrap(),
+            last_commit: self.__unsafe_private_named.2,
+            mode: self.__unsafe_private_named.3.unwrap(),
+            name: self.__unsafe_private_named.4.unwrap(),
+            size: self.__unsafe_private_named.5.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> TreeEntry<'a> {
+        TreeEntry {
+            is_file: self.__unsafe_private_named.0.unwrap(),
+            is_subtree: self.__unsafe_private_named.1.unwrap(),
+            last_commit: self.__unsafe_private_named.2,
+            mode: self.__unsafe_private_named.3.unwrap(),
+            name: self.__unsafe_private_named.4.unwrap(),
+            size: self.__unsafe_private_named.5.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TreeEntry<'a> {

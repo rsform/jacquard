@@ -12,14 +12,101 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetSubjects<'a> {
     #[serde(borrow)]
     pub subjects: Vec<jacquard_common::CowStr<'a>>,
+}
+
+pub mod get_subjects_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Subjects;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Subjects = Unset;
+    }
+    ///State transition - sets the `subjects` field to Set
+    pub struct SetSubjects<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubjects<S> {}
+    impl<S: State> State for SetSubjects<S> {
+        type Subjects = Set<members::subjects>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `subjects` field
+        pub struct subjects(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetSubjectsBuilder<'a, S: get_subjects_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GetSubjects<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GetSubjectsBuilder<'a, get_subjects_state::Empty> {
+        GetSubjectsBuilder::new()
+    }
+}
+
+impl<'a> GetSubjectsBuilder<'a, get_subjects_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetSubjectsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetSubjectsBuilder<'a, S>
+where
+    S: get_subjects_state::State,
+    S::Subjects: get_subjects_state::IsUnset,
+{
+    /// Set the `subjects` field (required)
+    pub fn subjects(
+        mut self,
+        value: impl Into<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> GetSubjectsBuilder<'a, get_subjects_state::SetSubjects<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        GetSubjectsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetSubjectsBuilder<'a, S>
+where
+    S: get_subjects_state::State,
+    S::Subjects: get_subjects_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetSubjects<'a> {
+        GetSubjects {
+            subjects: self.__unsafe_private_named.0.unwrap(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

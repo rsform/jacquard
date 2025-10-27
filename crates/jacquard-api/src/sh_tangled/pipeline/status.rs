@@ -13,8 +13,7 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Status<'a> {
@@ -22,23 +21,271 @@ pub struct Status<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     /// error message if failed
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub error: Option<jacquard_common::CowStr<'a>>,
     /// exit code if failed
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub exit_code: Option<i64>,
     /// ATURI of the pipeline
     #[serde(borrow)]
     pub pipeline: jacquard_common::types::string::AtUri<'a>,
     /// status of the workflow
     #[serde(borrow)]
-    #[builder(into)]
     pub status: jacquard_common::CowStr<'a>,
     /// name of the workflow within this pipeline
     #[serde(borrow)]
     pub workflow: jacquard_common::types::string::AtUri<'a>,
+}
+
+pub mod status_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Pipeline;
+        type Workflow;
+        type Status;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Pipeline = Unset;
+        type Workflow = Unset;
+        type Status = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `pipeline` field to Set
+    pub struct SetPipeline<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPipeline<S> {}
+    impl<S: State> State for SetPipeline<S> {
+        type Pipeline = Set<members::pipeline>;
+        type Workflow = S::Workflow;
+        type Status = S::Status;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `workflow` field to Set
+    pub struct SetWorkflow<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWorkflow<S> {}
+    impl<S: State> State for SetWorkflow<S> {
+        type Pipeline = S::Pipeline;
+        type Workflow = Set<members::workflow>;
+        type Status = S::Status;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStatus<S> {}
+    impl<S: State> State for SetStatus<S> {
+        type Pipeline = S::Pipeline;
+        type Workflow = S::Workflow;
+        type Status = Set<members::status>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Pipeline = S::Pipeline;
+        type Workflow = S::Workflow;
+        type Status = S::Status;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `pipeline` field
+        pub struct pipeline(());
+        ///Marker type for the `workflow` field
+        pub struct workflow(());
+        ///Marker type for the `status` field
+        pub struct status(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct StatusBuilder<'a, S: status_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Status<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> StatusBuilder<'a, status_state::Empty> {
+        StatusBuilder::new()
+    }
+}
+
+impl<'a> StatusBuilder<'a, status_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        StatusBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> StatusBuilder<'a, S>
+where
+    S: status_state::State,
+    S::CreatedAt: status_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> StatusBuilder<'a, status_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        StatusBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: status_state::State> StatusBuilder<'a, S> {
+    /// Set the `error` field (optional)
+    pub fn error(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `error` field to an Option value (optional)
+    pub fn maybe_error(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: status_state::State> StatusBuilder<'a, S> {
+    /// Set the `exitCode` field (optional)
+    pub fn exit_code(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `exitCode` field to an Option value (optional)
+    pub fn maybe_exit_code(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> StatusBuilder<'a, S>
+where
+    S: status_state::State,
+    S::Pipeline: status_state::IsUnset,
+{
+    /// Set the `pipeline` field (required)
+    pub fn pipeline(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> StatusBuilder<'a, status_state::SetPipeline<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        StatusBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> StatusBuilder<'a, S>
+where
+    S: status_state::State,
+    S::Status: status_state::IsUnset,
+{
+    /// Set the `status` field (required)
+    pub fn status(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> StatusBuilder<'a, status_state::SetStatus<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        StatusBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> StatusBuilder<'a, S>
+where
+    S: status_state::State,
+    S::Workflow: status_state::IsUnset,
+{
+    /// Set the `workflow` field (required)
+    pub fn workflow(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> StatusBuilder<'a, status_state::SetWorkflow<S>> {
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        StatusBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> StatusBuilder<'a, S>
+where
+    S: status_state::State,
+    S::Pipeline: status_state::IsSet,
+    S::Workflow: status_state::IsSet,
+    S::Status: status_state::IsSet,
+    S::CreatedAt: status_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Status<'a> {
+        Status {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            error: self.__unsafe_private_named.1,
+            exit_code: self.__unsafe_private_named.2,
+            pipeline: self.__unsafe_private_named.3.unwrap(),
+            status: self.__unsafe_private_named.4.unwrap(),
+            workflow: self.__unsafe_private_named.5.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Status<'a> {
+        Status {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            error: self.__unsafe_private_named.1,
+            exit_code: self.__unsafe_private_named.2,
+            pipeline: self.__unsafe_private_named.3.unwrap(),
+            status: self.__unsafe_private_named.4.unwrap(),
+            workflow: self.__unsafe_private_named.5.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Status<'a> {

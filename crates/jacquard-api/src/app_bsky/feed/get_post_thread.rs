@@ -12,10 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetPostThread<'a> {
     ///(default: 6, min: 0, max: 1000)
@@ -26,6 +24,127 @@ pub struct GetPostThread<'a> {
     pub parent_height: std::option::Option<i64>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+pub mod get_post_thread_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Uri;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Uri = Unset;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Uri = Set<members::uri>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `uri` field
+        pub struct uri(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetPostThreadBuilder<'a, S: get_post_thread_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<i64>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GetPostThread<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GetPostThreadBuilder<'a, get_post_thread_state::Empty> {
+        GetPostThreadBuilder::new()
+    }
+}
+
+impl<'a> GetPostThreadBuilder<'a, get_post_thread_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetPostThreadBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: get_post_thread_state::State> GetPostThreadBuilder<'a, S> {
+    /// Set the `depth` field (optional)
+    pub fn depth(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `depth` field to an Option value (optional)
+    pub fn maybe_depth(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: get_post_thread_state::State> GetPostThreadBuilder<'a, S> {
+    /// Set the `parentHeight` field (optional)
+    pub fn parent_height(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `parentHeight` field to an Option value (optional)
+    pub fn maybe_parent_height(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> GetPostThreadBuilder<'a, S>
+where
+    S: get_post_thread_state::State,
+    S::Uri: get_post_thread_state::IsUnset,
+{
+    /// Set the `uri` field (required)
+    pub fn uri(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> GetPostThreadBuilder<'a, get_post_thread_state::SetUri<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        GetPostThreadBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetPostThreadBuilder<'a, S>
+where
+    S: get_post_thread_state::State,
+    S::Uri: get_post_thread_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetPostThread<'a> {
+        GetPostThread {
+            depth: self.__unsafe_private_named.0,
+            parent_height: self.__unsafe_private_named.1,
+            uri: self.__unsafe_private_named.2.unwrap(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

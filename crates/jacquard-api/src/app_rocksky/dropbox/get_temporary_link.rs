@@ -12,15 +12,101 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetTemporaryLink<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub path: jacquard_common::CowStr<'a>,
+}
+
+pub mod get_temporary_link_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Path;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Path = Unset;
+    }
+    ///State transition - sets the `path` field to Set
+    pub struct SetPath<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPath<S> {}
+    impl<S: State> State for SetPath<S> {
+        type Path = Set<members::path>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `path` field
+        pub struct path(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetTemporaryLinkBuilder<'a, S: get_temporary_link_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (::core::option::Option<jacquard_common::CowStr<'a>>,),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GetTemporaryLink<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GetTemporaryLinkBuilder<'a, get_temporary_link_state::Empty> {
+        GetTemporaryLinkBuilder::new()
+    }
+}
+
+impl<'a> GetTemporaryLinkBuilder<'a, get_temporary_link_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetTemporaryLinkBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetTemporaryLinkBuilder<'a, S>
+where
+    S: get_temporary_link_state::State,
+    S::Path: get_temporary_link_state::IsUnset,
+{
+    /// Set the `path` field (required)
+    pub fn path(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> GetTemporaryLinkBuilder<'a, get_temporary_link_state::SetPath<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        GetTemporaryLinkBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetTemporaryLinkBuilder<'a, S>
+where
+    S: get_temporary_link_state::State,
+    S::Path: get_temporary_link_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetTemporaryLink<'a> {
+        GetTemporaryLink {
+            path: self.__unsafe_private_named.0.unwrap(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

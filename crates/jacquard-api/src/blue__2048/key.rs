@@ -17,16 +17,154 @@ pub mod player;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Key<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     /// A did:key used to verify records came from an at://2048 authority
     #[serde(borrow)]
-    #[builder(into)]
     pub key: jacquard_common::CowStr<'a>,
+}
+
+pub mod key_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Key;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Key = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `key` field to Set
+    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetKey<S> {}
+    impl<S: State> State for SetKey<S> {
+        type Key = Set<members::key>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Key = S::Key;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `key` field
+        pub struct key(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct KeyBuilder<'a, S: key_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Key<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> KeyBuilder<'a, key_state::Empty> {
+        KeyBuilder::new()
+    }
+}
+
+impl<'a> KeyBuilder<'a, key_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        KeyBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> KeyBuilder<'a, S>
+where
+    S: key_state::State,
+    S::CreatedAt: key_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> KeyBuilder<'a, key_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        KeyBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> KeyBuilder<'a, S>
+where
+    S: key_state::State,
+    S::Key: key_state::IsUnset,
+{
+    /// Set the `key` field (required)
+    pub fn key(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> KeyBuilder<'a, key_state::SetKey<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        KeyBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> KeyBuilder<'a, S>
+where
+    S: key_state::State,
+    S::Key: key_state::IsSet,
+    S::CreatedAt: key_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Key<'a> {
+        Key {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            key: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Key<'a> {
+        Key {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            key: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_blue_2048_key_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
@@ -210,20 +348,194 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Key<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SignatureRef<'a> {
     /// The at://uri for the public did:key to verify this record. This also counts as the authority of the verification (example @2048.blue). As well as the type of verification by the collection name (blue.2048.key.game).
     #[serde(borrow)]
-    #[builder(into)]
     pub at_uri: jacquard_common::CowStr<'a>,
     pub created_at: jacquard_common::types::string::Datetime,
     /// The public verifiable signature of the record. Serialization of the records value minus the signature field
     #[serde(borrow)]
-    #[builder(into)]
     pub signature: jacquard_common::CowStr<'a>,
+}
+
+pub mod signature_ref_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type AtUri;
+        type Signature;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type AtUri = Unset;
+        type Signature = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `at_uri` field to Set
+    pub struct SetAtUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAtUri<S> {}
+    impl<S: State> State for SetAtUri<S> {
+        type AtUri = Set<members::at_uri>;
+        type Signature = S::Signature;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `signature` field to Set
+    pub struct SetSignature<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSignature<S> {}
+    impl<S: State> State for SetSignature<S> {
+        type AtUri = S::AtUri;
+        type Signature = Set<members::signature>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type AtUri = S::AtUri;
+        type Signature = S::Signature;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `at_uri` field
+        pub struct at_uri(());
+        ///Marker type for the `signature` field
+        pub struct signature(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct SignatureRefBuilder<'a, S: signature_ref_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> SignatureRef<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> SignatureRefBuilder<'a, signature_ref_state::Empty> {
+        SignatureRefBuilder::new()
+    }
+}
+
+impl<'a> SignatureRefBuilder<'a, signature_ref_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        SignatureRefBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SignatureRefBuilder<'a, S>
+where
+    S: signature_ref_state::State,
+    S::AtUri: signature_ref_state::IsUnset,
+{
+    /// Set the `atURI` field (required)
+    pub fn at_uri(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> SignatureRefBuilder<'a, signature_ref_state::SetAtUri<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        SignatureRefBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SignatureRefBuilder<'a, S>
+where
+    S: signature_ref_state::State,
+    S::CreatedAt: signature_ref_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> SignatureRefBuilder<'a, signature_ref_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        SignatureRefBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SignatureRefBuilder<'a, S>
+where
+    S: signature_ref_state::State,
+    S::Signature: signature_ref_state::IsUnset,
+{
+    /// Set the `signature` field (required)
+    pub fn signature(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> SignatureRefBuilder<'a, signature_ref_state::SetSignature<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        SignatureRefBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SignatureRefBuilder<'a, S>
+where
+    S: signature_ref_state::State,
+    S::AtUri: signature_ref_state::IsSet,
+    S::Signature: signature_ref_state::IsSet,
+    S::CreatedAt: signature_ref_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> SignatureRef<'a> {
+        SignatureRef {
+            at_uri: self.__unsafe_private_named.0.unwrap(),
+            created_at: self.__unsafe_private_named.1.unwrap(),
+            signature: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> SignatureRef<'a> {
+        SignatureRef {
+            at_uri: self.__unsafe_private_named.0.unwrap(),
+            created_at: self.__unsafe_private_named.1.unwrap(),
+            signature: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SignatureRef<'a> {

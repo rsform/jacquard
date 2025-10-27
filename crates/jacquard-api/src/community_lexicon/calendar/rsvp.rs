@@ -50,16 +50,154 @@ impl std::fmt::Display for Interested {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Rsvp<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub status: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub subject: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+}
+
+pub mod rsvp_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Subject;
+        type Status;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Subject = Unset;
+        type Status = Unset;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type Subject = Set<members::subject>;
+        type Status = S::Status;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStatus<S> {}
+    impl<S: State> State for SetStatus<S> {
+        type Subject = S::Subject;
+        type Status = Set<members::status>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `subject` field
+        pub struct subject(());
+        ///Marker type for the `status` field
+        pub struct status(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct RsvpBuilder<'a, S: rsvp_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Rsvp<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> RsvpBuilder<'a, rsvp_state::Empty> {
+        RsvpBuilder::new()
+    }
+}
+
+impl<'a> RsvpBuilder<'a, rsvp_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        RsvpBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RsvpBuilder<'a, S>
+where
+    S: rsvp_state::State,
+    S::Status: rsvp_state::IsUnset,
+{
+    /// Set the `status` field (required)
+    pub fn status(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> RsvpBuilder<'a, rsvp_state::SetStatus<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        RsvpBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RsvpBuilder<'a, S>
+where
+    S: rsvp_state::State,
+    S::Subject: rsvp_state::IsUnset,
+{
+    /// Set the `subject` field (required)
+    pub fn subject(
+        mut self,
+        value: impl Into<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    ) -> RsvpBuilder<'a, rsvp_state::SetSubject<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        RsvpBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RsvpBuilder<'a, S>
+where
+    S: rsvp_state::State,
+    S::Subject: rsvp_state::IsSet,
+    S::Status: rsvp_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Rsvp<'a> {
+        Rsvp {
+            status: self.__unsafe_private_named.0.unwrap(),
+            subject: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Rsvp<'a> {
+        Rsvp {
+            status: self.__unsafe_private_named.0.unwrap(),
+            subject: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Rsvp<'a> {

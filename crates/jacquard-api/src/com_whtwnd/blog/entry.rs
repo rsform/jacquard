@@ -14,46 +14,309 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Entry<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub blobs: Option<Vec<crate::com_whtwnd::blog::BlobMetadata<'a>>>,
     #[serde(borrow)]
-    #[builder(into)]
     pub content: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub created_at: Option<jacquard_common::types::string::Datetime>,
     /// (DEPRECATED) Marks this entry as draft to tell AppViews not to show it to anyone except for the author
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub is_draft: Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub ogp: Option<crate::com_whtwnd::blog::Ogp<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub subtitle: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub theme: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub title: Option<jacquard_common::CowStr<'a>>,
     /// Tells the visibility of the article to AppView.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub visibility: Option<jacquard_common::CowStr<'a>>,
+}
+
+pub mod entry_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Content;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Content = Unset;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type Content = Set<members::content>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `content` field
+        pub struct content(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct EntryBuilder<'a, S: entry_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<Vec<crate::com_whtwnd::blog::BlobMetadata<'a>>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<crate::com_whtwnd::blog::Ogp<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Entry<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> EntryBuilder<'a, entry_state::Empty> {
+        EntryBuilder::new()
+    }
+}
+
+impl<'a> EntryBuilder<'a, entry_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        EntryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
+    /// Set the `blobs` field (optional)
+    pub fn blobs(
+        mut self,
+        value: impl Into<Option<Vec<crate::com_whtwnd::blog::BlobMetadata<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `blobs` field to an Option value (optional)
+    pub fn maybe_blobs(
+        mut self,
+        value: Option<Vec<crate::com_whtwnd::blog::BlobMetadata<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> EntryBuilder<'a, S>
+where
+    S: entry_state::State,
+    S::Content: entry_state::IsUnset,
+{
+    /// Set the `content` field (required)
+    pub fn content(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> EntryBuilder<'a, entry_state::SetContent<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        EntryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
+    /// Set the `createdAt` field (optional)
+    pub fn created_at(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `createdAt` field to an Option value (optional)
+    pub fn maybe_created_at(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
+    /// Set the `isDraft` field (optional)
+    pub fn is_draft(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `isDraft` field to an Option value (optional)
+    pub fn maybe_is_draft(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
+    /// Set the `ogp` field (optional)
+    pub fn ogp(
+        mut self,
+        value: impl Into<Option<crate::com_whtwnd::blog::Ogp<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `ogp` field to an Option value (optional)
+    pub fn maybe_ogp(mut self, value: Option<crate::com_whtwnd::blog::Ogp<'a>>) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
+    /// Set the `subtitle` field (optional)
+    pub fn subtitle(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `subtitle` field to an Option value (optional)
+    pub fn maybe_subtitle(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
+    /// Set the `theme` field (optional)
+    pub fn theme(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `theme` field to an Option value (optional)
+    pub fn maybe_theme(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
+    /// Set the `title` field (optional)
+    pub fn title(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value.into();
+        self
+    }
+    /// Set the `title` field to an Option value (optional)
+    pub fn maybe_title(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.7 = value;
+        self
+    }
+}
+
+impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
+    /// Set the `visibility` field (optional)
+    pub fn visibility(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value.into();
+        self
+    }
+    /// Set the `visibility` field to an Option value (optional)
+    pub fn maybe_visibility(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value;
+        self
+    }
+}
+
+impl<'a, S> EntryBuilder<'a, S>
+where
+    S: entry_state::State,
+    S::Content: entry_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Entry<'a> {
+        Entry {
+            blobs: self.__unsafe_private_named.0,
+            content: self.__unsafe_private_named.1.unwrap(),
+            created_at: self.__unsafe_private_named.2,
+            is_draft: self.__unsafe_private_named.3,
+            ogp: self.__unsafe_private_named.4,
+            subtitle: self.__unsafe_private_named.5,
+            theme: self.__unsafe_private_named.6,
+            title: self.__unsafe_private_named.7,
+            visibility: self.__unsafe_private_named.8,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Entry<'a> {
+        Entry {
+            blobs: self.__unsafe_private_named.0,
+            content: self.__unsafe_private_named.1.unwrap(),
+            created_at: self.__unsafe_private_named.2,
+            is_draft: self.__unsafe_private_named.3,
+            ogp: self.__unsafe_private_named.4,
+            subtitle: self.__unsafe_private_named.5,
+            theme: self.__unsafe_private_named.6,
+            title: self.__unsafe_private_named.7,
+            visibility: self.__unsafe_private_named.8,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Entry<'a> {

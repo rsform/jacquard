@@ -13,21 +13,117 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-#[builder(start_fn = new)]
 pub struct NotifyOfNewEntry<'a> {
     #[serde(borrow)]
     pub entry_uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(flatten)]
-    #[serde(borrow)]
-    #[builder(default)]
-    pub extra_data: ::std::collections::BTreeMap<
-        ::jacquard_common::smol_str::SmolStr,
-        ::jacquard_common::types::value::Data<'a>,
-    >,
+}
+
+pub mod notify_of_new_entry_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type EntryUri;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type EntryUri = Unset;
+    }
+    ///State transition - sets the `entry_uri` field to Set
+    pub struct SetEntryUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEntryUri<S> {}
+    impl<S: State> State for SetEntryUri<S> {
+        type EntryUri = Set<members::entry_uri>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `entry_uri` field
+        pub struct entry_uri(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct NotifyOfNewEntryBuilder<'a, S: notify_of_new_entry_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> NotifyOfNewEntry<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> NotifyOfNewEntryBuilder<'a, notify_of_new_entry_state::Empty> {
+        NotifyOfNewEntryBuilder::new()
+    }
+}
+
+impl<'a> NotifyOfNewEntryBuilder<'a, notify_of_new_entry_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        NotifyOfNewEntryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> NotifyOfNewEntryBuilder<'a, S>
+where
+    S: notify_of_new_entry_state::State,
+    S::EntryUri: notify_of_new_entry_state::IsUnset,
+{
+    /// Set the `entryUri` field (required)
+    pub fn entry_uri(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> NotifyOfNewEntryBuilder<'a, notify_of_new_entry_state::SetEntryUri<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        NotifyOfNewEntryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> NotifyOfNewEntryBuilder<'a, S>
+where
+    S: notify_of_new_entry_state::State,
+    S::EntryUri: notify_of_new_entry_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> NotifyOfNewEntry<'a> {
+        NotifyOfNewEntry {
+            entry_uri: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> NotifyOfNewEntry<'a> {
+        NotifyOfNewEntry {
+            entry_uri: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

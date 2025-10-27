@@ -14,21 +14,157 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Fungus<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub common_name: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub edible: Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub species: Option<jacquard_common::CowStr<'a>>,
+}
+
+pub mod fungus_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type CommonName;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type CommonName = Unset;
+    }
+    ///State transition - sets the `common_name` field to Set
+    pub struct SetCommonName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCommonName<S> {}
+    impl<S: State> State for SetCommonName<S> {
+        type CommonName = Set<members::common_name>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `common_name` field
+        pub struct common_name(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct FungusBuilder<'a, S: fungus_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Fungus<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> FungusBuilder<'a, fungus_state::Empty> {
+        FungusBuilder::new()
+    }
+}
+
+impl<'a> FungusBuilder<'a, fungus_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        FungusBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> FungusBuilder<'a, S>
+where
+    S: fungus_state::State,
+    S::CommonName: fungus_state::IsUnset,
+{
+    /// Set the `commonName` field (required)
+    pub fn common_name(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> FungusBuilder<'a, fungus_state::SetCommonName<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        FungusBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: fungus_state::State> FungusBuilder<'a, S> {
+    /// Set the `edible` field (optional)
+    pub fn edible(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `edible` field to an Option value (optional)
+    pub fn maybe_edible(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: fungus_state::State> FungusBuilder<'a, S> {
+    /// Set the `species` field (optional)
+    pub fn species(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `species` field to an Option value (optional)
+    pub fn maybe_species(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> FungusBuilder<'a, S>
+where
+    S: fungus_state::State,
+    S::CommonName: fungus_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Fungus<'a> {
+        Fungus {
+            common_name: self.__unsafe_private_named.0.unwrap(),
+            edible: self.__unsafe_private_named.1,
+            species: self.__unsafe_private_named.2,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Fungus<'a> {
+        Fungus {
+            common_name: self.__unsafe_private_named.0.unwrap(),
+            edible: self.__unsafe_private_named.1,
+            species: self.__unsafe_private_named.2,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Fungus<'a> {

@@ -13,8 +13,7 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Op<'a> {
@@ -26,6 +25,222 @@ pub struct Op<'a> {
     /// The subject (task, pull or discussion) of this label. Appviews may apply a `scope` check and refuse this op.
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::AtUri<'a>,
+}
+
+pub mod op_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Subject;
+        type Add;
+        type Delete;
+        type PerformedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Subject = Unset;
+        type Add = Unset;
+        type Delete = Unset;
+        type PerformedAt = Unset;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type Subject = Set<members::subject>;
+        type Add = S::Add;
+        type Delete = S::Delete;
+        type PerformedAt = S::PerformedAt;
+    }
+    ///State transition - sets the `add` field to Set
+    pub struct SetAdd<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAdd<S> {}
+    impl<S: State> State for SetAdd<S> {
+        type Subject = S::Subject;
+        type Add = Set<members::add>;
+        type Delete = S::Delete;
+        type PerformedAt = S::PerformedAt;
+    }
+    ///State transition - sets the `delete` field to Set
+    pub struct SetDelete<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDelete<S> {}
+    impl<S: State> State for SetDelete<S> {
+        type Subject = S::Subject;
+        type Add = S::Add;
+        type Delete = Set<members::delete>;
+        type PerformedAt = S::PerformedAt;
+    }
+    ///State transition - sets the `performed_at` field to Set
+    pub struct SetPerformedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPerformedAt<S> {}
+    impl<S: State> State for SetPerformedAt<S> {
+        type Subject = S::Subject;
+        type Add = S::Add;
+        type Delete = S::Delete;
+        type PerformedAt = Set<members::performed_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `subject` field
+        pub struct subject(());
+        ///Marker type for the `add` field
+        pub struct add(());
+        ///Marker type for the `delete` field
+        pub struct delete(());
+        ///Marker type for the `performed_at` field
+        pub struct performed_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct OpBuilder<'a, S: op_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<Vec<crate::sh_tangled::label::op::Operand<'a>>>,
+        ::core::option::Option<Vec<crate::sh_tangled::label::op::Operand<'a>>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Op<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> OpBuilder<'a, op_state::Empty> {
+        OpBuilder::new()
+    }
+}
+
+impl<'a> OpBuilder<'a, op_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        OpBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> OpBuilder<'a, S>
+where
+    S: op_state::State,
+    S::Add: op_state::IsUnset,
+{
+    /// Set the `add` field (required)
+    pub fn add(
+        mut self,
+        value: impl Into<Vec<crate::sh_tangled::label::op::Operand<'a>>>,
+    ) -> OpBuilder<'a, op_state::SetAdd<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        OpBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> OpBuilder<'a, S>
+where
+    S: op_state::State,
+    S::Delete: op_state::IsUnset,
+{
+    /// Set the `delete` field (required)
+    pub fn delete(
+        mut self,
+        value: impl Into<Vec<crate::sh_tangled::label::op::Operand<'a>>>,
+    ) -> OpBuilder<'a, op_state::SetDelete<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        OpBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> OpBuilder<'a, S>
+where
+    S: op_state::State,
+    S::PerformedAt: op_state::IsUnset,
+{
+    /// Set the `performedAt` field (required)
+    pub fn performed_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> OpBuilder<'a, op_state::SetPerformedAt<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        OpBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> OpBuilder<'a, S>
+where
+    S: op_state::State,
+    S::Subject: op_state::IsUnset,
+{
+    /// Set the `subject` field (required)
+    pub fn subject(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> OpBuilder<'a, op_state::SetSubject<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        OpBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> OpBuilder<'a, S>
+where
+    S: op_state::State,
+    S::Subject: op_state::IsSet,
+    S::Add: op_state::IsSet,
+    S::Delete: op_state::IsSet,
+    S::PerformedAt: op_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Op<'a> {
+        Op {
+            add: self.__unsafe_private_named.0.unwrap(),
+            delete: self.__unsafe_private_named.1.unwrap(),
+            performed_at: self.__unsafe_private_named.2.unwrap(),
+            subject: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Op<'a> {
+        Op {
+            add: self.__unsafe_private_named.0.unwrap(),
+            delete: self.__unsafe_private_named.1.unwrap(),
+            performed_at: self.__unsafe_private_named.2.unwrap(),
+            subject: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Op<'a> {
@@ -275,8 +490,7 @@ fn lexicon_doc_sh_tangled_label_op() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Operand<'a> {
@@ -285,8 +499,147 @@ pub struct Operand<'a> {
     pub key: jacquard_common::types::string::AtUri<'a>,
     /// Stringified value of the label. This is first unstringed by appviews and then interpreted as a concrete value.
     #[serde(borrow)]
-    #[builder(into)]
     pub value: jacquard_common::CowStr<'a>,
+}
+
+pub mod operand_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Key;
+        type Value;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Key = Unset;
+        type Value = Unset;
+    }
+    ///State transition - sets the `key` field to Set
+    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetKey<S> {}
+    impl<S: State> State for SetKey<S> {
+        type Key = Set<members::key>;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Key = S::Key;
+        type Value = Set<members::value>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `key` field
+        pub struct key(());
+        ///Marker type for the `value` field
+        pub struct value(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct OperandBuilder<'a, S: operand_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Operand<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> OperandBuilder<'a, operand_state::Empty> {
+        OperandBuilder::new()
+    }
+}
+
+impl<'a> OperandBuilder<'a, operand_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        OperandBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> OperandBuilder<'a, S>
+where
+    S: operand_state::State,
+    S::Key: operand_state::IsUnset,
+{
+    /// Set the `key` field (required)
+    pub fn key(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> OperandBuilder<'a, operand_state::SetKey<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        OperandBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> OperandBuilder<'a, S>
+where
+    S: operand_state::State,
+    S::Value: operand_state::IsUnset,
+{
+    /// Set the `value` field (required)
+    pub fn value(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> OperandBuilder<'a, operand_state::SetValue<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        OperandBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> OperandBuilder<'a, S>
+where
+    S: operand_state::State,
+    S::Key: operand_state::IsSet,
+    S::Value: operand_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Operand<'a> {
+        Operand {
+            key: self.__unsafe_private_named.0.unwrap(),
+            value: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Operand<'a> {
+        Operand {
+            key: self.__unsafe_private_named.0.unwrap(),
+            value: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Operand<'a> {

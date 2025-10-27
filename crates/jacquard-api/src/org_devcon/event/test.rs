@@ -13,37 +13,287 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Test<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub created_at: Option<jacquard_common::types::string::Datetime>,
     /// Description of the event
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub description: Option<jacquard_common::CowStr<'a>>,
     /// End time of the event
     pub end: jacquard_common::types::string::Datetime,
     /// Location of the event
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub location: Option<jacquard_common::CowStr<'a>>,
     /// Start time of the event
     pub start: jacquard_common::types::string::Datetime,
     /// Title of the event
     #[serde(borrow)]
-    #[builder(into)]
     pub title: jacquard_common::CowStr<'a>,
     /// URL of the event
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub url: Option<jacquard_common::CowStr<'a>>,
+}
+
+pub mod test_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Title;
+        type Start;
+        type End;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Title = Unset;
+        type Start = Unset;
+        type End = Unset;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Title = Set<members::title>;
+        type Start = S::Start;
+        type End = S::End;
+    }
+    ///State transition - sets the `start` field to Set
+    pub struct SetStart<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStart<S> {}
+    impl<S: State> State for SetStart<S> {
+        type Title = S::Title;
+        type Start = Set<members::start>;
+        type End = S::End;
+    }
+    ///State transition - sets the `end` field to Set
+    pub struct SetEnd<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEnd<S> {}
+    impl<S: State> State for SetEnd<S> {
+        type Title = S::Title;
+        type Start = S::Start;
+        type End = Set<members::end>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `start` field
+        pub struct start(());
+        ///Marker type for the `end` field
+        pub struct end(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct TestBuilder<'a, S: test_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Test<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> TestBuilder<'a, test_state::Empty> {
+        TestBuilder::new()
+    }
+}
+
+impl<'a> TestBuilder<'a, test_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        TestBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: test_state::State> TestBuilder<'a, S> {
+    /// Set the `createdAt` field (optional)
+    pub fn created_at(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `createdAt` field to an Option value (optional)
+    pub fn maybe_created_at(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: test_state::State> TestBuilder<'a, S> {
+    /// Set the `description` field (optional)
+    pub fn description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `description` field to an Option value (optional)
+    pub fn maybe_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> TestBuilder<'a, S>
+where
+    S: test_state::State,
+    S::End: test_state::IsUnset,
+{
+    /// Set the `end` field (required)
+    pub fn end(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> TestBuilder<'a, test_state::SetEnd<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        TestBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: test_state::State> TestBuilder<'a, S> {
+    /// Set the `location` field (optional)
+    pub fn location(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `location` field to an Option value (optional)
+    pub fn maybe_location(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S> TestBuilder<'a, S>
+where
+    S: test_state::State,
+    S::Start: test_state::IsUnset,
+{
+    /// Set the `start` field (required)
+    pub fn start(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> TestBuilder<'a, test_state::SetStart<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        TestBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TestBuilder<'a, S>
+where
+    S: test_state::State,
+    S::Title: test_state::IsUnset,
+{
+    /// Set the `title` field (required)
+    pub fn title(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> TestBuilder<'a, test_state::SetTitle<S>> {
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        TestBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: test_state::State> TestBuilder<'a, S> {
+    /// Set the `url` field (optional)
+    pub fn url(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `url` field to an Option value (optional)
+    pub fn maybe_url(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S> TestBuilder<'a, S>
+where
+    S: test_state::State,
+    S::Title: test_state::IsSet,
+    S::Start: test_state::IsSet,
+    S::End: test_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Test<'a> {
+        Test {
+            created_at: self.__unsafe_private_named.0,
+            description: self.__unsafe_private_named.1,
+            end: self.__unsafe_private_named.2.unwrap(),
+            location: self.__unsafe_private_named.3,
+            start: self.__unsafe_private_named.4.unwrap(),
+            title: self.__unsafe_private_named.5.unwrap(),
+            url: self.__unsafe_private_named.6,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Test<'a> {
+        Test {
+            created_at: self.__unsafe_private_named.0,
+            description: self.__unsafe_private_named.1,
+            end: self.__unsafe_private_named.2.unwrap(),
+            location: self.__unsafe_private_named.3,
+            start: self.__unsafe_private_named.4.unwrap(),
+            title: self.__unsafe_private_named.5.unwrap(),
+            url: self.__unsafe_private_named.6,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Test<'a> {

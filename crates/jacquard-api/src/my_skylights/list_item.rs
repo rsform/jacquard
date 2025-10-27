@@ -267,25 +267,236 @@ impl std::fmt::Display for InProgress {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListItem<'a> {
     pub added_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub item: Option<crate::my_skylights::Item<'a>>,
     #[serde(borrow)]
     pub list: ListItemList<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub note: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
-    #[builder(into)]
     pub position: jacquard_common::CowStr<'a>,
+}
+
+pub mod list_item_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type List;
+        type AddedAt;
+        type Position;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type List = Unset;
+        type AddedAt = Unset;
+        type Position = Unset;
+    }
+    ///State transition - sets the `list` field to Set
+    pub struct SetList<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetList<S> {}
+    impl<S: State> State for SetList<S> {
+        type List = Set<members::list>;
+        type AddedAt = S::AddedAt;
+        type Position = S::Position;
+    }
+    ///State transition - sets the `added_at` field to Set
+    pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAddedAt<S> {}
+    impl<S: State> State for SetAddedAt<S> {
+        type List = S::List;
+        type AddedAt = Set<members::added_at>;
+        type Position = S::Position;
+    }
+    ///State transition - sets the `position` field to Set
+    pub struct SetPosition<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPosition<S> {}
+    impl<S: State> State for SetPosition<S> {
+        type List = S::List;
+        type AddedAt = S::AddedAt;
+        type Position = Set<members::position>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `list` field
+        pub struct list(());
+        ///Marker type for the `added_at` field
+        pub struct added_at(());
+        ///Marker type for the `position` field
+        pub struct position(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ListItemBuilder<'a, S: list_item_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<crate::my_skylights::Item<'a>>,
+        ::core::option::Option<ListItemList<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ListItem<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ListItemBuilder<'a, list_item_state::Empty> {
+        ListItemBuilder::new()
+    }
+}
+
+impl<'a> ListItemBuilder<'a, list_item_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ListItemBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ListItemBuilder<'a, S>
+where
+    S: list_item_state::State,
+    S::AddedAt: list_item_state::IsUnset,
+{
+    /// Set the `addedAt` field (required)
+    pub fn added_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> ListItemBuilder<'a, list_item_state::SetAddedAt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ListItemBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: list_item_state::State> ListItemBuilder<'a, S> {
+    /// Set the `item` field (optional)
+    pub fn item(
+        mut self,
+        value: impl Into<Option<crate::my_skylights::Item<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `item` field to an Option value (optional)
+    pub fn maybe_item(mut self, value: Option<crate::my_skylights::Item<'a>>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> ListItemBuilder<'a, S>
+where
+    S: list_item_state::State,
+    S::List: list_item_state::IsUnset,
+{
+    /// Set the `list` field (required)
+    pub fn list(
+        mut self,
+        value: impl Into<ListItemList<'a>>,
+    ) -> ListItemBuilder<'a, list_item_state::SetList<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        ListItemBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: list_item_state::State> ListItemBuilder<'a, S> {
+    /// Set the `note` field (optional)
+    pub fn note(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `note` field to an Option value (optional)
+    pub fn maybe_note(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S> ListItemBuilder<'a, S>
+where
+    S: list_item_state::State,
+    S::Position: list_item_state::IsUnset,
+{
+    /// Set the `position` field (required)
+    pub fn position(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> ListItemBuilder<'a, list_item_state::SetPosition<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        ListItemBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ListItemBuilder<'a, S>
+where
+    S: list_item_state::State,
+    S::List: list_item_state::IsSet,
+    S::AddedAt: list_item_state::IsSet,
+    S::Position: list_item_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> ListItem<'a> {
+        ListItem {
+            added_at: self.__unsafe_private_named.0.unwrap(),
+            item: self.__unsafe_private_named.1,
+            list: self.__unsafe_private_named.2.unwrap(),
+            note: self.__unsafe_private_named.3,
+            position: self.__unsafe_private_named.4.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> ListItem<'a> {
+        ListItem {
+            added_at: self.__unsafe_private_named.0.unwrap(),
+            item: self.__unsafe_private_named.1,
+            list: self.__unsafe_private_named.2.unwrap(),
+            note: self.__unsafe_private_named.3,
+            position: self.__unsafe_private_named.4.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]

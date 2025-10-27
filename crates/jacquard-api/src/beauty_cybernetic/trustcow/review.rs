@@ -14,8 +14,7 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Review<'a> {
@@ -23,25 +22,261 @@ pub struct Review<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     /// The detailed review text
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub description: Option<jacquard_common::CowStr<'a>>,
     /// Rating score from 1 to 5
     pub rating: i64,
     /// Whether this review is from the service provider or consumer
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub reviewer_role: Option<jacquard_common::CowStr<'a>>,
     /// The title of the review
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub title: Option<jacquard_common::CowStr<'a>>,
     /// AT URI reference to the transaction record (at://did/beauty.cybernetic.trustcow.transaction/rkey)
     #[serde(borrow)]
-    #[builder(into)]
     pub transaction: jacquard_common::CowStr<'a>,
+}
+
+pub mod review_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Transaction;
+        type Rating;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Transaction = Unset;
+        type Rating = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `transaction` field to Set
+    pub struct SetTransaction<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTransaction<S> {}
+    impl<S: State> State for SetTransaction<S> {
+        type Transaction = Set<members::transaction>;
+        type Rating = S::Rating;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `rating` field to Set
+    pub struct SetRating<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRating<S> {}
+    impl<S: State> State for SetRating<S> {
+        type Transaction = S::Transaction;
+        type Rating = Set<members::rating>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Transaction = S::Transaction;
+        type Rating = S::Rating;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `transaction` field
+        pub struct transaction(());
+        ///Marker type for the `rating` field
+        pub struct rating(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ReviewBuilder<'a, S: review_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Review<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ReviewBuilder<'a, review_state::Empty> {
+        ReviewBuilder::new()
+    }
+}
+
+impl<'a> ReviewBuilder<'a, review_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ReviewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ReviewBuilder<'a, S>
+where
+    S: review_state::State,
+    S::CreatedAt: review_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> ReviewBuilder<'a, review_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ReviewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
+    /// Set the `description` field (optional)
+    pub fn description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `description` field to an Option value (optional)
+    pub fn maybe_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> ReviewBuilder<'a, S>
+where
+    S: review_state::State,
+    S::Rating: review_state::IsUnset,
+{
+    /// Set the `rating` field (required)
+    pub fn rating(
+        mut self,
+        value: impl Into<i64>,
+    ) -> ReviewBuilder<'a, review_state::SetRating<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        ReviewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
+    /// Set the `reviewerRole` field (optional)
+    pub fn reviewer_role(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `reviewerRole` field to an Option value (optional)
+    pub fn maybe_reviewer_role(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
+    /// Set the `title` field (optional)
+    pub fn title(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `title` field to an Option value (optional)
+    pub fn maybe_title(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S> ReviewBuilder<'a, S>
+where
+    S: review_state::State,
+    S::Transaction: review_state::IsUnset,
+{
+    /// Set the `transaction` field (required)
+    pub fn transaction(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> ReviewBuilder<'a, review_state::SetTransaction<S>> {
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        ReviewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ReviewBuilder<'a, S>
+where
+    S: review_state::State,
+    S::Transaction: review_state::IsSet,
+    S::Rating: review_state::IsSet,
+    S::CreatedAt: review_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Review<'a> {
+        Review {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            description: self.__unsafe_private_named.1,
+            rating: self.__unsafe_private_named.2.unwrap(),
+            reviewer_role: self.__unsafe_private_named.3,
+            title: self.__unsafe_private_named.4,
+            transaction: self.__unsafe_private_named.5.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Review<'a> {
+        Review {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            description: self.__unsafe_private_named.1,
+            rating: self.__unsafe_private_named.2.unwrap(),
+            reviewer_role: self.__unsafe_private_named.3,
+            title: self.__unsafe_private_named.4,
+            transaction: self.__unsafe_private_named.5.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Review<'a> {

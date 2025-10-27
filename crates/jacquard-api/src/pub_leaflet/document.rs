@@ -14,31 +14,308 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Document<'a> {
     #[serde(borrow)]
     pub author: jacquard_common::types::ident::AtIdentifier<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub description: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub pages: Vec<DocumentPagesItem<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub post_ref: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     #[serde(borrow)]
     pub publication: jacquard_common::types::string::AtUri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub published_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
-    #[builder(into)]
     pub title: jacquard_common::CowStr<'a>,
+}
+
+pub mod document_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Pages;
+        type Author;
+        type Title;
+        type Publication;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Pages = Unset;
+        type Author = Unset;
+        type Title = Unset;
+        type Publication = Unset;
+    }
+    ///State transition - sets the `pages` field to Set
+    pub struct SetPages<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPages<S> {}
+    impl<S: State> State for SetPages<S> {
+        type Pages = Set<members::pages>;
+        type Author = S::Author;
+        type Title = S::Title;
+        type Publication = S::Publication;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthor<S> {}
+    impl<S: State> State for SetAuthor<S> {
+        type Pages = S::Pages;
+        type Author = Set<members::author>;
+        type Title = S::Title;
+        type Publication = S::Publication;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Pages = S::Pages;
+        type Author = S::Author;
+        type Title = Set<members::title>;
+        type Publication = S::Publication;
+    }
+    ///State transition - sets the `publication` field to Set
+    pub struct SetPublication<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPublication<S> {}
+    impl<S: State> State for SetPublication<S> {
+        type Pages = S::Pages;
+        type Author = S::Author;
+        type Title = S::Title;
+        type Publication = Set<members::publication>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `pages` field
+        pub struct pages(());
+        ///Marker type for the `author` field
+        pub struct author(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `publication` field
+        pub struct publication(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct DocumentBuilder<'a, S: document_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<Vec<DocumentPagesItem<'a>>>,
+        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Document<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> DocumentBuilder<'a, document_state::Empty> {
+        DocumentBuilder::new()
+    }
+}
+
+impl<'a> DocumentBuilder<'a, document_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        DocumentBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DocumentBuilder<'a, S>
+where
+    S: document_state::State,
+    S::Author: document_state::IsUnset,
+{
+    /// Set the `author` field (required)
+    pub fn author(
+        mut self,
+        value: impl Into<jacquard_common::types::ident::AtIdentifier<'a>>,
+    ) -> DocumentBuilder<'a, document_state::SetAuthor<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        DocumentBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
+    /// Set the `description` field (optional)
+    pub fn description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `description` field to an Option value (optional)
+    pub fn maybe_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> DocumentBuilder<'a, S>
+where
+    S: document_state::State,
+    S::Pages: document_state::IsUnset,
+{
+    /// Set the `pages` field (required)
+    pub fn pages(
+        mut self,
+        value: impl Into<Vec<DocumentPagesItem<'a>>>,
+    ) -> DocumentBuilder<'a, document_state::SetPages<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        DocumentBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
+    /// Set the `postRef` field (optional)
+    pub fn post_ref(
+        mut self,
+        value: impl Into<Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `postRef` field to an Option value (optional)
+    pub fn maybe_post_ref(
+        mut self,
+        value: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S> DocumentBuilder<'a, S>
+where
+    S: document_state::State,
+    S::Publication: document_state::IsUnset,
+{
+    /// Set the `publication` field (required)
+    pub fn publication(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> DocumentBuilder<'a, document_state::SetPublication<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        DocumentBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
+    /// Set the `publishedAt` field (optional)
+    pub fn published_at(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `publishedAt` field to an Option value (optional)
+    pub fn maybe_published_at(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S> DocumentBuilder<'a, S>
+where
+    S: document_state::State,
+    S::Title: document_state::IsUnset,
+{
+    /// Set the `title` field (required)
+    pub fn title(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> DocumentBuilder<'a, document_state::SetTitle<S>> {
+        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        DocumentBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DocumentBuilder<'a, S>
+where
+    S: document_state::State,
+    S::Pages: document_state::IsSet,
+    S::Author: document_state::IsSet,
+    S::Title: document_state::IsSet,
+    S::Publication: document_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Document<'a> {
+        Document {
+            author: self.__unsafe_private_named.0.unwrap(),
+            description: self.__unsafe_private_named.1,
+            pages: self.__unsafe_private_named.2.unwrap(),
+            post_ref: self.__unsafe_private_named.3,
+            publication: self.__unsafe_private_named.4.unwrap(),
+            published_at: self.__unsafe_private_named.5,
+            title: self.__unsafe_private_named.6.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Document<'a> {
+        Document {
+            author: self.__unsafe_private_named.0.unwrap(),
+            description: self.__unsafe_private_named.1,
+            pages: self.__unsafe_private_named.2.unwrap(),
+            post_ref: self.__unsafe_private_named.3,
+            publication: self.__unsafe_private_named.4.unwrap(),
+            published_at: self.__unsafe_private_named.5,
+            title: self.__unsafe_private_named.6.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Document<'a> {

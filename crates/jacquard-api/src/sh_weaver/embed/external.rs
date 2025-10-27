@@ -13,23 +13,218 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct External<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub description: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub thumb: Option<jacquard_common::types::blob::BlobRef<'a>>,
     #[serde(borrow)]
-    #[builder(into)]
     pub title: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::Uri<'a>,
+}
+
+pub mod external_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Uri;
+        type Title;
+        type Description;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Uri = Unset;
+        type Title = Unset;
+        type Description = Unset;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Uri = Set<members::uri>;
+        type Title = S::Title;
+        type Description = S::Description;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Uri = S::Uri;
+        type Title = Set<members::title>;
+        type Description = S::Description;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDescription<S> {}
+    impl<S: State> State for SetDescription<S> {
+        type Uri = S::Uri;
+        type Title = S::Title;
+        type Description = Set<members::description>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `description` field
+        pub struct description(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ExternalBuilder<'a, S: external_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> External<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ExternalBuilder<'a, external_state::Empty> {
+        ExternalBuilder::new()
+    }
+}
+
+impl<'a> ExternalBuilder<'a, external_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ExternalBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ExternalBuilder<'a, S>
+where
+    S: external_state::State,
+    S::Description: external_state::IsUnset,
+{
+    /// Set the `description` field (required)
+    pub fn description(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> ExternalBuilder<'a, external_state::SetDescription<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ExternalBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: external_state::State> ExternalBuilder<'a, S> {
+    /// Set the `thumb` field (optional)
+    pub fn thumb(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::blob::BlobRef<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `thumb` field to an Option value (optional)
+    pub fn maybe_thumb(
+        mut self,
+        value: Option<jacquard_common::types::blob::BlobRef<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> ExternalBuilder<'a, S>
+where
+    S: external_state::State,
+    S::Title: external_state::IsUnset,
+{
+    /// Set the `title` field (required)
+    pub fn title(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> ExternalBuilder<'a, external_state::SetTitle<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        ExternalBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ExternalBuilder<'a, S>
+where
+    S: external_state::State,
+    S::Uri: external_state::IsUnset,
+{
+    /// Set the `uri` field (required)
+    pub fn uri(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+    ) -> ExternalBuilder<'a, external_state::SetUri<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        ExternalBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ExternalBuilder<'a, S>
+where
+    S: external_state::State,
+    S::Uri: external_state::IsSet,
+    S::Title: external_state::IsSet,
+    S::Description: external_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> External<'a> {
+        External {
+            description: self.__unsafe_private_named.0.unwrap(),
+            thumb: self.__unsafe_private_named.1,
+            title: self.__unsafe_private_named.2.unwrap(),
+            uri: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> External<'a> {
+        External {
+            description: self.__unsafe_private_named.0.unwrap(),
+            thumb: self.__unsafe_private_named.1,
+            title: self.__unsafe_private_named.2.unwrap(),
+            uri: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_sh_weaver_embed_external() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -286,13 +481,117 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for External<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ExternalRecord<'a> {
     #[serde(borrow)]
     pub embeds: Vec<crate::sh_weaver::embed::external::External<'a>>,
+}
+
+pub mod external_record_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Embeds;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Embeds = Unset;
+    }
+    ///State transition - sets the `embeds` field to Set
+    pub struct SetEmbeds<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEmbeds<S> {}
+    impl<S: State> State for SetEmbeds<S> {
+        type Embeds = Set<members::embeds>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `embeds` field
+        pub struct embeds(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ExternalRecordBuilder<'a, S: external_record_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<Vec<crate::sh_weaver::embed::external::External<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ExternalRecord<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ExternalRecordBuilder<'a, external_record_state::Empty> {
+        ExternalRecordBuilder::new()
+    }
+}
+
+impl<'a> ExternalRecordBuilder<'a, external_record_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ExternalRecordBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ExternalRecordBuilder<'a, S>
+where
+    S: external_record_state::State,
+    S::Embeds: external_record_state::IsUnset,
+{
+    /// Set the `embeds` field (required)
+    pub fn embeds(
+        mut self,
+        value: impl Into<Vec<crate::sh_weaver::embed::external::External<'a>>>,
+    ) -> ExternalRecordBuilder<'a, external_record_state::SetEmbeds<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ExternalRecordBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ExternalRecordBuilder<'a, S>
+where
+    S: external_record_state::State,
+    S::Embeds: external_record_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> ExternalRecord<'a> {
+        ExternalRecord {
+            embeds: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> ExternalRecord<'a> {
+        ExternalRecord {
+            embeds: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ExternalRecord<'a> {
@@ -333,13 +632,117 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ExternalRecord<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct View<'a> {
     #[serde(borrow)]
     pub external: crate::sh_weaver::embed::external::ViewExternal<'a>,
+}
+
+pub mod view_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type External;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type External = Unset;
+    }
+    ///State transition - sets the `external` field to Set
+    pub struct SetExternal<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetExternal<S> {}
+    impl<S: State> State for SetExternal<S> {
+        type External = Set<members::external>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `external` field
+        pub struct external(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ViewBuilder<'a, S: view_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<crate::sh_weaver::embed::external::ViewExternal<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> View<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ViewBuilder<'a, view_state::Empty> {
+        ViewBuilder::new()
+    }
+}
+
+impl<'a> ViewBuilder<'a, view_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ViewBuilder<'a, S>
+where
+    S: view_state::State,
+    S::External: view_state::IsUnset,
+{
+    /// Set the `external` field (required)
+    pub fn external(
+        mut self,
+        value: impl Into<crate::sh_weaver::embed::external::ViewExternal<'a>>,
+    ) -> ViewBuilder<'a, view_state::SetExternal<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ViewBuilder<'a, S>
+where
+    S: view_state::State,
+    S::External: view_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> View<'a> {
+        View {
+            external: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> View<'a> {
+        View {
+            external: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for View<'a> {
@@ -367,23 +770,218 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for View<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ViewExternal<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub description: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub thumb: Option<jacquard_common::types::string::Uri<'a>>,
     #[serde(borrow)]
-    #[builder(into)]
     pub title: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::Uri<'a>,
+}
+
+pub mod view_external_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Uri;
+        type Title;
+        type Description;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Uri = Unset;
+        type Title = Unset;
+        type Description = Unset;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Uri = Set<members::uri>;
+        type Title = S::Title;
+        type Description = S::Description;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Uri = S::Uri;
+        type Title = Set<members::title>;
+        type Description = S::Description;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDescription<S> {}
+    impl<S: State> State for SetDescription<S> {
+        type Uri = S::Uri;
+        type Title = S::Title;
+        type Description = Set<members::description>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `description` field
+        pub struct description(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ViewExternalBuilder<'a, S: view_external_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ViewExternal<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ViewExternalBuilder<'a, view_external_state::Empty> {
+        ViewExternalBuilder::new()
+    }
+}
+
+impl<'a> ViewExternalBuilder<'a, view_external_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ViewExternalBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ViewExternalBuilder<'a, S>
+where
+    S: view_external_state::State,
+    S::Description: view_external_state::IsUnset,
+{
+    /// Set the `description` field (required)
+    pub fn description(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> ViewExternalBuilder<'a, view_external_state::SetDescription<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ViewExternalBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: view_external_state::State> ViewExternalBuilder<'a, S> {
+    /// Set the `thumb` field (optional)
+    pub fn thumb(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `thumb` field to an Option value (optional)
+    pub fn maybe_thumb(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> ViewExternalBuilder<'a, S>
+where
+    S: view_external_state::State,
+    S::Title: view_external_state::IsUnset,
+{
+    /// Set the `title` field (required)
+    pub fn title(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> ViewExternalBuilder<'a, view_external_state::SetTitle<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        ViewExternalBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ViewExternalBuilder<'a, S>
+where
+    S: view_external_state::State,
+    S::Uri: view_external_state::IsUnset,
+{
+    /// Set the `uri` field (required)
+    pub fn uri(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+    ) -> ViewExternalBuilder<'a, view_external_state::SetUri<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        ViewExternalBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ViewExternalBuilder<'a, S>
+where
+    S: view_external_state::State,
+    S::Uri: view_external_state::IsSet,
+    S::Title: view_external_state::IsSet,
+    S::Description: view_external_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> ViewExternal<'a> {
+        ViewExternal {
+            description: self.__unsafe_private_named.0.unwrap(),
+            thumb: self.__unsafe_private_named.1,
+            title: self.__unsafe_private_named.2.unwrap(),
+            uri: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> ViewExternal<'a> {
+        ViewExternal {
+            description: self.__unsafe_private_named.0.unwrap(),
+            thumb: self.__unsafe_private_named.1,
+            title: self.__unsafe_private_named.2.unwrap(),
+            uri: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewExternal<'a> {

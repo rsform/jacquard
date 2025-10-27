@@ -12,10 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct ListVerifications<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -24,7 +22,6 @@ pub struct ListVerifications<'a> {
     pub created_before: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    #[builder(into)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub is_revoked: std::option::Option<bool>,
@@ -37,11 +34,219 @@ pub struct ListVerifications<'a> {
     ///(default: "desc")
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    #[builder(into)]
     pub sort_direction: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub subjects: std::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
+}
+
+pub mod list_verifications_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {}
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {}
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {}
+}
+
+/// Builder for constructing an instance of this type
+pub struct ListVerificationsBuilder<'a, S: list_verifications_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ListVerifications<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ListVerificationsBuilder<'a, list_verifications_state::Empty> {
+        ListVerificationsBuilder::new()
+    }
+}
+
+impl<'a> ListVerificationsBuilder<'a, list_verifications_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ListVerificationsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: list_verifications_state::State> ListVerificationsBuilder<'a, S> {
+    /// Set the `createdAfter` field (optional)
+    pub fn created_after(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `createdAfter` field to an Option value (optional)
+    pub fn maybe_created_after(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: list_verifications_state::State> ListVerificationsBuilder<'a, S> {
+    /// Set the `createdBefore` field (optional)
+    pub fn created_before(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `createdBefore` field to an Option value (optional)
+    pub fn maybe_created_before(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: list_verifications_state::State> ListVerificationsBuilder<'a, S> {
+    /// Set the `cursor` field (optional)
+    pub fn cursor(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `cursor` field to an Option value (optional)
+    pub fn maybe_cursor(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: list_verifications_state::State> ListVerificationsBuilder<'a, S> {
+    /// Set the `isRevoked` field (optional)
+    pub fn is_revoked(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `isRevoked` field to an Option value (optional)
+    pub fn maybe_is_revoked(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: list_verifications_state::State> ListVerificationsBuilder<'a, S> {
+    /// Set the `issuers` field (optional)
+    pub fn issuers(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::types::string::Did<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `issuers` field to an Option value (optional)
+    pub fn maybe_issuers(
+        mut self,
+        value: Option<Vec<jacquard_common::types::string::Did<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: list_verifications_state::State> ListVerificationsBuilder<'a, S> {
+    /// Set the `limit` field (optional)
+    pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `limit` field to an Option value (optional)
+    pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S: list_verifications_state::State> ListVerificationsBuilder<'a, S> {
+    /// Set the `sortDirection` field (optional)
+    pub fn sort_direction(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `sortDirection` field to an Option value (optional)
+    pub fn maybe_sort_direction(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S: list_verifications_state::State> ListVerificationsBuilder<'a, S> {
+    /// Set the `subjects` field (optional)
+    pub fn subjects(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::types::string::Did<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value.into();
+        self
+    }
+    /// Set the `subjects` field to an Option value (optional)
+    pub fn maybe_subjects(
+        mut self,
+        value: Option<Vec<jacquard_common::types::string::Did<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value;
+        self
+    }
+}
+
+impl<'a, S> ListVerificationsBuilder<'a, S>
+where
+    S: list_verifications_state::State,
+{
+    /// Build the final struct
+    pub fn build(self) -> ListVerifications<'a> {
+        ListVerifications {
+            created_after: self.__unsafe_private_named.0,
+            created_before: self.__unsafe_private_named.1,
+            cursor: self.__unsafe_private_named.2,
+            is_revoked: self.__unsafe_private_named.3,
+            issuers: self.__unsafe_private_named.4,
+            limit: self.__unsafe_private_named.5,
+            sort_direction: self.__unsafe_private_named.6,
+            subjects: self.__unsafe_private_named.7,
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

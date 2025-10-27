@@ -18,37 +18,427 @@ pub mod update_template;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TemplateView<'a> {
     /// Subject of the message, used in emails.
     #[serde(borrow)]
-    #[builder(into)]
     pub content_markdown: jacquard_common::CowStr<'a>,
     pub created_at: jacquard_common::types::string::Datetime,
     pub disabled: bool,
     #[serde(borrow)]
-    #[builder(into)]
     pub id: jacquard_common::CowStr<'a>,
     /// Message language.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub lang: Option<jacquard_common::types::string::Language>,
     /// DID of the user who last updated the template.
     #[serde(borrow)]
     pub last_updated_by: jacquard_common::types::string::Did<'a>,
     /// Name of the template.
     #[serde(borrow)]
-    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
     /// Content of the template, can contain markdown and variable placeholders.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub subject: Option<jacquard_common::CowStr<'a>>,
     pub updated_at: jacquard_common::types::string::Datetime,
+}
+
+pub mod template_view_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Id;
+        type Name;
+        type ContentMarkdown;
+        type Disabled;
+        type LastUpdatedBy;
+        type CreatedAt;
+        type UpdatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Id = Unset;
+        type Name = Unset;
+        type ContentMarkdown = Unset;
+        type Disabled = Unset;
+        type LastUpdatedBy = Unset;
+        type CreatedAt = Unset;
+        type UpdatedAt = Unset;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Id = Set<members::id>;
+        type Name = S::Name;
+        type ContentMarkdown = S::ContentMarkdown;
+        type Disabled = S::Disabled;
+        type LastUpdatedBy = S::LastUpdatedBy;
+        type CreatedAt = S::CreatedAt;
+        type UpdatedAt = S::UpdatedAt;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Id = S::Id;
+        type Name = Set<members::name>;
+        type ContentMarkdown = S::ContentMarkdown;
+        type Disabled = S::Disabled;
+        type LastUpdatedBy = S::LastUpdatedBy;
+        type CreatedAt = S::CreatedAt;
+        type UpdatedAt = S::UpdatedAt;
+    }
+    ///State transition - sets the `content_markdown` field to Set
+    pub struct SetContentMarkdown<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContentMarkdown<S> {}
+    impl<S: State> State for SetContentMarkdown<S> {
+        type Id = S::Id;
+        type Name = S::Name;
+        type ContentMarkdown = Set<members::content_markdown>;
+        type Disabled = S::Disabled;
+        type LastUpdatedBy = S::LastUpdatedBy;
+        type CreatedAt = S::CreatedAt;
+        type UpdatedAt = S::UpdatedAt;
+    }
+    ///State transition - sets the `disabled` field to Set
+    pub struct SetDisabled<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDisabled<S> {}
+    impl<S: State> State for SetDisabled<S> {
+        type Id = S::Id;
+        type Name = S::Name;
+        type ContentMarkdown = S::ContentMarkdown;
+        type Disabled = Set<members::disabled>;
+        type LastUpdatedBy = S::LastUpdatedBy;
+        type CreatedAt = S::CreatedAt;
+        type UpdatedAt = S::UpdatedAt;
+    }
+    ///State transition - sets the `last_updated_by` field to Set
+    pub struct SetLastUpdatedBy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLastUpdatedBy<S> {}
+    impl<S: State> State for SetLastUpdatedBy<S> {
+        type Id = S::Id;
+        type Name = S::Name;
+        type ContentMarkdown = S::ContentMarkdown;
+        type Disabled = S::Disabled;
+        type LastUpdatedBy = Set<members::last_updated_by>;
+        type CreatedAt = S::CreatedAt;
+        type UpdatedAt = S::UpdatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Id = S::Id;
+        type Name = S::Name;
+        type ContentMarkdown = S::ContentMarkdown;
+        type Disabled = S::Disabled;
+        type LastUpdatedBy = S::LastUpdatedBy;
+        type CreatedAt = Set<members::created_at>;
+        type UpdatedAt = S::UpdatedAt;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
+    impl<S: State> State for SetUpdatedAt<S> {
+        type Id = S::Id;
+        type Name = S::Name;
+        type ContentMarkdown = S::ContentMarkdown;
+        type Disabled = S::Disabled;
+        type LastUpdatedBy = S::LastUpdatedBy;
+        type CreatedAt = S::CreatedAt;
+        type UpdatedAt = Set<members::updated_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `id` field
+        pub struct id(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `content_markdown` field
+        pub struct content_markdown(());
+        ///Marker type for the `disabled` field
+        pub struct disabled(());
+        ///Marker type for the `last_updated_by` field
+        pub struct last_updated_by(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct TemplateViewBuilder<'a, S: template_view_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Language>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> TemplateView<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> TemplateViewBuilder<'a, template_view_state::Empty> {
+        TemplateViewBuilder::new()
+    }
+}
+
+impl<'a> TemplateViewBuilder<'a, template_view_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        TemplateViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TemplateViewBuilder<'a, S>
+where
+    S: template_view_state::State,
+    S::ContentMarkdown: template_view_state::IsUnset,
+{
+    /// Set the `contentMarkdown` field (required)
+    pub fn content_markdown(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> TemplateViewBuilder<'a, template_view_state::SetContentMarkdown<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        TemplateViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TemplateViewBuilder<'a, S>
+where
+    S: template_view_state::State,
+    S::CreatedAt: template_view_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> TemplateViewBuilder<'a, template_view_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        TemplateViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TemplateViewBuilder<'a, S>
+where
+    S: template_view_state::State,
+    S::Disabled: template_view_state::IsUnset,
+{
+    /// Set the `disabled` field (required)
+    pub fn disabled(
+        mut self,
+        value: impl Into<bool>,
+    ) -> TemplateViewBuilder<'a, template_view_state::SetDisabled<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        TemplateViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TemplateViewBuilder<'a, S>
+where
+    S: template_view_state::State,
+    S::Id: template_view_state::IsUnset,
+{
+    /// Set the `id` field (required)
+    pub fn id(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> TemplateViewBuilder<'a, template_view_state::SetId<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        TemplateViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: template_view_state::State> TemplateViewBuilder<'a, S> {
+    /// Set the `lang` field (optional)
+    pub fn lang(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Language>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `lang` field to an Option value (optional)
+    pub fn maybe_lang(
+        mut self,
+        value: Option<jacquard_common::types::string::Language>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S> TemplateViewBuilder<'a, S>
+where
+    S: template_view_state::State,
+    S::LastUpdatedBy: template_view_state::IsUnset,
+{
+    /// Set the `lastUpdatedBy` field (required)
+    pub fn last_updated_by(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> TemplateViewBuilder<'a, template_view_state::SetLastUpdatedBy<S>> {
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        TemplateViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TemplateViewBuilder<'a, S>
+where
+    S: template_view_state::State,
+    S::Name: template_view_state::IsUnset,
+{
+    /// Set the `name` field (required)
+    pub fn name(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> TemplateViewBuilder<'a, template_view_state::SetName<S>> {
+        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        TemplateViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: template_view_state::State> TemplateViewBuilder<'a, S> {
+    /// Set the `subject` field (optional)
+    pub fn subject(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value.into();
+        self
+    }
+    /// Set the `subject` field to an Option value (optional)
+    pub fn maybe_subject(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.7 = value;
+        self
+    }
+}
+
+impl<'a, S> TemplateViewBuilder<'a, S>
+where
+    S: template_view_state::State,
+    S::UpdatedAt: template_view_state::IsUnset,
+{
+    /// Set the `updatedAt` field (required)
+    pub fn updated_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> TemplateViewBuilder<'a, template_view_state::SetUpdatedAt<S>> {
+        self.__unsafe_private_named.8 = ::core::option::Option::Some(value.into());
+        TemplateViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TemplateViewBuilder<'a, S>
+where
+    S: template_view_state::State,
+    S::Id: template_view_state::IsSet,
+    S::Name: template_view_state::IsSet,
+    S::ContentMarkdown: template_view_state::IsSet,
+    S::Disabled: template_view_state::IsSet,
+    S::LastUpdatedBy: template_view_state::IsSet,
+    S::CreatedAt: template_view_state::IsSet,
+    S::UpdatedAt: template_view_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> TemplateView<'a> {
+        TemplateView {
+            content_markdown: self.__unsafe_private_named.0.unwrap(),
+            created_at: self.__unsafe_private_named.1.unwrap(),
+            disabled: self.__unsafe_private_named.2.unwrap(),
+            id: self.__unsafe_private_named.3.unwrap(),
+            lang: self.__unsafe_private_named.4,
+            last_updated_by: self.__unsafe_private_named.5.unwrap(),
+            name: self.__unsafe_private_named.6.unwrap(),
+            subject: self.__unsafe_private_named.7,
+            updated_at: self.__unsafe_private_named.8.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> TemplateView<'a> {
+        TemplateView {
+            content_markdown: self.__unsafe_private_named.0.unwrap(),
+            created_at: self.__unsafe_private_named.1.unwrap(),
+            disabled: self.__unsafe_private_named.2.unwrap(),
+            id: self.__unsafe_private_named.3.unwrap(),
+            lang: self.__unsafe_private_named.4,
+            last_updated_by: self.__unsafe_private_named.5.unwrap(),
+            name: self.__unsafe_private_named.6.unwrap(),
+            subject: self.__unsafe_private_named.7,
+            updated_at: self.__unsafe_private_named.8.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_tools_ozone_communication_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<

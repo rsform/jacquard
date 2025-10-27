@@ -14,28 +14,245 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Entry<'a> {
     /// The content of the notebook entry. This should be some flavor of Markdown.
     #[serde(borrow)]
-    #[builder(into)]
     pub content: jacquard_common::CowStr<'a>,
     /// Client-declared timestamp when this was originally created.
     pub created_at: jacquard_common::types::string::Datetime,
     /// The set of images, if any, embedded in the notebook entry.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub images: Option<crate::sh_weaver::embed::images::Images<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub tags: Option<crate::sh_weaver::notebook::Tags<'a>>,
     #[serde(borrow)]
     pub title: crate::sh_weaver::notebook::Title<'a>,
+}
+
+pub mod entry_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Content;
+        type Title;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Content = Unset;
+        type Title = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type Content = Set<members::content>;
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Content = S::Content;
+        type Title = Set<members::title>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Content = S::Content;
+        type Title = S::Title;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `content` field
+        pub struct content(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct EntryBuilder<'a, S: entry_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<crate::sh_weaver::embed::images::Images<'a>>,
+        ::core::option::Option<crate::sh_weaver::notebook::Tags<'a>>,
+        ::core::option::Option<crate::sh_weaver::notebook::Title<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Entry<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> EntryBuilder<'a, entry_state::Empty> {
+        EntryBuilder::new()
+    }
+}
+
+impl<'a> EntryBuilder<'a, entry_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        EntryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> EntryBuilder<'a, S>
+where
+    S: entry_state::State,
+    S::Content: entry_state::IsUnset,
+{
+    /// Set the `content` field (required)
+    pub fn content(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> EntryBuilder<'a, entry_state::SetContent<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        EntryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> EntryBuilder<'a, S>
+where
+    S: entry_state::State,
+    S::CreatedAt: entry_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> EntryBuilder<'a, entry_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        EntryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
+    /// Set the `images` field (optional)
+    pub fn images(
+        mut self,
+        value: impl Into<Option<crate::sh_weaver::embed::images::Images<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `images` field to an Option value (optional)
+    pub fn maybe_images(
+        mut self,
+        value: Option<crate::sh_weaver::embed::images::Images<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
+    /// Set the `tags` field (optional)
+    pub fn tags(
+        mut self,
+        value: impl Into<Option<crate::sh_weaver::notebook::Tags<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `tags` field to an Option value (optional)
+    pub fn maybe_tags(
+        mut self,
+        value: Option<crate::sh_weaver::notebook::Tags<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S> EntryBuilder<'a, S>
+where
+    S: entry_state::State,
+    S::Title: entry_state::IsUnset,
+{
+    /// Set the `title` field (required)
+    pub fn title(
+        mut self,
+        value: impl Into<crate::sh_weaver::notebook::Title<'a>>,
+    ) -> EntryBuilder<'a, entry_state::SetTitle<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        EntryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> EntryBuilder<'a, S>
+where
+    S: entry_state::State,
+    S::Content: entry_state::IsSet,
+    S::Title: entry_state::IsSet,
+    S::CreatedAt: entry_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Entry<'a> {
+        Entry {
+            content: self.__unsafe_private_named.0.unwrap(),
+            created_at: self.__unsafe_private_named.1.unwrap(),
+            images: self.__unsafe_private_named.2,
+            tags: self.__unsafe_private_named.3,
+            title: self.__unsafe_private_named.4.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Entry<'a> {
+        Entry {
+            content: self.__unsafe_private_named.0.unwrap(),
+            created_at: self.__unsafe_private_named.1.unwrap(),
+            images: self.__unsafe_private_named.2,
+            tags: self.__unsafe_private_named.3,
+            title: self.__unsafe_private_named.4.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Entry<'a> {

@@ -13,24 +13,154 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-#[builder(start_fn = new)]
 pub struct RemoveOptions<'a> {
     #[serde(borrow)]
     pub keys: Vec<jacquard_common::types::string::Nsid<'a>>,
     #[serde(borrow)]
-    #[builder(into)]
     pub scope: jacquard_common::CowStr<'a>,
-    #[serde(flatten)]
-    #[serde(borrow)]
-    #[builder(default)]
-    pub extra_data: ::std::collections::BTreeMap<
-        ::jacquard_common::smol_str::SmolStr,
-        ::jacquard_common::types::value::Data<'a>,
-    >,
+}
+
+pub mod remove_options_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Keys;
+        type Scope;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Keys = Unset;
+        type Scope = Unset;
+    }
+    ///State transition - sets the `keys` field to Set
+    pub struct SetKeys<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetKeys<S> {}
+    impl<S: State> State for SetKeys<S> {
+        type Keys = Set<members::keys>;
+        type Scope = S::Scope;
+    }
+    ///State transition - sets the `scope` field to Set
+    pub struct SetScope<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetScope<S> {}
+    impl<S: State> State for SetScope<S> {
+        type Keys = S::Keys;
+        type Scope = Set<members::scope>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `keys` field
+        pub struct keys(());
+        ///Marker type for the `scope` field
+        pub struct scope(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct RemoveOptionsBuilder<'a, S: remove_options_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<Vec<jacquard_common::types::string::Nsid<'a>>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> RemoveOptions<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> RemoveOptionsBuilder<'a, remove_options_state::Empty> {
+        RemoveOptionsBuilder::new()
+    }
+}
+
+impl<'a> RemoveOptionsBuilder<'a, remove_options_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        RemoveOptionsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RemoveOptionsBuilder<'a, S>
+where
+    S: remove_options_state::State,
+    S::Keys: remove_options_state::IsUnset,
+{
+    /// Set the `keys` field (required)
+    pub fn keys(
+        mut self,
+        value: impl Into<Vec<jacquard_common::types::string::Nsid<'a>>>,
+    ) -> RemoveOptionsBuilder<'a, remove_options_state::SetKeys<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        RemoveOptionsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RemoveOptionsBuilder<'a, S>
+where
+    S: remove_options_state::State,
+    S::Scope: remove_options_state::IsUnset,
+{
+    /// Set the `scope` field (required)
+    pub fn scope(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> RemoveOptionsBuilder<'a, remove_options_state::SetScope<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        RemoveOptionsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RemoveOptionsBuilder<'a, S>
+where
+    S: remove_options_state::State,
+    S::Keys: remove_options_state::IsSet,
+    S::Scope: remove_options_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> RemoveOptions<'a> {
+        RemoveOptions {
+            keys: self.__unsafe_private_named.0.unwrap(),
+            scope: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> RemoveOptions<'a> {
+        RemoveOptions {
+            keys: self.__unsafe_private_named.0.unwrap(),
+            scope: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

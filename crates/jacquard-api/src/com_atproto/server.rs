@@ -39,25 +39,366 @@ pub mod update_email;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct InviteCode<'a> {
     pub available: i64,
     #[serde(borrow)]
-    #[builder(into)]
     pub code: jacquard_common::CowStr<'a>,
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(borrow)]
-    #[builder(into)]
     pub created_by: jacquard_common::CowStr<'a>,
     pub disabled: bool,
     #[serde(borrow)]
-    #[builder(into)]
     pub for_account: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub uses: Vec<crate::com_atproto::server::InviteCodeUse<'a>>,
+}
+
+pub mod invite_code_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Code;
+        type Available;
+        type Disabled;
+        type ForAccount;
+        type CreatedBy;
+        type CreatedAt;
+        type Uses;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Code = Unset;
+        type Available = Unset;
+        type Disabled = Unset;
+        type ForAccount = Unset;
+        type CreatedBy = Unset;
+        type CreatedAt = Unset;
+        type Uses = Unset;
+    }
+    ///State transition - sets the `code` field to Set
+    pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCode<S> {}
+    impl<S: State> State for SetCode<S> {
+        type Code = Set<members::code>;
+        type Available = S::Available;
+        type Disabled = S::Disabled;
+        type ForAccount = S::ForAccount;
+        type CreatedBy = S::CreatedBy;
+        type CreatedAt = S::CreatedAt;
+        type Uses = S::Uses;
+    }
+    ///State transition - sets the `available` field to Set
+    pub struct SetAvailable<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAvailable<S> {}
+    impl<S: State> State for SetAvailable<S> {
+        type Code = S::Code;
+        type Available = Set<members::available>;
+        type Disabled = S::Disabled;
+        type ForAccount = S::ForAccount;
+        type CreatedBy = S::CreatedBy;
+        type CreatedAt = S::CreatedAt;
+        type Uses = S::Uses;
+    }
+    ///State transition - sets the `disabled` field to Set
+    pub struct SetDisabled<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDisabled<S> {}
+    impl<S: State> State for SetDisabled<S> {
+        type Code = S::Code;
+        type Available = S::Available;
+        type Disabled = Set<members::disabled>;
+        type ForAccount = S::ForAccount;
+        type CreatedBy = S::CreatedBy;
+        type CreatedAt = S::CreatedAt;
+        type Uses = S::Uses;
+    }
+    ///State transition - sets the `for_account` field to Set
+    pub struct SetForAccount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetForAccount<S> {}
+    impl<S: State> State for SetForAccount<S> {
+        type Code = S::Code;
+        type Available = S::Available;
+        type Disabled = S::Disabled;
+        type ForAccount = Set<members::for_account>;
+        type CreatedBy = S::CreatedBy;
+        type CreatedAt = S::CreatedAt;
+        type Uses = S::Uses;
+    }
+    ///State transition - sets the `created_by` field to Set
+    pub struct SetCreatedBy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedBy<S> {}
+    impl<S: State> State for SetCreatedBy<S> {
+        type Code = S::Code;
+        type Available = S::Available;
+        type Disabled = S::Disabled;
+        type ForAccount = S::ForAccount;
+        type CreatedBy = Set<members::created_by>;
+        type CreatedAt = S::CreatedAt;
+        type Uses = S::Uses;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Code = S::Code;
+        type Available = S::Available;
+        type Disabled = S::Disabled;
+        type ForAccount = S::ForAccount;
+        type CreatedBy = S::CreatedBy;
+        type CreatedAt = Set<members::created_at>;
+        type Uses = S::Uses;
+    }
+    ///State transition - sets the `uses` field to Set
+    pub struct SetUses<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUses<S> {}
+    impl<S: State> State for SetUses<S> {
+        type Code = S::Code;
+        type Available = S::Available;
+        type Disabled = S::Disabled;
+        type ForAccount = S::ForAccount;
+        type CreatedBy = S::CreatedBy;
+        type CreatedAt = S::CreatedAt;
+        type Uses = Set<members::uses>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `code` field
+        pub struct code(());
+        ///Marker type for the `available` field
+        pub struct available(());
+        ///Marker type for the `disabled` field
+        pub struct disabled(());
+        ///Marker type for the `for_account` field
+        pub struct for_account(());
+        ///Marker type for the `created_by` field
+        pub struct created_by(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `uses` field
+        pub struct uses(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct InviteCodeBuilder<'a, S: invite_code_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<Vec<crate::com_atproto::server::InviteCodeUse<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> InviteCode<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> InviteCodeBuilder<'a, invite_code_state::Empty> {
+        InviteCodeBuilder::new()
+    }
+}
+
+impl<'a> InviteCodeBuilder<'a, invite_code_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        InviteCodeBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> InviteCodeBuilder<'a, S>
+where
+    S: invite_code_state::State,
+    S::Available: invite_code_state::IsUnset,
+{
+    /// Set the `available` field (required)
+    pub fn available(
+        mut self,
+        value: impl Into<i64>,
+    ) -> InviteCodeBuilder<'a, invite_code_state::SetAvailable<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        InviteCodeBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> InviteCodeBuilder<'a, S>
+where
+    S: invite_code_state::State,
+    S::Code: invite_code_state::IsUnset,
+{
+    /// Set the `code` field (required)
+    pub fn code(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> InviteCodeBuilder<'a, invite_code_state::SetCode<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        InviteCodeBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> InviteCodeBuilder<'a, S>
+where
+    S: invite_code_state::State,
+    S::CreatedAt: invite_code_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> InviteCodeBuilder<'a, invite_code_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        InviteCodeBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> InviteCodeBuilder<'a, S>
+where
+    S: invite_code_state::State,
+    S::CreatedBy: invite_code_state::IsUnset,
+{
+    /// Set the `createdBy` field (required)
+    pub fn created_by(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> InviteCodeBuilder<'a, invite_code_state::SetCreatedBy<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        InviteCodeBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> InviteCodeBuilder<'a, S>
+where
+    S: invite_code_state::State,
+    S::Disabled: invite_code_state::IsUnset,
+{
+    /// Set the `disabled` field (required)
+    pub fn disabled(
+        mut self,
+        value: impl Into<bool>,
+    ) -> InviteCodeBuilder<'a, invite_code_state::SetDisabled<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        InviteCodeBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> InviteCodeBuilder<'a, S>
+where
+    S: invite_code_state::State,
+    S::ForAccount: invite_code_state::IsUnset,
+{
+    /// Set the `forAccount` field (required)
+    pub fn for_account(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> InviteCodeBuilder<'a, invite_code_state::SetForAccount<S>> {
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        InviteCodeBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> InviteCodeBuilder<'a, S>
+where
+    S: invite_code_state::State,
+    S::Uses: invite_code_state::IsUnset,
+{
+    /// Set the `uses` field (required)
+    pub fn uses(
+        mut self,
+        value: impl Into<Vec<crate::com_atproto::server::InviteCodeUse<'a>>>,
+    ) -> InviteCodeBuilder<'a, invite_code_state::SetUses<S>> {
+        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        InviteCodeBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> InviteCodeBuilder<'a, S>
+where
+    S: invite_code_state::State,
+    S::Code: invite_code_state::IsSet,
+    S::Available: invite_code_state::IsSet,
+    S::Disabled: invite_code_state::IsSet,
+    S::ForAccount: invite_code_state::IsSet,
+    S::CreatedBy: invite_code_state::IsSet,
+    S::CreatedAt: invite_code_state::IsSet,
+    S::Uses: invite_code_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> InviteCode<'a> {
+        InviteCode {
+            available: self.__unsafe_private_named.0.unwrap(),
+            code: self.__unsafe_private_named.1.unwrap(),
+            created_at: self.__unsafe_private_named.2.unwrap(),
+            created_by: self.__unsafe_private_named.3.unwrap(),
+            disabled: self.__unsafe_private_named.4.unwrap(),
+            for_account: self.__unsafe_private_named.5.unwrap(),
+            uses: self.__unsafe_private_named.6.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> InviteCode<'a> {
+        InviteCode {
+            available: self.__unsafe_private_named.0.unwrap(),
+            code: self.__unsafe_private_named.1.unwrap(),
+            created_at: self.__unsafe_private_named.2.unwrap(),
+            created_by: self.__unsafe_private_named.3.unwrap(),
+            disabled: self.__unsafe_private_named.4.unwrap(),
+            for_account: self.__unsafe_private_named.5.unwrap(),
+            uses: self.__unsafe_private_named.6.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_com_atproto_server_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -278,14 +619,153 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for InviteCode<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct InviteCodeUse<'a> {
     pub used_at: jacquard_common::types::string::Datetime,
     #[serde(borrow)]
     pub used_by: jacquard_common::types::string::Did<'a>,
+}
+
+pub mod invite_code_use_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type UsedBy;
+        type UsedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type UsedBy = Unset;
+        type UsedAt = Unset;
+    }
+    ///State transition - sets the `used_by` field to Set
+    pub struct SetUsedBy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUsedBy<S> {}
+    impl<S: State> State for SetUsedBy<S> {
+        type UsedBy = Set<members::used_by>;
+        type UsedAt = S::UsedAt;
+    }
+    ///State transition - sets the `used_at` field to Set
+    pub struct SetUsedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUsedAt<S> {}
+    impl<S: State> State for SetUsedAt<S> {
+        type UsedBy = S::UsedBy;
+        type UsedAt = Set<members::used_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `used_by` field
+        pub struct used_by(());
+        ///Marker type for the `used_at` field
+        pub struct used_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct InviteCodeUseBuilder<'a, S: invite_code_use_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> InviteCodeUse<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> InviteCodeUseBuilder<'a, invite_code_use_state::Empty> {
+        InviteCodeUseBuilder::new()
+    }
+}
+
+impl<'a> InviteCodeUseBuilder<'a, invite_code_use_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        InviteCodeUseBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> InviteCodeUseBuilder<'a, S>
+where
+    S: invite_code_use_state::State,
+    S::UsedAt: invite_code_use_state::IsUnset,
+{
+    /// Set the `usedAt` field (required)
+    pub fn used_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> InviteCodeUseBuilder<'a, invite_code_use_state::SetUsedAt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        InviteCodeUseBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> InviteCodeUseBuilder<'a, S>
+where
+    S: invite_code_use_state::State,
+    S::UsedBy: invite_code_use_state::IsUnset,
+{
+    /// Set the `usedBy` field (required)
+    pub fn used_by(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> InviteCodeUseBuilder<'a, invite_code_use_state::SetUsedBy<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        InviteCodeUseBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> InviteCodeUseBuilder<'a, S>
+where
+    S: invite_code_use_state::State,
+    S::UsedBy: invite_code_use_state::IsSet,
+    S::UsedAt: invite_code_use_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> InviteCodeUse<'a> {
+        InviteCodeUse {
+            used_at: self.__unsafe_private_named.0.unwrap(),
+            used_by: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> InviteCodeUse<'a> {
+        InviteCodeUse {
+            used_at: self.__unsafe_private_named.0.unwrap(),
+            used_by: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for InviteCodeUse<'a> {

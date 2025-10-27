@@ -14,18 +14,140 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Service<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub db: Option<crate::app_ocho::plugin::Db<'a>>,
     /// Additional metadata for the plugin, including Expo client and Go configurations.
     #[serde(borrow)]
     pub permissions: Vec<jacquard_common::CowStr<'a>>,
+}
+
+pub mod service_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Permissions;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Permissions = Unset;
+    }
+    ///State transition - sets the `permissions` field to Set
+    pub struct SetPermissions<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPermissions<S> {}
+    impl<S: State> State for SetPermissions<S> {
+        type Permissions = Set<members::permissions>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `permissions` field
+        pub struct permissions(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ServiceBuilder<'a, S: service_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<crate::app_ocho::plugin::Db<'a>>,
+        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Service<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ServiceBuilder<'a, service_state::Empty> {
+        ServiceBuilder::new()
+    }
+}
+
+impl<'a> ServiceBuilder<'a, service_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ServiceBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
+    /// Set the `db` field (optional)
+    pub fn db(
+        mut self,
+        value: impl Into<Option<crate::app_ocho::plugin::Db<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `db` field to an Option value (optional)
+    pub fn maybe_db(mut self, value: Option<crate::app_ocho::plugin::Db<'a>>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> ServiceBuilder<'a, S>
+where
+    S: service_state::State,
+    S::Permissions: service_state::IsUnset,
+{
+    /// Set the `permissions` field (required)
+    pub fn permissions(
+        mut self,
+        value: impl Into<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> ServiceBuilder<'a, service_state::SetPermissions<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        ServiceBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ServiceBuilder<'a, S>
+where
+    S: service_state::State,
+    S::Permissions: service_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Service<'a> {
+        Service {
+            db: self.__unsafe_private_named.0,
+            permissions: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Service<'a> {
+        Service {
+            db: self.__unsafe_private_named.0,
+            permissions: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Service<'a> {

@@ -14,8 +14,7 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Diff<'a> {
@@ -25,6 +24,183 @@ pub struct Diff<'a> {
     pub root: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     #[serde(borrow)]
     pub snapshot: jacquard_common::types::blob::BlobRef<'a>,
+}
+
+pub mod diff_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Snapshot;
+        type Root;
+        type Doc;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Snapshot = Unset;
+        type Root = Unset;
+        type Doc = Unset;
+    }
+    ///State transition - sets the `snapshot` field to Set
+    pub struct SetSnapshot<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSnapshot<S> {}
+    impl<S: State> State for SetSnapshot<S> {
+        type Snapshot = Set<members::snapshot>;
+        type Root = S::Root;
+        type Doc = S::Doc;
+    }
+    ///State transition - sets the `root` field to Set
+    pub struct SetRoot<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRoot<S> {}
+    impl<S: State> State for SetRoot<S> {
+        type Snapshot = S::Snapshot;
+        type Root = Set<members::root>;
+        type Doc = S::Doc;
+    }
+    ///State transition - sets the `doc` field to Set
+    pub struct SetDoc<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDoc<S> {}
+    impl<S: State> State for SetDoc<S> {
+        type Snapshot = S::Snapshot;
+        type Root = S::Root;
+        type Doc = Set<members::doc>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `snapshot` field
+        pub struct snapshot(());
+        ///Marker type for the `root` field
+        pub struct root(());
+        ///Marker type for the `doc` field
+        pub struct doc(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct DiffBuilder<'a, S: diff_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<crate::sh_weaver::edit::DocRef<'a>>,
+        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Diff<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> DiffBuilder<'a, diff_state::Empty> {
+        DiffBuilder::new()
+    }
+}
+
+impl<'a> DiffBuilder<'a, diff_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        DiffBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DiffBuilder<'a, S>
+where
+    S: diff_state::State,
+    S::Doc: diff_state::IsUnset,
+{
+    /// Set the `doc` field (required)
+    pub fn doc(
+        mut self,
+        value: impl Into<crate::sh_weaver::edit::DocRef<'a>>,
+    ) -> DiffBuilder<'a, diff_state::SetDoc<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        DiffBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DiffBuilder<'a, S>
+where
+    S: diff_state::State,
+    S::Root: diff_state::IsUnset,
+{
+    /// Set the `root` field (required)
+    pub fn root(
+        mut self,
+        value: impl Into<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    ) -> DiffBuilder<'a, diff_state::SetRoot<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        DiffBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DiffBuilder<'a, S>
+where
+    S: diff_state::State,
+    S::Snapshot: diff_state::IsUnset,
+{
+    /// Set the `snapshot` field (required)
+    pub fn snapshot(
+        mut self,
+        value: impl Into<jacquard_common::types::blob::BlobRef<'a>>,
+    ) -> DiffBuilder<'a, diff_state::SetSnapshot<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        DiffBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DiffBuilder<'a, S>
+where
+    S: diff_state::State,
+    S::Snapshot: diff_state::IsSet,
+    S::Root: diff_state::IsSet,
+    S::Doc: diff_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Diff<'a> {
+        Diff {
+            doc: self.__unsafe_private_named.0.unwrap(),
+            root: self.__unsafe_private_named.1.unwrap(),
+            snapshot: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Diff<'a> {
+        Diff {
+            doc: self.__unsafe_private_named.0.unwrap(),
+            root: self.__unsafe_private_named.1.unwrap(),
+            snapshot: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Diff<'a> {

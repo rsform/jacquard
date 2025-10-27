@@ -13,24 +13,154 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-#[builder(start_fn = new)]
 pub struct Authorize<'a> {
     #[serde(borrow)]
     pub authorize_options: jacquard_common::types::value::Data<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub input: jacquard_common::CowStr<'a>,
-    #[serde(flatten)]
-    #[serde(borrow)]
-    #[builder(default)]
-    pub extra_data: ::std::collections::BTreeMap<
-        ::jacquard_common::smol_str::SmolStr,
-        ::jacquard_common::types::value::Data<'a>,
-    >,
+}
+
+pub mod authorize_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Input;
+        type AuthorizeOptions;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Input = Unset;
+        type AuthorizeOptions = Unset;
+    }
+    ///State transition - sets the `input` field to Set
+    pub struct SetInput<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetInput<S> {}
+    impl<S: State> State for SetInput<S> {
+        type Input = Set<members::input>;
+        type AuthorizeOptions = S::AuthorizeOptions;
+    }
+    ///State transition - sets the `authorize_options` field to Set
+    pub struct SetAuthorizeOptions<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthorizeOptions<S> {}
+    impl<S: State> State for SetAuthorizeOptions<S> {
+        type Input = S::Input;
+        type AuthorizeOptions = Set<members::authorize_options>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `input` field
+        pub struct input(());
+        ///Marker type for the `authorize_options` field
+        pub struct authorize_options(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct AuthorizeBuilder<'a, S: authorize_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Authorize<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> AuthorizeBuilder<'a, authorize_state::Empty> {
+        AuthorizeBuilder::new()
+    }
+}
+
+impl<'a> AuthorizeBuilder<'a, authorize_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        AuthorizeBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AuthorizeBuilder<'a, S>
+where
+    S: authorize_state::State,
+    S::AuthorizeOptions: authorize_state::IsUnset,
+{
+    /// Set the `authorizeOptions` field (required)
+    pub fn authorize_options(
+        mut self,
+        value: impl Into<jacquard_common::types::value::Data<'a>>,
+    ) -> AuthorizeBuilder<'a, authorize_state::SetAuthorizeOptions<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        AuthorizeBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AuthorizeBuilder<'a, S>
+where
+    S: authorize_state::State,
+    S::Input: authorize_state::IsUnset,
+{
+    /// Set the `input` field (required)
+    pub fn input(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> AuthorizeBuilder<'a, authorize_state::SetInput<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        AuthorizeBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AuthorizeBuilder<'a, S>
+where
+    S: authorize_state::State,
+    S::Input: authorize_state::IsSet,
+    S::AuthorizeOptions: authorize_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Authorize<'a> {
+        Authorize {
+            authorize_options: self.__unsafe_private_named.0.unwrap(),
+            input: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Authorize<'a> {
+        Authorize {
+            authorize_options: self.__unsafe_private_named.0.unwrap(),
+            input: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

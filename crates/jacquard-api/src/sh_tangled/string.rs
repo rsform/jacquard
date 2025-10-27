@@ -13,21 +13,233 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TangledString<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub contents: jacquard_common::CowStr<'a>,
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(borrow)]
-    #[builder(into)]
     pub description: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub filename: jacquard_common::CowStr<'a>,
+}
+
+pub mod tangled_string_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Filename;
+        type Description;
+        type CreatedAt;
+        type Contents;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Filename = Unset;
+        type Description = Unset;
+        type CreatedAt = Unset;
+        type Contents = Unset;
+    }
+    ///State transition - sets the `filename` field to Set
+    pub struct SetFilename<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFilename<S> {}
+    impl<S: State> State for SetFilename<S> {
+        type Filename = Set<members::filename>;
+        type Description = S::Description;
+        type CreatedAt = S::CreatedAt;
+        type Contents = S::Contents;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDescription<S> {}
+    impl<S: State> State for SetDescription<S> {
+        type Filename = S::Filename;
+        type Description = Set<members::description>;
+        type CreatedAt = S::CreatedAt;
+        type Contents = S::Contents;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Filename = S::Filename;
+        type Description = S::Description;
+        type CreatedAt = Set<members::created_at>;
+        type Contents = S::Contents;
+    }
+    ///State transition - sets the `contents` field to Set
+    pub struct SetContents<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContents<S> {}
+    impl<S: State> State for SetContents<S> {
+        type Filename = S::Filename;
+        type Description = S::Description;
+        type CreatedAt = S::CreatedAt;
+        type Contents = Set<members::contents>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `filename` field
+        pub struct filename(());
+        ///Marker type for the `description` field
+        pub struct description(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `contents` field
+        pub struct contents(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct TangledStringBuilder<'a, S: tangled_string_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> TangledString<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> TangledStringBuilder<'a, tangled_string_state::Empty> {
+        TangledStringBuilder::new()
+    }
+}
+
+impl<'a> TangledStringBuilder<'a, tangled_string_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        TangledStringBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TangledStringBuilder<'a, S>
+where
+    S: tangled_string_state::State,
+    S::Contents: tangled_string_state::IsUnset,
+{
+    /// Set the `contents` field (required)
+    pub fn contents(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> TangledStringBuilder<'a, tangled_string_state::SetContents<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        TangledStringBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TangledStringBuilder<'a, S>
+where
+    S: tangled_string_state::State,
+    S::CreatedAt: tangled_string_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> TangledStringBuilder<'a, tangled_string_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        TangledStringBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TangledStringBuilder<'a, S>
+where
+    S: tangled_string_state::State,
+    S::Description: tangled_string_state::IsUnset,
+{
+    /// Set the `description` field (required)
+    pub fn description(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> TangledStringBuilder<'a, tangled_string_state::SetDescription<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        TangledStringBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TangledStringBuilder<'a, S>
+where
+    S: tangled_string_state::State,
+    S::Filename: tangled_string_state::IsUnset,
+{
+    /// Set the `filename` field (required)
+    pub fn filename(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> TangledStringBuilder<'a, tangled_string_state::SetFilename<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        TangledStringBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> TangledStringBuilder<'a, S>
+where
+    S: tangled_string_state::State,
+    S::Filename: tangled_string_state::IsSet,
+    S::Description: tangled_string_state::IsSet,
+    S::CreatedAt: tangled_string_state::IsSet,
+    S::Contents: tangled_string_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> TangledString<'a> {
+        TangledString {
+            contents: self.__unsafe_private_named.0.unwrap(),
+            created_at: self.__unsafe_private_named.1.unwrap(),
+            description: self.__unsafe_private_named.2.unwrap(),
+            filename: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> TangledString<'a> {
+        TangledString {
+            contents: self.__unsafe_private_named.0.unwrap(),
+            created_at: self.__unsafe_private_named.1.unwrap(),
+            description: self.__unsafe_private_named.2.unwrap(),
+            filename: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> TangledString<'a> {

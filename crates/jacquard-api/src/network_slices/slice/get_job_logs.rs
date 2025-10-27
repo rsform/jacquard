@@ -13,8 +13,7 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LogEntry<'a> {
@@ -24,36 +23,381 @@ pub struct LogEntry<'a> {
     pub id: i64,
     /// UUID of related job if applicable
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub job_id: Option<jacquard_common::CowStr<'a>>,
     /// Log level
     #[serde(borrow)]
-    #[builder(into)]
     pub level: jacquard_common::CowStr<'a>,
     /// Type of log entry
     #[serde(borrow)]
-    #[builder(into)]
     pub log_type: jacquard_common::CowStr<'a>,
     /// Log message
     #[serde(borrow)]
-    #[builder(into)]
     pub message: jacquard_common::CowStr<'a>,
     /// Additional metadata associated with the log entry
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub metadata: Option<jacquard_common::types::value::Data<'a>>,
     /// AT-URI of related slice if applicable
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub slice_uri: Option<jacquard_common::CowStr<'a>>,
     /// DID of related user if applicable
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub user_did: Option<jacquard_common::types::string::Did<'a>>,
+}
+
+pub mod log_entry_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Id;
+        type CreatedAt;
+        type LogType;
+        type Level;
+        type Message;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Id = Unset;
+        type CreatedAt = Unset;
+        type LogType = Unset;
+        type Level = Unset;
+        type Message = Unset;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Id = Set<members::id>;
+        type CreatedAt = S::CreatedAt;
+        type LogType = S::LogType;
+        type Level = S::Level;
+        type Message = S::Message;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Id = S::Id;
+        type CreatedAt = Set<members::created_at>;
+        type LogType = S::LogType;
+        type Level = S::Level;
+        type Message = S::Message;
+    }
+    ///State transition - sets the `log_type` field to Set
+    pub struct SetLogType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLogType<S> {}
+    impl<S: State> State for SetLogType<S> {
+        type Id = S::Id;
+        type CreatedAt = S::CreatedAt;
+        type LogType = Set<members::log_type>;
+        type Level = S::Level;
+        type Message = S::Message;
+    }
+    ///State transition - sets the `level` field to Set
+    pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLevel<S> {}
+    impl<S: State> State for SetLevel<S> {
+        type Id = S::Id;
+        type CreatedAt = S::CreatedAt;
+        type LogType = S::LogType;
+        type Level = Set<members::level>;
+        type Message = S::Message;
+    }
+    ///State transition - sets the `message` field to Set
+    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMessage<S> {}
+    impl<S: State> State for SetMessage<S> {
+        type Id = S::Id;
+        type CreatedAt = S::CreatedAt;
+        type LogType = S::LogType;
+        type Level = S::Level;
+        type Message = Set<members::message>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `id` field
+        pub struct id(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `log_type` field
+        pub struct log_type(());
+        ///Marker type for the `level` field
+        pub struct level(());
+        ///Marker type for the `message` field
+        pub struct message(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct LogEntryBuilder<'a, S: log_entry_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> LogEntry<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> LogEntryBuilder<'a, log_entry_state::Empty> {
+        LogEntryBuilder::new()
+    }
+}
+
+impl<'a> LogEntryBuilder<'a, log_entry_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        LogEntryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LogEntryBuilder<'a, S>
+where
+    S: log_entry_state::State,
+    S::CreatedAt: log_entry_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> LogEntryBuilder<'a, log_entry_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        LogEntryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LogEntryBuilder<'a, S>
+where
+    S: log_entry_state::State,
+    S::Id: log_entry_state::IsUnset,
+{
+    /// Set the `id` field (required)
+    pub fn id(
+        mut self,
+        value: impl Into<i64>,
+    ) -> LogEntryBuilder<'a, log_entry_state::SetId<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        LogEntryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: log_entry_state::State> LogEntryBuilder<'a, S> {
+    /// Set the `jobId` field (optional)
+    pub fn job_id(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `jobId` field to an Option value (optional)
+    pub fn maybe_job_id(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> LogEntryBuilder<'a, S>
+where
+    S: log_entry_state::State,
+    S::Level: log_entry_state::IsUnset,
+{
+    /// Set the `level` field (required)
+    pub fn level(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> LogEntryBuilder<'a, log_entry_state::SetLevel<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        LogEntryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LogEntryBuilder<'a, S>
+where
+    S: log_entry_state::State,
+    S::LogType: log_entry_state::IsUnset,
+{
+    /// Set the `logType` field (required)
+    pub fn log_type(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> LogEntryBuilder<'a, log_entry_state::SetLogType<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        LogEntryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LogEntryBuilder<'a, S>
+where
+    S: log_entry_state::State,
+    S::Message: log_entry_state::IsUnset,
+{
+    /// Set the `message` field (required)
+    pub fn message(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> LogEntryBuilder<'a, log_entry_state::SetMessage<S>> {
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        LogEntryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: log_entry_state::State> LogEntryBuilder<'a, S> {
+    /// Set the `metadata` field (optional)
+    pub fn metadata(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::value::Data<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `metadata` field to an Option value (optional)
+    pub fn maybe_metadata(
+        mut self,
+        value: Option<jacquard_common::types::value::Data<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S: log_entry_state::State> LogEntryBuilder<'a, S> {
+    /// Set the `sliceUri` field (optional)
+    pub fn slice_uri(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value.into();
+        self
+    }
+    /// Set the `sliceUri` field to an Option value (optional)
+    pub fn maybe_slice_uri(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value;
+        self
+    }
+}
+
+impl<'a, S: log_entry_state::State> LogEntryBuilder<'a, S> {
+    /// Set the `userDid` field (optional)
+    pub fn user_did(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Did<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value.into();
+        self
+    }
+    /// Set the `userDid` field to an Option value (optional)
+    pub fn maybe_user_did(
+        mut self,
+        value: Option<jacquard_common::types::string::Did<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value;
+        self
+    }
+}
+
+impl<'a, S> LogEntryBuilder<'a, S>
+where
+    S: log_entry_state::State,
+    S::Id: log_entry_state::IsSet,
+    S::CreatedAt: log_entry_state::IsSet,
+    S::LogType: log_entry_state::IsSet,
+    S::Level: log_entry_state::IsSet,
+    S::Message: log_entry_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> LogEntry<'a> {
+        LogEntry {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            id: self.__unsafe_private_named.1.unwrap(),
+            job_id: self.__unsafe_private_named.2,
+            level: self.__unsafe_private_named.3.unwrap(),
+            log_type: self.__unsafe_private_named.4.unwrap(),
+            message: self.__unsafe_private_named.5.unwrap(),
+            metadata: self.__unsafe_private_named.6,
+            slice_uri: self.__unsafe_private_named.7,
+            user_did: self.__unsafe_private_named.8,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> LogEntry<'a> {
+        LogEntry {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            id: self.__unsafe_private_named.1.unwrap(),
+            job_id: self.__unsafe_private_named.2,
+            level: self.__unsafe_private_named.3.unwrap(),
+            log_type: self.__unsafe_private_named.4.unwrap(),
+            message: self.__unsafe_private_named.5.unwrap(),
+            metadata: self.__unsafe_private_named.6,
+            slice_uri: self.__unsafe_private_named.7,
+            user_did: self.__unsafe_private_named.8,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_network_slices_slice_getJobLogs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -319,18 +663,121 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LogEntry<'a> {
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetJobLogs<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub job_id: jacquard_common::CowStr<'a>,
     ///(default: 100, min: 1, max: 1000)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
+}
+
+pub mod get_job_logs_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type JobId;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type JobId = Unset;
+    }
+    ///State transition - sets the `job_id` field to Set
+    pub struct SetJobId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetJobId<S> {}
+    impl<S: State> State for SetJobId<S> {
+        type JobId = Set<members::job_id>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `job_id` field
+        pub struct job_id(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetJobLogsBuilder<'a, S: get_job_logs_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GetJobLogs<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GetJobLogsBuilder<'a, get_job_logs_state::Empty> {
+        GetJobLogsBuilder::new()
+    }
+}
+
+impl<'a> GetJobLogsBuilder<'a, get_job_logs_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetJobLogsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetJobLogsBuilder<'a, S>
+where
+    S: get_job_logs_state::State,
+    S::JobId: get_job_logs_state::IsUnset,
+{
+    /// Set the `jobId` field (required)
+    pub fn job_id(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> GetJobLogsBuilder<'a, get_job_logs_state::SetJobId<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        GetJobLogsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: get_job_logs_state::State> GetJobLogsBuilder<'a, S> {
+    /// Set the `limit` field (optional)
+    pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `limit` field to an Option value (optional)
+    pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> GetJobLogsBuilder<'a, S>
+where
+    S: get_job_logs_state::State,
+    S::JobId: get_job_logs_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetJobLogs<'a> {
+        GetJobLogs {
+            job_id: self.__unsafe_private_named.0.unwrap(),
+            limit: self.__unsafe_private_named.1,
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]
@@ -346,7 +793,7 @@ pub struct GetJobLogs<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct GetJobLogsOutput<'a> {
     #[serde(borrow)]
-    pub logs: Vec<jacquard_common::types::value::Data<'a>>,
+    pub logs: Vec<crate::network_slices::slice::get_job_logs::LogEntry<'a>>,
 }
 
 /// Response type for

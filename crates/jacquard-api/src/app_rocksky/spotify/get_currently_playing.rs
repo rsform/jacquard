@@ -12,15 +12,90 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetCurrentlyPlaying<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub actor: std::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
+}
+
+pub mod get_currently_playing_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {}
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {}
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {}
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetCurrentlyPlayingBuilder<'a, S: get_currently_playing_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GetCurrentlyPlaying<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GetCurrentlyPlayingBuilder<'a, get_currently_playing_state::Empty> {
+        GetCurrentlyPlayingBuilder::new()
+    }
+}
+
+impl<'a> GetCurrentlyPlayingBuilder<'a, get_currently_playing_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetCurrentlyPlayingBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: get_currently_playing_state::State> GetCurrentlyPlayingBuilder<'a, S> {
+    /// Set the `actor` field (optional)
+    pub fn actor(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::ident::AtIdentifier<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `actor` field to an Option value (optional)
+    pub fn maybe_actor(
+        mut self,
+        value: Option<jacquard_common::types::ident::AtIdentifier<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> GetCurrentlyPlayingBuilder<'a, S>
+where
+    S: get_currently_playing_state::State,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetCurrentlyPlaying<'a> {
+        GetCurrentlyPlaying {
+            actor: self.__unsafe_private_named.0,
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

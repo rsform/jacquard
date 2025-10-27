@@ -12,14 +12,103 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetLaunchToken<'a> {
     #[serde(borrow)]
     pub aud: jacquard_common::types::string::Did<'a>,
+}
+
+pub mod get_launch_token_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Aud;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Aud = Unset;
+    }
+    ///State transition - sets the `aud` field to Set
+    pub struct SetAud<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAud<S> {}
+    impl<S: State> State for SetAud<S> {
+        type Aud = Set<members::aud>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `aud` field
+        pub struct aud(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetLaunchTokenBuilder<'a, S: get_launch_token_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GetLaunchToken<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GetLaunchTokenBuilder<'a, get_launch_token_state::Empty> {
+        GetLaunchTokenBuilder::new()
+    }
+}
+
+impl<'a> GetLaunchTokenBuilder<'a, get_launch_token_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetLaunchTokenBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetLaunchTokenBuilder<'a, S>
+where
+    S: get_launch_token_state::State,
+    S::Aud: get_launch_token_state::IsUnset,
+{
+    /// Set the `aud` field (required)
+    pub fn aud(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> GetLaunchTokenBuilder<'a, get_launch_token_state::SetAud<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        GetLaunchTokenBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetLaunchTokenBuilder<'a, S>
+where
+    S: get_launch_token_state::State,
+    S::Aud: get_launch_token_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetLaunchToken<'a> {
+        GetLaunchToken {
+            aud: self.__unsafe_private_named.0.unwrap(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

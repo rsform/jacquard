@@ -13,55 +13,426 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Proposal<'a> {
     /// The persistent, anonymous identifier for the user creating the proposal.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub aid: Option<jacquard_common::CowStr<'a>>,
     /// Optionally, CID specifying the specific version of 'uri' resource this proposal applies to.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub cid: Option<jacquard_common::types::string::Cid<'a>>,
     /// Timestamp when this proposal was created.
     pub cts: jacquard_common::types::string::Datetime,
     /// For 'label' proposals where 'val' is 'needs-context', the full text of any proposed annotation (e.g. community note) to be shown below the post.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub note: Option<jacquard_common::CowStr<'a>>,
     /// An optional array of predefined reasons justifying the moderation action.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub reasons: Option<Vec<jacquard_common::CowStr<'a>>>,
     /// Signature of dag-cbor encoded proposal.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub sig: Option<bytes::Bytes>,
     /// DID of the actor who created this proposal.
     #[serde(borrow)]
     pub src: jacquard_common::types::string::Did<'a>,
     /// The type of moderation action being proposed. Currently expected values are 'allowed_user' or 'label'
     #[serde(borrow)]
-    #[builder(into)]
     pub typ: jacquard_common::CowStr<'a>,
     /// AT URI of the record, repository (account), or other resource that this proposal applies to.
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::Uri<'a>,
     /// For 'label' proposals, the short string name of the value of the proposed label.
     #[serde(borrow)]
-    #[builder(into)]
     pub val: jacquard_common::CowStr<'a>,
     /// The AT Protocol version of the proposal object.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub ver: Option<i64>,
+}
+
+pub mod proposal_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Typ;
+        type Src;
+        type Uri;
+        type Val;
+        type Cts;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Typ = Unset;
+        type Src = Unset;
+        type Uri = Unset;
+        type Val = Unset;
+        type Cts = Unset;
+    }
+    ///State transition - sets the `typ` field to Set
+    pub struct SetTyp<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTyp<S> {}
+    impl<S: State> State for SetTyp<S> {
+        type Typ = Set<members::typ>;
+        type Src = S::Src;
+        type Uri = S::Uri;
+        type Val = S::Val;
+        type Cts = S::Cts;
+    }
+    ///State transition - sets the `src` field to Set
+    pub struct SetSrc<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSrc<S> {}
+    impl<S: State> State for SetSrc<S> {
+        type Typ = S::Typ;
+        type Src = Set<members::src>;
+        type Uri = S::Uri;
+        type Val = S::Val;
+        type Cts = S::Cts;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Typ = S::Typ;
+        type Src = S::Src;
+        type Uri = Set<members::uri>;
+        type Val = S::Val;
+        type Cts = S::Cts;
+    }
+    ///State transition - sets the `val` field to Set
+    pub struct SetVal<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVal<S> {}
+    impl<S: State> State for SetVal<S> {
+        type Typ = S::Typ;
+        type Src = S::Src;
+        type Uri = S::Uri;
+        type Val = Set<members::val>;
+        type Cts = S::Cts;
+    }
+    ///State transition - sets the `cts` field to Set
+    pub struct SetCts<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCts<S> {}
+    impl<S: State> State for SetCts<S> {
+        type Typ = S::Typ;
+        type Src = S::Src;
+        type Uri = S::Uri;
+        type Val = S::Val;
+        type Cts = Set<members::cts>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `typ` field
+        pub struct typ(());
+        ///Marker type for the `src` field
+        pub struct src(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `val` field
+        pub struct val(());
+        ///Marker type for the `cts` field
+        pub struct cts(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ProposalBuilder<'a, S: proposal_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+        ::core::option::Option<bytes::Bytes>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Proposal<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ProposalBuilder<'a, proposal_state::Empty> {
+        ProposalBuilder::new()
+    }
+}
+
+impl<'a> ProposalBuilder<'a, proposal_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ProposalBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: proposal_state::State> ProposalBuilder<'a, S> {
+    /// Set the `aid` field (optional)
+    pub fn aid(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `aid` field to an Option value (optional)
+    pub fn maybe_aid(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: proposal_state::State> ProposalBuilder<'a, S> {
+    /// Set the `cid` field (optional)
+    pub fn cid(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Cid<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `cid` field to an Option value (optional)
+    pub fn maybe_cid(
+        mut self,
+        value: Option<jacquard_common::types::string::Cid<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> ProposalBuilder<'a, S>
+where
+    S: proposal_state::State,
+    S::Cts: proposal_state::IsUnset,
+{
+    /// Set the `cts` field (required)
+    pub fn cts(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> ProposalBuilder<'a, proposal_state::SetCts<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        ProposalBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: proposal_state::State> ProposalBuilder<'a, S> {
+    /// Set the `note` field (optional)
+    pub fn note(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `note` field to an Option value (optional)
+    pub fn maybe_note(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: proposal_state::State> ProposalBuilder<'a, S> {
+    /// Set the `reasons` field (optional)
+    pub fn reasons(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `reasons` field to an Option value (optional)
+    pub fn maybe_reasons(
+        mut self,
+        value: Option<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: proposal_state::State> ProposalBuilder<'a, S> {
+    /// Set the `sig` field (optional)
+    pub fn sig(mut self, value: impl Into<Option<bytes::Bytes>>) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `sig` field to an Option value (optional)
+    pub fn maybe_sig(mut self, value: Option<bytes::Bytes>) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S> ProposalBuilder<'a, S>
+where
+    S: proposal_state::State,
+    S::Src: proposal_state::IsUnset,
+{
+    /// Set the `src` field (required)
+    pub fn src(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> ProposalBuilder<'a, proposal_state::SetSrc<S>> {
+        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        ProposalBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ProposalBuilder<'a, S>
+where
+    S: proposal_state::State,
+    S::Typ: proposal_state::IsUnset,
+{
+    /// Set the `typ` field (required)
+    pub fn typ(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> ProposalBuilder<'a, proposal_state::SetTyp<S>> {
+        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        ProposalBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ProposalBuilder<'a, S>
+where
+    S: proposal_state::State,
+    S::Uri: proposal_state::IsUnset,
+{
+    /// Set the `uri` field (required)
+    pub fn uri(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+    ) -> ProposalBuilder<'a, proposal_state::SetUri<S>> {
+        self.__unsafe_private_named.8 = ::core::option::Option::Some(value.into());
+        ProposalBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ProposalBuilder<'a, S>
+where
+    S: proposal_state::State,
+    S::Val: proposal_state::IsUnset,
+{
+    /// Set the `val` field (required)
+    pub fn val(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> ProposalBuilder<'a, proposal_state::SetVal<S>> {
+        self.__unsafe_private_named.9 = ::core::option::Option::Some(value.into());
+        ProposalBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: proposal_state::State> ProposalBuilder<'a, S> {
+    /// Set the `ver` field (optional)
+    pub fn ver(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.10 = value.into();
+        self
+    }
+    /// Set the `ver` field to an Option value (optional)
+    pub fn maybe_ver(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.10 = value;
+        self
+    }
+}
+
+impl<'a, S> ProposalBuilder<'a, S>
+where
+    S: proposal_state::State,
+    S::Typ: proposal_state::IsSet,
+    S::Src: proposal_state::IsSet,
+    S::Uri: proposal_state::IsSet,
+    S::Val: proposal_state::IsSet,
+    S::Cts: proposal_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Proposal<'a> {
+        Proposal {
+            aid: self.__unsafe_private_named.0,
+            cid: self.__unsafe_private_named.1,
+            cts: self.__unsafe_private_named.2.unwrap(),
+            note: self.__unsafe_private_named.3,
+            reasons: self.__unsafe_private_named.4,
+            sig: self.__unsafe_private_named.5,
+            src: self.__unsafe_private_named.6.unwrap(),
+            typ: self.__unsafe_private_named.7.unwrap(),
+            uri: self.__unsafe_private_named.8.unwrap(),
+            val: self.__unsafe_private_named.9.unwrap(),
+            ver: self.__unsafe_private_named.10,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Proposal<'a> {
+        Proposal {
+            aid: self.__unsafe_private_named.0,
+            cid: self.__unsafe_private_named.1,
+            cts: self.__unsafe_private_named.2.unwrap(),
+            note: self.__unsafe_private_named.3,
+            reasons: self.__unsafe_private_named.4,
+            sig: self.__unsafe_private_named.5,
+            src: self.__unsafe_private_named.6.unwrap(),
+            typ: self.__unsafe_private_named.7.unwrap(),
+            uri: self.__unsafe_private_named.8.unwrap(),
+            val: self.__unsafe_private_named.9.unwrap(),
+            ver: self.__unsafe_private_named.10,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Proposal<'a> {

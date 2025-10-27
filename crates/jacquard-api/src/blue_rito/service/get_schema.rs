@@ -13,23 +13,215 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Langs<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub comment: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
-    #[builder(into)]
     pub lang: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub moderation: Vec<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
-    #[builder(into)]
     pub title: jacquard_common::CowStr<'a>,
+}
+
+pub mod langs_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Lang;
+        type Title;
+        type Moderation;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Lang = Unset;
+        type Title = Unset;
+        type Moderation = Unset;
+    }
+    ///State transition - sets the `lang` field to Set
+    pub struct SetLang<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLang<S> {}
+    impl<S: State> State for SetLang<S> {
+        type Lang = Set<members::lang>;
+        type Title = S::Title;
+        type Moderation = S::Moderation;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Lang = S::Lang;
+        type Title = Set<members::title>;
+        type Moderation = S::Moderation;
+    }
+    ///State transition - sets the `moderation` field to Set
+    pub struct SetModeration<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetModeration<S> {}
+    impl<S: State> State for SetModeration<S> {
+        type Lang = S::Lang;
+        type Title = S::Title;
+        type Moderation = Set<members::moderation>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `lang` field
+        pub struct lang(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `moderation` field
+        pub struct moderation(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct LangsBuilder<'a, S: langs_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Langs<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> LangsBuilder<'a, langs_state::Empty> {
+        LangsBuilder::new()
+    }
+}
+
+impl<'a> LangsBuilder<'a, langs_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        LangsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: langs_state::State> LangsBuilder<'a, S> {
+    /// Set the `comment` field (optional)
+    pub fn comment(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `comment` field to an Option value (optional)
+    pub fn maybe_comment(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> LangsBuilder<'a, S>
+where
+    S: langs_state::State,
+    S::Lang: langs_state::IsUnset,
+{
+    /// Set the `lang` field (required)
+    pub fn lang(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> LangsBuilder<'a, langs_state::SetLang<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        LangsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LangsBuilder<'a, S>
+where
+    S: langs_state::State,
+    S::Moderation: langs_state::IsUnset,
+{
+    /// Set the `moderation` field (required)
+    pub fn moderation(
+        mut self,
+        value: impl Into<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> LangsBuilder<'a, langs_state::SetModeration<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        LangsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LangsBuilder<'a, S>
+where
+    S: langs_state::State,
+    S::Title: langs_state::IsUnset,
+{
+    /// Set the `title` field (required)
+    pub fn title(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> LangsBuilder<'a, langs_state::SetTitle<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        LangsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LangsBuilder<'a, S>
+where
+    S: langs_state::State,
+    S::Lang: langs_state::IsSet,
+    S::Title: langs_state::IsSet,
+    S::Moderation: langs_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Langs<'a> {
+        Langs {
+            comment: self.__unsafe_private_named.0,
+            lang: self.__unsafe_private_named.1.unwrap(),
+            moderation: self.__unsafe_private_named.2.unwrap(),
+            title: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Langs<'a> {
+        Langs {
+            comment: self.__unsafe_private_named.0,
+            lang: self.__unsafe_private_named.1.unwrap(),
+            moderation: self.__unsafe_private_named.2.unwrap(),
+            title: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_blue_rito_service_getSchema() -> ::jacquard_lexicon::lexicon::LexiconDoc<

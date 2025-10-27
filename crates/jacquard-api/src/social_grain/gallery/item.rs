@@ -13,8 +13,7 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Item<'a> {
@@ -24,8 +23,200 @@ pub struct Item<'a> {
     #[serde(borrow)]
     pub item: jacquard_common::types::string::AtUri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub position: Option<i64>,
+}
+
+pub mod item_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type CreatedAt;
+        type Gallery;
+        type Item;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type CreatedAt = Unset;
+        type Gallery = Unset;
+        type Item = Unset;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
+        type Gallery = S::Gallery;
+        type Item = S::Item;
+    }
+    ///State transition - sets the `gallery` field to Set
+    pub struct SetGallery<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGallery<S> {}
+    impl<S: State> State for SetGallery<S> {
+        type CreatedAt = S::CreatedAt;
+        type Gallery = Set<members::gallery>;
+        type Item = S::Item;
+    }
+    ///State transition - sets the `item` field to Set
+    pub struct SetItem<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetItem<S> {}
+    impl<S: State> State for SetItem<S> {
+        type CreatedAt = S::CreatedAt;
+        type Gallery = S::Gallery;
+        type Item = Set<members::item>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `gallery` field
+        pub struct gallery(());
+        ///Marker type for the `item` field
+        pub struct item(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ItemBuilder<'a, S: item_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+        ::core::option::Option<i64>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Item<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ItemBuilder<'a, item_state::Empty> {
+        ItemBuilder::new()
+    }
+}
+
+impl<'a> ItemBuilder<'a, item_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ItemBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ItemBuilder<'a, S>
+where
+    S: item_state::State,
+    S::CreatedAt: item_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> ItemBuilder<'a, item_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ItemBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ItemBuilder<'a, S>
+where
+    S: item_state::State,
+    S::Gallery: item_state::IsUnset,
+{
+    /// Set the `gallery` field (required)
+    pub fn gallery(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> ItemBuilder<'a, item_state::SetGallery<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        ItemBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ItemBuilder<'a, S>
+where
+    S: item_state::State,
+    S::Item: item_state::IsUnset,
+{
+    /// Set the `item` field (required)
+    pub fn item(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> ItemBuilder<'a, item_state::SetItem<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        ItemBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: item_state::State> ItemBuilder<'a, S> {
+    /// Set the `position` field (optional)
+    pub fn position(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `position` field to an Option value (optional)
+    pub fn maybe_position(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S> ItemBuilder<'a, S>
+where
+    S: item_state::State,
+    S::CreatedAt: item_state::IsSet,
+    S::Gallery: item_state::IsSet,
+    S::Item: item_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Item<'a> {
+        Item {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            gallery: self.__unsafe_private_named.1.unwrap(),
+            item: self.__unsafe_private_named.2.unwrap(),
+            position: self.__unsafe_private_named.3,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Item<'a> {
+        Item {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            gallery: self.__unsafe_private_named.1.unwrap(),
+            item: self.__unsafe_private_named.2.unwrap(),
+            position: self.__unsafe_private_named.3,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Item<'a> {

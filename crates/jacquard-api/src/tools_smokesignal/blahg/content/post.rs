@@ -13,18 +13,137 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Attachment<'a> {
     /// Alt text description of the content, for accessibility.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub alt: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub content: jacquard_common::types::blob::BlobRef<'a>,
+}
+
+pub mod attachment_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Content;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Content = Unset;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type Content = Set<members::content>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `content` field
+        pub struct content(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct AttachmentBuilder<'a, S: attachment_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Attachment<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> AttachmentBuilder<'a, attachment_state::Empty> {
+        AttachmentBuilder::new()
+    }
+}
+
+impl<'a> AttachmentBuilder<'a, attachment_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        AttachmentBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: attachment_state::State> AttachmentBuilder<'a, S> {
+    /// Set the `alt` field (optional)
+    pub fn alt(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `alt` field to an Option value (optional)
+    pub fn maybe_alt(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> AttachmentBuilder<'a, S>
+where
+    S: attachment_state::State,
+    S::Content: attachment_state::IsUnset,
+{
+    /// Set the `content` field (required)
+    pub fn content(
+        mut self,
+        value: impl Into<jacquard_common::types::blob::BlobRef<'a>>,
+    ) -> AttachmentBuilder<'a, attachment_state::SetContent<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        AttachmentBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AttachmentBuilder<'a, S>
+where
+    S: attachment_state::State,
+    S::Content: attachment_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Attachment<'a> {
+        Attachment {
+            alt: self.__unsafe_private_named.0,
+            content: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Attachment<'a> {
+        Attachment {
+            alt: self.__unsafe_private_named.0,
+            content: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_tools_smokesignal_blahg_content_post() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -213,33 +332,209 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Attachment<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Post<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub attachments: Option<
         Vec<crate::tools_smokesignal::blahg::content::post::Attachment<'a>>,
     >,
     /// The content of the post
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub content: Option<jacquard_common::types::blob::BlobRef<'a>>,
     /// Indicates human language of text content.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub langs: Option<Vec<jacquard_common::types::string::Language>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub published_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub title: Option<jacquard_common::CowStr<'a>>,
+}
+
+pub mod post_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {}
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {}
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {}
+}
+
+/// Builder for constructing an instance of this type
+pub struct PostBuilder<'a, S: post_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<
+            Vec<crate::tools_smokesignal::blahg::content::post::Attachment<'a>>,
+        >,
+        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+        ::core::option::Option<Vec<jacquard_common::types::string::Language>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Post<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> PostBuilder<'a, post_state::Empty> {
+        PostBuilder::new()
+    }
+}
+
+impl<'a> PostBuilder<'a, post_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        PostBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: post_state::State> PostBuilder<'a, S> {
+    /// Set the `attachments` field (optional)
+    pub fn attachments(
+        mut self,
+        value: impl Into<
+            Option<Vec<crate::tools_smokesignal::blahg::content::post::Attachment<'a>>>,
+        >,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `attachments` field to an Option value (optional)
+    pub fn maybe_attachments(
+        mut self,
+        value: Option<
+            Vec<crate::tools_smokesignal::blahg::content::post::Attachment<'a>>,
+        >,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: post_state::State> PostBuilder<'a, S> {
+    /// Set the `content` field (optional)
+    pub fn content(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::blob::BlobRef<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `content` field to an Option value (optional)
+    pub fn maybe_content(
+        mut self,
+        value: Option<jacquard_common::types::blob::BlobRef<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: post_state::State> PostBuilder<'a, S> {
+    /// Set the `langs` field (optional)
+    pub fn langs(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::types::string::Language>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `langs` field to an Option value (optional)
+    pub fn maybe_langs(
+        mut self,
+        value: Option<Vec<jacquard_common::types::string::Language>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: post_state::State> PostBuilder<'a, S> {
+    /// Set the `publishedAt` field (optional)
+    pub fn published_at(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `publishedAt` field to an Option value (optional)
+    pub fn maybe_published_at(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: post_state::State> PostBuilder<'a, S> {
+    /// Set the `title` field (optional)
+    pub fn title(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `title` field to an Option value (optional)
+    pub fn maybe_title(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S> PostBuilder<'a, S>
+where
+    S: post_state::State,
+{
+    /// Build the final struct
+    pub fn build(self) -> Post<'a> {
+        Post {
+            attachments: self.__unsafe_private_named.0,
+            content: self.__unsafe_private_named.1,
+            langs: self.__unsafe_private_named.2,
+            published_at: self.__unsafe_private_named.3,
+            title: self.__unsafe_private_named.4,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Post<'a> {
+        Post {
+            attachments: self.__unsafe_private_named.0,
+            content: self.__unsafe_private_named.1,
+            langs: self.__unsafe_private_named.2,
+            published_at: self.__unsafe_private_named.3,
+            title: self.__unsafe_private_named.4,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Post<'a> {

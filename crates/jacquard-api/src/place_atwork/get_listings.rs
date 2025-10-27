@@ -14,8 +14,7 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListingRecord<'a> {
@@ -27,9 +26,170 @@ pub struct ListingRecord<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
     /// The full job listing record
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub value: Option<crate::place_atwork::listing::Listing<'a>>,
+}
+
+pub mod listing_record_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Uri;
+        type Cid;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Uri = Unset;
+        type Cid = Unset;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Uri = Set<members::uri>;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Uri = S::Uri;
+        type Cid = Set<members::cid>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ListingRecordBuilder<'a, S: listing_record_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+        ::core::option::Option<crate::place_atwork::listing::Listing<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ListingRecord<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ListingRecordBuilder<'a, listing_record_state::Empty> {
+        ListingRecordBuilder::new()
+    }
+}
+
+impl<'a> ListingRecordBuilder<'a, listing_record_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ListingRecordBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ListingRecordBuilder<'a, S>
+where
+    S: listing_record_state::State,
+    S::Cid: listing_record_state::IsUnset,
+{
+    /// Set the `cid` field (required)
+    pub fn cid(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Cid<'a>>,
+    ) -> ListingRecordBuilder<'a, listing_record_state::SetCid<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ListingRecordBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ListingRecordBuilder<'a, S>
+where
+    S: listing_record_state::State,
+    S::Uri: listing_record_state::IsUnset,
+{
+    /// Set the `uri` field (required)
+    pub fn uri(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> ListingRecordBuilder<'a, listing_record_state::SetUri<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        ListingRecordBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: listing_record_state::State> ListingRecordBuilder<'a, S> {
+    /// Set the `value` field (optional)
+    pub fn value(
+        mut self,
+        value: impl Into<Option<crate::place_atwork::listing::Listing<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `value` field to an Option value (optional)
+    pub fn maybe_value(
+        mut self,
+        value: Option<crate::place_atwork::listing::Listing<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> ListingRecordBuilder<'a, S>
+where
+    S: listing_record_state::State,
+    S::Uri: listing_record_state::IsSet,
+    S::Cid: listing_record_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> ListingRecord<'a> {
+        ListingRecord {
+            cid: self.__unsafe_private_named.0.unwrap(),
+            uri: self.__unsafe_private_named.1.unwrap(),
+            value: self.__unsafe_private_named.2,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> ListingRecord<'a> {
+        ListingRecord {
+            cid: self.__unsafe_private_named.0.unwrap(),
+            uri: self.__unsafe_private_named.1.unwrap(),
+            value: self.__unsafe_private_named.2,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_place_atwork_getListings() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -203,20 +363,105 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListingRecord<'a> {
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetListings<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    #[builder(into)]
     pub identity: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    #[builder(into)]
     pub tag: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+pub mod get_listings_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {}
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {}
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {}
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetListingsBuilder<'a, S: get_listings_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GetListings<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GetListingsBuilder<'a, get_listings_state::Empty> {
+        GetListingsBuilder::new()
+    }
+}
+
+impl<'a> GetListingsBuilder<'a, get_listings_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetListingsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: get_listings_state::State> GetListingsBuilder<'a, S> {
+    /// Set the `identity` field (optional)
+    pub fn identity(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `identity` field to an Option value (optional)
+    pub fn maybe_identity(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: get_listings_state::State> GetListingsBuilder<'a, S> {
+    /// Set the `tag` field (optional)
+    pub fn tag(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `tag` field to an Option value (optional)
+    pub fn maybe_tag(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> GetListingsBuilder<'a, S>
+where
+    S: get_listings_state::State,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetListings<'a> {
+        GetListings {
+            identity: self.__unsafe_private_named.0,
+            tag: self.__unsafe_private_named.1,
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]
@@ -232,7 +477,7 @@ pub struct GetListings<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct GetListingsOutput<'a> {
     #[serde(borrow)]
-    pub listings: Vec<jacquard_common::types::value::Data<'a>>,
+    pub listings: Vec<crate::place_atwork::get_listings::ListingRecord<'a>>,
 }
 
 /// Response type for

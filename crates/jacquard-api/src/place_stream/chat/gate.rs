@@ -14,14 +14,118 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Gate<'a> {
     /// URI of the hidden chat message.
     #[serde(borrow)]
     pub hidden_message: jacquard_common::types::string::AtUri<'a>,
+}
+
+pub mod gate_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type HiddenMessage;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type HiddenMessage = Unset;
+    }
+    ///State transition - sets the `hidden_message` field to Set
+    pub struct SetHiddenMessage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHiddenMessage<S> {}
+    impl<S: State> State for SetHiddenMessage<S> {
+        type HiddenMessage = Set<members::hidden_message>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `hidden_message` field
+        pub struct hidden_message(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct GateBuilder<'a, S: gate_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Gate<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GateBuilder<'a, gate_state::Empty> {
+        GateBuilder::new()
+    }
+}
+
+impl<'a> GateBuilder<'a, gate_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GateBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GateBuilder<'a, S>
+where
+    S: gate_state::State,
+    S::HiddenMessage: gate_state::IsUnset,
+{
+    /// Set the `hiddenMessage` field (required)
+    pub fn hidden_message(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> GateBuilder<'a, gate_state::SetHiddenMessage<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        GateBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GateBuilder<'a, S>
+where
+    S: gate_state::State,
+    S::HiddenMessage: gate_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Gate<'a> {
+        Gate {
+            hidden_message: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Gate<'a> {
+        Gate {
+            hidden_message: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Gate<'a> {

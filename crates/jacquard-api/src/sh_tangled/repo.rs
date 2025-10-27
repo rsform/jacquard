@@ -41,39 +41,294 @@ pub mod tree;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Repo<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub description: Option<jacquard_common::CowStr<'a>>,
     /// knot where the repo was created
     #[serde(borrow)]
-    #[builder(into)]
     pub knot: jacquard_common::CowStr<'a>,
     /// List of labels that this repo subscribes to
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub labels: Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
     /// name of the repo
     #[serde(borrow)]
-    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
     /// source of the repo
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub source: Option<jacquard_common::types::string::Uri<'a>>,
     /// CI runner to send jobs to and receive results from
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub spindle: Option<jacquard_common::CowStr<'a>>,
+}
+
+pub mod repo_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Name;
+        type Knot;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Name = Unset;
+        type Knot = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Name = Set<members::name>;
+        type Knot = S::Knot;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `knot` field to Set
+    pub struct SetKnot<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetKnot<S> {}
+    impl<S: State> State for SetKnot<S> {
+        type Name = S::Name;
+        type Knot = Set<members::knot>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Name = S::Name;
+        type Knot = S::Knot;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `knot` field
+        pub struct knot(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct RepoBuilder<'a, S: repo_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Repo<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> RepoBuilder<'a, repo_state::Empty> {
+        RepoBuilder::new()
+    }
+}
+
+impl<'a> RepoBuilder<'a, repo_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        RepoBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RepoBuilder<'a, S>
+where
+    S: repo_state::State,
+    S::CreatedAt: repo_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> RepoBuilder<'a, repo_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        RepoBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: repo_state::State> RepoBuilder<'a, S> {
+    /// Set the `description` field (optional)
+    pub fn description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `description` field to an Option value (optional)
+    pub fn maybe_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> RepoBuilder<'a, S>
+where
+    S: repo_state::State,
+    S::Knot: repo_state::IsUnset,
+{
+    /// Set the `knot` field (required)
+    pub fn knot(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> RepoBuilder<'a, repo_state::SetKnot<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        RepoBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: repo_state::State> RepoBuilder<'a, S> {
+    /// Set the `labels` field (optional)
+    pub fn labels(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::types::string::AtUri<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `labels` field to an Option value (optional)
+    pub fn maybe_labels(
+        mut self,
+        value: Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S> RepoBuilder<'a, S>
+where
+    S: repo_state::State,
+    S::Name: repo_state::IsUnset,
+{
+    /// Set the `name` field (required)
+    pub fn name(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> RepoBuilder<'a, repo_state::SetName<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        RepoBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: repo_state::State> RepoBuilder<'a, S> {
+    /// Set the `source` field (optional)
+    pub fn source(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `source` field to an Option value (optional)
+    pub fn maybe_source(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S: repo_state::State> RepoBuilder<'a, S> {
+    /// Set the `spindle` field (optional)
+    pub fn spindle(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `spindle` field to an Option value (optional)
+    pub fn maybe_spindle(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S> RepoBuilder<'a, S>
+where
+    S: repo_state::State,
+    S::Name: repo_state::IsSet,
+    S::Knot: repo_state::IsSet,
+    S::CreatedAt: repo_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Repo<'a> {
+        Repo {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            description: self.__unsafe_private_named.1,
+            knot: self.__unsafe_private_named.2.unwrap(),
+            labels: self.__unsafe_private_named.3,
+            name: self.__unsafe_private_named.4.unwrap(),
+            source: self.__unsafe_private_named.5,
+            spindle: self.__unsafe_private_named.6,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Repo<'a> {
+        Repo {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            description: self.__unsafe_private_named.1,
+            knot: self.__unsafe_private_named.2.unwrap(),
+            labels: self.__unsafe_private_named.3,
+            name: self.__unsafe_private_named.4.unwrap(),
+            source: self.__unsafe_private_named.5,
+            spindle: self.__unsafe_private_named.6,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Repo<'a> {

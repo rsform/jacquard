@@ -13,8 +13,7 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Artifact<'a> {
@@ -25,13 +24,269 @@ pub struct Artifact<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     /// name of the artifact
     #[serde(borrow)]
-    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
     /// repo that this artifact is being uploaded to
     #[serde(borrow)]
     pub repo: jacquard_common::types::string::AtUri<'a>,
     /// hash of the tag object that this artifact is attached to (only annotated tags are supported)
     pub tag: bytes::Bytes,
+}
+
+pub mod artifact_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Name;
+        type Repo;
+        type Tag;
+        type CreatedAt;
+        type Artifact;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Name = Unset;
+        type Repo = Unset;
+        type Tag = Unset;
+        type CreatedAt = Unset;
+        type Artifact = Unset;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Name = Set<members::name>;
+        type Repo = S::Repo;
+        type Tag = S::Tag;
+        type CreatedAt = S::CreatedAt;
+        type Artifact = S::Artifact;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Name = S::Name;
+        type Repo = Set<members::repo>;
+        type Tag = S::Tag;
+        type CreatedAt = S::CreatedAt;
+        type Artifact = S::Artifact;
+    }
+    ///State transition - sets the `tag` field to Set
+    pub struct SetTag<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTag<S> {}
+    impl<S: State> State for SetTag<S> {
+        type Name = S::Name;
+        type Repo = S::Repo;
+        type Tag = Set<members::tag>;
+        type CreatedAt = S::CreatedAt;
+        type Artifact = S::Artifact;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Name = S::Name;
+        type Repo = S::Repo;
+        type Tag = S::Tag;
+        type CreatedAt = Set<members::created_at>;
+        type Artifact = S::Artifact;
+    }
+    ///State transition - sets the `artifact` field to Set
+    pub struct SetArtifact<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetArtifact<S> {}
+    impl<S: State> State for SetArtifact<S> {
+        type Name = S::Name;
+        type Repo = S::Repo;
+        type Tag = S::Tag;
+        type CreatedAt = S::CreatedAt;
+        type Artifact = Set<members::artifact>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
+        ///Marker type for the `tag` field
+        pub struct tag(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `artifact` field
+        pub struct artifact(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ArtifactBuilder<'a, S: artifact_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+        ::core::option::Option<bytes::Bytes>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Artifact<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ArtifactBuilder<'a, artifact_state::Empty> {
+        ArtifactBuilder::new()
+    }
+}
+
+impl<'a> ArtifactBuilder<'a, artifact_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ArtifactBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ArtifactBuilder<'a, S>
+where
+    S: artifact_state::State,
+    S::Artifact: artifact_state::IsUnset,
+{
+    /// Set the `artifact` field (required)
+    pub fn artifact(
+        mut self,
+        value: impl Into<jacquard_common::types::blob::BlobRef<'a>>,
+    ) -> ArtifactBuilder<'a, artifact_state::SetArtifact<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ArtifactBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ArtifactBuilder<'a, S>
+where
+    S: artifact_state::State,
+    S::CreatedAt: artifact_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> ArtifactBuilder<'a, artifact_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        ArtifactBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ArtifactBuilder<'a, S>
+where
+    S: artifact_state::State,
+    S::Name: artifact_state::IsUnset,
+{
+    /// Set the `name` field (required)
+    pub fn name(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> ArtifactBuilder<'a, artifact_state::SetName<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        ArtifactBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ArtifactBuilder<'a, S>
+where
+    S: artifact_state::State,
+    S::Repo: artifact_state::IsUnset,
+{
+    /// Set the `repo` field (required)
+    pub fn repo(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> ArtifactBuilder<'a, artifact_state::SetRepo<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        ArtifactBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ArtifactBuilder<'a, S>
+where
+    S: artifact_state::State,
+    S::Tag: artifact_state::IsUnset,
+{
+    /// Set the `tag` field (required)
+    pub fn tag(
+        mut self,
+        value: impl Into<bytes::Bytes>,
+    ) -> ArtifactBuilder<'a, artifact_state::SetTag<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        ArtifactBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ArtifactBuilder<'a, S>
+where
+    S: artifact_state::State,
+    S::Name: artifact_state::IsSet,
+    S::Repo: artifact_state::IsSet,
+    S::Tag: artifact_state::IsSet,
+    S::CreatedAt: artifact_state::IsSet,
+    S::Artifact: artifact_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Artifact<'a> {
+        Artifact {
+            artifact: self.__unsafe_private_named.0.unwrap(),
+            created_at: self.__unsafe_private_named.1.unwrap(),
+            name: self.__unsafe_private_named.2.unwrap(),
+            repo: self.__unsafe_private_named.3.unwrap(),
+            tag: self.__unsafe_private_named.4.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Artifact<'a> {
+        Artifact {
+            artifact: self.__unsafe_private_named.0.unwrap(),
+            created_at: self.__unsafe_private_named.1.unwrap(),
+            name: self.__unsafe_private_named.2.unwrap(),
+            repo: self.__unsafe_private_named.3.unwrap(),
+            tag: self.__unsafe_private_named.4.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Artifact<'a> {

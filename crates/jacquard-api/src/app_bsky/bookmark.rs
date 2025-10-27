@@ -18,14 +18,118 @@ pub mod get_bookmarks;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Bookmark<'a> {
     /// A strong ref to the record to be bookmarked. Currently, only `app.bsky.feed.post` records are supported.
     #[serde(borrow)]
     pub subject: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+}
+
+pub mod bookmark_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Subject;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Subject = Unset;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type Subject = Set<members::subject>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `subject` field
+        pub struct subject(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct BookmarkBuilder<'a, S: bookmark_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Bookmark<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> BookmarkBuilder<'a, bookmark_state::Empty> {
+        BookmarkBuilder::new()
+    }
+}
+
+impl<'a> BookmarkBuilder<'a, bookmark_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        BookmarkBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BookmarkBuilder<'a, S>
+where
+    S: bookmark_state::State,
+    S::Subject: bookmark_state::IsUnset,
+{
+    /// Set the `subject` field (required)
+    pub fn subject(
+        mut self,
+        value: impl Into<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    ) -> BookmarkBuilder<'a, bookmark_state::SetSubject<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        BookmarkBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BookmarkBuilder<'a, S>
+where
+    S: bookmark_state::State,
+    S::Subject: bookmark_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Bookmark<'a> {
+        Bookmark {
+            subject: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Bookmark<'a> {
+        Bookmark {
+            subject: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_app_bsky_bookmark_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -154,19 +258,179 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Bookmark<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BookmarkView<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub created_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub item: BookmarkViewItem<'a>,
     /// A strong ref to the bookmarked record.
     #[serde(borrow)]
     pub subject: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+}
+
+pub mod bookmark_view_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Subject;
+        type Item;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Subject = Unset;
+        type Item = Unset;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type Subject = Set<members::subject>;
+        type Item = S::Item;
+    }
+    ///State transition - sets the `item` field to Set
+    pub struct SetItem<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetItem<S> {}
+    impl<S: State> State for SetItem<S> {
+        type Subject = S::Subject;
+        type Item = Set<members::item>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `subject` field
+        pub struct subject(());
+        ///Marker type for the `item` field
+        pub struct item(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct BookmarkViewBuilder<'a, S: bookmark_view_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<BookmarkViewItem<'a>>,
+        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> BookmarkView<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> BookmarkViewBuilder<'a, bookmark_view_state::Empty> {
+        BookmarkViewBuilder::new()
+    }
+}
+
+impl<'a> BookmarkViewBuilder<'a, bookmark_view_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        BookmarkViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: bookmark_view_state::State> BookmarkViewBuilder<'a, S> {
+    /// Set the `createdAt` field (optional)
+    pub fn created_at(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `createdAt` field to an Option value (optional)
+    pub fn maybe_created_at(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> BookmarkViewBuilder<'a, S>
+where
+    S: bookmark_view_state::State,
+    S::Item: bookmark_view_state::IsUnset,
+{
+    /// Set the `item` field (required)
+    pub fn item(
+        mut self,
+        value: impl Into<BookmarkViewItem<'a>>,
+    ) -> BookmarkViewBuilder<'a, bookmark_view_state::SetItem<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        BookmarkViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BookmarkViewBuilder<'a, S>
+where
+    S: bookmark_view_state::State,
+    S::Subject: bookmark_view_state::IsUnset,
+{
+    /// Set the `subject` field (required)
+    pub fn subject(
+        mut self,
+        value: impl Into<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    ) -> BookmarkViewBuilder<'a, bookmark_view_state::SetSubject<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        BookmarkViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BookmarkViewBuilder<'a, S>
+where
+    S: bookmark_view_state::State,
+    S::Subject: bookmark_view_state::IsSet,
+    S::Item: bookmark_view_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> BookmarkView<'a> {
+        BookmarkView {
+            created_at: self.__unsafe_private_named.0,
+            item: self.__unsafe_private_named.1.unwrap(),
+            subject: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> BookmarkView<'a> {
+        BookmarkView {
+            created_at: self.__unsafe_private_named.0,
+            item: self.__unsafe_private_named.1.unwrap(),
+            subject: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]

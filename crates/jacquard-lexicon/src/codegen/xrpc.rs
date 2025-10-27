@@ -35,7 +35,7 @@ impl<'c> CodeGenerator<'c> {
         let has_errors = query.errors.is_some();
 
         if let Some(params) = &query.parameters {
-            let params_struct = self.generate_params_struct(&type_base, params)?;
+            let params_struct = self.generate_params_struct(&type_base, nsid, params)?;
             output.push(params_struct);
         }
 
@@ -99,7 +99,7 @@ impl<'c> CodeGenerator<'c> {
         let has_errors = proc.errors.is_some();
 
         if let Some(params) = &proc.parameters {
-            let params_struct = self.generate_params_struct_proc(&type_base, params)?;
+            let params_struct = self.generate_params_struct_proc(&type_base, nsid, params)?;
             output.push(params_struct);
         }
 
@@ -161,7 +161,7 @@ impl<'c> CodeGenerator<'c> {
             match params {
                 crate::lexicon::LexXrpcSubscriptionParameter::Params(params_inner) => {
                     let params_struct =
-                        self.generate_params_struct_inner(&type_base, params_inner)?;
+                        self.generate_params_struct_inner(&type_base, nsid, params_inner)?;
                     output.push(params_struct);
                 }
             }
@@ -230,7 +230,9 @@ impl<'c> CodeGenerator<'c> {
                     current_nsid: nsid,
                 };
 
-                let union_variants = ctx.build_simple_union_variants(&union.refs, |ref_str| self.ref_to_rust_type(ref_str))?;
+                let union_variants = ctx.build_simple_union_variants(&union.refs, |ref_str| {
+                    self.ref_to_rust_type(ref_str)
+                })?;
                 let variants = super::union_codegen::generate_variant_tokens(&union_variants);
 
                 // Generate decode arms for framed decoding
@@ -301,7 +303,8 @@ impl<'c> CodeGenerator<'c> {
                 };
 
                 // Generate union types for this message
-                let unions = self.generate_nested_types(nsid, &struct_name, &obj.properties, false)?;
+                let unions =
+                    self.generate_nested_types(nsid, &struct_name, &obj.properties, false)?;
 
                 Ok(quote! {
                     #struct_def
@@ -328,11 +331,14 @@ impl<'c> CodeGenerator<'c> {
     pub(super) fn generate_params_struct(
         &self,
         type_base: &str,
+        nsid: &str,
         params: &crate::lexicon::LexXrpcQueryParameter<'static>,
     ) -> Result<TokenStream> {
         use crate::lexicon::LexXrpcQueryParameter;
         match params {
-            LexXrpcQueryParameter::Params(p) => self.generate_params_struct_inner(type_base, p),
+            LexXrpcQueryParameter::Params(p) => {
+                self.generate_params_struct_inner(type_base, nsid, p)
+            }
         }
     }
 
@@ -340,6 +346,7 @@ impl<'c> CodeGenerator<'c> {
     pub(super) fn generate_params_struct_proc(
         &self,
         type_base: &str,
+        nsid: &str,
         params: &crate::lexicon::LexXrpcProcedureParameter<'static>,
     ) -> Result<TokenStream> {
         use crate::lexicon::LexXrpcProcedureParameter;
@@ -348,7 +355,7 @@ impl<'c> CodeGenerator<'c> {
             LexXrpcProcedureParameter::Params(p) => {
                 let struct_name = format!("{}Params", type_base);
                 let ident = syn::Ident::new(&struct_name, proc_macro2::Span::call_site());
-                self.generate_params_struct_inner_with_name(&ident, p)
+                self.generate_params_struct_inner_with_name(&ident, nsid, p)
             }
         }
     }
@@ -357,16 +364,18 @@ impl<'c> CodeGenerator<'c> {
     pub(super) fn generate_params_struct_inner(
         &self,
         type_base: &str,
+        nsid: &str,
         p: &crate::lexicon::LexXrpcParameters<'static>,
     ) -> Result<TokenStream> {
         let ident = syn::Ident::new(type_base, proc_macro2::Span::call_site());
-        self.generate_params_struct_inner_with_name(&ident, p)
+        self.generate_params_struct_inner_with_name(&ident, nsid, p)
     }
 
     /// Generate params struct with custom name
     pub(super) fn generate_params_struct_inner_with_name(
         &self,
         ident: &syn::Ident,
+        nsid: &str,
         p: &crate::lexicon::LexXrpcParameters<'static>,
     ) -> Result<TokenStream> {
         let required = p.required.as_ref().map(|r| r.as_slice()).unwrap_or(&[]);
@@ -387,33 +396,44 @@ impl<'c> CodeGenerator<'c> {
         let needs_lifetime = self.params_need_lifetime(p);
 
         let derives = quote! {
-            #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder, jacquard_derive::IntoStatic)]
-            #[builder(start_fn = new)]
+            #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic)]
         };
 
-        if needs_lifetime {
-            Ok(quote! {
-                #(#default_fns)*
-
+        let struct_def = if needs_lifetime {
+            quote! {
                 #doc
                 #derives
                 #[serde(rename_all = "camelCase")]
                 pub struct #ident<'a> {
                     #(#fields)*
                 }
-            })
+            }
         } else {
-            Ok(quote! {
-                #(#default_fns)*
-
+            quote! {
                 #doc
                 #derives
                 #[serde(rename_all = "camelCase")]
                 pub struct #ident {
                     #(#fields)*
                 }
-            })
-        }
+            }
+        };
+
+        let type_name = ident.to_string();
+        let ctx = super::builder_gen::BuilderGenContext::from_parameters(
+            self,
+            nsid,
+            &type_name,
+            p,
+            needs_lifetime,
+        );
+        let builder = ctx.generate();
+
+        Ok(quote! {
+            #(#default_fns)*
+            #struct_def
+            #builder
+        })
     }
 
     /// Generate input struct from XRPC body
@@ -428,10 +448,10 @@ impl<'c> CodeGenerator<'c> {
         // Check if this is a binary body (no schema, just raw bytes)
         let is_binary_body = body.schema.is_none();
 
-        // Determine if we should derive Default or bon::Builder
-        // Binary bodies always get builder, schema-based inputs use heuristics
+        // Determine if we should derive Default or generate custom builder
+        // Binary bodies skipped (single field), schema-based inputs use heuristics
         let (has_default, has_builder) = if is_binary_body {
-            (false, true)
+            (false, false) // binary bodies don't get builder (single field)
         } else if let Some(crate::lexicon::LexXrpcBodySchema::Object(obj)) = &body.schema {
             let decision = super::builder_heuristics::should_generate_builder(type_base, obj);
             (decision.has_default, decision.has_builder)
@@ -440,7 +460,7 @@ impl<'c> CodeGenerator<'c> {
         };
 
         let fields = if let Some(schema) = &body.schema {
-            self.generate_body_fields("", type_base, schema, has_builder)?
+            self.generate_body_fields(nsid, type_base, schema, has_builder)?
         } else {
             // Binary body: just a bytes field
             quote! {
@@ -454,31 +474,10 @@ impl<'c> CodeGenerator<'c> {
         let struct_def = if is_binary_body {
             quote! {
                 #doc
-                #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder, jacquard_derive::IntoStatic)]
-                #[builder(start_fn = new)]
+                #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic)]
                 #[serde(rename_all = "camelCase")]
                 pub struct #ident {
                     #fields
-                }
-            }
-        } else if has_builder {
-            // Input structs with schemas and builders: manually add extra_data field with #[builder(default)]
-            // for bon compatibility. The #[lexicon] macro will see it exists and skip adding it.
-            quote! {
-                #doc
-                #[jacquard_derive::lexicon]
-                #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, bon::Builder, jacquard_derive::IntoStatic)]
-                #[serde(rename_all = "camelCase")]
-                #[builder(start_fn = new)]
-                pub struct #ident<'a> {
-                    #fields
-                    #[serde(flatten)]
-                    #[serde(borrow)]
-                    #[builder(default)]
-                    pub extra_data: ::std::collections::BTreeMap<
-                        ::jacquard_common::smol_str::SmolStr,
-                        ::jacquard_common::types::value::Data<'a>
-                    >,
                 }
             }
         } else if has_default {
@@ -503,6 +502,21 @@ impl<'c> CodeGenerator<'c> {
             }
         };
 
+        // Generate custom builder if needed (binary bodies skipped - single field)
+        let builder = if !is_binary_body && has_builder {
+            if let Some(crate::lexicon::LexXrpcBodySchema::Object(obj)) = &body.schema {
+                let ctx = super::builder_gen::BuilderGenContext::from_object(
+                    self, nsid, type_base, obj,
+                    true, // input structs always have lifetime (for #[lexicon])
+                );
+                ctx.generate()
+            } else {
+                quote! {}
+            }
+        } else {
+            quote! {}
+        };
+
         // Generate union types if schema is an Object
         let unions = if let Some(crate::lexicon::LexXrpcBodySchema::Object(obj)) = &body.schema {
             self.generate_nested_types(nsid, type_base, &obj.properties, false)?
@@ -512,6 +526,7 @@ impl<'c> CodeGenerator<'c> {
 
         Ok(quote! {
             #struct_def
+            #builder
             #(#unions)*
         })
     }
@@ -527,7 +542,7 @@ impl<'c> CodeGenerator<'c> {
         let ident = syn::Ident::new(&struct_name, proc_macro2::Span::call_site());
 
         let fields = if let Some(schema) = &body.schema {
-            self.generate_body_fields("", &struct_name, schema, false)?
+            self.generate_body_fields(nsid, &struct_name, schema, false)?
         } else {
             quote! {
                 pub body: bytes::Bytes,
@@ -636,22 +651,15 @@ impl<'c> CodeGenerator<'c> {
 
         let field_ident = make_ident(&field_name.to_snake_case());
 
-        let (rust_type, needs_lifetime, is_cowstr) = match field_type {
-            LexXrpcParametersProperty::Boolean(_) => (quote! { bool }, false, false),
-            LexXrpcParametersProperty::Integer(_) => (quote! { i64 }, false, false),
+        let (rust_type, needs_lifetime) = match field_type {
+            LexXrpcParametersProperty::Boolean(_) => (quote! { bool }, false),
+            LexXrpcParametersProperty::Integer(_) => (quote! { i64 }, false),
             LexXrpcParametersProperty::String(s) => {
-                let is_cowstr = s.format.is_none(); // CowStr for plain strings
-                (
-                    self.string_to_rust_type(s),
-                    self.string_needs_lifetime(s),
-                    is_cowstr,
-                )
+                (self.string_to_rust_type(s), self.string_needs_lifetime(s))
             }
-            LexXrpcParametersProperty::Unknown(_) => (
-                quote! { jacquard_common::types::value::Data<'a> },
-                true,
-                false,
-            ),
+            LexXrpcParametersProperty::Unknown(_) => {
+                (quote! { jacquard_common::types::value::Data<'a> }, true)
+            }
             LexXrpcParametersProperty::Array(arr) => {
                 let needs_lifetime = match &arr.items {
                     crate::lexicon::LexPrimitiveArrayItem::Boolean(_)
@@ -669,7 +677,7 @@ impl<'c> CodeGenerator<'c> {
                         quote! { jacquard_common::types::value::Data<'a> }
                     }
                 };
-                (quote! { Vec<#item_type> }, needs_lifetime, false)
+                (quote! { Vec<#item_type> }, needs_lifetime)
             }
         };
 
@@ -688,11 +696,6 @@ impl<'c> CodeGenerator<'c> {
         // Add serde(borrow) to all fields with lifetimes
         if needs_lifetime {
             attrs.push(quote! { #[serde(borrow)] });
-        }
-
-        // Add builder(into) for CowStr fields to allow String, &str, etc.
-        if is_cowstr {
-            attrs.push(quote! { #[builder(into)] });
         }
 
         Ok(quote! {
@@ -725,7 +728,7 @@ impl<'c> CodeGenerator<'c> {
                     let fn_name = format!("_default_{}", field_name.to_snake_case());
                     let fn_ident = syn::Ident::new(&fn_name, proc_macro2::Span::call_site());
                     (
-                        Some(format!("Defaults to `{}`", v)),
+                        Some(format!(" Defaults to `{}`", v)),
                         Some(quote! { #[serde(default = #fn_name)] }),
                         Some(quote! {
                             fn #fn_ident() -> bool { #v }
@@ -737,7 +740,7 @@ impl<'c> CodeGenerator<'c> {
                     let fn_name = format!("_default_{}", field_name.to_snake_case());
                     let fn_ident = syn::Ident::new(&fn_name, proc_macro2::Span::call_site());
                     (
-                        Some(format!("Defaults to `{}`", v)),
+                        Some(format!(" Defaults to `{}`", v)),
                         Some(quote! { #[serde(default = #fn_name)] }),
                         Some(quote! {
                             fn #fn_ident() -> i64 { #v }
@@ -749,7 +752,7 @@ impl<'c> CodeGenerator<'c> {
                     let fn_name = format!("_default_{}", field_name.to_snake_case());
                     let fn_ident = syn::Ident::new(&fn_name, proc_macro2::Span::call_site());
                     (
-                        Some(format!("Defaults to `\"{}\"`", v)),
+                        Some(format!(" Defaults to `\"{}\"`", v)),
                         Some(quote! { #[serde(default = #fn_name)] }),
                         Some(quote! {
                             fn #fn_ident() -> jacquard_common::CowStr<'static> {
@@ -798,7 +801,7 @@ impl<'c> CodeGenerator<'c> {
                     }
                 }
                 LexXrpcParametersProperty::Boolean(b) => {
-                    b.default.map(|v| format!("(default: {})", v))
+                    b.default.map(|v| format!(" (default: {})", v))
                 }
                 _ => None,
             };

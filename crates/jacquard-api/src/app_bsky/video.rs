@@ -17,36 +17,282 @@ pub mod upload_video;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct JobStatus<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub blob: Option<jacquard_common::types::blob::BlobRef<'a>>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub error: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
-    #[builder(into)]
     pub job_id: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub message: Option<jacquard_common::CowStr<'a>>,
     /// Progress within the current processing state.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub progress: Option<i64>,
     /// The state of the video processing job. All values not listed as a known value indicate that the job is in process.
     #[serde(borrow)]
-    #[builder(into)]
     pub state: jacquard_common::CowStr<'a>,
+}
+
+pub mod job_status_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type JobId;
+        type Did;
+        type State;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type JobId = Unset;
+        type Did = Unset;
+        type State = Unset;
+    }
+    ///State transition - sets the `job_id` field to Set
+    pub struct SetJobId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetJobId<S> {}
+    impl<S: State> State for SetJobId<S> {
+        type JobId = Set<members::job_id>;
+        type Did = S::Did;
+        type State = S::State;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type JobId = S::JobId;
+        type Did = Set<members::did>;
+        type State = S::State;
+    }
+    ///State transition - sets the `state` field to Set
+    pub struct SetState<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetState<S> {}
+    impl<S: State> State for SetState<S> {
+        type JobId = S::JobId;
+        type Did = S::Did;
+        type State = Set<members::state>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `job_id` field
+        pub struct job_id(());
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `state` field
+        pub struct state(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct JobStatusBuilder<'a, S: job_status_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> JobStatus<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> JobStatusBuilder<'a, job_status_state::Empty> {
+        JobStatusBuilder::new()
+    }
+}
+
+impl<'a> JobStatusBuilder<'a, job_status_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        JobStatusBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: job_status_state::State> JobStatusBuilder<'a, S> {
+    /// Set the `blob` field (optional)
+    pub fn blob(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::blob::BlobRef<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `blob` field to an Option value (optional)
+    pub fn maybe_blob(
+        mut self,
+        value: Option<jacquard_common::types::blob::BlobRef<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> JobStatusBuilder<'a, S>
+where
+    S: job_status_state::State,
+    S::Did: job_status_state::IsUnset,
+{
+    /// Set the `did` field (required)
+    pub fn did(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> JobStatusBuilder<'a, job_status_state::SetDid<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        JobStatusBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: job_status_state::State> JobStatusBuilder<'a, S> {
+    /// Set the `error` field (optional)
+    pub fn error(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `error` field to an Option value (optional)
+    pub fn maybe_error(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> JobStatusBuilder<'a, S>
+where
+    S: job_status_state::State,
+    S::JobId: job_status_state::IsUnset,
+{
+    /// Set the `jobId` field (required)
+    pub fn job_id(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> JobStatusBuilder<'a, job_status_state::SetJobId<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        JobStatusBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: job_status_state::State> JobStatusBuilder<'a, S> {
+    /// Set the `message` field (optional)
+    pub fn message(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `message` field to an Option value (optional)
+    pub fn maybe_message(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: job_status_state::State> JobStatusBuilder<'a, S> {
+    /// Set the `progress` field (optional)
+    pub fn progress(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `progress` field to an Option value (optional)
+    pub fn maybe_progress(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S> JobStatusBuilder<'a, S>
+where
+    S: job_status_state::State,
+    S::State: job_status_state::IsUnset,
+{
+    /// Set the `state` field (required)
+    pub fn state(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> JobStatusBuilder<'a, job_status_state::SetState<S>> {
+        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        JobStatusBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> JobStatusBuilder<'a, S>
+where
+    S: job_status_state::State,
+    S::JobId: job_status_state::IsSet,
+    S::Did: job_status_state::IsSet,
+    S::State: job_status_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> JobStatus<'a> {
+        JobStatus {
+            blob: self.__unsafe_private_named.0,
+            did: self.__unsafe_private_named.1.unwrap(),
+            error: self.__unsafe_private_named.2,
+            job_id: self.__unsafe_private_named.3.unwrap(),
+            message: self.__unsafe_private_named.4,
+            progress: self.__unsafe_private_named.5,
+            state: self.__unsafe_private_named.6.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> JobStatus<'a> {
+        JobStatus {
+            blob: self.__unsafe_private_named.0,
+            did: self.__unsafe_private_named.1.unwrap(),
+            error: self.__unsafe_private_named.2,
+            job_id: self.__unsafe_private_named.3.unwrap(),
+            message: self.__unsafe_private_named.4,
+            progress: self.__unsafe_private_named.5,
+            state: self.__unsafe_private_named.6.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_app_bsky_video_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<

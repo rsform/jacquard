@@ -12,10 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct SearchClips<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -23,14 +21,157 @@ pub struct SearchClips<'a> {
     pub actor: std::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    #[builder(into)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     ///(default: 25, min: 1, max: 100)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
     #[serde(borrow)]
-    #[builder(into)]
     pub q: jacquard_common::CowStr<'a>,
+}
+
+pub mod search_clips_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Q;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Q = Unset;
+    }
+    ///State transition - sets the `q` field to Set
+    pub struct SetQ<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetQ<S> {}
+    impl<S: State> State for SetQ<S> {
+        type Q = Set<members::q>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `q` field
+        pub struct q(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct SearchClipsBuilder<'a, S: search_clips_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> SearchClips<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> SearchClipsBuilder<'a, search_clips_state::Empty> {
+        SearchClipsBuilder::new()
+    }
+}
+
+impl<'a> SearchClipsBuilder<'a, search_clips_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        SearchClipsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: search_clips_state::State> SearchClipsBuilder<'a, S> {
+    /// Set the `actor` field (optional)
+    pub fn actor(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::ident::AtIdentifier<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `actor` field to an Option value (optional)
+    pub fn maybe_actor(
+        mut self,
+        value: Option<jacquard_common::types::ident::AtIdentifier<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: search_clips_state::State> SearchClipsBuilder<'a, S> {
+    /// Set the `cursor` field (optional)
+    pub fn cursor(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `cursor` field to an Option value (optional)
+    pub fn maybe_cursor(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: search_clips_state::State> SearchClipsBuilder<'a, S> {
+    /// Set the `limit` field (optional)
+    pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `limit` field to an Option value (optional)
+    pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> SearchClipsBuilder<'a, S>
+where
+    S: search_clips_state::State,
+    S::Q: search_clips_state::IsUnset,
+{
+    /// Set the `q` field (required)
+    pub fn q(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> SearchClipsBuilder<'a, search_clips_state::SetQ<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        SearchClipsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SearchClipsBuilder<'a, S>
+where
+    S: search_clips_state::State,
+    S::Q: search_clips_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> SearchClips<'a> {
+        SearchClips {
+            actor: self.__unsafe_private_named.0,
+            cursor: self.__unsafe_private_named.1,
+            limit: self.__unsafe_private_named.2,
+            q: self.__unsafe_private_named.3.unwrap(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

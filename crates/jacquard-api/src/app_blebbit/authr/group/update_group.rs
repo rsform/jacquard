@@ -12,16 +12,82 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateGroupParams<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    #[builder(into)]
     pub id: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+pub mod update_group_params_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {}
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {}
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {}
+}
+
+/// Builder for constructing an instance of this type
+pub struct UpdateGroupParamsBuilder<'a, S: update_group_params_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (::core::option::Option<jacquard_common::CowStr<'a>>,),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> UpdateGroupParams<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> UpdateGroupParamsBuilder<'a, update_group_params_state::Empty> {
+        UpdateGroupParamsBuilder::new()
+    }
+}
+
+impl<'a> UpdateGroupParamsBuilder<'a, update_group_params_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        UpdateGroupParamsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: update_group_params_state::State> UpdateGroupParamsBuilder<'a, S> {
+    /// Set the `id` field (optional)
+    pub fn id(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `id` field to an Option value (optional)
+    pub fn maybe_id(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> UpdateGroupParamsBuilder<'a, S>
+where
+    S: update_group_params_state::State,
+{
+    /// Build the final struct
+    pub fn build(self) -> UpdateGroupParams<'a> {
+        UpdateGroupParams {
+            id: self.__unsafe_private_named.0,
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

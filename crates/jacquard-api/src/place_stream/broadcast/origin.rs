@@ -14,19 +14,16 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Origin<'a> {
     /// did of the broadcaster that operates the server syndicating the livestream
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub broadcaster: Option<jacquard_common::types::string::Did<'a>>,
     /// Iroh ticket that can be used to access the livestream from the server
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub iroh_ticket: Option<jacquard_common::CowStr<'a>>,
     /// did of the server that's currently rebroadcasting the livestream
@@ -37,6 +34,227 @@ pub struct Origin<'a> {
     pub streamer: jacquard_common::types::string::Did<'a>,
     /// Periodically updated timestamp when this origin last saw a livestream
     pub updated_at: jacquard_common::types::string::Datetime,
+}
+
+pub mod origin_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Streamer;
+        type Server;
+        type UpdatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Streamer = Unset;
+        type Server = Unset;
+        type UpdatedAt = Unset;
+    }
+    ///State transition - sets the `streamer` field to Set
+    pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStreamer<S> {}
+    impl<S: State> State for SetStreamer<S> {
+        type Streamer = Set<members::streamer>;
+        type Server = S::Server;
+        type UpdatedAt = S::UpdatedAt;
+    }
+    ///State transition - sets the `server` field to Set
+    pub struct SetServer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetServer<S> {}
+    impl<S: State> State for SetServer<S> {
+        type Streamer = S::Streamer;
+        type Server = Set<members::server>;
+        type UpdatedAt = S::UpdatedAt;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
+    impl<S: State> State for SetUpdatedAt<S> {
+        type Streamer = S::Streamer;
+        type Server = S::Server;
+        type UpdatedAt = Set<members::updated_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `streamer` field
+        pub struct streamer(());
+        ///Marker type for the `server` field
+        pub struct server(());
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct OriginBuilder<'a, S: origin_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Origin<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> OriginBuilder<'a, origin_state::Empty> {
+        OriginBuilder::new()
+    }
+}
+
+impl<'a> OriginBuilder<'a, origin_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        OriginBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: origin_state::State> OriginBuilder<'a, S> {
+    /// Set the `broadcaster` field (optional)
+    pub fn broadcaster(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Did<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `broadcaster` field to an Option value (optional)
+    pub fn maybe_broadcaster(
+        mut self,
+        value: Option<jacquard_common::types::string::Did<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: origin_state::State> OriginBuilder<'a, S> {
+    /// Set the `irohTicket` field (optional)
+    pub fn iroh_ticket(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `irohTicket` field to an Option value (optional)
+    pub fn maybe_iroh_ticket(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> OriginBuilder<'a, S>
+where
+    S: origin_state::State,
+    S::Server: origin_state::IsUnset,
+{
+    /// Set the `server` field (required)
+    pub fn server(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> OriginBuilder<'a, origin_state::SetServer<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        OriginBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> OriginBuilder<'a, S>
+where
+    S: origin_state::State,
+    S::Streamer: origin_state::IsUnset,
+{
+    /// Set the `streamer` field (required)
+    pub fn streamer(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> OriginBuilder<'a, origin_state::SetStreamer<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        OriginBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> OriginBuilder<'a, S>
+where
+    S: origin_state::State,
+    S::UpdatedAt: origin_state::IsUnset,
+{
+    /// Set the `updatedAt` field (required)
+    pub fn updated_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> OriginBuilder<'a, origin_state::SetUpdatedAt<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        OriginBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> OriginBuilder<'a, S>
+where
+    S: origin_state::State,
+    S::Streamer: origin_state::IsSet,
+    S::Server: origin_state::IsSet,
+    S::UpdatedAt: origin_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Origin<'a> {
+        Origin {
+            broadcaster: self.__unsafe_private_named.0,
+            iroh_ticket: self.__unsafe_private_named.1,
+            server: self.__unsafe_private_named.2.unwrap(),
+            streamer: self.__unsafe_private_named.3.unwrap(),
+            updated_at: self.__unsafe_private_named.4.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Origin<'a> {
+        Origin {
+            broadcaster: self.__unsafe_private_named.0,
+            iroh_ticket: self.__unsafe_private_named.1,
+            server: self.__unsafe_private_named.2.unwrap(),
+            streamer: self.__unsafe_private_named.3.unwrap(),
+            updated_at: self.__unsafe_private_named.4.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Origin<'a> {

@@ -14,15 +14,116 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct FavClient<'a> {
     /// Set to your favorite client.
     #[serde(borrow)]
-    #[builder(into)]
     pub fav_client: jacquard_common::CowStr<'a>,
+}
+
+pub mod fav_client_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type FavClient;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type FavClient = Unset;
+    }
+    ///State transition - sets the `fav_client` field to Set
+    pub struct SetFavClient<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFavClient<S> {}
+    impl<S: State> State for SetFavClient<S> {
+        type FavClient = Set<members::fav_client>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `fav_client` field
+        pub struct fav_client(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct FavClientBuilder<'a, S: fav_client_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (::core::option::Option<jacquard_common::CowStr<'a>>,),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> FavClient<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> FavClientBuilder<'a, fav_client_state::Empty> {
+        FavClientBuilder::new()
+    }
+}
+
+impl<'a> FavClientBuilder<'a, fav_client_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        FavClientBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> FavClientBuilder<'a, S>
+where
+    S: fav_client_state::State,
+    S::FavClient: fav_client_state::IsUnset,
+{
+    /// Set the `favClient` field (required)
+    pub fn fav_client(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> FavClientBuilder<'a, fav_client_state::SetFavClient<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        FavClientBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> FavClientBuilder<'a, S>
+where
+    S: fav_client_state::State,
+    S::FavClient: fav_client_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> FavClient<'a> {
+        FavClient {
+            fav_client: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> FavClient<'a> {
+        FavClient {
+            fav_client: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> FavClient<'a> {

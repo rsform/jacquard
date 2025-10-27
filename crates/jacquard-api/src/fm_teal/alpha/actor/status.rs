@@ -14,19 +14,179 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Status<'a> {
     /// The unix timestamp of the expiry time of the item. If unavailable, default to 10 minutes past the start time.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub expiry: Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub item: crate::fm_teal::alpha::feed::PlayView<'a>,
     /// The unix timestamp of when the item was recorded
     pub time: jacquard_common::types::string::Datetime,
+}
+
+pub mod status_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Time;
+        type Item;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Time = Unset;
+        type Item = Unset;
+    }
+    ///State transition - sets the `time` field to Set
+    pub struct SetTime<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTime<S> {}
+    impl<S: State> State for SetTime<S> {
+        type Time = Set<members::time>;
+        type Item = S::Item;
+    }
+    ///State transition - sets the `item` field to Set
+    pub struct SetItem<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetItem<S> {}
+    impl<S: State> State for SetItem<S> {
+        type Time = S::Time;
+        type Item = Set<members::item>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `time` field
+        pub struct time(());
+        ///Marker type for the `item` field
+        pub struct item(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct StatusBuilder<'a, S: status_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<crate::fm_teal::alpha::feed::PlayView<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Status<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> StatusBuilder<'a, status_state::Empty> {
+        StatusBuilder::new()
+    }
+}
+
+impl<'a> StatusBuilder<'a, status_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        StatusBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: status_state::State> StatusBuilder<'a, S> {
+    /// Set the `expiry` field (optional)
+    pub fn expiry(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `expiry` field to an Option value (optional)
+    pub fn maybe_expiry(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> StatusBuilder<'a, S>
+where
+    S: status_state::State,
+    S::Item: status_state::IsUnset,
+{
+    /// Set the `item` field (required)
+    pub fn item(
+        mut self,
+        value: impl Into<crate::fm_teal::alpha::feed::PlayView<'a>>,
+    ) -> StatusBuilder<'a, status_state::SetItem<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        StatusBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> StatusBuilder<'a, S>
+where
+    S: status_state::State,
+    S::Time: status_state::IsUnset,
+{
+    /// Set the `time` field (required)
+    pub fn time(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> StatusBuilder<'a, status_state::SetTime<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        StatusBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> StatusBuilder<'a, S>
+where
+    S: status_state::State,
+    S::Time: status_state::IsSet,
+    S::Item: status_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Status<'a> {
+        Status {
+            expiry: self.__unsafe_private_named.0,
+            item: self.__unsafe_private_named.1.unwrap(),
+            time: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Status<'a> {
+        Status {
+            expiry: self.__unsafe_private_named.0,
+            item: self.__unsafe_private_named.1.unwrap(),
+            time: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Status<'a> {

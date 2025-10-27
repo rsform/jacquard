@@ -12,13 +12,97 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetEvent {
     pub id: i64,
+}
+
+pub mod get_event_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Id;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Id = Unset;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Id = Set<members::id>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `id` field
+        pub struct id(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetEventBuilder<S: get_event_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (::core::option::Option<i64>,),
+}
+
+impl GetEvent {
+    /// Create a new builder for this type
+    pub fn new() -> GetEventBuilder<get_event_state::Empty> {
+        GetEventBuilder::new()
+    }
+}
+
+impl GetEventBuilder<get_event_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetEventBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+        }
+    }
+}
+
+impl<S> GetEventBuilder<S>
+where
+    S: get_event_state::State,
+    S::Id: get_event_state::IsUnset,
+{
+    /// Set the `id` field (required)
+    pub fn id(
+        mut self,
+        value: impl Into<i64>,
+    ) -> GetEventBuilder<get_event_state::SetId<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        GetEventBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+        }
+    }
+}
+
+impl<S> GetEventBuilder<S>
+where
+    S: get_event_state::State,
+    S::Id: get_event_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetEvent {
+        GetEvent {
+            id: self.__unsafe_private_named.0.unwrap(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

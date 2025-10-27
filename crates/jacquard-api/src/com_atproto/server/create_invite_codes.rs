@@ -13,16 +13,154 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AccountCodes<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub account: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub codes: Vec<jacquard_common::CowStr<'a>>,
+}
+
+pub mod account_codes_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Account;
+        type Codes;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Account = Unset;
+        type Codes = Unset;
+    }
+    ///State transition - sets the `account` field to Set
+    pub struct SetAccount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAccount<S> {}
+    impl<S: State> State for SetAccount<S> {
+        type Account = Set<members::account>;
+        type Codes = S::Codes;
+    }
+    ///State transition - sets the `codes` field to Set
+    pub struct SetCodes<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCodes<S> {}
+    impl<S: State> State for SetCodes<S> {
+        type Account = S::Account;
+        type Codes = Set<members::codes>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `account` field
+        pub struct account(());
+        ///Marker type for the `codes` field
+        pub struct codes(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct AccountCodesBuilder<'a, S: account_codes_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> AccountCodes<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> AccountCodesBuilder<'a, account_codes_state::Empty> {
+        AccountCodesBuilder::new()
+    }
+}
+
+impl<'a> AccountCodesBuilder<'a, account_codes_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        AccountCodesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AccountCodesBuilder<'a, S>
+where
+    S: account_codes_state::State,
+    S::Account: account_codes_state::IsUnset,
+{
+    /// Set the `account` field (required)
+    pub fn account(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> AccountCodesBuilder<'a, account_codes_state::SetAccount<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        AccountCodesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AccountCodesBuilder<'a, S>
+where
+    S: account_codes_state::State,
+    S::Codes: account_codes_state::IsUnset,
+{
+    /// Set the `codes` field (required)
+    pub fn codes(
+        mut self,
+        value: impl Into<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> AccountCodesBuilder<'a, account_codes_state::SetCodes<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        AccountCodesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AccountCodesBuilder<'a, S>
+where
+    S: account_codes_state::State,
+    S::Account: account_codes_state::IsSet,
+    S::Codes: account_codes_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> AccountCodes<'a> {
+        AccountCodes {
+            account: self.__unsafe_private_named.0.unwrap(),
+            codes: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> AccountCodes<'a> {
+        AccountCodes {
+            account: self.__unsafe_private_named.0.unwrap(),
+            codes: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_com_atproto_server_createInviteCodes() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -202,25 +340,177 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AccountCodes<'a> {
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-#[builder(start_fn = new)]
 pub struct CreateInviteCodes<'a> {
     pub code_count: i64,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub for_accounts: Option<Vec<jacquard_common::types::string::Did<'a>>>,
     pub use_count: i64,
-    #[serde(flatten)]
-    #[serde(borrow)]
-    #[builder(default)]
-    pub extra_data: ::std::collections::BTreeMap<
-        ::jacquard_common::smol_str::SmolStr,
-        ::jacquard_common::types::value::Data<'a>,
-    >,
+}
+
+pub mod create_invite_codes_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type CodeCount;
+        type UseCount;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type CodeCount = Unset;
+        type UseCount = Unset;
+    }
+    ///State transition - sets the `code_count` field to Set
+    pub struct SetCodeCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCodeCount<S> {}
+    impl<S: State> State for SetCodeCount<S> {
+        type CodeCount = Set<members::code_count>;
+        type UseCount = S::UseCount;
+    }
+    ///State transition - sets the `use_count` field to Set
+    pub struct SetUseCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUseCount<S> {}
+    impl<S: State> State for SetUseCount<S> {
+        type CodeCount = S::CodeCount;
+        type UseCount = Set<members::use_count>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `code_count` field
+        pub struct code_count(());
+        ///Marker type for the `use_count` field
+        pub struct use_count(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct CreateInviteCodesBuilder<'a, S: create_invite_codes_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<i64>,
+        ::core::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
+        ::core::option::Option<i64>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> CreateInviteCodes<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> CreateInviteCodesBuilder<'a, create_invite_codes_state::Empty> {
+        CreateInviteCodesBuilder::new()
+    }
+}
+
+impl<'a> CreateInviteCodesBuilder<'a, create_invite_codes_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        CreateInviteCodesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CreateInviteCodesBuilder<'a, S>
+where
+    S: create_invite_codes_state::State,
+    S::CodeCount: create_invite_codes_state::IsUnset,
+{
+    /// Set the `codeCount` field (required)
+    pub fn code_count(
+        mut self,
+        value: impl Into<i64>,
+    ) -> CreateInviteCodesBuilder<'a, create_invite_codes_state::SetCodeCount<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        CreateInviteCodesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: create_invite_codes_state::State> CreateInviteCodesBuilder<'a, S> {
+    /// Set the `forAccounts` field (optional)
+    pub fn for_accounts(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::types::string::Did<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `forAccounts` field to an Option value (optional)
+    pub fn maybe_for_accounts(
+        mut self,
+        value: Option<Vec<jacquard_common::types::string::Did<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> CreateInviteCodesBuilder<'a, S>
+where
+    S: create_invite_codes_state::State,
+    S::UseCount: create_invite_codes_state::IsUnset,
+{
+    /// Set the `useCount` field (required)
+    pub fn use_count(
+        mut self,
+        value: impl Into<i64>,
+    ) -> CreateInviteCodesBuilder<'a, create_invite_codes_state::SetUseCount<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        CreateInviteCodesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CreateInviteCodesBuilder<'a, S>
+where
+    S: create_invite_codes_state::State,
+    S::CodeCount: create_invite_codes_state::IsSet,
+    S::UseCount: create_invite_codes_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> CreateInviteCodes<'a> {
+        CreateInviteCodes {
+            code_count: self.__unsafe_private_named.0.unwrap(),
+            for_accounts: self.__unsafe_private_named.1,
+            use_count: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> CreateInviteCodes<'a> {
+        CreateInviteCodes {
+            code_count: self.__unsafe_private_named.0.unwrap(),
+            for_accounts: self.__unsafe_private_named.1,
+            use_count: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]
@@ -236,7 +526,7 @@ pub struct CreateInviteCodes<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct CreateInviteCodesOutput<'a> {
     #[serde(borrow)]
-    pub codes: Vec<jacquard_common::types::value::Data<'a>>,
+    pub codes: Vec<crate::com_atproto::server::create_invite_codes::AccountCodes<'a>>,
 }
 
 /// Response type for

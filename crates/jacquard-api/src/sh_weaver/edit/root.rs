@@ -14,8 +14,7 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Root<'a> {
@@ -27,6 +26,222 @@ pub struct Root<'a> {
     pub snapshot: jacquard_common::types::blob::BlobRef<'a>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+pub mod root_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Cid;
+        type Uri;
+        type Doc;
+        type Snapshot;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Cid = Unset;
+        type Uri = Unset;
+        type Doc = Unset;
+        type Snapshot = Unset;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Cid = Set<members::cid>;
+        type Uri = S::Uri;
+        type Doc = S::Doc;
+        type Snapshot = S::Snapshot;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Cid = S::Cid;
+        type Uri = Set<members::uri>;
+        type Doc = S::Doc;
+        type Snapshot = S::Snapshot;
+    }
+    ///State transition - sets the `doc` field to Set
+    pub struct SetDoc<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDoc<S> {}
+    impl<S: State> State for SetDoc<S> {
+        type Cid = S::Cid;
+        type Uri = S::Uri;
+        type Doc = Set<members::doc>;
+        type Snapshot = S::Snapshot;
+    }
+    ///State transition - sets the `snapshot` field to Set
+    pub struct SetSnapshot<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSnapshot<S> {}
+    impl<S: State> State for SetSnapshot<S> {
+        type Cid = S::Cid;
+        type Uri = S::Uri;
+        type Doc = S::Doc;
+        type Snapshot = Set<members::snapshot>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `doc` field
+        pub struct doc(());
+        ///Marker type for the `snapshot` field
+        pub struct snapshot(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct RootBuilder<'a, S: root_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
+        ::core::option::Option<crate::sh_weaver::edit::DocRef<'a>>,
+        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Root<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> RootBuilder<'a, root_state::Empty> {
+        RootBuilder::new()
+    }
+}
+
+impl<'a> RootBuilder<'a, root_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        RootBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RootBuilder<'a, S>
+where
+    S: root_state::State,
+    S::Cid: root_state::IsUnset,
+{
+    /// Set the `cid` field (required)
+    pub fn cid(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Cid<'a>>,
+    ) -> RootBuilder<'a, root_state::SetCid<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        RootBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RootBuilder<'a, S>
+where
+    S: root_state::State,
+    S::Doc: root_state::IsUnset,
+{
+    /// Set the `doc` field (required)
+    pub fn doc(
+        mut self,
+        value: impl Into<crate::sh_weaver::edit::DocRef<'a>>,
+    ) -> RootBuilder<'a, root_state::SetDoc<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        RootBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RootBuilder<'a, S>
+where
+    S: root_state::State,
+    S::Snapshot: root_state::IsUnset,
+{
+    /// Set the `snapshot` field (required)
+    pub fn snapshot(
+        mut self,
+        value: impl Into<jacquard_common::types::blob::BlobRef<'a>>,
+    ) -> RootBuilder<'a, root_state::SetSnapshot<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        RootBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RootBuilder<'a, S>
+where
+    S: root_state::State,
+    S::Uri: root_state::IsUnset,
+{
+    /// Set the `uri` field (required)
+    pub fn uri(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> RootBuilder<'a, root_state::SetUri<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        RootBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RootBuilder<'a, S>
+where
+    S: root_state::State,
+    S::Cid: root_state::IsSet,
+    S::Uri: root_state::IsSet,
+    S::Doc: root_state::IsSet,
+    S::Snapshot: root_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Root<'a> {
+        Root {
+            cid: self.__unsafe_private_named.0.unwrap(),
+            doc: self.__unsafe_private_named.1.unwrap(),
+            snapshot: self.__unsafe_private_named.2.unwrap(),
+            uri: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Root<'a> {
+        Root {
+            cid: self.__unsafe_private_named.0.unwrap(),
+            doc: self.__unsafe_private_named.1.unwrap(),
+            snapshot: self.__unsafe_private_named.2.unwrap(),
+            uri: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Root<'a> {

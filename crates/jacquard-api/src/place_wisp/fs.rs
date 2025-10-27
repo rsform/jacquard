@@ -13,16 +13,154 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Directory<'a> {
     #[serde(borrow)]
     pub entries: Vec<crate::place_wisp::fs::Entry<'a>>,
     #[serde(borrow)]
-    #[builder(into)]
     pub r#type: jacquard_common::CowStr<'a>,
+}
+
+pub mod directory_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Type;
+        type Entries;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Type = Unset;
+        type Entries = Unset;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type Type = Set<members::r#type>;
+        type Entries = S::Entries;
+    }
+    ///State transition - sets the `entries` field to Set
+    pub struct SetEntries<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEntries<S> {}
+    impl<S: State> State for SetEntries<S> {
+        type Type = S::Type;
+        type Entries = Set<members::entries>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `type` field
+        pub struct r#type(());
+        ///Marker type for the `entries` field
+        pub struct entries(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct DirectoryBuilder<'a, S: directory_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<Vec<crate::place_wisp::fs::Entry<'a>>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Directory<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> DirectoryBuilder<'a, directory_state::Empty> {
+        DirectoryBuilder::new()
+    }
+}
+
+impl<'a> DirectoryBuilder<'a, directory_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        DirectoryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DirectoryBuilder<'a, S>
+where
+    S: directory_state::State,
+    S::Entries: directory_state::IsUnset,
+{
+    /// Set the `entries` field (required)
+    pub fn entries(
+        mut self,
+        value: impl Into<Vec<crate::place_wisp::fs::Entry<'a>>>,
+    ) -> DirectoryBuilder<'a, directory_state::SetEntries<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        DirectoryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DirectoryBuilder<'a, S>
+where
+    S: directory_state::State,
+    S::Type: directory_state::IsUnset,
+{
+    /// Set the `type` field (required)
+    pub fn r#type(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> DirectoryBuilder<'a, directory_state::SetType<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        DirectoryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DirectoryBuilder<'a, S>
+where
+    S: directory_state::State,
+    S::Type: directory_state::IsSet,
+    S::Entries: directory_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Directory<'a> {
+        Directory {
+            entries: self.__unsafe_private_named.0.unwrap(),
+            r#type: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Directory<'a> {
+        Directory {
+            entries: self.__unsafe_private_named.0.unwrap(),
+            r#type: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_place_wisp_fs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
@@ -287,16 +425,154 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Directory<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Entry<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub node: EntryNode<'a>,
+}
+
+pub mod entry_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Name;
+        type Node;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Name = Unset;
+        type Node = Unset;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Name = Set<members::name>;
+        type Node = S::Node;
+    }
+    ///State transition - sets the `node` field to Set
+    pub struct SetNode<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNode<S> {}
+    impl<S: State> State for SetNode<S> {
+        type Name = S::Name;
+        type Node = Set<members::node>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `node` field
+        pub struct node(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct EntryBuilder<'a, S: entry_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<EntryNode<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Entry<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> EntryBuilder<'a, entry_state::Empty> {
+        EntryBuilder::new()
+    }
+}
+
+impl<'a> EntryBuilder<'a, entry_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        EntryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> EntryBuilder<'a, S>
+where
+    S: entry_state::State,
+    S::Name: entry_state::IsUnset,
+{
+    /// Set the `name` field (required)
+    pub fn name(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> EntryBuilder<'a, entry_state::SetName<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        EntryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> EntryBuilder<'a, S>
+where
+    S: entry_state::State,
+    S::Node: entry_state::IsUnset,
+{
+    /// Set the `node` field (required)
+    pub fn node(
+        mut self,
+        value: impl Into<EntryNode<'a>>,
+    ) -> EntryBuilder<'a, entry_state::SetNode<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        EntryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> EntryBuilder<'a, S>
+where
+    S: entry_state::State,
+    S::Name: entry_state::IsSet,
+    S::Node: entry_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Entry<'a> {
+        Entry {
+            name: self.__unsafe_private_named.0.unwrap(),
+            node: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Entry<'a> {
+        Entry {
+            name: self.__unsafe_private_named.0.unwrap(),
+            node: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -356,8 +632,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct File<'a> {
@@ -365,8 +640,147 @@ pub struct File<'a> {
     #[serde(borrow)]
     pub blob: jacquard_common::types::blob::BlobRef<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub r#type: jacquard_common::CowStr<'a>,
+}
+
+pub mod file_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Type;
+        type Blob;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Type = Unset;
+        type Blob = Unset;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type Type = Set<members::r#type>;
+        type Blob = S::Blob;
+    }
+    ///State transition - sets the `blob` field to Set
+    pub struct SetBlob<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlob<S> {}
+    impl<S: State> State for SetBlob<S> {
+        type Type = S::Type;
+        type Blob = Set<members::blob>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `type` field
+        pub struct r#type(());
+        ///Marker type for the `blob` field
+        pub struct blob(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct FileBuilder<'a, S: file_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> File<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> FileBuilder<'a, file_state::Empty> {
+        FileBuilder::new()
+    }
+}
+
+impl<'a> FileBuilder<'a, file_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        FileBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> FileBuilder<'a, S>
+where
+    S: file_state::State,
+    S::Blob: file_state::IsUnset,
+{
+    /// Set the `blob` field (required)
+    pub fn blob(
+        mut self,
+        value: impl Into<jacquard_common::types::blob::BlobRef<'a>>,
+    ) -> FileBuilder<'a, file_state::SetBlob<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        FileBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> FileBuilder<'a, S>
+where
+    S: file_state::State,
+    S::Type: file_state::IsUnset,
+{
+    /// Set the `type` field (required)
+    pub fn r#type(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> FileBuilder<'a, file_state::SetType<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        FileBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> FileBuilder<'a, S>
+where
+    S: file_state::State,
+    S::Type: file_state::IsSet,
+    S::Blob: file_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> File<'a> {
+        File {
+            blob: self.__unsafe_private_named.0.unwrap(),
+            r#type: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> File<'a> {
+        File {
+            blob: self.__unsafe_private_named.0.unwrap(),
+            r#type: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for File<'a> {
@@ -395,20 +809,210 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for File<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Fs<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub file_count: Option<i64>,
     #[serde(borrow)]
     pub root: crate::place_wisp::fs::Directory<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub site: jacquard_common::CowStr<'a>,
+}
+
+pub mod fs_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Site;
+        type Root;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Site = Unset;
+        type Root = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `site` field to Set
+    pub struct SetSite<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSite<S> {}
+    impl<S: State> State for SetSite<S> {
+        type Site = Set<members::site>;
+        type Root = S::Root;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `root` field to Set
+    pub struct SetRoot<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRoot<S> {}
+    impl<S: State> State for SetRoot<S> {
+        type Site = S::Site;
+        type Root = Set<members::root>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Site = S::Site;
+        type Root = S::Root;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `site` field
+        pub struct site(());
+        ///Marker type for the `root` field
+        pub struct root(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct FsBuilder<'a, S: fs_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<crate::place_wisp::fs::Directory<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Fs<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> FsBuilder<'a, fs_state::Empty> {
+        FsBuilder::new()
+    }
+}
+
+impl<'a> FsBuilder<'a, fs_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        FsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> FsBuilder<'a, S>
+where
+    S: fs_state::State,
+    S::CreatedAt: fs_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> FsBuilder<'a, fs_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        FsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: fs_state::State> FsBuilder<'a, S> {
+    /// Set the `fileCount` field (optional)
+    pub fn file_count(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `fileCount` field to an Option value (optional)
+    pub fn maybe_file_count(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> FsBuilder<'a, S>
+where
+    S: fs_state::State,
+    S::Root: fs_state::IsUnset,
+{
+    /// Set the `root` field (required)
+    pub fn root(
+        mut self,
+        value: impl Into<crate::place_wisp::fs::Directory<'a>>,
+    ) -> FsBuilder<'a, fs_state::SetRoot<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        FsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> FsBuilder<'a, S>
+where
+    S: fs_state::State,
+    S::Site: fs_state::IsUnset,
+{
+    /// Set the `site` field (required)
+    pub fn site(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> FsBuilder<'a, fs_state::SetSite<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        FsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> FsBuilder<'a, S>
+where
+    S: fs_state::State,
+    S::Site: fs_state::IsSet,
+    S::Root: fs_state::IsSet,
+    S::CreatedAt: fs_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Fs<'a> {
+        Fs {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            file_count: self.__unsafe_private_named.1,
+            root: self.__unsafe_private_named.2.unwrap(),
+            site: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Fs<'a> {
+        Fs {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            file_count: self.__unsafe_private_named.1,
+            root: self.__unsafe_private_named.2.unwrap(),
+            site: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Fs<'a> {

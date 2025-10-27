@@ -17,32 +17,339 @@ pub mod profile;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MessageView<'a> {
     #[serde(borrow)]
     pub author: crate::app_bsky::actor::ProfileViewBasic<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub chat_profile: Option<crate::place_stream::chat::profile::Profile<'a>>,
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
     /// If true, this message has been deleted or labeled and should be cleared from the cache
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub deleted: Option<bool>,
     pub indexed_at: jacquard_common::types::string::Datetime,
     #[serde(borrow)]
     pub record: jacquard_common::types::value::Data<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub reply_to: Option<MessageViewReplyTo<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+pub mod message_view_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Uri;
+        type Cid;
+        type Author;
+        type Record;
+        type IndexedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Uri = Unset;
+        type Cid = Unset;
+        type Author = Unset;
+        type Record = Unset;
+        type IndexedAt = Unset;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Uri = Set<members::uri>;
+        type Cid = S::Cid;
+        type Author = S::Author;
+        type Record = S::Record;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Uri = S::Uri;
+        type Cid = Set<members::cid>;
+        type Author = S::Author;
+        type Record = S::Record;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthor<S> {}
+    impl<S: State> State for SetAuthor<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Author = Set<members::author>;
+        type Record = S::Record;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecord<S> {}
+    impl<S: State> State for SetRecord<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Author = S::Author;
+        type Record = Set<members::record>;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Author = S::Author;
+        type Record = S::Record;
+        type IndexedAt = Set<members::indexed_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `author` field
+        pub struct author(());
+        ///Marker type for the `record` field
+        pub struct record(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct MessageViewBuilder<'a, S: message_view_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<crate::app_bsky::actor::ProfileViewBasic<'a>>,
+        ::core::option::Option<crate::place_stream::chat::profile::Profile<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
+        ::core::option::Option<MessageViewReplyTo<'a>>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> MessageView<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> MessageViewBuilder<'a, message_view_state::Empty> {
+        MessageViewBuilder::new()
+    }
+}
+
+impl<'a> MessageViewBuilder<'a, message_view_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        MessageViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> MessageViewBuilder<'a, S>
+where
+    S: message_view_state::State,
+    S::Author: message_view_state::IsUnset,
+{
+    /// Set the `author` field (required)
+    pub fn author(
+        mut self,
+        value: impl Into<crate::app_bsky::actor::ProfileViewBasic<'a>>,
+    ) -> MessageViewBuilder<'a, message_view_state::SetAuthor<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        MessageViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: message_view_state::State> MessageViewBuilder<'a, S> {
+    /// Set the `chatProfile` field (optional)
+    pub fn chat_profile(
+        mut self,
+        value: impl Into<Option<crate::place_stream::chat::profile::Profile<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `chatProfile` field to an Option value (optional)
+    pub fn maybe_chat_profile(
+        mut self,
+        value: Option<crate::place_stream::chat::profile::Profile<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> MessageViewBuilder<'a, S>
+where
+    S: message_view_state::State,
+    S::Cid: message_view_state::IsUnset,
+{
+    /// Set the `cid` field (required)
+    pub fn cid(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Cid<'a>>,
+    ) -> MessageViewBuilder<'a, message_view_state::SetCid<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        MessageViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: message_view_state::State> MessageViewBuilder<'a, S> {
+    /// Set the `deleted` field (optional)
+    pub fn deleted(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `deleted` field to an Option value (optional)
+    pub fn maybe_deleted(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S> MessageViewBuilder<'a, S>
+where
+    S: message_view_state::State,
+    S::IndexedAt: message_view_state::IsUnset,
+{
+    /// Set the `indexedAt` field (required)
+    pub fn indexed_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> MessageViewBuilder<'a, message_view_state::SetIndexedAt<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        MessageViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> MessageViewBuilder<'a, S>
+where
+    S: message_view_state::State,
+    S::Record: message_view_state::IsUnset,
+{
+    /// Set the `record` field (required)
+    pub fn record(
+        mut self,
+        value: impl Into<jacquard_common::types::value::Data<'a>>,
+    ) -> MessageViewBuilder<'a, message_view_state::SetRecord<S>> {
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        MessageViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: message_view_state::State> MessageViewBuilder<'a, S> {
+    /// Set the `replyTo` field (optional)
+    pub fn reply_to(mut self, value: impl Into<Option<MessageViewReplyTo<'a>>>) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `replyTo` field to an Option value (optional)
+    pub fn maybe_reply_to(mut self, value: Option<MessageViewReplyTo<'a>>) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S> MessageViewBuilder<'a, S>
+where
+    S: message_view_state::State,
+    S::Uri: message_view_state::IsUnset,
+{
+    /// Set the `uri` field (required)
+    pub fn uri(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> MessageViewBuilder<'a, message_view_state::SetUri<S>> {
+        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        MessageViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> MessageViewBuilder<'a, S>
+where
+    S: message_view_state::State,
+    S::Uri: message_view_state::IsSet,
+    S::Cid: message_view_state::IsSet,
+    S::Author: message_view_state::IsSet,
+    S::Record: message_view_state::IsSet,
+    S::IndexedAt: message_view_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> MessageView<'a> {
+        MessageView {
+            author: self.__unsafe_private_named.0.unwrap(),
+            chat_profile: self.__unsafe_private_named.1,
+            cid: self.__unsafe_private_named.2.unwrap(),
+            deleted: self.__unsafe_private_named.3,
+            indexed_at: self.__unsafe_private_named.4.unwrap(),
+            record: self.__unsafe_private_named.5.unwrap(),
+            reply_to: self.__unsafe_private_named.6,
+            uri: self.__unsafe_private_named.7.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> MessageView<'a> {
+        MessageView {
+            author: self.__unsafe_private_named.0.unwrap(),
+            chat_profile: self.__unsafe_private_named.1,
+            cid: self.__unsafe_private_named.2.unwrap(),
+            deleted: self.__unsafe_private_named.3,
+            indexed_at: self.__unsafe_private_named.4.unwrap(),
+            record: self.__unsafe_private_named.5.unwrap(),
+            reply_to: self.__unsafe_private_named.6,
+            uri: self.__unsafe_private_named.7.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]

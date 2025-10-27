@@ -343,26 +343,206 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Checksum<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct File<'a> {
     /// MIME type, e.g. 'video/mp4'.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub mime_type: Option<jacquard_common::CowStr<'a>>,
     /// Client-side last-modified timestamp.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub modified_at: Option<jacquard_common::types::string::Datetime>,
     /// User-visible filename.
     #[serde(borrow)]
-    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
     /// File size in bytes.
     pub size: i64,
+}
+
+pub mod file_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Name;
+        type Size;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Name = Unset;
+        type Size = Unset;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Name = Set<members::name>;
+        type Size = S::Size;
+    }
+    ///State transition - sets the `size` field to Set
+    pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSize<S> {}
+    impl<S: State> State for SetSize<S> {
+        type Name = S::Name;
+        type Size = Set<members::size>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `size` field
+        pub struct size(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct FileBuilder<'a, S: file_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> File<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> FileBuilder<'a, file_state::Empty> {
+        FileBuilder::new()
+    }
+}
+
+impl<'a> FileBuilder<'a, file_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        FileBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: file_state::State> FileBuilder<'a, S> {
+    /// Set the `mimeType` field (optional)
+    pub fn mime_type(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `mimeType` field to an Option value (optional)
+    pub fn maybe_mime_type(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: file_state::State> FileBuilder<'a, S> {
+    /// Set the `modifiedAt` field (optional)
+    pub fn modified_at(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `modifiedAt` field to an Option value (optional)
+    pub fn maybe_modified_at(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> FileBuilder<'a, S>
+where
+    S: file_state::State,
+    S::Name: file_state::IsUnset,
+{
+    /// Set the `name` field (required)
+    pub fn name(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> FileBuilder<'a, file_state::SetName<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        FileBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> FileBuilder<'a, S>
+where
+    S: file_state::State,
+    S::Size: file_state::IsUnset,
+{
+    /// Set the `size` field (required)
+    pub fn size(
+        mut self,
+        value: impl Into<i64>,
+    ) -> FileBuilder<'a, file_state::SetSize<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        FileBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> FileBuilder<'a, S>
+where
+    S: file_state::State,
+    S::Name: file_state::IsSet,
+    S::Size: file_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> File<'a> {
+        File {
+            mime_type: self.__unsafe_private_named.0,
+            modified_at: self.__unsafe_private_named.1,
+            name: self.__unsafe_private_named.2.unwrap(),
+            size: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> File<'a> {
+        File {
+            mime_type: self.__unsafe_private_named.0,
+            modified_at: self.__unsafe_private_named.1,
+            name: self.__unsafe_private_named.2.unwrap(),
+            size: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for File<'a> {
@@ -440,14 +620,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for File<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Aqfile<'a> {
     /// Handle or DID of the account to attribute this upload to.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub attribution: Option<jacquard_common::types::ident::AtIdentifier<'a>>,
     /// The uploaded blob reference. Note: Individual PDS instances may enforce lower size limits.
@@ -455,7 +633,6 @@ pub struct Aqfile<'a> {
     pub blob: jacquard_common::types::blob::BlobRef<'a>,
     /// Optional cryptographic checksum for integrity verification.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub checksum: Option<crate::net_altq::aqfile::Checksum<'a>>,
     /// Timestamp when this record was created.
@@ -463,6 +640,227 @@ pub struct Aqfile<'a> {
     /// Metadata about the file.
     #[serde(borrow)]
     pub file: crate::net_altq::aqfile::File<'a>,
+}
+
+pub mod aqfile_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Blob;
+        type CreatedAt;
+        type File;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Blob = Unset;
+        type CreatedAt = Unset;
+        type File = Unset;
+    }
+    ///State transition - sets the `blob` field to Set
+    pub struct SetBlob<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlob<S> {}
+    impl<S: State> State for SetBlob<S> {
+        type Blob = Set<members::blob>;
+        type CreatedAt = S::CreatedAt;
+        type File = S::File;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Blob = S::Blob;
+        type CreatedAt = Set<members::created_at>;
+        type File = S::File;
+    }
+    ///State transition - sets the `file` field to Set
+    pub struct SetFile<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFile<S> {}
+    impl<S: State> State for SetFile<S> {
+        type Blob = S::Blob;
+        type CreatedAt = S::CreatedAt;
+        type File = Set<members::file>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `blob` field
+        pub struct blob(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `file` field
+        pub struct file(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct AqfileBuilder<'a, S: aqfile_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
+        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+        ::core::option::Option<crate::net_altq::aqfile::Checksum<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<crate::net_altq::aqfile::File<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Aqfile<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> AqfileBuilder<'a, aqfile_state::Empty> {
+        AqfileBuilder::new()
+    }
+}
+
+impl<'a> AqfileBuilder<'a, aqfile_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        AqfileBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: aqfile_state::State> AqfileBuilder<'a, S> {
+    /// Set the `attribution` field (optional)
+    pub fn attribution(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::ident::AtIdentifier<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `attribution` field to an Option value (optional)
+    pub fn maybe_attribution(
+        mut self,
+        value: Option<jacquard_common::types::ident::AtIdentifier<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> AqfileBuilder<'a, S>
+where
+    S: aqfile_state::State,
+    S::Blob: aqfile_state::IsUnset,
+{
+    /// Set the `blob` field (required)
+    pub fn blob(
+        mut self,
+        value: impl Into<jacquard_common::types::blob::BlobRef<'a>>,
+    ) -> AqfileBuilder<'a, aqfile_state::SetBlob<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        AqfileBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: aqfile_state::State> AqfileBuilder<'a, S> {
+    /// Set the `checksum` field (optional)
+    pub fn checksum(
+        mut self,
+        value: impl Into<Option<crate::net_altq::aqfile::Checksum<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `checksum` field to an Option value (optional)
+    pub fn maybe_checksum(
+        mut self,
+        value: Option<crate::net_altq::aqfile::Checksum<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> AqfileBuilder<'a, S>
+where
+    S: aqfile_state::State,
+    S::CreatedAt: aqfile_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> AqfileBuilder<'a, aqfile_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        AqfileBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AqfileBuilder<'a, S>
+where
+    S: aqfile_state::State,
+    S::File: aqfile_state::IsUnset,
+{
+    /// Set the `file` field (required)
+    pub fn file(
+        mut self,
+        value: impl Into<crate::net_altq::aqfile::File<'a>>,
+    ) -> AqfileBuilder<'a, aqfile_state::SetFile<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        AqfileBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AqfileBuilder<'a, S>
+where
+    S: aqfile_state::State,
+    S::Blob: aqfile_state::IsSet,
+    S::CreatedAt: aqfile_state::IsSet,
+    S::File: aqfile_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Aqfile<'a> {
+        Aqfile {
+            attribution: self.__unsafe_private_named.0,
+            blob: self.__unsafe_private_named.1.unwrap(),
+            checksum: self.__unsafe_private_named.2,
+            created_at: self.__unsafe_private_named.3.unwrap(),
+            file: self.__unsafe_private_named.4.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Aqfile<'a> {
+        Aqfile {
+            attribution: self.__unsafe_private_named.0,
+            blob: self.__unsafe_private_named.1.unwrap(),
+            checksum: self.__unsafe_private_named.2,
+            created_at: self.__unsafe_private_named.3.unwrap(),
+            file: self.__unsafe_private_named.4.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Aqfile<'a> {

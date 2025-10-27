@@ -14,14 +14,118 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct EndorsementProof<'a> {
     /// The CID (Content Identifier) of the endorsement content that this proof validates. The endorsement's signatures array references this proof record.
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
+}
+
+pub mod endorsement_proof_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Cid;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Cid = Unset;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Cid = Set<members::cid>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `cid` field
+        pub struct cid(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct EndorsementProofBuilder<'a, S: endorsement_proof_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> EndorsementProof<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> EndorsementProofBuilder<'a, endorsement_proof_state::Empty> {
+        EndorsementProofBuilder::new()
+    }
+}
+
+impl<'a> EndorsementProofBuilder<'a, endorsement_proof_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        EndorsementProofBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> EndorsementProofBuilder<'a, S>
+where
+    S: endorsement_proof_state::State,
+    S::Cid: endorsement_proof_state::IsUnset,
+{
+    /// Set the `cid` field (required)
+    pub fn cid(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Cid<'a>>,
+    ) -> EndorsementProofBuilder<'a, endorsement_proof_state::SetCid<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        EndorsementProofBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> EndorsementProofBuilder<'a, S>
+where
+    S: endorsement_proof_state::State,
+    S::Cid: endorsement_proof_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> EndorsementProof<'a> {
+        EndorsementProof {
+            cid: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> EndorsementProof<'a> {
+        EndorsementProof {
+            cid: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> EndorsementProof<'a> {

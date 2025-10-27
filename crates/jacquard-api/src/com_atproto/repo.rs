@@ -25,14 +25,153 @@ pub mod upload_blob;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CommitMeta<'a> {
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
     pub rev: jacquard_common::types::string::Tid,
+}
+
+pub mod commit_meta_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Cid;
+        type Rev;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Cid = Unset;
+        type Rev = Unset;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Cid = Set<members::cid>;
+        type Rev = S::Rev;
+    }
+    ///State transition - sets the `rev` field to Set
+    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRev<S> {}
+    impl<S: State> State for SetRev<S> {
+        type Cid = S::Cid;
+        type Rev = Set<members::rev>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `rev` field
+        pub struct rev(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct CommitMetaBuilder<'a, S: commit_meta_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Tid>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> CommitMeta<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> CommitMetaBuilder<'a, commit_meta_state::Empty> {
+        CommitMetaBuilder::new()
+    }
+}
+
+impl<'a> CommitMetaBuilder<'a, commit_meta_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        CommitMetaBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CommitMetaBuilder<'a, S>
+where
+    S: commit_meta_state::State,
+    S::Cid: commit_meta_state::IsUnset,
+{
+    /// Set the `cid` field (required)
+    pub fn cid(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Cid<'a>>,
+    ) -> CommitMetaBuilder<'a, commit_meta_state::SetCid<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        CommitMetaBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CommitMetaBuilder<'a, S>
+where
+    S: commit_meta_state::State,
+    S::Rev: commit_meta_state::IsUnset,
+{
+    /// Set the `rev` field (required)
+    pub fn rev(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Tid>,
+    ) -> CommitMetaBuilder<'a, commit_meta_state::SetRev<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        CommitMetaBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CommitMetaBuilder<'a, S>
+where
+    S: commit_meta_state::State,
+    S::Cid: commit_meta_state::IsSet,
+    S::Rev: commit_meta_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> CommitMeta<'a> {
+        CommitMeta {
+            cid: self.__unsafe_private_named.0.unwrap(),
+            rev: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> CommitMeta<'a> {
+        CommitMeta {
+            cid: self.__unsafe_private_named.0.unwrap(),
+            rev: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_com_atproto_repo_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<

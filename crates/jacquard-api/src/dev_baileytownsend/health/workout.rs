@@ -13,29 +13,344 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Workout<'a> {
     /// Type of activity. Walking, running, weights, etc.
     #[serde(borrow)]
-    #[builder(into)]
     pub activity: jacquard_common::CowStr<'a>,
     /// Active calories burned during the workout.
     pub calories_burned: i64,
     pub created_at: jacquard_common::types::string::Datetime,
     /// Distance covered during the workout (optional).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub distance: Option<jacquard_common::CowStr<'a>>,
     /// How long the workout lasted in minutes.
     #[serde(borrow)]
-    #[builder(into)]
     pub duration: jacquard_common::CowStr<'a>,
     pub end_time: jacquard_common::types::string::Datetime,
     pub start_time: jacquard_common::types::string::Datetime,
+}
+
+pub mod workout_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Activity;
+        type CaloriesBurned;
+        type Duration;
+        type StartTime;
+        type EndTime;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Activity = Unset;
+        type CaloriesBurned = Unset;
+        type Duration = Unset;
+        type StartTime = Unset;
+        type EndTime = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `activity` field to Set
+    pub struct SetActivity<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActivity<S> {}
+    impl<S: State> State for SetActivity<S> {
+        type Activity = Set<members::activity>;
+        type CaloriesBurned = S::CaloriesBurned;
+        type Duration = S::Duration;
+        type StartTime = S::StartTime;
+        type EndTime = S::EndTime;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `calories_burned` field to Set
+    pub struct SetCaloriesBurned<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCaloriesBurned<S> {}
+    impl<S: State> State for SetCaloriesBurned<S> {
+        type Activity = S::Activity;
+        type CaloriesBurned = Set<members::calories_burned>;
+        type Duration = S::Duration;
+        type StartTime = S::StartTime;
+        type EndTime = S::EndTime;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `duration` field to Set
+    pub struct SetDuration<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDuration<S> {}
+    impl<S: State> State for SetDuration<S> {
+        type Activity = S::Activity;
+        type CaloriesBurned = S::CaloriesBurned;
+        type Duration = Set<members::duration>;
+        type StartTime = S::StartTime;
+        type EndTime = S::EndTime;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `start_time` field to Set
+    pub struct SetStartTime<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStartTime<S> {}
+    impl<S: State> State for SetStartTime<S> {
+        type Activity = S::Activity;
+        type CaloriesBurned = S::CaloriesBurned;
+        type Duration = S::Duration;
+        type StartTime = Set<members::start_time>;
+        type EndTime = S::EndTime;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `end_time` field to Set
+    pub struct SetEndTime<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEndTime<S> {}
+    impl<S: State> State for SetEndTime<S> {
+        type Activity = S::Activity;
+        type CaloriesBurned = S::CaloriesBurned;
+        type Duration = S::Duration;
+        type StartTime = S::StartTime;
+        type EndTime = Set<members::end_time>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Activity = S::Activity;
+        type CaloriesBurned = S::CaloriesBurned;
+        type Duration = S::Duration;
+        type StartTime = S::StartTime;
+        type EndTime = S::EndTime;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `activity` field
+        pub struct activity(());
+        ///Marker type for the `calories_burned` field
+        pub struct calories_burned(());
+        ///Marker type for the `duration` field
+        pub struct duration(());
+        ///Marker type for the `start_time` field
+        pub struct start_time(());
+        ///Marker type for the `end_time` field
+        pub struct end_time(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct WorkoutBuilder<'a, S: workout_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Workout<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> WorkoutBuilder<'a, workout_state::Empty> {
+        WorkoutBuilder::new()
+    }
+}
+
+impl<'a> WorkoutBuilder<'a, workout_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        WorkoutBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> WorkoutBuilder<'a, S>
+where
+    S: workout_state::State,
+    S::Activity: workout_state::IsUnset,
+{
+    /// Set the `activity` field (required)
+    pub fn activity(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> WorkoutBuilder<'a, workout_state::SetActivity<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        WorkoutBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> WorkoutBuilder<'a, S>
+where
+    S: workout_state::State,
+    S::CaloriesBurned: workout_state::IsUnset,
+{
+    /// Set the `caloriesBurned` field (required)
+    pub fn calories_burned(
+        mut self,
+        value: impl Into<i64>,
+    ) -> WorkoutBuilder<'a, workout_state::SetCaloriesBurned<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        WorkoutBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> WorkoutBuilder<'a, S>
+where
+    S: workout_state::State,
+    S::CreatedAt: workout_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> WorkoutBuilder<'a, workout_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        WorkoutBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
+    /// Set the `distance` field (optional)
+    pub fn distance(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `distance` field to an Option value (optional)
+    pub fn maybe_distance(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S> WorkoutBuilder<'a, S>
+where
+    S: workout_state::State,
+    S::Duration: workout_state::IsUnset,
+{
+    /// Set the `duration` field (required)
+    pub fn duration(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> WorkoutBuilder<'a, workout_state::SetDuration<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        WorkoutBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> WorkoutBuilder<'a, S>
+where
+    S: workout_state::State,
+    S::EndTime: workout_state::IsUnset,
+{
+    /// Set the `endTime` field (required)
+    pub fn end_time(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> WorkoutBuilder<'a, workout_state::SetEndTime<S>> {
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        WorkoutBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> WorkoutBuilder<'a, S>
+where
+    S: workout_state::State,
+    S::StartTime: workout_state::IsUnset,
+{
+    /// Set the `startTime` field (required)
+    pub fn start_time(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> WorkoutBuilder<'a, workout_state::SetStartTime<S>> {
+        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        WorkoutBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> WorkoutBuilder<'a, S>
+where
+    S: workout_state::State,
+    S::Activity: workout_state::IsSet,
+    S::CaloriesBurned: workout_state::IsSet,
+    S::Duration: workout_state::IsSet,
+    S::StartTime: workout_state::IsSet,
+    S::EndTime: workout_state::IsSet,
+    S::CreatedAt: workout_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Workout<'a> {
+        Workout {
+            activity: self.__unsafe_private_named.0.unwrap(),
+            calories_burned: self.__unsafe_private_named.1.unwrap(),
+            created_at: self.__unsafe_private_named.2.unwrap(),
+            distance: self.__unsafe_private_named.3,
+            duration: self.__unsafe_private_named.4.unwrap(),
+            end_time: self.__unsafe_private_named.5.unwrap(),
+            start_time: self.__unsafe_private_named.6.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Workout<'a> {
+        Workout {
+            activity: self.__unsafe_private_named.0.unwrap(),
+            calories_burned: self.__unsafe_private_named.1.unwrap(),
+            created_at: self.__unsafe_private_named.2.unwrap(),
+            distance: self.__unsafe_private_named.3,
+            duration: self.__unsafe_private_named.4.unwrap(),
+            end_time: self.__unsafe_private_named.5.unwrap(),
+            start_time: self.__unsafe_private_named.6.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Workout<'a> {

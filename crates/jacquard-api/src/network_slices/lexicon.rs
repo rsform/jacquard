@@ -13,8 +13,7 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Lexicon<'a> {
@@ -22,28 +21,299 @@ pub struct Lexicon<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     /// The lexicon schema definitions as JSON
     #[serde(borrow)]
-    #[builder(into)]
     pub definitions: jacquard_common::CowStr<'a>,
     /// Human-readable description of the lexicon
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub description: Option<jacquard_common::CowStr<'a>>,
     /// Whether this lexicon should be excluded from sync operations
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub excluded_from_sync: Option<bool>,
     /// Namespaced identifier for the lexicon
     #[serde(borrow)]
-    #[builder(into)]
     pub nsid: jacquard_common::CowStr<'a>,
     /// AT-URI reference to the slice this lexicon belongs to
     #[serde(borrow)]
     pub slice: jacquard_common::types::string::AtUri<'a>,
     /// When the lexicon was last updated
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub updated_at: Option<jacquard_common::types::string::Datetime>,
+}
+
+pub mod lexicon_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Nsid;
+        type Definitions;
+        type CreatedAt;
+        type Slice;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Nsid = Unset;
+        type Definitions = Unset;
+        type CreatedAt = Unset;
+        type Slice = Unset;
+    }
+    ///State transition - sets the `nsid` field to Set
+    pub struct SetNsid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNsid<S> {}
+    impl<S: State> State for SetNsid<S> {
+        type Nsid = Set<members::nsid>;
+        type Definitions = S::Definitions;
+        type CreatedAt = S::CreatedAt;
+        type Slice = S::Slice;
+    }
+    ///State transition - sets the `definitions` field to Set
+    pub struct SetDefinitions<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDefinitions<S> {}
+    impl<S: State> State for SetDefinitions<S> {
+        type Nsid = S::Nsid;
+        type Definitions = Set<members::definitions>;
+        type CreatedAt = S::CreatedAt;
+        type Slice = S::Slice;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Nsid = S::Nsid;
+        type Definitions = S::Definitions;
+        type CreatedAt = Set<members::created_at>;
+        type Slice = S::Slice;
+    }
+    ///State transition - sets the `slice` field to Set
+    pub struct SetSlice<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSlice<S> {}
+    impl<S: State> State for SetSlice<S> {
+        type Nsid = S::Nsid;
+        type Definitions = S::Definitions;
+        type CreatedAt = S::CreatedAt;
+        type Slice = Set<members::slice>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `nsid` field
+        pub struct nsid(());
+        ///Marker type for the `definitions` field
+        pub struct definitions(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `slice` field
+        pub struct slice(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct LexiconBuilder<'a, S: lexicon_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Lexicon<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> LexiconBuilder<'a, lexicon_state::Empty> {
+        LexiconBuilder::new()
+    }
+}
+
+impl<'a> LexiconBuilder<'a, lexicon_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        LexiconBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LexiconBuilder<'a, S>
+where
+    S: lexicon_state::State,
+    S::CreatedAt: lexicon_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> LexiconBuilder<'a, lexicon_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        LexiconBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LexiconBuilder<'a, S>
+where
+    S: lexicon_state::State,
+    S::Definitions: lexicon_state::IsUnset,
+{
+    /// Set the `definitions` field (required)
+    pub fn definitions(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> LexiconBuilder<'a, lexicon_state::SetDefinitions<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        LexiconBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: lexicon_state::State> LexiconBuilder<'a, S> {
+    /// Set the `description` field (optional)
+    pub fn description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `description` field to an Option value (optional)
+    pub fn maybe_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: lexicon_state::State> LexiconBuilder<'a, S> {
+    /// Set the `excludedFromSync` field (optional)
+    pub fn excluded_from_sync(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `excludedFromSync` field to an Option value (optional)
+    pub fn maybe_excluded_from_sync(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S> LexiconBuilder<'a, S>
+where
+    S: lexicon_state::State,
+    S::Nsid: lexicon_state::IsUnset,
+{
+    /// Set the `nsid` field (required)
+    pub fn nsid(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> LexiconBuilder<'a, lexicon_state::SetNsid<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        LexiconBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LexiconBuilder<'a, S>
+where
+    S: lexicon_state::State,
+    S::Slice: lexicon_state::IsUnset,
+{
+    /// Set the `slice` field (required)
+    pub fn slice(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> LexiconBuilder<'a, lexicon_state::SetSlice<S>> {
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        LexiconBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: lexicon_state::State> LexiconBuilder<'a, S> {
+    /// Set the `updatedAt` field (optional)
+    pub fn updated_at(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `updatedAt` field to an Option value (optional)
+    pub fn maybe_updated_at(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S> LexiconBuilder<'a, S>
+where
+    S: lexicon_state::State,
+    S::Nsid: lexicon_state::IsSet,
+    S::Definitions: lexicon_state::IsSet,
+    S::CreatedAt: lexicon_state::IsSet,
+    S::Slice: lexicon_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Lexicon<'a> {
+        Lexicon {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            definitions: self.__unsafe_private_named.1.unwrap(),
+            description: self.__unsafe_private_named.2,
+            excluded_from_sync: self.__unsafe_private_named.3,
+            nsid: self.__unsafe_private_named.4.unwrap(),
+            slice: self.__unsafe_private_named.5.unwrap(),
+            updated_at: self.__unsafe_private_named.6,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Lexicon<'a> {
+        Lexicon {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            definitions: self.__unsafe_private_named.1.unwrap(),
+            description: self.__unsafe_private_named.2,
+            excluded_from_sync: self.__unsafe_private_named.3,
+            nsid: self.__unsafe_private_named.4.unwrap(),
+            slice: self.__unsafe_private_named.5.unwrap(),
+            updated_at: self.__unsafe_private_named.6,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Lexicon<'a> {

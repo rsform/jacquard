@@ -14,29 +14,180 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Configuration<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub content_rights: Option<
         crate::place_stream::metadata::content_rights::ContentRights<'a>,
     >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub content_warnings: Option<
         crate::place_stream::metadata::content_warnings::ContentWarnings<'a>,
     >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub distribution_policy: Option<
         crate::place_stream::metadata::distribution_policy::DistributionPolicy<'a>,
     >,
+}
+
+pub mod configuration_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {}
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {}
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {}
+}
+
+/// Builder for constructing an instance of this type
+pub struct ConfigurationBuilder<'a, S: configuration_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<
+            crate::place_stream::metadata::content_rights::ContentRights<'a>,
+        >,
+        ::core::option::Option<
+            crate::place_stream::metadata::content_warnings::ContentWarnings<'a>,
+        >,
+        ::core::option::Option<
+            crate::place_stream::metadata::distribution_policy::DistributionPolicy<'a>,
+        >,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Configuration<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ConfigurationBuilder<'a, configuration_state::Empty> {
+        ConfigurationBuilder::new()
+    }
+}
+
+impl<'a> ConfigurationBuilder<'a, configuration_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ConfigurationBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: configuration_state::State> ConfigurationBuilder<'a, S> {
+    /// Set the `contentRights` field (optional)
+    pub fn content_rights(
+        mut self,
+        value: impl Into<
+            Option<crate::place_stream::metadata::content_rights::ContentRights<'a>>,
+        >,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `contentRights` field to an Option value (optional)
+    pub fn maybe_content_rights(
+        mut self,
+        value: Option<crate::place_stream::metadata::content_rights::ContentRights<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: configuration_state::State> ConfigurationBuilder<'a, S> {
+    /// Set the `contentWarnings` field (optional)
+    pub fn content_warnings(
+        mut self,
+        value: impl Into<
+            Option<crate::place_stream::metadata::content_warnings::ContentWarnings<'a>>,
+        >,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `contentWarnings` field to an Option value (optional)
+    pub fn maybe_content_warnings(
+        mut self,
+        value: Option<
+            crate::place_stream::metadata::content_warnings::ContentWarnings<'a>,
+        >,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: configuration_state::State> ConfigurationBuilder<'a, S> {
+    /// Set the `distributionPolicy` field (optional)
+    pub fn distribution_policy(
+        mut self,
+        value: impl Into<
+            Option<
+                crate::place_stream::metadata::distribution_policy::DistributionPolicy<
+                    'a,
+                >,
+            >,
+        >,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `distributionPolicy` field to an Option value (optional)
+    pub fn maybe_distribution_policy(
+        mut self,
+        value: Option<
+            crate::place_stream::metadata::distribution_policy::DistributionPolicy<'a>,
+        >,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> ConfigurationBuilder<'a, S>
+where
+    S: configuration_state::State,
+{
+    /// Build the final struct
+    pub fn build(self) -> Configuration<'a> {
+        Configuration {
+            content_rights: self.__unsafe_private_named.0,
+            content_warnings: self.__unsafe_private_named.1,
+            distribution_policy: self.__unsafe_private_named.2,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Configuration<'a> {
+        Configuration {
+            content_rights: self.__unsafe_private_named.0,
+            content_warnings: self.__unsafe_private_named.1,
+            distribution_policy: self.__unsafe_private_named.2,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Configuration<'a> {

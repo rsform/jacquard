@@ -12,14 +12,103 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetConvoForMembers<'a> {
     #[serde(borrow)]
     pub members: Vec<jacquard_common::types::string::Did<'a>>,
+}
+
+pub mod get_convo_for_members_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Members;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Members = Unset;
+    }
+    ///State transition - sets the `members` field to Set
+    pub struct SetMembers<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMembers<S> {}
+    impl<S: State> State for SetMembers<S> {
+        type Members = Set<members::members>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `members` field
+        pub struct members(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetConvoForMembersBuilder<'a, S: get_convo_for_members_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GetConvoForMembers<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GetConvoForMembersBuilder<'a, get_convo_for_members_state::Empty> {
+        GetConvoForMembersBuilder::new()
+    }
+}
+
+impl<'a> GetConvoForMembersBuilder<'a, get_convo_for_members_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetConvoForMembersBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetConvoForMembersBuilder<'a, S>
+where
+    S: get_convo_for_members_state::State,
+    S::Members: get_convo_for_members_state::IsUnset,
+{
+    /// Set the `members` field (required)
+    pub fn members(
+        mut self,
+        value: impl Into<Vec<jacquard_common::types::string::Did<'a>>>,
+    ) -> GetConvoForMembersBuilder<'a, get_convo_for_members_state::SetMembers<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        GetConvoForMembersBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetConvoForMembersBuilder<'a, S>
+where
+    S: get_convo_for_members_state::State,
+    S::Members: get_convo_for_members_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetConvoForMembers<'a> {
+        GetConvoForMembers {
+            members: self.__unsafe_private_named.0.unwrap(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

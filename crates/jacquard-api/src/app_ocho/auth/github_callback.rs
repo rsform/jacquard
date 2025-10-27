@@ -12,18 +12,139 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GithubCallback<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub code: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub state: jacquard_common::CowStr<'a>,
+}
+
+pub mod github_callback_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Code;
+        type State;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Code = Unset;
+        type State = Unset;
+    }
+    ///State transition - sets the `code` field to Set
+    pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCode<S> {}
+    impl<S: State> State for SetCode<S> {
+        type Code = Set<members::code>;
+        type State = S::State;
+    }
+    ///State transition - sets the `state` field to Set
+    pub struct SetState<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetState<S> {}
+    impl<S: State> State for SetState<S> {
+        type Code = S::Code;
+        type State = Set<members::state>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `code` field
+        pub struct code(());
+        ///Marker type for the `state` field
+        pub struct state(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct GithubCallbackBuilder<'a, S: github_callback_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GithubCallback<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GithubCallbackBuilder<'a, github_callback_state::Empty> {
+        GithubCallbackBuilder::new()
+    }
+}
+
+impl<'a> GithubCallbackBuilder<'a, github_callback_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GithubCallbackBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GithubCallbackBuilder<'a, S>
+where
+    S: github_callback_state::State,
+    S::Code: github_callback_state::IsUnset,
+{
+    /// Set the `code` field (required)
+    pub fn code(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> GithubCallbackBuilder<'a, github_callback_state::SetCode<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        GithubCallbackBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GithubCallbackBuilder<'a, S>
+where
+    S: github_callback_state::State,
+    S::State: github_callback_state::IsUnset,
+{
+    /// Set the `state` field (required)
+    pub fn state(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> GithubCallbackBuilder<'a, github_callback_state::SetState<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        GithubCallbackBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GithubCallbackBuilder<'a, S>
+where
+    S: github_callback_state::State,
+    S::Code: github_callback_state::IsSet,
+    S::State: github_callback_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> GithubCallback<'a> {
+        GithubCallback {
+            code: self.__unsafe_private_named.0.unwrap(),
+            state: self.__unsafe_private_named.1.unwrap(),
+        }
+    }
 }
 
 /// Response type for

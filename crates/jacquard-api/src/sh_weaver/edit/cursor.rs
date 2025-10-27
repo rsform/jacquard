@@ -13,13 +13,115 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ContainerId<'a> {
     #[serde(borrow)]
     pub value: ContainerIdValue<'a>,
+}
+
+pub mod container_id_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Value;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Value = Unset;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Value = Set<members::value>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `value` field
+        pub struct value(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ContainerIdBuilder<'a, S: container_id_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (::core::option::Option<ContainerIdValue<'a>>,),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ContainerId<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ContainerIdBuilder<'a, container_id_state::Empty> {
+        ContainerIdBuilder::new()
+    }
+}
+
+impl<'a> ContainerIdBuilder<'a, container_id_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ContainerIdBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ContainerIdBuilder<'a, S>
+where
+    S: container_id_state::State,
+    S::Value: container_id_state::IsUnset,
+{
+    /// Set the `value` field (required)
+    pub fn value(
+        mut self,
+        value: impl Into<ContainerIdValue<'a>>,
+    ) -> ContainerIdBuilder<'a, container_id_state::SetValue<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ContainerIdBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ContainerIdBuilder<'a, S>
+where
+    S: container_id_state::State,
+    S::Value: container_id_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> ContainerId<'a> {
+        ContainerId {
+            value: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> ContainerId<'a> {
+        ContainerId {
+            value: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -330,13 +432,115 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContainerId<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CursorSide<'a> {
     /// The side of an item the cursor is on (left = -1, right = 1, middle = 0)
     pub value: i64,
+}
+
+pub mod cursor_side_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Value;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Value = Unset;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Value = Set<members::value>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `value` field
+        pub struct value(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct CursorSideBuilder<'a, S: cursor_side_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (::core::option::Option<i64>,),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> CursorSide<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> CursorSideBuilder<'a, cursor_side_state::Empty> {
+        CursorSideBuilder::new()
+    }
+}
+
+impl<'a> CursorSideBuilder<'a, cursor_side_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        CursorSideBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CursorSideBuilder<'a, S>
+where
+    S: cursor_side_state::State,
+    S::Value: cursor_side_state::IsUnset,
+{
+    /// Set the `value` field (required)
+    pub fn value(
+        mut self,
+        value: impl Into<i64>,
+    ) -> CursorSideBuilder<'a, cursor_side_state::SetValue<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        CursorSideBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CursorSideBuilder<'a, S>
+where
+    S: cursor_side_state::State,
+    S::Value: cursor_side_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> CursorSide<'a> {
+        CursorSide {
+            value: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> CursorSide<'a> {
+        CursorSide {
+            value: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CursorSide<'a> {
@@ -364,13 +568,146 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CursorSide<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Id<'a> {
     pub counter: i64,
     pub peer: i64,
+}
+
+pub mod id_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Peer;
+        type Counter;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Peer = Unset;
+        type Counter = Unset;
+    }
+    ///State transition - sets the `peer` field to Set
+    pub struct SetPeer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPeer<S> {}
+    impl<S: State> State for SetPeer<S> {
+        type Peer = Set<members::peer>;
+        type Counter = S::Counter;
+    }
+    ///State transition - sets the `counter` field to Set
+    pub struct SetCounter<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCounter<S> {}
+    impl<S: State> State for SetCounter<S> {
+        type Peer = S::Peer;
+        type Counter = Set<members::counter>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `peer` field
+        pub struct peer(());
+        ///Marker type for the `counter` field
+        pub struct counter(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct IdBuilder<'a, S: id_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (::core::option::Option<i64>, ::core::option::Option<i64>),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Id<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> IdBuilder<'a, id_state::Empty> {
+        IdBuilder::new()
+    }
+}
+
+impl<'a> IdBuilder<'a, id_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        IdBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> IdBuilder<'a, S>
+where
+    S: id_state::State,
+    S::Counter: id_state::IsUnset,
+{
+    /// Set the `counter` field (required)
+    pub fn counter(
+        mut self,
+        value: impl Into<i64>,
+    ) -> IdBuilder<'a, id_state::SetCounter<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        IdBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> IdBuilder<'a, S>
+where
+    S: id_state::State,
+    S::Peer: id_state::IsUnset,
+{
+    /// Set the `peer` field (required)
+    pub fn peer(mut self, value: impl Into<i64>) -> IdBuilder<'a, id_state::SetPeer<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        IdBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> IdBuilder<'a, S>
+where
+    S: id_state::State,
+    S::Peer: id_state::IsSet,
+    S::Counter: id_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Id<'a> {
+        Id {
+            counter: self.__unsafe_private_named.0.unwrap(),
+            peer: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Id<'a> {
+        Id {
+            counter: self.__unsafe_private_named.0.unwrap(),
+            peer: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Id<'a> {
@@ -399,21 +736,180 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Id<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Cursor<'a> {
     #[serde(borrow)]
     pub container: crate::sh_weaver::edit::cursor::ContainerId<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub id: Option<crate::sh_weaver::edit::cursor::Id<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub side: Option<crate::sh_weaver::edit::cursor::CursorSide<'a>>,
+}
+
+pub mod cursor_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Container;
+        type Die;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Container = Unset;
+        type Die = Unset;
+    }
+    ///State transition - sets the `container` field to Set
+    pub struct SetContainer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContainer<S> {}
+    impl<S: State> State for SetContainer<S> {
+        type Container = Set<members::container>;
+        type Die = S::Die;
+    }
+    ///State transition - sets the `die` field to Set
+    pub struct SetDie<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDie<S> {}
+    impl<S: State> State for SetDie<S> {
+        type Container = S::Container;
+        type Die = Set<members::die>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `container` field
+        pub struct container(());
+        ///Marker type for the `die` field
+        pub struct die(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct CursorBuilder<'a, S: cursor_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<crate::sh_weaver::edit::cursor::ContainerId<'a>>,
+        ::core::option::Option<crate::sh_weaver::edit::cursor::Id<'a>>,
+        ::core::option::Option<crate::sh_weaver::edit::cursor::CursorSide<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Cursor<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> CursorBuilder<'a, cursor_state::Empty> {
+        CursorBuilder::new()
+    }
+}
+
+impl<'a> CursorBuilder<'a, cursor_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        CursorBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CursorBuilder<'a, S>
+where
+    S: cursor_state::State,
+    S::Container: cursor_state::IsUnset,
+{
+    /// Set the `container` field (required)
+    pub fn container(
+        mut self,
+        value: impl Into<crate::sh_weaver::edit::cursor::ContainerId<'a>>,
+    ) -> CursorBuilder<'a, cursor_state::SetContainer<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        CursorBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: cursor_state::State> CursorBuilder<'a, S> {
+    /// Set the `id` field (optional)
+    pub fn id(
+        mut self,
+        value: impl Into<Option<crate::sh_weaver::edit::cursor::Id<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `id` field to an Option value (optional)
+    pub fn maybe_id(
+        mut self,
+        value: Option<crate::sh_weaver::edit::cursor::Id<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: cursor_state::State> CursorBuilder<'a, S> {
+    /// Set the `side` field (optional)
+    pub fn side(
+        mut self,
+        value: impl Into<Option<crate::sh_weaver::edit::cursor::CursorSide<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `side` field to an Option value (optional)
+    pub fn maybe_side(
+        mut self,
+        value: Option<crate::sh_weaver::edit::cursor::CursorSide<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> CursorBuilder<'a, S>
+where
+    S: cursor_state::State,
+    S::Container: cursor_state::IsSet,
+    S::Die: cursor_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Cursor<'a> {
+        Cursor {
+            container: self.__unsafe_private_named.0.unwrap(),
+            id: self.__unsafe_private_named.1,
+            side: self.__unsafe_private_named.2,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Cursor<'a> {
+        Cursor {
+            container: self.__unsafe_private_named.0.unwrap(),
+            id: self.__unsafe_private_named.1,
+            side: self.__unsafe_private_named.2,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Cursor<'a> {
@@ -502,16 +998,191 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Cursor<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct NormalContainerId<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub container_type: jacquard_common::CowStr<'a>,
     pub counter: i64,
     pub peer: i64,
+}
+
+pub mod normal_container_id_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Peer;
+        type Counter;
+        type ContainerType;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Peer = Unset;
+        type Counter = Unset;
+        type ContainerType = Unset;
+    }
+    ///State transition - sets the `peer` field to Set
+    pub struct SetPeer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPeer<S> {}
+    impl<S: State> State for SetPeer<S> {
+        type Peer = Set<members::peer>;
+        type Counter = S::Counter;
+        type ContainerType = S::ContainerType;
+    }
+    ///State transition - sets the `counter` field to Set
+    pub struct SetCounter<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCounter<S> {}
+    impl<S: State> State for SetCounter<S> {
+        type Peer = S::Peer;
+        type Counter = Set<members::counter>;
+        type ContainerType = S::ContainerType;
+    }
+    ///State transition - sets the `container_type` field to Set
+    pub struct SetContainerType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContainerType<S> {}
+    impl<S: State> State for SetContainerType<S> {
+        type Peer = S::Peer;
+        type Counter = S::Counter;
+        type ContainerType = Set<members::container_type>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `peer` field
+        pub struct peer(());
+        ///Marker type for the `counter` field
+        pub struct counter(());
+        ///Marker type for the `container_type` field
+        pub struct container_type(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct NormalContainerIdBuilder<'a, S: normal_container_id_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<i64>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> NormalContainerId<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> NormalContainerIdBuilder<'a, normal_container_id_state::Empty> {
+        NormalContainerIdBuilder::new()
+    }
+}
+
+impl<'a> NormalContainerIdBuilder<'a, normal_container_id_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        NormalContainerIdBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> NormalContainerIdBuilder<'a, S>
+where
+    S: normal_container_id_state::State,
+    S::ContainerType: normal_container_id_state::IsUnset,
+{
+    /// Set the `container_type` field (required)
+    pub fn container_type(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> NormalContainerIdBuilder<'a, normal_container_id_state::SetContainerType<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        NormalContainerIdBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> NormalContainerIdBuilder<'a, S>
+where
+    S: normal_container_id_state::State,
+    S::Counter: normal_container_id_state::IsUnset,
+{
+    /// Set the `counter` field (required)
+    pub fn counter(
+        mut self,
+        value: impl Into<i64>,
+    ) -> NormalContainerIdBuilder<'a, normal_container_id_state::SetCounter<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        NormalContainerIdBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> NormalContainerIdBuilder<'a, S>
+where
+    S: normal_container_id_state::State,
+    S::Peer: normal_container_id_state::IsUnset,
+{
+    /// Set the `peer` field (required)
+    pub fn peer(
+        mut self,
+        value: impl Into<i64>,
+    ) -> NormalContainerIdBuilder<'a, normal_container_id_state::SetPeer<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        NormalContainerIdBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> NormalContainerIdBuilder<'a, S>
+where
+    S: normal_container_id_state::State,
+    S::Peer: normal_container_id_state::IsSet,
+    S::Counter: normal_container_id_state::IsSet,
+    S::ContainerType: normal_container_id_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> NormalContainerId<'a> {
+        NormalContainerId {
+            container_type: self.__unsafe_private_named.0.unwrap(),
+            counter: self.__unsafe_private_named.1.unwrap(),
+            peer: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> NormalContainerId<'a> {
+        NormalContainerId {
+            container_type: self.__unsafe_private_named.0.unwrap(),
+            counter: self.__unsafe_private_named.1.unwrap(),
+            peer: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NormalContainerId<'a> {

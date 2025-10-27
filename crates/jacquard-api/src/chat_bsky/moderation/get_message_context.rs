@@ -12,10 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetMessageContext<'a> {
     ///(default: 5)
@@ -26,11 +24,148 @@ pub struct GetMessageContext<'a> {
     pub before: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    #[builder(into)]
     pub convo_id: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
-    #[builder(into)]
     pub message_id: jacquard_common::CowStr<'a>,
+}
+
+pub mod get_message_context_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type MessageId;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type MessageId = Unset;
+    }
+    ///State transition - sets the `message_id` field to Set
+    pub struct SetMessageId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMessageId<S> {}
+    impl<S: State> State for SetMessageId<S> {
+        type MessageId = Set<members::message_id>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `message_id` field
+        pub struct message_id(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetMessageContextBuilder<'a, S: get_message_context_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<i64>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GetMessageContext<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GetMessageContextBuilder<'a, get_message_context_state::Empty> {
+        GetMessageContextBuilder::new()
+    }
+}
+
+impl<'a> GetMessageContextBuilder<'a, get_message_context_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetMessageContextBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: get_message_context_state::State> GetMessageContextBuilder<'a, S> {
+    /// Set the `after` field (optional)
+    pub fn after(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `after` field to an Option value (optional)
+    pub fn maybe_after(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: get_message_context_state::State> GetMessageContextBuilder<'a, S> {
+    /// Set the `before` field (optional)
+    pub fn before(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `before` field to an Option value (optional)
+    pub fn maybe_before(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: get_message_context_state::State> GetMessageContextBuilder<'a, S> {
+    /// Set the `convoId` field (optional)
+    pub fn convo_id(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `convoId` field to an Option value (optional)
+    pub fn maybe_convo_id(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> GetMessageContextBuilder<'a, S>
+where
+    S: get_message_context_state::State,
+    S::MessageId: get_message_context_state::IsUnset,
+{
+    /// Set the `messageId` field (required)
+    pub fn message_id(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> GetMessageContextBuilder<'a, get_message_context_state::SetMessageId<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        GetMessageContextBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetMessageContextBuilder<'a, S>
+where
+    S: get_message_context_state::State,
+    S::MessageId: get_message_context_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetMessageContext<'a> {
+        GetMessageContext {
+            after: self.__unsafe_private_named.0,
+            before: self.__unsafe_private_named.1,
+            convo_id: self.__unsafe_private_named.2,
+            message_id: self.__unsafe_private_named.3.unwrap(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

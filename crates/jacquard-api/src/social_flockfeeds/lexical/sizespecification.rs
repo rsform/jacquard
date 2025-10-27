@@ -14,147 +14,795 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Sizespecification<'a> {
     /// A property-value pair representing an additional characteristic of the entity, e.g. a product feature or another characteristic for which there is no matching property in schema.org.\n\nNote: Publishers should be aware that applications designed to use specific schema.org properties (e.g. https://schema.org/width, https://schema.org/color, https://schema.org/gtin13, ...) will typically expect such data to be provided using those properties, rather than using the generic property/value mechanism.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub additional_property: Option<SizespecificationAdditionalProperty<'a>>,
     /** An additional type for the item, typically used for adding more specific types from external vocabularies in microdata syntax. This is a relationship between something and a class that the thing is in. Typically the value is a URI-identified RDF class, and in this case corresponds to the
     use of rdf:type in RDF. Text values can be used sparingly, for cases where useful information can be added without their being an appropriate schema to reference. In the case of text values, the class label should follow the schema.org <a href="https://schema.org/docs/styleguide.html">style guide</a>.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub additional_type: Option<jacquard_common::CowStr<'a>>,
     /// An alias for the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub alternate_name: Option<jacquard_common::CowStr<'a>>,
     /// A description of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub description: Option<SizespecificationDescription<'a>>,
     /// A sub property of description. A short description of the item used to disambiguate from other, similar items. Information from other properties (in particular, name) may be necessary for the description to be useful for disambiguation.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub disambiguating_description: Option<jacquard_common::CowStr<'a>>,
     /// This ordering relation for qualitative values indicates that the subject is equal to the object.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub equal: Option<SizespecificationEqual<'a>>,
     /// This ordering relation for qualitative values indicates that the subject is greater than the object.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub greater: Option<SizespecificationGreater<'a>>,
     /// This ordering relation for qualitative values indicates that the subject is greater than or equal to the object.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub greater_or_equal: Option<SizespecificationGreaterOrEqual<'a>>,
     /// A measurement of an item, For example, the inseam of pants, the wheel size of a bicycle, the gauge of a screw, or the carbon footprint measured for certification by an authority. Usually an exact measurement, but can also be a range of measurements for adjustable products, for example belts and ski bindings.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub has_measurement: Option<SizespecificationHasMeasurement<'a>>,
     /// The identifier property represents any kind of identifier for any kind of [[Thing]], such as ISBNs, GTIN codes, UUIDs etc. Schema.org provides dedicated properties for representing many of these, either as textual strings or as URL (URI) links. See [background notes](/docs/datamodel.html#identifierBg) for more details.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub identifier: Option<SizespecificationIdentifier<'a>>,
     /// An image of the item. This can be a [[URL]] or a fully described [[ImageObject]].
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub image: Option<SizespecificationImage<'a>>,
     /// This ordering relation for qualitative values indicates that the subject is lesser than the object.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub lesser: Option<SizespecificationLesser<'a>>,
     /// This ordering relation for qualitative values indicates that the subject is lesser than or equal to the object.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub lesser_or_equal: Option<SizespecificationLesserOrEqual<'a>>,
     /// Indicates a page (or other CreativeWork) for which this thing is the main entity being described. See [background notes](/docs/datamodel.html#mainEntityBackground) for details.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub main_entity_of_page: Option<SizespecificationMainEntityOfPage<'a>>,
     /// The name of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub name: Option<jacquard_common::CowStr<'a>>,
     /// This ordering relation for qualitative values indicates that the subject is not equal to the object.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub non_equal: Option<SizespecificationNonEqual<'a>>,
     /// Indicates a potential Action, which describes an idealized action in which this thing would play an 'object' role.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub potential_action: Option<SizespecificationPotentialAction<'a>>,
     /// URL of a reference Web page that unambiguously indicates the item's identity. E.g. the URL of the item's Wikipedia page, Wikidata entry, or official website.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub same_as: Option<jacquard_common::types::string::Uri<'a>>,
     /// The size group (also known as "size type") for a product's size. Size groups are common in the fashion industry to define size segments and suggested audiences for wearable products. Multiple values can be combined, for example "men's big and tall", "petite maternity" or "regular".
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub size_group: Option<SizespecificationSizeGroup<'a>>,
     /// The size system used to identify a product's size. Typically either a standard (for example, "GS1" or "ISO-EN13402"), country code (for example "US" or "JP"), or a measuring system (for example "Metric" or "Imperial").
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub size_system: Option<SizespecificationSizeSystem<'a>>,
     /// A CreativeWork or Event about this Thing.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub subject_of: Option<SizespecificationSubjectOf<'a>>,
     /// The age or age range for the intended audience or person, for example 3-12 months for infants, 1-5 years for toddlers.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub suggested_age: Option<SizespecificationSuggestedAge<'a>>,
     /// The suggested gender of the intended person or audience, for example "male", "female", or "unisex".
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub suggested_gender: Option<SizespecificationSuggestedGender<'a>>,
     /// A suggested range of body measurements for the intended audience or person, for example inseam between 32 and 34 inches or height between 170 and 190 cm. Typically found on a size chart for wearable products.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub suggested_measurement: Option<SizespecificationSuggestedMeasurement<'a>>,
     /// Relates a term (i.e. a property, class or enumeration) to one that supersedes it.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub superseded_by: Option<SizespecificationSupersededBy<'a>>,
     /// URL of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub url: Option<jacquard_common::types::string::Uri<'a>>,
     /// A secondary value that provides additional information on the original value, e.g. a reference temperature or a type of measurement.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub value_reference: Option<SizespecificationValueReference<'a>>,
+}
+
+pub mod sizespecification_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {}
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {}
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {}
+}
+
+/// Builder for constructing an instance of this type
+pub struct SizespecificationBuilder<'a, S: sizespecification_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<SizespecificationAdditionalProperty<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<SizespecificationDescription<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<SizespecificationEqual<'a>>,
+        ::core::option::Option<SizespecificationGreater<'a>>,
+        ::core::option::Option<SizespecificationGreaterOrEqual<'a>>,
+        ::core::option::Option<SizespecificationHasMeasurement<'a>>,
+        ::core::option::Option<SizespecificationIdentifier<'a>>,
+        ::core::option::Option<SizespecificationImage<'a>>,
+        ::core::option::Option<SizespecificationLesser<'a>>,
+        ::core::option::Option<SizespecificationLesserOrEqual<'a>>,
+        ::core::option::Option<SizespecificationMainEntityOfPage<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<SizespecificationNonEqual<'a>>,
+        ::core::option::Option<SizespecificationPotentialAction<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<SizespecificationSizeGroup<'a>>,
+        ::core::option::Option<SizespecificationSizeSystem<'a>>,
+        ::core::option::Option<SizespecificationSubjectOf<'a>>,
+        ::core::option::Option<SizespecificationSuggestedAge<'a>>,
+        ::core::option::Option<SizespecificationSuggestedGender<'a>>,
+        ::core::option::Option<SizespecificationSuggestedMeasurement<'a>>,
+        ::core::option::Option<SizespecificationSupersededBy<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<SizespecificationValueReference<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Sizespecification<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> SizespecificationBuilder<'a, sizespecification_state::Empty> {
+        SizespecificationBuilder::new()
+    }
+}
+
+impl<'a> SizespecificationBuilder<'a, sizespecification_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        SizespecificationBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: sizespecification_state::State> SizespecificationBuilder<'a, S> {
+    /// Set the `additionalProperty` field (optional)
+    pub fn additional_property(
+        mut self,
+        value: impl Into<Option<SizespecificationAdditionalProperty<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `additionalProperty` field to an Option value (optional)
+    pub fn maybe_additional_property(
+        mut self,
+        value: Option<SizespecificationAdditionalProperty<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: sizespecification_state::State> SizespecificationBuilder<'a, S> {
+    /// Set the `additionalType` field (optional)
+    pub fn additional_type(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `additionalType` field to an Option value (optional)
+    pub fn maybe_additional_type(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: sizespecification_state::State> SizespecificationBuilder<'a, S> {
+    /// Set the `alternateName` field (optional)
+    pub fn alternate_name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `alternateName` field to an Option value (optional)
+    pub fn maybe_alternate_name(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: sizespecification_state::State> SizespecificationBuilder<'a, S> {
+    /// Set the `description` field (optional)
+    pub fn description(
+        mut self,
+        value: impl Into<Option<SizespecificationDescription<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `description` field to an Option value (optional)
+    pub fn maybe_description(
+        mut self,
+        value: Option<SizespecificationDescription<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: sizespecification_state::State> SizespecificationBuilder<'a, S> {
+    /// Set the `disambiguatingDescription` field (optional)
+    pub fn disambiguating_description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `disambiguatingDescription` field to an Option value (optional)
+    pub fn maybe_disambiguating_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: sizespecification_state::State> SizespecificationBuilder<'a, S> {
+    /// Set the `equal` field (optional)
+    pub fn equal(
+        mut self,
+        value: impl Into<Option<SizespecificationEqual<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `equal` field to an Option value (optional)
+    pub fn maybe_equal(mut self, value: Option<SizespecificationEqual<'a>>) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S: sizespecification_state::State> SizespecificationBuilder<'a, S> {
+    /// Set the `greater` field (optional)
+    pub fn greater(
+        mut self,
+        value: impl Into<Option<SizespecificationGreater<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `greater` field to an Option value (optional)
+    pub fn maybe_greater(mut self, value: Option<SizespecificationGreater<'a>>) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S: sizespecification_state::State> SizespecificationBuilder<'a, S> {
+    /// Set the `greaterOrEqual` field (optional)
+    pub fn greater_or_equal(
+        mut self,
+        value: impl Into<Option<SizespecificationGreaterOrEqual<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value.into();
+        self
+    }
+    /// Set the `greaterOrEqual` field to an Option value (optional)
+    pub fn maybe_greater_or_equal(
+        mut self,
+        value: Option<SizespecificationGreaterOrEqual<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value;
+        self
+    }
+}
+
+impl<'a, S: sizespecification_state::State> SizespecificationBuilder<'a, S> {
+    /// Set the `hasMeasurement` field (optional)
+    pub fn has_measurement(
+        mut self,
+        value: impl Into<Option<SizespecificationHasMeasurement<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value.into();
+        self
+    }
+    /// Set the `hasMeasurement` field to an Option value (optional)
+    pub fn maybe_has_measurement(
+        mut self,
+        value: Option<SizespecificationHasMeasurement<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value;
+        self
+    }
+}
+
+impl<'a, S: sizespecification_state::State> SizespecificationBuilder<'a, S> {
+    /// Set the `identifier` field (optional)
+    pub fn identifier(
+        mut self,
+        value: impl Into<Option<SizespecificationIdentifier<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.9 = value.into();
+        self
+    }
+    /// Set the `identifier` field to an Option value (optional)
+    pub fn maybe_identifier(
+        mut self,
+        value: Option<SizespecificationIdentifier<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.9 = value;
+        self
+    }
+}
+
+impl<'a, S: sizespecification_state::State> SizespecificationBuilder<'a, S> {
+    /// Set the `image` field (optional)
+    pub fn image(
+        mut self,
+        value: impl Into<Option<SizespecificationImage<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.10 = value.into();
+        self
+    }
+    /// Set the `image` field to an Option value (optional)
+    pub fn maybe_image(mut self, value: Option<SizespecificationImage<'a>>) -> Self {
+        self.__unsafe_private_named.10 = value;
+        self
+    }
+}
+
+impl<'a, S: sizespecification_state::State> SizespecificationBuilder<'a, S> {
+    /// Set the `lesser` field (optional)
+    pub fn lesser(
+        mut self,
+        value: impl Into<Option<SizespecificationLesser<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.11 = value.into();
+        self
+    }
+    /// Set the `lesser` field to an Option value (optional)
+    pub fn maybe_lesser(mut self, value: Option<SizespecificationLesser<'a>>) -> Self {
+        self.__unsafe_private_named.11 = value;
+        self
+    }
+}
+
+impl<'a, S: sizespecification_state::State> SizespecificationBuilder<'a, S> {
+    /// Set the `lesserOrEqual` field (optional)
+    pub fn lesser_or_equal(
+        mut self,
+        value: impl Into<Option<SizespecificationLesserOrEqual<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.12 = value.into();
+        self
+    }
+    /// Set the `lesserOrEqual` field to an Option value (optional)
+    pub fn maybe_lesser_or_equal(
+        mut self,
+        value: Option<SizespecificationLesserOrEqual<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.12 = value;
+        self
+    }
+}
+
+impl<'a, S: sizespecification_state::State> SizespecificationBuilder<'a, S> {
+    /// Set the `mainEntityOfPage` field (optional)
+    pub fn main_entity_of_page(
+        mut self,
+        value: impl Into<Option<SizespecificationMainEntityOfPage<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.13 = value.into();
+        self
+    }
+    /// Set the `mainEntityOfPage` field to an Option value (optional)
+    pub fn maybe_main_entity_of_page(
+        mut self,
+        value: Option<SizespecificationMainEntityOfPage<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.13 = value;
+        self
+    }
+}
+
+impl<'a, S: sizespecification_state::State> SizespecificationBuilder<'a, S> {
+    /// Set the `name` field (optional)
+    pub fn name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.14 = value.into();
+        self
+    }
+    /// Set the `name` field to an Option value (optional)
+    pub fn maybe_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.14 = value;
+        self
+    }
+}
+
+impl<'a, S: sizespecification_state::State> SizespecificationBuilder<'a, S> {
+    /// Set the `nonEqual` field (optional)
+    pub fn non_equal(
+        mut self,
+        value: impl Into<Option<SizespecificationNonEqual<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.15 = value.into();
+        self
+    }
+    /// Set the `nonEqual` field to an Option value (optional)
+    pub fn maybe_non_equal(
+        mut self,
+        value: Option<SizespecificationNonEqual<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.15 = value;
+        self
+    }
+}
+
+impl<'a, S: sizespecification_state::State> SizespecificationBuilder<'a, S> {
+    /// Set the `potentialAction` field (optional)
+    pub fn potential_action(
+        mut self,
+        value: impl Into<Option<SizespecificationPotentialAction<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.16 = value.into();
+        self
+    }
+    /// Set the `potentialAction` field to an Option value (optional)
+    pub fn maybe_potential_action(
+        mut self,
+        value: Option<SizespecificationPotentialAction<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.16 = value;
+        self
+    }
+}
+
+impl<'a, S: sizespecification_state::State> SizespecificationBuilder<'a, S> {
+    /// Set the `sameAs` field (optional)
+    pub fn same_as(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.17 = value.into();
+        self
+    }
+    /// Set the `sameAs` field to an Option value (optional)
+    pub fn maybe_same_as(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.17 = value;
+        self
+    }
+}
+
+impl<'a, S: sizespecification_state::State> SizespecificationBuilder<'a, S> {
+    /// Set the `sizeGroup` field (optional)
+    pub fn size_group(
+        mut self,
+        value: impl Into<Option<SizespecificationSizeGroup<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.18 = value.into();
+        self
+    }
+    /// Set the `sizeGroup` field to an Option value (optional)
+    pub fn maybe_size_group(
+        mut self,
+        value: Option<SizespecificationSizeGroup<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.18 = value;
+        self
+    }
+}
+
+impl<'a, S: sizespecification_state::State> SizespecificationBuilder<'a, S> {
+    /// Set the `sizeSystem` field (optional)
+    pub fn size_system(
+        mut self,
+        value: impl Into<Option<SizespecificationSizeSystem<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.19 = value.into();
+        self
+    }
+    /// Set the `sizeSystem` field to an Option value (optional)
+    pub fn maybe_size_system(
+        mut self,
+        value: Option<SizespecificationSizeSystem<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.19 = value;
+        self
+    }
+}
+
+impl<'a, S: sizespecification_state::State> SizespecificationBuilder<'a, S> {
+    /// Set the `subjectOf` field (optional)
+    pub fn subject_of(
+        mut self,
+        value: impl Into<Option<SizespecificationSubjectOf<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.20 = value.into();
+        self
+    }
+    /// Set the `subjectOf` field to an Option value (optional)
+    pub fn maybe_subject_of(
+        mut self,
+        value: Option<SizespecificationSubjectOf<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.20 = value;
+        self
+    }
+}
+
+impl<'a, S: sizespecification_state::State> SizespecificationBuilder<'a, S> {
+    /// Set the `suggestedAge` field (optional)
+    pub fn suggested_age(
+        mut self,
+        value: impl Into<Option<SizespecificationSuggestedAge<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.21 = value.into();
+        self
+    }
+    /// Set the `suggestedAge` field to an Option value (optional)
+    pub fn maybe_suggested_age(
+        mut self,
+        value: Option<SizespecificationSuggestedAge<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.21 = value;
+        self
+    }
+}
+
+impl<'a, S: sizespecification_state::State> SizespecificationBuilder<'a, S> {
+    /// Set the `suggestedGender` field (optional)
+    pub fn suggested_gender(
+        mut self,
+        value: impl Into<Option<SizespecificationSuggestedGender<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.22 = value.into();
+        self
+    }
+    /// Set the `suggestedGender` field to an Option value (optional)
+    pub fn maybe_suggested_gender(
+        mut self,
+        value: Option<SizespecificationSuggestedGender<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.22 = value;
+        self
+    }
+}
+
+impl<'a, S: sizespecification_state::State> SizespecificationBuilder<'a, S> {
+    /// Set the `suggestedMeasurement` field (optional)
+    pub fn suggested_measurement(
+        mut self,
+        value: impl Into<Option<SizespecificationSuggestedMeasurement<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.23 = value.into();
+        self
+    }
+    /// Set the `suggestedMeasurement` field to an Option value (optional)
+    pub fn maybe_suggested_measurement(
+        mut self,
+        value: Option<SizespecificationSuggestedMeasurement<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.23 = value;
+        self
+    }
+}
+
+impl<'a, S: sizespecification_state::State> SizespecificationBuilder<'a, S> {
+    /// Set the `supersededBy` field (optional)
+    pub fn superseded_by(
+        mut self,
+        value: impl Into<Option<SizespecificationSupersededBy<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.24 = value.into();
+        self
+    }
+    /// Set the `supersededBy` field to an Option value (optional)
+    pub fn maybe_superseded_by(
+        mut self,
+        value: Option<SizespecificationSupersededBy<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.24 = value;
+        self
+    }
+}
+
+impl<'a, S: sizespecification_state::State> SizespecificationBuilder<'a, S> {
+    /// Set the `url` field (optional)
+    pub fn url(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.25 = value.into();
+        self
+    }
+    /// Set the `url` field to an Option value (optional)
+    pub fn maybe_url(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.25 = value;
+        self
+    }
+}
+
+impl<'a, S: sizespecification_state::State> SizespecificationBuilder<'a, S> {
+    /// Set the `valueReference` field (optional)
+    pub fn value_reference(
+        mut self,
+        value: impl Into<Option<SizespecificationValueReference<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.26 = value.into();
+        self
+    }
+    /// Set the `valueReference` field to an Option value (optional)
+    pub fn maybe_value_reference(
+        mut self,
+        value: Option<SizespecificationValueReference<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.26 = value;
+        self
+    }
+}
+
+impl<'a, S> SizespecificationBuilder<'a, S>
+where
+    S: sizespecification_state::State,
+{
+    /// Build the final struct
+    pub fn build(self) -> Sizespecification<'a> {
+        Sizespecification {
+            additional_property: self.__unsafe_private_named.0,
+            additional_type: self.__unsafe_private_named.1,
+            alternate_name: self.__unsafe_private_named.2,
+            description: self.__unsafe_private_named.3,
+            disambiguating_description: self.__unsafe_private_named.4,
+            equal: self.__unsafe_private_named.5,
+            greater: self.__unsafe_private_named.6,
+            greater_or_equal: self.__unsafe_private_named.7,
+            has_measurement: self.__unsafe_private_named.8,
+            identifier: self.__unsafe_private_named.9,
+            image: self.__unsafe_private_named.10,
+            lesser: self.__unsafe_private_named.11,
+            lesser_or_equal: self.__unsafe_private_named.12,
+            main_entity_of_page: self.__unsafe_private_named.13,
+            name: self.__unsafe_private_named.14,
+            non_equal: self.__unsafe_private_named.15,
+            potential_action: self.__unsafe_private_named.16,
+            same_as: self.__unsafe_private_named.17,
+            size_group: self.__unsafe_private_named.18,
+            size_system: self.__unsafe_private_named.19,
+            subject_of: self.__unsafe_private_named.20,
+            suggested_age: self.__unsafe_private_named.21,
+            suggested_gender: self.__unsafe_private_named.22,
+            suggested_measurement: self.__unsafe_private_named.23,
+            superseded_by: self.__unsafe_private_named.24,
+            url: self.__unsafe_private_named.25,
+            value_reference: self.__unsafe_private_named.26,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Sizespecification<'a> {
+        Sizespecification {
+            additional_property: self.__unsafe_private_named.0,
+            additional_type: self.__unsafe_private_named.1,
+            alternate_name: self.__unsafe_private_named.2,
+            description: self.__unsafe_private_named.3,
+            disambiguating_description: self.__unsafe_private_named.4,
+            equal: self.__unsafe_private_named.5,
+            greater: self.__unsafe_private_named.6,
+            greater_or_equal: self.__unsafe_private_named.7,
+            has_measurement: self.__unsafe_private_named.8,
+            identifier: self.__unsafe_private_named.9,
+            image: self.__unsafe_private_named.10,
+            lesser: self.__unsafe_private_named.11,
+            lesser_or_equal: self.__unsafe_private_named.12,
+            main_entity_of_page: self.__unsafe_private_named.13,
+            name: self.__unsafe_private_named.14,
+            non_equal: self.__unsafe_private_named.15,
+            potential_action: self.__unsafe_private_named.16,
+            same_as: self.__unsafe_private_named.17,
+            size_group: self.__unsafe_private_named.18,
+            size_system: self.__unsafe_private_named.19,
+            subject_of: self.__unsafe_private_named.20,
+            suggested_age: self.__unsafe_private_named.21,
+            suggested_gender: self.__unsafe_private_named.22,
+            suggested_measurement: self.__unsafe_private_named.23,
+            superseded_by: self.__unsafe_private_named.24,
+            url: self.__unsafe_private_named.25,
+            value_reference: self.__unsafe_private_named.26,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Sizespecification<'a> {

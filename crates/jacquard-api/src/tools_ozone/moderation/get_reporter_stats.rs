@@ -12,14 +12,103 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetReporterStats<'a> {
     #[serde(borrow)]
     pub dids: Vec<jacquard_common::types::string::Did<'a>>,
+}
+
+pub mod get_reporter_stats_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Dids;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Dids = Unset;
+    }
+    ///State transition - sets the `dids` field to Set
+    pub struct SetDids<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDids<S> {}
+    impl<S: State> State for SetDids<S> {
+        type Dids = Set<members::dids>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `dids` field
+        pub struct dids(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetReporterStatsBuilder<'a, S: get_reporter_stats_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GetReporterStats<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GetReporterStatsBuilder<'a, get_reporter_stats_state::Empty> {
+        GetReporterStatsBuilder::new()
+    }
+}
+
+impl<'a> GetReporterStatsBuilder<'a, get_reporter_stats_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetReporterStatsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetReporterStatsBuilder<'a, S>
+where
+    S: get_reporter_stats_state::State,
+    S::Dids: get_reporter_stats_state::IsUnset,
+{
+    /// Set the `dids` field (required)
+    pub fn dids(
+        mut self,
+        value: impl Into<Vec<jacquard_common::types::string::Did<'a>>>,
+    ) -> GetReporterStatsBuilder<'a, get_reporter_stats_state::SetDids<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        GetReporterStatsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetReporterStatsBuilder<'a, S>
+where
+    S: get_reporter_stats_state::State,
+    S::Dids: get_reporter_stats_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetReporterStats<'a> {
+        GetReporterStats {
+            dids: self.__unsafe_private_named.0.unwrap(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

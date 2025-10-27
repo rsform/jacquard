@@ -12,22 +12,197 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetStripeIntent<'a> {
     pub amount: i64,
     #[serde(borrow)]
-    #[builder(into)]
     pub id: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub iss: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    #[builder(into)]
     pub token: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+pub mod get_stripe_intent_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Iss;
+        type Amount;
+        type Id;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Iss = Unset;
+        type Amount = Unset;
+        type Id = Unset;
+    }
+    ///State transition - sets the `iss` field to Set
+    pub struct SetIss<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIss<S> {}
+    impl<S: State> State for SetIss<S> {
+        type Iss = Set<members::iss>;
+        type Amount = S::Amount;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `amount` field to Set
+    pub struct SetAmount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAmount<S> {}
+    impl<S: State> State for SetAmount<S> {
+        type Iss = S::Iss;
+        type Amount = Set<members::amount>;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Iss = S::Iss;
+        type Amount = S::Amount;
+        type Id = Set<members::id>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `iss` field
+        pub struct iss(());
+        ///Marker type for the `amount` field
+        pub struct amount(());
+        ///Marker type for the `id` field
+        pub struct id(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetStripeIntentBuilder<'a, S: get_stripe_intent_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GetStripeIntent<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GetStripeIntentBuilder<'a, get_stripe_intent_state::Empty> {
+        GetStripeIntentBuilder::new()
+    }
+}
+
+impl<'a> GetStripeIntentBuilder<'a, get_stripe_intent_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetStripeIntentBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetStripeIntentBuilder<'a, S>
+where
+    S: get_stripe_intent_state::State,
+    S::Amount: get_stripe_intent_state::IsUnset,
+{
+    /// Set the `amount` field (required)
+    pub fn amount(
+        mut self,
+        value: impl Into<i64>,
+    ) -> GetStripeIntentBuilder<'a, get_stripe_intent_state::SetAmount<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        GetStripeIntentBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetStripeIntentBuilder<'a, S>
+where
+    S: get_stripe_intent_state::State,
+    S::Id: get_stripe_intent_state::IsUnset,
+{
+    /// Set the `id` field (required)
+    pub fn id(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> GetStripeIntentBuilder<'a, get_stripe_intent_state::SetId<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        GetStripeIntentBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetStripeIntentBuilder<'a, S>
+where
+    S: get_stripe_intent_state::State,
+    S::Iss: get_stripe_intent_state::IsUnset,
+{
+    /// Set the `iss` field (required)
+    pub fn iss(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> GetStripeIntentBuilder<'a, get_stripe_intent_state::SetIss<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        GetStripeIntentBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: get_stripe_intent_state::State> GetStripeIntentBuilder<'a, S> {
+    /// Set the `token` field (optional)
+    pub fn token(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `token` field to an Option value (optional)
+    pub fn maybe_token(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S> GetStripeIntentBuilder<'a, S>
+where
+    S: get_stripe_intent_state::State,
+    S::Iss: get_stripe_intent_state::IsSet,
+    S::Amount: get_stripe_intent_state::IsSet,
+    S::Id: get_stripe_intent_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetStripeIntent<'a> {
+        GetStripeIntent {
+            amount: self.__unsafe_private_named.0.unwrap(),
+            id: self.__unsafe_private_named.1.unwrap(),
+            iss: self.__unsafe_private_named.2.unwrap(),
+            token: self.__unsafe_private_named.3,
+        }
+    }
 }
 
 /// The intent data

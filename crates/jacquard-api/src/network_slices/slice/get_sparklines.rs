@@ -13,32 +13,164 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-#[builder(start_fn = new)]
 pub struct GetSparklines<'a> {
     /// Time range to fetch data for
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub duration: Option<jacquard_common::CowStr<'a>>,
     /// Time interval for data points
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub interval: Option<jacquard_common::CowStr<'a>>,
     /// Array of slice AT-URIs to get sparkline data for
     #[serde(borrow)]
     pub slices: Vec<jacquard_common::CowStr<'a>>,
-    #[serde(flatten)]
-    #[serde(borrow)]
-    #[builder(default)]
-    pub extra_data: ::std::collections::BTreeMap<
-        ::jacquard_common::smol_str::SmolStr,
-        ::jacquard_common::types::value::Data<'a>,
-    >,
+}
+
+pub mod get_sparklines_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Slices;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Slices = Unset;
+    }
+    ///State transition - sets the `slices` field to Set
+    pub struct SetSlices<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSlices<S> {}
+    impl<S: State> State for SetSlices<S> {
+        type Slices = Set<members::slices>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `slices` field
+        pub struct slices(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetSparklinesBuilder<'a, S: get_sparklines_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GetSparklines<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GetSparklinesBuilder<'a, get_sparklines_state::Empty> {
+        GetSparklinesBuilder::new()
+    }
+}
+
+impl<'a> GetSparklinesBuilder<'a, get_sparklines_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetSparklinesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: get_sparklines_state::State> GetSparklinesBuilder<'a, S> {
+    /// Set the `duration` field (optional)
+    pub fn duration(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `duration` field to an Option value (optional)
+    pub fn maybe_duration(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: get_sparklines_state::State> GetSparklinesBuilder<'a, S> {
+    /// Set the `interval` field (optional)
+    pub fn interval(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `interval` field to an Option value (optional)
+    pub fn maybe_interval(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> GetSparklinesBuilder<'a, S>
+where
+    S: get_sparklines_state::State,
+    S::Slices: get_sparklines_state::IsUnset,
+{
+    /// Set the `slices` field (required)
+    pub fn slices(
+        mut self,
+        value: impl Into<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> GetSparklinesBuilder<'a, get_sparklines_state::SetSlices<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        GetSparklinesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetSparklinesBuilder<'a, S>
+where
+    S: get_sparklines_state::State,
+    S::Slices: get_sparklines_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetSparklines<'a> {
+        GetSparklines {
+            duration: self.__unsafe_private_named.0,
+            interval: self.__unsafe_private_named.1,
+            slices: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> GetSparklines<'a> {
+        GetSparklines {
+            duration: self.__unsafe_private_named.0,
+            interval: self.__unsafe_private_named.1,
+            slices: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]
@@ -55,7 +187,9 @@ pub struct GetSparklines<'a> {
 pub struct GetSparklinesOutput<'a> {
     /// Array of slice sparkline data entries
     #[serde(borrow)]
-    pub sparklines: Vec<jacquard_common::types::value::Data<'a>>,
+    pub sparklines: Vec<
+        crate::network_slices::slice::get_sparklines::SparklineEntry<'a>,
+    >,
 }
 
 /// Response type for
@@ -96,8 +230,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetSparklinesRequest {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SparklineEntry<'a> {
@@ -106,8 +239,147 @@ pub struct SparklineEntry<'a> {
     pub points: Vec<crate::network_slices::slice::SparklinePoint<'a>>,
     /// AT-URI of the slice
     #[serde(borrow)]
-    #[builder(into)]
     pub slice_uri: jacquard_common::CowStr<'a>,
+}
+
+pub mod sparkline_entry_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type SliceUri;
+        type Points;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type SliceUri = Unset;
+        type Points = Unset;
+    }
+    ///State transition - sets the `slice_uri` field to Set
+    pub struct SetSliceUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSliceUri<S> {}
+    impl<S: State> State for SetSliceUri<S> {
+        type SliceUri = Set<members::slice_uri>;
+        type Points = S::Points;
+    }
+    ///State transition - sets the `points` field to Set
+    pub struct SetPoints<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPoints<S> {}
+    impl<S: State> State for SetPoints<S> {
+        type SliceUri = S::SliceUri;
+        type Points = Set<members::points>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `slice_uri` field
+        pub struct slice_uri(());
+        ///Marker type for the `points` field
+        pub struct points(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct SparklineEntryBuilder<'a, S: sparkline_entry_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<Vec<crate::network_slices::slice::SparklinePoint<'a>>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> SparklineEntry<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> SparklineEntryBuilder<'a, sparkline_entry_state::Empty> {
+        SparklineEntryBuilder::new()
+    }
+}
+
+impl<'a> SparklineEntryBuilder<'a, sparkline_entry_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        SparklineEntryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SparklineEntryBuilder<'a, S>
+where
+    S: sparkline_entry_state::State,
+    S::Points: sparkline_entry_state::IsUnset,
+{
+    /// Set the `points` field (required)
+    pub fn points(
+        mut self,
+        value: impl Into<Vec<crate::network_slices::slice::SparklinePoint<'a>>>,
+    ) -> SparklineEntryBuilder<'a, sparkline_entry_state::SetPoints<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        SparklineEntryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SparklineEntryBuilder<'a, S>
+where
+    S: sparkline_entry_state::State,
+    S::SliceUri: sparkline_entry_state::IsUnset,
+{
+    /// Set the `sliceUri` field (required)
+    pub fn slice_uri(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> SparklineEntryBuilder<'a, sparkline_entry_state::SetSliceUri<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        SparklineEntryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SparklineEntryBuilder<'a, S>
+where
+    S: sparkline_entry_state::State,
+    S::SliceUri: sparkline_entry_state::IsSet,
+    S::Points: sparkline_entry_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> SparklineEntry<'a> {
+        SparklineEntry {
+            points: self.__unsafe_private_named.0.unwrap(),
+            slice_uri: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> SparklineEntry<'a> {
+        SparklineEntry {
+            points: self.__unsafe_private_named.0.unwrap(),
+            slice_uri: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_network_slices_slice_getSparklines() -> ::jacquard_lexicon::lexicon::LexiconDoc<

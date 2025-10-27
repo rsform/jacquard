@@ -13,21 +13,180 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Image<'a> {
     /// Alt text description of the image, for accessibility.
     #[serde(borrow)]
-    #[builder(into)]
     pub alt: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub aspect_ratio: Option<crate::app_bsky::embed::AspectRatio<'a>>,
     #[serde(borrow)]
     pub image: jacquard_common::types::blob::BlobRef<'a>,
+}
+
+pub mod image_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Image;
+        type Alt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Image = Unset;
+        type Alt = Unset;
+    }
+    ///State transition - sets the `image` field to Set
+    pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetImage<S> {}
+    impl<S: State> State for SetImage<S> {
+        type Image = Set<members::image>;
+        type Alt = S::Alt;
+    }
+    ///State transition - sets the `alt` field to Set
+    pub struct SetAlt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAlt<S> {}
+    impl<S: State> State for SetAlt<S> {
+        type Image = S::Image;
+        type Alt = Set<members::alt>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `image` field
+        pub struct image(());
+        ///Marker type for the `alt` field
+        pub struct alt(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ImageBuilder<'a, S: image_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<crate::app_bsky::embed::AspectRatio<'a>>,
+        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Image<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ImageBuilder<'a, image_state::Empty> {
+        ImageBuilder::new()
+    }
+}
+
+impl<'a> ImageBuilder<'a, image_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ImageBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ImageBuilder<'a, S>
+where
+    S: image_state::State,
+    S::Alt: image_state::IsUnset,
+{
+    /// Set the `alt` field (required)
+    pub fn alt(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> ImageBuilder<'a, image_state::SetAlt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ImageBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: image_state::State> ImageBuilder<'a, S> {
+    /// Set the `aspectRatio` field (optional)
+    pub fn aspect_ratio(
+        mut self,
+        value: impl Into<Option<crate::app_bsky::embed::AspectRatio<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `aspectRatio` field to an Option value (optional)
+    pub fn maybe_aspect_ratio(
+        mut self,
+        value: Option<crate::app_bsky::embed::AspectRatio<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> ImageBuilder<'a, S>
+where
+    S: image_state::State,
+    S::Image: image_state::IsUnset,
+{
+    /// Set the `image` field (required)
+    pub fn image(
+        mut self,
+        value: impl Into<jacquard_common::types::blob::BlobRef<'a>>,
+    ) -> ImageBuilder<'a, image_state::SetImage<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        ImageBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ImageBuilder<'a, S>
+where
+    S: image_state::State,
+    S::Image: image_state::IsSet,
+    S::Alt: image_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Image<'a> {
+        Image {
+            alt: self.__unsafe_private_named.0.unwrap(),
+            aspect_ratio: self.__unsafe_private_named.1,
+            image: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Image<'a> {
+        Image {
+            alt: self.__unsafe_private_named.0.unwrap(),
+            aspect_ratio: self.__unsafe_private_named.1,
+            image: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_app_bsky_embed_images() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -271,13 +430,117 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Image<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Images<'a> {
     #[serde(borrow)]
     pub images: Vec<crate::app_bsky::embed::images::Image<'a>>,
+}
+
+pub mod images_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Images;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Images = Unset;
+    }
+    ///State transition - sets the `images` field to Set
+    pub struct SetImages<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetImages<S> {}
+    impl<S: State> State for SetImages<S> {
+        type Images = Set<members::images>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `images` field
+        pub struct images(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ImagesBuilder<'a, S: images_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<Vec<crate::app_bsky::embed::images::Image<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Images<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ImagesBuilder<'a, images_state::Empty> {
+        ImagesBuilder::new()
+    }
+}
+
+impl<'a> ImagesBuilder<'a, images_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ImagesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ImagesBuilder<'a, S>
+where
+    S: images_state::State,
+    S::Images: images_state::IsUnset,
+{
+    /// Set the `images` field (required)
+    pub fn images(
+        mut self,
+        value: impl Into<Vec<crate::app_bsky::embed::images::Image<'a>>>,
+    ) -> ImagesBuilder<'a, images_state::SetImages<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ImagesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ImagesBuilder<'a, S>
+where
+    S: images_state::State,
+    S::Images: images_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Images<'a> {
+        Images {
+            images: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Images<'a> {
+        Images {
+            images: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Images<'a> {
@@ -318,13 +581,117 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Images<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct View<'a> {
     #[serde(borrow)]
     pub images: Vec<crate::app_bsky::embed::images::ViewImage<'a>>,
+}
+
+pub mod view_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Images;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Images = Unset;
+    }
+    ///State transition - sets the `images` field to Set
+    pub struct SetImages<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetImages<S> {}
+    impl<S: State> State for SetImages<S> {
+        type Images = Set<members::images>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `images` field
+        pub struct images(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ViewBuilder<'a, S: view_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<Vec<crate::app_bsky::embed::images::ViewImage<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> View<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ViewBuilder<'a, view_state::Empty> {
+        ViewBuilder::new()
+    }
+}
+
+impl<'a> ViewBuilder<'a, view_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ViewBuilder<'a, S>
+where
+    S: view_state::State,
+    S::Images: view_state::IsUnset,
+{
+    /// Set the `images` field (required)
+    pub fn images(
+        mut self,
+        value: impl Into<Vec<crate::app_bsky::embed::images::ViewImage<'a>>>,
+    ) -> ViewBuilder<'a, view_state::SetImages<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ViewBuilder<'a, S>
+where
+    S: view_state::State,
+    S::Images: view_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> View<'a> {
+        View {
+            images: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> View<'a> {
+        View {
+            images: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for View<'a> {
@@ -365,17 +732,14 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for View<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ViewImage<'a> {
     /// Alt text description of the image, for accessibility.
     #[serde(borrow)]
-    #[builder(into)]
     pub alt: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub aspect_ratio: Option<crate::app_bsky::embed::AspectRatio<'a>>,
     /// Fully-qualified URL where a large version of the image can be fetched. May or may not be the exact original blob. For example, CDN location provided by the App View.
@@ -384,6 +748,205 @@ pub struct ViewImage<'a> {
     /// Fully-qualified URL where a thumbnail of the image can be fetched. For example, CDN location provided by the App View.
     #[serde(borrow)]
     pub thumb: jacquard_common::types::string::Uri<'a>,
+}
+
+pub mod view_image_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Thumb;
+        type Fullsize;
+        type Alt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Thumb = Unset;
+        type Fullsize = Unset;
+        type Alt = Unset;
+    }
+    ///State transition - sets the `thumb` field to Set
+    pub struct SetThumb<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetThumb<S> {}
+    impl<S: State> State for SetThumb<S> {
+        type Thumb = Set<members::thumb>;
+        type Fullsize = S::Fullsize;
+        type Alt = S::Alt;
+    }
+    ///State transition - sets the `fullsize` field to Set
+    pub struct SetFullsize<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFullsize<S> {}
+    impl<S: State> State for SetFullsize<S> {
+        type Thumb = S::Thumb;
+        type Fullsize = Set<members::fullsize>;
+        type Alt = S::Alt;
+    }
+    ///State transition - sets the `alt` field to Set
+    pub struct SetAlt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAlt<S> {}
+    impl<S: State> State for SetAlt<S> {
+        type Thumb = S::Thumb;
+        type Fullsize = S::Fullsize;
+        type Alt = Set<members::alt>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `thumb` field
+        pub struct thumb(());
+        ///Marker type for the `fullsize` field
+        pub struct fullsize(());
+        ///Marker type for the `alt` field
+        pub struct alt(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ViewImageBuilder<'a, S: view_image_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<crate::app_bsky::embed::AspectRatio<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ViewImage<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ViewImageBuilder<'a, view_image_state::Empty> {
+        ViewImageBuilder::new()
+    }
+}
+
+impl<'a> ViewImageBuilder<'a, view_image_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ViewImageBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ViewImageBuilder<'a, S>
+where
+    S: view_image_state::State,
+    S::Alt: view_image_state::IsUnset,
+{
+    /// Set the `alt` field (required)
+    pub fn alt(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> ViewImageBuilder<'a, view_image_state::SetAlt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ViewImageBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: view_image_state::State> ViewImageBuilder<'a, S> {
+    /// Set the `aspectRatio` field (optional)
+    pub fn aspect_ratio(
+        mut self,
+        value: impl Into<Option<crate::app_bsky::embed::AspectRatio<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `aspectRatio` field to an Option value (optional)
+    pub fn maybe_aspect_ratio(
+        mut self,
+        value: Option<crate::app_bsky::embed::AspectRatio<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> ViewImageBuilder<'a, S>
+where
+    S: view_image_state::State,
+    S::Fullsize: view_image_state::IsUnset,
+{
+    /// Set the `fullsize` field (required)
+    pub fn fullsize(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+    ) -> ViewImageBuilder<'a, view_image_state::SetFullsize<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        ViewImageBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ViewImageBuilder<'a, S>
+where
+    S: view_image_state::State,
+    S::Thumb: view_image_state::IsUnset,
+{
+    /// Set the `thumb` field (required)
+    pub fn thumb(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+    ) -> ViewImageBuilder<'a, view_image_state::SetThumb<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        ViewImageBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ViewImageBuilder<'a, S>
+where
+    S: view_image_state::State,
+    S::Thumb: view_image_state::IsSet,
+    S::Fullsize: view_image_state::IsSet,
+    S::Alt: view_image_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> ViewImage<'a> {
+        ViewImage {
+            alt: self.__unsafe_private_named.0.unwrap(),
+            aspect_ratio: self.__unsafe_private_named.1,
+            fullsize: self.__unsafe_private_named.2.unwrap(),
+            thumb: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> ViewImage<'a> {
+        ViewImage {
+            alt: self.__unsafe_private_named.0.unwrap(),
+            aspect_ratio: self.__unsafe_private_named.1,
+            fullsize: self.__unsafe_private_named.2.unwrap(),
+            thumb: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewImage<'a> {

@@ -13,16 +13,191 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CollectionSummary<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub collection: jacquard_common::CowStr<'a>,
     pub estimated_repos: i64,
     pub is_external: bool,
+}
+
+pub mod collection_summary_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Collection;
+        type EstimatedRepos;
+        type IsExternal;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Collection = Unset;
+        type EstimatedRepos = Unset;
+        type IsExternal = Unset;
+    }
+    ///State transition - sets the `collection` field to Set
+    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCollection<S> {}
+    impl<S: State> State for SetCollection<S> {
+        type Collection = Set<members::collection>;
+        type EstimatedRepos = S::EstimatedRepos;
+        type IsExternal = S::IsExternal;
+    }
+    ///State transition - sets the `estimated_repos` field to Set
+    pub struct SetEstimatedRepos<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEstimatedRepos<S> {}
+    impl<S: State> State for SetEstimatedRepos<S> {
+        type Collection = S::Collection;
+        type EstimatedRepos = Set<members::estimated_repos>;
+        type IsExternal = S::IsExternal;
+    }
+    ///State transition - sets the `is_external` field to Set
+    pub struct SetIsExternal<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIsExternal<S> {}
+    impl<S: State> State for SetIsExternal<S> {
+        type Collection = S::Collection;
+        type EstimatedRepos = S::EstimatedRepos;
+        type IsExternal = Set<members::is_external>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `collection` field
+        pub struct collection(());
+        ///Marker type for the `estimated_repos` field
+        pub struct estimated_repos(());
+        ///Marker type for the `is_external` field
+        pub struct is_external(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct CollectionSummaryBuilder<'a, S: collection_summary_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<bool>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> CollectionSummary<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> CollectionSummaryBuilder<'a, collection_summary_state::Empty> {
+        CollectionSummaryBuilder::new()
+    }
+}
+
+impl<'a> CollectionSummaryBuilder<'a, collection_summary_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        CollectionSummaryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CollectionSummaryBuilder<'a, S>
+where
+    S: collection_summary_state::State,
+    S::Collection: collection_summary_state::IsUnset,
+{
+    /// Set the `collection` field (required)
+    pub fn collection(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> CollectionSummaryBuilder<'a, collection_summary_state::SetCollection<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        CollectionSummaryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CollectionSummaryBuilder<'a, S>
+where
+    S: collection_summary_state::State,
+    S::EstimatedRepos: collection_summary_state::IsUnset,
+{
+    /// Set the `estimatedRepos` field (required)
+    pub fn estimated_repos(
+        mut self,
+        value: impl Into<i64>,
+    ) -> CollectionSummaryBuilder<'a, collection_summary_state::SetEstimatedRepos<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        CollectionSummaryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CollectionSummaryBuilder<'a, S>
+where
+    S: collection_summary_state::State,
+    S::IsExternal: collection_summary_state::IsUnset,
+{
+    /// Set the `isExternal` field (required)
+    pub fn is_external(
+        mut self,
+        value: impl Into<bool>,
+    ) -> CollectionSummaryBuilder<'a, collection_summary_state::SetIsExternal<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        CollectionSummaryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CollectionSummaryBuilder<'a, S>
+where
+    S: collection_summary_state::State,
+    S::Collection: collection_summary_state::IsSet,
+    S::EstimatedRepos: collection_summary_state::IsSet,
+    S::IsExternal: collection_summary_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> CollectionSummary<'a> {
+        CollectionSummary {
+            collection: self.__unsafe_private_named.0.unwrap(),
+            estimated_repos: self.__unsafe_private_named.1.unwrap(),
+            is_external: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> CollectionSummary<'a> {
+        CollectionSummary {
+            collection: self.__unsafe_private_named.0.unwrap(),
+            estimated_repos: self.__unsafe_private_named.1.unwrap(),
+            is_external: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_network_slices_slice_getSyncSummary() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -229,10 +404,8 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CollectionSummary<'a> {
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetSyncSummary<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -245,8 +418,161 @@ pub struct GetSyncSummary<'a> {
     #[serde(borrow)]
     pub repos: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     #[serde(borrow)]
-    #[builder(into)]
     pub slice: jacquard_common::CowStr<'a>,
+}
+
+pub mod get_sync_summary_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Slice;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Slice = Unset;
+    }
+    ///State transition - sets the `slice` field to Set
+    pub struct SetSlice<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSlice<S> {}
+    impl<S: State> State for SetSlice<S> {
+        type Slice = Set<members::slice>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `slice` field
+        pub struct slice(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetSyncSummaryBuilder<'a, S: get_sync_summary_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GetSyncSummary<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GetSyncSummaryBuilder<'a, get_sync_summary_state::Empty> {
+        GetSyncSummaryBuilder::new()
+    }
+}
+
+impl<'a> GetSyncSummaryBuilder<'a, get_sync_summary_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetSyncSummaryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: get_sync_summary_state::State> GetSyncSummaryBuilder<'a, S> {
+    /// Set the `collections` field (optional)
+    pub fn collections(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `collections` field to an Option value (optional)
+    pub fn maybe_collections(
+        mut self,
+        value: Option<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: get_sync_summary_state::State> GetSyncSummaryBuilder<'a, S> {
+    /// Set the `externalCollections` field (optional)
+    pub fn external_collections(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `externalCollections` field to an Option value (optional)
+    pub fn maybe_external_collections(
+        mut self,
+        value: Option<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: get_sync_summary_state::State> GetSyncSummaryBuilder<'a, S> {
+    /// Set the `repos` field (optional)
+    pub fn repos(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `repos` field to an Option value (optional)
+    pub fn maybe_repos(
+        mut self,
+        value: Option<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> GetSyncSummaryBuilder<'a, S>
+where
+    S: get_sync_summary_state::State,
+    S::Slice: get_sync_summary_state::IsUnset,
+{
+    /// Set the `slice` field (required)
+    pub fn slice(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> GetSyncSummaryBuilder<'a, get_sync_summary_state::SetSlice<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        GetSyncSummaryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetSyncSummaryBuilder<'a, S>
+where
+    S: get_sync_summary_state::State,
+    S::Slice: get_sync_summary_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetSyncSummary<'a> {
+        GetSyncSummary {
+            collections: self.__unsafe_private_named.0,
+            external_collections: self.__unsafe_private_named.1,
+            repos: self.__unsafe_private_named.2,
+            slice: self.__unsafe_private_named.3.unwrap(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]
@@ -266,7 +592,9 @@ pub struct GetSyncSummaryOutput<'a> {
     /// Number of repositories after applying limit
     pub capped_repos: i64,
     #[serde(borrow)]
-    pub collections_summary: Vec<jacquard_common::types::value::Data<'a>>,
+    pub collections_summary: Vec<
+        crate::network_slices::slice::get_sync_summary::CollectionSummary<'a>,
+    >,
     /// Total number of repositories that would be synced
     pub total_repos: i64,
     /// Whether the sync would be limited by maxRepos

@@ -12,14 +12,103 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct DescribeRepo<'a> {
     #[serde(borrow)]
     pub repo: jacquard_common::types::ident::AtIdentifier<'a>,
+}
+
+pub mod describe_repo_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Repo;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Repo = Unset;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Repo = Set<members::repo>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `repo` field
+        pub struct repo(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct DescribeRepoBuilder<'a, S: describe_repo_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> DescribeRepo<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> DescribeRepoBuilder<'a, describe_repo_state::Empty> {
+        DescribeRepoBuilder::new()
+    }
+}
+
+impl<'a> DescribeRepoBuilder<'a, describe_repo_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        DescribeRepoBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DescribeRepoBuilder<'a, S>
+where
+    S: describe_repo_state::State,
+    S::Repo: describe_repo_state::IsUnset,
+{
+    /// Set the `repo` field (required)
+    pub fn repo(
+        mut self,
+        value: impl Into<jacquard_common::types::ident::AtIdentifier<'a>>,
+    ) -> DescribeRepoBuilder<'a, describe_repo_state::SetRepo<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        DescribeRepoBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DescribeRepoBuilder<'a, S>
+where
+    S: describe_repo_state::State,
+    S::Repo: describe_repo_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> DescribeRepo<'a> {
+        DescribeRepo {
+            repo: self.__unsafe_private_named.0.unwrap(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

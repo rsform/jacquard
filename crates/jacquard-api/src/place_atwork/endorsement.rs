@@ -14,8 +14,7 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Endorsement<'a> {
@@ -29,13 +28,251 @@ pub struct Endorsement<'a> {
     pub receiver: jacquard_common::types::string::Did<'a>,
     /// Verified signatures from endorsement proofs (strong references).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub signatures: Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
     /// The endorsement text content.
     #[serde(borrow)]
-    #[builder(into)]
     pub text: jacquard_common::CowStr<'a>,
+}
+
+pub mod endorsement_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Giver;
+        type Receiver;
+        type Text;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Giver = Unset;
+        type Receiver = Unset;
+        type Text = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `giver` field to Set
+    pub struct SetGiver<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGiver<S> {}
+    impl<S: State> State for SetGiver<S> {
+        type Giver = Set<members::giver>;
+        type Receiver = S::Receiver;
+        type Text = S::Text;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `receiver` field to Set
+    pub struct SetReceiver<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetReceiver<S> {}
+    impl<S: State> State for SetReceiver<S> {
+        type Giver = S::Giver;
+        type Receiver = Set<members::receiver>;
+        type Text = S::Text;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetText<S> {}
+    impl<S: State> State for SetText<S> {
+        type Giver = S::Giver;
+        type Receiver = S::Receiver;
+        type Text = Set<members::text>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Giver = S::Giver;
+        type Receiver = S::Receiver;
+        type Text = S::Text;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `giver` field
+        pub struct giver(());
+        ///Marker type for the `receiver` field
+        pub struct receiver(());
+        ///Marker type for the `text` field
+        pub struct text(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct EndorsementBuilder<'a, S: endorsement_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Endorsement<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> EndorsementBuilder<'a, endorsement_state::Empty> {
+        EndorsementBuilder::new()
+    }
+}
+
+impl<'a> EndorsementBuilder<'a, endorsement_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        EndorsementBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> EndorsementBuilder<'a, S>
+where
+    S: endorsement_state::State,
+    S::CreatedAt: endorsement_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> EndorsementBuilder<'a, endorsement_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        EndorsementBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> EndorsementBuilder<'a, S>
+where
+    S: endorsement_state::State,
+    S::Giver: endorsement_state::IsUnset,
+{
+    /// Set the `giver` field (required)
+    pub fn giver(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> EndorsementBuilder<'a, endorsement_state::SetGiver<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        EndorsementBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> EndorsementBuilder<'a, S>
+where
+    S: endorsement_state::State,
+    S::Receiver: endorsement_state::IsUnset,
+{
+    /// Set the `receiver` field (required)
+    pub fn receiver(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> EndorsementBuilder<'a, endorsement_state::SetReceiver<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        EndorsementBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: endorsement_state::State> EndorsementBuilder<'a, S> {
+    /// Set the `signatures` field (optional)
+    pub fn signatures(
+        mut self,
+        value: impl Into<
+            Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
+        >,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `signatures` field to an Option value (optional)
+    pub fn maybe_signatures(
+        mut self,
+        value: Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S> EndorsementBuilder<'a, S>
+where
+    S: endorsement_state::State,
+    S::Text: endorsement_state::IsUnset,
+{
+    /// Set the `text` field (required)
+    pub fn text(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> EndorsementBuilder<'a, endorsement_state::SetText<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        EndorsementBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> EndorsementBuilder<'a, S>
+where
+    S: endorsement_state::State,
+    S::Giver: endorsement_state::IsSet,
+    S::Receiver: endorsement_state::IsSet,
+    S::Text: endorsement_state::IsSet,
+    S::CreatedAt: endorsement_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Endorsement<'a> {
+        Endorsement {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            giver: self.__unsafe_private_named.1.unwrap(),
+            receiver: self.__unsafe_private_named.2.unwrap(),
+            signatures: self.__unsafe_private_named.3,
+            text: self.__unsafe_private_named.4.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Endorsement<'a> {
+        Endorsement {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            giver: self.__unsafe_private_named.1.unwrap(),
+            receiver: self.__unsafe_private_named.2.unwrap(),
+            signatures: self.__unsafe_private_named.3,
+            text: self.__unsafe_private_named.4.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Endorsement<'a> {

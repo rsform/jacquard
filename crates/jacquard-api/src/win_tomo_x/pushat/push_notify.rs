@@ -13,24 +13,155 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-#[builder(start_fn = new)]
 pub struct PushNotify<'a> {
     #[serde(borrow)]
     pub body: crate::win_tomo_x::pushat::NotifyBody<'a>,
     /// The DID of the target user to whom the notification will be sent.
     #[serde(borrow)]
     pub target: jacquard_common::types::string::Did<'a>,
-    #[serde(flatten)]
-    #[serde(borrow)]
-    #[builder(default)]
-    pub extra_data: ::std::collections::BTreeMap<
-        ::jacquard_common::smol_str::SmolStr,
-        ::jacquard_common::types::value::Data<'a>,
-    >,
+}
+
+pub mod push_notify_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Body;
+        type Target;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Body = Unset;
+        type Target = Unset;
+    }
+    ///State transition - sets the `body` field to Set
+    pub struct SetBody<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBody<S> {}
+    impl<S: State> State for SetBody<S> {
+        type Body = Set<members::body>;
+        type Target = S::Target;
+    }
+    ///State transition - sets the `target` field to Set
+    pub struct SetTarget<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTarget<S> {}
+    impl<S: State> State for SetTarget<S> {
+        type Body = S::Body;
+        type Target = Set<members::target>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `body` field
+        pub struct body(());
+        ///Marker type for the `target` field
+        pub struct target(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct PushNotifyBuilder<'a, S: push_notify_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<crate::win_tomo_x::pushat::NotifyBody<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> PushNotify<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> PushNotifyBuilder<'a, push_notify_state::Empty> {
+        PushNotifyBuilder::new()
+    }
+}
+
+impl<'a> PushNotifyBuilder<'a, push_notify_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        PushNotifyBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PushNotifyBuilder<'a, S>
+where
+    S: push_notify_state::State,
+    S::Body: push_notify_state::IsUnset,
+{
+    /// Set the `body` field (required)
+    pub fn body(
+        mut self,
+        value: impl Into<crate::win_tomo_x::pushat::NotifyBody<'a>>,
+    ) -> PushNotifyBuilder<'a, push_notify_state::SetBody<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        PushNotifyBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PushNotifyBuilder<'a, S>
+where
+    S: push_notify_state::State,
+    S::Target: push_notify_state::IsUnset,
+{
+    /// Set the `target` field (required)
+    pub fn target(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> PushNotifyBuilder<'a, push_notify_state::SetTarget<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        PushNotifyBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PushNotifyBuilder<'a, S>
+where
+    S: push_notify_state::State,
+    S::Body: push_notify_state::IsSet,
+    S::Target: push_notify_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> PushNotify<'a> {
+        PushNotify {
+            body: self.__unsafe_private_named.0.unwrap(),
+            target: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> PushNotify<'a> {
+        PushNotify {
+            body: self.__unsafe_private_named.0.unwrap(),
+            target: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

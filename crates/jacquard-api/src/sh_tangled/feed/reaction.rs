@@ -13,17 +13,192 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Reaction<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(borrow)]
-    #[builder(into)]
     pub reaction: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::AtUri<'a>,
+}
+
+pub mod reaction_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Subject;
+        type Reaction;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Subject = Unset;
+        type Reaction = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type Subject = Set<members::subject>;
+        type Reaction = S::Reaction;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `reaction` field to Set
+    pub struct SetReaction<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetReaction<S> {}
+    impl<S: State> State for SetReaction<S> {
+        type Subject = S::Subject;
+        type Reaction = Set<members::reaction>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Subject = S::Subject;
+        type Reaction = S::Reaction;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `subject` field
+        pub struct subject(());
+        ///Marker type for the `reaction` field
+        pub struct reaction(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ReactionBuilder<'a, S: reaction_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Reaction<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ReactionBuilder<'a, reaction_state::Empty> {
+        ReactionBuilder::new()
+    }
+}
+
+impl<'a> ReactionBuilder<'a, reaction_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ReactionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ReactionBuilder<'a, S>
+where
+    S: reaction_state::State,
+    S::CreatedAt: reaction_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> ReactionBuilder<'a, reaction_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ReactionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ReactionBuilder<'a, S>
+where
+    S: reaction_state::State,
+    S::Reaction: reaction_state::IsUnset,
+{
+    /// Set the `reaction` field (required)
+    pub fn reaction(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> ReactionBuilder<'a, reaction_state::SetReaction<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        ReactionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ReactionBuilder<'a, S>
+where
+    S: reaction_state::State,
+    S::Subject: reaction_state::IsUnset,
+{
+    /// Set the `subject` field (required)
+    pub fn subject(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> ReactionBuilder<'a, reaction_state::SetSubject<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        ReactionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ReactionBuilder<'a, S>
+where
+    S: reaction_state::State,
+    S::Subject: reaction_state::IsSet,
+    S::Reaction: reaction_state::IsSet,
+    S::CreatedAt: reaction_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Reaction<'a> {
+        Reaction {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            reaction: self.__unsafe_private_named.1.unwrap(),
+            subject: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Reaction<'a> {
+        Reaction {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            reaction: self.__unsafe_private_named.1.unwrap(),
+            subject: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Reaction<'a> {

@@ -13,30 +13,196 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-#[builder(start_fn = new)]
 pub struct HiddenRef<'a> {
     /// Fork reference name
     #[serde(borrow)]
-    #[builder(into)]
     pub fork_ref: jacquard_common::CowStr<'a>,
     /// Remote reference name
     #[serde(borrow)]
-    #[builder(into)]
     pub remote_ref: jacquard_common::CowStr<'a>,
     /// AT-URI of the repository
     #[serde(borrow)]
     pub repo: jacquard_common::types::string::AtUri<'a>,
-    #[serde(flatten)]
-    #[serde(borrow)]
-    #[builder(default)]
-    pub extra_data: ::std::collections::BTreeMap<
-        ::jacquard_common::smol_str::SmolStr,
-        ::jacquard_common::types::value::Data<'a>,
-    >,
+}
+
+pub mod hidden_ref_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Repo;
+        type ForkRef;
+        type RemoteRef;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Repo = Unset;
+        type ForkRef = Unset;
+        type RemoteRef = Unset;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Repo = Set<members::repo>;
+        type ForkRef = S::ForkRef;
+        type RemoteRef = S::RemoteRef;
+    }
+    ///State transition - sets the `fork_ref` field to Set
+    pub struct SetForkRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetForkRef<S> {}
+    impl<S: State> State for SetForkRef<S> {
+        type Repo = S::Repo;
+        type ForkRef = Set<members::fork_ref>;
+        type RemoteRef = S::RemoteRef;
+    }
+    ///State transition - sets the `remote_ref` field to Set
+    pub struct SetRemoteRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRemoteRef<S> {}
+    impl<S: State> State for SetRemoteRef<S> {
+        type Repo = S::Repo;
+        type ForkRef = S::ForkRef;
+        type RemoteRef = Set<members::remote_ref>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `repo` field
+        pub struct repo(());
+        ///Marker type for the `fork_ref` field
+        pub struct fork_ref(());
+        ///Marker type for the `remote_ref` field
+        pub struct remote_ref(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct HiddenRefBuilder<'a, S: hidden_ref_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> HiddenRef<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> HiddenRefBuilder<'a, hidden_ref_state::Empty> {
+        HiddenRefBuilder::new()
+    }
+}
+
+impl<'a> HiddenRefBuilder<'a, hidden_ref_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        HiddenRefBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> HiddenRefBuilder<'a, S>
+where
+    S: hidden_ref_state::State,
+    S::ForkRef: hidden_ref_state::IsUnset,
+{
+    /// Set the `forkRef` field (required)
+    pub fn fork_ref(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> HiddenRefBuilder<'a, hidden_ref_state::SetForkRef<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        HiddenRefBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> HiddenRefBuilder<'a, S>
+where
+    S: hidden_ref_state::State,
+    S::RemoteRef: hidden_ref_state::IsUnset,
+{
+    /// Set the `remoteRef` field (required)
+    pub fn remote_ref(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> HiddenRefBuilder<'a, hidden_ref_state::SetRemoteRef<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        HiddenRefBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> HiddenRefBuilder<'a, S>
+where
+    S: hidden_ref_state::State,
+    S::Repo: hidden_ref_state::IsUnset,
+{
+    /// Set the `repo` field (required)
+    pub fn repo(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> HiddenRefBuilder<'a, hidden_ref_state::SetRepo<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        HiddenRefBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> HiddenRefBuilder<'a, S>
+where
+    S: hidden_ref_state::State,
+    S::Repo: hidden_ref_state::IsSet,
+    S::ForkRef: hidden_ref_state::IsSet,
+    S::RemoteRef: hidden_ref_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> HiddenRef<'a> {
+        HiddenRef {
+            fork_ref: self.__unsafe_private_named.0.unwrap(),
+            remote_ref: self.__unsafe_private_named.1.unwrap(),
+            repo: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> HiddenRef<'a> {
+        HiddenRef {
+            fork_ref: self.__unsafe_private_named.0.unwrap(),
+            remote_ref: self.__unsafe_private_named.1.unwrap(),
+            repo: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

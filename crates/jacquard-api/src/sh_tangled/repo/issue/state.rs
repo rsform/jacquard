@@ -16,8 +16,7 @@ pub mod open;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct State<'a> {
@@ -25,8 +24,147 @@ pub struct State<'a> {
     pub issue: jacquard_common::types::string::AtUri<'a>,
     /// state of the issue
     #[serde(borrow)]
-    #[builder(into)]
     pub state: jacquard_common::CowStr<'a>,
+}
+
+pub mod state_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Issue;
+        type State;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Issue = Unset;
+        type State = Unset;
+    }
+    ///State transition - sets the `issue` field to Set
+    pub struct SetIssue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIssue<S> {}
+    impl<S: State> State for SetIssue<S> {
+        type Issue = Set<members::issue>;
+        type State = S::State;
+    }
+    ///State transition - sets the `state` field to Set
+    pub struct SetState<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetState<S> {}
+    impl<S: State> State for SetState<S> {
+        type Issue = S::Issue;
+        type State = Set<members::state>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `issue` field
+        pub struct issue(());
+        ///Marker type for the `state` field
+        pub struct state(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct StateBuilder<'a, S: state_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> State<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> StateBuilder<'a, state_state::Empty> {
+        StateBuilder::new()
+    }
+}
+
+impl<'a> StateBuilder<'a, state_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        StateBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> StateBuilder<'a, S>
+where
+    S: state_state::State,
+    S::Issue: state_state::IsUnset,
+{
+    /// Set the `issue` field (required)
+    pub fn issue(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> StateBuilder<'a, state_state::SetIssue<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        StateBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> StateBuilder<'a, S>
+where
+    S: state_state::State,
+    S::State: state_state::IsUnset,
+{
+    /// Set the `state` field (required)
+    pub fn state(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> StateBuilder<'a, state_state::SetState<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        StateBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> StateBuilder<'a, S>
+where
+    S: state_state::State,
+    S::Issue: state_state::IsSet,
+    S::State: state_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> State<'a> {
+        State {
+            issue: self.__unsafe_private_named.0.unwrap(),
+            state: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> State<'a> {
+        State {
+            issue: self.__unsafe_private_named.0.unwrap(),
+            state: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> State<'a> {

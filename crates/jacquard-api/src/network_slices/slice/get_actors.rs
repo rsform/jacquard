@@ -13,8 +13,7 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Actor<'a> {
@@ -23,15 +22,212 @@ pub struct Actor<'a> {
     pub did: jacquard_common::types::string::Did<'a>,
     /// Human-readable handle of the actor
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub handle: Option<jacquard_common::types::string::Handle<'a>>,
     /// When this actor was indexed
     pub indexed_at: jacquard_common::types::string::Datetime,
     /// AT-URI of the slice this actor is indexed in
     #[serde(borrow)]
-    #[builder(into)]
     pub slice_uri: jacquard_common::CowStr<'a>,
+}
+
+pub mod actor_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Did;
+        type SliceUri;
+        type IndexedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Did = Unset;
+        type SliceUri = Unset;
+        type IndexedAt = Unset;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Did = Set<members::did>;
+        type SliceUri = S::SliceUri;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `slice_uri` field to Set
+    pub struct SetSliceUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSliceUri<S> {}
+    impl<S: State> State for SetSliceUri<S> {
+        type Did = S::Did;
+        type SliceUri = Set<members::slice_uri>;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type Did = S::Did;
+        type SliceUri = S::SliceUri;
+        type IndexedAt = Set<members::indexed_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `slice_uri` field
+        pub struct slice_uri(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ActorBuilder<'a, S: actor_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Handle<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Actor<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ActorBuilder<'a, actor_state::Empty> {
+        ActorBuilder::new()
+    }
+}
+
+impl<'a> ActorBuilder<'a, actor_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ActorBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ActorBuilder<'a, S>
+where
+    S: actor_state::State,
+    S::Did: actor_state::IsUnset,
+{
+    /// Set the `did` field (required)
+    pub fn did(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> ActorBuilder<'a, actor_state::SetDid<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ActorBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: actor_state::State> ActorBuilder<'a, S> {
+    /// Set the `handle` field (optional)
+    pub fn handle(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Handle<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `handle` field to an Option value (optional)
+    pub fn maybe_handle(
+        mut self,
+        value: Option<jacquard_common::types::string::Handle<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> ActorBuilder<'a, S>
+where
+    S: actor_state::State,
+    S::IndexedAt: actor_state::IsUnset,
+{
+    /// Set the `indexedAt` field (required)
+    pub fn indexed_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> ActorBuilder<'a, actor_state::SetIndexedAt<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        ActorBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ActorBuilder<'a, S>
+where
+    S: actor_state::State,
+    S::SliceUri: actor_state::IsUnset,
+{
+    /// Set the `sliceUri` field (required)
+    pub fn slice_uri(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> ActorBuilder<'a, actor_state::SetSliceUri<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        ActorBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ActorBuilder<'a, S>
+where
+    S: actor_state::State,
+    S::Did: actor_state::IsSet,
+    S::SliceUri: actor_state::IsSet,
+    S::IndexedAt: actor_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Actor<'a> {
+        Actor {
+            did: self.__unsafe_private_named.0.unwrap(),
+            handle: self.__unsafe_private_named.1,
+            indexed_at: self.__unsafe_private_named.2.unwrap(),
+            slice_uri: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Actor<'a> {
+        Actor {
+            did: self.__unsafe_private_named.0.unwrap(),
+            handle: self.__unsafe_private_named.1,
+            indexed_at: self.__unsafe_private_named.2.unwrap(),
+            slice_uri: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_network_slices_slice_getActors() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -297,7 +493,7 @@ pub struct GetActors<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct GetActorsOutput<'a> {
     #[serde(borrow)]
-    pub actors: Vec<jacquard_common::types::value::Data<'a>>,
+    pub actors: Vec<crate::network_slices::slice::get_actors::Actor<'a>>,
     /// Pagination cursor for next page
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]

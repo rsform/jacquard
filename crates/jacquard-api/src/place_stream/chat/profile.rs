@@ -14,14 +14,190 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Color<'a> {
     pub blue: i64,
     pub green: i64,
     pub red: i64,
+}
+
+pub mod color_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Red;
+        type Green;
+        type Blue;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Red = Unset;
+        type Green = Unset;
+        type Blue = Unset;
+    }
+    ///State transition - sets the `red` field to Set
+    pub struct SetRed<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRed<S> {}
+    impl<S: State> State for SetRed<S> {
+        type Red = Set<members::red>;
+        type Green = S::Green;
+        type Blue = S::Blue;
+    }
+    ///State transition - sets the `green` field to Set
+    pub struct SetGreen<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGreen<S> {}
+    impl<S: State> State for SetGreen<S> {
+        type Red = S::Red;
+        type Green = Set<members::green>;
+        type Blue = S::Blue;
+    }
+    ///State transition - sets the `blue` field to Set
+    pub struct SetBlue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlue<S> {}
+    impl<S: State> State for SetBlue<S> {
+        type Red = S::Red;
+        type Green = S::Green;
+        type Blue = Set<members::blue>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `red` field
+        pub struct red(());
+        ///Marker type for the `green` field
+        pub struct green(());
+        ///Marker type for the `blue` field
+        pub struct blue(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ColorBuilder<'a, S: color_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<i64>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<i64>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Color<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ColorBuilder<'a, color_state::Empty> {
+        ColorBuilder::new()
+    }
+}
+
+impl<'a> ColorBuilder<'a, color_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ColorBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ColorBuilder<'a, S>
+where
+    S: color_state::State,
+    S::Blue: color_state::IsUnset,
+{
+    /// Set the `blue` field (required)
+    pub fn blue(
+        mut self,
+        value: impl Into<i64>,
+    ) -> ColorBuilder<'a, color_state::SetBlue<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ColorBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ColorBuilder<'a, S>
+where
+    S: color_state::State,
+    S::Green: color_state::IsUnset,
+{
+    /// Set the `green` field (required)
+    pub fn green(
+        mut self,
+        value: impl Into<i64>,
+    ) -> ColorBuilder<'a, color_state::SetGreen<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        ColorBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ColorBuilder<'a, S>
+where
+    S: color_state::State,
+    S::Red: color_state::IsUnset,
+{
+    /// Set the `red` field (required)
+    pub fn red(
+        mut self,
+        value: impl Into<i64>,
+    ) -> ColorBuilder<'a, color_state::SetRed<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        ColorBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ColorBuilder<'a, S>
+where
+    S: color_state::State,
+    S::Red: color_state::IsSet,
+    S::Green: color_state::IsSet,
+    S::Blue: color_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Color<'a> {
+        Color {
+            blue: self.__unsafe_private_named.0.unwrap(),
+            green: self.__unsafe_private_named.1.unwrap(),
+            red: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Color<'a> {
+        Color {
+            blue: self.__unsafe_private_named.0.unwrap(),
+            green: self.__unsafe_private_named.1.unwrap(),
+            red: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_place_stream_chat_profile() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -221,15 +397,104 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Color<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Profile<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub color: Option<crate::place_stream::chat::profile::Color<'a>>,
+}
+
+pub mod profile_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {}
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {}
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {}
+}
+
+/// Builder for constructing an instance of this type
+pub struct ProfileBuilder<'a, S: profile_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<crate::place_stream::chat::profile::Color<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Profile<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ProfileBuilder<'a, profile_state::Empty> {
+        ProfileBuilder::new()
+    }
+}
+
+impl<'a> ProfileBuilder<'a, profile_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ProfileBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
+    /// Set the `color` field (optional)
+    pub fn color(
+        mut self,
+        value: impl Into<Option<crate::place_stream::chat::profile::Color<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `color` field to an Option value (optional)
+    pub fn maybe_color(
+        mut self,
+        value: Option<crate::place_stream::chat::profile::Color<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> ProfileBuilder<'a, S>
+where
+    S: profile_state::State,
+{
+    /// Build the final struct
+    pub fn build(self) -> Profile<'a> {
+        Profile {
+            color: self.__unsafe_private_named.0,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Profile<'a> {
+        Profile {
+            color: self.__unsafe_private_named.0,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Profile<'a> {

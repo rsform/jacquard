@@ -14,36 +14,241 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Room<'a> {
     /// List of users allowed to send messages in the room.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub allowlist: Option<crate::social_psky::chat::room::ModlistRef<'a>>,
     /// List of users disallowed to send messages in the room.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub denylist: Option<crate::social_psky::chat::room::ModlistRef<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub languages: Option<Vec<jacquard_common::types::string::Language>>,
     #[serde(borrow)]
-    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub tags: Option<Vec<jacquard_common::CowStr<'a>>>,
     /// Topic title of the room.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub topic: Option<jacquard_common::CowStr<'a>>,
+}
+
+pub mod room_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Name;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Name = Unset;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Name = Set<members::name>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `name` field
+        pub struct name(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct RoomBuilder<'a, S: room_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<crate::social_psky::chat::room::ModlistRef<'a>>,
+        ::core::option::Option<crate::social_psky::chat::room::ModlistRef<'a>>,
+        ::core::option::Option<Vec<jacquard_common::types::string::Language>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Room<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> RoomBuilder<'a, room_state::Empty> {
+        RoomBuilder::new()
+    }
+}
+
+impl<'a> RoomBuilder<'a, room_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        RoomBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: room_state::State> RoomBuilder<'a, S> {
+    /// Set the `allowlist` field (optional)
+    pub fn allowlist(
+        mut self,
+        value: impl Into<Option<crate::social_psky::chat::room::ModlistRef<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `allowlist` field to an Option value (optional)
+    pub fn maybe_allowlist(
+        mut self,
+        value: Option<crate::social_psky::chat::room::ModlistRef<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: room_state::State> RoomBuilder<'a, S> {
+    /// Set the `denylist` field (optional)
+    pub fn denylist(
+        mut self,
+        value: impl Into<Option<crate::social_psky::chat::room::ModlistRef<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `denylist` field to an Option value (optional)
+    pub fn maybe_denylist(
+        mut self,
+        value: Option<crate::social_psky::chat::room::ModlistRef<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: room_state::State> RoomBuilder<'a, S> {
+    /// Set the `languages` field (optional)
+    pub fn languages(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::types::string::Language>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `languages` field to an Option value (optional)
+    pub fn maybe_languages(
+        mut self,
+        value: Option<Vec<jacquard_common::types::string::Language>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> RoomBuilder<'a, S>
+where
+    S: room_state::State,
+    S::Name: room_state::IsUnset,
+{
+    /// Set the `name` field (required)
+    pub fn name(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> RoomBuilder<'a, room_state::SetName<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        RoomBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: room_state::State> RoomBuilder<'a, S> {
+    /// Set the `tags` field (optional)
+    pub fn tags(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `tags` field to an Option value (optional)
+    pub fn maybe_tags(
+        mut self,
+        value: Option<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: room_state::State> RoomBuilder<'a, S> {
+    /// Set the `topic` field (optional)
+    pub fn topic(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `topic` field to an Option value (optional)
+    pub fn maybe_topic(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S> RoomBuilder<'a, S>
+where
+    S: room_state::State,
+    S::Name: room_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Room<'a> {
+        Room {
+            allowlist: self.__unsafe_private_named.0,
+            denylist: self.__unsafe_private_named.1,
+            languages: self.__unsafe_private_named.2,
+            name: self.__unsafe_private_named.3.unwrap(),
+            tags: self.__unsafe_private_named.4,
+            topic: self.__unsafe_private_named.5,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Room<'a> {
+        Room {
+            allowlist: self.__unsafe_private_named.0,
+            denylist: self.__unsafe_private_named.1,
+            languages: self.__unsafe_private_named.2,
+            name: self.__unsafe_private_named.3.unwrap(),
+            tags: self.__unsafe_private_named.4,
+            topic: self.__unsafe_private_named.5,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Room<'a> {
@@ -402,14 +607,153 @@ fn lexicon_doc_social_psky_chat_room() -> ::jacquard_lexicon::lexicon::LexiconDo
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ModlistRef<'a> {
     pub active: bool,
     #[serde(borrow)]
     pub users: Vec<jacquard_common::types::string::Did<'a>>,
+}
+
+pub mod modlist_ref_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Active;
+        type Users;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Active = Unset;
+        type Users = Unset;
+    }
+    ///State transition - sets the `active` field to Set
+    pub struct SetActive<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActive<S> {}
+    impl<S: State> State for SetActive<S> {
+        type Active = Set<members::active>;
+        type Users = S::Users;
+    }
+    ///State transition - sets the `users` field to Set
+    pub struct SetUsers<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUsers<S> {}
+    impl<S: State> State for SetUsers<S> {
+        type Active = S::Active;
+        type Users = Set<members::users>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `active` field
+        pub struct active(());
+        ///Marker type for the `users` field
+        pub struct users(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ModlistRefBuilder<'a, S: modlist_ref_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<bool>,
+        ::core::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ModlistRef<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ModlistRefBuilder<'a, modlist_ref_state::Empty> {
+        ModlistRefBuilder::new()
+    }
+}
+
+impl<'a> ModlistRefBuilder<'a, modlist_ref_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ModlistRefBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ModlistRefBuilder<'a, S>
+where
+    S: modlist_ref_state::State,
+    S::Active: modlist_ref_state::IsUnset,
+{
+    /// Set the `active` field (required)
+    pub fn active(
+        mut self,
+        value: impl Into<bool>,
+    ) -> ModlistRefBuilder<'a, modlist_ref_state::SetActive<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ModlistRefBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ModlistRefBuilder<'a, S>
+where
+    S: modlist_ref_state::State,
+    S::Users: modlist_ref_state::IsUnset,
+{
+    /// Set the `users` field (required)
+    pub fn users(
+        mut self,
+        value: impl Into<Vec<jacquard_common::types::string::Did<'a>>>,
+    ) -> ModlistRefBuilder<'a, modlist_ref_state::SetUsers<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        ModlistRefBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ModlistRefBuilder<'a, S>
+where
+    S: modlist_ref_state::State,
+    S::Active: modlist_ref_state::IsSet,
+    S::Users: modlist_ref_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> ModlistRef<'a> {
+        ModlistRef {
+            active: self.__unsafe_private_named.0.unwrap(),
+            users: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> ModlistRef<'a> {
+        ModlistRef {
+            active: self.__unsafe_private_named.0.unwrap(),
+            users: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ModlistRef<'a> {

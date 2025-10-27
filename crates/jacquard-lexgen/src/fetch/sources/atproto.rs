@@ -1,12 +1,12 @@
 use super::LexiconSource;
-use jacquard_lexicon::lexicon::LexiconDoc;
-use jacquard_api::com_atproto::repo::list_records::ListRecords;
-use jacquard_common::IntoStatic;
+use jacquard_api::com_atproto::repo::list_records::{ListRecords, Record};
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::Nsid;
 use jacquard_common::xrpc::XrpcExt;
+use jacquard_common::{CowStr, IntoStatic};
 use jacquard_identity::JacquardResolver;
 use jacquard_identity::resolver::{IdentityResolver, ResolverOptions};
+use jacquard_lexicon::lexicon::LexiconDoc;
 use miette::{Result, miette};
 use std::collections::HashMap;
 
@@ -17,19 +17,17 @@ pub struct AtProtoSource {
 }
 
 impl AtProtoSource {
-    fn parse_lexicon_record(
-        record_data: &jacquard_common::types::value::Data<'_>,
-    ) -> Option<LexiconDoc<'static>> {
-        // Extract the 'value' field from the record
-        let value = match record_data {
-            jacquard_common::types::value::Data::Object(map) => map.0.get("value")?,
-            _ => {
-                eprintln!("Warning: Record is not an object");
-                return None;
-            }
-        };
+    fn parse_lexicon_record(record_data: &Record<'_>) -> Option<LexiconDoc<'static>> {
+        // // Extract the 'value' field from the record
+        // let value = match record_data {
+        //     jacquard_common::types::value::Data::Object(map) => map.0.get("value")?,
+        //     _ => {
+        //         eprintln!("Warning: Record is not an object");
+        //         return None;
+        //     }
+        // };
 
-        match serde_json::to_string(value) {
+        match serde_json::to_string(&record_data.value) {
             Ok(json) => match serde_json::from_str::<LexiconDoc>(&json) {
                 Ok(doc) => Some(doc.into_static()),
                 Err(e) => {
@@ -105,7 +103,7 @@ impl LexiconSource for AtProtoSource {
                 eprintln!("Warning: Batch decode failed from {}: {}", self.endpoint, e);
                 eprintln!("Retrying with limit=1 to skip invalid records...");
 
-                let mut cursor: Option<String> = None;
+                let mut cursor: Option<CowStr> = None;
                 loop {
                     let req = if let Some(ref c) = cursor {
                         ListRecords::new()
@@ -133,7 +131,7 @@ impl LexiconSource for AtProtoSource {
                             }
 
                             if let Some(next_cursor) = output.cursor {
-                                cursor = Some(next_cursor.to_string());
+                                cursor = Some(next_cursor);
                             } else {
                                 break;
                             }

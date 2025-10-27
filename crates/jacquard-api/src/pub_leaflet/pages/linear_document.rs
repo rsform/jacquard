@@ -13,17 +13,142 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Block<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub alignment: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub block: BlockBlock<'a>,
+}
+
+pub mod block_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Block;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Block = Unset;
+    }
+    ///State transition - sets the `block` field to Set
+    pub struct SetBlock<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlock<S> {}
+    impl<S: State> State for SetBlock<S> {
+        type Block = Set<members::block>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `block` field
+        pub struct block(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct BlockBuilder<'a, S: block_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<BlockBlock<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Block<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> BlockBuilder<'a, block_state::Empty> {
+        BlockBuilder::new()
+    }
+}
+
+impl<'a> BlockBuilder<'a, block_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        BlockBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: block_state::State> BlockBuilder<'a, S> {
+    /// Set the `alignment` field (optional)
+    pub fn alignment(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `alignment` field to an Option value (optional)
+    pub fn maybe_alignment(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> BlockBuilder<'a, S>
+where
+    S: block_state::State,
+    S::Block: block_state::IsUnset,
+{
+    /// Set the `block` field (required)
+    pub fn block(
+        mut self,
+        value: impl Into<BlockBlock<'a>>,
+    ) -> BlockBuilder<'a, block_state::SetBlock<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        BlockBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BlockBuilder<'a, S>
+where
+    S: block_state::State,
+    S::Block: block_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Block<'a> {
+        Block {
+            alignment: self.__unsafe_private_named.0,
+            block: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Block<'a> {
+        Block {
+            alignment: self.__unsafe_private_named.0,
+            block: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -298,17 +423,138 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Block<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LinearDocument<'a> {
     #[serde(borrow)]
     pub blocks: Vec<crate::pub_leaflet::pages::linear_document::Block<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub id: Option<jacquard_common::CowStr<'a>>,
+}
+
+pub mod linear_document_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Blocks;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Blocks = Unset;
+    }
+    ///State transition - sets the `blocks` field to Set
+    pub struct SetBlocks<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlocks<S> {}
+    impl<S: State> State for SetBlocks<S> {
+        type Blocks = Set<members::blocks>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `blocks` field
+        pub struct blocks(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct LinearDocumentBuilder<'a, S: linear_document_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<
+            Vec<crate::pub_leaflet::pages::linear_document::Block<'a>>,
+        >,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> LinearDocument<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> LinearDocumentBuilder<'a, linear_document_state::Empty> {
+        LinearDocumentBuilder::new()
+    }
+}
+
+impl<'a> LinearDocumentBuilder<'a, linear_document_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        LinearDocumentBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LinearDocumentBuilder<'a, S>
+where
+    S: linear_document_state::State,
+    S::Blocks: linear_document_state::IsUnset,
+{
+    /// Set the `blocks` field (required)
+    pub fn blocks(
+        mut self,
+        value: impl Into<Vec<crate::pub_leaflet::pages::linear_document::Block<'a>>>,
+    ) -> LinearDocumentBuilder<'a, linear_document_state::SetBlocks<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        LinearDocumentBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: linear_document_state::State> LinearDocumentBuilder<'a, S> {
+    /// Set the `id` field (optional)
+    pub fn id(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `id` field to an Option value (optional)
+    pub fn maybe_id(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> LinearDocumentBuilder<'a, S>
+where
+    S: linear_document_state::State,
+    S::Blocks: linear_document_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> LinearDocument<'a> {
+        LinearDocument {
+            blocks: self.__unsafe_private_named.0.unwrap(),
+            id: self.__unsafe_private_named.1,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> LinearDocument<'a> {
+        LinearDocument {
+            blocks: self.__unsafe_private_named.0.unwrap(),
+            id: self.__unsafe_private_named.1,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LinearDocument<'a> {
@@ -336,13 +582,152 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LinearDocument<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Position<'a> {
     pub block: Vec<i64>,
     pub offset: i64,
+}
+
+pub mod position_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Block;
+        type Offset;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Block = Unset;
+        type Offset = Unset;
+    }
+    ///State transition - sets the `block` field to Set
+    pub struct SetBlock<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlock<S> {}
+    impl<S: State> State for SetBlock<S> {
+        type Block = Set<members::block>;
+        type Offset = S::Offset;
+    }
+    ///State transition - sets the `offset` field to Set
+    pub struct SetOffset<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOffset<S> {}
+    impl<S: State> State for SetOffset<S> {
+        type Block = S::Block;
+        type Offset = Set<members::offset>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `block` field
+        pub struct block(());
+        ///Marker type for the `offset` field
+        pub struct offset(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct PositionBuilder<'a, S: position_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<Vec<i64>>,
+        ::core::option::Option<i64>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Position<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> PositionBuilder<'a, position_state::Empty> {
+        PositionBuilder::new()
+    }
+}
+
+impl<'a> PositionBuilder<'a, position_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        PositionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PositionBuilder<'a, S>
+where
+    S: position_state::State,
+    S::Block: position_state::IsUnset,
+{
+    /// Set the `block` field (required)
+    pub fn block(
+        mut self,
+        value: impl Into<Vec<i64>>,
+    ) -> PositionBuilder<'a, position_state::SetBlock<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        PositionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PositionBuilder<'a, S>
+where
+    S: position_state::State,
+    S::Offset: position_state::IsUnset,
+{
+    /// Set the `offset` field (required)
+    pub fn offset(
+        mut self,
+        value: impl Into<i64>,
+    ) -> PositionBuilder<'a, position_state::SetOffset<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        PositionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PositionBuilder<'a, S>
+where
+    S: position_state::State,
+    S::Block: position_state::IsSet,
+    S::Offset: position_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Position<'a> {
+        Position {
+            block: self.__unsafe_private_named.0.unwrap(),
+            offset: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Position<'a> {
+        Position {
+            block: self.__unsafe_private_named.0.unwrap(),
+            offset: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Position<'a> {
@@ -370,8 +755,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Position<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Quote<'a> {
@@ -379,6 +763,146 @@ pub struct Quote<'a> {
     pub end: crate::pub_leaflet::pages::linear_document::Position<'a>,
     #[serde(borrow)]
     pub start: crate::pub_leaflet::pages::linear_document::Position<'a>,
+}
+
+pub mod quote_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Start;
+        type End;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Start = Unset;
+        type End = Unset;
+    }
+    ///State transition - sets the `start` field to Set
+    pub struct SetStart<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStart<S> {}
+    impl<S: State> State for SetStart<S> {
+        type Start = Set<members::start>;
+        type End = S::End;
+    }
+    ///State transition - sets the `end` field to Set
+    pub struct SetEnd<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEnd<S> {}
+    impl<S: State> State for SetEnd<S> {
+        type Start = S::Start;
+        type End = Set<members::end>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `start` field
+        pub struct start(());
+        ///Marker type for the `end` field
+        pub struct end(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct QuoteBuilder<'a, S: quote_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<crate::pub_leaflet::pages::linear_document::Position<'a>>,
+        ::core::option::Option<crate::pub_leaflet::pages::linear_document::Position<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Quote<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> QuoteBuilder<'a, quote_state::Empty> {
+        QuoteBuilder::new()
+    }
+}
+
+impl<'a> QuoteBuilder<'a, quote_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        QuoteBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> QuoteBuilder<'a, S>
+where
+    S: quote_state::State,
+    S::End: quote_state::IsUnset,
+{
+    /// Set the `end` field (required)
+    pub fn end(
+        mut self,
+        value: impl Into<crate::pub_leaflet::pages::linear_document::Position<'a>>,
+    ) -> QuoteBuilder<'a, quote_state::SetEnd<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        QuoteBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> QuoteBuilder<'a, S>
+where
+    S: quote_state::State,
+    S::Start: quote_state::IsUnset,
+{
+    /// Set the `start` field (required)
+    pub fn start(
+        mut self,
+        value: impl Into<crate::pub_leaflet::pages::linear_document::Position<'a>>,
+    ) -> QuoteBuilder<'a, quote_state::SetStart<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        QuoteBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> QuoteBuilder<'a, S>
+where
+    S: quote_state::State,
+    S::Start: quote_state::IsSet,
+    S::End: quote_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Quote<'a> {
+        Quote {
+            end: self.__unsafe_private_named.0.unwrap(),
+            start: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Quote<'a> {
+        Quote {
+            end: self.__unsafe_private_named.0.unwrap(),
+            start: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Quote<'a> {

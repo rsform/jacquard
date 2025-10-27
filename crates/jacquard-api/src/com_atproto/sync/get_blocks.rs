@@ -12,16 +12,139 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetBlocks<'a> {
     #[serde(borrow)]
     pub cids: Vec<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
+}
+
+pub mod get_blocks_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Did;
+        type Cids;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Did = Unset;
+        type Cids = Unset;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Did = Set<members::did>;
+        type Cids = S::Cids;
+    }
+    ///State transition - sets the `cids` field to Set
+    pub struct SetCids<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCids<S> {}
+    impl<S: State> State for SetCids<S> {
+        type Did = S::Did;
+        type Cids = Set<members::cids>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `cids` field
+        pub struct cids(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetBlocksBuilder<'a, S: get_blocks_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<Vec<jacquard_common::types::string::Cid<'a>>>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GetBlocks<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GetBlocksBuilder<'a, get_blocks_state::Empty> {
+        GetBlocksBuilder::new()
+    }
+}
+
+impl<'a> GetBlocksBuilder<'a, get_blocks_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetBlocksBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetBlocksBuilder<'a, S>
+where
+    S: get_blocks_state::State,
+    S::Cids: get_blocks_state::IsUnset,
+{
+    /// Set the `cids` field (required)
+    pub fn cids(
+        mut self,
+        value: impl Into<Vec<jacquard_common::types::string::Cid<'a>>>,
+    ) -> GetBlocksBuilder<'a, get_blocks_state::SetCids<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        GetBlocksBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetBlocksBuilder<'a, S>
+where
+    S: get_blocks_state::State,
+    S::Did: get_blocks_state::IsUnset,
+{
+    /// Set the `did` field (required)
+    pub fn did(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> GetBlocksBuilder<'a, get_blocks_state::SetDid<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        GetBlocksBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetBlocksBuilder<'a, S>
+where
+    S: get_blocks_state::State,
+    S::Did: get_blocks_state::IsSet,
+    S::Cids: get_blocks_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetBlocks<'a> {
+        GetBlocks {
+            cids: self.__unsafe_private_named.0.unwrap(),
+            did: self.__unsafe_private_named.1.unwrap(),
+        }
+    }
 }
 
 #[derive(

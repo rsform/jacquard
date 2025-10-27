@@ -13,8 +13,7 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LiveNowConfig<'a> {
@@ -22,6 +21,146 @@ pub struct LiveNowConfig<'a> {
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(borrow)]
     pub domains: Vec<jacquard_common::CowStr<'a>>,
+}
+
+pub mod live_now_config_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Did;
+        type Domains;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Did = Unset;
+        type Domains = Unset;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Did = Set<members::did>;
+        type Domains = S::Domains;
+    }
+    ///State transition - sets the `domains` field to Set
+    pub struct SetDomains<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDomains<S> {}
+    impl<S: State> State for SetDomains<S> {
+        type Did = S::Did;
+        type Domains = Set<members::domains>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `domains` field
+        pub struct domains(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct LiveNowConfigBuilder<'a, S: live_now_config_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> LiveNowConfig<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> LiveNowConfigBuilder<'a, live_now_config_state::Empty> {
+        LiveNowConfigBuilder::new()
+    }
+}
+
+impl<'a> LiveNowConfigBuilder<'a, live_now_config_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        LiveNowConfigBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LiveNowConfigBuilder<'a, S>
+where
+    S: live_now_config_state::State,
+    S::Did: live_now_config_state::IsUnset,
+{
+    /// Set the `did` field (required)
+    pub fn did(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> LiveNowConfigBuilder<'a, live_now_config_state::SetDid<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        LiveNowConfigBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LiveNowConfigBuilder<'a, S>
+where
+    S: live_now_config_state::State,
+    S::Domains: live_now_config_state::IsUnset,
+{
+    /// Set the `domains` field (required)
+    pub fn domains(
+        mut self,
+        value: impl Into<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> LiveNowConfigBuilder<'a, live_now_config_state::SetDomains<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        LiveNowConfigBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LiveNowConfigBuilder<'a, S>
+where
+    S: live_now_config_state::State,
+    S::Did: live_now_config_state::IsSet,
+    S::Domains: live_now_config_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> LiveNowConfig<'a> {
+        LiveNowConfig {
+            did: self.__unsafe_private_named.0.unwrap(),
+            domains: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> LiveNowConfig<'a> {
+        LiveNowConfig {
+            did: self.__unsafe_private_named.0.unwrap(),
+            domains: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_app_bsky_unspecced_getConfig() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -137,7 +276,9 @@ pub struct GetConfigOutput<'a> {
     pub check_email_confirmed: std::option::Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub live_now: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
+    pub live_now: std::option::Option<
+        Vec<crate::app_bsky::unspecced::get_config::LiveNowConfig<'a>>,
+    >,
 }
 
 /// XRPC request marker type

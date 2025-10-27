@@ -13,8 +13,7 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LinearDocumentQuote<'a> {
@@ -22,6 +21,146 @@ pub struct LinearDocumentQuote<'a> {
     pub document: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
     pub quote: crate::pub_leaflet::pages::linear_document::Quote<'a>,
+}
+
+pub mod linear_document_quote_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Document;
+        type Quote;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Document = Unset;
+        type Quote = Unset;
+    }
+    ///State transition - sets the `document` field to Set
+    pub struct SetDocument<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDocument<S> {}
+    impl<S: State> State for SetDocument<S> {
+        type Document = Set<members::document>;
+        type Quote = S::Quote;
+    }
+    ///State transition - sets the `quote` field to Set
+    pub struct SetQuote<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetQuote<S> {}
+    impl<S: State> State for SetQuote<S> {
+        type Document = S::Document;
+        type Quote = Set<members::quote>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `document` field
+        pub struct document(());
+        ///Marker type for the `quote` field
+        pub struct quote(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct LinearDocumentQuoteBuilder<'a, S: linear_document_quote_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+        ::core::option::Option<crate::pub_leaflet::pages::linear_document::Quote<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> LinearDocumentQuote<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> LinearDocumentQuoteBuilder<'a, linear_document_quote_state::Empty> {
+        LinearDocumentQuoteBuilder::new()
+    }
+}
+
+impl<'a> LinearDocumentQuoteBuilder<'a, linear_document_quote_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        LinearDocumentQuoteBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LinearDocumentQuoteBuilder<'a, S>
+where
+    S: linear_document_quote_state::State,
+    S::Document: linear_document_quote_state::IsUnset,
+{
+    /// Set the `document` field (required)
+    pub fn document(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> LinearDocumentQuoteBuilder<'a, linear_document_quote_state::SetDocument<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        LinearDocumentQuoteBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LinearDocumentQuoteBuilder<'a, S>
+where
+    S: linear_document_quote_state::State,
+    S::Quote: linear_document_quote_state::IsUnset,
+{
+    /// Set the `quote` field (required)
+    pub fn quote(
+        mut self,
+        value: impl Into<crate::pub_leaflet::pages::linear_document::Quote<'a>>,
+    ) -> LinearDocumentQuoteBuilder<'a, linear_document_quote_state::SetQuote<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        LinearDocumentQuoteBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LinearDocumentQuoteBuilder<'a, S>
+where
+    S: linear_document_quote_state::State,
+    S::Document: linear_document_quote_state::IsSet,
+    S::Quote: linear_document_quote_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> LinearDocumentQuote<'a> {
+        LinearDocumentQuote {
+            document: self.__unsafe_private_named.0.unwrap(),
+            quote: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> LinearDocumentQuote<'a> {
+        LinearDocumentQuote {
+            document: self.__unsafe_private_named.0.unwrap(),
+            quote: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_pub_leaflet_comment() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -269,33 +408,289 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LinearDocumentQuote<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Comment<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub attachment: Option<crate::pub_leaflet::comment::LinearDocumentQuote<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub facets: Option<Vec<crate::pub_leaflet::richtext::facet::Facet<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub on_page: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
-    #[builder(into)]
     pub plaintext: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub reply: Option<crate::pub_leaflet::comment::ReplyRef<'a>>,
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::AtUri<'a>,
+}
+
+pub mod comment_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Subject;
+        type Plaintext;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Subject = Unset;
+        type Plaintext = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type Subject = Set<members::subject>;
+        type Plaintext = S::Plaintext;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `plaintext` field to Set
+    pub struct SetPlaintext<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPlaintext<S> {}
+    impl<S: State> State for SetPlaintext<S> {
+        type Subject = S::Subject;
+        type Plaintext = Set<members::plaintext>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Subject = S::Subject;
+        type Plaintext = S::Plaintext;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `subject` field
+        pub struct subject(());
+        ///Marker type for the `plaintext` field
+        pub struct plaintext(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct CommentBuilder<'a, S: comment_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<crate::pub_leaflet::comment::LinearDocumentQuote<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<Vec<crate::pub_leaflet::richtext::facet::Facet<'a>>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<crate::pub_leaflet::comment::ReplyRef<'a>>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Comment<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> CommentBuilder<'a, comment_state::Empty> {
+        CommentBuilder::new()
+    }
+}
+
+impl<'a> CommentBuilder<'a, comment_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        CommentBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: comment_state::State> CommentBuilder<'a, S> {
+    /// Set the `attachment` field (optional)
+    pub fn attachment(
+        mut self,
+        value: impl Into<Option<crate::pub_leaflet::comment::LinearDocumentQuote<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `attachment` field to an Option value (optional)
+    pub fn maybe_attachment(
+        mut self,
+        value: Option<crate::pub_leaflet::comment::LinearDocumentQuote<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> CommentBuilder<'a, S>
+where
+    S: comment_state::State,
+    S::CreatedAt: comment_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> CommentBuilder<'a, comment_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        CommentBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: comment_state::State> CommentBuilder<'a, S> {
+    /// Set the `facets` field (optional)
+    pub fn facets(
+        mut self,
+        value: impl Into<Option<Vec<crate::pub_leaflet::richtext::facet::Facet<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `facets` field to an Option value (optional)
+    pub fn maybe_facets(
+        mut self,
+        value: Option<Vec<crate::pub_leaflet::richtext::facet::Facet<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: comment_state::State> CommentBuilder<'a, S> {
+    /// Set the `onPage` field (optional)
+    pub fn on_page(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `onPage` field to an Option value (optional)
+    pub fn maybe_on_page(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S> CommentBuilder<'a, S>
+where
+    S: comment_state::State,
+    S::Plaintext: comment_state::IsUnset,
+{
+    /// Set the `plaintext` field (required)
+    pub fn plaintext(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> CommentBuilder<'a, comment_state::SetPlaintext<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        CommentBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: comment_state::State> CommentBuilder<'a, S> {
+    /// Set the `reply` field (optional)
+    pub fn reply(
+        mut self,
+        value: impl Into<Option<crate::pub_leaflet::comment::ReplyRef<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `reply` field to an Option value (optional)
+    pub fn maybe_reply(
+        mut self,
+        value: Option<crate::pub_leaflet::comment::ReplyRef<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S> CommentBuilder<'a, S>
+where
+    S: comment_state::State,
+    S::Subject: comment_state::IsUnset,
+{
+    /// Set the `subject` field (required)
+    pub fn subject(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> CommentBuilder<'a, comment_state::SetSubject<S>> {
+        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        CommentBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CommentBuilder<'a, S>
+where
+    S: comment_state::State,
+    S::Subject: comment_state::IsSet,
+    S::Plaintext: comment_state::IsSet,
+    S::CreatedAt: comment_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Comment<'a> {
+        Comment {
+            attachment: self.__unsafe_private_named.0,
+            created_at: self.__unsafe_private_named.1.unwrap(),
+            facets: self.__unsafe_private_named.2,
+            on_page: self.__unsafe_private_named.3,
+            plaintext: self.__unsafe_private_named.4.unwrap(),
+            reply: self.__unsafe_private_named.5,
+            subject: self.__unsafe_private_named.6.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Comment<'a> {
+        Comment {
+            attachment: self.__unsafe_private_named.0,
+            created_at: self.__unsafe_private_named.1.unwrap(),
+            facets: self.__unsafe_private_named.2,
+            on_page: self.__unsafe_private_named.3,
+            plaintext: self.__unsafe_private_named.4.unwrap(),
+            reply: self.__unsafe_private_named.5,
+            subject: self.__unsafe_private_named.6.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Comment<'a> {
@@ -384,13 +779,117 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Comment<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ReplyRef<'a> {
     #[serde(borrow)]
     pub parent: jacquard_common::types::string::AtUri<'a>,
+}
+
+pub mod reply_ref_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Parent;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Parent = Unset;
+    }
+    ///State transition - sets the `parent` field to Set
+    pub struct SetParent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetParent<S> {}
+    impl<S: State> State for SetParent<S> {
+        type Parent = Set<members::parent>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `parent` field
+        pub struct parent(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ReplyRefBuilder<'a, S: reply_ref_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ReplyRef<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ReplyRefBuilder<'a, reply_ref_state::Empty> {
+        ReplyRefBuilder::new()
+    }
+}
+
+impl<'a> ReplyRefBuilder<'a, reply_ref_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ReplyRefBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ReplyRefBuilder<'a, S>
+where
+    S: reply_ref_state::State,
+    S::Parent: reply_ref_state::IsUnset,
+{
+    /// Set the `parent` field (required)
+    pub fn parent(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> ReplyRefBuilder<'a, reply_ref_state::SetParent<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ReplyRefBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ReplyRefBuilder<'a, S>
+where
+    S: reply_ref_state::State,
+    S::Parent: reply_ref_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> ReplyRef<'a> {
+        ReplyRef {
+            parent: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> ReplyRef<'a> {
+        ReplyRef {
+            parent: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReplyRef<'a> {

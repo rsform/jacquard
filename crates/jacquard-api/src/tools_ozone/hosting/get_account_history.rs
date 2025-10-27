@@ -441,17 +441,192 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EmailUpdated<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Event<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(borrow)]
-    #[builder(into)]
     pub created_by: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub details: EventDetails<'a>,
+}
+
+pub mod event_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Details;
+        type CreatedBy;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Details = Unset;
+        type CreatedBy = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `details` field to Set
+    pub struct SetDetails<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDetails<S> {}
+    impl<S: State> State for SetDetails<S> {
+        type Details = Set<members::details>;
+        type CreatedBy = S::CreatedBy;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_by` field to Set
+    pub struct SetCreatedBy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedBy<S> {}
+    impl<S: State> State for SetCreatedBy<S> {
+        type Details = S::Details;
+        type CreatedBy = Set<members::created_by>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Details = S::Details;
+        type CreatedBy = S::CreatedBy;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `details` field
+        pub struct details(());
+        ///Marker type for the `created_by` field
+        pub struct created_by(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct EventBuilder<'a, S: event_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<EventDetails<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Event<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> EventBuilder<'a, event_state::Empty> {
+        EventBuilder::new()
+    }
+}
+
+impl<'a> EventBuilder<'a, event_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        EventBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> EventBuilder<'a, S>
+where
+    S: event_state::State,
+    S::CreatedAt: event_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> EventBuilder<'a, event_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        EventBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> EventBuilder<'a, S>
+where
+    S: event_state::State,
+    S::CreatedBy: event_state::IsUnset,
+{
+    /// Set the `createdBy` field (required)
+    pub fn created_by(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> EventBuilder<'a, event_state::SetCreatedBy<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        EventBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> EventBuilder<'a, S>
+where
+    S: event_state::State,
+    S::Details: event_state::IsUnset,
+{
+    /// Set the `details` field (required)
+    pub fn details(
+        mut self,
+        value: impl Into<EventDetails<'a>>,
+    ) -> EventBuilder<'a, event_state::SetDetails<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        EventBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> EventBuilder<'a, S>
+where
+    S: event_state::State,
+    S::Details: event_state::IsSet,
+    S::CreatedBy: event_state::IsSet,
+    S::CreatedAt: event_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Event<'a> {
+        Event {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            created_by: self.__unsafe_private_named.1.unwrap(),
+            details: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Event<'a> {
+        Event {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            created_by: self.__unsafe_private_named.1.unwrap(),
+            details: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -514,13 +689,117 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Event<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct HandleUpdated<'a> {
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
+}
+
+pub mod handle_updated_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Handle;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Handle = Unset;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHandle<S> {}
+    impl<S: State> State for SetHandle<S> {
+        type Handle = Set<members::handle>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `handle` field
+        pub struct handle(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct HandleUpdatedBuilder<'a, S: handle_updated_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Handle<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> HandleUpdated<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> HandleUpdatedBuilder<'a, handle_updated_state::Empty> {
+        HandleUpdatedBuilder::new()
+    }
+}
+
+impl<'a> HandleUpdatedBuilder<'a, handle_updated_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        HandleUpdatedBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> HandleUpdatedBuilder<'a, S>
+where
+    S: handle_updated_state::State,
+    S::Handle: handle_updated_state::IsUnset,
+{
+    /// Set the `handle` field (required)
+    pub fn handle(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Handle<'a>>,
+    ) -> HandleUpdatedBuilder<'a, handle_updated_state::SetHandle<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        HandleUpdatedBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> HandleUpdatedBuilder<'a, S>
+where
+    S: handle_updated_state::State,
+    S::Handle: handle_updated_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> HandleUpdated<'a> {
+        HandleUpdated {
+            handle: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> HandleUpdated<'a> {
+        HandleUpdated {
+            handle: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HandleUpdated<'a> {
@@ -547,15 +826,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HandleUpdated<'a> {
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetAccountHistory<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    #[builder(into)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
@@ -565,6 +841,151 @@ pub struct GetAccountHistory<'a> {
     ///(default: 50, min: 1, max: 100)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub limit: std::option::Option<i64>,
+}
+
+pub mod get_account_history_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Did;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Did = Unset;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Did = Set<members::did>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `did` field
+        pub struct did(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetAccountHistoryBuilder<'a, S: get_account_history_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+        ::core::option::Option<i64>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GetAccountHistory<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GetAccountHistoryBuilder<'a, get_account_history_state::Empty> {
+        GetAccountHistoryBuilder::new()
+    }
+}
+
+impl<'a> GetAccountHistoryBuilder<'a, get_account_history_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetAccountHistoryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: get_account_history_state::State> GetAccountHistoryBuilder<'a, S> {
+    /// Set the `cursor` field (optional)
+    pub fn cursor(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `cursor` field to an Option value (optional)
+    pub fn maybe_cursor(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> GetAccountHistoryBuilder<'a, S>
+where
+    S: get_account_history_state::State,
+    S::Did: get_account_history_state::IsUnset,
+{
+    /// Set the `did` field (required)
+    pub fn did(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> GetAccountHistoryBuilder<'a, get_account_history_state::SetDid<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        GetAccountHistoryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: get_account_history_state::State> GetAccountHistoryBuilder<'a, S> {
+    /// Set the `events` field (optional)
+    pub fn events(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `events` field to an Option value (optional)
+    pub fn maybe_events(
+        mut self,
+        value: Option<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: get_account_history_state::State> GetAccountHistoryBuilder<'a, S> {
+    /// Set the `limit` field (optional)
+    pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `limit` field to an Option value (optional)
+    pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S> GetAccountHistoryBuilder<'a, S>
+where
+    S: get_account_history_state::State,
+    S::Did: get_account_history_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetAccountHistory<'a> {
+        GetAccountHistory {
+            cursor: self.__unsafe_private_named.0,
+            did: self.__unsafe_private_named.1.unwrap(),
+            events: self.__unsafe_private_named.2,
+            limit: self.__unsafe_private_named.3,
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]
@@ -583,7 +1004,7 @@ pub struct GetAccountHistoryOutput<'a> {
     #[serde(borrow)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
-    pub events: Vec<jacquard_common::types::value::Data<'a>>,
+    pub events: Vec<crate::tools_ozone::hosting::get_account_history::Event<'a>>,
 }
 
 /// Response type for

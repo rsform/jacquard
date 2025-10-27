@@ -13,8 +13,7 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CancellationResults<'a> {
@@ -26,6 +25,158 @@ pub struct CancellationResults<'a> {
     /// DIDs for which all pending scheduled actions were successfully cancelled
     #[serde(borrow)]
     pub succeeded: Vec<jacquard_common::types::string::Did<'a>>,
+}
+
+pub mod cancellation_results_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Succeeded;
+        type Failed;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Succeeded = Unset;
+        type Failed = Unset;
+    }
+    ///State transition - sets the `succeeded` field to Set
+    pub struct SetSucceeded<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSucceeded<S> {}
+    impl<S: State> State for SetSucceeded<S> {
+        type Succeeded = Set<members::succeeded>;
+        type Failed = S::Failed;
+    }
+    ///State transition - sets the `failed` field to Set
+    pub struct SetFailed<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFailed<S> {}
+    impl<S: State> State for SetFailed<S> {
+        type Succeeded = S::Succeeded;
+        type Failed = Set<members::failed>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `succeeded` field
+        pub struct succeeded(());
+        ///Marker type for the `failed` field
+        pub struct failed(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct CancellationResultsBuilder<'a, S: cancellation_results_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<
+            Vec<
+                crate::tools_ozone::moderation::cancel_scheduled_actions::FailedCancellation<
+                    'a,
+                >,
+            >,
+        >,
+        ::core::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> CancellationResults<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> CancellationResultsBuilder<'a, cancellation_results_state::Empty> {
+        CancellationResultsBuilder::new()
+    }
+}
+
+impl<'a> CancellationResultsBuilder<'a, cancellation_results_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        CancellationResultsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CancellationResultsBuilder<'a, S>
+where
+    S: cancellation_results_state::State,
+    S::Failed: cancellation_results_state::IsUnset,
+{
+    /// Set the `failed` field (required)
+    pub fn failed(
+        mut self,
+        value: impl Into<
+            Vec<
+                crate::tools_ozone::moderation::cancel_scheduled_actions::FailedCancellation<
+                    'a,
+                >,
+            >,
+        >,
+    ) -> CancellationResultsBuilder<'a, cancellation_results_state::SetFailed<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        CancellationResultsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CancellationResultsBuilder<'a, S>
+where
+    S: cancellation_results_state::State,
+    S::Succeeded: cancellation_results_state::IsUnset,
+{
+    /// Set the `succeeded` field (required)
+    pub fn succeeded(
+        mut self,
+        value: impl Into<Vec<jacquard_common::types::string::Did<'a>>>,
+    ) -> CancellationResultsBuilder<'a, cancellation_results_state::SetSucceeded<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        CancellationResultsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CancellationResultsBuilder<'a, S>
+where
+    S: cancellation_results_state::State,
+    S::Succeeded: cancellation_results_state::IsSet,
+    S::Failed: cancellation_results_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> CancellationResults<'a> {
+        CancellationResults {
+            failed: self.__unsafe_private_named.0.unwrap(),
+            succeeded: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> CancellationResults<'a> {
+        CancellationResults {
+            failed: self.__unsafe_private_named.0.unwrap(),
+            succeeded: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_tools_ozone_moderation_cancelScheduledActions() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -279,20 +430,179 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CancellationResults<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct FailedCancellation<'a> {
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub error: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub error_code: Option<jacquard_common::CowStr<'a>>,
+}
+
+pub mod failed_cancellation_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Did;
+        type Error;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Did = Unset;
+        type Error = Unset;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Did = Set<members::did>;
+        type Error = S::Error;
+    }
+    ///State transition - sets the `error` field to Set
+    pub struct SetError<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetError<S> {}
+    impl<S: State> State for SetError<S> {
+        type Did = S::Did;
+        type Error = Set<members::error>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `error` field
+        pub struct error(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct FailedCancellationBuilder<'a, S: failed_cancellation_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> FailedCancellation<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> FailedCancellationBuilder<'a, failed_cancellation_state::Empty> {
+        FailedCancellationBuilder::new()
+    }
+}
+
+impl<'a> FailedCancellationBuilder<'a, failed_cancellation_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        FailedCancellationBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> FailedCancellationBuilder<'a, S>
+where
+    S: failed_cancellation_state::State,
+    S::Did: failed_cancellation_state::IsUnset,
+{
+    /// Set the `did` field (required)
+    pub fn did(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> FailedCancellationBuilder<'a, failed_cancellation_state::SetDid<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        FailedCancellationBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> FailedCancellationBuilder<'a, S>
+where
+    S: failed_cancellation_state::State,
+    S::Error: failed_cancellation_state::IsUnset,
+{
+    /// Set the `error` field (required)
+    pub fn error(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> FailedCancellationBuilder<'a, failed_cancellation_state::SetError<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        FailedCancellationBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: failed_cancellation_state::State> FailedCancellationBuilder<'a, S> {
+    /// Set the `errorCode` field (optional)
+    pub fn error_code(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `errorCode` field to an Option value (optional)
+    pub fn maybe_error_code(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> FailedCancellationBuilder<'a, S>
+where
+    S: failed_cancellation_state::State,
+    S::Did: failed_cancellation_state::IsSet,
+    S::Error: failed_cancellation_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> FailedCancellation<'a> {
+        FailedCancellation {
+            did: self.__unsafe_private_named.0.unwrap(),
+            error: self.__unsafe_private_named.1.unwrap(),
+            error_code: self.__unsafe_private_named.2,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> FailedCancellation<'a> {
+        FailedCancellation {
+            did: self.__unsafe_private_named.0.unwrap(),
+            error: self.__unsafe_private_named.1.unwrap(),
+            error_code: self.__unsafe_private_named.2,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FailedCancellation<'a> {
@@ -320,27 +630,147 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FailedCancellation<'a> {
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-#[builder(start_fn = new)]
 pub struct CancelScheduledActions<'a> {
     /// Optional comment describing the reason for cancellation
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub comment: Option<jacquard_common::CowStr<'a>>,
     /// Array of DID subjects to cancel scheduled actions for
     #[serde(borrow)]
     pub subjects: Vec<jacquard_common::types::string::Did<'a>>,
-    #[serde(flatten)]
-    #[serde(borrow)]
-    #[builder(default)]
-    pub extra_data: ::std::collections::BTreeMap<
-        ::jacquard_common::smol_str::SmolStr,
-        ::jacquard_common::types::value::Data<'a>,
-    >,
+}
+
+pub mod cancel_scheduled_actions_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Subjects;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Subjects = Unset;
+    }
+    ///State transition - sets the `subjects` field to Set
+    pub struct SetSubjects<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubjects<S> {}
+    impl<S: State> State for SetSubjects<S> {
+        type Subjects = Set<members::subjects>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `subjects` field
+        pub struct subjects(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct CancelScheduledActionsBuilder<'a, S: cancel_scheduled_actions_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> CancelScheduledActions<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> CancelScheduledActionsBuilder<
+        'a,
+        cancel_scheduled_actions_state::Empty,
+    > {
+        CancelScheduledActionsBuilder::new()
+    }
+}
+
+impl<'a> CancelScheduledActionsBuilder<'a, cancel_scheduled_actions_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        CancelScheduledActionsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: cancel_scheduled_actions_state::State> CancelScheduledActionsBuilder<'a, S> {
+    /// Set the `comment` field (optional)
+    pub fn comment(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `comment` field to an Option value (optional)
+    pub fn maybe_comment(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> CancelScheduledActionsBuilder<'a, S>
+where
+    S: cancel_scheduled_actions_state::State,
+    S::Subjects: cancel_scheduled_actions_state::IsUnset,
+{
+    /// Set the `subjects` field (required)
+    pub fn subjects(
+        mut self,
+        value: impl Into<Vec<jacquard_common::types::string::Did<'a>>>,
+    ) -> CancelScheduledActionsBuilder<
+        'a,
+        cancel_scheduled_actions_state::SetSubjects<S>,
+    > {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        CancelScheduledActionsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CancelScheduledActionsBuilder<'a, S>
+where
+    S: cancel_scheduled_actions_state::State,
+    S::Subjects: cancel_scheduled_actions_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> CancelScheduledActions<'a> {
+        CancelScheduledActions {
+            comment: self.__unsafe_private_named.0,
+            subjects: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> CancelScheduledActions<'a> {
+        CancelScheduledActions {
+            comment: self.__unsafe_private_named.0,
+            subjects: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

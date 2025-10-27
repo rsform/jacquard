@@ -14,8 +14,7 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Collection<'a> {
@@ -23,77 +22,573 @@ pub struct Collection<'a> {
     pub acquired_at: jacquard_common::types::string::Datetime,
     /// Common name of the specimen
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub common_name: Option<jacquard_common::CowStr<'a>>,
     /// When the record was created
     pub created_at: jacquard_common::types::string::Datetime,
     /// Taxonomic family
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub family: Option<jacquard_common::CowStr<'a>>,
     /// Taxonomic genus
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub genus: Option<jacquard_common::CowStr<'a>>,
     /// When the record was last modified
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub last_modified: Option<jacquard_common::types::string::Datetime>,
     /// When the specimen was last encountered
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub last_seen: Option<jacquard_common::types::string::Datetime>,
     /// URI of the game.log record that documents the acquisition of this specimen
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub log_record_uri: Option<jacquard_common::CowStr<'a>>,
     /// Number of specimens collected
     pub quantity: i64,
     /// Rarity level of the specimen
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub rarity: Option<jacquard_common::CowStr<'a>>,
     /// Scientific name of the specimen
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub scientific_name: Option<jacquard_common::CowStr<'a>>,
     /// How the specimen was acquired
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub source: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub source_details: Option<
         crate::net_anisota::beta::game::collection::SourceDetails<'a>,
     >,
     /// Taxonomic species
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub species: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub specimen_data: Option<
         crate::net_anisota::beta::game::collection::SpecimenData<'a>,
     >,
     /// Unique identifier for the specimen
     #[serde(borrow)]
-    #[builder(into)]
     pub specimen_id: jacquard_common::CowStr<'a>,
     /// Collection status of this specimen
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub status: Option<jacquard_common::CowStr<'a>>,
+}
+
+pub mod collection_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type SpecimenId;
+        type Quantity;
+        type AcquiredAt;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type SpecimenId = Unset;
+        type Quantity = Unset;
+        type AcquiredAt = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `specimen_id` field to Set
+    pub struct SetSpecimenId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSpecimenId<S> {}
+    impl<S: State> State for SetSpecimenId<S> {
+        type SpecimenId = Set<members::specimen_id>;
+        type Quantity = S::Quantity;
+        type AcquiredAt = S::AcquiredAt;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `quantity` field to Set
+    pub struct SetQuantity<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetQuantity<S> {}
+    impl<S: State> State for SetQuantity<S> {
+        type SpecimenId = S::SpecimenId;
+        type Quantity = Set<members::quantity>;
+        type AcquiredAt = S::AcquiredAt;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `acquired_at` field to Set
+    pub struct SetAcquiredAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAcquiredAt<S> {}
+    impl<S: State> State for SetAcquiredAt<S> {
+        type SpecimenId = S::SpecimenId;
+        type Quantity = S::Quantity;
+        type AcquiredAt = Set<members::acquired_at>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type SpecimenId = S::SpecimenId;
+        type Quantity = S::Quantity;
+        type AcquiredAt = S::AcquiredAt;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `specimen_id` field
+        pub struct specimen_id(());
+        ///Marker type for the `quantity` field
+        pub struct quantity(());
+        ///Marker type for the `acquired_at` field
+        pub struct acquired_at(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct CollectionBuilder<'a, S: collection_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<
+            crate::net_anisota::beta::game::collection::SourceDetails<'a>,
+        >,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<
+            crate::net_anisota::beta::game::collection::SpecimenData<'a>,
+        >,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Collection<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> CollectionBuilder<'a, collection_state::Empty> {
+        CollectionBuilder::new()
+    }
+}
+
+impl<'a> CollectionBuilder<'a, collection_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        CollectionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CollectionBuilder<'a, S>
+where
+    S: collection_state::State,
+    S::AcquiredAt: collection_state::IsUnset,
+{
+    /// Set the `acquiredAt` field (required)
+    pub fn acquired_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> CollectionBuilder<'a, collection_state::SetAcquiredAt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        CollectionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
+    /// Set the `commonName` field (optional)
+    pub fn common_name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `commonName` field to an Option value (optional)
+    pub fn maybe_common_name(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> CollectionBuilder<'a, S>
+where
+    S: collection_state::State,
+    S::CreatedAt: collection_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> CollectionBuilder<'a, collection_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        CollectionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
+    /// Set the `family` field (optional)
+    pub fn family(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `family` field to an Option value (optional)
+    pub fn maybe_family(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
+    /// Set the `genus` field (optional)
+    pub fn genus(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `genus` field to an Option value (optional)
+    pub fn maybe_genus(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
+    /// Set the `lastModified` field (optional)
+    pub fn last_modified(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `lastModified` field to an Option value (optional)
+    pub fn maybe_last_modified(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
+    /// Set the `lastSeen` field (optional)
+    pub fn last_seen(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `lastSeen` field to an Option value (optional)
+    pub fn maybe_last_seen(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
+    /// Set the `logRecordUri` field (optional)
+    pub fn log_record_uri(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value.into();
+        self
+    }
+    /// Set the `logRecordUri` field to an Option value (optional)
+    pub fn maybe_log_record_uri(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value;
+        self
+    }
+}
+
+impl<'a, S> CollectionBuilder<'a, S>
+where
+    S: collection_state::State,
+    S::Quantity: collection_state::IsUnset,
+{
+    /// Set the `quantity` field (required)
+    pub fn quantity(
+        mut self,
+        value: impl Into<i64>,
+    ) -> CollectionBuilder<'a, collection_state::SetQuantity<S>> {
+        self.__unsafe_private_named.8 = ::core::option::Option::Some(value.into());
+        CollectionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
+    /// Set the `rarity` field (optional)
+    pub fn rarity(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.9 = value.into();
+        self
+    }
+    /// Set the `rarity` field to an Option value (optional)
+    pub fn maybe_rarity(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.9 = value;
+        self
+    }
+}
+
+impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
+    /// Set the `scientificName` field (optional)
+    pub fn scientific_name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.10 = value.into();
+        self
+    }
+    /// Set the `scientificName` field to an Option value (optional)
+    pub fn maybe_scientific_name(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.10 = value;
+        self
+    }
+}
+
+impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
+    /// Set the `source` field (optional)
+    pub fn source(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.11 = value.into();
+        self
+    }
+    /// Set the `source` field to an Option value (optional)
+    pub fn maybe_source(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.11 = value;
+        self
+    }
+}
+
+impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
+    /// Set the `sourceDetails` field (optional)
+    pub fn source_details(
+        mut self,
+        value: impl Into<
+            Option<crate::net_anisota::beta::game::collection::SourceDetails<'a>>,
+        >,
+    ) -> Self {
+        self.__unsafe_private_named.12 = value.into();
+        self
+    }
+    /// Set the `sourceDetails` field to an Option value (optional)
+    pub fn maybe_source_details(
+        mut self,
+        value: Option<crate::net_anisota::beta::game::collection::SourceDetails<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.12 = value;
+        self
+    }
+}
+
+impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
+    /// Set the `species` field (optional)
+    pub fn species(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.13 = value.into();
+        self
+    }
+    /// Set the `species` field to an Option value (optional)
+    pub fn maybe_species(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.13 = value;
+        self
+    }
+}
+
+impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
+    /// Set the `specimenData` field (optional)
+    pub fn specimen_data(
+        mut self,
+        value: impl Into<
+            Option<crate::net_anisota::beta::game::collection::SpecimenData<'a>>,
+        >,
+    ) -> Self {
+        self.__unsafe_private_named.14 = value.into();
+        self
+    }
+    /// Set the `specimenData` field to an Option value (optional)
+    pub fn maybe_specimen_data(
+        mut self,
+        value: Option<crate::net_anisota::beta::game::collection::SpecimenData<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.14 = value;
+        self
+    }
+}
+
+impl<'a, S> CollectionBuilder<'a, S>
+where
+    S: collection_state::State,
+    S::SpecimenId: collection_state::IsUnset,
+{
+    /// Set the `specimenId` field (required)
+    pub fn specimen_id(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> CollectionBuilder<'a, collection_state::SetSpecimenId<S>> {
+        self.__unsafe_private_named.15 = ::core::option::Option::Some(value.into());
+        CollectionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
+    /// Set the `status` field (optional)
+    pub fn status(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.16 = value.into();
+        self
+    }
+    /// Set the `status` field to an Option value (optional)
+    pub fn maybe_status(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.16 = value;
+        self
+    }
+}
+
+impl<'a, S> CollectionBuilder<'a, S>
+where
+    S: collection_state::State,
+    S::SpecimenId: collection_state::IsSet,
+    S::Quantity: collection_state::IsSet,
+    S::AcquiredAt: collection_state::IsSet,
+    S::CreatedAt: collection_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Collection<'a> {
+        Collection {
+            acquired_at: self.__unsafe_private_named.0.unwrap(),
+            common_name: self.__unsafe_private_named.1,
+            created_at: self.__unsafe_private_named.2.unwrap(),
+            family: self.__unsafe_private_named.3,
+            genus: self.__unsafe_private_named.4,
+            last_modified: self.__unsafe_private_named.5,
+            last_seen: self.__unsafe_private_named.6,
+            log_record_uri: self.__unsafe_private_named.7,
+            quantity: self.__unsafe_private_named.8.unwrap(),
+            rarity: self.__unsafe_private_named.9,
+            scientific_name: self.__unsafe_private_named.10,
+            source: self.__unsafe_private_named.11,
+            source_details: self.__unsafe_private_named.12,
+            species: self.__unsafe_private_named.13,
+            specimen_data: self.__unsafe_private_named.14,
+            specimen_id: self.__unsafe_private_named.15.unwrap(),
+            status: self.__unsafe_private_named.16,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Collection<'a> {
+        Collection {
+            acquired_at: self.__unsafe_private_named.0.unwrap(),
+            common_name: self.__unsafe_private_named.1,
+            created_at: self.__unsafe_private_named.2.unwrap(),
+            family: self.__unsafe_private_named.3,
+            genus: self.__unsafe_private_named.4,
+            last_modified: self.__unsafe_private_named.5,
+            last_seen: self.__unsafe_private_named.6,
+            log_record_uri: self.__unsafe_private_named.7,
+            quantity: self.__unsafe_private_named.8.unwrap(),
+            rarity: self.__unsafe_private_named.9,
+            scientific_name: self.__unsafe_private_named.10,
+            source: self.__unsafe_private_named.11,
+            source_details: self.__unsafe_private_named.12,
+            species: self.__unsafe_private_named.13,
+            specimen_data: self.__unsafe_private_named.14,
+            specimen_id: self.__unsafe_private_named.15.unwrap(),
+            status: self.__unsafe_private_named.16,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Collection<'a> {

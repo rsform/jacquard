@@ -12,15 +12,12 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct QueryLabels<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    #[builder(into)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     ///(default: 50, min: 1, max: 250)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -30,6 +27,151 @@ pub struct QueryLabels<'a> {
     pub sources: std::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
     #[serde(borrow)]
     pub uri_patterns: Vec<jacquard_common::CowStr<'a>>,
+}
+
+pub mod query_labels_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type UriPatterns;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type UriPatterns = Unset;
+    }
+    ///State transition - sets the `uri_patterns` field to Set
+    pub struct SetUriPatterns<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUriPatterns<S> {}
+    impl<S: State> State for SetUriPatterns<S> {
+        type UriPatterns = Set<members::uri_patterns>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `uri_patterns` field
+        pub struct uri_patterns(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct QueryLabelsBuilder<'a, S: query_labels_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
+        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> QueryLabels<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> QueryLabelsBuilder<'a, query_labels_state::Empty> {
+        QueryLabelsBuilder::new()
+    }
+}
+
+impl<'a> QueryLabelsBuilder<'a, query_labels_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        QueryLabelsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: query_labels_state::State> QueryLabelsBuilder<'a, S> {
+    /// Set the `cursor` field (optional)
+    pub fn cursor(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `cursor` field to an Option value (optional)
+    pub fn maybe_cursor(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: query_labels_state::State> QueryLabelsBuilder<'a, S> {
+    /// Set the `limit` field (optional)
+    pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `limit` field to an Option value (optional)
+    pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: query_labels_state::State> QueryLabelsBuilder<'a, S> {
+    /// Set the `sources` field (optional)
+    pub fn sources(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::types::string::Did<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `sources` field to an Option value (optional)
+    pub fn maybe_sources(
+        mut self,
+        value: Option<Vec<jacquard_common::types::string::Did<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> QueryLabelsBuilder<'a, S>
+where
+    S: query_labels_state::State,
+    S::UriPatterns: query_labels_state::IsUnset,
+{
+    /// Set the `uriPatterns` field (required)
+    pub fn uri_patterns(
+        mut self,
+        value: impl Into<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> QueryLabelsBuilder<'a, query_labels_state::SetUriPatterns<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        QueryLabelsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> QueryLabelsBuilder<'a, S>
+where
+    S: query_labels_state::State,
+    S::UriPatterns: query_labels_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> QueryLabels<'a> {
+        QueryLabels {
+            cursor: self.__unsafe_private_named.0,
+            limit: self.__unsafe_private_named.1,
+            sources: self.__unsafe_private_named.2,
+            uri_patterns: self.__unsafe_private_named.3.unwrap(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

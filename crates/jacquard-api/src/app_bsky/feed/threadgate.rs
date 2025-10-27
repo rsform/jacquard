@@ -294,13 +294,117 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FollowingRule<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListRule<'a> {
     #[serde(borrow)]
     pub list: jacquard_common::types::string::AtUri<'a>,
+}
+
+pub mod list_rule_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type List;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type List = Unset;
+    }
+    ///State transition - sets the `list` field to Set
+    pub struct SetList<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetList<S> {}
+    impl<S: State> State for SetList<S> {
+        type List = Set<members::list>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `list` field
+        pub struct list(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ListRuleBuilder<'a, S: list_rule_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ListRule<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ListRuleBuilder<'a, list_rule_state::Empty> {
+        ListRuleBuilder::new()
+    }
+}
+
+impl<'a> ListRuleBuilder<'a, list_rule_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ListRuleBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ListRuleBuilder<'a, S>
+where
+    S: list_rule_state::State,
+    S::List: list_rule_state::IsUnset,
+{
+    /// Set the `list` field (required)
+    pub fn list(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> ListRuleBuilder<'a, list_rule_state::SetList<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ListRuleBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ListRuleBuilder<'a, S>
+where
+    S: list_rule_state::State,
+    S::List: list_rule_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> ListRule<'a> {
+        ListRule {
+            list: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> ListRule<'a> {
+        ListRule {
+            list: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListRule<'a> {
@@ -329,25 +433,203 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListRule<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Threadgate<'a> {
     /// List of rules defining who can reply to this post. If value is an empty array, no one can reply. If value is undefined, anyone can reply.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub allow: Option<Vec<ThreadgateAllowItem<'a>>>,
     pub created_at: jacquard_common::types::string::Datetime,
     /// List of hidden reply URIs.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub hidden_replies: Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
     /// Reference (AT-URI) to the post record.
     #[serde(borrow)]
     pub post: jacquard_common::types::string::AtUri<'a>,
+}
+
+pub mod threadgate_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Post;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Post = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `post` field to Set
+    pub struct SetPost<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPost<S> {}
+    impl<S: State> State for SetPost<S> {
+        type Post = Set<members::post>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Post = S::Post;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `post` field
+        pub struct post(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ThreadgateBuilder<'a, S: threadgate_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<Vec<ThreadgateAllowItem<'a>>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Threadgate<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ThreadgateBuilder<'a, threadgate_state::Empty> {
+        ThreadgateBuilder::new()
+    }
+}
+
+impl<'a> ThreadgateBuilder<'a, threadgate_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ThreadgateBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: threadgate_state::State> ThreadgateBuilder<'a, S> {
+    /// Set the `allow` field (optional)
+    pub fn allow(
+        mut self,
+        value: impl Into<Option<Vec<ThreadgateAllowItem<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `allow` field to an Option value (optional)
+    pub fn maybe_allow(mut self, value: Option<Vec<ThreadgateAllowItem<'a>>>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> ThreadgateBuilder<'a, S>
+where
+    S: threadgate_state::State,
+    S::CreatedAt: threadgate_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> ThreadgateBuilder<'a, threadgate_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        ThreadgateBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: threadgate_state::State> ThreadgateBuilder<'a, S> {
+    /// Set the `hiddenReplies` field (optional)
+    pub fn hidden_replies(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::types::string::AtUri<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `hiddenReplies` field to an Option value (optional)
+    pub fn maybe_hidden_replies(
+        mut self,
+        value: Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> ThreadgateBuilder<'a, S>
+where
+    S: threadgate_state::State,
+    S::Post: threadgate_state::IsUnset,
+{
+    /// Set the `post` field (required)
+    pub fn post(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> ThreadgateBuilder<'a, threadgate_state::SetPost<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        ThreadgateBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ThreadgateBuilder<'a, S>
+where
+    S: threadgate_state::State,
+    S::Post: threadgate_state::IsSet,
+    S::CreatedAt: threadgate_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Threadgate<'a> {
+        Threadgate {
+            allow: self.__unsafe_private_named.0,
+            created_at: self.__unsafe_private_named.1.unwrap(),
+            hidden_replies: self.__unsafe_private_named.2,
+            post: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Threadgate<'a> {
+        Threadgate {
+            allow: self.__unsafe_private_named.0,
+            created_at: self.__unsafe_private_named.1.unwrap(),
+            hidden_replies: self.__unsafe_private_named.2,
+            post: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Threadgate<'a> {

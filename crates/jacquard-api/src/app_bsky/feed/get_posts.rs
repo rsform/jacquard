@@ -12,14 +12,103 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetPosts<'a> {
     #[serde(borrow)]
     pub uris: Vec<jacquard_common::types::string::AtUri<'a>>,
+}
+
+pub mod get_posts_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Uris;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Uris = Unset;
+    }
+    ///State transition - sets the `uris` field to Set
+    pub struct SetUris<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUris<S> {}
+    impl<S: State> State for SetUris<S> {
+        type Uris = Set<members::uris>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `uris` field
+        pub struct uris(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetPostsBuilder<'a, S: get_posts_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GetPosts<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GetPostsBuilder<'a, get_posts_state::Empty> {
+        GetPostsBuilder::new()
+    }
+}
+
+impl<'a> GetPostsBuilder<'a, get_posts_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetPostsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetPostsBuilder<'a, S>
+where
+    S: get_posts_state::State,
+    S::Uris: get_posts_state::IsUnset,
+{
+    /// Set the `uris` field (required)
+    pub fn uris(
+        mut self,
+        value: impl Into<Vec<jacquard_common::types::string::AtUri<'a>>>,
+    ) -> GetPostsBuilder<'a, get_posts_state::SetUris<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        GetPostsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetPostsBuilder<'a, S>
+where
+    S: get_posts_state::State,
+    S::Uris: get_posts_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetPosts<'a> {
+        GetPosts {
+            uris: self.__unsafe_private_named.0.unwrap(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

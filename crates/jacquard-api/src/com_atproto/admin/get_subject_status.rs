@@ -12,10 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetSubjectStatus<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -27,6 +25,125 @@ pub struct GetSubjectStatus<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+}
+
+pub mod get_subject_status_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {}
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {}
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {}
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetSubjectStatusBuilder<'a, S: get_subject_status_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GetSubjectStatus<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GetSubjectStatusBuilder<'a, get_subject_status_state::Empty> {
+        GetSubjectStatusBuilder::new()
+    }
+}
+
+impl<'a> GetSubjectStatusBuilder<'a, get_subject_status_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetSubjectStatusBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: get_subject_status_state::State> GetSubjectStatusBuilder<'a, S> {
+    /// Set the `blob` field (optional)
+    pub fn blob(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Cid<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `blob` field to an Option value (optional)
+    pub fn maybe_blob(
+        mut self,
+        value: Option<jacquard_common::types::string::Cid<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: get_subject_status_state::State> GetSubjectStatusBuilder<'a, S> {
+    /// Set the `did` field (optional)
+    pub fn did(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Did<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `did` field to an Option value (optional)
+    pub fn maybe_did(
+        mut self,
+        value: Option<jacquard_common::types::string::Did<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: get_subject_status_state::State> GetSubjectStatusBuilder<'a, S> {
+    /// Set the `uri` field (optional)
+    pub fn uri(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::AtUri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `uri` field to an Option value (optional)
+    pub fn maybe_uri(
+        mut self,
+        value: Option<jacquard_common::types::string::AtUri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> GetSubjectStatusBuilder<'a, S>
+where
+    S: get_subject_status_state::State,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetSubjectStatus<'a> {
+        GetSubjectStatus {
+            blob: self.__unsafe_private_named.0,
+            did: self.__unsafe_private_named.1,
+            uri: self.__unsafe_private_named.2,
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

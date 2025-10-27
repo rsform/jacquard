@@ -68,8 +68,7 @@ impl std::fmt::Display for Inperson {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Event<'a> {
@@ -77,41 +76,337 @@ pub struct Event<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     /// The description of the event.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub description: Option<jacquard_common::CowStr<'a>>,
     /// Client-declared timestamp when the event ends.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub ends_at: Option<jacquard_common::types::string::Datetime>,
     /// The locations where the event takes place.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub locations: Option<Vec<EventLocationsItem<'a>>>,
     /// The attendance mode of the event.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub mode: Option<crate::community_lexicon::calendar::event::Mode<'a>>,
     /// The name of the event.
     #[serde(borrow)]
-    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
     /// Client-declared timestamp when the event starts.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub starts_at: Option<jacquard_common::types::string::Datetime>,
     /// The status of the event.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub status: Option<crate::community_lexicon::calendar::event::Status<'a>>,
     /// URIs associated with the event.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub uris: Option<Vec<crate::community_lexicon::calendar::event::Uri<'a>>>,
+}
+
+pub mod event_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type CreatedAt;
+        type Name;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type CreatedAt = Unset;
+        type Name = Unset;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type CreatedAt = S::CreatedAt;
+        type Name = Set<members::name>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `name` field
+        pub struct name(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct EventBuilder<'a, S: event_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<Vec<EventLocationsItem<'a>>>,
+        ::core::option::Option<crate::community_lexicon::calendar::event::Mode<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<crate::community_lexicon::calendar::event::Status<'a>>,
+        ::core::option::Option<Vec<crate::community_lexicon::calendar::event::Uri<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Event<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> EventBuilder<'a, event_state::Empty> {
+        EventBuilder::new()
+    }
+}
+
+impl<'a> EventBuilder<'a, event_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        EventBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> EventBuilder<'a, S>
+where
+    S: event_state::State,
+    S::CreatedAt: event_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> EventBuilder<'a, event_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        EventBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `description` field (optional)
+    pub fn description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `description` field to an Option value (optional)
+    pub fn maybe_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `endsAt` field (optional)
+    pub fn ends_at(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `endsAt` field to an Option value (optional)
+    pub fn maybe_ends_at(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `locations` field (optional)
+    pub fn locations(
+        mut self,
+        value: impl Into<Option<Vec<EventLocationsItem<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `locations` field to an Option value (optional)
+    pub fn maybe_locations(
+        mut self,
+        value: Option<Vec<EventLocationsItem<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `mode` field (optional)
+    pub fn mode(
+        mut self,
+        value: impl Into<Option<crate::community_lexicon::calendar::event::Mode<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `mode` field to an Option value (optional)
+    pub fn maybe_mode(
+        mut self,
+        value: Option<crate::community_lexicon::calendar::event::Mode<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S> EventBuilder<'a, S>
+where
+    S: event_state::State,
+    S::Name: event_state::IsUnset,
+{
+    /// Set the `name` field (required)
+    pub fn name(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> EventBuilder<'a, event_state::SetName<S>> {
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        EventBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `startsAt` field (optional)
+    pub fn starts_at(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `startsAt` field to an Option value (optional)
+    pub fn maybe_starts_at(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `status` field (optional)
+    pub fn status(
+        mut self,
+        value: impl Into<Option<crate::community_lexicon::calendar::event::Status<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value.into();
+        self
+    }
+    /// Set the `status` field to an Option value (optional)
+    pub fn maybe_status(
+        mut self,
+        value: Option<crate::community_lexicon::calendar::event::Status<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `uris` field (optional)
+    pub fn uris(
+        mut self,
+        value: impl Into<Option<Vec<crate::community_lexicon::calendar::event::Uri<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value.into();
+        self
+    }
+    /// Set the `uris` field to an Option value (optional)
+    pub fn maybe_uris(
+        mut self,
+        value: Option<Vec<crate::community_lexicon::calendar::event::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value;
+        self
+    }
+}
+
+impl<'a, S> EventBuilder<'a, S>
+where
+    S: event_state::State,
+    S::CreatedAt: event_state::IsSet,
+    S::Name: event_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Event<'a> {
+        Event {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            description: self.__unsafe_private_named.1,
+            ends_at: self.__unsafe_private_named.2,
+            locations: self.__unsafe_private_named.3,
+            mode: self.__unsafe_private_named.4,
+            name: self.__unsafe_private_named.5.unwrap(),
+            starts_at: self.__unsafe_private_named.6,
+            status: self.__unsafe_private_named.7,
+            uris: self.__unsafe_private_named.8,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Event<'a> {
+        Event {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            description: self.__unsafe_private_named.1,
+            ends_at: self.__unsafe_private_named.2,
+            locations: self.__unsafe_private_named.3,
+            mode: self.__unsafe_private_named.4,
+            name: self.__unsafe_private_named.5.unwrap(),
+            starts_at: self.__unsafe_private_named.6,
+            status: self.__unsafe_private_named.7,
+            uris: self.__unsafe_private_named.8,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Event<'a> {
@@ -880,18 +1175,140 @@ impl jacquard_common::IntoStatic for Status<'_> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Uri<'a> {
     /// The display name of the URI.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub name: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::Uri<'a>,
+}
+
+pub mod uri_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Uri;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Uri = Unset;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Uri = Set<members::uri>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `uri` field
+        pub struct uri(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct UriBuilder<'a, S: uri_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Uri<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> UriBuilder<'a, uri_state::Empty> {
+        UriBuilder::new()
+    }
+}
+
+impl<'a> UriBuilder<'a, uri_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        UriBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: uri_state::State> UriBuilder<'a, S> {
+    /// Set the `name` field (optional)
+    pub fn name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `name` field to an Option value (optional)
+    pub fn maybe_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> UriBuilder<'a, S>
+where
+    S: uri_state::State,
+    S::Uri: uri_state::IsUnset,
+{
+    /// Set the `uri` field (required)
+    pub fn uri(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+    ) -> UriBuilder<'a, uri_state::SetUri<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        UriBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> UriBuilder<'a, S>
+where
+    S: uri_state::State,
+    S::Uri: uri_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Uri<'a> {
+        Uri {
+            name: self.__unsafe_private_named.0,
+            uri: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Uri<'a> {
+        Uri {
+            name: self.__unsafe_private_named.0,
+            uri: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Uri<'a> {

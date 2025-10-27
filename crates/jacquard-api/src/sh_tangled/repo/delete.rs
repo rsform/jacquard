@@ -13,30 +13,196 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-#[builder(start_fn = new)]
 pub struct Delete<'a> {
     /// DID of the repository owner
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     /// Name of the repository to delete
     #[serde(borrow)]
-    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
     /// Rkey of the repository record
     #[serde(borrow)]
-    #[builder(into)]
     pub rkey: jacquard_common::CowStr<'a>,
-    #[serde(flatten)]
-    #[serde(borrow)]
-    #[builder(default)]
-    pub extra_data: ::std::collections::BTreeMap<
-        ::jacquard_common::smol_str::SmolStr,
-        ::jacquard_common::types::value::Data<'a>,
-    >,
+}
+
+pub mod delete_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Did;
+        type Name;
+        type Rkey;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Did = Unset;
+        type Name = Unset;
+        type Rkey = Unset;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Did = Set<members::did>;
+        type Name = S::Name;
+        type Rkey = S::Rkey;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Did = S::Did;
+        type Name = Set<members::name>;
+        type Rkey = S::Rkey;
+    }
+    ///State transition - sets the `rkey` field to Set
+    pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRkey<S> {}
+    impl<S: State> State for SetRkey<S> {
+        type Did = S::Did;
+        type Name = S::Name;
+        type Rkey = Set<members::rkey>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `rkey` field
+        pub struct rkey(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct DeleteBuilder<'a, S: delete_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Delete<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> DeleteBuilder<'a, delete_state::Empty> {
+        DeleteBuilder::new()
+    }
+}
+
+impl<'a> DeleteBuilder<'a, delete_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        DeleteBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DeleteBuilder<'a, S>
+where
+    S: delete_state::State,
+    S::Did: delete_state::IsUnset,
+{
+    /// Set the `did` field (required)
+    pub fn did(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> DeleteBuilder<'a, delete_state::SetDid<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        DeleteBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DeleteBuilder<'a, S>
+where
+    S: delete_state::State,
+    S::Name: delete_state::IsUnset,
+{
+    /// Set the `name` field (required)
+    pub fn name(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> DeleteBuilder<'a, delete_state::SetName<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        DeleteBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DeleteBuilder<'a, S>
+where
+    S: delete_state::State,
+    S::Rkey: delete_state::IsUnset,
+{
+    /// Set the `rkey` field (required)
+    pub fn rkey(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> DeleteBuilder<'a, delete_state::SetRkey<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        DeleteBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DeleteBuilder<'a, S>
+where
+    S: delete_state::State,
+    S::Did: delete_state::IsSet,
+    S::Name: delete_state::IsSet,
+    S::Rkey: delete_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Delete<'a> {
+        Delete {
+            did: self.__unsafe_private_named.0.unwrap(),
+            name: self.__unsafe_private_named.1.unwrap(),
+            rkey: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Delete<'a> {
+        Delete {
+            did: self.__unsafe_private_named.0.unwrap(),
+            name: self.__unsafe_private_named.1.unwrap(),
+            rkey: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 /// Response type for

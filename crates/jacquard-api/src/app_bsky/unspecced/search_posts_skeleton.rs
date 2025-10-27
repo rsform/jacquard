@@ -12,10 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct SearchPostsSkeleton<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -23,11 +21,9 @@ pub struct SearchPostsSkeleton<'a> {
     pub author: std::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    #[builder(into)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    #[builder(into)]
     pub domain: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub lang: std::option::Option<jacquard_common::types::string::Language>,
@@ -38,23 +34,19 @@ pub struct SearchPostsSkeleton<'a> {
     #[serde(borrow)]
     pub mentions: std::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
     #[serde(borrow)]
-    #[builder(into)]
     pub q: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    #[builder(into)]
     pub since: std::option::Option<jacquard_common::CowStr<'a>>,
     ///(default: "latest")
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    #[builder(into)]
     pub sort: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub tag: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    #[builder(into)]
     pub until: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -62,6 +54,339 @@ pub struct SearchPostsSkeleton<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub viewer: std::option::Option<jacquard_common::types::string::Did<'a>>,
+}
+
+pub mod search_posts_skeleton_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Q;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Q = Unset;
+    }
+    ///State transition - sets the `q` field to Set
+    pub struct SetQ<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetQ<S> {}
+    impl<S: State> State for SetQ<S> {
+        type Q = Set<members::q>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `q` field
+        pub struct q(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct SearchPostsSkeletonBuilder<'a, S: search_posts_skeleton_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Language>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> SearchPostsSkeleton<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> SearchPostsSkeletonBuilder<'a, search_posts_skeleton_state::Empty> {
+        SearchPostsSkeletonBuilder::new()
+    }
+}
+
+impl<'a> SearchPostsSkeletonBuilder<'a, search_posts_skeleton_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        SearchPostsSkeletonBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: search_posts_skeleton_state::State> SearchPostsSkeletonBuilder<'a, S> {
+    /// Set the `author` field (optional)
+    pub fn author(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::ident::AtIdentifier<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `author` field to an Option value (optional)
+    pub fn maybe_author(
+        mut self,
+        value: Option<jacquard_common::types::ident::AtIdentifier<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: search_posts_skeleton_state::State> SearchPostsSkeletonBuilder<'a, S> {
+    /// Set the `cursor` field (optional)
+    pub fn cursor(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `cursor` field to an Option value (optional)
+    pub fn maybe_cursor(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: search_posts_skeleton_state::State> SearchPostsSkeletonBuilder<'a, S> {
+    /// Set the `domain` field (optional)
+    pub fn domain(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `domain` field to an Option value (optional)
+    pub fn maybe_domain(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: search_posts_skeleton_state::State> SearchPostsSkeletonBuilder<'a, S> {
+    /// Set the `lang` field (optional)
+    pub fn lang(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Language>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `lang` field to an Option value (optional)
+    pub fn maybe_lang(
+        mut self,
+        value: Option<jacquard_common::types::string::Language>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: search_posts_skeleton_state::State> SearchPostsSkeletonBuilder<'a, S> {
+    /// Set the `limit` field (optional)
+    pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `limit` field to an Option value (optional)
+    pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: search_posts_skeleton_state::State> SearchPostsSkeletonBuilder<'a, S> {
+    /// Set the `mentions` field (optional)
+    pub fn mentions(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::ident::AtIdentifier<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `mentions` field to an Option value (optional)
+    pub fn maybe_mentions(
+        mut self,
+        value: Option<jacquard_common::types::ident::AtIdentifier<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S> SearchPostsSkeletonBuilder<'a, S>
+where
+    S: search_posts_skeleton_state::State,
+    S::Q: search_posts_skeleton_state::IsUnset,
+{
+    /// Set the `q` field (required)
+    pub fn q(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> SearchPostsSkeletonBuilder<'a, search_posts_skeleton_state::SetQ<S>> {
+        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        SearchPostsSkeletonBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: search_posts_skeleton_state::State> SearchPostsSkeletonBuilder<'a, S> {
+    /// Set the `since` field (optional)
+    pub fn since(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value.into();
+        self
+    }
+    /// Set the `since` field to an Option value (optional)
+    pub fn maybe_since(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.7 = value;
+        self
+    }
+}
+
+impl<'a, S: search_posts_skeleton_state::State> SearchPostsSkeletonBuilder<'a, S> {
+    /// Set the `sort` field (optional)
+    pub fn sort(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value.into();
+        self
+    }
+    /// Set the `sort` field to an Option value (optional)
+    pub fn maybe_sort(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.8 = value;
+        self
+    }
+}
+
+impl<'a, S: search_posts_skeleton_state::State> SearchPostsSkeletonBuilder<'a, S> {
+    /// Set the `tag` field (optional)
+    pub fn tag(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.9 = value.into();
+        self
+    }
+    /// Set the `tag` field to an Option value (optional)
+    pub fn maybe_tag(mut self, value: Option<Vec<jacquard_common::CowStr<'a>>>) -> Self {
+        self.__unsafe_private_named.9 = value;
+        self
+    }
+}
+
+impl<'a, S: search_posts_skeleton_state::State> SearchPostsSkeletonBuilder<'a, S> {
+    /// Set the `until` field (optional)
+    pub fn until(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.10 = value.into();
+        self
+    }
+    /// Set the `until` field to an Option value (optional)
+    pub fn maybe_until(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.10 = value;
+        self
+    }
+}
+
+impl<'a, S: search_posts_skeleton_state::State> SearchPostsSkeletonBuilder<'a, S> {
+    /// Set the `url` field (optional)
+    pub fn url(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.11 = value.into();
+        self
+    }
+    /// Set the `url` field to an Option value (optional)
+    pub fn maybe_url(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.11 = value;
+        self
+    }
+}
+
+impl<'a, S: search_posts_skeleton_state::State> SearchPostsSkeletonBuilder<'a, S> {
+    /// Set the `viewer` field (optional)
+    pub fn viewer(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Did<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.12 = value.into();
+        self
+    }
+    /// Set the `viewer` field to an Option value (optional)
+    pub fn maybe_viewer(
+        mut self,
+        value: Option<jacquard_common::types::string::Did<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.12 = value;
+        self
+    }
+}
+
+impl<'a, S> SearchPostsSkeletonBuilder<'a, S>
+where
+    S: search_posts_skeleton_state::State,
+    S::Q: search_posts_skeleton_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> SearchPostsSkeleton<'a> {
+        SearchPostsSkeleton {
+            author: self.__unsafe_private_named.0,
+            cursor: self.__unsafe_private_named.1,
+            domain: self.__unsafe_private_named.2,
+            lang: self.__unsafe_private_named.3,
+            limit: self.__unsafe_private_named.4,
+            mentions: self.__unsafe_private_named.5,
+            q: self.__unsafe_private_named.6.unwrap(),
+            since: self.__unsafe_private_named.7,
+            sort: self.__unsafe_private_named.8,
+            tag: self.__unsafe_private_named.9,
+            until: self.__unsafe_private_named.10,
+            url: self.__unsafe_private_named.11,
+            viewer: self.__unsafe_private_named.12,
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

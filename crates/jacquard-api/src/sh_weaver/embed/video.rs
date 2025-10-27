@@ -13,14 +13,153 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Caption<'a> {
     #[serde(borrow)]
     pub file: jacquard_common::types::blob::BlobRef<'a>,
     pub lang: jacquard_common::types::string::Language,
+}
+
+pub mod caption_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Lang;
+        type File;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Lang = Unset;
+        type File = Unset;
+    }
+    ///State transition - sets the `lang` field to Set
+    pub struct SetLang<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLang<S> {}
+    impl<S: State> State for SetLang<S> {
+        type Lang = Set<members::lang>;
+        type File = S::File;
+    }
+    ///State transition - sets the `file` field to Set
+    pub struct SetFile<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFile<S> {}
+    impl<S: State> State for SetFile<S> {
+        type Lang = S::Lang;
+        type File = Set<members::file>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `lang` field
+        pub struct lang(());
+        ///Marker type for the `file` field
+        pub struct file(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct CaptionBuilder<'a, S: caption_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Language>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Caption<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> CaptionBuilder<'a, caption_state::Empty> {
+        CaptionBuilder::new()
+    }
+}
+
+impl<'a> CaptionBuilder<'a, caption_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        CaptionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CaptionBuilder<'a, S>
+where
+    S: caption_state::State,
+    S::File: caption_state::IsUnset,
+{
+    /// Set the `file` field (required)
+    pub fn file(
+        mut self,
+        value: impl Into<jacquard_common::types::blob::BlobRef<'a>>,
+    ) -> CaptionBuilder<'a, caption_state::SetFile<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        CaptionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CaptionBuilder<'a, S>
+where
+    S: caption_state::State,
+    S::Lang: caption_state::IsUnset,
+{
+    /// Set the `lang` field (required)
+    pub fn lang(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Language>,
+    ) -> CaptionBuilder<'a, caption_state::SetLang<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        CaptionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> CaptionBuilder<'a, S>
+where
+    S: caption_state::State,
+    S::Lang: caption_state::IsSet,
+    S::File: caption_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Caption<'a> {
+        Caption {
+            file: self.__unsafe_private_named.0.unwrap(),
+            lang: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Caption<'a> {
+        Caption {
+            file: self.__unsafe_private_named.0.unwrap(),
+            lang: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_sh_weaver_embed_video() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -268,27 +407,188 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Caption<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Video<'a> {
     /// Alt text description of the video, for accessibility.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub alt: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub aspect_ratio: Option<crate::app_bsky::embed::AspectRatio<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub captions: Option<Vec<crate::sh_weaver::embed::video::Caption<'a>>>,
     /// The mp4 video file. May be up to 100mb, formerly limited to 50mb.
     #[serde(borrow)]
     pub video: jacquard_common::types::blob::BlobRef<'a>,
+}
+
+pub mod video_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Video;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Video = Unset;
+    }
+    ///State transition - sets the `video` field to Set
+    pub struct SetVideo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVideo<S> {}
+    impl<S: State> State for SetVideo<S> {
+        type Video = Set<members::video>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `video` field
+        pub struct video(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct VideoBuilder<'a, S: video_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<crate::app_bsky::embed::AspectRatio<'a>>,
+        ::core::option::Option<Vec<crate::sh_weaver::embed::video::Caption<'a>>>,
+        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Video<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> VideoBuilder<'a, video_state::Empty> {
+        VideoBuilder::new()
+    }
+}
+
+impl<'a> VideoBuilder<'a, video_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        VideoBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: video_state::State> VideoBuilder<'a, S> {
+    /// Set the `alt` field (optional)
+    pub fn alt(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `alt` field to an Option value (optional)
+    pub fn maybe_alt(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: video_state::State> VideoBuilder<'a, S> {
+    /// Set the `aspectRatio` field (optional)
+    pub fn aspect_ratio(
+        mut self,
+        value: impl Into<Option<crate::app_bsky::embed::AspectRatio<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `aspectRatio` field to an Option value (optional)
+    pub fn maybe_aspect_ratio(
+        mut self,
+        value: Option<crate::app_bsky::embed::AspectRatio<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: video_state::State> VideoBuilder<'a, S> {
+    /// Set the `captions` field (optional)
+    pub fn captions(
+        mut self,
+        value: impl Into<Option<Vec<crate::sh_weaver::embed::video::Caption<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `captions` field to an Option value (optional)
+    pub fn maybe_captions(
+        mut self,
+        value: Option<Vec<crate::sh_weaver::embed::video::Caption<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> VideoBuilder<'a, S>
+where
+    S: video_state::State,
+    S::Video: video_state::IsUnset,
+{
+    /// Set the `video` field (required)
+    pub fn video(
+        mut self,
+        value: impl Into<jacquard_common::types::blob::BlobRef<'a>>,
+    ) -> VideoBuilder<'a, video_state::SetVideo<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        VideoBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> VideoBuilder<'a, S>
+where
+    S: video_state::State,
+    S::Video: video_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Video<'a> {
+        Video {
+            alt: self.__unsafe_private_named.0,
+            aspect_ratio: self.__unsafe_private_named.1,
+            captions: self.__unsafe_private_named.2,
+            video: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Video<'a> {
+        Video {
+            alt: self.__unsafe_private_named.0,
+            aspect_ratio: self.__unsafe_private_named.1,
+            captions: self.__unsafe_private_named.2,
+            video: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Video<'a> {
@@ -358,17 +658,14 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Video<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct View<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub alt: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub aspect_ratio: Option<crate::app_bsky::embed::AspectRatio<'a>>,
     #[serde(borrow)]
@@ -376,9 +673,208 @@ pub struct View<'a> {
     #[serde(borrow)]
     pub playlist: jacquard_common::types::string::Uri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub thumbnail: Option<jacquard_common::types::string::Uri<'a>>,
+}
+
+pub mod view_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Cid;
+        type Playlist;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Cid = Unset;
+        type Playlist = Unset;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Cid = Set<members::cid>;
+        type Playlist = S::Playlist;
+    }
+    ///State transition - sets the `playlist` field to Set
+    pub struct SetPlaylist<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPlaylist<S> {}
+    impl<S: State> State for SetPlaylist<S> {
+        type Cid = S::Cid;
+        type Playlist = Set<members::playlist>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `playlist` field
+        pub struct playlist(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ViewBuilder<'a, S: view_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<crate::app_bsky::embed::AspectRatio<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> View<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ViewBuilder<'a, view_state::Empty> {
+        ViewBuilder::new()
+    }
+}
+
+impl<'a> ViewBuilder<'a, view_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: view_state::State> ViewBuilder<'a, S> {
+    /// Set the `alt` field (optional)
+    pub fn alt(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `alt` field to an Option value (optional)
+    pub fn maybe_alt(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: view_state::State> ViewBuilder<'a, S> {
+    /// Set the `aspectRatio` field (optional)
+    pub fn aspect_ratio(
+        mut self,
+        value: impl Into<Option<crate::app_bsky::embed::AspectRatio<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `aspectRatio` field to an Option value (optional)
+    pub fn maybe_aspect_ratio(
+        mut self,
+        value: Option<crate::app_bsky::embed::AspectRatio<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> ViewBuilder<'a, S>
+where
+    S: view_state::State,
+    S::Cid: view_state::IsUnset,
+{
+    /// Set the `cid` field (required)
+    pub fn cid(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Cid<'a>>,
+    ) -> ViewBuilder<'a, view_state::SetCid<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        ViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ViewBuilder<'a, S>
+where
+    S: view_state::State,
+    S::Playlist: view_state::IsUnset,
+{
+    /// Set the `playlist` field (required)
+    pub fn playlist(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+    ) -> ViewBuilder<'a, view_state::SetPlaylist<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        ViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: view_state::State> ViewBuilder<'a, S> {
+    /// Set the `thumbnail` field (optional)
+    pub fn thumbnail(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `thumbnail` field to an Option value (optional)
+    pub fn maybe_thumbnail(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S> ViewBuilder<'a, S>
+where
+    S: view_state::State,
+    S::Cid: view_state::IsSet,
+    S::Playlist: view_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> View<'a> {
+        View {
+            alt: self.__unsafe_private_named.0,
+            aspect_ratio: self.__unsafe_private_named.1,
+            cid: self.__unsafe_private_named.2.unwrap(),
+            playlist: self.__unsafe_private_named.3.unwrap(),
+            thumbnail: self.__unsafe_private_named.4,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> View<'a> {
+        View {
+            alt: self.__unsafe_private_named.0,
+            aspect_ratio: self.__unsafe_private_named.1,
+            cid: self.__unsafe_private_named.2.unwrap(),
+            playlist: self.__unsafe_private_named.3.unwrap(),
+            thumbnail: self.__unsafe_private_named.4,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for View<'a> {

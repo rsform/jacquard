@@ -12,18 +12,97 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetAccountInviteCodes {
-    ///(default: true)
+    /// (default: true)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub create_available: std::option::Option<bool>,
-    ///(default: true)
+    /// (default: true)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub include_used: std::option::Option<bool>,
+}
+
+pub mod get_account_invite_codes_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {}
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {}
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {}
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetAccountInviteCodesBuilder<S: get_account_invite_codes_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (::core::option::Option<bool>, ::core::option::Option<bool>),
+}
+
+impl GetAccountInviteCodes {
+    /// Create a new builder for this type
+    pub fn new() -> GetAccountInviteCodesBuilder<get_account_invite_codes_state::Empty> {
+        GetAccountInviteCodesBuilder::new()
+    }
+}
+
+impl GetAccountInviteCodesBuilder<get_account_invite_codes_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetAccountInviteCodesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+        }
+    }
+}
+
+impl<S: get_account_invite_codes_state::State> GetAccountInviteCodesBuilder<S> {
+    /// Set the `createAvailable` field (optional)
+    pub fn create_available(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `createAvailable` field to an Option value (optional)
+    pub fn maybe_create_available(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<S: get_account_invite_codes_state::State> GetAccountInviteCodesBuilder<S> {
+    /// Set the `includeUsed` field (optional)
+    pub fn include_used(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `includeUsed` field to an Option value (optional)
+    pub fn maybe_include_used(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<S> GetAccountInviteCodesBuilder<S>
+where
+    S: get_account_invite_codes_state::State,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetAccountInviteCodes {
+        GetAccountInviteCodes {
+            create_available: self.__unsafe_private_named.0,
+            include_used: self.__unsafe_private_named.1,
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

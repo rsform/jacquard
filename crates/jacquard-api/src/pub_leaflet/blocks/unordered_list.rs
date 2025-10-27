@@ -13,17 +13,146 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListItem<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub children: Option<Vec<crate::pub_leaflet::blocks::unordered_list::ListItem<'a>>>,
     #[serde(borrow)]
     pub content: ListItemContent<'a>,
+}
+
+pub mod list_item_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Content;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Content = Unset;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type Content = Set<members::content>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `content` field
+        pub struct content(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ListItemBuilder<'a, S: list_item_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<
+            Vec<crate::pub_leaflet::blocks::unordered_list::ListItem<'a>>,
+        >,
+        ::core::option::Option<ListItemContent<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ListItem<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ListItemBuilder<'a, list_item_state::Empty> {
+        ListItemBuilder::new()
+    }
+}
+
+impl<'a> ListItemBuilder<'a, list_item_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ListItemBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: list_item_state::State> ListItemBuilder<'a, S> {
+    /// Set the `children` field (optional)
+    pub fn children(
+        mut self,
+        value: impl Into<
+            Option<Vec<crate::pub_leaflet::blocks::unordered_list::ListItem<'a>>>,
+        >,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `children` field to an Option value (optional)
+    pub fn maybe_children(
+        mut self,
+        value: Option<Vec<crate::pub_leaflet::blocks::unordered_list::ListItem<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> ListItemBuilder<'a, S>
+where
+    S: list_item_state::State,
+    S::Content: list_item_state::IsUnset,
+{
+    /// Set the `content` field (required)
+    pub fn content(
+        mut self,
+        value: impl Into<ListItemContent<'a>>,
+    ) -> ListItemBuilder<'a, list_item_state::SetContent<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        ListItemBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ListItemBuilder<'a, S>
+where
+    S: list_item_state::State,
+    S::Content: list_item_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> ListItem<'a> {
+        ListItem {
+            children: self.__unsafe_private_named.0,
+            content: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> ListItem<'a> {
+        ListItem {
+            children: self.__unsafe_private_named.0,
+            content: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -155,13 +284,119 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListItem<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UnorderedList<'a> {
     #[serde(borrow)]
     pub children: Vec<crate::pub_leaflet::blocks::unordered_list::ListItem<'a>>,
+}
+
+pub mod unordered_list_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Children;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Children = Unset;
+    }
+    ///State transition - sets the `children` field to Set
+    pub struct SetChildren<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetChildren<S> {}
+    impl<S: State> State for SetChildren<S> {
+        type Children = Set<members::children>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `children` field
+        pub struct children(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct UnorderedListBuilder<'a, S: unordered_list_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<
+            Vec<crate::pub_leaflet::blocks::unordered_list::ListItem<'a>>,
+        >,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> UnorderedList<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> UnorderedListBuilder<'a, unordered_list_state::Empty> {
+        UnorderedListBuilder::new()
+    }
+}
+
+impl<'a> UnorderedListBuilder<'a, unordered_list_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        UnorderedListBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> UnorderedListBuilder<'a, S>
+where
+    S: unordered_list_state::State,
+    S::Children: unordered_list_state::IsUnset,
+{
+    /// Set the `children` field (required)
+    pub fn children(
+        mut self,
+        value: impl Into<Vec<crate::pub_leaflet::blocks::unordered_list::ListItem<'a>>>,
+    ) -> UnorderedListBuilder<'a, unordered_list_state::SetChildren<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        UnorderedListBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> UnorderedListBuilder<'a, S>
+where
+    S: unordered_list_state::State,
+    S::Children: unordered_list_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> UnorderedList<'a> {
+        UnorderedList {
+            children: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> UnorderedList<'a> {
+        UnorderedList {
+            children: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UnorderedList<'a> {

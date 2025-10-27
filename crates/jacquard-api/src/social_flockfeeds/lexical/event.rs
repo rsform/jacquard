@@ -14,94 +14,76 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Event<'a> {
     /// The subject matter of the content.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub about: Option<EventAbout<'a>>,
     /// An actor (individual or a group), e.g. in TV, radio, movie, video games etc., or in an event. Actors can be associated with individual items or with a series, episode, clip.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub actor: Option<EventActor<'a>>,
     /** An additional type for the item, typically used for adding more specific types from external vocabularies in microdata syntax. This is a relationship between something and a class that the thing is in. Typically the value is a URI-identified RDF class, and in this case corresponds to the
     use of rdf:type in RDF. Text values can be used sparingly, for cases where useful information can be added without their being an appropriate schema to reference. In the case of text values, the class label should follow the schema.org <a href="https://schema.org/docs/styleguide.html">style guide</a>.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub additional_type: Option<jacquard_common::CowStr<'a>>,
     /// The overall rating, based on a collection of reviews or ratings, of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub aggregate_rating: Option<EventAggregateRating<'a>>,
     /// An alias for the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub alternate_name: Option<jacquard_common::CowStr<'a>>,
     /// A person or organization attending the event.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub attendee: Option<EventAttendee<'a>>,
     /// A person attending the event.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub attendees: Option<EventAttendees<'a>>,
     /// An intended audience, i.e. a group for whom something was created.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub audience: Option<EventAudience<'a>>,
     /// The person or organization who wrote a composition, or who is the composer of a work performed at some event.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub composer: Option<EventComposer<'a>>,
     /// A secondary contributor to the CreativeWork or Event.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub contributor: Option<EventContributor<'a>>,
     /// A description of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub description: Option<EventDescription<'a>>,
     /// A director of e.g. TV, radio, movie, video gaming etc. content, or of an event. Directors can be associated with individual items or with a series, episode, clip.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub director: Option<EventDirector<'a>>,
     /// A sub property of description. A short description of the item used to disambiguate from other, similar items. Information from other properties (in particular, name) may be necessary for the description to be useful for disambiguation.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub disambiguating_description: Option<jacquard_common::CowStr<'a>>,
     /// The time admission will commence.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub door_time: Option<jacquard_common::CowStr<'a>>,
     /// The duration of the item (movie, audio recording, event, etc.) in [ISO 8601 duration format](http://en.wikipedia.org/wiki/ISO_8601).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub duration: Option<EventDuration<'a>>,
     /// The end date and time of the item (in [ISO 8601 date format](http://en.wikipedia.org/wiki/ISO_8601)).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub end_date: Option<jacquard_common::types::string::Datetime>,
     /// The eventAttendanceMode of an event indicates whether it occurs online, offline, or a mix.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub event_attendance_mode: Option<jacquard_common::CowStr<'a>>,
     /** Associates an [[Event]] with a [[Schedule]]. There are circumstances where it is preferable to share a schedule for a series of
@@ -111,178 +93,1236 @@ pub struct Event<'a> {
       [[Schedule]], this avoids any ambiguity for clients using the data. The property might have repeated values to specify different schedules, e.g. for different months
       or seasons.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub event_schedule: Option<EventEventSchedule<'a>>,
     /// An eventStatus of an event represents its status; particularly useful when an event is cancelled or rescheduled.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub event_status: Option<EventEventStatus<'a>>,
     /// A person or organization that supports (sponsors) something through some kind of financial contribution.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub funder: Option<EventFunder<'a>>,
     /// A [[Grant]] that directly or indirectly provide funding or sponsorship for this item. See also [[ownershipFundingInfo]].
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub funding: Option<EventFunding<'a>>,
     /// The identifier property represents any kind of identifier for any kind of [[Thing]], such as ISBNs, GTIN codes, UUIDs etc. Schema.org provides dedicated properties for representing many of these, either as textual strings or as URL (URI) links. See [background notes](/docs/datamodel.html#identifierBg) for more details.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub identifier: Option<EventIdentifier<'a>>,
     /// An image of the item. This can be a [[URL]] or a fully described [[ImageObject]].
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub image: Option<EventImage<'a>>,
     /// The language of the content or performance or used in an action. Please use one of the language codes from the [IETF BCP 47 standard](http://tools.ietf.org/html/bcp47). See also [[availableLanguage]].
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub in_language: Option<EventInLanguage<'a>>,
     /// A flag to signal that the item, event, or place is accessible for free.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub is_accessible_for_free: Option<bool>,
     /// Keywords or tags used to describe some item. Multiple textual entries in a keywords list are typically delimited by commas, or by repeating the property.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub keywords: Option<EventKeywords<'a>>,
     /// The location of, for example, where an event is happening, where an organization is located, or where an action takes place.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub location: Option<EventLocation<'a>>,
     /// Indicates a page (or other CreativeWork) for which this thing is the main entity being described. See [background notes](/docs/datamodel.html#mainEntityBackground) for details.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub main_entity_of_page: Option<EventMainEntityOfPage<'a>>,
     /// The total number of individuals that may attend an event or venue.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub maximum_attendee_capacity: Option<i64>,
     /// The maximum physical attendee capacity of an [[Event]] whose [[eventAttendanceMode]] is [[OfflineEventAttendanceMode]] (or the offline aspects, in the case of a [[MixedEventAttendanceMode]]).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub maximum_physical_attendee_capacity: Option<i64>,
     /// The maximum virtual attendee capacity of an [[Event]] whose [[eventAttendanceMode]] is [[OnlineEventAttendanceMode]] (or the online aspects, in the case of a [[MixedEventAttendanceMode]]).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub maximum_virtual_attendee_capacity: Option<i64>,
     /// The name of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub name: Option<jacquard_common::CowStr<'a>>,
     /// An offer to provide this item&#x2014;for example, an offer to sell a product, rent the DVD of a movie, perform a service, or give away tickets to an event. Use [[businessFunction]] to indicate the kind of transaction offered, i.e. sell, lease, etc. This property can also be used to describe a [[Demand]]. While this property is listed as expected on a number of common types, it can be used in others. In that case, using a second type, such as Product or a subtype of Product, can clarify the nature of the offer.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub offers: Option<EventOffers<'a>>,
     /// An organizer of an Event.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub organizer: Option<EventOrganizer<'a>>,
     /// A performer at the event&#x2014;for example, a presenter, musician, musical group or actor.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub performer: Option<EventPerformer<'a>>,
     /// The main performer or performers of the event&#x2014;for example, a presenter, musician, or actor.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub performers: Option<EventPerformers<'a>>,
     /// Indicates a potential Action, which describes an idealized action in which this thing would play an 'object' role.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub potential_action: Option<EventPotentialAction<'a>>,
     /// Used in conjunction with eventStatus for rescheduled or cancelled events. This property contains the previously scheduled start date. For rescheduled events, the startDate property should be used for the newly scheduled start date. In the (rare) case of an event that has been postponed and rescheduled multiple times, this field may be repeated.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub previous_start_date: Option<jacquard_common::types::string::Datetime>,
     /// The CreativeWork that captured all or part of this Event.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub recorded_in: Option<EventRecordedIn<'a>>,
     /// The number of attendee places for an event that remain unallocated.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub remaining_attendee_capacity: Option<i64>,
     /// A review of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub review: Option<EventReview<'a>>,
     /// URL of a reference Web page that unambiguously indicates the item's identity. E.g. the URL of the item's Wikipedia page, Wikidata entry, or official website.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub same_as: Option<jacquard_common::types::string::Uri<'a>>,
     /// A person or organization that supports a thing through a pledge, promise, or financial contribution. E.g. a sponsor of a Medical Study or a corporate sponsor of an event.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub sponsor: Option<EventSponsor<'a>>,
     /// The start date and time of the item (in [ISO 8601 date format](http://en.wikipedia.org/wiki/ISO_8601)).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub start_date: Option<jacquard_common::types::string::Datetime>,
     /// An Event that is part of this event. For example, a conference event includes many presentations, each of which is a subEvent of the conference.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub sub_event: Option<EventSubEvent<'a>>,
     /// Events that are a part of this event. For example, a conference event includes many presentations, each subEvents of the conference.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub sub_events: Option<EventSubEvents<'a>>,
     /// A CreativeWork or Event about this Thing.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub subject_of: Option<EventSubjectOf<'a>>,
     /// An event that this event is a part of. For example, a collection of individual music performances might each have a music festival as their superEvent.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub super_event: Option<EventSuperEvent<'a>>,
     /// Organization or person who adapts a creative work to different languages, regional differences and technical requirements of a target market, or that translates during some event.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub translator: Option<EventTranslator<'a>>,
     /// The typical expected age range, e.g. '7-9', '11-'.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub typical_age_range: Option<jacquard_common::CowStr<'a>>,
     /// URL of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub url: Option<jacquard_common::types::string::Uri<'a>>,
     /** A work featured in some event, e.g. exhibited in an ExhibitionEvent.
        Specific subproperties are available for workPerformed (e.g. a play), or a workPresented (a Movie at a ScreeningEvent).*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub work_featured: Option<EventWorkFeatured<'a>>,
     /// A work performed in some event, for example a play performed in a TheaterEvent.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub work_performed: Option<EventWorkPerformed<'a>>,
+}
+
+pub mod event_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {}
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {}
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {}
+}
+
+/// Builder for constructing an instance of this type
+pub struct EventBuilder<'a, S: event_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<EventAbout<'a>>,
+        ::core::option::Option<EventActor<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<EventAggregateRating<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<EventAttendee<'a>>,
+        ::core::option::Option<EventAttendees<'a>>,
+        ::core::option::Option<EventAudience<'a>>,
+        ::core::option::Option<EventComposer<'a>>,
+        ::core::option::Option<EventContributor<'a>>,
+        ::core::option::Option<EventDescription<'a>>,
+        ::core::option::Option<EventDirector<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<EventDuration<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<EventEventSchedule<'a>>,
+        ::core::option::Option<EventEventStatus<'a>>,
+        ::core::option::Option<EventFunder<'a>>,
+        ::core::option::Option<EventFunding<'a>>,
+        ::core::option::Option<EventIdentifier<'a>>,
+        ::core::option::Option<EventImage<'a>>,
+        ::core::option::Option<EventInLanguage<'a>>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<EventKeywords<'a>>,
+        ::core::option::Option<EventLocation<'a>>,
+        ::core::option::Option<EventMainEntityOfPage<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<EventOffers<'a>>,
+        ::core::option::Option<EventOrganizer<'a>>,
+        ::core::option::Option<EventPerformer<'a>>,
+        ::core::option::Option<EventPerformers<'a>>,
+        ::core::option::Option<EventPotentialAction<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<EventRecordedIn<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<EventReview<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<EventSponsor<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<EventSubEvent<'a>>,
+        ::core::option::Option<EventSubEvents<'a>>,
+        ::core::option::Option<EventSubjectOf<'a>>,
+        ::core::option::Option<EventSuperEvent<'a>>,
+        ::core::option::Option<EventTranslator<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<EventWorkFeatured<'a>>,
+        ::core::option::Option<EventWorkPerformed<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Event<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> EventBuilder<'a, event_state::Empty> {
+        EventBuilder::new()
+    }
+}
+
+impl<'a> EventBuilder<'a, event_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        EventBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `about` field (optional)
+    pub fn about(mut self, value: impl Into<Option<EventAbout<'a>>>) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `about` field to an Option value (optional)
+    pub fn maybe_about(mut self, value: Option<EventAbout<'a>>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `actor` field (optional)
+    pub fn actor(mut self, value: impl Into<Option<EventActor<'a>>>) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `actor` field to an Option value (optional)
+    pub fn maybe_actor(mut self, value: Option<EventActor<'a>>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `additionalType` field (optional)
+    pub fn additional_type(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `additionalType` field to an Option value (optional)
+    pub fn maybe_additional_type(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `aggregateRating` field (optional)
+    pub fn aggregate_rating(
+        mut self,
+        value: impl Into<Option<EventAggregateRating<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `aggregateRating` field to an Option value (optional)
+    pub fn maybe_aggregate_rating(
+        mut self,
+        value: Option<EventAggregateRating<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `alternateName` field (optional)
+    pub fn alternate_name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `alternateName` field to an Option value (optional)
+    pub fn maybe_alternate_name(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `attendee` field (optional)
+    pub fn attendee(mut self, value: impl Into<Option<EventAttendee<'a>>>) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `attendee` field to an Option value (optional)
+    pub fn maybe_attendee(mut self, value: Option<EventAttendee<'a>>) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `attendees` field (optional)
+    pub fn attendees(mut self, value: impl Into<Option<EventAttendees<'a>>>) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `attendees` field to an Option value (optional)
+    pub fn maybe_attendees(mut self, value: Option<EventAttendees<'a>>) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `audience` field (optional)
+    pub fn audience(mut self, value: impl Into<Option<EventAudience<'a>>>) -> Self {
+        self.__unsafe_private_named.7 = value.into();
+        self
+    }
+    /// Set the `audience` field to an Option value (optional)
+    pub fn maybe_audience(mut self, value: Option<EventAudience<'a>>) -> Self {
+        self.__unsafe_private_named.7 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `composer` field (optional)
+    pub fn composer(mut self, value: impl Into<Option<EventComposer<'a>>>) -> Self {
+        self.__unsafe_private_named.8 = value.into();
+        self
+    }
+    /// Set the `composer` field to an Option value (optional)
+    pub fn maybe_composer(mut self, value: Option<EventComposer<'a>>) -> Self {
+        self.__unsafe_private_named.8 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `contributor` field (optional)
+    pub fn contributor(
+        mut self,
+        value: impl Into<Option<EventContributor<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.9 = value.into();
+        self
+    }
+    /// Set the `contributor` field to an Option value (optional)
+    pub fn maybe_contributor(mut self, value: Option<EventContributor<'a>>) -> Self {
+        self.__unsafe_private_named.9 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `description` field (optional)
+    pub fn description(
+        mut self,
+        value: impl Into<Option<EventDescription<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.10 = value.into();
+        self
+    }
+    /// Set the `description` field to an Option value (optional)
+    pub fn maybe_description(mut self, value: Option<EventDescription<'a>>) -> Self {
+        self.__unsafe_private_named.10 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `director` field (optional)
+    pub fn director(mut self, value: impl Into<Option<EventDirector<'a>>>) -> Self {
+        self.__unsafe_private_named.11 = value.into();
+        self
+    }
+    /// Set the `director` field to an Option value (optional)
+    pub fn maybe_director(mut self, value: Option<EventDirector<'a>>) -> Self {
+        self.__unsafe_private_named.11 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `disambiguatingDescription` field (optional)
+    pub fn disambiguating_description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.12 = value.into();
+        self
+    }
+    /// Set the `disambiguatingDescription` field to an Option value (optional)
+    pub fn maybe_disambiguating_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.12 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `doorTime` field (optional)
+    pub fn door_time(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.13 = value.into();
+        self
+    }
+    /// Set the `doorTime` field to an Option value (optional)
+    pub fn maybe_door_time(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.13 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `duration` field (optional)
+    pub fn duration(mut self, value: impl Into<Option<EventDuration<'a>>>) -> Self {
+        self.__unsafe_private_named.14 = value.into();
+        self
+    }
+    /// Set the `duration` field to an Option value (optional)
+    pub fn maybe_duration(mut self, value: Option<EventDuration<'a>>) -> Self {
+        self.__unsafe_private_named.14 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `endDate` field (optional)
+    pub fn end_date(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.15 = value.into();
+        self
+    }
+    /// Set the `endDate` field to an Option value (optional)
+    pub fn maybe_end_date(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.15 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `eventAttendanceMode` field (optional)
+    pub fn event_attendance_mode(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.16 = value.into();
+        self
+    }
+    /// Set the `eventAttendanceMode` field to an Option value (optional)
+    pub fn maybe_event_attendance_mode(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.16 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `eventSchedule` field (optional)
+    pub fn event_schedule(
+        mut self,
+        value: impl Into<Option<EventEventSchedule<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.17 = value.into();
+        self
+    }
+    /// Set the `eventSchedule` field to an Option value (optional)
+    pub fn maybe_event_schedule(
+        mut self,
+        value: Option<EventEventSchedule<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.17 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `eventStatus` field (optional)
+    pub fn event_status(
+        mut self,
+        value: impl Into<Option<EventEventStatus<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.18 = value.into();
+        self
+    }
+    /// Set the `eventStatus` field to an Option value (optional)
+    pub fn maybe_event_status(mut self, value: Option<EventEventStatus<'a>>) -> Self {
+        self.__unsafe_private_named.18 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `funder` field (optional)
+    pub fn funder(mut self, value: impl Into<Option<EventFunder<'a>>>) -> Self {
+        self.__unsafe_private_named.19 = value.into();
+        self
+    }
+    /// Set the `funder` field to an Option value (optional)
+    pub fn maybe_funder(mut self, value: Option<EventFunder<'a>>) -> Self {
+        self.__unsafe_private_named.19 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `funding` field (optional)
+    pub fn funding(mut self, value: impl Into<Option<EventFunding<'a>>>) -> Self {
+        self.__unsafe_private_named.20 = value.into();
+        self
+    }
+    /// Set the `funding` field to an Option value (optional)
+    pub fn maybe_funding(mut self, value: Option<EventFunding<'a>>) -> Self {
+        self.__unsafe_private_named.20 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `identifier` field (optional)
+    pub fn identifier(mut self, value: impl Into<Option<EventIdentifier<'a>>>) -> Self {
+        self.__unsafe_private_named.21 = value.into();
+        self
+    }
+    /// Set the `identifier` field to an Option value (optional)
+    pub fn maybe_identifier(mut self, value: Option<EventIdentifier<'a>>) -> Self {
+        self.__unsafe_private_named.21 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `image` field (optional)
+    pub fn image(mut self, value: impl Into<Option<EventImage<'a>>>) -> Self {
+        self.__unsafe_private_named.22 = value.into();
+        self
+    }
+    /// Set the `image` field to an Option value (optional)
+    pub fn maybe_image(mut self, value: Option<EventImage<'a>>) -> Self {
+        self.__unsafe_private_named.22 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `inLanguage` field (optional)
+    pub fn in_language(mut self, value: impl Into<Option<EventInLanguage<'a>>>) -> Self {
+        self.__unsafe_private_named.23 = value.into();
+        self
+    }
+    /// Set the `inLanguage` field to an Option value (optional)
+    pub fn maybe_in_language(mut self, value: Option<EventInLanguage<'a>>) -> Self {
+        self.__unsafe_private_named.23 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `isAccessibleForFree` field (optional)
+    pub fn is_accessible_for_free(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.24 = value.into();
+        self
+    }
+    /// Set the `isAccessibleForFree` field to an Option value (optional)
+    pub fn maybe_is_accessible_for_free(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.24 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `keywords` field (optional)
+    pub fn keywords(mut self, value: impl Into<Option<EventKeywords<'a>>>) -> Self {
+        self.__unsafe_private_named.25 = value.into();
+        self
+    }
+    /// Set the `keywords` field to an Option value (optional)
+    pub fn maybe_keywords(mut self, value: Option<EventKeywords<'a>>) -> Self {
+        self.__unsafe_private_named.25 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `location` field (optional)
+    pub fn location(mut self, value: impl Into<Option<EventLocation<'a>>>) -> Self {
+        self.__unsafe_private_named.26 = value.into();
+        self
+    }
+    /// Set the `location` field to an Option value (optional)
+    pub fn maybe_location(mut self, value: Option<EventLocation<'a>>) -> Self {
+        self.__unsafe_private_named.26 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `mainEntityOfPage` field (optional)
+    pub fn main_entity_of_page(
+        mut self,
+        value: impl Into<Option<EventMainEntityOfPage<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.27 = value.into();
+        self
+    }
+    /// Set the `mainEntityOfPage` field to an Option value (optional)
+    pub fn maybe_main_entity_of_page(
+        mut self,
+        value: Option<EventMainEntityOfPage<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.27 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `maximumAttendeeCapacity` field (optional)
+    pub fn maximum_attendee_capacity(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.28 = value.into();
+        self
+    }
+    /// Set the `maximumAttendeeCapacity` field to an Option value (optional)
+    pub fn maybe_maximum_attendee_capacity(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.28 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `maximumPhysicalAttendeeCapacity` field (optional)
+    pub fn maximum_physical_attendee_capacity(
+        mut self,
+        value: impl Into<Option<i64>>,
+    ) -> Self {
+        self.__unsafe_private_named.29 = value.into();
+        self
+    }
+    /// Set the `maximumPhysicalAttendeeCapacity` field to an Option value (optional)
+    pub fn maybe_maximum_physical_attendee_capacity(
+        mut self,
+        value: Option<i64>,
+    ) -> Self {
+        self.__unsafe_private_named.29 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `maximumVirtualAttendeeCapacity` field (optional)
+    pub fn maximum_virtual_attendee_capacity(
+        mut self,
+        value: impl Into<Option<i64>>,
+    ) -> Self {
+        self.__unsafe_private_named.30 = value.into();
+        self
+    }
+    /// Set the `maximumVirtualAttendeeCapacity` field to an Option value (optional)
+    pub fn maybe_maximum_virtual_attendee_capacity(
+        mut self,
+        value: Option<i64>,
+    ) -> Self {
+        self.__unsafe_private_named.30 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `name` field (optional)
+    pub fn name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.31 = value.into();
+        self
+    }
+    /// Set the `name` field to an Option value (optional)
+    pub fn maybe_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.31 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `offers` field (optional)
+    pub fn offers(mut self, value: impl Into<Option<EventOffers<'a>>>) -> Self {
+        self.__unsafe_private_named.32 = value.into();
+        self
+    }
+    /// Set the `offers` field to an Option value (optional)
+    pub fn maybe_offers(mut self, value: Option<EventOffers<'a>>) -> Self {
+        self.__unsafe_private_named.32 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `organizer` field (optional)
+    pub fn organizer(mut self, value: impl Into<Option<EventOrganizer<'a>>>) -> Self {
+        self.__unsafe_private_named.33 = value.into();
+        self
+    }
+    /// Set the `organizer` field to an Option value (optional)
+    pub fn maybe_organizer(mut self, value: Option<EventOrganizer<'a>>) -> Self {
+        self.__unsafe_private_named.33 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `performer` field (optional)
+    pub fn performer(mut self, value: impl Into<Option<EventPerformer<'a>>>) -> Self {
+        self.__unsafe_private_named.34 = value.into();
+        self
+    }
+    /// Set the `performer` field to an Option value (optional)
+    pub fn maybe_performer(mut self, value: Option<EventPerformer<'a>>) -> Self {
+        self.__unsafe_private_named.34 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `performers` field (optional)
+    pub fn performers(mut self, value: impl Into<Option<EventPerformers<'a>>>) -> Self {
+        self.__unsafe_private_named.35 = value.into();
+        self
+    }
+    /// Set the `performers` field to an Option value (optional)
+    pub fn maybe_performers(mut self, value: Option<EventPerformers<'a>>) -> Self {
+        self.__unsafe_private_named.35 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `potentialAction` field (optional)
+    pub fn potential_action(
+        mut self,
+        value: impl Into<Option<EventPotentialAction<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.36 = value.into();
+        self
+    }
+    /// Set the `potentialAction` field to an Option value (optional)
+    pub fn maybe_potential_action(
+        mut self,
+        value: Option<EventPotentialAction<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.36 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `previousStartDate` field (optional)
+    pub fn previous_start_date(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.37 = value.into();
+        self
+    }
+    /// Set the `previousStartDate` field to an Option value (optional)
+    pub fn maybe_previous_start_date(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.37 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `recordedIn` field (optional)
+    pub fn recorded_in(mut self, value: impl Into<Option<EventRecordedIn<'a>>>) -> Self {
+        self.__unsafe_private_named.38 = value.into();
+        self
+    }
+    /// Set the `recordedIn` field to an Option value (optional)
+    pub fn maybe_recorded_in(mut self, value: Option<EventRecordedIn<'a>>) -> Self {
+        self.__unsafe_private_named.38 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `remainingAttendeeCapacity` field (optional)
+    pub fn remaining_attendee_capacity(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.39 = value.into();
+        self
+    }
+    /// Set the `remainingAttendeeCapacity` field to an Option value (optional)
+    pub fn maybe_remaining_attendee_capacity(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.39 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `review` field (optional)
+    pub fn review(mut self, value: impl Into<Option<EventReview<'a>>>) -> Self {
+        self.__unsafe_private_named.40 = value.into();
+        self
+    }
+    /// Set the `review` field to an Option value (optional)
+    pub fn maybe_review(mut self, value: Option<EventReview<'a>>) -> Self {
+        self.__unsafe_private_named.40 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `sameAs` field (optional)
+    pub fn same_as(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.41 = value.into();
+        self
+    }
+    /// Set the `sameAs` field to an Option value (optional)
+    pub fn maybe_same_as(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.41 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `sponsor` field (optional)
+    pub fn sponsor(mut self, value: impl Into<Option<EventSponsor<'a>>>) -> Self {
+        self.__unsafe_private_named.42 = value.into();
+        self
+    }
+    /// Set the `sponsor` field to an Option value (optional)
+    pub fn maybe_sponsor(mut self, value: Option<EventSponsor<'a>>) -> Self {
+        self.__unsafe_private_named.42 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `startDate` field (optional)
+    pub fn start_date(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.43 = value.into();
+        self
+    }
+    /// Set the `startDate` field to an Option value (optional)
+    pub fn maybe_start_date(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.43 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `subEvent` field (optional)
+    pub fn sub_event(mut self, value: impl Into<Option<EventSubEvent<'a>>>) -> Self {
+        self.__unsafe_private_named.44 = value.into();
+        self
+    }
+    /// Set the `subEvent` field to an Option value (optional)
+    pub fn maybe_sub_event(mut self, value: Option<EventSubEvent<'a>>) -> Self {
+        self.__unsafe_private_named.44 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `subEvents` field (optional)
+    pub fn sub_events(mut self, value: impl Into<Option<EventSubEvents<'a>>>) -> Self {
+        self.__unsafe_private_named.45 = value.into();
+        self
+    }
+    /// Set the `subEvents` field to an Option value (optional)
+    pub fn maybe_sub_events(mut self, value: Option<EventSubEvents<'a>>) -> Self {
+        self.__unsafe_private_named.45 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `subjectOf` field (optional)
+    pub fn subject_of(mut self, value: impl Into<Option<EventSubjectOf<'a>>>) -> Self {
+        self.__unsafe_private_named.46 = value.into();
+        self
+    }
+    /// Set the `subjectOf` field to an Option value (optional)
+    pub fn maybe_subject_of(mut self, value: Option<EventSubjectOf<'a>>) -> Self {
+        self.__unsafe_private_named.46 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `superEvent` field (optional)
+    pub fn super_event(mut self, value: impl Into<Option<EventSuperEvent<'a>>>) -> Self {
+        self.__unsafe_private_named.47 = value.into();
+        self
+    }
+    /// Set the `superEvent` field to an Option value (optional)
+    pub fn maybe_super_event(mut self, value: Option<EventSuperEvent<'a>>) -> Self {
+        self.__unsafe_private_named.47 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `translator` field (optional)
+    pub fn translator(mut self, value: impl Into<Option<EventTranslator<'a>>>) -> Self {
+        self.__unsafe_private_named.48 = value.into();
+        self
+    }
+    /// Set the `translator` field to an Option value (optional)
+    pub fn maybe_translator(mut self, value: Option<EventTranslator<'a>>) -> Self {
+        self.__unsafe_private_named.48 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `typicalAgeRange` field (optional)
+    pub fn typical_age_range(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.49 = value.into();
+        self
+    }
+    /// Set the `typicalAgeRange` field to an Option value (optional)
+    pub fn maybe_typical_age_range(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.49 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `url` field (optional)
+    pub fn url(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.50 = value.into();
+        self
+    }
+    /// Set the `url` field to an Option value (optional)
+    pub fn maybe_url(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.50 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `workFeatured` field (optional)
+    pub fn work_featured(
+        mut self,
+        value: impl Into<Option<EventWorkFeatured<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.51 = value.into();
+        self
+    }
+    /// Set the `workFeatured` field to an Option value (optional)
+    pub fn maybe_work_featured(mut self, value: Option<EventWorkFeatured<'a>>) -> Self {
+        self.__unsafe_private_named.51 = value;
+        self
+    }
+}
+
+impl<'a, S: event_state::State> EventBuilder<'a, S> {
+    /// Set the `workPerformed` field (optional)
+    pub fn work_performed(
+        mut self,
+        value: impl Into<Option<EventWorkPerformed<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.52 = value.into();
+        self
+    }
+    /// Set the `workPerformed` field to an Option value (optional)
+    pub fn maybe_work_performed(
+        mut self,
+        value: Option<EventWorkPerformed<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.52 = value;
+        self
+    }
+}
+
+impl<'a, S> EventBuilder<'a, S>
+where
+    S: event_state::State,
+{
+    /// Build the final struct
+    pub fn build(self) -> Event<'a> {
+        Event {
+            about: self.__unsafe_private_named.0,
+            actor: self.__unsafe_private_named.1,
+            additional_type: self.__unsafe_private_named.2,
+            aggregate_rating: self.__unsafe_private_named.3,
+            alternate_name: self.__unsafe_private_named.4,
+            attendee: self.__unsafe_private_named.5,
+            attendees: self.__unsafe_private_named.6,
+            audience: self.__unsafe_private_named.7,
+            composer: self.__unsafe_private_named.8,
+            contributor: self.__unsafe_private_named.9,
+            description: self.__unsafe_private_named.10,
+            director: self.__unsafe_private_named.11,
+            disambiguating_description: self.__unsafe_private_named.12,
+            door_time: self.__unsafe_private_named.13,
+            duration: self.__unsafe_private_named.14,
+            end_date: self.__unsafe_private_named.15,
+            event_attendance_mode: self.__unsafe_private_named.16,
+            event_schedule: self.__unsafe_private_named.17,
+            event_status: self.__unsafe_private_named.18,
+            funder: self.__unsafe_private_named.19,
+            funding: self.__unsafe_private_named.20,
+            identifier: self.__unsafe_private_named.21,
+            image: self.__unsafe_private_named.22,
+            in_language: self.__unsafe_private_named.23,
+            is_accessible_for_free: self.__unsafe_private_named.24,
+            keywords: self.__unsafe_private_named.25,
+            location: self.__unsafe_private_named.26,
+            main_entity_of_page: self.__unsafe_private_named.27,
+            maximum_attendee_capacity: self.__unsafe_private_named.28,
+            maximum_physical_attendee_capacity: self.__unsafe_private_named.29,
+            maximum_virtual_attendee_capacity: self.__unsafe_private_named.30,
+            name: self.__unsafe_private_named.31,
+            offers: self.__unsafe_private_named.32,
+            organizer: self.__unsafe_private_named.33,
+            performer: self.__unsafe_private_named.34,
+            performers: self.__unsafe_private_named.35,
+            potential_action: self.__unsafe_private_named.36,
+            previous_start_date: self.__unsafe_private_named.37,
+            recorded_in: self.__unsafe_private_named.38,
+            remaining_attendee_capacity: self.__unsafe_private_named.39,
+            review: self.__unsafe_private_named.40,
+            same_as: self.__unsafe_private_named.41,
+            sponsor: self.__unsafe_private_named.42,
+            start_date: self.__unsafe_private_named.43,
+            sub_event: self.__unsafe_private_named.44,
+            sub_events: self.__unsafe_private_named.45,
+            subject_of: self.__unsafe_private_named.46,
+            super_event: self.__unsafe_private_named.47,
+            translator: self.__unsafe_private_named.48,
+            typical_age_range: self.__unsafe_private_named.49,
+            url: self.__unsafe_private_named.50,
+            work_featured: self.__unsafe_private_named.51,
+            work_performed: self.__unsafe_private_named.52,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Event<'a> {
+        Event {
+            about: self.__unsafe_private_named.0,
+            actor: self.__unsafe_private_named.1,
+            additional_type: self.__unsafe_private_named.2,
+            aggregate_rating: self.__unsafe_private_named.3,
+            alternate_name: self.__unsafe_private_named.4,
+            attendee: self.__unsafe_private_named.5,
+            attendees: self.__unsafe_private_named.6,
+            audience: self.__unsafe_private_named.7,
+            composer: self.__unsafe_private_named.8,
+            contributor: self.__unsafe_private_named.9,
+            description: self.__unsafe_private_named.10,
+            director: self.__unsafe_private_named.11,
+            disambiguating_description: self.__unsafe_private_named.12,
+            door_time: self.__unsafe_private_named.13,
+            duration: self.__unsafe_private_named.14,
+            end_date: self.__unsafe_private_named.15,
+            event_attendance_mode: self.__unsafe_private_named.16,
+            event_schedule: self.__unsafe_private_named.17,
+            event_status: self.__unsafe_private_named.18,
+            funder: self.__unsafe_private_named.19,
+            funding: self.__unsafe_private_named.20,
+            identifier: self.__unsafe_private_named.21,
+            image: self.__unsafe_private_named.22,
+            in_language: self.__unsafe_private_named.23,
+            is_accessible_for_free: self.__unsafe_private_named.24,
+            keywords: self.__unsafe_private_named.25,
+            location: self.__unsafe_private_named.26,
+            main_entity_of_page: self.__unsafe_private_named.27,
+            maximum_attendee_capacity: self.__unsafe_private_named.28,
+            maximum_physical_attendee_capacity: self.__unsafe_private_named.29,
+            maximum_virtual_attendee_capacity: self.__unsafe_private_named.30,
+            name: self.__unsafe_private_named.31,
+            offers: self.__unsafe_private_named.32,
+            organizer: self.__unsafe_private_named.33,
+            performer: self.__unsafe_private_named.34,
+            performers: self.__unsafe_private_named.35,
+            potential_action: self.__unsafe_private_named.36,
+            previous_start_date: self.__unsafe_private_named.37,
+            recorded_in: self.__unsafe_private_named.38,
+            remaining_attendee_capacity: self.__unsafe_private_named.39,
+            review: self.__unsafe_private_named.40,
+            same_as: self.__unsafe_private_named.41,
+            sponsor: self.__unsafe_private_named.42,
+            start_date: self.__unsafe_private_named.43,
+            sub_event: self.__unsafe_private_named.44,
+            sub_events: self.__unsafe_private_named.45,
+            subject_of: self.__unsafe_private_named.46,
+            super_event: self.__unsafe_private_named.47,
+            translator: self.__unsafe_private_named.48,
+            typical_age_range: self.__unsafe_private_named.49,
+            url: self.__unsafe_private_named.50,
+            work_featured: self.__unsafe_private_named.51,
+            work_performed: self.__unsafe_private_named.52,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Event<'a> {

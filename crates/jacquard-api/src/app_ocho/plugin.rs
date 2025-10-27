@@ -1112,8 +1112,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AndroidStatusBar<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Asset<'a> {
@@ -1122,16 +1121,212 @@ pub struct Asset<'a> {
     pub blob: jacquard_common::types::blob::BlobRef<'a>,
     /// The hash of the asset
     #[serde(borrow)]
-    #[builder(into)]
     pub hash: jacquard_common::CowStr<'a>,
     /// The type of the asset
     #[serde(borrow)]
-    #[builder(into)]
     pub r#type: jacquard_common::CowStr<'a>,
     /// The date and time when this asset was last updated. Used to reset the jetstream cache, among other things.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub updated_at: Option<jacquard_common::types::string::Datetime>,
+}
+
+pub mod asset_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Hash;
+        type Blob;
+        type Type;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Hash = Unset;
+        type Blob = Unset;
+        type Type = Unset;
+    }
+    ///State transition - sets the `hash` field to Set
+    pub struct SetHash<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHash<S> {}
+    impl<S: State> State for SetHash<S> {
+        type Hash = Set<members::hash>;
+        type Blob = S::Blob;
+        type Type = S::Type;
+    }
+    ///State transition - sets the `blob` field to Set
+    pub struct SetBlob<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlob<S> {}
+    impl<S: State> State for SetBlob<S> {
+        type Hash = S::Hash;
+        type Blob = Set<members::blob>;
+        type Type = S::Type;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type Hash = S::Hash;
+        type Blob = S::Blob;
+        type Type = Set<members::r#type>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `hash` field
+        pub struct hash(());
+        ///Marker type for the `blob` field
+        pub struct blob(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct AssetBuilder<'a, S: asset_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Asset<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> AssetBuilder<'a, asset_state::Empty> {
+        AssetBuilder::new()
+    }
+}
+
+impl<'a> AssetBuilder<'a, asset_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        AssetBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AssetBuilder<'a, S>
+where
+    S: asset_state::State,
+    S::Blob: asset_state::IsUnset,
+{
+    /// Set the `blob` field (required)
+    pub fn blob(
+        mut self,
+        value: impl Into<jacquard_common::types::blob::BlobRef<'a>>,
+    ) -> AssetBuilder<'a, asset_state::SetBlob<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        AssetBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AssetBuilder<'a, S>
+where
+    S: asset_state::State,
+    S::Hash: asset_state::IsUnset,
+{
+    /// Set the `hash` field (required)
+    pub fn hash(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> AssetBuilder<'a, asset_state::SetHash<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        AssetBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AssetBuilder<'a, S>
+where
+    S: asset_state::State,
+    S::Type: asset_state::IsUnset,
+{
+    /// Set the `type` field (required)
+    pub fn r#type(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> AssetBuilder<'a, asset_state::SetType<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        AssetBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: asset_state::State> AssetBuilder<'a, S> {
+    /// Set the `updatedAt` field (optional)
+    pub fn updated_at(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `updatedAt` field to an Option value (optional)
+    pub fn maybe_updated_at(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S> AssetBuilder<'a, S>
+where
+    S: asset_state::State,
+    S::Hash: asset_state::IsSet,
+    S::Blob: asset_state::IsSet,
+    S::Type: asset_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Asset<'a> {
+        Asset {
+            blob: self.__unsafe_private_named.0.unwrap(),
+            hash: self.__unsafe_private_named.1.unwrap(),
+            r#type: self.__unsafe_private_named.2.unwrap(),
+            updated_at: self.__unsafe_private_named.3,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Asset<'a> {
+        Asset {
+            blob: self.__unsafe_private_named.0.unwrap(),
+            hash: self.__unsafe_private_named.1.unwrap(),
+            r#type: self.__unsafe_private_named.2.unwrap(),
+            updated_at: self.__unsafe_private_named.3,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Asset<'a> {
@@ -1332,14 +1527,118 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ExpoClient<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ExpoGo<'a> {
     /// Developer-specific configuration for the Expo Go app.
     #[serde(borrow)]
     pub developer: crate::app_ocho::plugin::Developer<'a>,
+}
+
+pub mod expo_go_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Developer;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Developer = Unset;
+    }
+    ///State transition - sets the `developer` field to Set
+    pub struct SetDeveloper<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDeveloper<S> {}
+    impl<S: State> State for SetDeveloper<S> {
+        type Developer = Set<members::developer>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `developer` field
+        pub struct developer(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ExpoGoBuilder<'a, S: expo_go_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<crate::app_ocho::plugin::Developer<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ExpoGo<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ExpoGoBuilder<'a, expo_go_state::Empty> {
+        ExpoGoBuilder::new()
+    }
+}
+
+impl<'a> ExpoGoBuilder<'a, expo_go_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ExpoGoBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ExpoGoBuilder<'a, S>
+where
+    S: expo_go_state::State,
+    S::Developer: expo_go_state::IsUnset,
+{
+    /// Set the `developer` field (required)
+    pub fn developer(
+        mut self,
+        value: impl Into<crate::app_ocho::plugin::Developer<'a>>,
+    ) -> ExpoGoBuilder<'a, expo_go_state::SetDeveloper<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ExpoGoBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ExpoGoBuilder<'a, S>
+where
+    S: expo_go_state::State,
+    S::Developer: expo_go_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> ExpoGo<'a> {
+        ExpoGo {
+            developer: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> ExpoGo<'a> {
+        ExpoGo {
+            developer: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ExpoGo<'a> {
@@ -1402,22 +1701,196 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Ios<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LaunchAsset<'a> {
     /// The MIME type of the asset, e.g., 'image/png'.
     #[serde(borrow)]
-    #[builder(into)]
     pub content_type: jacquard_common::CowStr<'a>,
     /// The unique key for this asset, used to reference it in the plugin.
     #[serde(borrow)]
-    #[builder(into)]
     pub key: jacquard_common::CowStr<'a>,
     /// The URL where the asset can be accessed.
     #[serde(borrow)]
     pub url: jacquard_common::types::string::Uri<'a>,
+}
+
+pub mod launch_asset_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Key;
+        type ContentType;
+        type Url;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Key = Unset;
+        type ContentType = Unset;
+        type Url = Unset;
+    }
+    ///State transition - sets the `key` field to Set
+    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetKey<S> {}
+    impl<S: State> State for SetKey<S> {
+        type Key = Set<members::key>;
+        type ContentType = S::ContentType;
+        type Url = S::Url;
+    }
+    ///State transition - sets the `content_type` field to Set
+    pub struct SetContentType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContentType<S> {}
+    impl<S: State> State for SetContentType<S> {
+        type Key = S::Key;
+        type ContentType = Set<members::content_type>;
+        type Url = S::Url;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type Key = S::Key;
+        type ContentType = S::ContentType;
+        type Url = Set<members::url>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `key` field
+        pub struct key(());
+        ///Marker type for the `content_type` field
+        pub struct content_type(());
+        ///Marker type for the `url` field
+        pub struct url(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct LaunchAssetBuilder<'a, S: launch_asset_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> LaunchAsset<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> LaunchAssetBuilder<'a, launch_asset_state::Empty> {
+        LaunchAssetBuilder::new()
+    }
+}
+
+impl<'a> LaunchAssetBuilder<'a, launch_asset_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        LaunchAssetBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LaunchAssetBuilder<'a, S>
+where
+    S: launch_asset_state::State,
+    S::ContentType: launch_asset_state::IsUnset,
+{
+    /// Set the `contentType` field (required)
+    pub fn content_type(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> LaunchAssetBuilder<'a, launch_asset_state::SetContentType<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        LaunchAssetBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LaunchAssetBuilder<'a, S>
+where
+    S: launch_asset_state::State,
+    S::Key: launch_asset_state::IsUnset,
+{
+    /// Set the `key` field (required)
+    pub fn key(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> LaunchAssetBuilder<'a, launch_asset_state::SetKey<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        LaunchAssetBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LaunchAssetBuilder<'a, S>
+where
+    S: launch_asset_state::State,
+    S::Url: launch_asset_state::IsUnset,
+{
+    /// Set the `url` field (required)
+    pub fn url(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+    ) -> LaunchAssetBuilder<'a, launch_asset_state::SetUrl<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        LaunchAssetBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LaunchAssetBuilder<'a, S>
+where
+    S: launch_asset_state::State,
+    S::Key: launch_asset_state::IsSet,
+    S::ContentType: launch_asset_state::IsSet,
+    S::Url: launch_asset_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> LaunchAsset<'a> {
+        LaunchAsset {
+            content_type: self.__unsafe_private_named.0.unwrap(),
+            key: self.__unsafe_private_named.1.unwrap(),
+            url: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> LaunchAsset<'a> {
+        LaunchAsset {
+            content_type: self.__unsafe_private_named.0.unwrap(),
+            key: self.__unsafe_private_named.1.unwrap(),
+            url: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LaunchAsset<'a> {
@@ -1445,8 +1918,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LaunchAsset<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Manifest<'a> {
@@ -1457,7 +1929,6 @@ pub struct Manifest<'a> {
     pub extra: crate::app_ocho::plugin::ManifestExtra<'a>,
     /// The unique identifier for this plugin manifest.
     #[serde(borrow)]
-    #[builder(into)]
     pub id: jacquard_common::CowStr<'a>,
     /// The launch asset for the plugin (the main javascipt bundle).
     #[serde(borrow)]
@@ -1466,8 +1937,307 @@ pub struct Manifest<'a> {
     pub metadata: jacquard_common::types::value::Data<'a>,
     /// The version of the Expo runtime this plugin is compatible with.
     #[serde(borrow)]
-    #[builder(into)]
     pub runtime_version: jacquard_common::CowStr<'a>,
+}
+
+pub mod manifest_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Id;
+        type CreatedAt;
+        type RuntimeVersion;
+        type LaunchAsset;
+        type Metadata;
+        type Extra;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Id = Unset;
+        type CreatedAt = Unset;
+        type RuntimeVersion = Unset;
+        type LaunchAsset = Unset;
+        type Metadata = Unset;
+        type Extra = Unset;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Id = Set<members::id>;
+        type CreatedAt = S::CreatedAt;
+        type RuntimeVersion = S::RuntimeVersion;
+        type LaunchAsset = S::LaunchAsset;
+        type Metadata = S::Metadata;
+        type Extra = S::Extra;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Id = S::Id;
+        type CreatedAt = Set<members::created_at>;
+        type RuntimeVersion = S::RuntimeVersion;
+        type LaunchAsset = S::LaunchAsset;
+        type Metadata = S::Metadata;
+        type Extra = S::Extra;
+    }
+    ///State transition - sets the `runtime_version` field to Set
+    pub struct SetRuntimeVersion<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRuntimeVersion<S> {}
+    impl<S: State> State for SetRuntimeVersion<S> {
+        type Id = S::Id;
+        type CreatedAt = S::CreatedAt;
+        type RuntimeVersion = Set<members::runtime_version>;
+        type LaunchAsset = S::LaunchAsset;
+        type Metadata = S::Metadata;
+        type Extra = S::Extra;
+    }
+    ///State transition - sets the `launch_asset` field to Set
+    pub struct SetLaunchAsset<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLaunchAsset<S> {}
+    impl<S: State> State for SetLaunchAsset<S> {
+        type Id = S::Id;
+        type CreatedAt = S::CreatedAt;
+        type RuntimeVersion = S::RuntimeVersion;
+        type LaunchAsset = Set<members::launch_asset>;
+        type Metadata = S::Metadata;
+        type Extra = S::Extra;
+    }
+    ///State transition - sets the `metadata` field to Set
+    pub struct SetMetadata<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMetadata<S> {}
+    impl<S: State> State for SetMetadata<S> {
+        type Id = S::Id;
+        type CreatedAt = S::CreatedAt;
+        type RuntimeVersion = S::RuntimeVersion;
+        type LaunchAsset = S::LaunchAsset;
+        type Metadata = Set<members::metadata>;
+        type Extra = S::Extra;
+    }
+    ///State transition - sets the `extra` field to Set
+    pub struct SetExtra<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetExtra<S> {}
+    impl<S: State> State for SetExtra<S> {
+        type Id = S::Id;
+        type CreatedAt = S::CreatedAt;
+        type RuntimeVersion = S::RuntimeVersion;
+        type LaunchAsset = S::LaunchAsset;
+        type Metadata = S::Metadata;
+        type Extra = Set<members::extra>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `id` field
+        pub struct id(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `runtime_version` field
+        pub struct runtime_version(());
+        ///Marker type for the `launch_asset` field
+        pub struct launch_asset(());
+        ///Marker type for the `metadata` field
+        pub struct metadata(());
+        ///Marker type for the `extra` field
+        pub struct extra(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ManifestBuilder<'a, S: manifest_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<crate::app_ocho::plugin::ManifestExtra<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<crate::app_ocho::plugin::LaunchAsset<'a>>,
+        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Manifest<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ManifestBuilder<'a, manifest_state::Empty> {
+        ManifestBuilder::new()
+    }
+}
+
+impl<'a> ManifestBuilder<'a, manifest_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ManifestBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ManifestBuilder<'a, S>
+where
+    S: manifest_state::State,
+    S::CreatedAt: manifest_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> ManifestBuilder<'a, manifest_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ManifestBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ManifestBuilder<'a, S>
+where
+    S: manifest_state::State,
+    S::Extra: manifest_state::IsUnset,
+{
+    /// Set the `extra` field (required)
+    pub fn extra(
+        mut self,
+        value: impl Into<crate::app_ocho::plugin::ManifestExtra<'a>>,
+    ) -> ManifestBuilder<'a, manifest_state::SetExtra<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        ManifestBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ManifestBuilder<'a, S>
+where
+    S: manifest_state::State,
+    S::Id: manifest_state::IsUnset,
+{
+    /// Set the `id` field (required)
+    pub fn id(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> ManifestBuilder<'a, manifest_state::SetId<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        ManifestBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ManifestBuilder<'a, S>
+where
+    S: manifest_state::State,
+    S::LaunchAsset: manifest_state::IsUnset,
+{
+    /// Set the `launchAsset` field (required)
+    pub fn launch_asset(
+        mut self,
+        value: impl Into<crate::app_ocho::plugin::LaunchAsset<'a>>,
+    ) -> ManifestBuilder<'a, manifest_state::SetLaunchAsset<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        ManifestBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ManifestBuilder<'a, S>
+where
+    S: manifest_state::State,
+    S::Metadata: manifest_state::IsUnset,
+{
+    /// Set the `metadata` field (required)
+    pub fn metadata(
+        mut self,
+        value: impl Into<jacquard_common::types::value::Data<'a>>,
+    ) -> ManifestBuilder<'a, manifest_state::SetMetadata<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        ManifestBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ManifestBuilder<'a, S>
+where
+    S: manifest_state::State,
+    S::RuntimeVersion: manifest_state::IsUnset,
+{
+    /// Set the `runtimeVersion` field (required)
+    pub fn runtime_version(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> ManifestBuilder<'a, manifest_state::SetRuntimeVersion<S>> {
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        ManifestBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ManifestBuilder<'a, S>
+where
+    S: manifest_state::State,
+    S::Id: manifest_state::IsSet,
+    S::CreatedAt: manifest_state::IsSet,
+    S::RuntimeVersion: manifest_state::IsSet,
+    S::LaunchAsset: manifest_state::IsSet,
+    S::Metadata: manifest_state::IsSet,
+    S::Extra: manifest_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Manifest<'a> {
+        Manifest {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            extra: self.__unsafe_private_named.1.unwrap(),
+            id: self.__unsafe_private_named.2.unwrap(),
+            launch_asset: self.__unsafe_private_named.3.unwrap(),
+            metadata: self.__unsafe_private_named.4.unwrap(),
+            runtime_version: self.__unsafe_private_named.5.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Manifest<'a> {
+        Manifest {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            extra: self.__unsafe_private_named.1.unwrap(),
+            id: self.__unsafe_private_named.2.unwrap(),
+            launch_asset: self.__unsafe_private_named.3.unwrap(),
+            metadata: self.__unsafe_private_named.4.unwrap(),
+            runtime_version: self.__unsafe_private_named.5.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Manifest<'a> {
@@ -1495,8 +2265,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Manifest<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ManifestExtra<'a> {
@@ -1504,6 +2273,146 @@ pub struct ManifestExtra<'a> {
     pub expo_client: crate::app_ocho::plugin::ExpoClient<'a>,
     #[serde(borrow)]
     pub expo_go: crate::app_ocho::plugin::ExpoGo<'a>,
+}
+
+pub mod manifest_extra_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type ExpoClient;
+        type ExpoGo;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type ExpoClient = Unset;
+        type ExpoGo = Unset;
+    }
+    ///State transition - sets the `expo_client` field to Set
+    pub struct SetExpoClient<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetExpoClient<S> {}
+    impl<S: State> State for SetExpoClient<S> {
+        type ExpoClient = Set<members::expo_client>;
+        type ExpoGo = S::ExpoGo;
+    }
+    ///State transition - sets the `expo_go` field to Set
+    pub struct SetExpoGo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetExpoGo<S> {}
+    impl<S: State> State for SetExpoGo<S> {
+        type ExpoClient = S::ExpoClient;
+        type ExpoGo = Set<members::expo_go>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `expo_client` field
+        pub struct expo_client(());
+        ///Marker type for the `expo_go` field
+        pub struct expo_go(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ManifestExtraBuilder<'a, S: manifest_extra_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<crate::app_ocho::plugin::ExpoClient<'a>>,
+        ::core::option::Option<crate::app_ocho::plugin::ExpoGo<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ManifestExtra<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ManifestExtraBuilder<'a, manifest_extra_state::Empty> {
+        ManifestExtraBuilder::new()
+    }
+}
+
+impl<'a> ManifestExtraBuilder<'a, manifest_extra_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ManifestExtraBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ManifestExtraBuilder<'a, S>
+where
+    S: manifest_extra_state::State,
+    S::ExpoClient: manifest_extra_state::IsUnset,
+{
+    /// Set the `expoClient` field (required)
+    pub fn expo_client(
+        mut self,
+        value: impl Into<crate::app_ocho::plugin::ExpoClient<'a>>,
+    ) -> ManifestExtraBuilder<'a, manifest_extra_state::SetExpoClient<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ManifestExtraBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ManifestExtraBuilder<'a, S>
+where
+    S: manifest_extra_state::State,
+    S::ExpoGo: manifest_extra_state::IsUnset,
+{
+    /// Set the `expoGo` field (required)
+    pub fn expo_go(
+        mut self,
+        value: impl Into<crate::app_ocho::plugin::ExpoGo<'a>>,
+    ) -> ManifestExtraBuilder<'a, manifest_extra_state::SetExpoGo<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        ManifestExtraBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ManifestExtraBuilder<'a, S>
+where
+    S: manifest_extra_state::State,
+    S::ExpoClient: manifest_extra_state::IsSet,
+    S::ExpoGo: manifest_extra_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> ManifestExtra<'a> {
+        ManifestExtra {
+            expo_client: self.__unsafe_private_named.0.unwrap(),
+            expo_go: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> ManifestExtra<'a> {
+        ManifestExtra {
+            expo_client: self.__unsafe_private_named.0.unwrap(),
+            expo_go: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ManifestExtra<'a> {

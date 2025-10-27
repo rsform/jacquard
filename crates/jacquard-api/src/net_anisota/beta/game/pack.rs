@@ -14,8 +14,7 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Pack<'a> {
@@ -23,17 +22,14 @@ pub struct Pack<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     /// When the record was last modified
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub last_modified: Option<jacquard_common::types::string::Datetime>,
     /// When daily pack was last opened
     pub last_open_time: jacquard_common::types::string::Datetime,
     /// Longest daily pack opening streak achieved
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub longest_streak: Option<i64>,
     /// History of the last few pack openings
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub pack_history: Option<
         Vec<crate::net_anisota::beta::game::pack::PackHistoryEntry<'a>>,
@@ -42,6 +38,286 @@ pub struct Pack<'a> {
     pub streak: i64,
     /// Total number of times daily packs have been opened
     pub total_opens: i64,
+}
+
+pub mod pack_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type LastOpenTime;
+        type TotalOpens;
+        type Streak;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type LastOpenTime = Unset;
+        type TotalOpens = Unset;
+        type Streak = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `last_open_time` field to Set
+    pub struct SetLastOpenTime<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLastOpenTime<S> {}
+    impl<S: State> State for SetLastOpenTime<S> {
+        type LastOpenTime = Set<members::last_open_time>;
+        type TotalOpens = S::TotalOpens;
+        type Streak = S::Streak;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `total_opens` field to Set
+    pub struct SetTotalOpens<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTotalOpens<S> {}
+    impl<S: State> State for SetTotalOpens<S> {
+        type LastOpenTime = S::LastOpenTime;
+        type TotalOpens = Set<members::total_opens>;
+        type Streak = S::Streak;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `streak` field to Set
+    pub struct SetStreak<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStreak<S> {}
+    impl<S: State> State for SetStreak<S> {
+        type LastOpenTime = S::LastOpenTime;
+        type TotalOpens = S::TotalOpens;
+        type Streak = Set<members::streak>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type LastOpenTime = S::LastOpenTime;
+        type TotalOpens = S::TotalOpens;
+        type Streak = S::Streak;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `last_open_time` field
+        pub struct last_open_time(());
+        ///Marker type for the `total_opens` field
+        pub struct total_opens(());
+        ///Marker type for the `streak` field
+        pub struct streak(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct PackBuilder<'a, S: pack_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<
+            Vec<crate::net_anisota::beta::game::pack::PackHistoryEntry<'a>>,
+        >,
+        ::core::option::Option<i64>,
+        ::core::option::Option<i64>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Pack<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> PackBuilder<'a, pack_state::Empty> {
+        PackBuilder::new()
+    }
+}
+
+impl<'a> PackBuilder<'a, pack_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        PackBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PackBuilder<'a, S>
+where
+    S: pack_state::State,
+    S::CreatedAt: pack_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> PackBuilder<'a, pack_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        PackBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: pack_state::State> PackBuilder<'a, S> {
+    /// Set the `lastModified` field (optional)
+    pub fn last_modified(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `lastModified` field to an Option value (optional)
+    pub fn maybe_last_modified(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> PackBuilder<'a, S>
+where
+    S: pack_state::State,
+    S::LastOpenTime: pack_state::IsUnset,
+{
+    /// Set the `lastOpenTime` field (required)
+    pub fn last_open_time(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> PackBuilder<'a, pack_state::SetLastOpenTime<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        PackBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: pack_state::State> PackBuilder<'a, S> {
+    /// Set the `longestStreak` field (optional)
+    pub fn longest_streak(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `longestStreak` field to an Option value (optional)
+    pub fn maybe_longest_streak(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: pack_state::State> PackBuilder<'a, S> {
+    /// Set the `packHistory` field (optional)
+    pub fn pack_history(
+        mut self,
+        value: impl Into<
+            Option<Vec<crate::net_anisota::beta::game::pack::PackHistoryEntry<'a>>>,
+        >,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `packHistory` field to an Option value (optional)
+    pub fn maybe_pack_history(
+        mut self,
+        value: Option<Vec<crate::net_anisota::beta::game::pack::PackHistoryEntry<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S> PackBuilder<'a, S>
+where
+    S: pack_state::State,
+    S::Streak: pack_state::IsUnset,
+{
+    /// Set the `streak` field (required)
+    pub fn streak(
+        mut self,
+        value: impl Into<i64>,
+    ) -> PackBuilder<'a, pack_state::SetStreak<S>> {
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        PackBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PackBuilder<'a, S>
+where
+    S: pack_state::State,
+    S::TotalOpens: pack_state::IsUnset,
+{
+    /// Set the `totalOpens` field (required)
+    pub fn total_opens(
+        mut self,
+        value: impl Into<i64>,
+    ) -> PackBuilder<'a, pack_state::SetTotalOpens<S>> {
+        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        PackBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PackBuilder<'a, S>
+where
+    S: pack_state::State,
+    S::LastOpenTime: pack_state::IsSet,
+    S::TotalOpens: pack_state::IsSet,
+    S::Streak: pack_state::IsSet,
+    S::CreatedAt: pack_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Pack<'a> {
+        Pack {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            last_modified: self.__unsafe_private_named.1,
+            last_open_time: self.__unsafe_private_named.2.unwrap(),
+            longest_streak: self.__unsafe_private_named.3,
+            pack_history: self.__unsafe_private_named.4,
+            streak: self.__unsafe_private_named.5.unwrap(),
+            total_opens: self.__unsafe_private_named.6.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Pack<'a> {
+        Pack {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            last_modified: self.__unsafe_private_named.1,
+            last_open_time: self.__unsafe_private_named.2.unwrap(),
+            longest_streak: self.__unsafe_private_named.3,
+            pack_history: self.__unsafe_private_named.4,
+            streak: self.__unsafe_private_named.5.unwrap(),
+            total_opens: self.__unsafe_private_named.6.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Pack<'a> {

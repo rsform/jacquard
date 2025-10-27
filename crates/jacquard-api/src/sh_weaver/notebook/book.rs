@@ -14,8 +14,7 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Book<'a> {
@@ -23,18 +22,221 @@ pub struct Book<'a> {
     pub authors: Vec<crate::sh_weaver::actor::Author<'a>>,
     /// Client-declared timestamp when this was originally created.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub created_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub entry_list: Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub tags: Option<crate::sh_weaver::notebook::Tags<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub title: Option<crate::sh_weaver::notebook::Title<'a>>,
+}
+
+pub mod book_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Authors;
+        type EntryList;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Authors = Unset;
+        type EntryList = Unset;
+    }
+    ///State transition - sets the `authors` field to Set
+    pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthors<S> {}
+    impl<S: State> State for SetAuthors<S> {
+        type Authors = Set<members::authors>;
+        type EntryList = S::EntryList;
+    }
+    ///State transition - sets the `entry_list` field to Set
+    pub struct SetEntryList<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEntryList<S> {}
+    impl<S: State> State for SetEntryList<S> {
+        type Authors = S::Authors;
+        type EntryList = Set<members::entry_list>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `authors` field
+        pub struct authors(());
+        ///Marker type for the `entry_list` field
+        pub struct entry_list(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct BookBuilder<'a, S: book_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<Vec<crate::sh_weaver::actor::Author<'a>>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
+        ::core::option::Option<crate::sh_weaver::notebook::Tags<'a>>,
+        ::core::option::Option<crate::sh_weaver::notebook::Title<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Book<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> BookBuilder<'a, book_state::Empty> {
+        BookBuilder::new()
+    }
+}
+
+impl<'a> BookBuilder<'a, book_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        BookBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BookBuilder<'a, S>
+where
+    S: book_state::State,
+    S::Authors: book_state::IsUnset,
+{
+    /// Set the `authors` field (required)
+    pub fn authors(
+        mut self,
+        value: impl Into<Vec<crate::sh_weaver::actor::Author<'a>>>,
+    ) -> BookBuilder<'a, book_state::SetAuthors<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        BookBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: book_state::State> BookBuilder<'a, S> {
+    /// Set the `createdAt` field (optional)
+    pub fn created_at(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `createdAt` field to an Option value (optional)
+    pub fn maybe_created_at(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> BookBuilder<'a, S>
+where
+    S: book_state::State,
+    S::EntryList: book_state::IsUnset,
+{
+    /// Set the `entryList` field (required)
+    pub fn entry_list(
+        mut self,
+        value: impl Into<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
+    ) -> BookBuilder<'a, book_state::SetEntryList<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        BookBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: book_state::State> BookBuilder<'a, S> {
+    /// Set the `tags` field (optional)
+    pub fn tags(
+        mut self,
+        value: impl Into<Option<crate::sh_weaver::notebook::Tags<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `tags` field to an Option value (optional)
+    pub fn maybe_tags(
+        mut self,
+        value: Option<crate::sh_weaver::notebook::Tags<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: book_state::State> BookBuilder<'a, S> {
+    /// Set the `title` field (optional)
+    pub fn title(
+        mut self,
+        value: impl Into<Option<crate::sh_weaver::notebook::Title<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `title` field to an Option value (optional)
+    pub fn maybe_title(
+        mut self,
+        value: Option<crate::sh_weaver::notebook::Title<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S> BookBuilder<'a, S>
+where
+    S: book_state::State,
+    S::Authors: book_state::IsSet,
+    S::EntryList: book_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Book<'a> {
+        Book {
+            authors: self.__unsafe_private_named.0.unwrap(),
+            created_at: self.__unsafe_private_named.1,
+            entry_list: self.__unsafe_private_named.2.unwrap(),
+            tags: self.__unsafe_private_named.3,
+            title: self.__unsafe_private_named.4,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Book<'a> {
+        Book {
+            authors: self.__unsafe_private_named.0.unwrap(),
+            created_at: self.__unsafe_private_named.1,
+            entry_list: self.__unsafe_private_named.2.unwrap(),
+            tags: self.__unsafe_private_named.3,
+            title: self.__unsafe_private_named.4,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Book<'a> {

@@ -12,17 +12,14 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetUserTopReleases<'a> {
     #[serde(borrow)]
     pub actor: jacquard_common::types::ident::AtIdentifier<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    #[builder(into)]
     pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     ///(default: 50, min: 1, max: 100)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -30,8 +27,149 @@ pub struct GetUserTopReleases<'a> {
     ///(default: "30days")
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    #[builder(into)]
     pub period: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+pub mod get_user_top_releases_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Actor;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Actor = Unset;
+    }
+    ///State transition - sets the `actor` field to Set
+    pub struct SetActor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActor<S> {}
+    impl<S: State> State for SetActor<S> {
+        type Actor = Set<members::actor>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `actor` field
+        pub struct actor(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetUserTopReleasesBuilder<'a, S: get_user_top_releases_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GetUserTopReleases<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GetUserTopReleasesBuilder<'a, get_user_top_releases_state::Empty> {
+        GetUserTopReleasesBuilder::new()
+    }
+}
+
+impl<'a> GetUserTopReleasesBuilder<'a, get_user_top_releases_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetUserTopReleasesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetUserTopReleasesBuilder<'a, S>
+where
+    S: get_user_top_releases_state::State,
+    S::Actor: get_user_top_releases_state::IsUnset,
+{
+    /// Set the `actor` field (required)
+    pub fn actor(
+        mut self,
+        value: impl Into<jacquard_common::types::ident::AtIdentifier<'a>>,
+    ) -> GetUserTopReleasesBuilder<'a, get_user_top_releases_state::SetActor<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        GetUserTopReleasesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: get_user_top_releases_state::State> GetUserTopReleasesBuilder<'a, S> {
+    /// Set the `cursor` field (optional)
+    pub fn cursor(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `cursor` field to an Option value (optional)
+    pub fn maybe_cursor(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: get_user_top_releases_state::State> GetUserTopReleasesBuilder<'a, S> {
+    /// Set the `limit` field (optional)
+    pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `limit` field to an Option value (optional)
+    pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: get_user_top_releases_state::State> GetUserTopReleasesBuilder<'a, S> {
+    /// Set the `period` field (optional)
+    pub fn period(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `period` field to an Option value (optional)
+    pub fn maybe_period(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S> GetUserTopReleasesBuilder<'a, S>
+where
+    S: get_user_top_releases_state::State,
+    S::Actor: get_user_top_releases_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetUserTopReleases<'a> {
+        GetUserTopReleases {
+            actor: self.__unsafe_private_named.0.unwrap(),
+            cursor: self.__unsafe_private_named.1,
+            limit: self.__unsafe_private_named.2,
+            period: self.__unsafe_private_named.3,
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

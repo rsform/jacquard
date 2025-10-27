@@ -12,14 +12,103 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetActorMetadata<'a> {
     #[serde(borrow)]
     pub actor: jacquard_common::types::string::Did<'a>,
+}
+
+pub mod get_actor_metadata_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Actor;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Actor = Unset;
+    }
+    ///State transition - sets the `actor` field to Set
+    pub struct SetActor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActor<S> {}
+    impl<S: State> State for SetActor<S> {
+        type Actor = Set<members::actor>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `actor` field
+        pub struct actor(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetActorMetadataBuilder<'a, S: get_actor_metadata_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GetActorMetadata<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GetActorMetadataBuilder<'a, get_actor_metadata_state::Empty> {
+        GetActorMetadataBuilder::new()
+    }
+}
+
+impl<'a> GetActorMetadataBuilder<'a, get_actor_metadata_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetActorMetadataBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetActorMetadataBuilder<'a, S>
+where
+    S: get_actor_metadata_state::State,
+    S::Actor: get_actor_metadata_state::IsUnset,
+{
+    /// Set the `actor` field (required)
+    pub fn actor(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> GetActorMetadataBuilder<'a, get_actor_metadata_state::SetActor<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        GetActorMetadataBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetActorMetadataBuilder<'a, S>
+where
+    S: get_actor_metadata_state::State,
+    S::Actor: get_actor_metadata_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetActorMetadata<'a> {
+        GetActorMetadata {
+            actor: self.__unsafe_private_named.0.unwrap(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]
@@ -35,11 +124,11 @@ pub struct GetActorMetadata<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct GetActorMetadataOutput<'a> {
     #[serde(borrow)]
-    pub all: jacquard_common::types::value::Data<'a>,
+    pub all: crate::chat_bsky::moderation::get_actor_metadata::Metadata<'a>,
     #[serde(borrow)]
-    pub day: jacquard_common::types::value::Data<'a>,
+    pub day: crate::chat_bsky::moderation::get_actor_metadata::Metadata<'a>,
     #[serde(borrow)]
-    pub month: jacquard_common::types::value::Data<'a>,
+    pub month: crate::chat_bsky::moderation::get_actor_metadata::Metadata<'a>,
 }
 
 /// Response type for
@@ -76,8 +165,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetActorMetadataRequest {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Metadata<'a> {
@@ -85,6 +173,222 @@ pub struct Metadata<'a> {
     pub convos_started: i64,
     pub messages_received: i64,
     pub messages_sent: i64,
+}
+
+pub mod metadata_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type MessagesSent;
+        type MessagesReceived;
+        type Convos;
+        type ConvosStarted;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type MessagesSent = Unset;
+        type MessagesReceived = Unset;
+        type Convos = Unset;
+        type ConvosStarted = Unset;
+    }
+    ///State transition - sets the `messages_sent` field to Set
+    pub struct SetMessagesSent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMessagesSent<S> {}
+    impl<S: State> State for SetMessagesSent<S> {
+        type MessagesSent = Set<members::messages_sent>;
+        type MessagesReceived = S::MessagesReceived;
+        type Convos = S::Convos;
+        type ConvosStarted = S::ConvosStarted;
+    }
+    ///State transition - sets the `messages_received` field to Set
+    pub struct SetMessagesReceived<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMessagesReceived<S> {}
+    impl<S: State> State for SetMessagesReceived<S> {
+        type MessagesSent = S::MessagesSent;
+        type MessagesReceived = Set<members::messages_received>;
+        type Convos = S::Convos;
+        type ConvosStarted = S::ConvosStarted;
+    }
+    ///State transition - sets the `convos` field to Set
+    pub struct SetConvos<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetConvos<S> {}
+    impl<S: State> State for SetConvos<S> {
+        type MessagesSent = S::MessagesSent;
+        type MessagesReceived = S::MessagesReceived;
+        type Convos = Set<members::convos>;
+        type ConvosStarted = S::ConvosStarted;
+    }
+    ///State transition - sets the `convos_started` field to Set
+    pub struct SetConvosStarted<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetConvosStarted<S> {}
+    impl<S: State> State for SetConvosStarted<S> {
+        type MessagesSent = S::MessagesSent;
+        type MessagesReceived = S::MessagesReceived;
+        type Convos = S::Convos;
+        type ConvosStarted = Set<members::convos_started>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `messages_sent` field
+        pub struct messages_sent(());
+        ///Marker type for the `messages_received` field
+        pub struct messages_received(());
+        ///Marker type for the `convos` field
+        pub struct convos(());
+        ///Marker type for the `convos_started` field
+        pub struct convos_started(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct MetadataBuilder<'a, S: metadata_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<i64>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<i64>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Metadata<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> MetadataBuilder<'a, metadata_state::Empty> {
+        MetadataBuilder::new()
+    }
+}
+
+impl<'a> MetadataBuilder<'a, metadata_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        MetadataBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> MetadataBuilder<'a, S>
+where
+    S: metadata_state::State,
+    S::Convos: metadata_state::IsUnset,
+{
+    /// Set the `convos` field (required)
+    pub fn convos(
+        mut self,
+        value: impl Into<i64>,
+    ) -> MetadataBuilder<'a, metadata_state::SetConvos<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        MetadataBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> MetadataBuilder<'a, S>
+where
+    S: metadata_state::State,
+    S::ConvosStarted: metadata_state::IsUnset,
+{
+    /// Set the `convosStarted` field (required)
+    pub fn convos_started(
+        mut self,
+        value: impl Into<i64>,
+    ) -> MetadataBuilder<'a, metadata_state::SetConvosStarted<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        MetadataBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> MetadataBuilder<'a, S>
+where
+    S: metadata_state::State,
+    S::MessagesReceived: metadata_state::IsUnset,
+{
+    /// Set the `messagesReceived` field (required)
+    pub fn messages_received(
+        mut self,
+        value: impl Into<i64>,
+    ) -> MetadataBuilder<'a, metadata_state::SetMessagesReceived<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        MetadataBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> MetadataBuilder<'a, S>
+where
+    S: metadata_state::State,
+    S::MessagesSent: metadata_state::IsUnset,
+{
+    /// Set the `messagesSent` field (required)
+    pub fn messages_sent(
+        mut self,
+        value: impl Into<i64>,
+    ) -> MetadataBuilder<'a, metadata_state::SetMessagesSent<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        MetadataBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> MetadataBuilder<'a, S>
+where
+    S: metadata_state::State,
+    S::MessagesSent: metadata_state::IsSet,
+    S::MessagesReceived: metadata_state::IsSet,
+    S::Convos: metadata_state::IsSet,
+    S::ConvosStarted: metadata_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Metadata<'a> {
+        Metadata {
+            convos: self.__unsafe_private_named.0.unwrap(),
+            convos_started: self.__unsafe_private_named.1.unwrap(),
+            messages_received: self.__unsafe_private_named.2.unwrap(),
+            messages_sent: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Metadata<'a> {
+        Metadata {
+            convos: self.__unsafe_private_named.0.unwrap(),
+            convos_started: self.__unsafe_private_named.1.unwrap(),
+            messages_received: self.__unsafe_private_named.2.unwrap(),
+            messages_sent: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_chat_bsky_moderation_getActorMetadata() -> ::jacquard_lexicon::lexicon::LexiconDoc<

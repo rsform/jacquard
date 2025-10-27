@@ -14,8 +14,7 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Buzz<'a> {
@@ -23,12 +22,227 @@ pub struct Buzz<'a> {
     pub book: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     /// The content of the comment.
     #[serde(borrow)]
-    #[builder(into)]
     pub comment: jacquard_common::CowStr<'a>,
     /// Client-declared timestamp when this comment was originally created.
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(borrow)]
     pub parent: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+}
+
+pub mod buzz_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Comment;
+        type CreatedAt;
+        type Book;
+        type Parent;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Comment = Unset;
+        type CreatedAt = Unset;
+        type Book = Unset;
+        type Parent = Unset;
+    }
+    ///State transition - sets the `comment` field to Set
+    pub struct SetComment<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetComment<S> {}
+    impl<S: State> State for SetComment<S> {
+        type Comment = Set<members::comment>;
+        type CreatedAt = S::CreatedAt;
+        type Book = S::Book;
+        type Parent = S::Parent;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Comment = S::Comment;
+        type CreatedAt = Set<members::created_at>;
+        type Book = S::Book;
+        type Parent = S::Parent;
+    }
+    ///State transition - sets the `book` field to Set
+    pub struct SetBook<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBook<S> {}
+    impl<S: State> State for SetBook<S> {
+        type Comment = S::Comment;
+        type CreatedAt = S::CreatedAt;
+        type Book = Set<members::book>;
+        type Parent = S::Parent;
+    }
+    ///State transition - sets the `parent` field to Set
+    pub struct SetParent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetParent<S> {}
+    impl<S: State> State for SetParent<S> {
+        type Comment = S::Comment;
+        type CreatedAt = S::CreatedAt;
+        type Book = S::Book;
+        type Parent = Set<members::parent>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `comment` field
+        pub struct comment(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `book` field
+        pub struct book(());
+        ///Marker type for the `parent` field
+        pub struct parent(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct BuzzBuilder<'a, S: buzz_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Buzz<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> BuzzBuilder<'a, buzz_state::Empty> {
+        BuzzBuilder::new()
+    }
+}
+
+impl<'a> BuzzBuilder<'a, buzz_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        BuzzBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BuzzBuilder<'a, S>
+where
+    S: buzz_state::State,
+    S::Book: buzz_state::IsUnset,
+{
+    /// Set the `book` field (required)
+    pub fn book(
+        mut self,
+        value: impl Into<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    ) -> BuzzBuilder<'a, buzz_state::SetBook<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        BuzzBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BuzzBuilder<'a, S>
+where
+    S: buzz_state::State,
+    S::Comment: buzz_state::IsUnset,
+{
+    /// Set the `comment` field (required)
+    pub fn comment(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> BuzzBuilder<'a, buzz_state::SetComment<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        BuzzBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BuzzBuilder<'a, S>
+where
+    S: buzz_state::State,
+    S::CreatedAt: buzz_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> BuzzBuilder<'a, buzz_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        BuzzBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BuzzBuilder<'a, S>
+where
+    S: buzz_state::State,
+    S::Parent: buzz_state::IsUnset,
+{
+    /// Set the `parent` field (required)
+    pub fn parent(
+        mut self,
+        value: impl Into<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    ) -> BuzzBuilder<'a, buzz_state::SetParent<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        BuzzBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BuzzBuilder<'a, S>
+where
+    S: buzz_state::State,
+    S::Comment: buzz_state::IsSet,
+    S::CreatedAt: buzz_state::IsSet,
+    S::Book: buzz_state::IsSet,
+    S::Parent: buzz_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Buzz<'a> {
+        Buzz {
+            book: self.__unsafe_private_named.0.unwrap(),
+            comment: self.__unsafe_private_named.1.unwrap(),
+            created_at: self.__unsafe_private_named.2.unwrap(),
+            parent: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Buzz<'a> {
+        Buzz {
+            book: self.__unsafe_private_named.0.unwrap(),
+            comment: self.__unsafe_private_named.1.unwrap(),
+            created_at: self.__unsafe_private_named.2.unwrap(),
+            parent: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Buzz<'a> {

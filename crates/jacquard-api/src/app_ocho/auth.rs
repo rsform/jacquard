@@ -22,22 +22,234 @@ pub mod whoami;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AuthCallback<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub access_jwt: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub handle: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    #[builder(into)]
     pub refresh_jwt: jacquard_common::CowStr<'a>,
+}
+
+pub mod auth_callback_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type RefreshJwt;
+        type AccessJwt;
+        type Handle;
+        type Did;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type RefreshJwt = Unset;
+        type AccessJwt = Unset;
+        type Handle = Unset;
+        type Did = Unset;
+    }
+    ///State transition - sets the `refresh_jwt` field to Set
+    pub struct SetRefreshJwt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRefreshJwt<S> {}
+    impl<S: State> State for SetRefreshJwt<S> {
+        type RefreshJwt = Set<members::refresh_jwt>;
+        type AccessJwt = S::AccessJwt;
+        type Handle = S::Handle;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `access_jwt` field to Set
+    pub struct SetAccessJwt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAccessJwt<S> {}
+    impl<S: State> State for SetAccessJwt<S> {
+        type RefreshJwt = S::RefreshJwt;
+        type AccessJwt = Set<members::access_jwt>;
+        type Handle = S::Handle;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHandle<S> {}
+    impl<S: State> State for SetHandle<S> {
+        type RefreshJwt = S::RefreshJwt;
+        type AccessJwt = S::AccessJwt;
+        type Handle = Set<members::handle>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type RefreshJwt = S::RefreshJwt;
+        type AccessJwt = S::AccessJwt;
+        type Handle = S::Handle;
+        type Did = Set<members::did>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `refresh_jwt` field
+        pub struct refresh_jwt(());
+        ///Marker type for the `access_jwt` field
+        pub struct access_jwt(());
+        ///Marker type for the `handle` field
+        pub struct handle(());
+        ///Marker type for the `did` field
+        pub struct did(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct AuthCallbackBuilder<'a, S: auth_callback_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> AuthCallback<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> AuthCallbackBuilder<'a, auth_callback_state::Empty> {
+        AuthCallbackBuilder::new()
+    }
+}
+
+impl<'a> AuthCallbackBuilder<'a, auth_callback_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        AuthCallbackBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AuthCallbackBuilder<'a, S>
+where
+    S: auth_callback_state::State,
+    S::AccessJwt: auth_callback_state::IsUnset,
+{
+    /// Set the `accessJwt` field (required)
+    pub fn access_jwt(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> AuthCallbackBuilder<'a, auth_callback_state::SetAccessJwt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        AuthCallbackBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AuthCallbackBuilder<'a, S>
+where
+    S: auth_callback_state::State,
+    S::Did: auth_callback_state::IsUnset,
+{
+    /// Set the `did` field (required)
+    pub fn did(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> AuthCallbackBuilder<'a, auth_callback_state::SetDid<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        AuthCallbackBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AuthCallbackBuilder<'a, S>
+where
+    S: auth_callback_state::State,
+    S::Handle: auth_callback_state::IsUnset,
+{
+    /// Set the `handle` field (required)
+    pub fn handle(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> AuthCallbackBuilder<'a, auth_callback_state::SetHandle<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        AuthCallbackBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AuthCallbackBuilder<'a, S>
+where
+    S: auth_callback_state::State,
+    S::RefreshJwt: auth_callback_state::IsUnset,
+{
+    /// Set the `refreshJwt` field (required)
+    pub fn refresh_jwt(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> AuthCallbackBuilder<'a, auth_callback_state::SetRefreshJwt<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        AuthCallbackBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AuthCallbackBuilder<'a, S>
+where
+    S: auth_callback_state::State,
+    S::RefreshJwt: auth_callback_state::IsSet,
+    S::AccessJwt: auth_callback_state::IsSet,
+    S::Handle: auth_callback_state::IsSet,
+    S::Did: auth_callback_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> AuthCallback<'a> {
+        AuthCallback {
+            access_jwt: self.__unsafe_private_named.0.unwrap(),
+            did: self.__unsafe_private_named.1.unwrap(),
+            handle: self.__unsafe_private_named.2.unwrap(),
+            refresh_jwt: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> AuthCallback<'a> {
+        AuthCallback {
+            access_jwt: self.__unsafe_private_named.0.unwrap(),
+            did: self.__unsafe_private_named.1.unwrap(),
+            handle: self.__unsafe_private_named.2.unwrap(),
+            refresh_jwt: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_app_ocho_auth_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {

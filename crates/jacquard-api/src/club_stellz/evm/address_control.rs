@@ -13,8 +13,7 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AddressControl<'a> {
@@ -22,12 +21,204 @@ pub struct AddressControl<'a> {
     pub address: bytes::Bytes,
     /// List of all Chain IDs (besides the one in the sign-in message, though you can include it) that the holder of this address is also active on & accepts tokens thru.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub also_on: Option<Vec<i64>>,
     /// Sign in With Ethereum message signature as bytes
     pub signature: bytes::Bytes,
     #[serde(borrow)]
     pub siwe: crate::club_stellz::evm::address_control::SiweMessage<'a>,
+}
+
+pub mod address_control_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Address;
+        type Signature;
+        type Siwe;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Address = Unset;
+        type Signature = Unset;
+        type Siwe = Unset;
+    }
+    ///State transition - sets the `address` field to Set
+    pub struct SetAddress<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAddress<S> {}
+    impl<S: State> State for SetAddress<S> {
+        type Address = Set<members::address>;
+        type Signature = S::Signature;
+        type Siwe = S::Siwe;
+    }
+    ///State transition - sets the `signature` field to Set
+    pub struct SetSignature<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSignature<S> {}
+    impl<S: State> State for SetSignature<S> {
+        type Address = S::Address;
+        type Signature = Set<members::signature>;
+        type Siwe = S::Siwe;
+    }
+    ///State transition - sets the `siwe` field to Set
+    pub struct SetSiwe<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSiwe<S> {}
+    impl<S: State> State for SetSiwe<S> {
+        type Address = S::Address;
+        type Signature = S::Signature;
+        type Siwe = Set<members::siwe>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `address` field
+        pub struct address(());
+        ///Marker type for the `signature` field
+        pub struct signature(());
+        ///Marker type for the `siwe` field
+        pub struct siwe(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct AddressControlBuilder<'a, S: address_control_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<bytes::Bytes>,
+        ::core::option::Option<Vec<i64>>,
+        ::core::option::Option<bytes::Bytes>,
+        ::core::option::Option<crate::club_stellz::evm::address_control::SiweMessage<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> AddressControl<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> AddressControlBuilder<'a, address_control_state::Empty> {
+        AddressControlBuilder::new()
+    }
+}
+
+impl<'a> AddressControlBuilder<'a, address_control_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        AddressControlBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AddressControlBuilder<'a, S>
+where
+    S: address_control_state::State,
+    S::Address: address_control_state::IsUnset,
+{
+    /// Set the `address` field (required)
+    pub fn address(
+        mut self,
+        value: impl Into<bytes::Bytes>,
+    ) -> AddressControlBuilder<'a, address_control_state::SetAddress<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        AddressControlBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: address_control_state::State> AddressControlBuilder<'a, S> {
+    /// Set the `alsoOn` field (optional)
+    pub fn also_on(mut self, value: impl Into<Option<Vec<i64>>>) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `alsoOn` field to an Option value (optional)
+    pub fn maybe_also_on(mut self, value: Option<Vec<i64>>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> AddressControlBuilder<'a, S>
+where
+    S: address_control_state::State,
+    S::Signature: address_control_state::IsUnset,
+{
+    /// Set the `signature` field (required)
+    pub fn signature(
+        mut self,
+        value: impl Into<bytes::Bytes>,
+    ) -> AddressControlBuilder<'a, address_control_state::SetSignature<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        AddressControlBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AddressControlBuilder<'a, S>
+where
+    S: address_control_state::State,
+    S::Siwe: address_control_state::IsUnset,
+{
+    /// Set the `siwe` field (required)
+    pub fn siwe(
+        mut self,
+        value: impl Into<crate::club_stellz::evm::address_control::SiweMessage<'a>>,
+    ) -> AddressControlBuilder<'a, address_control_state::SetSiwe<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        AddressControlBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AddressControlBuilder<'a, S>
+where
+    S: address_control_state::State,
+    S::Address: address_control_state::IsSet,
+    S::Signature: address_control_state::IsSet,
+    S::Siwe: address_control_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> AddressControl<'a> {
+        AddressControl {
+            address: self.__unsafe_private_named.0.unwrap(),
+            also_on: self.__unsafe_private_named.1,
+            signature: self.__unsafe_private_named.2.unwrap(),
+            siwe: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> AddressControl<'a> {
+        AddressControl {
+            address: self.__unsafe_private_named.0.unwrap(),
+            also_on: self.__unsafe_private_named.1,
+            signature: self.__unsafe_private_named.2.unwrap(),
+            siwe: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_club_stellz_evm_addressControl() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -308,38 +499,424 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AddressControl<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SiweMessage<'a> {
     /// Ethereum address in 0x-prefixed, checksummed hex format
     #[serde(borrow)]
-    #[builder(into)]
     pub address: jacquard_common::CowStr<'a>,
     /// Chain ID of the Ethereum VM network the address is on
     pub chain_id: i64,
     /// Domain of the application requesting the signature, e.g. 'wallet-link.stellz.club'
     #[serde(borrow)]
-    #[builder(into)]
     pub domain: jacquard_common::CowStr<'a>,
     /// Timestamp when the message was signed
     pub issued_at: jacquard_common::types::string::Datetime,
     /// Random nonce the message was signed with
     #[serde(borrow)]
-    #[builder(into)]
     pub nonce: jacquard_common::CowStr<'a>,
     /// The message shown to the user in their wallet before signing, which MUST be of the format 'Prove control of ${address} to link it to ${did}', where ${address} is the linked Ethereum address in 0x-prefixed, checksummed hex format, and ${did} is the DID of the user.
     #[serde(borrow)]
-    #[builder(into)]
     pub statement: jacquard_common::CowStr<'a>,
     /// URI of the application requesting the signature, e.g. 'https://wallet-link.stellz.club'
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::Uri<'a>,
     /// Sign in With Ethereum message version
     #[serde(borrow)]
-    #[builder(into)]
     pub version: jacquard_common::CowStr<'a>,
+}
+
+pub mod siwe_message_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Domain;
+        type Address;
+        type Statement;
+        type Uri;
+        type Version;
+        type ChainId;
+        type Nonce;
+        type IssuedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Domain = Unset;
+        type Address = Unset;
+        type Statement = Unset;
+        type Uri = Unset;
+        type Version = Unset;
+        type ChainId = Unset;
+        type Nonce = Unset;
+        type IssuedAt = Unset;
+    }
+    ///State transition - sets the `domain` field to Set
+    pub struct SetDomain<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDomain<S> {}
+    impl<S: State> State for SetDomain<S> {
+        type Domain = Set<members::domain>;
+        type Address = S::Address;
+        type Statement = S::Statement;
+        type Uri = S::Uri;
+        type Version = S::Version;
+        type ChainId = S::ChainId;
+        type Nonce = S::Nonce;
+        type IssuedAt = S::IssuedAt;
+    }
+    ///State transition - sets the `address` field to Set
+    pub struct SetAddress<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAddress<S> {}
+    impl<S: State> State for SetAddress<S> {
+        type Domain = S::Domain;
+        type Address = Set<members::address>;
+        type Statement = S::Statement;
+        type Uri = S::Uri;
+        type Version = S::Version;
+        type ChainId = S::ChainId;
+        type Nonce = S::Nonce;
+        type IssuedAt = S::IssuedAt;
+    }
+    ///State transition - sets the `statement` field to Set
+    pub struct SetStatement<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStatement<S> {}
+    impl<S: State> State for SetStatement<S> {
+        type Domain = S::Domain;
+        type Address = S::Address;
+        type Statement = Set<members::statement>;
+        type Uri = S::Uri;
+        type Version = S::Version;
+        type ChainId = S::ChainId;
+        type Nonce = S::Nonce;
+        type IssuedAt = S::IssuedAt;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Domain = S::Domain;
+        type Address = S::Address;
+        type Statement = S::Statement;
+        type Uri = Set<members::uri>;
+        type Version = S::Version;
+        type ChainId = S::ChainId;
+        type Nonce = S::Nonce;
+        type IssuedAt = S::IssuedAt;
+    }
+    ///State transition - sets the `version` field to Set
+    pub struct SetVersion<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVersion<S> {}
+    impl<S: State> State for SetVersion<S> {
+        type Domain = S::Domain;
+        type Address = S::Address;
+        type Statement = S::Statement;
+        type Uri = S::Uri;
+        type Version = Set<members::version>;
+        type ChainId = S::ChainId;
+        type Nonce = S::Nonce;
+        type IssuedAt = S::IssuedAt;
+    }
+    ///State transition - sets the `chain_id` field to Set
+    pub struct SetChainId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetChainId<S> {}
+    impl<S: State> State for SetChainId<S> {
+        type Domain = S::Domain;
+        type Address = S::Address;
+        type Statement = S::Statement;
+        type Uri = S::Uri;
+        type Version = S::Version;
+        type ChainId = Set<members::chain_id>;
+        type Nonce = S::Nonce;
+        type IssuedAt = S::IssuedAt;
+    }
+    ///State transition - sets the `nonce` field to Set
+    pub struct SetNonce<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNonce<S> {}
+    impl<S: State> State for SetNonce<S> {
+        type Domain = S::Domain;
+        type Address = S::Address;
+        type Statement = S::Statement;
+        type Uri = S::Uri;
+        type Version = S::Version;
+        type ChainId = S::ChainId;
+        type Nonce = Set<members::nonce>;
+        type IssuedAt = S::IssuedAt;
+    }
+    ///State transition - sets the `issued_at` field to Set
+    pub struct SetIssuedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIssuedAt<S> {}
+    impl<S: State> State for SetIssuedAt<S> {
+        type Domain = S::Domain;
+        type Address = S::Address;
+        type Statement = S::Statement;
+        type Uri = S::Uri;
+        type Version = S::Version;
+        type ChainId = S::ChainId;
+        type Nonce = S::Nonce;
+        type IssuedAt = Set<members::issued_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `domain` field
+        pub struct domain(());
+        ///Marker type for the `address` field
+        pub struct address(());
+        ///Marker type for the `statement` field
+        pub struct statement(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `version` field
+        pub struct version(());
+        ///Marker type for the `chain_id` field
+        pub struct chain_id(());
+        ///Marker type for the `nonce` field
+        pub struct nonce(());
+        ///Marker type for the `issued_at` field
+        pub struct issued_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct SiweMessageBuilder<'a, S: siwe_message_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> SiweMessage<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> SiweMessageBuilder<'a, siwe_message_state::Empty> {
+        SiweMessageBuilder::new()
+    }
+}
+
+impl<'a> SiweMessageBuilder<'a, siwe_message_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        SiweMessageBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SiweMessageBuilder<'a, S>
+where
+    S: siwe_message_state::State,
+    S::Address: siwe_message_state::IsUnset,
+{
+    /// Set the `address` field (required)
+    pub fn address(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> SiweMessageBuilder<'a, siwe_message_state::SetAddress<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        SiweMessageBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SiweMessageBuilder<'a, S>
+where
+    S: siwe_message_state::State,
+    S::ChainId: siwe_message_state::IsUnset,
+{
+    /// Set the `chainId` field (required)
+    pub fn chain_id(
+        mut self,
+        value: impl Into<i64>,
+    ) -> SiweMessageBuilder<'a, siwe_message_state::SetChainId<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        SiweMessageBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SiweMessageBuilder<'a, S>
+where
+    S: siwe_message_state::State,
+    S::Domain: siwe_message_state::IsUnset,
+{
+    /// Set the `domain` field (required)
+    pub fn domain(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> SiweMessageBuilder<'a, siwe_message_state::SetDomain<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        SiweMessageBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SiweMessageBuilder<'a, S>
+where
+    S: siwe_message_state::State,
+    S::IssuedAt: siwe_message_state::IsUnset,
+{
+    /// Set the `issuedAt` field (required)
+    pub fn issued_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> SiweMessageBuilder<'a, siwe_message_state::SetIssuedAt<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        SiweMessageBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SiweMessageBuilder<'a, S>
+where
+    S: siwe_message_state::State,
+    S::Nonce: siwe_message_state::IsUnset,
+{
+    /// Set the `nonce` field (required)
+    pub fn nonce(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> SiweMessageBuilder<'a, siwe_message_state::SetNonce<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        SiweMessageBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SiweMessageBuilder<'a, S>
+where
+    S: siwe_message_state::State,
+    S::Statement: siwe_message_state::IsUnset,
+{
+    /// Set the `statement` field (required)
+    pub fn statement(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> SiweMessageBuilder<'a, siwe_message_state::SetStatement<S>> {
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        SiweMessageBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SiweMessageBuilder<'a, S>
+where
+    S: siwe_message_state::State,
+    S::Uri: siwe_message_state::IsUnset,
+{
+    /// Set the `uri` field (required)
+    pub fn uri(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+    ) -> SiweMessageBuilder<'a, siwe_message_state::SetUri<S>> {
+        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        SiweMessageBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SiweMessageBuilder<'a, S>
+where
+    S: siwe_message_state::State,
+    S::Version: siwe_message_state::IsUnset,
+{
+    /// Set the `version` field (required)
+    pub fn version(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> SiweMessageBuilder<'a, siwe_message_state::SetVersion<S>> {
+        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        SiweMessageBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SiweMessageBuilder<'a, S>
+where
+    S: siwe_message_state::State,
+    S::Domain: siwe_message_state::IsSet,
+    S::Address: siwe_message_state::IsSet,
+    S::Statement: siwe_message_state::IsSet,
+    S::Uri: siwe_message_state::IsSet,
+    S::Version: siwe_message_state::IsSet,
+    S::ChainId: siwe_message_state::IsSet,
+    S::Nonce: siwe_message_state::IsSet,
+    S::IssuedAt: siwe_message_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> SiweMessage<'a> {
+        SiweMessage {
+            address: self.__unsafe_private_named.0.unwrap(),
+            chain_id: self.__unsafe_private_named.1.unwrap(),
+            domain: self.__unsafe_private_named.2.unwrap(),
+            issued_at: self.__unsafe_private_named.3.unwrap(),
+            nonce: self.__unsafe_private_named.4.unwrap(),
+            statement: self.__unsafe_private_named.5.unwrap(),
+            uri: self.__unsafe_private_named.6.unwrap(),
+            version: self.__unsafe_private_named.7.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> SiweMessage<'a> {
+        SiweMessage {
+            address: self.__unsafe_private_named.0.unwrap(),
+            chain_id: self.__unsafe_private_named.1.unwrap(),
+            domain: self.__unsafe_private_named.2.unwrap(),
+            issued_at: self.__unsafe_private_named.3.unwrap(),
+            nonce: self.__unsafe_private_named.4.unwrap(),
+            statement: self.__unsafe_private_named.5.unwrap(),
+            uri: self.__unsafe_private_named.6.unwrap(),
+            version: self.__unsafe_private_named.7.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SiweMessage<'a> {

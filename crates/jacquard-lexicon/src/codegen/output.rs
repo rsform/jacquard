@@ -108,8 +108,8 @@ impl<'c> CodeGenerator<'c> {
                     module_path.push(format!("{}.rs", name));
                     let is_subscription = subscription_files.contains(&module_path);
 
-                    if is_root {
-                        // Top-level modules get feature gates
+                    if is_root && name != "builder_types" {
+                        // Top-level modules get feature gates (except builder_types which is always needed)
                         quote! {
                             #[cfg(feature = #name)]
                             pub mod #ident;
@@ -147,6 +147,11 @@ impl<'c> CodeGenerator<'c> {
         // Generate all code (defs only)
         let defs_files = self.generate_all()?;
         let mut all_files = defs_files.clone();
+
+        // Generate common builder types (Set, Unset, IsSet, IsUnset)
+        let common_types_path = std::path::PathBuf::from("builder_types.rs");
+        let common_types_tokens = super::builder_gen::common::generate_common_types();
+        all_files.insert(common_types_path, (common_types_tokens, None));
 
         // Get subscription files for feature gating
         let subscription_files = self.subscription_files.borrow();

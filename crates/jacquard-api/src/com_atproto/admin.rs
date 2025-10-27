@@ -29,49 +29,418 @@ pub mod update_subject_status;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AccountView<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub deactivated_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub email: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub email_confirmed_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
     pub indexed_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub invite_note: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub invited_by: Option<crate::com_atproto::server::InviteCode<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub invites: Option<Vec<crate::com_atproto::server::InviteCode<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub invites_disabled: Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub related_records: Option<Vec<jacquard_common::types::value::Data<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub threat_signatures: Option<Vec<crate::com_atproto::admin::ThreatSignature<'a>>>,
+}
+
+pub mod account_view_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Did;
+        type Handle;
+        type IndexedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Did = Unset;
+        type Handle = Unset;
+        type IndexedAt = Unset;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Did = Set<members::did>;
+        type Handle = S::Handle;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHandle<S> {}
+    impl<S: State> State for SetHandle<S> {
+        type Did = S::Did;
+        type Handle = Set<members::handle>;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type Did = S::Did;
+        type Handle = S::Handle;
+        type IndexedAt = Set<members::indexed_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `handle` field
+        pub struct handle(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct AccountViewBuilder<'a, S: account_view_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::string::Handle<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<crate::com_atproto::server::InviteCode<'a>>,
+        ::core::option::Option<Vec<crate::com_atproto::server::InviteCode<'a>>>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
+        ::core::option::Option<Vec<crate::com_atproto::admin::ThreatSignature<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> AccountView<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> AccountViewBuilder<'a, account_view_state::Empty> {
+        AccountViewBuilder::new()
+    }
+}
+
+impl<'a> AccountViewBuilder<'a, account_view_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        AccountViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: account_view_state::State> AccountViewBuilder<'a, S> {
+    /// Set the `deactivatedAt` field (optional)
+    pub fn deactivated_at(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `deactivatedAt` field to an Option value (optional)
+    pub fn maybe_deactivated_at(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> AccountViewBuilder<'a, S>
+where
+    S: account_view_state::State,
+    S::Did: account_view_state::IsUnset,
+{
+    /// Set the `did` field (required)
+    pub fn did(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> AccountViewBuilder<'a, account_view_state::SetDid<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        AccountViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: account_view_state::State> AccountViewBuilder<'a, S> {
+    /// Set the `email` field (optional)
+    pub fn email(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `email` field to an Option value (optional)
+    pub fn maybe_email(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: account_view_state::State> AccountViewBuilder<'a, S> {
+    /// Set the `emailConfirmedAt` field (optional)
+    pub fn email_confirmed_at(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `emailConfirmedAt` field to an Option value (optional)
+    pub fn maybe_email_confirmed_at(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S> AccountViewBuilder<'a, S>
+where
+    S: account_view_state::State,
+    S::Handle: account_view_state::IsUnset,
+{
+    /// Set the `handle` field (required)
+    pub fn handle(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Handle<'a>>,
+    ) -> AccountViewBuilder<'a, account_view_state::SetHandle<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        AccountViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AccountViewBuilder<'a, S>
+where
+    S: account_view_state::State,
+    S::IndexedAt: account_view_state::IsUnset,
+{
+    /// Set the `indexedAt` field (required)
+    pub fn indexed_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> AccountViewBuilder<'a, account_view_state::SetIndexedAt<S>> {
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        AccountViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: account_view_state::State> AccountViewBuilder<'a, S> {
+    /// Set the `inviteNote` field (optional)
+    pub fn invite_note(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `inviteNote` field to an Option value (optional)
+    pub fn maybe_invite_note(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S: account_view_state::State> AccountViewBuilder<'a, S> {
+    /// Set the `invitedBy` field (optional)
+    pub fn invited_by(
+        mut self,
+        value: impl Into<Option<crate::com_atproto::server::InviteCode<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value.into();
+        self
+    }
+    /// Set the `invitedBy` field to an Option value (optional)
+    pub fn maybe_invited_by(
+        mut self,
+        value: Option<crate::com_atproto::server::InviteCode<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value;
+        self
+    }
+}
+
+impl<'a, S: account_view_state::State> AccountViewBuilder<'a, S> {
+    /// Set the `invites` field (optional)
+    pub fn invites(
+        mut self,
+        value: impl Into<Option<Vec<crate::com_atproto::server::InviteCode<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value.into();
+        self
+    }
+    /// Set the `invites` field to an Option value (optional)
+    pub fn maybe_invites(
+        mut self,
+        value: Option<Vec<crate::com_atproto::server::InviteCode<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value;
+        self
+    }
+}
+
+impl<'a, S: account_view_state::State> AccountViewBuilder<'a, S> {
+    /// Set the `invitesDisabled` field (optional)
+    pub fn invites_disabled(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.9 = value.into();
+        self
+    }
+    /// Set the `invitesDisabled` field to an Option value (optional)
+    pub fn maybe_invites_disabled(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.9 = value;
+        self
+    }
+}
+
+impl<'a, S: account_view_state::State> AccountViewBuilder<'a, S> {
+    /// Set the `relatedRecords` field (optional)
+    pub fn related_records(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::types::value::Data<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.10 = value.into();
+        self
+    }
+    /// Set the `relatedRecords` field to an Option value (optional)
+    pub fn maybe_related_records(
+        mut self,
+        value: Option<Vec<jacquard_common::types::value::Data<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.10 = value;
+        self
+    }
+}
+
+impl<'a, S: account_view_state::State> AccountViewBuilder<'a, S> {
+    /// Set the `threatSignatures` field (optional)
+    pub fn threat_signatures(
+        mut self,
+        value: impl Into<Option<Vec<crate::com_atproto::admin::ThreatSignature<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.11 = value.into();
+        self
+    }
+    /// Set the `threatSignatures` field to an Option value (optional)
+    pub fn maybe_threat_signatures(
+        mut self,
+        value: Option<Vec<crate::com_atproto::admin::ThreatSignature<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.11 = value;
+        self
+    }
+}
+
+impl<'a, S> AccountViewBuilder<'a, S>
+where
+    S: account_view_state::State,
+    S::Did: account_view_state::IsSet,
+    S::Handle: account_view_state::IsSet,
+    S::IndexedAt: account_view_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> AccountView<'a> {
+        AccountView {
+            deactivated_at: self.__unsafe_private_named.0,
+            did: self.__unsafe_private_named.1.unwrap(),
+            email: self.__unsafe_private_named.2,
+            email_confirmed_at: self.__unsafe_private_named.3,
+            handle: self.__unsafe_private_named.4.unwrap(),
+            indexed_at: self.__unsafe_private_named.5.unwrap(),
+            invite_note: self.__unsafe_private_named.6,
+            invited_by: self.__unsafe_private_named.7,
+            invites: self.__unsafe_private_named.8,
+            invites_disabled: self.__unsafe_private_named.9,
+            related_records: self.__unsafe_private_named.10,
+            threat_signatures: self.__unsafe_private_named.11,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> AccountView<'a> {
+        AccountView {
+            deactivated_at: self.__unsafe_private_named.0,
+            did: self.__unsafe_private_named.1.unwrap(),
+            email: self.__unsafe_private_named.2,
+            email_confirmed_at: self.__unsafe_private_named.3,
+            handle: self.__unsafe_private_named.4.unwrap(),
+            indexed_at: self.__unsafe_private_named.5.unwrap(),
+            invite_note: self.__unsafe_private_named.6,
+            invited_by: self.__unsafe_private_named.7,
+            invites: self.__unsafe_private_named.8,
+            invites_disabled: self.__unsafe_private_named.9,
+            related_records: self.__unsafe_private_named.10,
+            threat_signatures: self.__unsafe_private_named.11,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_com_atproto_admin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -509,8 +878,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AccountView<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RepoBlobRef<'a> {
@@ -519,9 +887,170 @@ pub struct RepoBlobRef<'a> {
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub record_uri: Option<jacquard_common::types::string::AtUri<'a>>,
+}
+
+pub mod repo_blob_ref_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Did;
+        type Cid;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Did = Unset;
+        type Cid = Unset;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Did = Set<members::did>;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Did = S::Did;
+        type Cid = Set<members::cid>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct RepoBlobRefBuilder<'a, S: repo_blob_ref_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> RepoBlobRef<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> RepoBlobRefBuilder<'a, repo_blob_ref_state::Empty> {
+        RepoBlobRefBuilder::new()
+    }
+}
+
+impl<'a> RepoBlobRefBuilder<'a, repo_blob_ref_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        RepoBlobRefBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RepoBlobRefBuilder<'a, S>
+where
+    S: repo_blob_ref_state::State,
+    S::Cid: repo_blob_ref_state::IsUnset,
+{
+    /// Set the `cid` field (required)
+    pub fn cid(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Cid<'a>>,
+    ) -> RepoBlobRefBuilder<'a, repo_blob_ref_state::SetCid<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        RepoBlobRefBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RepoBlobRefBuilder<'a, S>
+where
+    S: repo_blob_ref_state::State,
+    S::Did: repo_blob_ref_state::IsUnset,
+{
+    /// Set the `did` field (required)
+    pub fn did(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> RepoBlobRefBuilder<'a, repo_blob_ref_state::SetDid<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        RepoBlobRefBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: repo_blob_ref_state::State> RepoBlobRefBuilder<'a, S> {
+    /// Set the `recordUri` field (optional)
+    pub fn record_uri(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::AtUri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `recordUri` field to an Option value (optional)
+    pub fn maybe_record_uri(
+        mut self,
+        value: Option<jacquard_common::types::string::AtUri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> RepoBlobRefBuilder<'a, S>
+where
+    S: repo_blob_ref_state::State,
+    S::Did: repo_blob_ref_state::IsSet,
+    S::Cid: repo_blob_ref_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> RepoBlobRef<'a> {
+        RepoBlobRef {
+            cid: self.__unsafe_private_named.0.unwrap(),
+            did: self.__unsafe_private_named.1.unwrap(),
+            record_uri: self.__unsafe_private_named.2,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> RepoBlobRef<'a> {
+        RepoBlobRef {
+            cid: self.__unsafe_private_named.0.unwrap(),
+            did: self.__unsafe_private_named.1.unwrap(),
+            record_uri: self.__unsafe_private_named.2,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RepoBlobRef<'a> {
@@ -549,13 +1078,117 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RepoBlobRef<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RepoRef<'a> {
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
+}
+
+pub mod repo_ref_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Did;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Did = Unset;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Did = Set<members::did>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `did` field
+        pub struct did(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct RepoRefBuilder<'a, S: repo_ref_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> RepoRef<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> RepoRefBuilder<'a, repo_ref_state::Empty> {
+        RepoRefBuilder::new()
+    }
+}
+
+impl<'a> RepoRefBuilder<'a, repo_ref_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        RepoRefBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RepoRefBuilder<'a, S>
+where
+    S: repo_ref_state::State,
+    S::Did: repo_ref_state::IsUnset,
+{
+    /// Set the `did` field (required)
+    pub fn did(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> RepoRefBuilder<'a, repo_ref_state::SetDid<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        RepoRefBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RepoRefBuilder<'a, S>
+where
+    S: repo_ref_state::State,
+    S::Did: repo_ref_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> RepoRef<'a> {
+        RepoRef {
+            did: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> RepoRef<'a> {
+        RepoRef {
+            did: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RepoRef<'a> {
@@ -583,16 +1216,138 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RepoRef<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StatusAttr<'a> {
     pub applied: bool,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub r#ref: Option<jacquard_common::CowStr<'a>>,
+}
+
+pub mod status_attr_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Applied;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Applied = Unset;
+    }
+    ///State transition - sets the `applied` field to Set
+    pub struct SetApplied<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetApplied<S> {}
+    impl<S: State> State for SetApplied<S> {
+        type Applied = Set<members::applied>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `applied` field
+        pub struct applied(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct StatusAttrBuilder<'a, S: status_attr_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<bool>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> StatusAttr<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> StatusAttrBuilder<'a, status_attr_state::Empty> {
+        StatusAttrBuilder::new()
+    }
+}
+
+impl<'a> StatusAttrBuilder<'a, status_attr_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        StatusAttrBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> StatusAttrBuilder<'a, S>
+where
+    S: status_attr_state::State,
+    S::Applied: status_attr_state::IsUnset,
+{
+    /// Set the `applied` field (required)
+    pub fn applied(
+        mut self,
+        value: impl Into<bool>,
+    ) -> StatusAttrBuilder<'a, status_attr_state::SetApplied<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        StatusAttrBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: status_attr_state::State> StatusAttrBuilder<'a, S> {
+    /// Set the `ref` field (optional)
+    pub fn r#ref(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `ref` field to an Option value (optional)
+    pub fn maybe_ref(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> StatusAttrBuilder<'a, S>
+where
+    S: status_attr_state::State,
+    S::Applied: status_attr_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> StatusAttr<'a> {
+        StatusAttr {
+            applied: self.__unsafe_private_named.0.unwrap(),
+            r#ref: self.__unsafe_private_named.1,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> StatusAttr<'a> {
+        StatusAttr {
+            applied: self.__unsafe_private_named.0.unwrap(),
+            r#ref: self.__unsafe_private_named.1,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StatusAttr<'a> {

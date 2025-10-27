@@ -13,8 +13,7 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LivestreamView<'a> {
@@ -29,9 +28,287 @@ pub struct LivestreamView<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
     /// The number of viewers watching this livestream. Use when you can't reasonably use #viewerCount directly.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub viewer_count: Option<crate::place_stream::livestream::ViewerCount<'a>>,
+}
+
+pub mod livestream_view_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Uri;
+        type Cid;
+        type Author;
+        type Record;
+        type IndexedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Uri = Unset;
+        type Cid = Unset;
+        type Author = Unset;
+        type Record = Unset;
+        type IndexedAt = Unset;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Uri = Set<members::uri>;
+        type Cid = S::Cid;
+        type Author = S::Author;
+        type Record = S::Record;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Uri = S::Uri;
+        type Cid = Set<members::cid>;
+        type Author = S::Author;
+        type Record = S::Record;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthor<S> {}
+    impl<S: State> State for SetAuthor<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Author = Set<members::author>;
+        type Record = S::Record;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecord<S> {}
+    impl<S: State> State for SetRecord<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Author = S::Author;
+        type Record = Set<members::record>;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Author = S::Author;
+        type Record = S::Record;
+        type IndexedAt = Set<members::indexed_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `author` field
+        pub struct author(());
+        ///Marker type for the `record` field
+        pub struct record(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct LivestreamViewBuilder<'a, S: livestream_view_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<crate::app_bsky::actor::ProfileViewBasic<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+        ::core::option::Option<crate::place_stream::livestream::ViewerCount<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> LivestreamView<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> LivestreamViewBuilder<'a, livestream_view_state::Empty> {
+        LivestreamViewBuilder::new()
+    }
+}
+
+impl<'a> LivestreamViewBuilder<'a, livestream_view_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        LivestreamViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LivestreamViewBuilder<'a, S>
+where
+    S: livestream_view_state::State,
+    S::Author: livestream_view_state::IsUnset,
+{
+    /// Set the `author` field (required)
+    pub fn author(
+        mut self,
+        value: impl Into<crate::app_bsky::actor::ProfileViewBasic<'a>>,
+    ) -> LivestreamViewBuilder<'a, livestream_view_state::SetAuthor<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        LivestreamViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LivestreamViewBuilder<'a, S>
+where
+    S: livestream_view_state::State,
+    S::Cid: livestream_view_state::IsUnset,
+{
+    /// Set the `cid` field (required)
+    pub fn cid(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Cid<'a>>,
+    ) -> LivestreamViewBuilder<'a, livestream_view_state::SetCid<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        LivestreamViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LivestreamViewBuilder<'a, S>
+where
+    S: livestream_view_state::State,
+    S::IndexedAt: livestream_view_state::IsUnset,
+{
+    /// Set the `indexedAt` field (required)
+    pub fn indexed_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> LivestreamViewBuilder<'a, livestream_view_state::SetIndexedAt<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        LivestreamViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LivestreamViewBuilder<'a, S>
+where
+    S: livestream_view_state::State,
+    S::Record: livestream_view_state::IsUnset,
+{
+    /// Set the `record` field (required)
+    pub fn record(
+        mut self,
+        value: impl Into<jacquard_common::types::value::Data<'a>>,
+    ) -> LivestreamViewBuilder<'a, livestream_view_state::SetRecord<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        LivestreamViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LivestreamViewBuilder<'a, S>
+where
+    S: livestream_view_state::State,
+    S::Uri: livestream_view_state::IsUnset,
+{
+    /// Set the `uri` field (required)
+    pub fn uri(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> LivestreamViewBuilder<'a, livestream_view_state::SetUri<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        LivestreamViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: livestream_view_state::State> LivestreamViewBuilder<'a, S> {
+    /// Set the `viewerCount` field (optional)
+    pub fn viewer_count(
+        mut self,
+        value: impl Into<Option<crate::place_stream::livestream::ViewerCount<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `viewerCount` field to an Option value (optional)
+    pub fn maybe_viewer_count(
+        mut self,
+        value: Option<crate::place_stream::livestream::ViewerCount<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S> LivestreamViewBuilder<'a, S>
+where
+    S: livestream_view_state::State,
+    S::Uri: livestream_view_state::IsSet,
+    S::Cid: livestream_view_state::IsSet,
+    S::Author: livestream_view_state::IsSet,
+    S::Record: livestream_view_state::IsSet,
+    S::IndexedAt: livestream_view_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> LivestreamView<'a> {
+        LivestreamView {
+            author: self.__unsafe_private_named.0.unwrap(),
+            cid: self.__unsafe_private_named.1.unwrap(),
+            indexed_at: self.__unsafe_private_named.2.unwrap(),
+            record: self.__unsafe_private_named.3.unwrap(),
+            uri: self.__unsafe_private_named.4.unwrap(),
+            viewer_count: self.__unsafe_private_named.5,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> LivestreamView<'a> {
+        LivestreamView {
+            author: self.__unsafe_private_named.0.unwrap(),
+            cid: self.__unsafe_private_named.1.unwrap(),
+            indexed_at: self.__unsafe_private_named.2.unwrap(),
+            record: self.__unsafe_private_named.3.unwrap(),
+            uri: self.__unsafe_private_named.4.unwrap(),
+            viewer_count: self.__unsafe_private_named.5,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_place_stream_livestream() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -415,47 +692,312 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LivestreamView<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Livestream<'a> {
     /// The source of the livestream, if available, in a User Agent format: `<product> / <product-version> <comment>` e.g. Streamplace/0.7.5 iOS
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub agent: Option<jacquard_common::CowStr<'a>>,
     /// The primary URL where this livestream can be viewed, if available.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub canonical_url: Option<jacquard_common::types::string::Uri<'a>>,
     /// Client-declared timestamp when this livestream started.
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub notification_settings: Option<
         crate::place_stream::livestream::NotificationSettings<'a>,
     >,
     /// The post that announced this livestream.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub post: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub thumb: Option<jacquard_common::types::blob::BlobRef<'a>>,
     /// The title of the livestream, as it will be announced to followers.
     #[serde(borrow)]
-    #[builder(into)]
     pub title: jacquard_common::CowStr<'a>,
     /// The URL where this stream can be found. This is primarily a hint for other Streamplace nodes to locate and replicate the stream.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub url: Option<jacquard_common::types::string::Uri<'a>>,
+}
+
+pub mod livestream_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Title;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Title = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Title = Set<members::title>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Title = S::Title;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct LivestreamBuilder<'a, S: livestream_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<
+            crate::place_stream::livestream::NotificationSettings<'a>,
+        >,
+        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Livestream<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> LivestreamBuilder<'a, livestream_state::Empty> {
+        LivestreamBuilder::new()
+    }
+}
+
+impl<'a> LivestreamBuilder<'a, livestream_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        LivestreamBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: livestream_state::State> LivestreamBuilder<'a, S> {
+    /// Set the `agent` field (optional)
+    pub fn agent(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `agent` field to an Option value (optional)
+    pub fn maybe_agent(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: livestream_state::State> LivestreamBuilder<'a, S> {
+    /// Set the `canonicalUrl` field (optional)
+    pub fn canonical_url(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `canonicalUrl` field to an Option value (optional)
+    pub fn maybe_canonical_url(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> LivestreamBuilder<'a, S>
+where
+    S: livestream_state::State,
+    S::CreatedAt: livestream_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> LivestreamBuilder<'a, livestream_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        LivestreamBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: livestream_state::State> LivestreamBuilder<'a, S> {
+    /// Set the `notificationSettings` field (optional)
+    pub fn notification_settings(
+        mut self,
+        value: impl Into<
+            Option<crate::place_stream::livestream::NotificationSettings<'a>>,
+        >,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `notificationSettings` field to an Option value (optional)
+    pub fn maybe_notification_settings(
+        mut self,
+        value: Option<crate::place_stream::livestream::NotificationSettings<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: livestream_state::State> LivestreamBuilder<'a, S> {
+    /// Set the `post` field (optional)
+    pub fn post(
+        mut self,
+        value: impl Into<Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `post` field to an Option value (optional)
+    pub fn maybe_post(
+        mut self,
+        value: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: livestream_state::State> LivestreamBuilder<'a, S> {
+    /// Set the `thumb` field (optional)
+    pub fn thumb(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::blob::BlobRef<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `thumb` field to an Option value (optional)
+    pub fn maybe_thumb(
+        mut self,
+        value: Option<jacquard_common::types::blob::BlobRef<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S> LivestreamBuilder<'a, S>
+where
+    S: livestream_state::State,
+    S::Title: livestream_state::IsUnset,
+{
+    /// Set the `title` field (required)
+    pub fn title(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> LivestreamBuilder<'a, livestream_state::SetTitle<S>> {
+        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        LivestreamBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: livestream_state::State> LivestreamBuilder<'a, S> {
+    /// Set the `url` field (optional)
+    pub fn url(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value.into();
+        self
+    }
+    /// Set the `url` field to an Option value (optional)
+    pub fn maybe_url(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value;
+        self
+    }
+}
+
+impl<'a, S> LivestreamBuilder<'a, S>
+where
+    S: livestream_state::State,
+    S::Title: livestream_state::IsSet,
+    S::CreatedAt: livestream_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Livestream<'a> {
+        Livestream {
+            agent: self.__unsafe_private_named.0,
+            canonical_url: self.__unsafe_private_named.1,
+            created_at: self.__unsafe_private_named.2.unwrap(),
+            notification_settings: self.__unsafe_private_named.3,
+            post: self.__unsafe_private_named.4,
+            thumb: self.__unsafe_private_named.5,
+            title: self.__unsafe_private_named.6.unwrap(),
+            url: self.__unsafe_private_named.7,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Livestream<'a> {
+        Livestream {
+            agent: self.__unsafe_private_named.0,
+            canonical_url: self.__unsafe_private_named.1,
+            created_at: self.__unsafe_private_named.2.unwrap(),
+            notification_settings: self.__unsafe_private_named.3,
+            post: self.__unsafe_private_named.4,
+            thumb: self.__unsafe_private_named.5,
+            title: self.__unsafe_private_named.6.unwrap(),
+            url: self.__unsafe_private_named.7,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Livestream<'a> {
@@ -611,13 +1153,115 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NotificationSettings<'a> 
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StreamplaceAnything<'a> {
     #[serde(borrow)]
     pub livestream: StreamplaceAnythingLivestream<'a>,
+}
+
+pub mod streamplace_anything_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Livestream;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Livestream = Unset;
+    }
+    ///State transition - sets the `livestream` field to Set
+    pub struct SetLivestream<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLivestream<S> {}
+    impl<S: State> State for SetLivestream<S> {
+        type Livestream = Set<members::livestream>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `livestream` field
+        pub struct livestream(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct StreamplaceAnythingBuilder<'a, S: streamplace_anything_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (::core::option::Option<StreamplaceAnythingLivestream<'a>>,),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> StreamplaceAnything<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> StreamplaceAnythingBuilder<'a, streamplace_anything_state::Empty> {
+        StreamplaceAnythingBuilder::new()
+    }
+}
+
+impl<'a> StreamplaceAnythingBuilder<'a, streamplace_anything_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        StreamplaceAnythingBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> StreamplaceAnythingBuilder<'a, S>
+where
+    S: streamplace_anything_state::State,
+    S::Livestream: streamplace_anything_state::IsUnset,
+{
+    /// Set the `livestream` field (required)
+    pub fn livestream(
+        mut self,
+        value: impl Into<StreamplaceAnythingLivestream<'a>>,
+    ) -> StreamplaceAnythingBuilder<'a, streamplace_anything_state::SetLivestream<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        StreamplaceAnythingBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> StreamplaceAnythingBuilder<'a, S>
+where
+    S: streamplace_anything_state::State,
+    S::Livestream: streamplace_anything_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> StreamplaceAnything<'a> {
+        StreamplaceAnything {
+            livestream: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> StreamplaceAnything<'a> {
+        StreamplaceAnything {
+            livestream: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -672,12 +1316,114 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StreamplaceAnything<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ViewerCount<'a> {
     pub count: i64,
+}
+
+pub mod viewer_count_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Count;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Count = Unset;
+    }
+    ///State transition - sets the `count` field to Set
+    pub struct SetCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCount<S> {}
+    impl<S: State> State for SetCount<S> {
+        type Count = Set<members::count>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `count` field
+        pub struct count(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ViewerCountBuilder<'a, S: viewer_count_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (::core::option::Option<i64>,),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ViewerCount<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ViewerCountBuilder<'a, viewer_count_state::Empty> {
+        ViewerCountBuilder::new()
+    }
+}
+
+impl<'a> ViewerCountBuilder<'a, viewer_count_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ViewerCountBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ViewerCountBuilder<'a, S>
+where
+    S: viewer_count_state::State,
+    S::Count: viewer_count_state::IsUnset,
+{
+    /// Set the `count` field (required)
+    pub fn count(
+        mut self,
+        value: impl Into<i64>,
+    ) -> ViewerCountBuilder<'a, viewer_count_state::SetCount<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ViewerCountBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ViewerCountBuilder<'a, S>
+where
+    S: viewer_count_state::State,
+    S::Count: viewer_count_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> ViewerCount<'a> {
+        ViewerCount {
+            count: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> ViewerCount<'a> {
+        ViewerCount {
+            count: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewerCount<'a> {

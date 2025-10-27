@@ -16,14 +16,12 @@ pub mod service;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LabelerPolicies<'a> {
     /// Label values created by this labeler and scoped exclusively to it. Labels defined here will override global label definitions for this labeler.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub label_value_definitions: Option<
         Vec<crate::com_atproto::label::LabelValueDefinition<'a>>,
@@ -31,6 +29,135 @@ pub struct LabelerPolicies<'a> {
     /// The label values which this labeler publishes. May include global or custom labels.
     #[serde(borrow)]
     pub label_values: Vec<crate::com_atproto::label::LabelValue<'a>>,
+}
+
+pub mod labeler_policies_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type LabelValues;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type LabelValues = Unset;
+    }
+    ///State transition - sets the `label_values` field to Set
+    pub struct SetLabelValues<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLabelValues<S> {}
+    impl<S: State> State for SetLabelValues<S> {
+        type LabelValues = Set<members::label_values>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `label_values` field
+        pub struct label_values(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct LabelerPoliciesBuilder<'a, S: labeler_policies_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<Vec<crate::com_atproto::label::LabelValueDefinition<'a>>>,
+        ::core::option::Option<Vec<crate::com_atproto::label::LabelValue<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> LabelerPolicies<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> LabelerPoliciesBuilder<'a, labeler_policies_state::Empty> {
+        LabelerPoliciesBuilder::new()
+    }
+}
+
+impl<'a> LabelerPoliciesBuilder<'a, labeler_policies_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        LabelerPoliciesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: labeler_policies_state::State> LabelerPoliciesBuilder<'a, S> {
+    /// Set the `labelValueDefinitions` field (optional)
+    pub fn label_value_definitions(
+        mut self,
+        value: impl Into<
+            Option<Vec<crate::com_atproto::label::LabelValueDefinition<'a>>>,
+        >,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `labelValueDefinitions` field to an Option value (optional)
+    pub fn maybe_label_value_definitions(
+        mut self,
+        value: Option<Vec<crate::com_atproto::label::LabelValueDefinition<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> LabelerPoliciesBuilder<'a, S>
+where
+    S: labeler_policies_state::State,
+    S::LabelValues: labeler_policies_state::IsUnset,
+{
+    /// Set the `labelValues` field (required)
+    pub fn label_values(
+        mut self,
+        value: impl Into<Vec<crate::com_atproto::label::LabelValue<'a>>>,
+    ) -> LabelerPoliciesBuilder<'a, labeler_policies_state::SetLabelValues<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        LabelerPoliciesBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LabelerPoliciesBuilder<'a, S>
+where
+    S: labeler_policies_state::State,
+    S::LabelValues: labeler_policies_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> LabelerPolicies<'a> {
+        LabelerPolicies {
+            label_value_definitions: self.__unsafe_private_named.0,
+            label_values: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> LabelerPolicies<'a> {
+        LabelerPolicies {
+            label_value_definitions: self.__unsafe_private_named.0,
+            label_values: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_app_bsky_labeler_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -474,8 +601,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LabelerPolicies<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LabelerView<'a> {
@@ -485,18 +611,291 @@ pub struct LabelerView<'a> {
     pub creator: crate::app_bsky::actor::ProfileView<'a>,
     pub indexed_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub labels: Option<Vec<crate::com_atproto::label::Label<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub like_count: Option<i64>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub viewer: Option<crate::app_bsky::labeler::LabelerViewerState<'a>>,
+}
+
+pub mod labeler_view_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Uri;
+        type Cid;
+        type Creator;
+        type IndexedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Uri = Unset;
+        type Cid = Unset;
+        type Creator = Unset;
+        type IndexedAt = Unset;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Uri = Set<members::uri>;
+        type Cid = S::Cid;
+        type Creator = S::Creator;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Uri = S::Uri;
+        type Cid = Set<members::cid>;
+        type Creator = S::Creator;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `creator` field to Set
+    pub struct SetCreator<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreator<S> {}
+    impl<S: State> State for SetCreator<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Creator = Set<members::creator>;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Creator = S::Creator;
+        type IndexedAt = Set<members::indexed_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `creator` field
+        pub struct creator(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct LabelerViewBuilder<'a, S: labeler_view_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
+        ::core::option::Option<crate::app_bsky::actor::ProfileView<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+        ::core::option::Option<crate::app_bsky::labeler::LabelerViewerState<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> LabelerView<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> LabelerViewBuilder<'a, labeler_view_state::Empty> {
+        LabelerViewBuilder::new()
+    }
+}
+
+impl<'a> LabelerViewBuilder<'a, labeler_view_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        LabelerViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LabelerViewBuilder<'a, S>
+where
+    S: labeler_view_state::State,
+    S::Cid: labeler_view_state::IsUnset,
+{
+    /// Set the `cid` field (required)
+    pub fn cid(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Cid<'a>>,
+    ) -> LabelerViewBuilder<'a, labeler_view_state::SetCid<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        LabelerViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LabelerViewBuilder<'a, S>
+where
+    S: labeler_view_state::State,
+    S::Creator: labeler_view_state::IsUnset,
+{
+    /// Set the `creator` field (required)
+    pub fn creator(
+        mut self,
+        value: impl Into<crate::app_bsky::actor::ProfileView<'a>>,
+    ) -> LabelerViewBuilder<'a, labeler_view_state::SetCreator<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        LabelerViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LabelerViewBuilder<'a, S>
+where
+    S: labeler_view_state::State,
+    S::IndexedAt: labeler_view_state::IsUnset,
+{
+    /// Set the `indexedAt` field (required)
+    pub fn indexed_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> LabelerViewBuilder<'a, labeler_view_state::SetIndexedAt<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        LabelerViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: labeler_view_state::State> LabelerViewBuilder<'a, S> {
+    /// Set the `labels` field (optional)
+    pub fn labels(
+        mut self,
+        value: impl Into<Option<Vec<crate::com_atproto::label::Label<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `labels` field to an Option value (optional)
+    pub fn maybe_labels(
+        mut self,
+        value: Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: labeler_view_state::State> LabelerViewBuilder<'a, S> {
+    /// Set the `likeCount` field (optional)
+    pub fn like_count(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `likeCount` field to an Option value (optional)
+    pub fn maybe_like_count(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S> LabelerViewBuilder<'a, S>
+where
+    S: labeler_view_state::State,
+    S::Uri: labeler_view_state::IsUnset,
+{
+    /// Set the `uri` field (required)
+    pub fn uri(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> LabelerViewBuilder<'a, labeler_view_state::SetUri<S>> {
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        LabelerViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: labeler_view_state::State> LabelerViewBuilder<'a, S> {
+    /// Set the `viewer` field (optional)
+    pub fn viewer(
+        mut self,
+        value: impl Into<Option<crate::app_bsky::labeler::LabelerViewerState<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `viewer` field to an Option value (optional)
+    pub fn maybe_viewer(
+        mut self,
+        value: Option<crate::app_bsky::labeler::LabelerViewerState<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S> LabelerViewBuilder<'a, S>
+where
+    S: labeler_view_state::State,
+    S::Uri: labeler_view_state::IsSet,
+    S::Cid: labeler_view_state::IsSet,
+    S::Creator: labeler_view_state::IsSet,
+    S::IndexedAt: labeler_view_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> LabelerView<'a> {
+        LabelerView {
+            cid: self.__unsafe_private_named.0.unwrap(),
+            creator: self.__unsafe_private_named.1.unwrap(),
+            indexed_at: self.__unsafe_private_named.2.unwrap(),
+            labels: self.__unsafe_private_named.3,
+            like_count: self.__unsafe_private_named.4,
+            uri: self.__unsafe_private_named.5.unwrap(),
+            viewer: self.__unsafe_private_named.6,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> LabelerView<'a> {
+        LabelerView {
+            cid: self.__unsafe_private_named.0.unwrap(),
+            creator: self.__unsafe_private_named.1.unwrap(),
+            indexed_at: self.__unsafe_private_named.2.unwrap(),
+            labels: self.__unsafe_private_named.3,
+            like_count: self.__unsafe_private_named.4,
+            uri: self.__unsafe_private_named.5.unwrap(),
+            viewer: self.__unsafe_private_named.6,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LabelerView<'a> {
@@ -535,8 +934,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LabelerView<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LabelerViewDetailed<'a> {
@@ -546,35 +944,424 @@ pub struct LabelerViewDetailed<'a> {
     pub creator: crate::app_bsky::actor::ProfileView<'a>,
     pub indexed_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub labels: Option<Vec<crate::com_atproto::label::Label<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub like_count: Option<i64>,
     #[serde(borrow)]
     pub policies: crate::app_bsky::labeler::LabelerPolicies<'a>,
     /// The set of report reason 'codes' which are in-scope for this service to review and action. These usually align to policy categories. If not defined (distinct from empty array), all reason types are allowed.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub reason_types: Option<Vec<crate::com_atproto::moderation::ReasonType<'a>>>,
     /// Set of record types (collection NSIDs) which can be reported to this service. If not defined (distinct from empty array), default is any record type.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub subject_collections: Option<Vec<jacquard_common::types::string::Nsid<'a>>>,
     /// The set of subject types (account, record, etc) this service accepts reports on.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub subject_types: Option<Vec<crate::com_atproto::moderation::SubjectType<'a>>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub viewer: Option<crate::app_bsky::labeler::LabelerViewerState<'a>>,
+}
+
+pub mod labeler_view_detailed_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Uri;
+        type Cid;
+        type Creator;
+        type Policies;
+        type IndexedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Uri = Unset;
+        type Cid = Unset;
+        type Creator = Unset;
+        type Policies = Unset;
+        type IndexedAt = Unset;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Uri = Set<members::uri>;
+        type Cid = S::Cid;
+        type Creator = S::Creator;
+        type Policies = S::Policies;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Uri = S::Uri;
+        type Cid = Set<members::cid>;
+        type Creator = S::Creator;
+        type Policies = S::Policies;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `creator` field to Set
+    pub struct SetCreator<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreator<S> {}
+    impl<S: State> State for SetCreator<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Creator = Set<members::creator>;
+        type Policies = S::Policies;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `policies` field to Set
+    pub struct SetPolicies<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPolicies<S> {}
+    impl<S: State> State for SetPolicies<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Creator = S::Creator;
+        type Policies = Set<members::policies>;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Creator = S::Creator;
+        type Policies = S::Policies;
+        type IndexedAt = Set<members::indexed_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `creator` field
+        pub struct creator(());
+        ///Marker type for the `policies` field
+        pub struct policies(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct LabelerViewDetailedBuilder<'a, S: labeler_view_detailed_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
+        ::core::option::Option<crate::app_bsky::actor::ProfileView<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<crate::app_bsky::labeler::LabelerPolicies<'a>>,
+        ::core::option::Option<Vec<crate::com_atproto::moderation::ReasonType<'a>>>,
+        ::core::option::Option<Vec<jacquard_common::types::string::Nsid<'a>>>,
+        ::core::option::Option<Vec<crate::com_atproto::moderation::SubjectType<'a>>>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+        ::core::option::Option<crate::app_bsky::labeler::LabelerViewerState<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> LabelerViewDetailed<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> LabelerViewDetailedBuilder<'a, labeler_view_detailed_state::Empty> {
+        LabelerViewDetailedBuilder::new()
+    }
+}
+
+impl<'a> LabelerViewDetailedBuilder<'a, labeler_view_detailed_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        LabelerViewDetailedBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LabelerViewDetailedBuilder<'a, S>
+where
+    S: labeler_view_detailed_state::State,
+    S::Cid: labeler_view_detailed_state::IsUnset,
+{
+    /// Set the `cid` field (required)
+    pub fn cid(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Cid<'a>>,
+    ) -> LabelerViewDetailedBuilder<'a, labeler_view_detailed_state::SetCid<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        LabelerViewDetailedBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LabelerViewDetailedBuilder<'a, S>
+where
+    S: labeler_view_detailed_state::State,
+    S::Creator: labeler_view_detailed_state::IsUnset,
+{
+    /// Set the `creator` field (required)
+    pub fn creator(
+        mut self,
+        value: impl Into<crate::app_bsky::actor::ProfileView<'a>>,
+    ) -> LabelerViewDetailedBuilder<'a, labeler_view_detailed_state::SetCreator<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        LabelerViewDetailedBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LabelerViewDetailedBuilder<'a, S>
+where
+    S: labeler_view_detailed_state::State,
+    S::IndexedAt: labeler_view_detailed_state::IsUnset,
+{
+    /// Set the `indexedAt` field (required)
+    pub fn indexed_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> LabelerViewDetailedBuilder<'a, labeler_view_detailed_state::SetIndexedAt<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        LabelerViewDetailedBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: labeler_view_detailed_state::State> LabelerViewDetailedBuilder<'a, S> {
+    /// Set the `labels` field (optional)
+    pub fn labels(
+        mut self,
+        value: impl Into<Option<Vec<crate::com_atproto::label::Label<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `labels` field to an Option value (optional)
+    pub fn maybe_labels(
+        mut self,
+        value: Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: labeler_view_detailed_state::State> LabelerViewDetailedBuilder<'a, S> {
+    /// Set the `likeCount` field (optional)
+    pub fn like_count(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `likeCount` field to an Option value (optional)
+    pub fn maybe_like_count(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S> LabelerViewDetailedBuilder<'a, S>
+where
+    S: labeler_view_detailed_state::State,
+    S::Policies: labeler_view_detailed_state::IsUnset,
+{
+    /// Set the `policies` field (required)
+    pub fn policies(
+        mut self,
+        value: impl Into<crate::app_bsky::labeler::LabelerPolicies<'a>>,
+    ) -> LabelerViewDetailedBuilder<'a, labeler_view_detailed_state::SetPolicies<S>> {
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        LabelerViewDetailedBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: labeler_view_detailed_state::State> LabelerViewDetailedBuilder<'a, S> {
+    /// Set the `reasonTypes` field (optional)
+    pub fn reason_types(
+        mut self,
+        value: impl Into<Option<Vec<crate::com_atproto::moderation::ReasonType<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `reasonTypes` field to an Option value (optional)
+    pub fn maybe_reason_types(
+        mut self,
+        value: Option<Vec<crate::com_atproto::moderation::ReasonType<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S: labeler_view_detailed_state::State> LabelerViewDetailedBuilder<'a, S> {
+    /// Set the `subjectCollections` field (optional)
+    pub fn subject_collections(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::types::string::Nsid<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value.into();
+        self
+    }
+    /// Set the `subjectCollections` field to an Option value (optional)
+    pub fn maybe_subject_collections(
+        mut self,
+        value: Option<Vec<jacquard_common::types::string::Nsid<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value;
+        self
+    }
+}
+
+impl<'a, S: labeler_view_detailed_state::State> LabelerViewDetailedBuilder<'a, S> {
+    /// Set the `subjectTypes` field (optional)
+    pub fn subject_types(
+        mut self,
+        value: impl Into<Option<Vec<crate::com_atproto::moderation::SubjectType<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value.into();
+        self
+    }
+    /// Set the `subjectTypes` field to an Option value (optional)
+    pub fn maybe_subject_types(
+        mut self,
+        value: Option<Vec<crate::com_atproto::moderation::SubjectType<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value;
+        self
+    }
+}
+
+impl<'a, S> LabelerViewDetailedBuilder<'a, S>
+where
+    S: labeler_view_detailed_state::State,
+    S::Uri: labeler_view_detailed_state::IsUnset,
+{
+    /// Set the `uri` field (required)
+    pub fn uri(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> LabelerViewDetailedBuilder<'a, labeler_view_detailed_state::SetUri<S>> {
+        self.__unsafe_private_named.9 = ::core::option::Option::Some(value.into());
+        LabelerViewDetailedBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: labeler_view_detailed_state::State> LabelerViewDetailedBuilder<'a, S> {
+    /// Set the `viewer` field (optional)
+    pub fn viewer(
+        mut self,
+        value: impl Into<Option<crate::app_bsky::labeler::LabelerViewerState<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.10 = value.into();
+        self
+    }
+    /// Set the `viewer` field to an Option value (optional)
+    pub fn maybe_viewer(
+        mut self,
+        value: Option<crate::app_bsky::labeler::LabelerViewerState<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.10 = value;
+        self
+    }
+}
+
+impl<'a, S> LabelerViewDetailedBuilder<'a, S>
+where
+    S: labeler_view_detailed_state::State,
+    S::Uri: labeler_view_detailed_state::IsSet,
+    S::Cid: labeler_view_detailed_state::IsSet,
+    S::Creator: labeler_view_detailed_state::IsSet,
+    S::Policies: labeler_view_detailed_state::IsSet,
+    S::IndexedAt: labeler_view_detailed_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> LabelerViewDetailed<'a> {
+        LabelerViewDetailed {
+            cid: self.__unsafe_private_named.0.unwrap(),
+            creator: self.__unsafe_private_named.1.unwrap(),
+            indexed_at: self.__unsafe_private_named.2.unwrap(),
+            labels: self.__unsafe_private_named.3,
+            like_count: self.__unsafe_private_named.4,
+            policies: self.__unsafe_private_named.5.unwrap(),
+            reason_types: self.__unsafe_private_named.6,
+            subject_collections: self.__unsafe_private_named.7,
+            subject_types: self.__unsafe_private_named.8,
+            uri: self.__unsafe_private_named.9.unwrap(),
+            viewer: self.__unsafe_private_named.10,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> LabelerViewDetailed<'a> {
+        LabelerViewDetailed {
+            cid: self.__unsafe_private_named.0.unwrap(),
+            creator: self.__unsafe_private_named.1.unwrap(),
+            indexed_at: self.__unsafe_private_named.2.unwrap(),
+            labels: self.__unsafe_private_named.3,
+            like_count: self.__unsafe_private_named.4,
+            policies: self.__unsafe_private_named.5.unwrap(),
+            reason_types: self.__unsafe_private_named.6,
+            subject_collections: self.__unsafe_private_named.7,
+            subject_types: self.__unsafe_private_named.8,
+            uri: self.__unsafe_private_named.9.unwrap(),
+            viewer: self.__unsafe_private_named.10,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LabelerViewDetailed<'a> {

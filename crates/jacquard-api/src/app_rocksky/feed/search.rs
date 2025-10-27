@@ -12,15 +12,101 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct Search<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub query: jacquard_common::CowStr<'a>,
+}
+
+pub mod search_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Query;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Query = Unset;
+    }
+    ///State transition - sets the `query` field to Set
+    pub struct SetQuery<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetQuery<S> {}
+    impl<S: State> State for SetQuery<S> {
+        type Query = Set<members::query>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `query` field
+        pub struct query(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct SearchBuilder<'a, S: search_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (::core::option::Option<jacquard_common::CowStr<'a>>,),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Search<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> SearchBuilder<'a, search_state::Empty> {
+        SearchBuilder::new()
+    }
+}
+
+impl<'a> SearchBuilder<'a, search_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        SearchBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SearchBuilder<'a, S>
+where
+    S: search_state::State,
+    S::Query: search_state::IsUnset,
+{
+    /// Set the `query` field (required)
+    pub fn query(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> SearchBuilder<'a, search_state::SetQuery<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        SearchBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SearchBuilder<'a, S>
+where
+    S: search_state::State,
+    S::Query: search_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Search<'a> {
+        Search {
+            query: self.__unsafe_private_named.0.unwrap(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

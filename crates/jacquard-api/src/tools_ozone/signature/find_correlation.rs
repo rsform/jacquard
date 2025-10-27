@@ -12,14 +12,103 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct FindCorrelation<'a> {
     #[serde(borrow)]
     pub dids: Vec<jacquard_common::types::string::Did<'a>>,
+}
+
+pub mod find_correlation_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Dids;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Dids = Unset;
+    }
+    ///State transition - sets the `dids` field to Set
+    pub struct SetDids<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDids<S> {}
+    impl<S: State> State for SetDids<S> {
+        type Dids = Set<members::dids>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `dids` field
+        pub struct dids(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct FindCorrelationBuilder<'a, S: find_correlation_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> FindCorrelation<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> FindCorrelationBuilder<'a, find_correlation_state::Empty> {
+        FindCorrelationBuilder::new()
+    }
+}
+
+impl<'a> FindCorrelationBuilder<'a, find_correlation_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        FindCorrelationBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> FindCorrelationBuilder<'a, S>
+where
+    S: find_correlation_state::State,
+    S::Dids: find_correlation_state::IsUnset,
+{
+    /// Set the `dids` field (required)
+    pub fn dids(
+        mut self,
+        value: impl Into<Vec<jacquard_common::types::string::Did<'a>>>,
+    ) -> FindCorrelationBuilder<'a, find_correlation_state::SetDids<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        FindCorrelationBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> FindCorrelationBuilder<'a, S>
+where
+    S: find_correlation_state::State,
+    S::Dids: find_correlation_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> FindCorrelation<'a> {
+        FindCorrelation {
+            dids: self.__unsafe_private_named.0.unwrap(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

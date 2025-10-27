@@ -12,15 +12,101 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct DereferenceScope<'a> {
     #[serde(borrow)]
-    #[builder(into)]
     pub scope: jacquard_common::CowStr<'a>,
+}
+
+pub mod dereference_scope_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Scope;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Scope = Unset;
+    }
+    ///State transition - sets the `scope` field to Set
+    pub struct SetScope<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetScope<S> {}
+    impl<S: State> State for SetScope<S> {
+        type Scope = Set<members::scope>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `scope` field
+        pub struct scope(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct DereferenceScopeBuilder<'a, S: dereference_scope_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (::core::option::Option<jacquard_common::CowStr<'a>>,),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> DereferenceScope<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> DereferenceScopeBuilder<'a, dereference_scope_state::Empty> {
+        DereferenceScopeBuilder::new()
+    }
+}
+
+impl<'a> DereferenceScopeBuilder<'a, dereference_scope_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        DereferenceScopeBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DereferenceScopeBuilder<'a, S>
+where
+    S: dereference_scope_state::State,
+    S::Scope: dereference_scope_state::IsUnset,
+{
+    /// Set the `scope` field (required)
+    pub fn scope(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> DereferenceScopeBuilder<'a, dereference_scope_state::SetScope<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        DereferenceScopeBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DereferenceScopeBuilder<'a, S>
+where
+    S: dereference_scope_state::State,
+    S::Scope: dereference_scope_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> DereferenceScope<'a> {
+        DereferenceScope {
+            scope: self.__unsafe_private_named.0.unwrap(),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

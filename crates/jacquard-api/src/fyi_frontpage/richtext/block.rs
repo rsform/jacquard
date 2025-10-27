@@ -13,13 +13,119 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Block<'a> {
     #[serde(borrow)]
     pub content: crate::fyi_frontpage::richtext::block::PlaintextParagraph<'a>,
+}
+
+pub mod block_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Content;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Content = Unset;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type Content = Set<members::content>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `content` field
+        pub struct content(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct BlockBuilder<'a, S: block_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<
+            crate::fyi_frontpage::richtext::block::PlaintextParagraph<'a>,
+        >,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Block<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> BlockBuilder<'a, block_state::Empty> {
+        BlockBuilder::new()
+    }
+}
+
+impl<'a> BlockBuilder<'a, block_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        BlockBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BlockBuilder<'a, S>
+where
+    S: block_state::State,
+    S::Content: block_state::IsUnset,
+{
+    /// Set the `content` field (required)
+    pub fn content(
+        mut self,
+        value: impl Into<crate::fyi_frontpage::richtext::block::PlaintextParagraph<'a>>,
+    ) -> BlockBuilder<'a, block_state::SetContent<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        BlockBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BlockBuilder<'a, S>
+where
+    S: block_state::State,
+    S::Content: block_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Block<'a> {
+        Block {
+            content: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Block<'a> {
+        Block {
+            content: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_fyi_frontpage_richtext_block() -> ::jacquard_lexicon::lexicon::LexiconDoc<

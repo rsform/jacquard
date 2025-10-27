@@ -14,18 +14,133 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AuthorListItem<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub index: Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub profile: Option<AuthorListItemProfile<'a>>,
+}
+
+pub mod author_list_item_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type ProfileIndex;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type ProfileIndex = Unset;
+    }
+    ///State transition - sets the `profile_index` field to Set
+    pub struct SetProfileIndex<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetProfileIndex<S> {}
+    impl<S: State> State for SetProfileIndex<S> {
+        type ProfileIndex = Set<members::profile_index>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `profile_index` field
+        pub struct profile_index(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct AuthorListItemBuilder<'a, S: author_list_item_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<i64>,
+        ::core::option::Option<AuthorListItemProfile<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> AuthorListItem<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> AuthorListItemBuilder<'a, author_list_item_state::Empty> {
+        AuthorListItemBuilder::new()
+    }
+}
+
+impl<'a> AuthorListItemBuilder<'a, author_list_item_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        AuthorListItemBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: author_list_item_state::State> AuthorListItemBuilder<'a, S> {
+    /// Set the `index` field (optional)
+    pub fn index(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `index` field to an Option value (optional)
+    pub fn maybe_index(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: author_list_item_state::State> AuthorListItemBuilder<'a, S> {
+    /// Set the `profile` field (optional)
+    pub fn profile(
+        mut self,
+        value: impl Into<Option<AuthorListItemProfile<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `profile` field to an Option value (optional)
+    pub fn maybe_profile(mut self, value: Option<AuthorListItemProfile<'a>>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> AuthorListItemBuilder<'a, S>
+where
+    S: author_list_item_state::State,
+    S::ProfileIndex: author_list_item_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> AuthorListItem<'a> {
+        AuthorListItem {
+            index: self.__unsafe_private_named.0,
+            profile: self.__unsafe_private_named.1,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> AuthorListItem<'a> {
+        AuthorListItem {
+            index: self.__unsafe_private_named.0,
+            profile: self.__unsafe_private_named.1,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -191,16 +306,143 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AuthorListItem<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Authors<'a> {
     #[serde(borrow)]
     pub author_list: Vec<crate::sh_weaver::notebook::authors::AuthorListItem<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub created_at: Option<jacquard_common::types::string::Datetime>,
+}
+
+pub mod authors_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type AuthorList;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type AuthorList = Unset;
+    }
+    ///State transition - sets the `author_list` field to Set
+    pub struct SetAuthorList<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthorList<S> {}
+    impl<S: State> State for SetAuthorList<S> {
+        type AuthorList = Set<members::author_list>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `author_list` field
+        pub struct author_list(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct AuthorsBuilder<'a, S: authors_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<
+            Vec<crate::sh_weaver::notebook::authors::AuthorListItem<'a>>,
+        >,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Authors<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> AuthorsBuilder<'a, authors_state::Empty> {
+        AuthorsBuilder::new()
+    }
+}
+
+impl<'a> AuthorsBuilder<'a, authors_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        AuthorsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AuthorsBuilder<'a, S>
+where
+    S: authors_state::State,
+    S::AuthorList: authors_state::IsUnset,
+{
+    /// Set the `authorList` field (required)
+    pub fn author_list(
+        mut self,
+        value: impl Into<Vec<crate::sh_weaver::notebook::authors::AuthorListItem<'a>>>,
+    ) -> AuthorsBuilder<'a, authors_state::SetAuthorList<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        AuthorsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: authors_state::State> AuthorsBuilder<'a, S> {
+    /// Set the `createdAt` field (optional)
+    pub fn created_at(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `createdAt` field to an Option value (optional)
+    pub fn maybe_created_at(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> AuthorsBuilder<'a, S>
+where
+    S: authors_state::State,
+    S::AuthorList: authors_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Authors<'a> {
+        Authors {
+            author_list: self.__unsafe_private_named.0.unwrap(),
+            created_at: self.__unsafe_private_named.1,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Authors<'a> {
+        Authors {
+            author_list: self.__unsafe_private_named.0.unwrap(),
+            created_at: self.__unsafe_private_named.1,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Authors<'a> {

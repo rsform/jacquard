@@ -13,8 +13,7 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Board<'a> {
@@ -22,14 +21,228 @@ pub struct Board<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     /// A short description of the board
     #[serde(borrow)]
-    #[builder(into)]
     pub description: jacquard_common::CowStr<'a>,
     /// Whether the board is NSFW
     pub nsfw: bool,
     /// The title of the board (e.g. /at/)
     #[serde(borrow)]
-    #[builder(into)]
     pub title: jacquard_common::CowStr<'a>,
+}
+
+pub mod board_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Title;
+        type Description;
+        type Nsfw;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Title = Unset;
+        type Description = Unset;
+        type Nsfw = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Title = Set<members::title>;
+        type Description = S::Description;
+        type Nsfw = S::Nsfw;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDescription<S> {}
+    impl<S: State> State for SetDescription<S> {
+        type Title = S::Title;
+        type Description = Set<members::description>;
+        type Nsfw = S::Nsfw;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `nsfw` field to Set
+    pub struct SetNsfw<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNsfw<S> {}
+    impl<S: State> State for SetNsfw<S> {
+        type Title = S::Title;
+        type Description = S::Description;
+        type Nsfw = Set<members::nsfw>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Title = S::Title;
+        type Description = S::Description;
+        type Nsfw = S::Nsfw;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `description` field
+        pub struct description(());
+        ///Marker type for the `nsfw` field
+        pub struct nsfw(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct BoardBuilder<'a, S: board_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Board<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> BoardBuilder<'a, board_state::Empty> {
+        BoardBuilder::new()
+    }
+}
+
+impl<'a> BoardBuilder<'a, board_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        BoardBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BoardBuilder<'a, S>
+where
+    S: board_state::State,
+    S::CreatedAt: board_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> BoardBuilder<'a, board_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        BoardBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BoardBuilder<'a, S>
+where
+    S: board_state::State,
+    S::Description: board_state::IsUnset,
+{
+    /// Set the `description` field (required)
+    pub fn description(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> BoardBuilder<'a, board_state::SetDescription<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        BoardBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BoardBuilder<'a, S>
+where
+    S: board_state::State,
+    S::Nsfw: board_state::IsUnset,
+{
+    /// Set the `nsfw` field (required)
+    pub fn nsfw(
+        mut self,
+        value: impl Into<bool>,
+    ) -> BoardBuilder<'a, board_state::SetNsfw<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        BoardBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BoardBuilder<'a, S>
+where
+    S: board_state::State,
+    S::Title: board_state::IsUnset,
+{
+    /// Set the `title` field (required)
+    pub fn title(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> BoardBuilder<'a, board_state::SetTitle<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        BoardBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BoardBuilder<'a, S>
+where
+    S: board_state::State,
+    S::Title: board_state::IsSet,
+    S::Description: board_state::IsSet,
+    S::Nsfw: board_state::IsSet,
+    S::CreatedAt: board_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Board<'a> {
+        Board {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            description: self.__unsafe_private_named.1.unwrap(),
+            nsfw: self.__unsafe_private_named.2.unwrap(),
+            title: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Board<'a> {
+        Board {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            description: self.__unsafe_private_named.1.unwrap(),
+            nsfw: self.__unsafe_private_named.2.unwrap(),
+            title: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Board<'a> {

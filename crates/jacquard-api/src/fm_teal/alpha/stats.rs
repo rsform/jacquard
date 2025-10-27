@@ -19,21 +19,195 @@ pub mod get_user_top_releases;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ArtistView<'a> {
     /// MusicBrainz artist ID
     #[serde(borrow)]
-    #[builder(into)]
     pub mbid: jacquard_common::CowStr<'a>,
     /// Artist name
     #[serde(borrow)]
-    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
     /// Total number of plays for this artist
     pub play_count: i64,
+}
+
+pub mod artist_view_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Mbid;
+        type Name;
+        type PlayCount;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Mbid = Unset;
+        type Name = Unset;
+        type PlayCount = Unset;
+    }
+    ///State transition - sets the `mbid` field to Set
+    pub struct SetMbid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMbid<S> {}
+    impl<S: State> State for SetMbid<S> {
+        type Mbid = Set<members::mbid>;
+        type Name = S::Name;
+        type PlayCount = S::PlayCount;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Mbid = S::Mbid;
+        type Name = Set<members::name>;
+        type PlayCount = S::PlayCount;
+    }
+    ///State transition - sets the `play_count` field to Set
+    pub struct SetPlayCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPlayCount<S> {}
+    impl<S: State> State for SetPlayCount<S> {
+        type Mbid = S::Mbid;
+        type Name = S::Name;
+        type PlayCount = Set<members::play_count>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `mbid` field
+        pub struct mbid(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `play_count` field
+        pub struct play_count(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ArtistViewBuilder<'a, S: artist_view_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ArtistView<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ArtistViewBuilder<'a, artist_view_state::Empty> {
+        ArtistViewBuilder::new()
+    }
+}
+
+impl<'a> ArtistViewBuilder<'a, artist_view_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ArtistViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ArtistViewBuilder<'a, S>
+where
+    S: artist_view_state::State,
+    S::Mbid: artist_view_state::IsUnset,
+{
+    /// Set the `mbid` field (required)
+    pub fn mbid(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> ArtistViewBuilder<'a, artist_view_state::SetMbid<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ArtistViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ArtistViewBuilder<'a, S>
+where
+    S: artist_view_state::State,
+    S::Name: artist_view_state::IsUnset,
+{
+    /// Set the `name` field (required)
+    pub fn name(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> ArtistViewBuilder<'a, artist_view_state::SetName<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        ArtistViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ArtistViewBuilder<'a, S>
+where
+    S: artist_view_state::State,
+    S::PlayCount: artist_view_state::IsUnset,
+{
+    /// Set the `playCount` field (required)
+    pub fn play_count(
+        mut self,
+        value: impl Into<i64>,
+    ) -> ArtistViewBuilder<'a, artist_view_state::SetPlayCount<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        ArtistViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ArtistViewBuilder<'a, S>
+where
+    S: artist_view_state::State,
+    S::Mbid: artist_view_state::IsSet,
+    S::Name: artist_view_state::IsSet,
+    S::PlayCount: artist_view_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> ArtistView<'a> {
+        ArtistView {
+            mbid: self.__unsafe_private_named.0.unwrap(),
+            name: self.__unsafe_private_named.1.unwrap(),
+            play_count: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> ArtistView<'a> {
+        ArtistView {
+            mbid: self.__unsafe_private_named.0.unwrap(),
+            name: self.__unsafe_private_named.1.unwrap(),
+            play_count: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_fm_teal_alpha_stats_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -282,21 +456,195 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ArtistView<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RecordingView<'a> {
     /// MusicBrainz recording ID
     #[serde(borrow)]
-    #[builder(into)]
     pub mbid: jacquard_common::CowStr<'a>,
     /// Recording/track name
     #[serde(borrow)]
-    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
     /// Total number of plays for this recording
     pub play_count: i64,
+}
+
+pub mod recording_view_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Mbid;
+        type Name;
+        type PlayCount;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Mbid = Unset;
+        type Name = Unset;
+        type PlayCount = Unset;
+    }
+    ///State transition - sets the `mbid` field to Set
+    pub struct SetMbid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMbid<S> {}
+    impl<S: State> State for SetMbid<S> {
+        type Mbid = Set<members::mbid>;
+        type Name = S::Name;
+        type PlayCount = S::PlayCount;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Mbid = S::Mbid;
+        type Name = Set<members::name>;
+        type PlayCount = S::PlayCount;
+    }
+    ///State transition - sets the `play_count` field to Set
+    pub struct SetPlayCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPlayCount<S> {}
+    impl<S: State> State for SetPlayCount<S> {
+        type Mbid = S::Mbid;
+        type Name = S::Name;
+        type PlayCount = Set<members::play_count>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `mbid` field
+        pub struct mbid(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `play_count` field
+        pub struct play_count(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct RecordingViewBuilder<'a, S: recording_view_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> RecordingView<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> RecordingViewBuilder<'a, recording_view_state::Empty> {
+        RecordingViewBuilder::new()
+    }
+}
+
+impl<'a> RecordingViewBuilder<'a, recording_view_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        RecordingViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RecordingViewBuilder<'a, S>
+where
+    S: recording_view_state::State,
+    S::Mbid: recording_view_state::IsUnset,
+{
+    /// Set the `mbid` field (required)
+    pub fn mbid(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> RecordingViewBuilder<'a, recording_view_state::SetMbid<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        RecordingViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RecordingViewBuilder<'a, S>
+where
+    S: recording_view_state::State,
+    S::Name: recording_view_state::IsUnset,
+{
+    /// Set the `name` field (required)
+    pub fn name(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> RecordingViewBuilder<'a, recording_view_state::SetName<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        RecordingViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RecordingViewBuilder<'a, S>
+where
+    S: recording_view_state::State,
+    S::PlayCount: recording_view_state::IsUnset,
+{
+    /// Set the `playCount` field (required)
+    pub fn play_count(
+        mut self,
+        value: impl Into<i64>,
+    ) -> RecordingViewBuilder<'a, recording_view_state::SetPlayCount<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        RecordingViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RecordingViewBuilder<'a, S>
+where
+    S: recording_view_state::State,
+    S::Mbid: recording_view_state::IsSet,
+    S::Name: recording_view_state::IsSet,
+    S::PlayCount: recording_view_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> RecordingView<'a> {
+        RecordingView {
+            mbid: self.__unsafe_private_named.0.unwrap(),
+            name: self.__unsafe_private_named.1.unwrap(),
+            play_count: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> RecordingView<'a> {
+        RecordingView {
+            mbid: self.__unsafe_private_named.0.unwrap(),
+            name: self.__unsafe_private_named.1.unwrap(),
+            play_count: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RecordingView<'a> {
@@ -324,21 +672,195 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RecordingView<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ReleaseView<'a> {
     /// MusicBrainz release ID
     #[serde(borrow)]
-    #[builder(into)]
     pub mbid: jacquard_common::CowStr<'a>,
     /// Release/album name
     #[serde(borrow)]
-    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
     /// Total number of plays for this release
     pub play_count: i64,
+}
+
+pub mod release_view_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Mbid;
+        type Name;
+        type PlayCount;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Mbid = Unset;
+        type Name = Unset;
+        type PlayCount = Unset;
+    }
+    ///State transition - sets the `mbid` field to Set
+    pub struct SetMbid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMbid<S> {}
+    impl<S: State> State for SetMbid<S> {
+        type Mbid = Set<members::mbid>;
+        type Name = S::Name;
+        type PlayCount = S::PlayCount;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Mbid = S::Mbid;
+        type Name = Set<members::name>;
+        type PlayCount = S::PlayCount;
+    }
+    ///State transition - sets the `play_count` field to Set
+    pub struct SetPlayCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPlayCount<S> {}
+    impl<S: State> State for SetPlayCount<S> {
+        type Mbid = S::Mbid;
+        type Name = S::Name;
+        type PlayCount = Set<members::play_count>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `mbid` field
+        pub struct mbid(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `play_count` field
+        pub struct play_count(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ReleaseViewBuilder<'a, S: release_view_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ReleaseView<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ReleaseViewBuilder<'a, release_view_state::Empty> {
+        ReleaseViewBuilder::new()
+    }
+}
+
+impl<'a> ReleaseViewBuilder<'a, release_view_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ReleaseViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ReleaseViewBuilder<'a, S>
+where
+    S: release_view_state::State,
+    S::Mbid: release_view_state::IsUnset,
+{
+    /// Set the `mbid` field (required)
+    pub fn mbid(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> ReleaseViewBuilder<'a, release_view_state::SetMbid<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ReleaseViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ReleaseViewBuilder<'a, S>
+where
+    S: release_view_state::State,
+    S::Name: release_view_state::IsUnset,
+{
+    /// Set the `name` field (required)
+    pub fn name(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> ReleaseViewBuilder<'a, release_view_state::SetName<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        ReleaseViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ReleaseViewBuilder<'a, S>
+where
+    S: release_view_state::State,
+    S::PlayCount: release_view_state::IsUnset,
+{
+    /// Set the `playCount` field (required)
+    pub fn play_count(
+        mut self,
+        value: impl Into<i64>,
+    ) -> ReleaseViewBuilder<'a, release_view_state::SetPlayCount<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        ReleaseViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ReleaseViewBuilder<'a, S>
+where
+    S: release_view_state::State,
+    S::Mbid: release_view_state::IsSet,
+    S::Name: release_view_state::IsSet,
+    S::PlayCount: release_view_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> ReleaseView<'a> {
+        ReleaseView {
+            mbid: self.__unsafe_private_named.0.unwrap(),
+            name: self.__unsafe_private_named.1.unwrap(),
+            play_count: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> ReleaseView<'a> {
+        ReleaseView {
+            mbid: self.__unsafe_private_named.0.unwrap(),
+            name: self.__unsafe_private_named.1.unwrap(),
+            play_count: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReleaseView<'a> {

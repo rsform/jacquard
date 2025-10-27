@@ -17,43 +17,333 @@ pub mod export_account_data;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileViewBasic<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub associated: Option<crate::app_bsky::actor::ProfileAssociated<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub avatar: Option<jacquard_common::types::string::Uri<'a>>,
     /// Set to true when the actor cannot actively participate in conversations
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub chat_disabled: Option<bool>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub display_name: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub labels: Option<Vec<crate::com_atproto::label::Label<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub verification: Option<crate::app_bsky::actor::VerificationState<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub viewer: Option<crate::app_bsky::actor::ViewerState<'a>>,
+}
+
+pub mod profile_view_basic_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Did;
+        type Handle;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Did = Unset;
+        type Handle = Unset;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Did = Set<members::did>;
+        type Handle = S::Handle;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHandle<S> {}
+    impl<S: State> State for SetHandle<S> {
+        type Did = S::Did;
+        type Handle = Set<members::handle>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `handle` field
+        pub struct handle(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ProfileViewBasicBuilder<'a, S: profile_view_basic_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<crate::app_bsky::actor::ProfileAssociated<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Handle<'a>>,
+        ::core::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
+        ::core::option::Option<crate::app_bsky::actor::VerificationState<'a>>,
+        ::core::option::Option<crate::app_bsky::actor::ViewerState<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ProfileViewBasic<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ProfileViewBasicBuilder<'a, profile_view_basic_state::Empty> {
+        ProfileViewBasicBuilder::new()
+    }
+}
+
+impl<'a> ProfileViewBasicBuilder<'a, profile_view_basic_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ProfileViewBasicBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
+    /// Set the `associated` field (optional)
+    pub fn associated(
+        mut self,
+        value: impl Into<Option<crate::app_bsky::actor::ProfileAssociated<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `associated` field to an Option value (optional)
+    pub fn maybe_associated(
+        mut self,
+        value: Option<crate::app_bsky::actor::ProfileAssociated<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
+    /// Set the `avatar` field (optional)
+    pub fn avatar(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `avatar` field to an Option value (optional)
+    pub fn maybe_avatar(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
+    /// Set the `chatDisabled` field (optional)
+    pub fn chat_disabled(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `chatDisabled` field to an Option value (optional)
+    pub fn maybe_chat_disabled(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> ProfileViewBasicBuilder<'a, S>
+where
+    S: profile_view_basic_state::State,
+    S::Did: profile_view_basic_state::IsUnset,
+{
+    /// Set the `did` field (required)
+    pub fn did(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> ProfileViewBasicBuilder<'a, profile_view_basic_state::SetDid<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        ProfileViewBasicBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
+    /// Set the `displayName` field (optional)
+    pub fn display_name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `displayName` field to an Option value (optional)
+    pub fn maybe_display_name(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S> ProfileViewBasicBuilder<'a, S>
+where
+    S: profile_view_basic_state::State,
+    S::Handle: profile_view_basic_state::IsUnset,
+{
+    /// Set the `handle` field (required)
+    pub fn handle(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Handle<'a>>,
+    ) -> ProfileViewBasicBuilder<'a, profile_view_basic_state::SetHandle<S>> {
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        ProfileViewBasicBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
+    /// Set the `labels` field (optional)
+    pub fn labels(
+        mut self,
+        value: impl Into<Option<Vec<crate::com_atproto::label::Label<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `labels` field to an Option value (optional)
+    pub fn maybe_labels(
+        mut self,
+        value: Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
+    /// Set the `verification` field (optional)
+    pub fn verification(
+        mut self,
+        value: impl Into<Option<crate::app_bsky::actor::VerificationState<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value.into();
+        self
+    }
+    /// Set the `verification` field to an Option value (optional)
+    pub fn maybe_verification(
+        mut self,
+        value: Option<crate::app_bsky::actor::VerificationState<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value;
+        self
+    }
+}
+
+impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
+    /// Set the `viewer` field (optional)
+    pub fn viewer(
+        mut self,
+        value: impl Into<Option<crate::app_bsky::actor::ViewerState<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value.into();
+        self
+    }
+    /// Set the `viewer` field to an Option value (optional)
+    pub fn maybe_viewer(
+        mut self,
+        value: Option<crate::app_bsky::actor::ViewerState<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value;
+        self
+    }
+}
+
+impl<'a, S> ProfileViewBasicBuilder<'a, S>
+where
+    S: profile_view_basic_state::State,
+    S::Did: profile_view_basic_state::IsSet,
+    S::Handle: profile_view_basic_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> ProfileViewBasic<'a> {
+        ProfileViewBasic {
+            associated: self.__unsafe_private_named.0,
+            avatar: self.__unsafe_private_named.1,
+            chat_disabled: self.__unsafe_private_named.2,
+            did: self.__unsafe_private_named.3.unwrap(),
+            display_name: self.__unsafe_private_named.4,
+            handle: self.__unsafe_private_named.5.unwrap(),
+            labels: self.__unsafe_private_named.6,
+            verification: self.__unsafe_private_named.7,
+            viewer: self.__unsafe_private_named.8,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> ProfileViewBasic<'a> {
+        ProfileViewBasic {
+            associated: self.__unsafe_private_named.0,
+            avatar: self.__unsafe_private_named.1,
+            chat_disabled: self.__unsafe_private_named.2,
+            did: self.__unsafe_private_named.3.unwrap(),
+            display_name: self.__unsafe_private_named.4,
+            handle: self.__unsafe_private_named.5.unwrap(),
+            labels: self.__unsafe_private_named.6,
+            verification: self.__unsafe_private_named.7,
+            viewer: self.__unsafe_private_named.8,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_chat_bsky_actor_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<

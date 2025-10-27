@@ -14,204 +14,164 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Clip<'a> {
     /// The subject matter of the content.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub about: Option<ClipAbout<'a>>,
     /// An abstract is a short description that summarizes a [[CreativeWork]].
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub r#abstract: Option<jacquard_common::CowStr<'a>>,
     /// The human sensory perceptual system or cognitive faculty through which a person may process or perceive information. Values should be drawn from the [approved vocabulary](https://www.w3.org/2021/a11y-discov-vocab/latest/#accessMode-vocabulary).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub access_mode: Option<jacquard_common::CowStr<'a>>,
     /// A list of single or combined accessModes that are sufficient to understand all the intellectual content of a resource. Values should be drawn from the [approved vocabulary](https://www.w3.org/2021/a11y-discov-vocab/latest/#accessModeSufficient-vocabulary).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub access_mode_sufficient: Option<
         crate::social_flockfeeds::lexical::itemlist::Itemlist<'a>,
     >,
     /// Indicates that the resource is compatible with the referenced accessibility API. Values should be drawn from the [approved vocabulary](https://www.w3.org/2021/a11y-discov-vocab/latest/#accessibilityAPI-vocabulary).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub accessibility_api: Option<jacquard_common::CowStr<'a>>,
     /// Identifies input methods that are sufficient to fully control the described resource. Values should be drawn from the [approved vocabulary](https://www.w3.org/2021/a11y-discov-vocab/latest/#accessibilityControl-vocabulary).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub accessibility_control: Option<jacquard_common::CowStr<'a>>,
     /// Content features of the resource, such as accessible media, alternatives and supported enhancements for accessibility. Values should be drawn from the [approved vocabulary](https://www.w3.org/2021/a11y-discov-vocab/latest/#accessibilityFeature-vocabulary).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub accessibility_feature: Option<jacquard_common::CowStr<'a>>,
     /// A characteristic of the described resource that is physiologically dangerous to some users. Related to WCAG 2.0 guideline 2.3. Values should be drawn from the [approved vocabulary](https://www.w3.org/2021/a11y-discov-vocab/latest/#accessibilityHazard-vocabulary).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub accessibility_hazard: Option<jacquard_common::CowStr<'a>>,
     /// A human-readable summary of specific accessibility features or deficiencies, consistent with the other accessibility metadata but expressing subtleties such as "short descriptions are present but long descriptions will be needed for non-visual users" or "short descriptions are present and no long descriptions are needed".
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub accessibility_summary: Option<jacquard_common::CowStr<'a>>,
     /// Specifies the Person that is legally accountable for the CreativeWork.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub accountable_person: Option<ClipAccountablePerson<'a>>,
     /// Indicates a page documenting how licenses can be purchased or otherwise acquired, for the current item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub acquire_license_page: Option<ClipAcquireLicensePage<'a>>,
     /// An actor (individual or a group), e.g. in TV, radio, movie, video games etc., or in an event. Actors can be associated with individual items or with a series, episode, clip.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub actor: Option<ClipActor<'a>>,
     /// An actor, e.g. in TV, radio, movie, video games etc. Actors can be associated with individual items or with a series, episode, clip.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub actors: Option<ClipActors<'a>>,
     /** An additional type for the item, typically used for adding more specific types from external vocabularies in microdata syntax. This is a relationship between something and a class that the thing is in. Typically the value is a URI-identified RDF class, and in this case corresponds to the
     use of rdf:type in RDF. Text values can be used sparingly, for cases where useful information can be added without their being an appropriate schema to reference. In the case of text values, the class label should follow the schema.org <a href="https://schema.org/docs/styleguide.html">style guide</a>.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub additional_type: Option<jacquard_common::CowStr<'a>>,
     /// The overall rating, based on a collection of reviews or ratings, of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub aggregate_rating: Option<ClipAggregateRating<'a>>,
     /// An alias for the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub alternate_name: Option<jacquard_common::CowStr<'a>>,
     /// A secondary title of the CreativeWork.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub alternative_headline: Option<jacquard_common::CowStr<'a>>,
     /// Indicates a page or other link involved in archival of a [[CreativeWork]]. In the case of [[MediaReview]], the items in a [[MediaReviewItem]] may often become inaccessible, but be archived by archival, journalistic, activist, or law enforcement organizations. In such cases, the referenced page may not directly publish the content.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub archived_at: Option<ClipArchivedAt<'a>>,
     /// The item being described is intended to assess the competency or learning outcome defined by the referenced term.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub assesses: Option<ClipAssesses<'a>>,
     /// A media object that encodes this CreativeWork. This property is a synonym for encoding.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub associated_media: Option<ClipAssociatedMedia<'a>>,
     /// An intended audience, i.e. a group for whom something was created.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub audience: Option<ClipAudience<'a>>,
     /// An embedded audio object.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub audio: Option<ClipAudio<'a>>,
     /// The author of this content or rating. Please note that author is special in that HTML 5 provides a special mechanism for indicating authorship via the rel tag. That is equivalent to this and may be used interchangeably.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub author: Option<ClipAuthor<'a>>,
     /// An award won by or for this item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub award: Option<jacquard_common::CowStr<'a>>,
     /// Awards won by or for this item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub awards: Option<jacquard_common::CowStr<'a>>,
     /// Fictional person connected with a creative work.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub character: Option<ClipCharacter<'a>>,
     /// A citation or reference to another creative work, such as another publication, web page, scholarly article, etc.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub citation: Option<ClipCitation<'a>>,
     /// Position of the clip within an ordered group of clips.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub clip_number: Option<jacquard_common::CowStr<'a>>,
     /// Comments, typically from users.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub comment: Option<ClipComment<'a>>,
     /// The number of comments this CreativeWork (e.g. Article, Question or Answer) has received. This is most applicable to works published in Web sites with commenting system; additional comments may exist elsewhere.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub comment_count: Option<i64>,
     /// Conditions that affect the availability of, or method(s) of access to, an item. Typically used for real world items such as an [[ArchiveComponent]] held by an [[ArchiveOrganization]]. This property is not suitable for use as a general Web access control mechanism. It is expressed only in natural language.\n\nFor example "Available by appointment from the Reading Room" or "Accessible only from logged-in accounts ".
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub conditions_of_access: Option<jacquard_common::CowStr<'a>>,
     /// The location depicted or described in the content. For example, the location in a photograph or painting.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub content_location: Option<ClipContentLocation<'a>>,
     /// Official rating of a piece of content&#x2014;for example, 'MPAA PG-13'.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub content_rating: Option<ClipContentRating<'a>>,
     /// The specific time described by a creative work, for works (e.g. articles, video objects etc.) that emphasise a particular moment within an Event.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub content_reference_time: Option<jacquard_common::types::string::Datetime>,
     /// A secondary contributor to the CreativeWork or Event.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub contributor: Option<ClipContributor<'a>>,
     /// The party holding the legal copyright to the CreativeWork.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub copyright_holder: Option<ClipCopyrightHolder<'a>>,
     /// Text of a notice appropriate for describing the copyright aspects of this Creative Work, ideally indicating the owner of the copyright for the Work.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub copyright_notice: Option<jacquard_common::CowStr<'a>>,
     /// The year during which the claimed copyright for the CreativeWork was first asserted.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub copyright_year: Option<i64>,
     /// Indicates a correction to a [[CreativeWork]], either via a [[CorrectionComment]], textually or in another document.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub correction: Option<ClipCorrection<'a>>,
     /** The country of origin of something, including products as well as creative  works such as movie and TV content.
@@ -220,64 +180,51 @@ In the case of TV and movie, this would be the country of the principle offices 
 
 In the case of products, the country of origin of the product. The exact interpretation of this may vary by context and product type, and cannot be fully enumerated here.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub country_of_origin: Option<ClipCountryOfOrigin<'a>>,
     /// The status of a creative work in terms of its stage in a lifecycle. Example terms include Incomplete, Draft, Published, Obsolete. Some organizations define a set of terms for the stages of their publication lifecycle.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub creative_work_status: Option<ClipCreativeWorkStatus<'a>>,
     /// The creator/author of this CreativeWork. This is the same as the Author property for CreativeWork.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub creator: Option<ClipCreator<'a>>,
     /// Text that can be used to credit person(s) and/or organization(s) associated with a published Creative Work.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub credit_text: Option<jacquard_common::CowStr<'a>>,
     /// The date on which the CreativeWork was created or the item was added to a DataFeed.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub date_created: Option<jacquard_common::types::string::Datetime>,
     /// The date on which the CreativeWork was most recently modified or when the item's entry was modified within a DataFeed.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub date_modified: Option<jacquard_common::types::string::Datetime>,
     /// Date of first publication or broadcast. For example the date a [[CreativeWork]] was broadcast or a [[Certification]] was issued.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub date_published: Option<jacquard_common::types::string::Datetime>,
     /// A description of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub description: Option<ClipDescription<'a>>,
     /// Indicates an IPTCDigitalSourceEnumeration code indicating the nature of the digital source(s) for some [[CreativeWork]].
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub digital_source_type: Option<jacquard_common::CowStr<'a>>,
     /// A director of e.g. TV, radio, movie, video gaming etc. content, or of an event. Directors can be associated with individual items or with a series, episode, clip.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub director: Option<ClipDirector<'a>>,
     /// A director of e.g. TV, radio, movie, video games etc. content. Directors can be associated with individual items or with a series, episode, clip.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub directors: Option<ClipDirectors<'a>>,
     /// A sub property of description. A short description of the item used to disambiguate from other, similar items. Information from other properties (in particular, name) may be necessary for the description to be useful for disambiguation.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub disambiguating_description: Option<jacquard_common::CowStr<'a>>,
     /// A link to the page containing the comments of the CreativeWork.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub discussion_url: Option<jacquard_common::types::string::Uri<'a>>,
     /** An [EIDR](https://eidr.org/) (Entertainment Identifier Registry) [[identifier]] representing a specific edit / edition for a work of film or television.
@@ -286,34 +233,28 @@ For example, the motion picture known as "Ghostbusters" whose [[titleEIDR]] is "
 
 Since schema.org types like [[Movie]] and [[TVEpisode]] can be used for both works and their multiple expressions, it is possible to use [[titleEIDR]] alone (for a general description), or alongside [[editEIDR]] for a more edit-specific description.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub edit_eidr: Option<jacquard_common::CowStr<'a>>,
     /// Specifies the Person who edited the CreativeWork.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub editor: Option<ClipEditor<'a>>,
     /** An alignment to an established educational framework.
 
 This property should not be used where the nature of the alignment can be described using a simple property, for example to express that a resource [[teaches]] or [[assesses]] a competency.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub educational_alignment: Option<ClipEducationalAlignment<'a>>,
     /// The level in terms of progression through an educational or training context. Examples of educational levels include 'beginner', 'intermediate' or 'advanced', and formal sets of level indicators.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub educational_level: Option<ClipEducationalLevel<'a>>,
     /// The purpose of a work in the context of education; for example, 'assignment', 'group work'.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub educational_use: Option<ClipEducationalUse<'a>>,
     /// A media object that encodes this CreativeWork. This property is a synonym for associatedMedia.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub encoding: Option<ClipEncoding<'a>>,
     /** Media type typically expressed using a MIME format (see [IANA site](http://www.iana.org/assignments/media-types/media-types.xhtml) and [MDN reference](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types)), e.g. application/zip for a SoftwareApplication binary, audio/mpeg for .mp3 etc.
@@ -322,326 +263,262 @@ In cases where a [[CreativeWork]] has several media type representations, [[enco
 
 Unregistered or niche encoding and file formats can be indicated instead via the most appropriate URL, e.g. defining Web page or a Wikipedia/Wikidata entry.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub encoding_format: Option<jacquard_common::CowStr<'a>>,
     /// A media object that encodes this CreativeWork.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub encodings: Option<ClipEncodings<'a>>,
     /// The end time of the clip expressed as the number of seconds from the beginning of the work.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub end_offset: Option<ClipEndOffset<'a>>,
     /// A creative work that this work is an example/instance/realization/derivation of.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub example_of_work: Option<ClipExampleOfWork<'a>>,
     /// Date the content expires and is no longer useful or available. For example a [[VideoObject]] or [[NewsArticle]] whose availability or relevance is time-limited, a [[ClaimReview]] fact check whose publisher wants to indicate that it may no longer be relevant (or helpful to highlight) after some date, or a [[Certification]] the validity has expired.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub expires: Option<jacquard_common::types::string::Datetime>,
     /// Media type, typically MIME format (see [IANA site](http://www.iana.org/assignments/media-types/media-types.xhtml)) of the content, e.g. application/zip of a SoftwareApplication binary. In cases where a CreativeWork has several media type representations, 'encoding' can be used to indicate each MediaObject alongside particular fileFormat information. Unregistered or niche file formats can be indicated instead via the most appropriate URL, e.g. defining Web page or a Wikipedia entry.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub file_format: Option<jacquard_common::CowStr<'a>>,
     /// A person or organization that supports (sponsors) something through some kind of financial contribution.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub funder: Option<ClipFunder<'a>>,
     /// A [[Grant]] that directly or indirectly provide funding or sponsorship for this item. See also [[ownershipFundingInfo]].
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub funding: Option<ClipFunding<'a>>,
     /// Genre of the creative work, broadcast channel or group.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub genre: Option<jacquard_common::CowStr<'a>>,
     /// Indicates an item or CreativeWork that is part of this item, or CreativeWork (in some sense).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub has_part: Option<ClipHasPart<'a>>,
     /// Headline of the article.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub headline: Option<jacquard_common::CowStr<'a>>,
     /// The identifier property represents any kind of identifier for any kind of [[Thing]], such as ISBNs, GTIN codes, UUIDs etc. Schema.org provides dedicated properties for representing many of these, either as textual strings or as URL (URI) links. See [background notes](/docs/datamodel.html#identifierBg) for more details.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub identifier: Option<ClipIdentifier<'a>>,
     /// An image of the item. This can be a [[URL]] or a fully described [[ImageObject]].
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub image: Option<ClipImage<'a>>,
     /// The language of the content or performance or used in an action. Please use one of the language codes from the [IETF BCP 47 standard](http://tools.ietf.org/html/bcp47). See also [[availableLanguage]].
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub in_language: Option<ClipInLanguage<'a>>,
     /// The number of interactions for the CreativeWork using the WebSite or SoftwareApplication. The most specific child type of InteractionCounter should be used.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub interaction_statistic: Option<ClipInteractionStatistic<'a>>,
     /// The predominant mode of learning supported by the learning resource. Acceptable values are 'active', 'expositive', or 'mixed'.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub interactivity_type: Option<jacquard_common::CowStr<'a>>,
     /// Used to indicate a specific claim contained, implied, translated or refined from the content of a [[MediaObject]] or other [[CreativeWork]]. The interpreting party can be indicated using [[claimInterpreter]].
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub interpreted_as_claim: Option<ClipInterpretedAsClaim<'a>>,
     /// A flag to signal that the item, event, or place is accessible for free.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub is_accessible_for_free: Option<bool>,
     /// A resource from which this work is derived or from which it is a modification or adaptation.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub is_based_on: Option<jacquard_common::types::string::Uri<'a>>,
     /// Indicates whether this content is family friendly.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub is_family_friendly: Option<bool>,
     /// Indicates an item or CreativeWork that this item, or CreativeWork (in some sense), is part of.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub is_part_of: Option<ClipIsPartOf<'a>>,
     /// Keywords or tags used to describe some item. Multiple textual entries in a keywords list are typically delimited by commas, or by repeating the property.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub keywords: Option<ClipKeywords<'a>>,
     /// The predominant type or kind characterizing the learning resource. For example, 'presentation', 'handout'.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub learning_resource_type: Option<ClipLearningResourceType<'a>>,
     /// A license document that applies to this content, typically indicated by URL.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub license: Option<ClipLicense<'a>>,
     /// The location where the CreativeWork was created, which may not be the same as the location depicted in the CreativeWork.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub location_created: Option<ClipLocationCreated<'a>>,
     /// Indicates the primary entity described in some page or other CreativeWork.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub main_entity: Option<ClipMainEntity<'a>>,
     /// Indicates a page (or other CreativeWork) for which this thing is the main entity being described. See [background notes](/docs/datamodel.html#mainEntityBackground) for details.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub main_entity_of_page: Option<ClipMainEntityOfPage<'a>>,
     /// A maintainer of a [[Dataset]], software package ([[SoftwareApplication]]), or other [[Project]]. A maintainer is a [[Person]] or [[Organization]] that manages contributions to, and/or publication of, some (typically complex) artifact. It is common for distributions of software and data to be based on "upstream" sources. When [[maintainer]] is applied to a specific version of something e.g. a particular version or packaging of a [[Dataset]], it is always  possible that the upstream source has a different maintainer. The [[isBasedOn]] property can be used to indicate such relationships between datasets to make the different maintenance roles clear. Similarly in the case of software, a package may have dedicated maintainers working on integration into software distributions such as Ubuntu, as well as upstream maintainers of the underlying work.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub maintainer: Option<ClipMaintainer<'a>>,
     /// A material that something is made from, e.g. leather, wool, cotton, paper.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub material: Option<ClipMaterial<'a>>,
     /// The quantity of the materials being described or an expression of the physical space they occupy.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub material_extent: Option<ClipMaterialExtent<'a>>,
     /// Indicates that the CreativeWork contains a reference to, but is not necessarily about a concept.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub mentions: Option<ClipMentions<'a>>,
     /// The composer of the soundtrack.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub music_by: Option<ClipMusicBy<'a>>,
     /// The name of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub name: Option<jacquard_common::CowStr<'a>>,
     /// An offer to provide this item&#x2014;for example, an offer to sell a product, rent the DVD of a movie, perform a service, or give away tickets to an event. Use [[businessFunction]] to indicate the kind of transaction offered, i.e. sell, lease, etc. This property can also be used to describe a [[Demand]]. While this property is listed as expected on a number of common types, it can be used in others. In that case, using a second type, such as Product or a subtype of Product, can clarify the nature of the offer.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub offers: Option<ClipOffers<'a>>,
     /// The episode to which this clip belongs.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub part_of_episode: Option<ClipPartOfEpisode<'a>>,
     /// The season to which this episode belongs.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub part_of_season: Option<ClipPartOfSeason<'a>>,
     /// The series to which this episode or season belongs.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub part_of_series: Option<ClipPartOfSeries<'a>>,
     /// A pattern that something has, for example 'polka dot', 'striped', 'Canadian flag'. Values are typically expressed as text, although links to controlled value schemes are also supported.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub pattern: Option<ClipPattern<'a>>,
     /// The position of an item in a series or sequence of items.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub position: Option<jacquard_common::CowStr<'a>>,
     /// Indicates a potential Action, which describes an idealized action in which this thing would play an 'object' role.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub potential_action: Option<ClipPotentialAction<'a>>,
     /// The person or organization who produced the work (e.g. music album, movie, TV/radio series etc.).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub producer: Option<ClipProducer<'a>>,
     /// The service provider, service operator, or service performer; the goods producer. Another party (a seller) may offer those services or goods on behalf of the provider. A provider may also serve as the seller.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub provider: Option<ClipProvider<'a>>,
     /// A publication event associated with the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub publication: Option<ClipPublication<'a>>,
     /// The publisher of the article in question.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub publisher: Option<ClipPublisher<'a>>,
     /// The publishing division which published the comic.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub publisher_imprint: Option<ClipPublisherImprint<'a>>,
     /** The publishingPrinciples property indicates (typically via [[URL]]) a document describing the editorial principles of an [[Organization]] (or individual, e.g. a [[Person]] writing a blog) that relate to their activities as a publisher, e.g. ethics or diversity policies. When applied to a [[CreativeWork]] (e.g. [[NewsArticle]]) the principles are those of the party primarily responsible for the creation of the [[CreativeWork]].
 
 While such policies are most typically expressed in natural language, sometimes related information (e.g. indicating a [[funder]]) can be expressed using schema.org terminology.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub publishing_principles: Option<ClipPublishingPrinciples<'a>>,
     /// The Event where the CreativeWork was recorded. The CreativeWork may capture all or part of the event.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub recorded_at: Option<ClipRecordedAt<'a>>,
     /// The place and time the release was issued, expressed as a PublicationEvent.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub released_event: Option<ClipReleasedEvent<'a>>,
     /// A review of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub review: Option<ClipReview<'a>>,
     /// Review of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub reviews: Option<ClipReviews<'a>>,
     /// URL of a reference Web page that unambiguously indicates the item's identity. E.g. the URL of the item's Wikipedia page, Wikidata entry, or official website.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub same_as: Option<jacquard_common::types::string::Uri<'a>>,
     /** Indicates (by URL or string) a particular version of a schema used in some CreativeWork. This property was created primarily to
     indicate the use of a specific schema.org release, e.g. ```10.0``` as a simple string, or more explicitly via URL, ```https://schema.org/docs/releases.html#v10.0```. There may be situations in which other schemas might usefully be referenced this way, e.g. ```http://dublincore.org/specifications/dublin-core/dces/1999-07-02/``` but this has not been carefully explored in the community.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub schema_version: Option<jacquard_common::CowStr<'a>>,
     /// Indicates the date on which the current structured data was generated / published. Typically used alongside [[sdPublisher]].
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub sd_date_published: Option<jacquard_common::types::string::Datetime>,
     /// A license document that applies to this structured data, typically indicated by URL.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub sd_license: Option<ClipSdLicense<'a>>,
     /** Indicates the party responsible for generating and publishing the current structured data markup, typically in cases where the structured data is derived automatically from existing published content but published on a different site. For example, student projects and open data initiatives often re-publish existing content with more explicitly structured metadata. The
 [[sdPublisher]] property helps make such practices more explicit.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub sd_publisher: Option<ClipSdPublisher<'a>>,
     /// A standardized size of a product or creative work, specified either through a simple textual string (for example 'XL', '32Wx34L'), a  QuantitativeValue with a unitCode, or a comprehensive and structured [[SizeSpecification]]; in other cases, the [[width]], [[height]], [[depth]] and [[weight]] properties may be more applicable.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub size: Option<ClipSize<'a>>,
     /// The Organization on whose behalf the creator was working.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub source_organization: Option<ClipSourceOrganization<'a>>,
     /** The "spatial" property can be used in cases when more specific properties
 (e.g. [[locationCreated]], [[spatialCoverage]], [[contentLocation]]) are not known to be appropriate.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub spatial: Option<ClipSpatial<'a>>,
     /** The spatialCoverage of a CreativeWork indicates the place(s) which are the focus of the content. It is a subproperty of
       contentLocation intended primarily for more technical and detailed materials. For example with a Dataset, it indicates
       areas that the dataset describes: a dataset of New York weather would have spatialCoverage which was the place: the state of New York.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub spatial_coverage: Option<ClipSpatialCoverage<'a>>,
     /// A person or organization that supports a thing through a pledge, promise, or financial contribution. E.g. a sponsor of a Medical Study or a corporate sponsor of an event.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub sponsor: Option<ClipSponsor<'a>>,
     /// The start time of the clip expressed as the number of seconds from the beginning of the work.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub start_offset: Option<ClipStartOffset<'a>>,
     /// A CreativeWork or Event about this Thing.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub subject_of: Option<ClipSubjectOf<'a>>,
     /// The item being described is intended to help a person learn the competency or learning outcome defined by the referenced term.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub teaches: Option<ClipTeaches<'a>>,
     /** The "temporal" property can be used in cases where more specific properties
 (e.g. [[temporalCoverage]], [[dateCreated]], [[dateModified]], [[datePublished]]) are not known to be appropriate.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub temporal: Option<jacquard_common::CowStr<'a>>,
     /** The temporalCoverage of a CreativeWork indicates the period that the content applies to, i.e. that it describes, either as a DateTime or as a textual string indicating a time period in [ISO 8601 time interval format](https://en.wikipedia.org/wiki/ISO_8601#Time_intervals). In
@@ -650,80 +527,2882 @@ While such policies are most typically expressed in natural language, sometimes 
 
 Open-ended date ranges can be written with ".." in place of the end date. For example, "2015-11/.." indicates a range beginning in November 2015 and with no specified final date. This is tentative and might be updated in future when ISO 8601 is officially updated.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub temporal_coverage: Option<jacquard_common::CowStr<'a>>,
     /// The textual content of this CreativeWork.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub text: Option<jacquard_common::CowStr<'a>>,
     /// Thumbnail image for an image or video.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub thumbnail: Option<ClipThumbnail<'a>>,
     /// A thumbnail image relevant to the Thing.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub thumbnail_url: Option<jacquard_common::types::string::Uri<'a>>,
     /// Approximate or typical time it usually takes to work with or through the content of this work for the typical or target audience.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub time_required: Option<ClipTimeRequired<'a>>,
     /// The work that this work has been translated from. E.g. 物种起源 is a translationOf “On the Origin of Species”.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub translation_of_work: Option<ClipTranslationOfWork<'a>>,
     /// Organization or person who adapts a creative work to different languages, regional differences and technical requirements of a target market, or that translates during some event.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub translator: Option<ClipTranslator<'a>>,
     /// The typical expected age range, e.g. '7-9', '11-'.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub typical_age_range: Option<jacquard_common::CowStr<'a>>,
     /// URL of the item.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub url: Option<jacquard_common::types::string::Uri<'a>>,
     /** The schema.org [[usageInfo]] property indicates further information about a [[CreativeWork]]. This property is applicable both to works that are freely available and to those that require payment or other transactions. It can reference additional information, e.g. community expectations on preferred linking and citation conventions, as well as purchasing details. For something that can be commercially licensed, usageInfo can provide detailed, resource-specific information about licensing options.
 
 This property can be used alongside the license property which indicates license(s) applicable to some piece of content. The usageInfo property can provide information about other licensing options, e.g. acquiring commercial usage rights for an image that is also available under non-commercial creative commons licenses.*/
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub usage_info: Option<ClipUsageInfo<'a>>,
     /// The version of the CreativeWork embodied by a specified resource.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub version: Option<jacquard_common::CowStr<'a>>,
     /// An embedded video object.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub video: Option<ClipVideo<'a>>,
     /// The number of words in the text of the CreativeWork such as an Article, Book, etc.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub word_count: Option<i64>,
     /// Example/instance/realization/derivation of the concept of this creative work. E.g. the paperback edition, first edition, or e-book.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub work_example: Option<ClipWorkExample<'a>>,
     /// A work that is a translation of the content of this work. E.g. 西遊記 has an English workTranslation “Journey to the West”, a German workTranslation “Monkeys Pilgerfahrt” and a Vietnamese  translation Tây du ký bình khảo.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub work_translation: Option<ClipWorkTranslation<'a>>,
+}
+
+pub mod clip_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {}
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {}
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {}
+}
+
+/// Builder for constructing an instance of this type
+pub struct ClipBuilder<'a, S: clip_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<ClipAbout<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<
+            crate::social_flockfeeds::lexical::itemlist::Itemlist<'a>,
+        >,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ClipAccountablePerson<'a>>,
+        ::core::option::Option<ClipAcquireLicensePage<'a>>,
+        ::core::option::Option<ClipActor<'a>>,
+        ::core::option::Option<ClipActors<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ClipAggregateRating<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ClipArchivedAt<'a>>,
+        ::core::option::Option<ClipAssesses<'a>>,
+        ::core::option::Option<ClipAssociatedMedia<'a>>,
+        ::core::option::Option<ClipAudience<'a>>,
+        ::core::option::Option<ClipAudio<'a>>,
+        ::core::option::Option<ClipAuthor<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ClipCharacter<'a>>,
+        ::core::option::Option<ClipCitation<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ClipComment<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ClipContentLocation<'a>>,
+        ::core::option::Option<ClipContentRating<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<ClipContributor<'a>>,
+        ::core::option::Option<ClipCopyrightHolder<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<ClipCorrection<'a>>,
+        ::core::option::Option<ClipCountryOfOrigin<'a>>,
+        ::core::option::Option<ClipCreativeWorkStatus<'a>>,
+        ::core::option::Option<ClipCreator<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<ClipDescription<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ClipDirector<'a>>,
+        ::core::option::Option<ClipDirectors<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ClipEditor<'a>>,
+        ::core::option::Option<ClipEducationalAlignment<'a>>,
+        ::core::option::Option<ClipEducationalLevel<'a>>,
+        ::core::option::Option<ClipEducationalUse<'a>>,
+        ::core::option::Option<ClipEncoding<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ClipEncodings<'a>>,
+        ::core::option::Option<ClipEndOffset<'a>>,
+        ::core::option::Option<ClipExampleOfWork<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ClipFunder<'a>>,
+        ::core::option::Option<ClipFunding<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ClipHasPart<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ClipIdentifier<'a>>,
+        ::core::option::Option<ClipImage<'a>>,
+        ::core::option::Option<ClipInLanguage<'a>>,
+        ::core::option::Option<ClipInteractionStatistic<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ClipInterpretedAsClaim<'a>>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<ClipIsPartOf<'a>>,
+        ::core::option::Option<ClipKeywords<'a>>,
+        ::core::option::Option<ClipLearningResourceType<'a>>,
+        ::core::option::Option<ClipLicense<'a>>,
+        ::core::option::Option<ClipLocationCreated<'a>>,
+        ::core::option::Option<ClipMainEntity<'a>>,
+        ::core::option::Option<ClipMainEntityOfPage<'a>>,
+        ::core::option::Option<ClipMaintainer<'a>>,
+        ::core::option::Option<ClipMaterial<'a>>,
+        ::core::option::Option<ClipMaterialExtent<'a>>,
+        ::core::option::Option<ClipMentions<'a>>,
+        ::core::option::Option<ClipMusicBy<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ClipOffers<'a>>,
+        ::core::option::Option<ClipPartOfEpisode<'a>>,
+        ::core::option::Option<ClipPartOfSeason<'a>>,
+        ::core::option::Option<ClipPartOfSeries<'a>>,
+        ::core::option::Option<ClipPattern<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ClipPotentialAction<'a>>,
+        ::core::option::Option<ClipProducer<'a>>,
+        ::core::option::Option<ClipProvider<'a>>,
+        ::core::option::Option<ClipPublication<'a>>,
+        ::core::option::Option<ClipPublisher<'a>>,
+        ::core::option::Option<ClipPublisherImprint<'a>>,
+        ::core::option::Option<ClipPublishingPrinciples<'a>>,
+        ::core::option::Option<ClipRecordedAt<'a>>,
+        ::core::option::Option<ClipReleasedEvent<'a>>,
+        ::core::option::Option<ClipReview<'a>>,
+        ::core::option::Option<ClipReviews<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<ClipSdLicense<'a>>,
+        ::core::option::Option<ClipSdPublisher<'a>>,
+        ::core::option::Option<ClipSize<'a>>,
+        ::core::option::Option<ClipSourceOrganization<'a>>,
+        ::core::option::Option<ClipSpatial<'a>>,
+        ::core::option::Option<ClipSpatialCoverage<'a>>,
+        ::core::option::Option<ClipSponsor<'a>>,
+        ::core::option::Option<ClipStartOffset<'a>>,
+        ::core::option::Option<ClipSubjectOf<'a>>,
+        ::core::option::Option<ClipTeaches<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ClipThumbnail<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<ClipTimeRequired<'a>>,
+        ::core::option::Option<ClipTranslationOfWork<'a>>,
+        ::core::option::Option<ClipTranslator<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<ClipUsageInfo<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ClipVideo<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<ClipWorkExample<'a>>,
+        ::core::option::Option<ClipWorkTranslation<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Clip<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ClipBuilder<'a, clip_state::Empty> {
+        ClipBuilder::new()
+    }
+}
+
+impl<'a> ClipBuilder<'a, clip_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ClipBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `about` field (optional)
+    pub fn about(mut self, value: impl Into<Option<ClipAbout<'a>>>) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `about` field to an Option value (optional)
+    pub fn maybe_about(mut self, value: Option<ClipAbout<'a>>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `abstract` field (optional)
+    pub fn r#abstract(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `abstract` field to an Option value (optional)
+    pub fn maybe_abstract(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `accessMode` field (optional)
+    pub fn access_mode(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `accessMode` field to an Option value (optional)
+    pub fn maybe_access_mode(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `accessModeSufficient` field (optional)
+    pub fn access_mode_sufficient(
+        mut self,
+        value: impl Into<
+            Option<crate::social_flockfeeds::lexical::itemlist::Itemlist<'a>>,
+        >,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `accessModeSufficient` field to an Option value (optional)
+    pub fn maybe_access_mode_sufficient(
+        mut self,
+        value: Option<crate::social_flockfeeds::lexical::itemlist::Itemlist<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `accessibilityAPI` field (optional)
+    pub fn accessibility_api(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `accessibilityAPI` field to an Option value (optional)
+    pub fn maybe_accessibility_api(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `accessibilityControl` field (optional)
+    pub fn accessibility_control(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `accessibilityControl` field to an Option value (optional)
+    pub fn maybe_accessibility_control(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `accessibilityFeature` field (optional)
+    pub fn accessibility_feature(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `accessibilityFeature` field to an Option value (optional)
+    pub fn maybe_accessibility_feature(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `accessibilityHazard` field (optional)
+    pub fn accessibility_hazard(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value.into();
+        self
+    }
+    /// Set the `accessibilityHazard` field to an Option value (optional)
+    pub fn maybe_accessibility_hazard(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `accessibilitySummary` field (optional)
+    pub fn accessibility_summary(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value.into();
+        self
+    }
+    /// Set the `accessibilitySummary` field to an Option value (optional)
+    pub fn maybe_accessibility_summary(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `accountablePerson` field (optional)
+    pub fn accountable_person(
+        mut self,
+        value: impl Into<Option<ClipAccountablePerson<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.9 = value.into();
+        self
+    }
+    /// Set the `accountablePerson` field to an Option value (optional)
+    pub fn maybe_accountable_person(
+        mut self,
+        value: Option<ClipAccountablePerson<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.9 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `acquireLicensePage` field (optional)
+    pub fn acquire_license_page(
+        mut self,
+        value: impl Into<Option<ClipAcquireLicensePage<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.10 = value.into();
+        self
+    }
+    /// Set the `acquireLicensePage` field to an Option value (optional)
+    pub fn maybe_acquire_license_page(
+        mut self,
+        value: Option<ClipAcquireLicensePage<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.10 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `actor` field (optional)
+    pub fn actor(mut self, value: impl Into<Option<ClipActor<'a>>>) -> Self {
+        self.__unsafe_private_named.11 = value.into();
+        self
+    }
+    /// Set the `actor` field to an Option value (optional)
+    pub fn maybe_actor(mut self, value: Option<ClipActor<'a>>) -> Self {
+        self.__unsafe_private_named.11 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `actors` field (optional)
+    pub fn actors(mut self, value: impl Into<Option<ClipActors<'a>>>) -> Self {
+        self.__unsafe_private_named.12 = value.into();
+        self
+    }
+    /// Set the `actors` field to an Option value (optional)
+    pub fn maybe_actors(mut self, value: Option<ClipActors<'a>>) -> Self {
+        self.__unsafe_private_named.12 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `additionalType` field (optional)
+    pub fn additional_type(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.13 = value.into();
+        self
+    }
+    /// Set the `additionalType` field to an Option value (optional)
+    pub fn maybe_additional_type(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.13 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `aggregateRating` field (optional)
+    pub fn aggregate_rating(
+        mut self,
+        value: impl Into<Option<ClipAggregateRating<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.14 = value.into();
+        self
+    }
+    /// Set the `aggregateRating` field to an Option value (optional)
+    pub fn maybe_aggregate_rating(
+        mut self,
+        value: Option<ClipAggregateRating<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.14 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `alternateName` field (optional)
+    pub fn alternate_name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.15 = value.into();
+        self
+    }
+    /// Set the `alternateName` field to an Option value (optional)
+    pub fn maybe_alternate_name(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.15 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `alternativeHeadline` field (optional)
+    pub fn alternative_headline(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.16 = value.into();
+        self
+    }
+    /// Set the `alternativeHeadline` field to an Option value (optional)
+    pub fn maybe_alternative_headline(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.16 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `archivedAt` field (optional)
+    pub fn archived_at(mut self, value: impl Into<Option<ClipArchivedAt<'a>>>) -> Self {
+        self.__unsafe_private_named.17 = value.into();
+        self
+    }
+    /// Set the `archivedAt` field to an Option value (optional)
+    pub fn maybe_archived_at(mut self, value: Option<ClipArchivedAt<'a>>) -> Self {
+        self.__unsafe_private_named.17 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `assesses` field (optional)
+    pub fn assesses(mut self, value: impl Into<Option<ClipAssesses<'a>>>) -> Self {
+        self.__unsafe_private_named.18 = value.into();
+        self
+    }
+    /// Set the `assesses` field to an Option value (optional)
+    pub fn maybe_assesses(mut self, value: Option<ClipAssesses<'a>>) -> Self {
+        self.__unsafe_private_named.18 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `associatedMedia` field (optional)
+    pub fn associated_media(
+        mut self,
+        value: impl Into<Option<ClipAssociatedMedia<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.19 = value.into();
+        self
+    }
+    /// Set the `associatedMedia` field to an Option value (optional)
+    pub fn maybe_associated_media(
+        mut self,
+        value: Option<ClipAssociatedMedia<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.19 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `audience` field (optional)
+    pub fn audience(mut self, value: impl Into<Option<ClipAudience<'a>>>) -> Self {
+        self.__unsafe_private_named.20 = value.into();
+        self
+    }
+    /// Set the `audience` field to an Option value (optional)
+    pub fn maybe_audience(mut self, value: Option<ClipAudience<'a>>) -> Self {
+        self.__unsafe_private_named.20 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `audio` field (optional)
+    pub fn audio(mut self, value: impl Into<Option<ClipAudio<'a>>>) -> Self {
+        self.__unsafe_private_named.21 = value.into();
+        self
+    }
+    /// Set the `audio` field to an Option value (optional)
+    pub fn maybe_audio(mut self, value: Option<ClipAudio<'a>>) -> Self {
+        self.__unsafe_private_named.21 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `author` field (optional)
+    pub fn author(mut self, value: impl Into<Option<ClipAuthor<'a>>>) -> Self {
+        self.__unsafe_private_named.22 = value.into();
+        self
+    }
+    /// Set the `author` field to an Option value (optional)
+    pub fn maybe_author(mut self, value: Option<ClipAuthor<'a>>) -> Self {
+        self.__unsafe_private_named.22 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `award` field (optional)
+    pub fn award(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.23 = value.into();
+        self
+    }
+    /// Set the `award` field to an Option value (optional)
+    pub fn maybe_award(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.23 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `awards` field (optional)
+    pub fn awards(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.24 = value.into();
+        self
+    }
+    /// Set the `awards` field to an Option value (optional)
+    pub fn maybe_awards(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.24 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `character` field (optional)
+    pub fn character(mut self, value: impl Into<Option<ClipCharacter<'a>>>) -> Self {
+        self.__unsafe_private_named.25 = value.into();
+        self
+    }
+    /// Set the `character` field to an Option value (optional)
+    pub fn maybe_character(mut self, value: Option<ClipCharacter<'a>>) -> Self {
+        self.__unsafe_private_named.25 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `citation` field (optional)
+    pub fn citation(mut self, value: impl Into<Option<ClipCitation<'a>>>) -> Self {
+        self.__unsafe_private_named.26 = value.into();
+        self
+    }
+    /// Set the `citation` field to an Option value (optional)
+    pub fn maybe_citation(mut self, value: Option<ClipCitation<'a>>) -> Self {
+        self.__unsafe_private_named.26 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `clipNumber` field (optional)
+    pub fn clip_number(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.27 = value.into();
+        self
+    }
+    /// Set the `clipNumber` field to an Option value (optional)
+    pub fn maybe_clip_number(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.27 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `comment` field (optional)
+    pub fn comment(mut self, value: impl Into<Option<ClipComment<'a>>>) -> Self {
+        self.__unsafe_private_named.28 = value.into();
+        self
+    }
+    /// Set the `comment` field to an Option value (optional)
+    pub fn maybe_comment(mut self, value: Option<ClipComment<'a>>) -> Self {
+        self.__unsafe_private_named.28 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `commentCount` field (optional)
+    pub fn comment_count(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.29 = value.into();
+        self
+    }
+    /// Set the `commentCount` field to an Option value (optional)
+    pub fn maybe_comment_count(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.29 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `conditionsOfAccess` field (optional)
+    pub fn conditions_of_access(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.30 = value.into();
+        self
+    }
+    /// Set the `conditionsOfAccess` field to an Option value (optional)
+    pub fn maybe_conditions_of_access(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.30 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `contentLocation` field (optional)
+    pub fn content_location(
+        mut self,
+        value: impl Into<Option<ClipContentLocation<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.31 = value.into();
+        self
+    }
+    /// Set the `contentLocation` field to an Option value (optional)
+    pub fn maybe_content_location(
+        mut self,
+        value: Option<ClipContentLocation<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.31 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `contentRating` field (optional)
+    pub fn content_rating(
+        mut self,
+        value: impl Into<Option<ClipContentRating<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.32 = value.into();
+        self
+    }
+    /// Set the `contentRating` field to an Option value (optional)
+    pub fn maybe_content_rating(mut self, value: Option<ClipContentRating<'a>>) -> Self {
+        self.__unsafe_private_named.32 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `contentReferenceTime` field (optional)
+    pub fn content_reference_time(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.33 = value.into();
+        self
+    }
+    /// Set the `contentReferenceTime` field to an Option value (optional)
+    pub fn maybe_content_reference_time(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.33 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `contributor` field (optional)
+    pub fn contributor(mut self, value: impl Into<Option<ClipContributor<'a>>>) -> Self {
+        self.__unsafe_private_named.34 = value.into();
+        self
+    }
+    /// Set the `contributor` field to an Option value (optional)
+    pub fn maybe_contributor(mut self, value: Option<ClipContributor<'a>>) -> Self {
+        self.__unsafe_private_named.34 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `copyrightHolder` field (optional)
+    pub fn copyright_holder(
+        mut self,
+        value: impl Into<Option<ClipCopyrightHolder<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.35 = value.into();
+        self
+    }
+    /// Set the `copyrightHolder` field to an Option value (optional)
+    pub fn maybe_copyright_holder(
+        mut self,
+        value: Option<ClipCopyrightHolder<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.35 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `copyrightNotice` field (optional)
+    pub fn copyright_notice(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.36 = value.into();
+        self
+    }
+    /// Set the `copyrightNotice` field to an Option value (optional)
+    pub fn maybe_copyright_notice(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.36 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `copyrightYear` field (optional)
+    pub fn copyright_year(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.37 = value.into();
+        self
+    }
+    /// Set the `copyrightYear` field to an Option value (optional)
+    pub fn maybe_copyright_year(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.37 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `correction` field (optional)
+    pub fn correction(mut self, value: impl Into<Option<ClipCorrection<'a>>>) -> Self {
+        self.__unsafe_private_named.38 = value.into();
+        self
+    }
+    /// Set the `correction` field to an Option value (optional)
+    pub fn maybe_correction(mut self, value: Option<ClipCorrection<'a>>) -> Self {
+        self.__unsafe_private_named.38 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `countryOfOrigin` field (optional)
+    pub fn country_of_origin(
+        mut self,
+        value: impl Into<Option<ClipCountryOfOrigin<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.39 = value.into();
+        self
+    }
+    /// Set the `countryOfOrigin` field to an Option value (optional)
+    pub fn maybe_country_of_origin(
+        mut self,
+        value: Option<ClipCountryOfOrigin<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.39 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `creativeWorkStatus` field (optional)
+    pub fn creative_work_status(
+        mut self,
+        value: impl Into<Option<ClipCreativeWorkStatus<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.40 = value.into();
+        self
+    }
+    /// Set the `creativeWorkStatus` field to an Option value (optional)
+    pub fn maybe_creative_work_status(
+        mut self,
+        value: Option<ClipCreativeWorkStatus<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.40 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `creator` field (optional)
+    pub fn creator(mut self, value: impl Into<Option<ClipCreator<'a>>>) -> Self {
+        self.__unsafe_private_named.41 = value.into();
+        self
+    }
+    /// Set the `creator` field to an Option value (optional)
+    pub fn maybe_creator(mut self, value: Option<ClipCreator<'a>>) -> Self {
+        self.__unsafe_private_named.41 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `creditText` field (optional)
+    pub fn credit_text(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.42 = value.into();
+        self
+    }
+    /// Set the `creditText` field to an Option value (optional)
+    pub fn maybe_credit_text(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.42 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `dateCreated` field (optional)
+    pub fn date_created(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.43 = value.into();
+        self
+    }
+    /// Set the `dateCreated` field to an Option value (optional)
+    pub fn maybe_date_created(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.43 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `dateModified` field (optional)
+    pub fn date_modified(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.44 = value.into();
+        self
+    }
+    /// Set the `dateModified` field to an Option value (optional)
+    pub fn maybe_date_modified(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.44 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `datePublished` field (optional)
+    pub fn date_published(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.45 = value.into();
+        self
+    }
+    /// Set the `datePublished` field to an Option value (optional)
+    pub fn maybe_date_published(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.45 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `description` field (optional)
+    pub fn description(mut self, value: impl Into<Option<ClipDescription<'a>>>) -> Self {
+        self.__unsafe_private_named.46 = value.into();
+        self
+    }
+    /// Set the `description` field to an Option value (optional)
+    pub fn maybe_description(mut self, value: Option<ClipDescription<'a>>) -> Self {
+        self.__unsafe_private_named.46 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `digitalSourceType` field (optional)
+    pub fn digital_source_type(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.47 = value.into();
+        self
+    }
+    /// Set the `digitalSourceType` field to an Option value (optional)
+    pub fn maybe_digital_source_type(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.47 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `director` field (optional)
+    pub fn director(mut self, value: impl Into<Option<ClipDirector<'a>>>) -> Self {
+        self.__unsafe_private_named.48 = value.into();
+        self
+    }
+    /// Set the `director` field to an Option value (optional)
+    pub fn maybe_director(mut self, value: Option<ClipDirector<'a>>) -> Self {
+        self.__unsafe_private_named.48 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `directors` field (optional)
+    pub fn directors(mut self, value: impl Into<Option<ClipDirectors<'a>>>) -> Self {
+        self.__unsafe_private_named.49 = value.into();
+        self
+    }
+    /// Set the `directors` field to an Option value (optional)
+    pub fn maybe_directors(mut self, value: Option<ClipDirectors<'a>>) -> Self {
+        self.__unsafe_private_named.49 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `disambiguatingDescription` field (optional)
+    pub fn disambiguating_description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.50 = value.into();
+        self
+    }
+    /// Set the `disambiguatingDescription` field to an Option value (optional)
+    pub fn maybe_disambiguating_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.50 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `discussionUrl` field (optional)
+    pub fn discussion_url(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.51 = value.into();
+        self
+    }
+    /// Set the `discussionUrl` field to an Option value (optional)
+    pub fn maybe_discussion_url(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.51 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `editEIDR` field (optional)
+    pub fn edit_eidr(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.52 = value.into();
+        self
+    }
+    /// Set the `editEIDR` field to an Option value (optional)
+    pub fn maybe_edit_eidr(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.52 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `editor` field (optional)
+    pub fn editor(mut self, value: impl Into<Option<ClipEditor<'a>>>) -> Self {
+        self.__unsafe_private_named.53 = value.into();
+        self
+    }
+    /// Set the `editor` field to an Option value (optional)
+    pub fn maybe_editor(mut self, value: Option<ClipEditor<'a>>) -> Self {
+        self.__unsafe_private_named.53 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `educationalAlignment` field (optional)
+    pub fn educational_alignment(
+        mut self,
+        value: impl Into<Option<ClipEducationalAlignment<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.54 = value.into();
+        self
+    }
+    /// Set the `educationalAlignment` field to an Option value (optional)
+    pub fn maybe_educational_alignment(
+        mut self,
+        value: Option<ClipEducationalAlignment<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.54 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `educationalLevel` field (optional)
+    pub fn educational_level(
+        mut self,
+        value: impl Into<Option<ClipEducationalLevel<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.55 = value.into();
+        self
+    }
+    /// Set the `educationalLevel` field to an Option value (optional)
+    pub fn maybe_educational_level(
+        mut self,
+        value: Option<ClipEducationalLevel<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.55 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `educationalUse` field (optional)
+    pub fn educational_use(
+        mut self,
+        value: impl Into<Option<ClipEducationalUse<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.56 = value.into();
+        self
+    }
+    /// Set the `educationalUse` field to an Option value (optional)
+    pub fn maybe_educational_use(
+        mut self,
+        value: Option<ClipEducationalUse<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.56 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `encoding` field (optional)
+    pub fn encoding(mut self, value: impl Into<Option<ClipEncoding<'a>>>) -> Self {
+        self.__unsafe_private_named.57 = value.into();
+        self
+    }
+    /// Set the `encoding` field to an Option value (optional)
+    pub fn maybe_encoding(mut self, value: Option<ClipEncoding<'a>>) -> Self {
+        self.__unsafe_private_named.57 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `encodingFormat` field (optional)
+    pub fn encoding_format(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.58 = value.into();
+        self
+    }
+    /// Set the `encodingFormat` field to an Option value (optional)
+    pub fn maybe_encoding_format(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.58 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `encodings` field (optional)
+    pub fn encodings(mut self, value: impl Into<Option<ClipEncodings<'a>>>) -> Self {
+        self.__unsafe_private_named.59 = value.into();
+        self
+    }
+    /// Set the `encodings` field to an Option value (optional)
+    pub fn maybe_encodings(mut self, value: Option<ClipEncodings<'a>>) -> Self {
+        self.__unsafe_private_named.59 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `endOffset` field (optional)
+    pub fn end_offset(mut self, value: impl Into<Option<ClipEndOffset<'a>>>) -> Self {
+        self.__unsafe_private_named.60 = value.into();
+        self
+    }
+    /// Set the `endOffset` field to an Option value (optional)
+    pub fn maybe_end_offset(mut self, value: Option<ClipEndOffset<'a>>) -> Self {
+        self.__unsafe_private_named.60 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `exampleOfWork` field (optional)
+    pub fn example_of_work(
+        mut self,
+        value: impl Into<Option<ClipExampleOfWork<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.61 = value.into();
+        self
+    }
+    /// Set the `exampleOfWork` field to an Option value (optional)
+    pub fn maybe_example_of_work(
+        mut self,
+        value: Option<ClipExampleOfWork<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.61 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `expires` field (optional)
+    pub fn expires(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.62 = value.into();
+        self
+    }
+    /// Set the `expires` field to an Option value (optional)
+    pub fn maybe_expires(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.62 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `fileFormat` field (optional)
+    pub fn file_format(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.63 = value.into();
+        self
+    }
+    /// Set the `fileFormat` field to an Option value (optional)
+    pub fn maybe_file_format(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.63 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `funder` field (optional)
+    pub fn funder(mut self, value: impl Into<Option<ClipFunder<'a>>>) -> Self {
+        self.__unsafe_private_named.64 = value.into();
+        self
+    }
+    /// Set the `funder` field to an Option value (optional)
+    pub fn maybe_funder(mut self, value: Option<ClipFunder<'a>>) -> Self {
+        self.__unsafe_private_named.64 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `funding` field (optional)
+    pub fn funding(mut self, value: impl Into<Option<ClipFunding<'a>>>) -> Self {
+        self.__unsafe_private_named.65 = value.into();
+        self
+    }
+    /// Set the `funding` field to an Option value (optional)
+    pub fn maybe_funding(mut self, value: Option<ClipFunding<'a>>) -> Self {
+        self.__unsafe_private_named.65 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `genre` field (optional)
+    pub fn genre(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.66 = value.into();
+        self
+    }
+    /// Set the `genre` field to an Option value (optional)
+    pub fn maybe_genre(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.66 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `hasPart` field (optional)
+    pub fn has_part(mut self, value: impl Into<Option<ClipHasPart<'a>>>) -> Self {
+        self.__unsafe_private_named.67 = value.into();
+        self
+    }
+    /// Set the `hasPart` field to an Option value (optional)
+    pub fn maybe_has_part(mut self, value: Option<ClipHasPart<'a>>) -> Self {
+        self.__unsafe_private_named.67 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `headline` field (optional)
+    pub fn headline(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.68 = value.into();
+        self
+    }
+    /// Set the `headline` field to an Option value (optional)
+    pub fn maybe_headline(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.68 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `identifier` field (optional)
+    pub fn identifier(mut self, value: impl Into<Option<ClipIdentifier<'a>>>) -> Self {
+        self.__unsafe_private_named.69 = value.into();
+        self
+    }
+    /// Set the `identifier` field to an Option value (optional)
+    pub fn maybe_identifier(mut self, value: Option<ClipIdentifier<'a>>) -> Self {
+        self.__unsafe_private_named.69 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `image` field (optional)
+    pub fn image(mut self, value: impl Into<Option<ClipImage<'a>>>) -> Self {
+        self.__unsafe_private_named.70 = value.into();
+        self
+    }
+    /// Set the `image` field to an Option value (optional)
+    pub fn maybe_image(mut self, value: Option<ClipImage<'a>>) -> Self {
+        self.__unsafe_private_named.70 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `inLanguage` field (optional)
+    pub fn in_language(mut self, value: impl Into<Option<ClipInLanguage<'a>>>) -> Self {
+        self.__unsafe_private_named.71 = value.into();
+        self
+    }
+    /// Set the `inLanguage` field to an Option value (optional)
+    pub fn maybe_in_language(mut self, value: Option<ClipInLanguage<'a>>) -> Self {
+        self.__unsafe_private_named.71 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `interactionStatistic` field (optional)
+    pub fn interaction_statistic(
+        mut self,
+        value: impl Into<Option<ClipInteractionStatistic<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.72 = value.into();
+        self
+    }
+    /// Set the `interactionStatistic` field to an Option value (optional)
+    pub fn maybe_interaction_statistic(
+        mut self,
+        value: Option<ClipInteractionStatistic<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.72 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `interactivityType` field (optional)
+    pub fn interactivity_type(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.73 = value.into();
+        self
+    }
+    /// Set the `interactivityType` field to an Option value (optional)
+    pub fn maybe_interactivity_type(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.73 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `interpretedAsClaim` field (optional)
+    pub fn interpreted_as_claim(
+        mut self,
+        value: impl Into<Option<ClipInterpretedAsClaim<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.74 = value.into();
+        self
+    }
+    /// Set the `interpretedAsClaim` field to an Option value (optional)
+    pub fn maybe_interpreted_as_claim(
+        mut self,
+        value: Option<ClipInterpretedAsClaim<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.74 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `isAccessibleForFree` field (optional)
+    pub fn is_accessible_for_free(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.75 = value.into();
+        self
+    }
+    /// Set the `isAccessibleForFree` field to an Option value (optional)
+    pub fn maybe_is_accessible_for_free(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.75 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `isBasedOn` field (optional)
+    pub fn is_based_on(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.76 = value.into();
+        self
+    }
+    /// Set the `isBasedOn` field to an Option value (optional)
+    pub fn maybe_is_based_on(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.76 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `isFamilyFriendly` field (optional)
+    pub fn is_family_friendly(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.77 = value.into();
+        self
+    }
+    /// Set the `isFamilyFriendly` field to an Option value (optional)
+    pub fn maybe_is_family_friendly(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.77 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `isPartOf` field (optional)
+    pub fn is_part_of(mut self, value: impl Into<Option<ClipIsPartOf<'a>>>) -> Self {
+        self.__unsafe_private_named.78 = value.into();
+        self
+    }
+    /// Set the `isPartOf` field to an Option value (optional)
+    pub fn maybe_is_part_of(mut self, value: Option<ClipIsPartOf<'a>>) -> Self {
+        self.__unsafe_private_named.78 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `keywords` field (optional)
+    pub fn keywords(mut self, value: impl Into<Option<ClipKeywords<'a>>>) -> Self {
+        self.__unsafe_private_named.79 = value.into();
+        self
+    }
+    /// Set the `keywords` field to an Option value (optional)
+    pub fn maybe_keywords(mut self, value: Option<ClipKeywords<'a>>) -> Self {
+        self.__unsafe_private_named.79 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `learningResourceType` field (optional)
+    pub fn learning_resource_type(
+        mut self,
+        value: impl Into<Option<ClipLearningResourceType<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.80 = value.into();
+        self
+    }
+    /// Set the `learningResourceType` field to an Option value (optional)
+    pub fn maybe_learning_resource_type(
+        mut self,
+        value: Option<ClipLearningResourceType<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.80 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `license` field (optional)
+    pub fn license(mut self, value: impl Into<Option<ClipLicense<'a>>>) -> Self {
+        self.__unsafe_private_named.81 = value.into();
+        self
+    }
+    /// Set the `license` field to an Option value (optional)
+    pub fn maybe_license(mut self, value: Option<ClipLicense<'a>>) -> Self {
+        self.__unsafe_private_named.81 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `locationCreated` field (optional)
+    pub fn location_created(
+        mut self,
+        value: impl Into<Option<ClipLocationCreated<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.82 = value.into();
+        self
+    }
+    /// Set the `locationCreated` field to an Option value (optional)
+    pub fn maybe_location_created(
+        mut self,
+        value: Option<ClipLocationCreated<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.82 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `mainEntity` field (optional)
+    pub fn main_entity(mut self, value: impl Into<Option<ClipMainEntity<'a>>>) -> Self {
+        self.__unsafe_private_named.83 = value.into();
+        self
+    }
+    /// Set the `mainEntity` field to an Option value (optional)
+    pub fn maybe_main_entity(mut self, value: Option<ClipMainEntity<'a>>) -> Self {
+        self.__unsafe_private_named.83 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `mainEntityOfPage` field (optional)
+    pub fn main_entity_of_page(
+        mut self,
+        value: impl Into<Option<ClipMainEntityOfPage<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.84 = value.into();
+        self
+    }
+    /// Set the `mainEntityOfPage` field to an Option value (optional)
+    pub fn maybe_main_entity_of_page(
+        mut self,
+        value: Option<ClipMainEntityOfPage<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.84 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `maintainer` field (optional)
+    pub fn maintainer(mut self, value: impl Into<Option<ClipMaintainer<'a>>>) -> Self {
+        self.__unsafe_private_named.85 = value.into();
+        self
+    }
+    /// Set the `maintainer` field to an Option value (optional)
+    pub fn maybe_maintainer(mut self, value: Option<ClipMaintainer<'a>>) -> Self {
+        self.__unsafe_private_named.85 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `material` field (optional)
+    pub fn material(mut self, value: impl Into<Option<ClipMaterial<'a>>>) -> Self {
+        self.__unsafe_private_named.86 = value.into();
+        self
+    }
+    /// Set the `material` field to an Option value (optional)
+    pub fn maybe_material(mut self, value: Option<ClipMaterial<'a>>) -> Self {
+        self.__unsafe_private_named.86 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `materialExtent` field (optional)
+    pub fn material_extent(
+        mut self,
+        value: impl Into<Option<ClipMaterialExtent<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.87 = value.into();
+        self
+    }
+    /// Set the `materialExtent` field to an Option value (optional)
+    pub fn maybe_material_extent(
+        mut self,
+        value: Option<ClipMaterialExtent<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.87 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `mentions` field (optional)
+    pub fn mentions(mut self, value: impl Into<Option<ClipMentions<'a>>>) -> Self {
+        self.__unsafe_private_named.88 = value.into();
+        self
+    }
+    /// Set the `mentions` field to an Option value (optional)
+    pub fn maybe_mentions(mut self, value: Option<ClipMentions<'a>>) -> Self {
+        self.__unsafe_private_named.88 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `musicBy` field (optional)
+    pub fn music_by(mut self, value: impl Into<Option<ClipMusicBy<'a>>>) -> Self {
+        self.__unsafe_private_named.89 = value.into();
+        self
+    }
+    /// Set the `musicBy` field to an Option value (optional)
+    pub fn maybe_music_by(mut self, value: Option<ClipMusicBy<'a>>) -> Self {
+        self.__unsafe_private_named.89 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `name` field (optional)
+    pub fn name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.90 = value.into();
+        self
+    }
+    /// Set the `name` field to an Option value (optional)
+    pub fn maybe_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.90 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `offers` field (optional)
+    pub fn offers(mut self, value: impl Into<Option<ClipOffers<'a>>>) -> Self {
+        self.__unsafe_private_named.91 = value.into();
+        self
+    }
+    /// Set the `offers` field to an Option value (optional)
+    pub fn maybe_offers(mut self, value: Option<ClipOffers<'a>>) -> Self {
+        self.__unsafe_private_named.91 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `partOfEpisode` field (optional)
+    pub fn part_of_episode(
+        mut self,
+        value: impl Into<Option<ClipPartOfEpisode<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.92 = value.into();
+        self
+    }
+    /// Set the `partOfEpisode` field to an Option value (optional)
+    pub fn maybe_part_of_episode(
+        mut self,
+        value: Option<ClipPartOfEpisode<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.92 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `partOfSeason` field (optional)
+    pub fn part_of_season(
+        mut self,
+        value: impl Into<Option<ClipPartOfSeason<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.93 = value.into();
+        self
+    }
+    /// Set the `partOfSeason` field to an Option value (optional)
+    pub fn maybe_part_of_season(mut self, value: Option<ClipPartOfSeason<'a>>) -> Self {
+        self.__unsafe_private_named.93 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `partOfSeries` field (optional)
+    pub fn part_of_series(
+        mut self,
+        value: impl Into<Option<ClipPartOfSeries<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.94 = value.into();
+        self
+    }
+    /// Set the `partOfSeries` field to an Option value (optional)
+    pub fn maybe_part_of_series(mut self, value: Option<ClipPartOfSeries<'a>>) -> Self {
+        self.__unsafe_private_named.94 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `pattern` field (optional)
+    pub fn pattern(mut self, value: impl Into<Option<ClipPattern<'a>>>) -> Self {
+        self.__unsafe_private_named.95 = value.into();
+        self
+    }
+    /// Set the `pattern` field to an Option value (optional)
+    pub fn maybe_pattern(mut self, value: Option<ClipPattern<'a>>) -> Self {
+        self.__unsafe_private_named.95 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `position` field (optional)
+    pub fn position(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.96 = value.into();
+        self
+    }
+    /// Set the `position` field to an Option value (optional)
+    pub fn maybe_position(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.96 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `potentialAction` field (optional)
+    pub fn potential_action(
+        mut self,
+        value: impl Into<Option<ClipPotentialAction<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.97 = value.into();
+        self
+    }
+    /// Set the `potentialAction` field to an Option value (optional)
+    pub fn maybe_potential_action(
+        mut self,
+        value: Option<ClipPotentialAction<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.97 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `producer` field (optional)
+    pub fn producer(mut self, value: impl Into<Option<ClipProducer<'a>>>) -> Self {
+        self.__unsafe_private_named.98 = value.into();
+        self
+    }
+    /// Set the `producer` field to an Option value (optional)
+    pub fn maybe_producer(mut self, value: Option<ClipProducer<'a>>) -> Self {
+        self.__unsafe_private_named.98 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `provider` field (optional)
+    pub fn provider(mut self, value: impl Into<Option<ClipProvider<'a>>>) -> Self {
+        self.__unsafe_private_named.99 = value.into();
+        self
+    }
+    /// Set the `provider` field to an Option value (optional)
+    pub fn maybe_provider(mut self, value: Option<ClipProvider<'a>>) -> Self {
+        self.__unsafe_private_named.99 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `publication` field (optional)
+    pub fn publication(mut self, value: impl Into<Option<ClipPublication<'a>>>) -> Self {
+        self.__unsafe_private_named.100 = value.into();
+        self
+    }
+    /// Set the `publication` field to an Option value (optional)
+    pub fn maybe_publication(mut self, value: Option<ClipPublication<'a>>) -> Self {
+        self.__unsafe_private_named.100 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `publisher` field (optional)
+    pub fn publisher(mut self, value: impl Into<Option<ClipPublisher<'a>>>) -> Self {
+        self.__unsafe_private_named.101 = value.into();
+        self
+    }
+    /// Set the `publisher` field to an Option value (optional)
+    pub fn maybe_publisher(mut self, value: Option<ClipPublisher<'a>>) -> Self {
+        self.__unsafe_private_named.101 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `publisherImprint` field (optional)
+    pub fn publisher_imprint(
+        mut self,
+        value: impl Into<Option<ClipPublisherImprint<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.102 = value.into();
+        self
+    }
+    /// Set the `publisherImprint` field to an Option value (optional)
+    pub fn maybe_publisher_imprint(
+        mut self,
+        value: Option<ClipPublisherImprint<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.102 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `publishingPrinciples` field (optional)
+    pub fn publishing_principles(
+        mut self,
+        value: impl Into<Option<ClipPublishingPrinciples<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.103 = value.into();
+        self
+    }
+    /// Set the `publishingPrinciples` field to an Option value (optional)
+    pub fn maybe_publishing_principles(
+        mut self,
+        value: Option<ClipPublishingPrinciples<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.103 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `recordedAt` field (optional)
+    pub fn recorded_at(mut self, value: impl Into<Option<ClipRecordedAt<'a>>>) -> Self {
+        self.__unsafe_private_named.104 = value.into();
+        self
+    }
+    /// Set the `recordedAt` field to an Option value (optional)
+    pub fn maybe_recorded_at(mut self, value: Option<ClipRecordedAt<'a>>) -> Self {
+        self.__unsafe_private_named.104 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `releasedEvent` field (optional)
+    pub fn released_event(
+        mut self,
+        value: impl Into<Option<ClipReleasedEvent<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.105 = value.into();
+        self
+    }
+    /// Set the `releasedEvent` field to an Option value (optional)
+    pub fn maybe_released_event(mut self, value: Option<ClipReleasedEvent<'a>>) -> Self {
+        self.__unsafe_private_named.105 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `review` field (optional)
+    pub fn review(mut self, value: impl Into<Option<ClipReview<'a>>>) -> Self {
+        self.__unsafe_private_named.106 = value.into();
+        self
+    }
+    /// Set the `review` field to an Option value (optional)
+    pub fn maybe_review(mut self, value: Option<ClipReview<'a>>) -> Self {
+        self.__unsafe_private_named.106 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `reviews` field (optional)
+    pub fn reviews(mut self, value: impl Into<Option<ClipReviews<'a>>>) -> Self {
+        self.__unsafe_private_named.107 = value.into();
+        self
+    }
+    /// Set the `reviews` field to an Option value (optional)
+    pub fn maybe_reviews(mut self, value: Option<ClipReviews<'a>>) -> Self {
+        self.__unsafe_private_named.107 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `sameAs` field (optional)
+    pub fn same_as(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.108 = value.into();
+        self
+    }
+    /// Set the `sameAs` field to an Option value (optional)
+    pub fn maybe_same_as(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.108 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `schemaVersion` field (optional)
+    pub fn schema_version(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.109 = value.into();
+        self
+    }
+    /// Set the `schemaVersion` field to an Option value (optional)
+    pub fn maybe_schema_version(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.109 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `sdDatePublished` field (optional)
+    pub fn sd_date_published(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.110 = value.into();
+        self
+    }
+    /// Set the `sdDatePublished` field to an Option value (optional)
+    pub fn maybe_sd_date_published(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.110 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `sdLicense` field (optional)
+    pub fn sd_license(mut self, value: impl Into<Option<ClipSdLicense<'a>>>) -> Self {
+        self.__unsafe_private_named.111 = value.into();
+        self
+    }
+    /// Set the `sdLicense` field to an Option value (optional)
+    pub fn maybe_sd_license(mut self, value: Option<ClipSdLicense<'a>>) -> Self {
+        self.__unsafe_private_named.111 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `sdPublisher` field (optional)
+    pub fn sd_publisher(
+        mut self,
+        value: impl Into<Option<ClipSdPublisher<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.112 = value.into();
+        self
+    }
+    /// Set the `sdPublisher` field to an Option value (optional)
+    pub fn maybe_sd_publisher(mut self, value: Option<ClipSdPublisher<'a>>) -> Self {
+        self.__unsafe_private_named.112 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `size` field (optional)
+    pub fn size(mut self, value: impl Into<Option<ClipSize<'a>>>) -> Self {
+        self.__unsafe_private_named.113 = value.into();
+        self
+    }
+    /// Set the `size` field to an Option value (optional)
+    pub fn maybe_size(mut self, value: Option<ClipSize<'a>>) -> Self {
+        self.__unsafe_private_named.113 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `sourceOrganization` field (optional)
+    pub fn source_organization(
+        mut self,
+        value: impl Into<Option<ClipSourceOrganization<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.114 = value.into();
+        self
+    }
+    /// Set the `sourceOrganization` field to an Option value (optional)
+    pub fn maybe_source_organization(
+        mut self,
+        value: Option<ClipSourceOrganization<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.114 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `spatial` field (optional)
+    pub fn spatial(mut self, value: impl Into<Option<ClipSpatial<'a>>>) -> Self {
+        self.__unsafe_private_named.115 = value.into();
+        self
+    }
+    /// Set the `spatial` field to an Option value (optional)
+    pub fn maybe_spatial(mut self, value: Option<ClipSpatial<'a>>) -> Self {
+        self.__unsafe_private_named.115 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `spatialCoverage` field (optional)
+    pub fn spatial_coverage(
+        mut self,
+        value: impl Into<Option<ClipSpatialCoverage<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.116 = value.into();
+        self
+    }
+    /// Set the `spatialCoverage` field to an Option value (optional)
+    pub fn maybe_spatial_coverage(
+        mut self,
+        value: Option<ClipSpatialCoverage<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.116 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `sponsor` field (optional)
+    pub fn sponsor(mut self, value: impl Into<Option<ClipSponsor<'a>>>) -> Self {
+        self.__unsafe_private_named.117 = value.into();
+        self
+    }
+    /// Set the `sponsor` field to an Option value (optional)
+    pub fn maybe_sponsor(mut self, value: Option<ClipSponsor<'a>>) -> Self {
+        self.__unsafe_private_named.117 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `startOffset` field (optional)
+    pub fn start_offset(
+        mut self,
+        value: impl Into<Option<ClipStartOffset<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.118 = value.into();
+        self
+    }
+    /// Set the `startOffset` field to an Option value (optional)
+    pub fn maybe_start_offset(mut self, value: Option<ClipStartOffset<'a>>) -> Self {
+        self.__unsafe_private_named.118 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `subjectOf` field (optional)
+    pub fn subject_of(mut self, value: impl Into<Option<ClipSubjectOf<'a>>>) -> Self {
+        self.__unsafe_private_named.119 = value.into();
+        self
+    }
+    /// Set the `subjectOf` field to an Option value (optional)
+    pub fn maybe_subject_of(mut self, value: Option<ClipSubjectOf<'a>>) -> Self {
+        self.__unsafe_private_named.119 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `teaches` field (optional)
+    pub fn teaches(mut self, value: impl Into<Option<ClipTeaches<'a>>>) -> Self {
+        self.__unsafe_private_named.120 = value.into();
+        self
+    }
+    /// Set the `teaches` field to an Option value (optional)
+    pub fn maybe_teaches(mut self, value: Option<ClipTeaches<'a>>) -> Self {
+        self.__unsafe_private_named.120 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `temporal` field (optional)
+    pub fn temporal(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.121 = value.into();
+        self
+    }
+    /// Set the `temporal` field to an Option value (optional)
+    pub fn maybe_temporal(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.121 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `temporalCoverage` field (optional)
+    pub fn temporal_coverage(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.122 = value.into();
+        self
+    }
+    /// Set the `temporalCoverage` field to an Option value (optional)
+    pub fn maybe_temporal_coverage(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.122 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `text` field (optional)
+    pub fn text(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.123 = value.into();
+        self
+    }
+    /// Set the `text` field to an Option value (optional)
+    pub fn maybe_text(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.123 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `thumbnail` field (optional)
+    pub fn thumbnail(mut self, value: impl Into<Option<ClipThumbnail<'a>>>) -> Self {
+        self.__unsafe_private_named.124 = value.into();
+        self
+    }
+    /// Set the `thumbnail` field to an Option value (optional)
+    pub fn maybe_thumbnail(mut self, value: Option<ClipThumbnail<'a>>) -> Self {
+        self.__unsafe_private_named.124 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `thumbnailUrl` field (optional)
+    pub fn thumbnail_url(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.125 = value.into();
+        self
+    }
+    /// Set the `thumbnailUrl` field to an Option value (optional)
+    pub fn maybe_thumbnail_url(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.125 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `timeRequired` field (optional)
+    pub fn time_required(
+        mut self,
+        value: impl Into<Option<ClipTimeRequired<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.126 = value.into();
+        self
+    }
+    /// Set the `timeRequired` field to an Option value (optional)
+    pub fn maybe_time_required(mut self, value: Option<ClipTimeRequired<'a>>) -> Self {
+        self.__unsafe_private_named.126 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `translationOfWork` field (optional)
+    pub fn translation_of_work(
+        mut self,
+        value: impl Into<Option<ClipTranslationOfWork<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.127 = value.into();
+        self
+    }
+    /// Set the `translationOfWork` field to an Option value (optional)
+    pub fn maybe_translation_of_work(
+        mut self,
+        value: Option<ClipTranslationOfWork<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.127 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `translator` field (optional)
+    pub fn translator(mut self, value: impl Into<Option<ClipTranslator<'a>>>) -> Self {
+        self.__unsafe_private_named.128 = value.into();
+        self
+    }
+    /// Set the `translator` field to an Option value (optional)
+    pub fn maybe_translator(mut self, value: Option<ClipTranslator<'a>>) -> Self {
+        self.__unsafe_private_named.128 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `typicalAgeRange` field (optional)
+    pub fn typical_age_range(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.129 = value.into();
+        self
+    }
+    /// Set the `typicalAgeRange` field to an Option value (optional)
+    pub fn maybe_typical_age_range(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.129 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `url` field (optional)
+    pub fn url(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.130 = value.into();
+        self
+    }
+    /// Set the `url` field to an Option value (optional)
+    pub fn maybe_url(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.130 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `usageInfo` field (optional)
+    pub fn usage_info(mut self, value: impl Into<Option<ClipUsageInfo<'a>>>) -> Self {
+        self.__unsafe_private_named.131 = value.into();
+        self
+    }
+    /// Set the `usageInfo` field to an Option value (optional)
+    pub fn maybe_usage_info(mut self, value: Option<ClipUsageInfo<'a>>) -> Self {
+        self.__unsafe_private_named.131 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `version` field (optional)
+    pub fn version(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.132 = value.into();
+        self
+    }
+    /// Set the `version` field to an Option value (optional)
+    pub fn maybe_version(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.132 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `video` field (optional)
+    pub fn video(mut self, value: impl Into<Option<ClipVideo<'a>>>) -> Self {
+        self.__unsafe_private_named.133 = value.into();
+        self
+    }
+    /// Set the `video` field to an Option value (optional)
+    pub fn maybe_video(mut self, value: Option<ClipVideo<'a>>) -> Self {
+        self.__unsafe_private_named.133 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `wordCount` field (optional)
+    pub fn word_count(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.134 = value.into();
+        self
+    }
+    /// Set the `wordCount` field to an Option value (optional)
+    pub fn maybe_word_count(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.134 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `workExample` field (optional)
+    pub fn work_example(
+        mut self,
+        value: impl Into<Option<ClipWorkExample<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.135 = value.into();
+        self
+    }
+    /// Set the `workExample` field to an Option value (optional)
+    pub fn maybe_work_example(mut self, value: Option<ClipWorkExample<'a>>) -> Self {
+        self.__unsafe_private_named.135 = value;
+        self
+    }
+}
+
+impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+    /// Set the `workTranslation` field (optional)
+    pub fn work_translation(
+        mut self,
+        value: impl Into<Option<ClipWorkTranslation<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.136 = value.into();
+        self
+    }
+    /// Set the `workTranslation` field to an Option value (optional)
+    pub fn maybe_work_translation(
+        mut self,
+        value: Option<ClipWorkTranslation<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.136 = value;
+        self
+    }
+}
+
+impl<'a, S> ClipBuilder<'a, S>
+where
+    S: clip_state::State,
+{
+    /// Build the final struct
+    pub fn build(self) -> Clip<'a> {
+        Clip {
+            about: self.__unsafe_private_named.0,
+            r#abstract: self.__unsafe_private_named.1,
+            access_mode: self.__unsafe_private_named.2,
+            access_mode_sufficient: self.__unsafe_private_named.3,
+            accessibility_api: self.__unsafe_private_named.4,
+            accessibility_control: self.__unsafe_private_named.5,
+            accessibility_feature: self.__unsafe_private_named.6,
+            accessibility_hazard: self.__unsafe_private_named.7,
+            accessibility_summary: self.__unsafe_private_named.8,
+            accountable_person: self.__unsafe_private_named.9,
+            acquire_license_page: self.__unsafe_private_named.10,
+            actor: self.__unsafe_private_named.11,
+            actors: self.__unsafe_private_named.12,
+            additional_type: self.__unsafe_private_named.13,
+            aggregate_rating: self.__unsafe_private_named.14,
+            alternate_name: self.__unsafe_private_named.15,
+            alternative_headline: self.__unsafe_private_named.16,
+            archived_at: self.__unsafe_private_named.17,
+            assesses: self.__unsafe_private_named.18,
+            associated_media: self.__unsafe_private_named.19,
+            audience: self.__unsafe_private_named.20,
+            audio: self.__unsafe_private_named.21,
+            author: self.__unsafe_private_named.22,
+            award: self.__unsafe_private_named.23,
+            awards: self.__unsafe_private_named.24,
+            character: self.__unsafe_private_named.25,
+            citation: self.__unsafe_private_named.26,
+            clip_number: self.__unsafe_private_named.27,
+            comment: self.__unsafe_private_named.28,
+            comment_count: self.__unsafe_private_named.29,
+            conditions_of_access: self.__unsafe_private_named.30,
+            content_location: self.__unsafe_private_named.31,
+            content_rating: self.__unsafe_private_named.32,
+            content_reference_time: self.__unsafe_private_named.33,
+            contributor: self.__unsafe_private_named.34,
+            copyright_holder: self.__unsafe_private_named.35,
+            copyright_notice: self.__unsafe_private_named.36,
+            copyright_year: self.__unsafe_private_named.37,
+            correction: self.__unsafe_private_named.38,
+            country_of_origin: self.__unsafe_private_named.39,
+            creative_work_status: self.__unsafe_private_named.40,
+            creator: self.__unsafe_private_named.41,
+            credit_text: self.__unsafe_private_named.42,
+            date_created: self.__unsafe_private_named.43,
+            date_modified: self.__unsafe_private_named.44,
+            date_published: self.__unsafe_private_named.45,
+            description: self.__unsafe_private_named.46,
+            digital_source_type: self.__unsafe_private_named.47,
+            director: self.__unsafe_private_named.48,
+            directors: self.__unsafe_private_named.49,
+            disambiguating_description: self.__unsafe_private_named.50,
+            discussion_url: self.__unsafe_private_named.51,
+            edit_eidr: self.__unsafe_private_named.52,
+            editor: self.__unsafe_private_named.53,
+            educational_alignment: self.__unsafe_private_named.54,
+            educational_level: self.__unsafe_private_named.55,
+            educational_use: self.__unsafe_private_named.56,
+            encoding: self.__unsafe_private_named.57,
+            encoding_format: self.__unsafe_private_named.58,
+            encodings: self.__unsafe_private_named.59,
+            end_offset: self.__unsafe_private_named.60,
+            example_of_work: self.__unsafe_private_named.61,
+            expires: self.__unsafe_private_named.62,
+            file_format: self.__unsafe_private_named.63,
+            funder: self.__unsafe_private_named.64,
+            funding: self.__unsafe_private_named.65,
+            genre: self.__unsafe_private_named.66,
+            has_part: self.__unsafe_private_named.67,
+            headline: self.__unsafe_private_named.68,
+            identifier: self.__unsafe_private_named.69,
+            image: self.__unsafe_private_named.70,
+            in_language: self.__unsafe_private_named.71,
+            interaction_statistic: self.__unsafe_private_named.72,
+            interactivity_type: self.__unsafe_private_named.73,
+            interpreted_as_claim: self.__unsafe_private_named.74,
+            is_accessible_for_free: self.__unsafe_private_named.75,
+            is_based_on: self.__unsafe_private_named.76,
+            is_family_friendly: self.__unsafe_private_named.77,
+            is_part_of: self.__unsafe_private_named.78,
+            keywords: self.__unsafe_private_named.79,
+            learning_resource_type: self.__unsafe_private_named.80,
+            license: self.__unsafe_private_named.81,
+            location_created: self.__unsafe_private_named.82,
+            main_entity: self.__unsafe_private_named.83,
+            main_entity_of_page: self.__unsafe_private_named.84,
+            maintainer: self.__unsafe_private_named.85,
+            material: self.__unsafe_private_named.86,
+            material_extent: self.__unsafe_private_named.87,
+            mentions: self.__unsafe_private_named.88,
+            music_by: self.__unsafe_private_named.89,
+            name: self.__unsafe_private_named.90,
+            offers: self.__unsafe_private_named.91,
+            part_of_episode: self.__unsafe_private_named.92,
+            part_of_season: self.__unsafe_private_named.93,
+            part_of_series: self.__unsafe_private_named.94,
+            pattern: self.__unsafe_private_named.95,
+            position: self.__unsafe_private_named.96,
+            potential_action: self.__unsafe_private_named.97,
+            producer: self.__unsafe_private_named.98,
+            provider: self.__unsafe_private_named.99,
+            publication: self.__unsafe_private_named.100,
+            publisher: self.__unsafe_private_named.101,
+            publisher_imprint: self.__unsafe_private_named.102,
+            publishing_principles: self.__unsafe_private_named.103,
+            recorded_at: self.__unsafe_private_named.104,
+            released_event: self.__unsafe_private_named.105,
+            review: self.__unsafe_private_named.106,
+            reviews: self.__unsafe_private_named.107,
+            same_as: self.__unsafe_private_named.108,
+            schema_version: self.__unsafe_private_named.109,
+            sd_date_published: self.__unsafe_private_named.110,
+            sd_license: self.__unsafe_private_named.111,
+            sd_publisher: self.__unsafe_private_named.112,
+            size: self.__unsafe_private_named.113,
+            source_organization: self.__unsafe_private_named.114,
+            spatial: self.__unsafe_private_named.115,
+            spatial_coverage: self.__unsafe_private_named.116,
+            sponsor: self.__unsafe_private_named.117,
+            start_offset: self.__unsafe_private_named.118,
+            subject_of: self.__unsafe_private_named.119,
+            teaches: self.__unsafe_private_named.120,
+            temporal: self.__unsafe_private_named.121,
+            temporal_coverage: self.__unsafe_private_named.122,
+            text: self.__unsafe_private_named.123,
+            thumbnail: self.__unsafe_private_named.124,
+            thumbnail_url: self.__unsafe_private_named.125,
+            time_required: self.__unsafe_private_named.126,
+            translation_of_work: self.__unsafe_private_named.127,
+            translator: self.__unsafe_private_named.128,
+            typical_age_range: self.__unsafe_private_named.129,
+            url: self.__unsafe_private_named.130,
+            usage_info: self.__unsafe_private_named.131,
+            version: self.__unsafe_private_named.132,
+            video: self.__unsafe_private_named.133,
+            word_count: self.__unsafe_private_named.134,
+            work_example: self.__unsafe_private_named.135,
+            work_translation: self.__unsafe_private_named.136,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Clip<'a> {
+        Clip {
+            about: self.__unsafe_private_named.0,
+            r#abstract: self.__unsafe_private_named.1,
+            access_mode: self.__unsafe_private_named.2,
+            access_mode_sufficient: self.__unsafe_private_named.3,
+            accessibility_api: self.__unsafe_private_named.4,
+            accessibility_control: self.__unsafe_private_named.5,
+            accessibility_feature: self.__unsafe_private_named.6,
+            accessibility_hazard: self.__unsafe_private_named.7,
+            accessibility_summary: self.__unsafe_private_named.8,
+            accountable_person: self.__unsafe_private_named.9,
+            acquire_license_page: self.__unsafe_private_named.10,
+            actor: self.__unsafe_private_named.11,
+            actors: self.__unsafe_private_named.12,
+            additional_type: self.__unsafe_private_named.13,
+            aggregate_rating: self.__unsafe_private_named.14,
+            alternate_name: self.__unsafe_private_named.15,
+            alternative_headline: self.__unsafe_private_named.16,
+            archived_at: self.__unsafe_private_named.17,
+            assesses: self.__unsafe_private_named.18,
+            associated_media: self.__unsafe_private_named.19,
+            audience: self.__unsafe_private_named.20,
+            audio: self.__unsafe_private_named.21,
+            author: self.__unsafe_private_named.22,
+            award: self.__unsafe_private_named.23,
+            awards: self.__unsafe_private_named.24,
+            character: self.__unsafe_private_named.25,
+            citation: self.__unsafe_private_named.26,
+            clip_number: self.__unsafe_private_named.27,
+            comment: self.__unsafe_private_named.28,
+            comment_count: self.__unsafe_private_named.29,
+            conditions_of_access: self.__unsafe_private_named.30,
+            content_location: self.__unsafe_private_named.31,
+            content_rating: self.__unsafe_private_named.32,
+            content_reference_time: self.__unsafe_private_named.33,
+            contributor: self.__unsafe_private_named.34,
+            copyright_holder: self.__unsafe_private_named.35,
+            copyright_notice: self.__unsafe_private_named.36,
+            copyright_year: self.__unsafe_private_named.37,
+            correction: self.__unsafe_private_named.38,
+            country_of_origin: self.__unsafe_private_named.39,
+            creative_work_status: self.__unsafe_private_named.40,
+            creator: self.__unsafe_private_named.41,
+            credit_text: self.__unsafe_private_named.42,
+            date_created: self.__unsafe_private_named.43,
+            date_modified: self.__unsafe_private_named.44,
+            date_published: self.__unsafe_private_named.45,
+            description: self.__unsafe_private_named.46,
+            digital_source_type: self.__unsafe_private_named.47,
+            director: self.__unsafe_private_named.48,
+            directors: self.__unsafe_private_named.49,
+            disambiguating_description: self.__unsafe_private_named.50,
+            discussion_url: self.__unsafe_private_named.51,
+            edit_eidr: self.__unsafe_private_named.52,
+            editor: self.__unsafe_private_named.53,
+            educational_alignment: self.__unsafe_private_named.54,
+            educational_level: self.__unsafe_private_named.55,
+            educational_use: self.__unsafe_private_named.56,
+            encoding: self.__unsafe_private_named.57,
+            encoding_format: self.__unsafe_private_named.58,
+            encodings: self.__unsafe_private_named.59,
+            end_offset: self.__unsafe_private_named.60,
+            example_of_work: self.__unsafe_private_named.61,
+            expires: self.__unsafe_private_named.62,
+            file_format: self.__unsafe_private_named.63,
+            funder: self.__unsafe_private_named.64,
+            funding: self.__unsafe_private_named.65,
+            genre: self.__unsafe_private_named.66,
+            has_part: self.__unsafe_private_named.67,
+            headline: self.__unsafe_private_named.68,
+            identifier: self.__unsafe_private_named.69,
+            image: self.__unsafe_private_named.70,
+            in_language: self.__unsafe_private_named.71,
+            interaction_statistic: self.__unsafe_private_named.72,
+            interactivity_type: self.__unsafe_private_named.73,
+            interpreted_as_claim: self.__unsafe_private_named.74,
+            is_accessible_for_free: self.__unsafe_private_named.75,
+            is_based_on: self.__unsafe_private_named.76,
+            is_family_friendly: self.__unsafe_private_named.77,
+            is_part_of: self.__unsafe_private_named.78,
+            keywords: self.__unsafe_private_named.79,
+            learning_resource_type: self.__unsafe_private_named.80,
+            license: self.__unsafe_private_named.81,
+            location_created: self.__unsafe_private_named.82,
+            main_entity: self.__unsafe_private_named.83,
+            main_entity_of_page: self.__unsafe_private_named.84,
+            maintainer: self.__unsafe_private_named.85,
+            material: self.__unsafe_private_named.86,
+            material_extent: self.__unsafe_private_named.87,
+            mentions: self.__unsafe_private_named.88,
+            music_by: self.__unsafe_private_named.89,
+            name: self.__unsafe_private_named.90,
+            offers: self.__unsafe_private_named.91,
+            part_of_episode: self.__unsafe_private_named.92,
+            part_of_season: self.__unsafe_private_named.93,
+            part_of_series: self.__unsafe_private_named.94,
+            pattern: self.__unsafe_private_named.95,
+            position: self.__unsafe_private_named.96,
+            potential_action: self.__unsafe_private_named.97,
+            producer: self.__unsafe_private_named.98,
+            provider: self.__unsafe_private_named.99,
+            publication: self.__unsafe_private_named.100,
+            publisher: self.__unsafe_private_named.101,
+            publisher_imprint: self.__unsafe_private_named.102,
+            publishing_principles: self.__unsafe_private_named.103,
+            recorded_at: self.__unsafe_private_named.104,
+            released_event: self.__unsafe_private_named.105,
+            review: self.__unsafe_private_named.106,
+            reviews: self.__unsafe_private_named.107,
+            same_as: self.__unsafe_private_named.108,
+            schema_version: self.__unsafe_private_named.109,
+            sd_date_published: self.__unsafe_private_named.110,
+            sd_license: self.__unsafe_private_named.111,
+            sd_publisher: self.__unsafe_private_named.112,
+            size: self.__unsafe_private_named.113,
+            source_organization: self.__unsafe_private_named.114,
+            spatial: self.__unsafe_private_named.115,
+            spatial_coverage: self.__unsafe_private_named.116,
+            sponsor: self.__unsafe_private_named.117,
+            start_offset: self.__unsafe_private_named.118,
+            subject_of: self.__unsafe_private_named.119,
+            teaches: self.__unsafe_private_named.120,
+            temporal: self.__unsafe_private_named.121,
+            temporal_coverage: self.__unsafe_private_named.122,
+            text: self.__unsafe_private_named.123,
+            thumbnail: self.__unsafe_private_named.124,
+            thumbnail_url: self.__unsafe_private_named.125,
+            time_required: self.__unsafe_private_named.126,
+            translation_of_work: self.__unsafe_private_named.127,
+            translator: self.__unsafe_private_named.128,
+            typical_age_range: self.__unsafe_private_named.129,
+            url: self.__unsafe_private_named.130,
+            usage_info: self.__unsafe_private_named.131,
+            version: self.__unsafe_private_named.132,
+            video: self.__unsafe_private_named.133,
+            word_count: self.__unsafe_private_named.134,
+            work_example: self.__unsafe_private_named.135,
+            work_translation: self.__unsafe_private_named.136,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Clip<'a> {

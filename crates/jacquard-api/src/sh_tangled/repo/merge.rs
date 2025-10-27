@@ -13,34 +13,27 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-#[builder(start_fn = new)]
 pub struct Merge<'a> {
     /// Author email for the merge commit
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub author_email: Option<jacquard_common::CowStr<'a>>,
     /// Author name for the merge commit
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub author_name: Option<jacquard_common::CowStr<'a>>,
     /// Target branch to merge into
     #[serde(borrow)]
-    #[builder(into)]
     pub branch: jacquard_common::CowStr<'a>,
     /// Additional commit message body
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub commit_body: Option<jacquard_common::CowStr<'a>>,
     /// Merge commit message
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub commit_message: Option<jacquard_common::CowStr<'a>>,
     /// DID of the repository owner
@@ -48,19 +41,314 @@ pub struct Merge<'a> {
     pub did: jacquard_common::types::string::Did<'a>,
     /// Name of the repository
     #[serde(borrow)]
-    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
     /// Patch content to merge
     #[serde(borrow)]
-    #[builder(into)]
     pub patch: jacquard_common::CowStr<'a>,
-    #[serde(flatten)]
-    #[serde(borrow)]
-    #[builder(default)]
-    pub extra_data: ::std::collections::BTreeMap<
-        ::jacquard_common::smol_str::SmolStr,
-        ::jacquard_common::types::value::Data<'a>,
-    >,
+}
+
+pub mod merge_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Did;
+        type Name;
+        type Patch;
+        type Branch;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Did = Unset;
+        type Name = Unset;
+        type Patch = Unset;
+        type Branch = Unset;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Did = Set<members::did>;
+        type Name = S::Name;
+        type Patch = S::Patch;
+        type Branch = S::Branch;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Did = S::Did;
+        type Name = Set<members::name>;
+        type Patch = S::Patch;
+        type Branch = S::Branch;
+    }
+    ///State transition - sets the `patch` field to Set
+    pub struct SetPatch<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPatch<S> {}
+    impl<S: State> State for SetPatch<S> {
+        type Did = S::Did;
+        type Name = S::Name;
+        type Patch = Set<members::patch>;
+        type Branch = S::Branch;
+    }
+    ///State transition - sets the `branch` field to Set
+    pub struct SetBranch<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBranch<S> {}
+    impl<S: State> State for SetBranch<S> {
+        type Did = S::Did;
+        type Name = S::Name;
+        type Patch = S::Patch;
+        type Branch = Set<members::branch>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `patch` field
+        pub struct patch(());
+        ///Marker type for the `branch` field
+        pub struct branch(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct MergeBuilder<'a, S: merge_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Merge<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> MergeBuilder<'a, merge_state::Empty> {
+        MergeBuilder::new()
+    }
+}
+
+impl<'a> MergeBuilder<'a, merge_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        MergeBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: merge_state::State> MergeBuilder<'a, S> {
+    /// Set the `authorEmail` field (optional)
+    pub fn author_email(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `authorEmail` field to an Option value (optional)
+    pub fn maybe_author_email(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: merge_state::State> MergeBuilder<'a, S> {
+    /// Set the `authorName` field (optional)
+    pub fn author_name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `authorName` field to an Option value (optional)
+    pub fn maybe_author_name(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> MergeBuilder<'a, S>
+where
+    S: merge_state::State,
+    S::Branch: merge_state::IsUnset,
+{
+    /// Set the `branch` field (required)
+    pub fn branch(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> MergeBuilder<'a, merge_state::SetBranch<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        MergeBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: merge_state::State> MergeBuilder<'a, S> {
+    /// Set the `commitBody` field (optional)
+    pub fn commit_body(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `commitBody` field to an Option value (optional)
+    pub fn maybe_commit_body(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: merge_state::State> MergeBuilder<'a, S> {
+    /// Set the `commitMessage` field (optional)
+    pub fn commit_message(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `commitMessage` field to an Option value (optional)
+    pub fn maybe_commit_message(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S> MergeBuilder<'a, S>
+where
+    S: merge_state::State,
+    S::Did: merge_state::IsUnset,
+{
+    /// Set the `did` field (required)
+    pub fn did(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> MergeBuilder<'a, merge_state::SetDid<S>> {
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        MergeBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> MergeBuilder<'a, S>
+where
+    S: merge_state::State,
+    S::Name: merge_state::IsUnset,
+{
+    /// Set the `name` field (required)
+    pub fn name(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> MergeBuilder<'a, merge_state::SetName<S>> {
+        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        MergeBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> MergeBuilder<'a, S>
+where
+    S: merge_state::State,
+    S::Patch: merge_state::IsUnset,
+{
+    /// Set the `patch` field (required)
+    pub fn patch(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> MergeBuilder<'a, merge_state::SetPatch<S>> {
+        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        MergeBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> MergeBuilder<'a, S>
+where
+    S: merge_state::State,
+    S::Did: merge_state::IsSet,
+    S::Name: merge_state::IsSet,
+    S::Patch: merge_state::IsSet,
+    S::Branch: merge_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Merge<'a> {
+        Merge {
+            author_email: self.__unsafe_private_named.0,
+            author_name: self.__unsafe_private_named.1,
+            branch: self.__unsafe_private_named.2.unwrap(),
+            commit_body: self.__unsafe_private_named.3,
+            commit_message: self.__unsafe_private_named.4,
+            did: self.__unsafe_private_named.5.unwrap(),
+            name: self.__unsafe_private_named.6.unwrap(),
+            patch: self.__unsafe_private_named.7.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Merge<'a> {
+        Merge {
+            author_email: self.__unsafe_private_named.0,
+            author_name: self.__unsafe_private_named.1,
+            branch: self.__unsafe_private_named.2.unwrap(),
+            commit_body: self.__unsafe_private_named.3,
+            commit_message: self.__unsafe_private_named.4,
+            did: self.__unsafe_private_named.5.unwrap(),
+            name: self.__unsafe_private_named.6.unwrap(),
+            patch: self.__unsafe_private_named.7.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 /// Response type for

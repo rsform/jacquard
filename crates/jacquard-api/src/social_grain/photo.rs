@@ -15,24 +15,204 @@ pub mod exif;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Photo<'a> {
     /// Alt text description of the image, for accessibility.
     #[serde(borrow)]
-    #[builder(into)]
     pub alt: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub aspect_ratio: Option<crate::social_grain::AspectRatio<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub created_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub photo: jacquard_common::types::blob::BlobRef<'a>,
+}
+
+pub mod photo_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Photo;
+        type Alt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Photo = Unset;
+        type Alt = Unset;
+    }
+    ///State transition - sets the `photo` field to Set
+    pub struct SetPhoto<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPhoto<S> {}
+    impl<S: State> State for SetPhoto<S> {
+        type Photo = Set<members::photo>;
+        type Alt = S::Alt;
+    }
+    ///State transition - sets the `alt` field to Set
+    pub struct SetAlt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAlt<S> {}
+    impl<S: State> State for SetAlt<S> {
+        type Photo = S::Photo;
+        type Alt = Set<members::alt>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `photo` field
+        pub struct photo(());
+        ///Marker type for the `alt` field
+        pub struct alt(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct PhotoBuilder<'a, S: photo_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<crate::social_grain::AspectRatio<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Photo<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> PhotoBuilder<'a, photo_state::Empty> {
+        PhotoBuilder::new()
+    }
+}
+
+impl<'a> PhotoBuilder<'a, photo_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        PhotoBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PhotoBuilder<'a, S>
+where
+    S: photo_state::State,
+    S::Alt: photo_state::IsUnset,
+{
+    /// Set the `alt` field (required)
+    pub fn alt(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> PhotoBuilder<'a, photo_state::SetAlt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        PhotoBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: photo_state::State> PhotoBuilder<'a, S> {
+    /// Set the `aspectRatio` field (optional)
+    pub fn aspect_ratio(
+        mut self,
+        value: impl Into<Option<crate::social_grain::AspectRatio<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `aspectRatio` field to an Option value (optional)
+    pub fn maybe_aspect_ratio(
+        mut self,
+        value: Option<crate::social_grain::AspectRatio<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: photo_state::State> PhotoBuilder<'a, S> {
+    /// Set the `createdAt` field (optional)
+    pub fn created_at(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `createdAt` field to an Option value (optional)
+    pub fn maybe_created_at(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> PhotoBuilder<'a, S>
+where
+    S: photo_state::State,
+    S::Photo: photo_state::IsUnset,
+{
+    /// Set the `photo` field (required)
+    pub fn photo(
+        mut self,
+        value: impl Into<jacquard_common::types::blob::BlobRef<'a>>,
+    ) -> PhotoBuilder<'a, photo_state::SetPhoto<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        PhotoBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PhotoBuilder<'a, S>
+where
+    S: photo_state::State,
+    S::Photo: photo_state::IsSet,
+    S::Alt: photo_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Photo<'a> {
+        Photo {
+            alt: self.__unsafe_private_named.0.unwrap(),
+            aspect_ratio: self.__unsafe_private_named.1,
+            created_at: self.__unsafe_private_named.2,
+            photo: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Photo<'a> {
+        Photo {
+            alt: self.__unsafe_private_named.0.unwrap(),
+            aspect_ratio: self.__unsafe_private_named.1,
+            created_at: self.__unsafe_private_named.2,
+            photo: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Photo<'a> {
@@ -213,61 +393,449 @@ fn lexicon_doc_social_grain_photo() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ExifView<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub cid: Option<jacquard_common::types::string::Cid<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub date_time_original: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub exposure_time: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub f_number: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub flash: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub focal_length_in35mm_format: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub i_so: Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub lens_make: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub lens_model: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub make: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub model: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub photo: jacquard_common::types::string::AtUri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub uri: Option<jacquard_common::types::string::AtUri<'a>>,
+}
+
+pub mod exif_view_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Photo;
+        type CreatedAt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Photo = Unset;
+        type CreatedAt = Unset;
+    }
+    ///State transition - sets the `photo` field to Set
+    pub struct SetPhoto<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPhoto<S> {}
+    impl<S: State> State for SetPhoto<S> {
+        type Photo = Set<members::photo>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Photo = S::Photo;
+        type CreatedAt = Set<members::created_at>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `photo` field
+        pub struct photo(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ExifViewBuilder<'a, S: exif_view_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ExifView<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ExifViewBuilder<'a, exif_view_state::Empty> {
+        ExifViewBuilder::new()
+    }
+}
+
+impl<'a> ExifViewBuilder<'a, exif_view_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ExifViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
+    /// Set the `cid` field (optional)
+    pub fn cid(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Cid<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `cid` field to an Option value (optional)
+    pub fn maybe_cid(
+        mut self,
+        value: Option<jacquard_common::types::string::Cid<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> ExifViewBuilder<'a, S>
+where
+    S: exif_view_state::State,
+    S::CreatedAt: exif_view_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> ExifViewBuilder<'a, exif_view_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        ExifViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
+    /// Set the `dateTimeOriginal` field (optional)
+    pub fn date_time_original(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `dateTimeOriginal` field to an Option value (optional)
+    pub fn maybe_date_time_original(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
+    /// Set the `exposureTime` field (optional)
+    pub fn exposure_time(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `exposureTime` field to an Option value (optional)
+    pub fn maybe_exposure_time(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
+    /// Set the `fNumber` field (optional)
+    pub fn f_number(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `fNumber` field to an Option value (optional)
+    pub fn maybe_f_number(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
+    /// Set the `flash` field (optional)
+    pub fn flash(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `flash` field to an Option value (optional)
+    pub fn maybe_flash(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
+    /// Set the `focalLengthIn35mmFormat` field (optional)
+    pub fn focal_length_in35mm_format(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `focalLengthIn35mmFormat` field to an Option value (optional)
+    pub fn maybe_focal_length_in35mm_format(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
+    /// Set the `iSO` field (optional)
+    pub fn i_so(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.7 = value.into();
+        self
+    }
+    /// Set the `iSO` field to an Option value (optional)
+    pub fn maybe_i_so(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.7 = value;
+        self
+    }
+}
+
+impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
+    /// Set the `lensMake` field (optional)
+    pub fn lens_make(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value.into();
+        self
+    }
+    /// Set the `lensMake` field to an Option value (optional)
+    pub fn maybe_lens_make(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value;
+        self
+    }
+}
+
+impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
+    /// Set the `lensModel` field (optional)
+    pub fn lens_model(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.9 = value.into();
+        self
+    }
+    /// Set the `lensModel` field to an Option value (optional)
+    pub fn maybe_lens_model(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.9 = value;
+        self
+    }
+}
+
+impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
+    /// Set the `make` field (optional)
+    pub fn make(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.10 = value.into();
+        self
+    }
+    /// Set the `make` field to an Option value (optional)
+    pub fn maybe_make(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.10 = value;
+        self
+    }
+}
+
+impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
+    /// Set the `model` field (optional)
+    pub fn model(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.11 = value.into();
+        self
+    }
+    /// Set the `model` field to an Option value (optional)
+    pub fn maybe_model(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.11 = value;
+        self
+    }
+}
+
+impl<'a, S> ExifViewBuilder<'a, S>
+where
+    S: exif_view_state::State,
+    S::Photo: exif_view_state::IsUnset,
+{
+    /// Set the `photo` field (required)
+    pub fn photo(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> ExifViewBuilder<'a, exif_view_state::SetPhoto<S>> {
+        self.__unsafe_private_named.12 = ::core::option::Option::Some(value.into());
+        ExifViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
+    /// Set the `uri` field (optional)
+    pub fn uri(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::AtUri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.13 = value.into();
+        self
+    }
+    /// Set the `uri` field to an Option value (optional)
+    pub fn maybe_uri(
+        mut self,
+        value: Option<jacquard_common::types::string::AtUri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.13 = value;
+        self
+    }
+}
+
+impl<'a, S> ExifViewBuilder<'a, S>
+where
+    S: exif_view_state::State,
+    S::Photo: exif_view_state::IsSet,
+    S::CreatedAt: exif_view_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> ExifView<'a> {
+        ExifView {
+            cid: self.__unsafe_private_named.0,
+            created_at: self.__unsafe_private_named.1.unwrap(),
+            date_time_original: self.__unsafe_private_named.2,
+            exposure_time: self.__unsafe_private_named.3,
+            f_number: self.__unsafe_private_named.4,
+            flash: self.__unsafe_private_named.5,
+            focal_length_in35mm_format: self.__unsafe_private_named.6,
+            i_so: self.__unsafe_private_named.7,
+            lens_make: self.__unsafe_private_named.8,
+            lens_model: self.__unsafe_private_named.9,
+            make: self.__unsafe_private_named.10,
+            model: self.__unsafe_private_named.11,
+            photo: self.__unsafe_private_named.12.unwrap(),
+            uri: self.__unsafe_private_named.13,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> ExifView<'a> {
+        ExifView {
+            cid: self.__unsafe_private_named.0,
+            created_at: self.__unsafe_private_named.1.unwrap(),
+            date_time_original: self.__unsafe_private_named.2,
+            exposure_time: self.__unsafe_private_named.3,
+            f_number: self.__unsafe_private_named.4,
+            flash: self.__unsafe_private_named.5,
+            focal_length_in35mm_format: self.__unsafe_private_named.6,
+            i_so: self.__unsafe_private_named.7,
+            lens_make: self.__unsafe_private_named.8,
+            lens_model: self.__unsafe_private_named.9,
+            make: self.__unsafe_private_named.10,
+            model: self.__unsafe_private_named.11,
+            photo: self.__unsafe_private_named.12.unwrap(),
+            uri: self.__unsafe_private_named.13,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_social_grain_photo_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -688,24 +1256,20 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ExifView<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PhotoView<'a> {
     /// Alt text description of the image, for accessibility.
     #[serde(borrow)]
-    #[builder(into)]
     pub alt: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub aspect_ratio: Option<crate::social_grain::AspectRatio<'a>>,
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
     /// EXIF metadata for the photo, if available.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub exif: Option<crate::social_grain::photo::ExifView<'a>>,
     /// Fully-qualified URL where a large version of the image can be fetched. May or may not be the exact original blob. For example, CDN location provided by the App View.
@@ -716,6 +1280,307 @@ pub struct PhotoView<'a> {
     pub thumb: jacquard_common::types::string::Uri<'a>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+pub mod photo_view_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Uri;
+        type Cid;
+        type Thumb;
+        type Fullsize;
+        type Alt;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Uri = Unset;
+        type Cid = Unset;
+        type Thumb = Unset;
+        type Fullsize = Unset;
+        type Alt = Unset;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Uri = Set<members::uri>;
+        type Cid = S::Cid;
+        type Thumb = S::Thumb;
+        type Fullsize = S::Fullsize;
+        type Alt = S::Alt;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Uri = S::Uri;
+        type Cid = Set<members::cid>;
+        type Thumb = S::Thumb;
+        type Fullsize = S::Fullsize;
+        type Alt = S::Alt;
+    }
+    ///State transition - sets the `thumb` field to Set
+    pub struct SetThumb<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetThumb<S> {}
+    impl<S: State> State for SetThumb<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Thumb = Set<members::thumb>;
+        type Fullsize = S::Fullsize;
+        type Alt = S::Alt;
+    }
+    ///State transition - sets the `fullsize` field to Set
+    pub struct SetFullsize<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFullsize<S> {}
+    impl<S: State> State for SetFullsize<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Thumb = S::Thumb;
+        type Fullsize = Set<members::fullsize>;
+        type Alt = S::Alt;
+    }
+    ///State transition - sets the `alt` field to Set
+    pub struct SetAlt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAlt<S> {}
+    impl<S: State> State for SetAlt<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Thumb = S::Thumb;
+        type Fullsize = S::Fullsize;
+        type Alt = Set<members::alt>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `thumb` field
+        pub struct thumb(());
+        ///Marker type for the `fullsize` field
+        pub struct fullsize(());
+        ///Marker type for the `alt` field
+        pub struct alt(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct PhotoViewBuilder<'a, S: photo_view_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<crate::social_grain::AspectRatio<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
+        ::core::option::Option<crate::social_grain::photo::ExifView<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> PhotoView<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> PhotoViewBuilder<'a, photo_view_state::Empty> {
+        PhotoViewBuilder::new()
+    }
+}
+
+impl<'a> PhotoViewBuilder<'a, photo_view_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        PhotoViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PhotoViewBuilder<'a, S>
+where
+    S: photo_view_state::State,
+    S::Alt: photo_view_state::IsUnset,
+{
+    /// Set the `alt` field (required)
+    pub fn alt(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> PhotoViewBuilder<'a, photo_view_state::SetAlt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        PhotoViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: photo_view_state::State> PhotoViewBuilder<'a, S> {
+    /// Set the `aspectRatio` field (optional)
+    pub fn aspect_ratio(
+        mut self,
+        value: impl Into<Option<crate::social_grain::AspectRatio<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `aspectRatio` field to an Option value (optional)
+    pub fn maybe_aspect_ratio(
+        mut self,
+        value: Option<crate::social_grain::AspectRatio<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> PhotoViewBuilder<'a, S>
+where
+    S: photo_view_state::State,
+    S::Cid: photo_view_state::IsUnset,
+{
+    /// Set the `cid` field (required)
+    pub fn cid(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Cid<'a>>,
+    ) -> PhotoViewBuilder<'a, photo_view_state::SetCid<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        PhotoViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: photo_view_state::State> PhotoViewBuilder<'a, S> {
+    /// Set the `exif` field (optional)
+    pub fn exif(
+        mut self,
+        value: impl Into<Option<crate::social_grain::photo::ExifView<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `exif` field to an Option value (optional)
+    pub fn maybe_exif(
+        mut self,
+        value: Option<crate::social_grain::photo::ExifView<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S> PhotoViewBuilder<'a, S>
+where
+    S: photo_view_state::State,
+    S::Fullsize: photo_view_state::IsUnset,
+{
+    /// Set the `fullsize` field (required)
+    pub fn fullsize(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+    ) -> PhotoViewBuilder<'a, photo_view_state::SetFullsize<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        PhotoViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PhotoViewBuilder<'a, S>
+where
+    S: photo_view_state::State,
+    S::Thumb: photo_view_state::IsUnset,
+{
+    /// Set the `thumb` field (required)
+    pub fn thumb(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+    ) -> PhotoViewBuilder<'a, photo_view_state::SetThumb<S>> {
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        PhotoViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PhotoViewBuilder<'a, S>
+where
+    S: photo_view_state::State,
+    S::Uri: photo_view_state::IsUnset,
+{
+    /// Set the `uri` field (required)
+    pub fn uri(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> PhotoViewBuilder<'a, photo_view_state::SetUri<S>> {
+        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        PhotoViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> PhotoViewBuilder<'a, S>
+where
+    S: photo_view_state::State,
+    S::Uri: photo_view_state::IsSet,
+    S::Cid: photo_view_state::IsSet,
+    S::Thumb: photo_view_state::IsSet,
+    S::Fullsize: photo_view_state::IsSet,
+    S::Alt: photo_view_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> PhotoView<'a> {
+        PhotoView {
+            alt: self.__unsafe_private_named.0.unwrap(),
+            aspect_ratio: self.__unsafe_private_named.1,
+            cid: self.__unsafe_private_named.2.unwrap(),
+            exif: self.__unsafe_private_named.3,
+            fullsize: self.__unsafe_private_named.4.unwrap(),
+            thumb: self.__unsafe_private_named.5.unwrap(),
+            uri: self.__unsafe_private_named.6.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> PhotoView<'a> {
+        PhotoView {
+            alt: self.__unsafe_private_named.0.unwrap(),
+            aspect_ratio: self.__unsafe_private_named.1,
+            cid: self.__unsafe_private_named.2.unwrap(),
+            exif: self.__unsafe_private_named.3,
+            fullsize: self.__unsafe_private_named.4.unwrap(),
+            thumb: self.__unsafe_private_named.5.unwrap(),
+            uri: self.__unsafe_private_named.6.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PhotoView<'a> {

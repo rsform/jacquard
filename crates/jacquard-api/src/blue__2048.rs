@@ -19,19 +19,233 @@ pub mod verification;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SyncStatus<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     /// A XXH3 hash of the record to tell if anything has changed
     #[serde(borrow)]
-    #[builder(into)]
     pub hash: jacquard_common::CowStr<'a>,
     /// A flag to know if it has been synced with the AT repo. Used mostly client side to filter what records need syncing
     pub synced_with_at_repo: bool,
     pub updated_at: jacquard_common::types::string::Datetime,
+}
+
+pub mod sync_status_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Hash;
+        type UpdatedAt;
+        type CreatedAt;
+        type SyncedWithAtRepo;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Hash = Unset;
+        type UpdatedAt = Unset;
+        type CreatedAt = Unset;
+        type SyncedWithAtRepo = Unset;
+    }
+    ///State transition - sets the `hash` field to Set
+    pub struct SetHash<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHash<S> {}
+    impl<S: State> State for SetHash<S> {
+        type Hash = Set<members::hash>;
+        type UpdatedAt = S::UpdatedAt;
+        type CreatedAt = S::CreatedAt;
+        type SyncedWithAtRepo = S::SyncedWithAtRepo;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
+    impl<S: State> State for SetUpdatedAt<S> {
+        type Hash = S::Hash;
+        type UpdatedAt = Set<members::updated_at>;
+        type CreatedAt = S::CreatedAt;
+        type SyncedWithAtRepo = S::SyncedWithAtRepo;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Hash = S::Hash;
+        type UpdatedAt = S::UpdatedAt;
+        type CreatedAt = Set<members::created_at>;
+        type SyncedWithAtRepo = S::SyncedWithAtRepo;
+    }
+    ///State transition - sets the `synced_with_at_repo` field to Set
+    pub struct SetSyncedWithAtRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSyncedWithAtRepo<S> {}
+    impl<S: State> State for SetSyncedWithAtRepo<S> {
+        type Hash = S::Hash;
+        type UpdatedAt = S::UpdatedAt;
+        type CreatedAt = S::CreatedAt;
+        type SyncedWithAtRepo = Set<members::synced_with_at_repo>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `hash` field
+        pub struct hash(());
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `synced_with_at_repo` field
+        pub struct synced_with_at_repo(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct SyncStatusBuilder<'a, S: sync_status_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> SyncStatus<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> SyncStatusBuilder<'a, sync_status_state::Empty> {
+        SyncStatusBuilder::new()
+    }
+}
+
+impl<'a> SyncStatusBuilder<'a, sync_status_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        SyncStatusBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SyncStatusBuilder<'a, S>
+where
+    S: sync_status_state::State,
+    S::CreatedAt: sync_status_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> SyncStatusBuilder<'a, sync_status_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        SyncStatusBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SyncStatusBuilder<'a, S>
+where
+    S: sync_status_state::State,
+    S::Hash: sync_status_state::IsUnset,
+{
+    /// Set the `hash` field (required)
+    pub fn hash(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> SyncStatusBuilder<'a, sync_status_state::SetHash<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        SyncStatusBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SyncStatusBuilder<'a, S>
+where
+    S: sync_status_state::State,
+    S::SyncedWithAtRepo: sync_status_state::IsUnset,
+{
+    /// Set the `syncedWithATRepo` field (required)
+    pub fn synced_with_at_repo(
+        mut self,
+        value: impl Into<bool>,
+    ) -> SyncStatusBuilder<'a, sync_status_state::SetSyncedWithAtRepo<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        SyncStatusBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SyncStatusBuilder<'a, S>
+where
+    S: sync_status_state::State,
+    S::UpdatedAt: sync_status_state::IsUnset,
+{
+    /// Set the `updatedAt` field (required)
+    pub fn updated_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> SyncStatusBuilder<'a, sync_status_state::SetUpdatedAt<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        SyncStatusBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SyncStatusBuilder<'a, S>
+where
+    S: sync_status_state::State,
+    S::Hash: sync_status_state::IsSet,
+    S::UpdatedAt: sync_status_state::IsSet,
+    S::CreatedAt: sync_status_state::IsSet,
+    S::SyncedWithAtRepo: sync_status_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> SyncStatus<'a> {
+        SyncStatus {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            hash: self.__unsafe_private_named.1.unwrap(),
+            synced_with_at_repo: self.__unsafe_private_named.2.unwrap(),
+            updated_at: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> SyncStatus<'a> {
+        SyncStatus {
+            created_at: self.__unsafe_private_named.0.unwrap(),
+            hash: self.__unsafe_private_named.1.unwrap(),
+            synced_with_at_repo: self.__unsafe_private_named.2.unwrap(),
+            updated_at: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_blue_2048_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {

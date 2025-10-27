@@ -325,13 +325,149 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Bold<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ByteSlice<'a> {
     pub byte_end: i64,
     pub byte_start: i64,
+}
+
+pub mod byte_slice_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type ByteStart;
+        type ByteEnd;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type ByteStart = Unset;
+        type ByteEnd = Unset;
+    }
+    ///State transition - sets the `byte_start` field to Set
+    pub struct SetByteStart<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetByteStart<S> {}
+    impl<S: State> State for SetByteStart<S> {
+        type ByteStart = Set<members::byte_start>;
+        type ByteEnd = S::ByteEnd;
+    }
+    ///State transition - sets the `byte_end` field to Set
+    pub struct SetByteEnd<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetByteEnd<S> {}
+    impl<S: State> State for SetByteEnd<S> {
+        type ByteStart = S::ByteStart;
+        type ByteEnd = Set<members::byte_end>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `byte_start` field
+        pub struct byte_start(());
+        ///Marker type for the `byte_end` field
+        pub struct byte_end(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ByteSliceBuilder<'a, S: byte_slice_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (::core::option::Option<i64>, ::core::option::Option<i64>),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ByteSlice<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ByteSliceBuilder<'a, byte_slice_state::Empty> {
+        ByteSliceBuilder::new()
+    }
+}
+
+impl<'a> ByteSliceBuilder<'a, byte_slice_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ByteSliceBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ByteSliceBuilder<'a, S>
+where
+    S: byte_slice_state::State,
+    S::ByteEnd: byte_slice_state::IsUnset,
+{
+    /// Set the `byteEnd` field (required)
+    pub fn byte_end(
+        mut self,
+        value: impl Into<i64>,
+    ) -> ByteSliceBuilder<'a, byte_slice_state::SetByteEnd<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ByteSliceBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ByteSliceBuilder<'a, S>
+where
+    S: byte_slice_state::State,
+    S::ByteStart: byte_slice_state::IsUnset,
+{
+    /// Set the `byteStart` field (required)
+    pub fn byte_start(
+        mut self,
+        value: impl Into<i64>,
+    ) -> ByteSliceBuilder<'a, byte_slice_state::SetByteStart<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        ByteSliceBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ByteSliceBuilder<'a, S>
+where
+    S: byte_slice_state::State,
+    S::ByteStart: byte_slice_state::IsSet,
+    S::ByteEnd: byte_slice_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> ByteSlice<'a> {
+        ByteSlice {
+            byte_end: self.__unsafe_private_named.0.unwrap(),
+            byte_start: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> ByteSlice<'a> {
+        ByteSlice {
+            byte_end: self.__unsafe_private_named.0.unwrap(),
+            byte_start: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ByteSlice<'a> {
@@ -548,8 +684,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Link<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Facet<'a> {
@@ -557,6 +692,146 @@ pub struct Facet<'a> {
     pub features: Vec<FacetFeaturesItem<'a>>,
     #[serde(borrow)]
     pub index: crate::pub_leaflet::richtext::facet::ByteSlice<'a>,
+}
+
+pub mod facet_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Index;
+        type Features;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Index = Unset;
+        type Features = Unset;
+    }
+    ///State transition - sets the `index` field to Set
+    pub struct SetIndex<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndex<S> {}
+    impl<S: State> State for SetIndex<S> {
+        type Index = Set<members::index>;
+        type Features = S::Features;
+    }
+    ///State transition - sets the `features` field to Set
+    pub struct SetFeatures<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFeatures<S> {}
+    impl<S: State> State for SetFeatures<S> {
+        type Index = S::Index;
+        type Features = Set<members::features>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `index` field
+        pub struct index(());
+        ///Marker type for the `features` field
+        pub struct features(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct FacetBuilder<'a, S: facet_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<Vec<FacetFeaturesItem<'a>>>,
+        ::core::option::Option<crate::pub_leaflet::richtext::facet::ByteSlice<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Facet<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> FacetBuilder<'a, facet_state::Empty> {
+        FacetBuilder::new()
+    }
+}
+
+impl<'a> FacetBuilder<'a, facet_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        FacetBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> FacetBuilder<'a, S>
+where
+    S: facet_state::State,
+    S::Features: facet_state::IsUnset,
+{
+    /// Set the `features` field (required)
+    pub fn features(
+        mut self,
+        value: impl Into<Vec<FacetFeaturesItem<'a>>>,
+    ) -> FacetBuilder<'a, facet_state::SetFeatures<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        FacetBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> FacetBuilder<'a, S>
+where
+    S: facet_state::State,
+    S::Index: facet_state::IsUnset,
+{
+    /// Set the `index` field (required)
+    pub fn index(
+        mut self,
+        value: impl Into<crate::pub_leaflet::richtext::facet::ByteSlice<'a>>,
+    ) -> FacetBuilder<'a, facet_state::SetIndex<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        FacetBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> FacetBuilder<'a, S>
+where
+    S: facet_state::State,
+    S::Index: facet_state::IsSet,
+    S::Features: facet_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Facet<'a> {
+        Facet {
+            features: self.__unsafe_private_named.0.unwrap(),
+            index: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Facet<'a> {
+        Facet {
+            features: self.__unsafe_private_named.0.unwrap(),
+            index: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 #[jacquard_derive::open_union]

@@ -12,17 +12,124 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetPostThreadOtherV2<'a> {
     #[serde(borrow)]
     pub anchor: jacquard_common::types::string::AtUri<'a>,
-    ///(default: false)
+    /// (default: false)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub prioritize_followed_users: std::option::Option<bool>,
+}
+
+pub mod get_post_thread_other_v2_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Anchor;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Anchor = Unset;
+    }
+    ///State transition - sets the `anchor` field to Set
+    pub struct SetAnchor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAnchor<S> {}
+    impl<S: State> State for SetAnchor<S> {
+        type Anchor = Set<members::anchor>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `anchor` field
+        pub struct anchor(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetPostThreadOtherV2Builder<'a, S: get_post_thread_other_v2_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+        ::core::option::Option<bool>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GetPostThreadOtherV2<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GetPostThreadOtherV2Builder<
+        'a,
+        get_post_thread_other_v2_state::Empty,
+    > {
+        GetPostThreadOtherV2Builder::new()
+    }
+}
+
+impl<'a> GetPostThreadOtherV2Builder<'a, get_post_thread_other_v2_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetPostThreadOtherV2Builder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetPostThreadOtherV2Builder<'a, S>
+where
+    S: get_post_thread_other_v2_state::State,
+    S::Anchor: get_post_thread_other_v2_state::IsUnset,
+{
+    /// Set the `anchor` field (required)
+    pub fn anchor(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> GetPostThreadOtherV2Builder<'a, get_post_thread_other_v2_state::SetAnchor<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        GetPostThreadOtherV2Builder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: get_post_thread_other_v2_state::State> GetPostThreadOtherV2Builder<'a, S> {
+    /// Set the `prioritizeFollowedUsers` field (optional)
+    pub fn prioritize_followed_users(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `prioritizeFollowedUsers` field to an Option value (optional)
+    pub fn maybe_prioritize_followed_users(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> GetPostThreadOtherV2Builder<'a, S>
+where
+    S: get_post_thread_other_v2_state::State,
+    S::Anchor: get_post_thread_other_v2_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetPostThreadOtherV2<'a> {
+        GetPostThreadOtherV2 {
+            anchor: self.__unsafe_private_named.0.unwrap(),
+            prioritize_followed_users: self.__unsafe_private_named.1,
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]
@@ -39,7 +146,9 @@ pub struct GetPostThreadOtherV2<'a> {
 pub struct GetPostThreadOtherV2Output<'a> {
     /// A flat list of other thread items. The depth of each item is indicated by the depth property inside the item.
     #[serde(borrow)]
-    pub thread: Vec<jacquard_common::types::value::Data<'a>>,
+    pub thread: Vec<
+        crate::app_bsky::unspecced::get_post_thread_other_v2::ThreadItem<'a>,
+    >,
 }
 
 /// Response type for
@@ -76,8 +185,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetPostThreadOtherV2Request {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ThreadItem<'a> {
@@ -87,6 +195,183 @@ pub struct ThreadItem<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
     pub value: crate::app_bsky::unspecced::ThreadItemPost<'a>,
+}
+
+pub mod thread_item_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Uri;
+        type Depth;
+        type Value;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Uri = Unset;
+        type Depth = Unset;
+        type Value = Unset;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Uri = Set<members::uri>;
+        type Depth = S::Depth;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `depth` field to Set
+    pub struct SetDepth<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDepth<S> {}
+    impl<S: State> State for SetDepth<S> {
+        type Uri = S::Uri;
+        type Depth = Set<members::depth>;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Uri = S::Uri;
+        type Depth = S::Depth;
+        type Value = Set<members::value>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `depth` field
+        pub struct depth(());
+        ///Marker type for the `value` field
+        pub struct value(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ThreadItemBuilder<'a, S: thread_item_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+        ::core::option::Option<crate::app_bsky::unspecced::ThreadItemPost<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ThreadItem<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ThreadItemBuilder<'a, thread_item_state::Empty> {
+        ThreadItemBuilder::new()
+    }
+}
+
+impl<'a> ThreadItemBuilder<'a, thread_item_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ThreadItemBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ThreadItemBuilder<'a, S>
+where
+    S: thread_item_state::State,
+    S::Depth: thread_item_state::IsUnset,
+{
+    /// Set the `depth` field (required)
+    pub fn depth(
+        mut self,
+        value: impl Into<i64>,
+    ) -> ThreadItemBuilder<'a, thread_item_state::SetDepth<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ThreadItemBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ThreadItemBuilder<'a, S>
+where
+    S: thread_item_state::State,
+    S::Uri: thread_item_state::IsUnset,
+{
+    /// Set the `uri` field (required)
+    pub fn uri(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> ThreadItemBuilder<'a, thread_item_state::SetUri<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        ThreadItemBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ThreadItemBuilder<'a, S>
+where
+    S: thread_item_state::State,
+    S::Value: thread_item_state::IsUnset,
+{
+    /// Set the `value` field (required)
+    pub fn value(
+        mut self,
+        value: impl Into<crate::app_bsky::unspecced::ThreadItemPost<'a>>,
+    ) -> ThreadItemBuilder<'a, thread_item_state::SetValue<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        ThreadItemBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ThreadItemBuilder<'a, S>
+where
+    S: thread_item_state::State,
+    S::Uri: thread_item_state::IsSet,
+    S::Depth: thread_item_state::IsSet,
+    S::Value: thread_item_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> ThreadItem<'a> {
+        ThreadItem {
+            depth: self.__unsafe_private_named.0.unwrap(),
+            uri: self.__unsafe_private_named.1.unwrap(),
+            value: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> ThreadItem<'a> {
+        ThreadItem {
+            depth: self.__unsafe_private_named.0.unwrap(),
+            uri: self.__unsafe_private_named.1.unwrap(),
+            value: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_app_bsky_unspecced_getPostThreadOtherV2() -> ::jacquard_lexicon::lexicon::LexiconDoc<

@@ -12,10 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetRecent {
     ///(default: 50, min: 1, max: 50)
@@ -23,6 +21,96 @@ pub struct GetRecent {
     pub limit: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub since: std::option::Option<jacquard_common::types::string::Datetime>,
+}
+
+pub mod get_recent_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {}
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {}
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {}
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetRecentBuilder<S: get_recent_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+    ),
+}
+
+impl GetRecent {
+    /// Create a new builder for this type
+    pub fn new() -> GetRecentBuilder<get_recent_state::Empty> {
+        GetRecentBuilder::new()
+    }
+}
+
+impl GetRecentBuilder<get_recent_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetRecentBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+        }
+    }
+}
+
+impl<S: get_recent_state::State> GetRecentBuilder<S> {
+    /// Set the `limit` field (optional)
+    pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `limit` field to an Option value (optional)
+    pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<S: get_recent_state::State> GetRecentBuilder<S> {
+    /// Set the `since` field (optional)
+    pub fn since(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `since` field to an Option value (optional)
+    pub fn maybe_since(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<S> GetRecentBuilder<S>
+where
+    S: get_recent_state::State,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetRecent {
+        GetRecent {
+            limit: self.__unsafe_private_named.0,
+            since: self.__unsafe_private_named.1,
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

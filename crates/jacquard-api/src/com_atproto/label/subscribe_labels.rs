@@ -184,14 +184,153 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Info<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Labels<'a> {
     #[serde(borrow)]
     pub labels: Vec<crate::com_atproto::label::Label<'a>>,
     pub seq: i64,
+}
+
+pub mod labels_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Seq;
+        type Labels;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Seq = Unset;
+        type Labels = Unset;
+    }
+    ///State transition - sets the `seq` field to Set
+    pub struct SetSeq<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSeq<S> {}
+    impl<S: State> State for SetSeq<S> {
+        type Seq = Set<members::seq>;
+        type Labels = S::Labels;
+    }
+    ///State transition - sets the `labels` field to Set
+    pub struct SetLabels<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLabels<S> {}
+    impl<S: State> State for SetLabels<S> {
+        type Seq = S::Seq;
+        type Labels = Set<members::labels>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `seq` field
+        pub struct seq(());
+        ///Marker type for the `labels` field
+        pub struct labels(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct LabelsBuilder<'a, S: labels_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
+        ::core::option::Option<i64>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Labels<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> LabelsBuilder<'a, labels_state::Empty> {
+        LabelsBuilder::new()
+    }
+}
+
+impl<'a> LabelsBuilder<'a, labels_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        LabelsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LabelsBuilder<'a, S>
+where
+    S: labels_state::State,
+    S::Labels: labels_state::IsUnset,
+{
+    /// Set the `labels` field (required)
+    pub fn labels(
+        mut self,
+        value: impl Into<Vec<crate::com_atproto::label::Label<'a>>>,
+    ) -> LabelsBuilder<'a, labels_state::SetLabels<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        LabelsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LabelsBuilder<'a, S>
+where
+    S: labels_state::State,
+    S::Seq: labels_state::IsUnset,
+{
+    /// Set the `seq` field (required)
+    pub fn seq(
+        mut self,
+        value: impl Into<i64>,
+    ) -> LabelsBuilder<'a, labels_state::SetSeq<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        LabelsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> LabelsBuilder<'a, S>
+where
+    S: labels_state::State,
+    S::Seq: labels_state::IsSet,
+    S::Labels: labels_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Labels<'a> {
+        Labels {
+            labels: self.__unsafe_private_named.0.unwrap(),
+            seq: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Labels<'a> {
+        Labels {
+            labels: self.__unsafe_private_named.0.unwrap(),
+            seq: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Labels<'a> {
@@ -218,14 +357,79 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Labels<'a> {
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct SubscribeLabels {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub cursor: std::option::Option<i64>,
+}
+
+pub mod subscribe_labels_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {}
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {}
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {}
+}
+
+/// Builder for constructing an instance of this type
+pub struct SubscribeLabelsBuilder<S: subscribe_labels_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (::core::option::Option<i64>,),
+}
+
+impl SubscribeLabels {
+    /// Create a new builder for this type
+    pub fn new() -> SubscribeLabelsBuilder<subscribe_labels_state::Empty> {
+        SubscribeLabelsBuilder::new()
+    }
+}
+
+impl SubscribeLabelsBuilder<subscribe_labels_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        SubscribeLabelsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+        }
+    }
+}
+
+impl<S: subscribe_labels_state::State> SubscribeLabelsBuilder<S> {
+    /// Set the `cursor` field (optional)
+    pub fn cursor(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `cursor` field to an Option value (optional)
+    pub fn maybe_cursor(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<S> SubscribeLabelsBuilder<S>
+where
+    S: subscribe_labels_state::State,
+{
+    /// Build the final struct
+    pub fn build(self) -> SubscribeLabels {
+        SubscribeLabels {
+            cursor: self.__unsafe_private_named.0,
+        }
+    }
 }
 
 #[jacquard_derive::open_union]

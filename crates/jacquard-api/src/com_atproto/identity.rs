@@ -23,8 +23,7 @@ pub mod update_handle;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct IdentityInfo<'a> {
@@ -36,6 +35,183 @@ pub struct IdentityInfo<'a> {
     /// The validated handle of the account; or 'handle.invalid' if the handle did not bi-directionally match the DID document.
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
+}
+
+pub mod identity_info_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Did;
+        type Handle;
+        type DidDoc;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Did = Unset;
+        type Handle = Unset;
+        type DidDoc = Unset;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Did = Set<members::did>;
+        type Handle = S::Handle;
+        type DidDoc = S::DidDoc;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHandle<S> {}
+    impl<S: State> State for SetHandle<S> {
+        type Did = S::Did;
+        type Handle = Set<members::handle>;
+        type DidDoc = S::DidDoc;
+    }
+    ///State transition - sets the `did_doc` field to Set
+    pub struct SetDidDoc<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDidDoc<S> {}
+    impl<S: State> State for SetDidDoc<S> {
+        type Did = S::Did;
+        type Handle = S::Handle;
+        type DidDoc = Set<members::did_doc>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `handle` field
+        pub struct handle(());
+        ///Marker type for the `did_doc` field
+        pub struct did_doc(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct IdentityInfoBuilder<'a, S: identity_info_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Handle<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> IdentityInfo<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> IdentityInfoBuilder<'a, identity_info_state::Empty> {
+        IdentityInfoBuilder::new()
+    }
+}
+
+impl<'a> IdentityInfoBuilder<'a, identity_info_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        IdentityInfoBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> IdentityInfoBuilder<'a, S>
+where
+    S: identity_info_state::State,
+    S::Did: identity_info_state::IsUnset,
+{
+    /// Set the `did` field (required)
+    pub fn did(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> IdentityInfoBuilder<'a, identity_info_state::SetDid<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        IdentityInfoBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> IdentityInfoBuilder<'a, S>
+where
+    S: identity_info_state::State,
+    S::DidDoc: identity_info_state::IsUnset,
+{
+    /// Set the `didDoc` field (required)
+    pub fn did_doc(
+        mut self,
+        value: impl Into<jacquard_common::types::value::Data<'a>>,
+    ) -> IdentityInfoBuilder<'a, identity_info_state::SetDidDoc<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        IdentityInfoBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> IdentityInfoBuilder<'a, S>
+where
+    S: identity_info_state::State,
+    S::Handle: identity_info_state::IsUnset,
+{
+    /// Set the `handle` field (required)
+    pub fn handle(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Handle<'a>>,
+    ) -> IdentityInfoBuilder<'a, identity_info_state::SetHandle<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        IdentityInfoBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> IdentityInfoBuilder<'a, S>
+where
+    S: identity_info_state::State,
+    S::Did: identity_info_state::IsSet,
+    S::Handle: identity_info_state::IsSet,
+    S::DidDoc: identity_info_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> IdentityInfo<'a> {
+        IdentityInfo {
+            did: self.__unsafe_private_named.0.unwrap(),
+            did_doc: self.__unsafe_private_named.1.unwrap(),
+            handle: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> IdentityInfo<'a> {
+        IdentityInfo {
+            did: self.__unsafe_private_named.0.unwrap(),
+            did_doc: self.__unsafe_private_named.1.unwrap(),
+            handle: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_com_atproto_identity_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<

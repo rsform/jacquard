@@ -13,16 +13,191 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Audio<'a> {
     pub channels: i64,
     #[serde(borrow)]
-    #[builder(into)]
     pub codec: jacquard_common::CowStr<'a>,
     pub rate: i64,
+}
+
+pub mod audio_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Codec;
+        type Rate;
+        type Channels;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Codec = Unset;
+        type Rate = Unset;
+        type Channels = Unset;
+    }
+    ///State transition - sets the `codec` field to Set
+    pub struct SetCodec<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCodec<S> {}
+    impl<S: State> State for SetCodec<S> {
+        type Codec = Set<members::codec>;
+        type Rate = S::Rate;
+        type Channels = S::Channels;
+    }
+    ///State transition - sets the `rate` field to Set
+    pub struct SetRate<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRate<S> {}
+    impl<S: State> State for SetRate<S> {
+        type Codec = S::Codec;
+        type Rate = Set<members::rate>;
+        type Channels = S::Channels;
+    }
+    ///State transition - sets the `channels` field to Set
+    pub struct SetChannels<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetChannels<S> {}
+    impl<S: State> State for SetChannels<S> {
+        type Codec = S::Codec;
+        type Rate = S::Rate;
+        type Channels = Set<members::channels>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `codec` field
+        pub struct codec(());
+        ///Marker type for the `rate` field
+        pub struct rate(());
+        ///Marker type for the `channels` field
+        pub struct channels(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct AudioBuilder<'a, S: audio_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Audio<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> AudioBuilder<'a, audio_state::Empty> {
+        AudioBuilder::new()
+    }
+}
+
+impl<'a> AudioBuilder<'a, audio_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        AudioBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AudioBuilder<'a, S>
+where
+    S: audio_state::State,
+    S::Channels: audio_state::IsUnset,
+{
+    /// Set the `channels` field (required)
+    pub fn channels(
+        mut self,
+        value: impl Into<i64>,
+    ) -> AudioBuilder<'a, audio_state::SetChannels<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        AudioBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AudioBuilder<'a, S>
+where
+    S: audio_state::State,
+    S::Codec: audio_state::IsUnset,
+{
+    /// Set the `codec` field (required)
+    pub fn codec(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> AudioBuilder<'a, audio_state::SetCodec<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        AudioBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AudioBuilder<'a, S>
+where
+    S: audio_state::State,
+    S::Rate: audio_state::IsUnset,
+{
+    /// Set the `rate` field (required)
+    pub fn rate(
+        mut self,
+        value: impl Into<i64>,
+    ) -> AudioBuilder<'a, audio_state::SetRate<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        AudioBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AudioBuilder<'a, S>
+where
+    S: audio_state::State,
+    S::Codec: audio_state::IsSet,
+    S::Rate: audio_state::IsSet,
+    S::Channels: audio_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Audio<'a> {
+        Audio {
+            channels: self.__unsafe_private_named.0.unwrap(),
+            codec: self.__unsafe_private_named.1.unwrap(),
+            rate: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Audio<'a> {
+        Audio {
+            channels: self.__unsafe_private_named.0.unwrap(),
+            codec: self.__unsafe_private_named.1.unwrap(),
+            rate: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_place_stream_segment() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -464,13 +639,149 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Audio<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Framerate<'a> {
     pub den: i64,
     pub num: i64,
+}
+
+pub mod framerate_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Num;
+        type Den;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Num = Unset;
+        type Den = Unset;
+    }
+    ///State transition - sets the `num` field to Set
+    pub struct SetNum<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNum<S> {}
+    impl<S: State> State for SetNum<S> {
+        type Num = Set<members::num>;
+        type Den = S::Den;
+    }
+    ///State transition - sets the `den` field to Set
+    pub struct SetDen<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDen<S> {}
+    impl<S: State> State for SetDen<S> {
+        type Num = S::Num;
+        type Den = Set<members::den>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `num` field
+        pub struct num(());
+        ///Marker type for the `den` field
+        pub struct den(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct FramerateBuilder<'a, S: framerate_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (::core::option::Option<i64>, ::core::option::Option<i64>),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Framerate<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> FramerateBuilder<'a, framerate_state::Empty> {
+        FramerateBuilder::new()
+    }
+}
+
+impl<'a> FramerateBuilder<'a, framerate_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        FramerateBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> FramerateBuilder<'a, S>
+where
+    S: framerate_state::State,
+    S::Den: framerate_state::IsUnset,
+{
+    /// Set the `den` field (required)
+    pub fn den(
+        mut self,
+        value: impl Into<i64>,
+    ) -> FramerateBuilder<'a, framerate_state::SetDen<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        FramerateBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> FramerateBuilder<'a, S>
+where
+    S: framerate_state::State,
+    S::Num: framerate_state::IsUnset,
+{
+    /// Set the `num` field (required)
+    pub fn num(
+        mut self,
+        value: impl Into<i64>,
+    ) -> FramerateBuilder<'a, framerate_state::SetNum<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        FramerateBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> FramerateBuilder<'a, S>
+where
+    S: framerate_state::State,
+    S::Num: framerate_state::IsSet,
+    S::Den: framerate_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Framerate<'a> {
+        Framerate {
+            den: self.__unsafe_private_named.0.unwrap(),
+            num: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Framerate<'a> {
+        Framerate {
+            den: self.__unsafe_private_named.0.unwrap(),
+            num: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Framerate<'a> {
@@ -499,23 +810,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Framerate<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Segment<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub audio: Option<Vec<crate::place_stream::segment::Audio<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub content_rights: Option<
         crate::place_stream::metadata::content_rights::ContentRights<'a>,
     >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub content_warnings: Option<
         crate::place_stream::metadata::content_warnings::ContentWarnings<'a>,
@@ -523,33 +830,417 @@ pub struct Segment<'a> {
     #[serde(borrow)]
     pub creator: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub distribution_policy: Option<
         crate::place_stream::metadata::distribution_policy::DistributionPolicy<'a>,
     >,
     /// The duration of the segment in nanoseconds
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub duration: Option<i64>,
     /// Unique identifier for the segment
     #[serde(borrow)]
-    #[builder(into)]
     pub id: jacquard_common::CowStr<'a>,
     /// The DID of the signing key used for this segment
     #[serde(borrow)]
-    #[builder(into)]
     pub signing_key: jacquard_common::CowStr<'a>,
     /// The size of the segment in bytes
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub size: Option<i64>,
     /// When this segment started
     pub start_time: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub video: Option<Vec<crate::place_stream::segment::Video<'a>>>,
+}
+
+pub mod segment_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Id;
+        type SigningKey;
+        type StartTime;
+        type Creator;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Id = Unset;
+        type SigningKey = Unset;
+        type StartTime = Unset;
+        type Creator = Unset;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Id = Set<members::id>;
+        type SigningKey = S::SigningKey;
+        type StartTime = S::StartTime;
+        type Creator = S::Creator;
+    }
+    ///State transition - sets the `signing_key` field to Set
+    pub struct SetSigningKey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSigningKey<S> {}
+    impl<S: State> State for SetSigningKey<S> {
+        type Id = S::Id;
+        type SigningKey = Set<members::signing_key>;
+        type StartTime = S::StartTime;
+        type Creator = S::Creator;
+    }
+    ///State transition - sets the `start_time` field to Set
+    pub struct SetStartTime<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStartTime<S> {}
+    impl<S: State> State for SetStartTime<S> {
+        type Id = S::Id;
+        type SigningKey = S::SigningKey;
+        type StartTime = Set<members::start_time>;
+        type Creator = S::Creator;
+    }
+    ///State transition - sets the `creator` field to Set
+    pub struct SetCreator<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreator<S> {}
+    impl<S: State> State for SetCreator<S> {
+        type Id = S::Id;
+        type SigningKey = S::SigningKey;
+        type StartTime = S::StartTime;
+        type Creator = Set<members::creator>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `id` field
+        pub struct id(());
+        ///Marker type for the `signing_key` field
+        pub struct signing_key(());
+        ///Marker type for the `start_time` field
+        pub struct start_time(());
+        ///Marker type for the `creator` field
+        pub struct creator(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct SegmentBuilder<'a, S: segment_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<Vec<crate::place_stream::segment::Audio<'a>>>,
+        ::core::option::Option<
+            crate::place_stream::metadata::content_rights::ContentRights<'a>,
+        >,
+        ::core::option::Option<
+            crate::place_stream::metadata::content_warnings::ContentWarnings<'a>,
+        >,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<
+            crate::place_stream::metadata::distribution_policy::DistributionPolicy<'a>,
+        >,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<Vec<crate::place_stream::segment::Video<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Segment<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> SegmentBuilder<'a, segment_state::Empty> {
+        SegmentBuilder::new()
+    }
+}
+
+impl<'a> SegmentBuilder<'a, segment_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        SegmentBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: segment_state::State> SegmentBuilder<'a, S> {
+    /// Set the `audio` field (optional)
+    pub fn audio(
+        mut self,
+        value: impl Into<Option<Vec<crate::place_stream::segment::Audio<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `audio` field to an Option value (optional)
+    pub fn maybe_audio(
+        mut self,
+        value: Option<Vec<crate::place_stream::segment::Audio<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: segment_state::State> SegmentBuilder<'a, S> {
+    /// Set the `contentRights` field (optional)
+    pub fn content_rights(
+        mut self,
+        value: impl Into<
+            Option<crate::place_stream::metadata::content_rights::ContentRights<'a>>,
+        >,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `contentRights` field to an Option value (optional)
+    pub fn maybe_content_rights(
+        mut self,
+        value: Option<crate::place_stream::metadata::content_rights::ContentRights<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: segment_state::State> SegmentBuilder<'a, S> {
+    /// Set the `contentWarnings` field (optional)
+    pub fn content_warnings(
+        mut self,
+        value: impl Into<
+            Option<crate::place_stream::metadata::content_warnings::ContentWarnings<'a>>,
+        >,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `contentWarnings` field to an Option value (optional)
+    pub fn maybe_content_warnings(
+        mut self,
+        value: Option<
+            crate::place_stream::metadata::content_warnings::ContentWarnings<'a>,
+        >,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> SegmentBuilder<'a, S>
+where
+    S: segment_state::State,
+    S::Creator: segment_state::IsUnset,
+{
+    /// Set the `creator` field (required)
+    pub fn creator(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> SegmentBuilder<'a, segment_state::SetCreator<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        SegmentBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: segment_state::State> SegmentBuilder<'a, S> {
+    /// Set the `distributionPolicy` field (optional)
+    pub fn distribution_policy(
+        mut self,
+        value: impl Into<
+            Option<
+                crate::place_stream::metadata::distribution_policy::DistributionPolicy<
+                    'a,
+                >,
+            >,
+        >,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `distributionPolicy` field to an Option value (optional)
+    pub fn maybe_distribution_policy(
+        mut self,
+        value: Option<
+            crate::place_stream::metadata::distribution_policy::DistributionPolicy<'a>,
+        >,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: segment_state::State> SegmentBuilder<'a, S> {
+    /// Set the `duration` field (optional)
+    pub fn duration(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `duration` field to an Option value (optional)
+    pub fn maybe_duration(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S> SegmentBuilder<'a, S>
+where
+    S: segment_state::State,
+    S::Id: segment_state::IsUnset,
+{
+    /// Set the `id` field (required)
+    pub fn id(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> SegmentBuilder<'a, segment_state::SetId<S>> {
+        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        SegmentBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SegmentBuilder<'a, S>
+where
+    S: segment_state::State,
+    S::SigningKey: segment_state::IsUnset,
+{
+    /// Set the `signingKey` field (required)
+    pub fn signing_key(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> SegmentBuilder<'a, segment_state::SetSigningKey<S>> {
+        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        SegmentBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: segment_state::State> SegmentBuilder<'a, S> {
+    /// Set the `size` field (optional)
+    pub fn size(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.8 = value.into();
+        self
+    }
+    /// Set the `size` field to an Option value (optional)
+    pub fn maybe_size(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.8 = value;
+        self
+    }
+}
+
+impl<'a, S> SegmentBuilder<'a, S>
+where
+    S: segment_state::State,
+    S::StartTime: segment_state::IsUnset,
+{
+    /// Set the `startTime` field (required)
+    pub fn start_time(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> SegmentBuilder<'a, segment_state::SetStartTime<S>> {
+        self.__unsafe_private_named.9 = ::core::option::Option::Some(value.into());
+        SegmentBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: segment_state::State> SegmentBuilder<'a, S> {
+    /// Set the `video` field (optional)
+    pub fn video(
+        mut self,
+        value: impl Into<Option<Vec<crate::place_stream::segment::Video<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.10 = value.into();
+        self
+    }
+    /// Set the `video` field to an Option value (optional)
+    pub fn maybe_video(
+        mut self,
+        value: Option<Vec<crate::place_stream::segment::Video<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.10 = value;
+        self
+    }
+}
+
+impl<'a, S> SegmentBuilder<'a, S>
+where
+    S: segment_state::State,
+    S::Id: segment_state::IsSet,
+    S::SigningKey: segment_state::IsSet,
+    S::StartTime: segment_state::IsSet,
+    S::Creator: segment_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Segment<'a> {
+        Segment {
+            audio: self.__unsafe_private_named.0,
+            content_rights: self.__unsafe_private_named.1,
+            content_warnings: self.__unsafe_private_named.2,
+            creator: self.__unsafe_private_named.3.unwrap(),
+            distribution_policy: self.__unsafe_private_named.4,
+            duration: self.__unsafe_private_named.5,
+            id: self.__unsafe_private_named.6.unwrap(),
+            signing_key: self.__unsafe_private_named.7.unwrap(),
+            size: self.__unsafe_private_named.8,
+            start_time: self.__unsafe_private_named.9.unwrap(),
+            video: self.__unsafe_private_named.10,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Segment<'a> {
+        Segment {
+            audio: self.__unsafe_private_named.0,
+            content_rights: self.__unsafe_private_named.1,
+            content_warnings: self.__unsafe_private_named.2,
+            creator: self.__unsafe_private_named.3.unwrap(),
+            distribution_policy: self.__unsafe_private_named.4,
+            duration: self.__unsafe_private_named.5,
+            id: self.__unsafe_private_named.6.unwrap(),
+            signing_key: self.__unsafe_private_named.7.unwrap(),
+            size: self.__unsafe_private_named.8,
+            start_time: self.__unsafe_private_named.9.unwrap(),
+            video: self.__unsafe_private_named.10,
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> Segment<'a> {
@@ -638,8 +1329,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Segment<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SegmentView<'a> {
@@ -647,6 +1337,146 @@ pub struct SegmentView<'a> {
     pub cid: jacquard_common::types::string::Cid<'a>,
     #[serde(borrow)]
     pub record: jacquard_common::types::value::Data<'a>,
+}
+
+pub mod segment_view_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Cid;
+        type Record;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Cid = Unset;
+        type Record = Unset;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Cid = Set<members::cid>;
+        type Record = S::Record;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecord<S> {}
+    impl<S: State> State for SetRecord<S> {
+        type Cid = S::Cid;
+        type Record = Set<members::record>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `record` field
+        pub struct record(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct SegmentViewBuilder<'a, S: segment_view_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
+        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> SegmentView<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> SegmentViewBuilder<'a, segment_view_state::Empty> {
+        SegmentViewBuilder::new()
+    }
+}
+
+impl<'a> SegmentViewBuilder<'a, segment_view_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        SegmentViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SegmentViewBuilder<'a, S>
+where
+    S: segment_view_state::State,
+    S::Cid: segment_view_state::IsUnset,
+{
+    /// Set the `cid` field (required)
+    pub fn cid(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Cid<'a>>,
+    ) -> SegmentViewBuilder<'a, segment_view_state::SetCid<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        SegmentViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SegmentViewBuilder<'a, S>
+where
+    S: segment_view_state::State,
+    S::Record: segment_view_state::IsUnset,
+{
+    /// Set the `record` field (required)
+    pub fn record(
+        mut self,
+        value: impl Into<jacquard_common::types::value::Data<'a>>,
+    ) -> SegmentViewBuilder<'a, segment_view_state::SetRecord<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        SegmentViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SegmentViewBuilder<'a, S>
+where
+    S: segment_view_state::State,
+    S::Cid: segment_view_state::IsSet,
+    S::Record: segment_view_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> SegmentView<'a> {
+        SegmentView {
+            cid: self.__unsafe_private_named.0.unwrap(),
+            record: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> SegmentView<'a> {
+        SegmentView {
+            cid: self.__unsafe_private_named.0.unwrap(),
+            record: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SegmentView<'a> {
@@ -674,23 +1504,234 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SegmentView<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Video<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub bframes: Option<bool>,
     #[serde(borrow)]
-    #[builder(into)]
     pub codec: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub framerate: Option<crate::place_stream::segment::Framerate<'a>>,
     pub height: i64,
     pub width: i64,
+}
+
+pub mod video_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Codec;
+        type Width;
+        type Height;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Codec = Unset;
+        type Width = Unset;
+        type Height = Unset;
+    }
+    ///State transition - sets the `codec` field to Set
+    pub struct SetCodec<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCodec<S> {}
+    impl<S: State> State for SetCodec<S> {
+        type Codec = Set<members::codec>;
+        type Width = S::Width;
+        type Height = S::Height;
+    }
+    ///State transition - sets the `width` field to Set
+    pub struct SetWidth<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWidth<S> {}
+    impl<S: State> State for SetWidth<S> {
+        type Codec = S::Codec;
+        type Width = Set<members::width>;
+        type Height = S::Height;
+    }
+    ///State transition - sets the `height` field to Set
+    pub struct SetHeight<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHeight<S> {}
+    impl<S: State> State for SetHeight<S> {
+        type Codec = S::Codec;
+        type Width = S::Width;
+        type Height = Set<members::height>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `codec` field
+        pub struct codec(());
+        ///Marker type for the `width` field
+        pub struct width(());
+        ///Marker type for the `height` field
+        pub struct height(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct VideoBuilder<'a, S: video_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<bool>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<crate::place_stream::segment::Framerate<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<i64>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Video<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> VideoBuilder<'a, video_state::Empty> {
+        VideoBuilder::new()
+    }
+}
+
+impl<'a> VideoBuilder<'a, video_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        VideoBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: video_state::State> VideoBuilder<'a, S> {
+    /// Set the `bframes` field (optional)
+    pub fn bframes(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `bframes` field to an Option value (optional)
+    pub fn maybe_bframes(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> VideoBuilder<'a, S>
+where
+    S: video_state::State,
+    S::Codec: video_state::IsUnset,
+{
+    /// Set the `codec` field (required)
+    pub fn codec(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> VideoBuilder<'a, video_state::SetCodec<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        VideoBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: video_state::State> VideoBuilder<'a, S> {
+    /// Set the `framerate` field (optional)
+    pub fn framerate(
+        mut self,
+        value: impl Into<Option<crate::place_stream::segment::Framerate<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `framerate` field to an Option value (optional)
+    pub fn maybe_framerate(
+        mut self,
+        value: Option<crate::place_stream::segment::Framerate<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> VideoBuilder<'a, S>
+where
+    S: video_state::State,
+    S::Height: video_state::IsUnset,
+{
+    /// Set the `height` field (required)
+    pub fn height(
+        mut self,
+        value: impl Into<i64>,
+    ) -> VideoBuilder<'a, video_state::SetHeight<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        VideoBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> VideoBuilder<'a, S>
+where
+    S: video_state::State,
+    S::Width: video_state::IsUnset,
+{
+    /// Set the `width` field (required)
+    pub fn width(
+        mut self,
+        value: impl Into<i64>,
+    ) -> VideoBuilder<'a, video_state::SetWidth<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        VideoBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> VideoBuilder<'a, S>
+where
+    S: video_state::State,
+    S::Codec: video_state::IsSet,
+    S::Width: video_state::IsSet,
+    S::Height: video_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Video<'a> {
+        Video {
+            bframes: self.__unsafe_private_named.0,
+            codec: self.__unsafe_private_named.1.unwrap(),
+            framerate: self.__unsafe_private_named.2,
+            height: self.__unsafe_private_named.3.unwrap(),
+            width: self.__unsafe_private_named.4.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Video<'a> {
+        Video {
+            bframes: self.__unsafe_private_named.0,
+            codec: self.__unsafe_private_named.1.unwrap(),
+            framerate: self.__unsafe_private_named.2,
+            height: self.__unsafe_private_named.3.unwrap(),
+            width: self.__unsafe_private_named.4.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Video<'a> {

@@ -17,18 +17,15 @@ pub mod upsert_option;
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    bon::Builder
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DefsOption<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub created_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub created_by: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub description: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
@@ -38,17 +35,413 @@ pub struct DefsOption<'a> {
     #[serde(borrow)]
     pub last_updated_by: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     #[serde(borrow)]
     pub manager_role: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
-    #[builder(into)]
     pub scope: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[builder(into)]
     pub updated_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub value: jacquard_common::types::value::Data<'a>,
+}
+
+pub mod defs_option_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Key;
+        type Value;
+        type Did;
+        type Scope;
+        type CreatedBy;
+        type LastUpdatedBy;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Key = Unset;
+        type Value = Unset;
+        type Did = Unset;
+        type Scope = Unset;
+        type CreatedBy = Unset;
+        type LastUpdatedBy = Unset;
+    }
+    ///State transition - sets the `key` field to Set
+    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetKey<S> {}
+    impl<S: State> State for SetKey<S> {
+        type Key = Set<members::key>;
+        type Value = S::Value;
+        type Did = S::Did;
+        type Scope = S::Scope;
+        type CreatedBy = S::CreatedBy;
+        type LastUpdatedBy = S::LastUpdatedBy;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Key = S::Key;
+        type Value = Set<members::value>;
+        type Did = S::Did;
+        type Scope = S::Scope;
+        type CreatedBy = S::CreatedBy;
+        type LastUpdatedBy = S::LastUpdatedBy;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Key = S::Key;
+        type Value = S::Value;
+        type Did = Set<members::did>;
+        type Scope = S::Scope;
+        type CreatedBy = S::CreatedBy;
+        type LastUpdatedBy = S::LastUpdatedBy;
+    }
+    ///State transition - sets the `scope` field to Set
+    pub struct SetScope<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetScope<S> {}
+    impl<S: State> State for SetScope<S> {
+        type Key = S::Key;
+        type Value = S::Value;
+        type Did = S::Did;
+        type Scope = Set<members::scope>;
+        type CreatedBy = S::CreatedBy;
+        type LastUpdatedBy = S::LastUpdatedBy;
+    }
+    ///State transition - sets the `created_by` field to Set
+    pub struct SetCreatedBy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedBy<S> {}
+    impl<S: State> State for SetCreatedBy<S> {
+        type Key = S::Key;
+        type Value = S::Value;
+        type Did = S::Did;
+        type Scope = S::Scope;
+        type CreatedBy = Set<members::created_by>;
+        type LastUpdatedBy = S::LastUpdatedBy;
+    }
+    ///State transition - sets the `last_updated_by` field to Set
+    pub struct SetLastUpdatedBy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLastUpdatedBy<S> {}
+    impl<S: State> State for SetLastUpdatedBy<S> {
+        type Key = S::Key;
+        type Value = S::Value;
+        type Did = S::Did;
+        type Scope = S::Scope;
+        type CreatedBy = S::CreatedBy;
+        type LastUpdatedBy = Set<members::last_updated_by>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `key` field
+        pub struct key(());
+        ///Marker type for the `value` field
+        pub struct value(());
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `scope` field
+        pub struct scope(());
+        ///Marker type for the `created_by` field
+        pub struct created_by(());
+        ///Marker type for the `last_updated_by` field
+        pub struct last_updated_by(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct DefsOptionBuilder<'a, S: defs_option_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Nsid<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> DefsOption<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> DefsOptionBuilder<'a, defs_option_state::Empty> {
+        DefsOptionBuilder::new()
+    }
+}
+
+impl<'a> DefsOptionBuilder<'a, defs_option_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        DefsOptionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: defs_option_state::State> DefsOptionBuilder<'a, S> {
+    /// Set the `createdAt` field (optional)
+    pub fn created_at(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `createdAt` field to an Option value (optional)
+    pub fn maybe_created_at(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> DefsOptionBuilder<'a, S>
+where
+    S: defs_option_state::State,
+    S::CreatedBy: defs_option_state::IsUnset,
+{
+    /// Set the `createdBy` field (required)
+    pub fn created_by(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> DefsOptionBuilder<'a, defs_option_state::SetCreatedBy<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        DefsOptionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: defs_option_state::State> DefsOptionBuilder<'a, S> {
+    /// Set the `description` field (optional)
+    pub fn description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `description` field to an Option value (optional)
+    pub fn maybe_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S> DefsOptionBuilder<'a, S>
+where
+    S: defs_option_state::State,
+    S::Did: defs_option_state::IsUnset,
+{
+    /// Set the `did` field (required)
+    pub fn did(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> DefsOptionBuilder<'a, defs_option_state::SetDid<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        DefsOptionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DefsOptionBuilder<'a, S>
+where
+    S: defs_option_state::State,
+    S::Key: defs_option_state::IsUnset,
+{
+    /// Set the `key` field (required)
+    pub fn key(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Nsid<'a>>,
+    ) -> DefsOptionBuilder<'a, defs_option_state::SetKey<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        DefsOptionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DefsOptionBuilder<'a, S>
+where
+    S: defs_option_state::State,
+    S::LastUpdatedBy: defs_option_state::IsUnset,
+{
+    /// Set the `lastUpdatedBy` field (required)
+    pub fn last_updated_by(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> DefsOptionBuilder<'a, defs_option_state::SetLastUpdatedBy<S>> {
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        DefsOptionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: defs_option_state::State> DefsOptionBuilder<'a, S> {
+    /// Set the `managerRole` field (optional)
+    pub fn manager_role(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `managerRole` field to an Option value (optional)
+    pub fn maybe_manager_role(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S> DefsOptionBuilder<'a, S>
+where
+    S: defs_option_state::State,
+    S::Scope: defs_option_state::IsUnset,
+{
+    /// Set the `scope` field (required)
+    pub fn scope(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> DefsOptionBuilder<'a, defs_option_state::SetScope<S>> {
+        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        DefsOptionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: defs_option_state::State> DefsOptionBuilder<'a, S> {
+    /// Set the `updatedAt` field (optional)
+    pub fn updated_at(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value.into();
+        self
+    }
+    /// Set the `updatedAt` field to an Option value (optional)
+    pub fn maybe_updated_at(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value;
+        self
+    }
+}
+
+impl<'a, S> DefsOptionBuilder<'a, S>
+where
+    S: defs_option_state::State,
+    S::Value: defs_option_state::IsUnset,
+{
+    /// Set the `value` field (required)
+    pub fn value(
+        mut self,
+        value: impl Into<jacquard_common::types::value::Data<'a>>,
+    ) -> DefsOptionBuilder<'a, defs_option_state::SetValue<S>> {
+        self.__unsafe_private_named.9 = ::core::option::Option::Some(value.into());
+        DefsOptionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DefsOptionBuilder<'a, S>
+where
+    S: defs_option_state::State,
+    S::Key: defs_option_state::IsSet,
+    S::Value: defs_option_state::IsSet,
+    S::Did: defs_option_state::IsSet,
+    S::Scope: defs_option_state::IsSet,
+    S::CreatedBy: defs_option_state::IsSet,
+    S::LastUpdatedBy: defs_option_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> DefsOption<'a> {
+        DefsOption {
+            created_at: self.__unsafe_private_named.0,
+            created_by: self.__unsafe_private_named.1.unwrap(),
+            description: self.__unsafe_private_named.2,
+            did: self.__unsafe_private_named.3.unwrap(),
+            key: self.__unsafe_private_named.4.unwrap(),
+            last_updated_by: self.__unsafe_private_named.5.unwrap(),
+            manager_role: self.__unsafe_private_named.6,
+            scope: self.__unsafe_private_named.7.unwrap(),
+            updated_at: self.__unsafe_private_named.8,
+            value: self.__unsafe_private_named.9.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> DefsOption<'a> {
+        DefsOption {
+            created_at: self.__unsafe_private_named.0,
+            created_by: self.__unsafe_private_named.1.unwrap(),
+            description: self.__unsafe_private_named.2,
+            did: self.__unsafe_private_named.3.unwrap(),
+            key: self.__unsafe_private_named.4.unwrap(),
+            last_updated_by: self.__unsafe_private_named.5.unwrap(),
+            manager_role: self.__unsafe_private_named.6,
+            scope: self.__unsafe_private_named.7.unwrap(),
+            updated_at: self.__unsafe_private_named.8,
+            value: self.__unsafe_private_named.9.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 fn lexicon_doc_tools_ozone_setting_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<

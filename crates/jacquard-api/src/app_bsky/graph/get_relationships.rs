@@ -12,10 +12,8 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
-#[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct GetRelationships<'a> {
     #[serde(borrow)]
@@ -25,6 +23,118 @@ pub struct GetRelationships<'a> {
     pub others: std::option::Option<
         Vec<jacquard_common::types::ident::AtIdentifier<'a>>,
     >,
+}
+
+pub mod get_relationships_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Actor;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Actor = Unset;
+    }
+    ///State transition - sets the `actor` field to Set
+    pub struct SetActor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActor<S> {}
+    impl<S: State> State for SetActor<S> {
+        type Actor = Set<members::actor>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `actor` field
+        pub struct actor(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct GetRelationshipsBuilder<'a, S: get_relationships_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
+        ::core::option::Option<Vec<jacquard_common::types::ident::AtIdentifier<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> GetRelationships<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> GetRelationshipsBuilder<'a, get_relationships_state::Empty> {
+        GetRelationshipsBuilder::new()
+    }
+}
+
+impl<'a> GetRelationshipsBuilder<'a, get_relationships_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        GetRelationshipsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> GetRelationshipsBuilder<'a, S>
+where
+    S: get_relationships_state::State,
+    S::Actor: get_relationships_state::IsUnset,
+{
+    /// Set the `actor` field (required)
+    pub fn actor(
+        mut self,
+        value: impl Into<jacquard_common::types::ident::AtIdentifier<'a>>,
+    ) -> GetRelationshipsBuilder<'a, get_relationships_state::SetActor<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        GetRelationshipsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: get_relationships_state::State> GetRelationshipsBuilder<'a, S> {
+    /// Set the `others` field (optional)
+    pub fn others(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::types::ident::AtIdentifier<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `others` field to an Option value (optional)
+    pub fn maybe_others(
+        mut self,
+        value: Option<Vec<jacquard_common::types::ident::AtIdentifier<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> GetRelationshipsBuilder<'a, S>
+where
+    S: get_relationships_state::State,
+    S::Actor: get_relationships_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> GetRelationships<'a> {
+        GetRelationships {
+            actor: self.__unsafe_private_named.0.unwrap(),
+            others: self.__unsafe_private_named.1,
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

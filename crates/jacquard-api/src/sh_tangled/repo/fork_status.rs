@@ -13,38 +13,282 @@
     Clone,
     PartialEq,
     Eq,
-    bon::Builder,
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-#[builder(start_fn = new)]
 pub struct ForkStatus<'a> {
     /// Branch to check status for
     #[serde(borrow)]
-    #[builder(into)]
     pub branch: jacquard_common::CowStr<'a>,
     /// DID of the fork owner
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     /// Hidden ref to use for comparison
     #[serde(borrow)]
-    #[builder(into)]
     pub hidden_ref: jacquard_common::CowStr<'a>,
     /// Name of the forked repository
     #[serde(borrow)]
-    #[builder(into)]
     pub name: jacquard_common::CowStr<'a>,
     /// Source repository URL
     #[serde(borrow)]
-    #[builder(into)]
     pub source: jacquard_common::CowStr<'a>,
-    #[serde(flatten)]
-    #[serde(borrow)]
-    #[builder(default)]
-    pub extra_data: ::std::collections::BTreeMap<
-        ::jacquard_common::smol_str::SmolStr,
-        ::jacquard_common::types::value::Data<'a>,
-    >,
+}
+
+pub mod fork_status_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Did;
+        type Name;
+        type Source;
+        type Branch;
+        type HiddenRef;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Did = Unset;
+        type Name = Unset;
+        type Source = Unset;
+        type Branch = Unset;
+        type HiddenRef = Unset;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Did = Set<members::did>;
+        type Name = S::Name;
+        type Source = S::Source;
+        type Branch = S::Branch;
+        type HiddenRef = S::HiddenRef;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Did = S::Did;
+        type Name = Set<members::name>;
+        type Source = S::Source;
+        type Branch = S::Branch;
+        type HiddenRef = S::HiddenRef;
+    }
+    ///State transition - sets the `source` field to Set
+    pub struct SetSource<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSource<S> {}
+    impl<S: State> State for SetSource<S> {
+        type Did = S::Did;
+        type Name = S::Name;
+        type Source = Set<members::source>;
+        type Branch = S::Branch;
+        type HiddenRef = S::HiddenRef;
+    }
+    ///State transition - sets the `branch` field to Set
+    pub struct SetBranch<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBranch<S> {}
+    impl<S: State> State for SetBranch<S> {
+        type Did = S::Did;
+        type Name = S::Name;
+        type Source = S::Source;
+        type Branch = Set<members::branch>;
+        type HiddenRef = S::HiddenRef;
+    }
+    ///State transition - sets the `hidden_ref` field to Set
+    pub struct SetHiddenRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHiddenRef<S> {}
+    impl<S: State> State for SetHiddenRef<S> {
+        type Did = S::Did;
+        type Name = S::Name;
+        type Source = S::Source;
+        type Branch = S::Branch;
+        type HiddenRef = Set<members::hidden_ref>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `source` field
+        pub struct source(());
+        ///Marker type for the `branch` field
+        pub struct branch(());
+        ///Marker type for the `hidden_ref` field
+        pub struct hidden_ref(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ForkStatusBuilder<'a, S: fork_status_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ForkStatus<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ForkStatusBuilder<'a, fork_status_state::Empty> {
+        ForkStatusBuilder::new()
+    }
+}
+
+impl<'a> ForkStatusBuilder<'a, fork_status_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ForkStatusBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ForkStatusBuilder<'a, S>
+where
+    S: fork_status_state::State,
+    S::Branch: fork_status_state::IsUnset,
+{
+    /// Set the `branch` field (required)
+    pub fn branch(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> ForkStatusBuilder<'a, fork_status_state::SetBranch<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ForkStatusBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ForkStatusBuilder<'a, S>
+where
+    S: fork_status_state::State,
+    S::Did: fork_status_state::IsUnset,
+{
+    /// Set the `did` field (required)
+    pub fn did(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> ForkStatusBuilder<'a, fork_status_state::SetDid<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        ForkStatusBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ForkStatusBuilder<'a, S>
+where
+    S: fork_status_state::State,
+    S::HiddenRef: fork_status_state::IsUnset,
+{
+    /// Set the `hiddenRef` field (required)
+    pub fn hidden_ref(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> ForkStatusBuilder<'a, fork_status_state::SetHiddenRef<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        ForkStatusBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ForkStatusBuilder<'a, S>
+where
+    S: fork_status_state::State,
+    S::Name: fork_status_state::IsUnset,
+{
+    /// Set the `name` field (required)
+    pub fn name(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> ForkStatusBuilder<'a, fork_status_state::SetName<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        ForkStatusBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ForkStatusBuilder<'a, S>
+where
+    S: fork_status_state::State,
+    S::Source: fork_status_state::IsUnset,
+{
+    /// Set the `source` field (required)
+    pub fn source(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> ForkStatusBuilder<'a, fork_status_state::SetSource<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        ForkStatusBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ForkStatusBuilder<'a, S>
+where
+    S: fork_status_state::State,
+    S::Did: fork_status_state::IsSet,
+    S::Name: fork_status_state::IsSet,
+    S::Source: fork_status_state::IsSet,
+    S::Branch: fork_status_state::IsSet,
+    S::HiddenRef: fork_status_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> ForkStatus<'a> {
+        ForkStatus {
+            branch: self.__unsafe_private_named.0.unwrap(),
+            did: self.__unsafe_private_named.1.unwrap(),
+            hidden_ref: self.__unsafe_private_named.2.unwrap(),
+            name: self.__unsafe_private_named.3.unwrap(),
+            source: self.__unsafe_private_named.4.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> ForkStatus<'a> {
+        ForkStatus {
+            branch: self.__unsafe_private_named.0.unwrap(),
+            did: self.__unsafe_private_named.1.unwrap(),
+            hidden_ref: self.__unsafe_private_named.2.unwrap(),
+            name: self.__unsafe_private_named.3.unwrap(),
+            source: self.__unsafe_private_named.4.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]
