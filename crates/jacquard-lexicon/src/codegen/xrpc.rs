@@ -399,23 +399,37 @@ impl<'c> CodeGenerator<'c> {
             #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic)]
         };
 
-        let struct_def = if needs_lifetime {
+        let struct_body = if fields.is_empty() {
             quote! {
-                #doc
-                #derives
-                #[serde(rename_all = "camelCase")]
+                pub struct #ident;
+            }
+        } else if needs_lifetime {
+            quote! {
                 pub struct #ident<'a> {
                     #(#fields)*
                 }
             }
         } else {
             quote! {
-                #doc
-                #derives
-                #[serde(rename_all = "camelCase")]
                 pub struct #ident {
                     #(#fields)*
                 }
+            }
+        };
+
+        let struct_def = if needs_lifetime {
+            quote! {
+                #doc
+                #derives
+                #[serde(rename_all = "camelCase")]
+                #struct_body
+            }
+        } else {
+            quote! {
+                #doc
+                #derives
+                #[serde(rename_all = "camelCase")]
+                #struct_body
             }
         };
 

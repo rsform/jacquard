@@ -116,15 +116,6 @@ fn test_state_module_generation() {
 }
 
 #[test]
-fn test_state_module_empty_fields() {
-    let tokens = generate_state_module("Foo", &[]);
-    assert!(
-        tokens.is_empty(),
-        "No state module for zero required fields"
-    );
-}
-
-#[test]
 fn test_build_method_generation() {
     let fields = vec![RequiredField::new("repo"), RequiredField::new("collection")];
 

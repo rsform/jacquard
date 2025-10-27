@@ -184,7 +184,7 @@ impl MemoryCredentialSession {
     /// # let (identifier, password, post_text): (CowStr<'_>, CowStr<'_>, CowStr<'_>)  = todo!();
     /// let (session, _) = MemoryCredentialSession::authenticated(identifier, password, None).await?;
     /// let agent = Agent::from(session);
-    /// let post = Post::builder().text(post_text).created_at(Datetime::now()).build();
+    /// let post = Post::new().text(post_text).created_at(Datetime::now()).build();
     /// let output = agent.create_record(post, None).await?;
     /// # Ok(())
     /// # }

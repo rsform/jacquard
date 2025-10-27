@@ -39,7 +39,7 @@ impl super::VecUpdate for PreferencesUpdate {
     type Item = PreferencesItem<'static>;
 
     fn build_get() -> Self::GetRequest {
-        GetPreferences {}
+        GetPreferences
     }
 
     fn extract_vec<'s>(

@@ -15,7 +15,7 @@
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-pub struct GetIdentity {}
+pub struct GetIdentity;
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,

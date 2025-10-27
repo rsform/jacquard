@@ -15,7 +15,7 @@
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-pub struct GetBroadcaster {}
+pub struct GetBroadcaster;
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,

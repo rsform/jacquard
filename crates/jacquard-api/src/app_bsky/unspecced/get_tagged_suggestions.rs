@@ -15,7 +15,7 @@
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-pub struct GetTaggedSuggestions {}
+pub struct GetTaggedSuggestions;
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
