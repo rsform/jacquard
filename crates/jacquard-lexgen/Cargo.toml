@@ -24,7 +24,6 @@ name = "extract-schemas"
 path = "src/bin/extract_schemas.rs"
 
 [dependencies]
-async-trait = "0.1"
 clap.workspace = true
 glob = "0.3"
 inventory = "0.3"

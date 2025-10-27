@@ -308,6 +308,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Monetaryamount<'a> {
     fn nsid() -> &'static str {
         "social.flockfeeds.lexical.monetaryamount"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_flockfeeds_lexical_monetaryamount()
     }
@@ -323,16 +326,22 @@ fn lexicon_doc_social_flockfeeds_lexical_monetaryamount() -> ::jacquard_lexicon:
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "social.flockfeeds.lexical.monetaryamount".into(),
+        id: ::jacquard_common::CowStr::new_static(
+            "social.flockfeeds.lexical.monetaryamount",
+        ),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("tid".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A monetary value or range. This type can be used to describe an amount of money such as $50 USD, or a range as in describing a bank account being suitable for a balance between £1,000 and £1,000,000 GBP, or the value of a salary, etc. It is recommended to use [[PriceSpecification]] Types to describe the price of an Offer, Invoice, etc.",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: None,
@@ -341,9 +350,15 @@ fn lexicon_doc_social_flockfeeds_lexical_monetaryamount() -> ::jacquard_lexicon:
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "additionalType".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "additionalType",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "An additional type for the item, typically used for adding more specific types from external vocabularies in microdata syntax. This is a relationship between something and a class that the thing is in. Typically the value is a URI-identified RDF class, and in this case corresponds to the\n    use of rdf:type in RDF. Text values can be used sparingly, for cases where useful information can be added without their being an appropriate schema to reference. In the case of text values, the class label should follow the schema.org <a href=\"https://schema.org/docs/styleguide.html\">style guide</a>.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -356,9 +371,15 @@ fn lexicon_doc_social_flockfeeds_lexical_monetaryamount() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                "alternateName".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "alternateName",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "An alias for the item.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -371,9 +392,15 @@ fn lexicon_doc_social_flockfeeds_lexical_monetaryamount() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                "currency".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "currency",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The currency in which the monetary amount is expressed.\\n\\nUse standard formats: [ISO 4217 currency format](http://en.wikipedia.org/wiki/ISO_4217), e.g. \"USD\"; [Ticker symbol](https://en.wikipedia.org/wiki/List_of_cryptocurrencies) for cryptocurrencies, e.g. \"BTC\"; well known names for [Local Exchange Trading Systems](https://en.wikipedia.org/wiki/Local_exchange_trading_system) (LETS) and other currency types, e.g. \"Ithaca HOUR\".",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -386,20 +413,32 @@ fn lexicon_doc_social_flockfeeds_lexical_monetaryamount() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                "description".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "description",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "A description of the item.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.textobject".into(),
-                                        "social.flockfeeds.lexical.itemlist".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.textobject"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.itemlist")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "disambiguatingDescription".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "disambiguatingDescription",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "A sub property of description. A short description of the item used to disambiguate from other, similar items. Information from other properties (in particular, name) may be necessary for the description to be useful for disambiguation.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -412,40 +451,58 @@ fn lexicon_doc_social_flockfeeds_lexical_monetaryamount() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                "identifier".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "identifier",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The identifier property represents any kind of identifier for any kind of [[Thing]], such as ISBNs, GTIN codes, UUIDs etc. Schema.org provides dedicated properties for representing many of these, either as textual strings or as URL (URI) links. See [background notes](/docs/datamodel.html#identifierBg) for more details.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.propertyvalue".into(),
-                                        "social.flockfeeds.lexical.itemlist".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.propertyvalue"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.itemlist")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "image".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("image"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "An image of the item. This can be a [[URL]] or a fully described [[ImageObject]].",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.imageobject".into(),
-                                        "social.flockfeeds.lexical.itemlist".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.imageobject"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.itemlist")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "mainEntityOfPage".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "mainEntityOfPage",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Indicates a page (or other CreativeWork) for which this thing is the main entity being described. See [background notes](/docs/datamodel.html#mainEntityBackground) for details.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.creativework".into(),
-                                        "social.flockfeeds.lexical.itemlist".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.creativework"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.itemlist")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "maxValue".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "maxValue",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -456,7 +513,9 @@ fn lexicon_doc_social_flockfeeds_lexical_monetaryamount() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                "minValue".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "minValue",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -467,9 +526,13 @@ fn lexicon_doc_social_flockfeeds_lexical_monetaryamount() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                "name".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The name of the item.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -482,20 +545,30 @@ fn lexicon_doc_social_flockfeeds_lexical_monetaryamount() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                "potentialAction".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "potentialAction",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Indicates a potential Action, which describes an idealized action in which this thing would play an 'object' role.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.action".into(),
-                                        "social.flockfeeds.lexical.itemlist".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.action"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.itemlist")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "sameAs".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("sameAs"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "URL of a reference Web page that unambiguously indicates the item's identity. E.g. the URL of the item's Wikipedia page, Wikidata entry, or official website.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                     ),
@@ -510,21 +583,29 @@ fn lexicon_doc_social_flockfeeds_lexical_monetaryamount() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                "subjectOf".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "subjectOf",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "A CreativeWork or Event about this Thing.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.event".into(),
-                                        "social.flockfeeds.lexical.creativework".into(),
-                                        "social.flockfeeds.lexical.itemlist".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.event"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.creativework"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.itemlist")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "url".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("url"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static("URL of the item."),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                     ),
@@ -539,9 +620,15 @@ fn lexicon_doc_social_flockfeeds_lexical_monetaryamount() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                "validFrom".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "validFrom",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The date when the item becomes valid.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -556,9 +643,15 @@ fn lexicon_doc_social_flockfeeds_lexical_monetaryamount() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                "validThrough".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "validThrough",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The date after when the item is not valid. For example the end of an offer, salary period, or a period of opening hours.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -573,12 +666,16 @@ fn lexicon_doc_social_flockfeeds_lexical_monetaryamount() -> ::jacquard_lexicon:
                                 }),
                             );
                             map.insert(
-                                "value".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("value"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The value of a [[QuantitativeValue]] (including [[Observation]]) or property value node.\\n\\n* For [[QuantitativeValue]] and [[MonetaryAmount]], the recommended type for values is 'Number'.\\n* For [[PropertyValue]], it can be 'Text', 'Number', 'Boolean', or 'StructuredValue'.\\n* Use values from 0123456789 (Unicode 'DIGIT ZERO' (U+0030) to 'DIGIT NINE' (U+0039)) rather than superficially similar Unicode symbols.\\n* Use '.' (Unicode 'FULL STOP' (U+002E)) rather than ',' to indicate a decimal point. Avoid using these symbols as a readability separator.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.structuredvalue".into(),
-                                        "social.flockfeeds.lexical.itemlist".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.structuredvalue"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.itemlist")
                                     ],
                                     closed: None,
                                 }),

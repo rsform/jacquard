@@ -46,26 +46,29 @@ fn lexicon_doc_sh_weaver_edit_cursor() -> ::jacquard_lexicon::lexicon::LexiconDo
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "sh.weaver.edit.cursor".into(),
+        id: ::jacquard_common::CowStr::new_static("sh.weaver.edit.cursor"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "containerId".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("containerId"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["value".into()]),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("value")],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "value".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("value"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
-                                    "#normalContainerId".into(), "#rootContainerId".into()
+                                    ::jacquard_common::CowStr::new_static("#normalContainerId"),
+                                    ::jacquard_common::CowStr::new_static("#rootContainerId")
                                 ],
                                 closed: None,
                             }),
@@ -75,16 +78,18 @@ fn lexicon_doc_sh_weaver_edit_cursor() -> ::jacquard_lexicon::lexicon::LexiconDo
                 }),
             );
             map.insert(
-                "cursorSide".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("cursorSide"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["value".into()]),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("value")],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "value".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("value"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -99,16 +104,21 @@ fn lexicon_doc_sh_weaver_edit_cursor() -> ::jacquard_lexicon::lexicon::LexiconDo
                 }),
             );
             map.insert(
-                "id".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("id"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["peer".into(), "counter".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("peer"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("counter")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "counter".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("counter"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -119,7 +129,7 @@ fn lexicon_doc_sh_weaver_edit_cursor() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            "peer".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("peer"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -134,36 +144,47 @@ fn lexicon_doc_sh_weaver_edit_cursor() -> ::jacquard_lexicon::lexicon::LexiconDo
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("tid".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "An edit record for a notebook.",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
-                        required: Some(vec!["container".into(), "die".into()]),
+                        required: Some(
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("container"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("die")
+                            ],
+                        ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "container".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "container",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "#containerId".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static("#containerId"),
                                 }),
                             );
                             map.insert(
-                                "id".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("id"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "#id".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static("#id"),
                                 }),
                             );
                             map.insert(
-                                "side".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("side"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "#cursorSide".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static("#cursorSide"),
                                 }),
                             );
                             map
@@ -172,18 +193,24 @@ fn lexicon_doc_sh_weaver_edit_cursor() -> ::jacquard_lexicon::lexicon::LexiconDo
                 }),
             );
             map.insert(
-                "normalContainerId".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("normalContainerId"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
-                        vec!["peer".into(), "counter".into(), "container_type".into()],
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("peer"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("counter"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("container_type")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "container_type".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "container_type",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -198,7 +225,7 @@ fn lexicon_doc_sh_weaver_edit_cursor() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            "counter".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("counter"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -209,7 +236,7 @@ fn lexicon_doc_sh_weaver_edit_cursor() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            "peer".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("peer"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -224,16 +251,23 @@ fn lexicon_doc_sh_weaver_edit_cursor() -> ::jacquard_lexicon::lexicon::LexiconDo
                 }),
             );
             map.insert(
-                "rootContainerId".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("rootContainerId"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["name".into(), "container_type".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("container_type")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "container_type".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "container_type",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -248,7 +282,7 @@ fn lexicon_doc_sh_weaver_edit_cursor() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            "name".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -274,6 +308,9 @@ fn lexicon_doc_sh_weaver_edit_cursor() -> ::jacquard_lexicon::lexicon::LexiconDo
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContainerId<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.cursor"
+    }
+    fn def_name() -> &'static str {
+        "containerId"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_edit_cursor()
@@ -306,6 +343,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CursorSide<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.cursor"
     }
+    fn def_name() -> &'static str {
+        "cursorSide"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_edit_cursor()
     }
@@ -336,6 +376,9 @@ pub struct Id<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Id<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.cursor"
+    }
+    fn def_name() -> &'static str {
+        "id"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_edit_cursor()
@@ -438,6 +481,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Cursor<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.cursor"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_edit_cursor()
     }
@@ -472,6 +518,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NormalContainerId<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.cursor"
     }
+    fn def_name() -> &'static str {
+        "normalContainerId"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_edit_cursor()
     }
@@ -504,6 +553,9 @@ pub struct RootContainerId<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RootContainerId<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.cursor"
+    }
+    fn def_name() -> &'static str {
+        "rootContainerId"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_edit_cursor()

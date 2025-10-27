@@ -97,6 +97,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Board<'a> {
     fn nsid() -> &'static str {
         "dev.ocbwoy3.blueboard.board"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_dev_ocbwoy3_blueboard_board()
     }
@@ -122,11 +125,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Board<'a> {
         }
         {
             let value = &self.title;
-            if value.as_ref().len() > 10usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 10usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "title",
                     max: 10usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -139,22 +143,24 @@ fn lexicon_doc_dev_ocbwoy3_blueboard_board() -> ::jacquard_lexicon::lexicon::Lex
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "dev.ocbwoy3.blueboard.board".into(),
+        id: ::jacquard_common::CowStr::new_static("dev.ocbwoy3.blueboard.board"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: None,
-                    key: Some("any".into()),
+                    key: Some(::jacquard_common::CowStr::new_static("any")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: Some(
                             vec![
-                                "title".into(), "description".into(), "nsfw".into(),
-                                "createdAt".into()
+                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("description"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("nsfw"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -162,9 +168,15 @@ fn lexicon_doc_dev_ocbwoy3_blueboard_board() -> ::jacquard_lexicon::lexicon::Lex
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The date and time when the board was created",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -179,9 +191,15 @@ fn lexicon_doc_dev_ocbwoy3_blueboard_board() -> ::jacquard_lexicon::lexicon::Lex
                                 }),
                             );
                             map.insert(
-                                "description".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "description",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "A short description of the board",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -194,7 +212,7 @@ fn lexicon_doc_dev_ocbwoy3_blueboard_board() -> ::jacquard_lexicon::lexicon::Lex
                                 }),
                             );
                             map.insert(
-                                "nsfw".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("nsfw"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                     description: None,
                                     default: None,
@@ -202,9 +220,13 @@ fn lexicon_doc_dev_ocbwoy3_blueboard_board() -> ::jacquard_lexicon::lexicon::Lex
                                 }),
                             );
                             map.insert(
-                                "title".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The title of the board (e.g. /at/)",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,

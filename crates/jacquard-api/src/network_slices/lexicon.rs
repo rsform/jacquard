@@ -111,6 +111,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Lexicon<'a> {
     fn nsid() -> &'static str {
         "network.slices.lexicon"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_network_slices_lexicon()
     }
@@ -118,21 +121,23 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Lexicon<'a> {
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         if let Some(ref value) = self.description {
-            if value.as_ref().len() > 500usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 500usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "description",
                     max: 500usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         {
             let value = &self.nsid;
-            if value.as_ref().len() > 256usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "nsid",
                     max: 256usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -145,22 +150,24 @@ fn lexicon_doc_network_slices_lexicon() -> ::jacquard_lexicon::lexicon::LexiconD
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "network.slices.lexicon".into(),
+        id: ::jacquard_common::CowStr::new_static("network.slices.lexicon"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: None,
-                    key: Some("tid".into()),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: Some(
                             vec![
-                                "nsid".into(), "definitions".into(), "createdAt".into(),
-                                "slice".into()
+                                ::jacquard_common::smol_str::SmolStr::new_static("nsid"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("definitions"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("slice")
                             ],
                         ),
                         nullable: None,
@@ -168,9 +175,15 @@ fn lexicon_doc_network_slices_lexicon() -> ::jacquard_lexicon::lexicon::LexiconD
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "When the lexicon was created",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -185,9 +198,15 @@ fn lexicon_doc_network_slices_lexicon() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                "definitions".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "definitions",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The lexicon schema definitions as JSON",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -200,9 +219,15 @@ fn lexicon_doc_network_slices_lexicon() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                "description".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "description",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Human-readable description of the lexicon",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -215,7 +240,9 @@ fn lexicon_doc_network_slices_lexicon() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                "excludedFromSync".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "excludedFromSync",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                     description: None,
                                     default: None,
@@ -223,9 +250,13 @@ fn lexicon_doc_network_slices_lexicon() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                "nsid".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("nsid"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Namespaced identifier for the lexicon",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -238,9 +269,13 @@ fn lexicon_doc_network_slices_lexicon() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                "slice".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("slice"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "AT-URI reference to the slice this lexicon belongs to",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
                                     ),
@@ -255,9 +290,15 @@ fn lexicon_doc_network_slices_lexicon() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                "updatedAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "updatedAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "When the lexicon was last updated",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),

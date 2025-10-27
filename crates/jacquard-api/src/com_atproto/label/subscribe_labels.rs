@@ -30,22 +30,24 @@ fn lexicon_doc_com_atproto_label_subscribeLabels() -> ::jacquard_lexicon::lexico
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "com.atproto.label.subscribeLabels".into(),
+        id: ::jacquard_common::CowStr::new_static("com.atproto.label.subscribeLabels"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "info".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("info"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["name".into()]),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("name")],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "message".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("message"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -60,7 +62,7 @@ fn lexicon_doc_com_atproto_label_subscribeLabels() -> ::jacquard_lexicon::lexico
                             }),
                         );
                         map.insert(
-                            "name".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -79,28 +81,35 @@ fn lexicon_doc_com_atproto_label_subscribeLabels() -> ::jacquard_lexicon::lexico
                 }),
             );
             map.insert(
-                "labels".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("labels"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["seq".into(), "labels".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("seq"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("labels")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "labels".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("labels"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "com.atproto.label.defs#label".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "com.atproto.label.defs#label",
+                                    ),
                                 }),
                                 min_length: None,
                                 max_length: None,
                             }),
                         );
                         map.insert(
-                            "seq".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("seq"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -115,7 +124,7 @@ fn lexicon_doc_com_atproto_label_subscribeLabels() -> ::jacquard_lexicon::lexico
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcSubscription(::jacquard_lexicon::lexicon::LexXrpcSubscription {
                     description: None,
                     parameters: Some(
@@ -126,7 +135,7 @@ fn lexicon_doc_com_atproto_label_subscribeLabels() -> ::jacquard_lexicon::lexico
                                 #[allow(unused_mut)]
                                 let mut map = ::std::collections::BTreeMap::new();
                                 map.insert(
-                                    "cursor".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static("cursor"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                         description: None,
                                         default: None,
@@ -153,6 +162,9 @@ fn lexicon_doc_com_atproto_label_subscribeLabels() -> ::jacquard_lexicon::lexico
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Info<'a> {
     fn nsid() -> &'static str {
         "com.atproto.label.subscribeLabels"
+    }
+    fn def_name() -> &'static str {
+        "info"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_label_subscribeLabels()
@@ -185,6 +197,9 @@ pub struct Labels<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Labels<'a> {
     fn nsid() -> &'static str {
         "com.atproto.label.subscribeLabels"
+    }
+    fn def_name() -> &'static str {
+        "labels"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_label_subscribeLabels()

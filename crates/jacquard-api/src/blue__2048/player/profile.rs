@@ -92,6 +92,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
     fn nsid() -> &'static str {
         "blue.2048.player.profile"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blue_2048_player_profile()
     }
@@ -107,21 +110,27 @@ fn lexicon_doc_blue_2048_player_profile() -> ::jacquard_lexicon::lexicon::Lexico
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "blue.2048.player.profile".into(),
+        id: ::jacquard_common::CowStr::new_static("blue.2048.player.profile"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("literal:self".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A declaration of a at://2048 player's profile",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("literal:self")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: Some(
                             vec![
-                                "soloPlay".into(), "syncStatus".into(), "createdAt".into()
+                                ::jacquard_common::smol_str::SmolStr::new_static("soloPlay"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("syncStatus"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -129,7 +138,9 @@ fn lexicon_doc_blue_2048_player_profile() -> ::jacquard_lexicon::lexicon::Lexico
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -146,7 +157,9 @@ fn lexicon_doc_blue_2048_player_profile() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                "soloPlay".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "soloPlay",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                     description: None,
                                     default: None,
@@ -154,10 +167,14 @@ fn lexicon_doc_blue_2048_player_profile() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                "syncStatus".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "syncStatus",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "blue.2048.defs#syncStatus".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "blue.2048.defs#syncStatus",
+                                    ),
                                 }),
                             );
                             map

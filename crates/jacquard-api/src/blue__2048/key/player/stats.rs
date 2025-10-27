@@ -90,6 +90,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Stats<'a> {
     fn nsid() -> &'static str {
         "blue.2048.key.player.stats"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blue_2048_key_player_stats()
     }
@@ -105,25 +108,36 @@ fn lexicon_doc_blue_2048_key_player_stats() -> ::jacquard_lexicon::lexicon::Lexi
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "blue.2048.key.player.stats".into(),
+        id: ::jacquard_common::CowStr::new_static("blue.2048.key.player.stats"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("literal:self".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A record that holds a did:key for verifying a players stats. This is intended to be written at a verification authorities repo",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("literal:self")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
-                        required: Some(vec!["key".into(), "createdAt".into()]),
+                        required: Some(
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("key"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -140,10 +154,12 @@ fn lexicon_doc_blue_2048_key_player_stats() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                "key".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("key"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "blue.2048.key.defs#key".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "blue.2048.key.defs#key",
+                                    ),
                                 }),
                             );
                             map

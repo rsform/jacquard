@@ -56,19 +56,23 @@ fn lexicon_doc_tools_ozone_setting_defs() -> ::jacquard_lexicon::lexicon::Lexico
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "tools.ozone.setting.defs".into(),
+        id: ::jacquard_common::CowStr::new_static("tools.ozone.setting.defs"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "option".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("option"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            "key".into(), "value".into(), "did".into(), "scope".into(),
-                            "createdBy".into(), "lastUpdatedBy".into()
+                            ::jacquard_common::smol_str::SmolStr::new_static("key"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("value"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("scope"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("createdBy"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("lastUpdatedBy")
                         ],
                     ),
                     nullable: None,
@@ -76,7 +80,9 @@ fn lexicon_doc_tools_ozone_setting_defs() -> ::jacquard_lexicon::lexicon::Lexico
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "createdAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "createdAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -93,7 +99,9 @@ fn lexicon_doc_tools_ozone_setting_defs() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            "createdBy".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "createdBy",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -110,7 +118,9 @@ fn lexicon_doc_tools_ozone_setting_defs() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            "description".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "description",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -125,7 +135,7 @@ fn lexicon_doc_tools_ozone_setting_defs() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            "did".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -142,7 +152,7 @@ fn lexicon_doc_tools_ozone_setting_defs() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            "key".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("key"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -159,7 +169,9 @@ fn lexicon_doc_tools_ozone_setting_defs() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            "lastUpdatedBy".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "lastUpdatedBy",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -176,7 +188,9 @@ fn lexicon_doc_tools_ozone_setting_defs() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            "managerRole".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "managerRole",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -191,7 +205,7 @@ fn lexicon_doc_tools_ozone_setting_defs() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            "scope".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("scope"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -206,7 +220,9 @@ fn lexicon_doc_tools_ozone_setting_defs() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            "updatedAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "updatedAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -223,7 +239,7 @@ fn lexicon_doc_tools_ozone_setting_defs() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            "value".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("value"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
                                 description: None,
                             }),
@@ -241,6 +257,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DefsOption<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.setting.defs"
     }
+    fn def_name() -> &'static str {
+        "option"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_setting_defs()
     }
@@ -248,11 +267,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DefsOption<'a> {
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         if let Some(ref value) = self.description {
-            if value.as_ref().len() > 10240usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 10240usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "description",
                     max: 10240usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }

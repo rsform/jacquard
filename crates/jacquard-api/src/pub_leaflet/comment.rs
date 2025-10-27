@@ -29,22 +29,27 @@ fn lexicon_doc_pub_leaflet_comment() -> ::jacquard_lexicon::lexicon::LexiconDoc<
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "pub.leaflet.comment".into(),
+        id: ::jacquard_common::CowStr::new_static("pub.leaflet.comment"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "linearDocumentQuote".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("linearDocumentQuote"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["document".into(), "quote".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("document"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("quote")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "document".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("document"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -61,10 +66,12 @@ fn lexicon_doc_pub_leaflet_comment() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                             }),
                         );
                         map.insert(
-                            "quote".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("quote"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "pub.leaflet.pages.linearDocument#quote".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "pub.leaflet.pages.linearDocument#quote",
+                                ),
                             }),
                         );
                         map
@@ -72,15 +79,21 @@ fn lexicon_doc_pub_leaflet_comment() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("tid".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Record containing a comment",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: Some(
                             vec![
-                                "subject".into(), "plaintext".into(), "createdAt".into()
+                                ::jacquard_common::smol_str::SmolStr::new_static("subject"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("plaintext"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -88,15 +101,21 @@ fn lexicon_doc_pub_leaflet_comment() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "attachment".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "attachment",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
-                                    refs: vec!["#linearDocumentQuote".into()],
+                                    refs: vec![
+                                        ::jacquard_common::CowStr::new_static("#linearDocumentQuote")
+                                    ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -113,19 +132,21 @@ fn lexicon_doc_pub_leaflet_comment() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                                 }),
                             );
                             map.insert(
-                                "facets".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("facets"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: None,
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                         description: None,
-                                        r#ref: "pub.leaflet.richtext.facet".into(),
+                                        r#ref: ::jacquard_common::CowStr::new_static(
+                                            "pub.leaflet.richtext.facet",
+                                        ),
                                     }),
                                     min_length: None,
                                     max_length: None,
                                 }),
                             );
                             map.insert(
-                                "onPage".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("onPage"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -140,7 +161,9 @@ fn lexicon_doc_pub_leaflet_comment() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                                 }),
                             );
                             map.insert(
-                                "plaintext".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "plaintext",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -155,14 +178,14 @@ fn lexicon_doc_pub_leaflet_comment() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                                 }),
                             );
                             map.insert(
-                                "reply".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("reply"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "#replyRef".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static("#replyRef"),
                                 }),
                             );
                             map.insert(
-                                "subject".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("subject"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -184,16 +207,18 @@ fn lexicon_doc_pub_leaflet_comment() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                 }),
             );
             map.insert(
-                "replyRef".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("replyRef"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["parent".into()]),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("parent")],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "parent".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("parent"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -221,6 +246,9 @@ fn lexicon_doc_pub_leaflet_comment() -> ::jacquard_lexicon::lexicon::LexiconDoc<
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LinearDocumentQuote<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.comment"
+    }
+    fn def_name() -> &'static str {
+        "linearDocumentQuote"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_comment()
@@ -335,6 +363,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Comment<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.comment"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_comment()
     }
@@ -365,6 +396,9 @@ pub struct ReplyRef<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReplyRef<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.comment"
+    }
+    fn def_name() -> &'static str {
+        "replyRef"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_comment()

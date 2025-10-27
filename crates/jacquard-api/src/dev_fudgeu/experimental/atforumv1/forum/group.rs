@@ -93,6 +93,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Group<'a> {
     fn nsid() -> &'static str {
         "dev.fudgeu.experimental.atforumv1.forum.group"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_dev_fudgeu_experimental_atforumv1_forum_group()
     }
@@ -100,31 +103,34 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Group<'a> {
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         if let Some(ref value) = self.description {
-            if value.as_ref().len() > 300usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 300usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "description",
                     max: 300usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         {
             let value = &self.name;
-            if value.as_ref().len() > 100usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "name",
                     max: 100usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         {
             let value = &self.name;
-            if value.as_ref().len() < 1usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 1usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
                     field: "name",
                     min: 1usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -137,25 +143,37 @@ fn lexicon_doc_dev_fudgeu_experimental_atforumv1_forum_group() -> ::jacquard_lex
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "dev.fudgeu.experimental.atforumv1.forum.group".into(),
+        id: ::jacquard_common::CowStr::new_static(
+            "dev.fudgeu.experimental.atforumv1.forum.group",
+        ),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("any".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Defines a group of categories",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("any")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
-                        required: Some(vec!["name".into()]),
+                        required: Some(
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("name")
+                            ],
+                        ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "description".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "description",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -170,7 +188,7 @@ fn lexicon_doc_dev_fudgeu_experimental_atforumv1_forum_group() -> ::jacquard_lex
                                 }),
                             );
                             map.insert(
-                                "name".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,

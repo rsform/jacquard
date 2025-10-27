@@ -127,6 +127,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Rsvp<'a> {
     fn nsid() -> &'static str {
         "community.lexicon.calendar.rsvp"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_community_lexicon_calendar_rsvp()
     }
@@ -142,37 +145,44 @@ fn lexicon_doc_community_lexicon_calendar_rsvp() -> ::jacquard_lexicon::lexicon:
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "community.lexicon.calendar.rsvp".into(),
+        id: ::jacquard_common::CowStr::new_static("community.lexicon.calendar.rsvp"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "going".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("going"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
             );
             map.insert(
-                "interested".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("interested"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("tid".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static("An RSVP for an event."),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
-                        required: Some(vec!["subject".into(), "status".into()]),
+                        required: Some(
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("subject"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("status")
+                            ],
+                        ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "status".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("status"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -187,10 +197,12 @@ fn lexicon_doc_community_lexicon_calendar_rsvp() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                "subject".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("subject"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "com.atproto.repo.strongRef".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "com.atproto.repo.strongRef",
+                                    ),
                                 }),
                             );
                             map
@@ -199,7 +211,7 @@ fn lexicon_doc_community_lexicon_calendar_rsvp() -> ::jacquard_lexicon::lexicon:
                 }),
             );
             map.insert(
-                "notgoing".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("notgoing"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),

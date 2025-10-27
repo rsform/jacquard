@@ -44,7 +44,7 @@ pub fn rust_type_to_lexicon_type(ty: &syn::Type) -> Option<LexiconPrimitiveType>
                 "CidLink" => Some(LexiconPrimitiveType::CidLink),
 
                 // Blob type
-                "Blob" => Some(LexiconPrimitiveType::Blob),
+                "Blob" | "BlobRef" => Some(LexiconPrimitiveType::Blob),
 
                 // Unknown/unvalidated data
                 "Data" | "RawData" => Some(LexiconPrimitiveType::Unknown),

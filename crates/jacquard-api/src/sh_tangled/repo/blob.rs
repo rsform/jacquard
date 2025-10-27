@@ -44,31 +44,39 @@ fn lexicon_doc_sh_tangled_repo_blob() -> ::jacquard_lexicon::lexicon::LexiconDoc
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "sh.tangled.repo.blob".into(),
+        id: ::jacquard_common::CowStr::new_static("sh.tangled.repo.blob"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "lastCommit".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("lastCommit"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["hash".into(), "message".into(), "when".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("hash"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("message"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("when")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "author".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("author"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#signature".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static("#signature"),
                             }),
                         );
                         map.insert(
-                            "hash".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("hash"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static("Commit hash"),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -81,9 +89,11 @@ fn lexicon_doc_sh_tangled_repo_blob() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "message".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("message"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static("Commit message"),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -96,9 +106,13 @@ fn lexicon_doc_sh_tangled_repo_blob() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "shortHash".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "shortHash",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static("Short commit hash"),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -111,9 +125,11 @@ fn lexicon_doc_sh_tangled_repo_blob() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "when".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("when"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static("Commit timestamp"),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                 ),
@@ -132,22 +148,30 @@ fn lexicon_doc_sh_tangled_repo_blob() -> ::jacquard_lexicon::lexicon::LexiconDoc
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
                     description: None,
                     parameters: Some(
                         ::jacquard_lexicon::lexicon::LexXrpcQueryParameter::Params(::jacquard_lexicon::lexicon::LexXrpcParameters {
                             description: None,
                             required: Some(
-                                vec!["repo".into(), "ref".into(), "path".into()],
+                                vec![
+                                    ::jacquard_common::smol_str::SmolStr::new_static("repo"),
+                                    ::jacquard_common::smol_str::SmolStr::new_static("ref"),
+                                    ::jacquard_common::smol_str::SmolStr::new_static("path")
+                                ],
                             ),
                             properties: {
                                 #[allow(unused_mut)]
                                 let mut map = ::std::collections::BTreeMap::new();
                                 map.insert(
-                                    "path".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static("path"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
+                                        description: Some(
+                                            ::jacquard_common::CowStr::new_static(
+                                                "Path to the file within the repository",
+                                            ),
+                                        ),
                                         format: None,
                                         default: None,
                                         min_length: None,
@@ -160,7 +184,7 @@ fn lexicon_doc_sh_tangled_repo_blob() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                     }),
                                 );
                                 map.insert(
-                                    "raw".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static("raw"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                         description: None,
                                         default: None,
@@ -168,9 +192,13 @@ fn lexicon_doc_sh_tangled_repo_blob() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                     }),
                                 );
                                 map.insert(
-                                    "ref".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static("ref"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
+                                        description: Some(
+                                            ::jacquard_common::CowStr::new_static(
+                                                "Git reference (branch, tag, or commit SHA)",
+                                            ),
+                                        ),
                                         format: None,
                                         default: None,
                                         min_length: None,
@@ -183,9 +211,13 @@ fn lexicon_doc_sh_tangled_repo_blob() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                     }),
                                 );
                                 map.insert(
-                                    "repo".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static("repo"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
+                                        description: Some(
+                                            ::jacquard_common::CowStr::new_static(
+                                                "Repository identifier in format 'did:plc:.../repoName'",
+                                            ),
+                                        ),
                                         format: None,
                                         default: None,
                                         min_length: None,
@@ -206,18 +238,26 @@ fn lexicon_doc_sh_tangled_repo_blob() -> ::jacquard_lexicon::lexicon::LexiconDoc
                 }),
             );
             map.insert(
-                "signature".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("signature"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["name".into(), "email".into(), "when".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("email"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("when")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "email".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("email"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static("Author email"),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -230,9 +270,11 @@ fn lexicon_doc_sh_tangled_repo_blob() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "name".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static("Author name"),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -245,9 +287,11 @@ fn lexicon_doc_sh_tangled_repo_blob() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "when".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("when"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static("Author timestamp"),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                 ),
@@ -273,6 +317,9 @@ fn lexicon_doc_sh_tangled_repo_blob() -> ::jacquard_lexicon::lexicon::LexiconDoc
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LastCommit<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.repo.blob"
+    }
+    fn def_name() -> &'static str {
+        "lastCommit"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_repo_blob()
@@ -471,6 +518,9 @@ pub struct Signature<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Signature<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.repo.blob"
+    }
+    fn def_name() -> &'static str {
+        "signature"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_repo_blob()

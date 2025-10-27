@@ -125,6 +125,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Document<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.document"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_document()
     }
@@ -132,11 +135,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Document<'a> {
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         if let Some(ref value) = self.description {
-            if value.as_ref().len() > 3000usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 3000usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "description",
                     max: 3000usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -158,11 +162,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Document<'a> {
         }
         {
             let value = &self.title;
-            if value.as_ref().len() > 1280usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 1280usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "title",
                     max: 1280usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -192,22 +197,28 @@ fn lexicon_doc_pub_leaflet_document() -> ::jacquard_lexicon::lexicon::LexiconDoc
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "pub.leaflet.document".into(),
+        id: ::jacquard_common::CowStr::new_static("pub.leaflet.document"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("tid".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Record containing a document",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: Some(
                             vec![
-                                "pages".into(), "author".into(), "title".into(),
-                                "publication".into()
+                                ::jacquard_common::smol_str::SmolStr::new_static("pages"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("author"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("publication")
                             ],
                         ),
                         nullable: None,
@@ -215,7 +226,7 @@ fn lexicon_doc_pub_leaflet_document() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "author".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("author"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -232,7 +243,9 @@ fn lexicon_doc_pub_leaflet_document() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                "description".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "description",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -247,14 +260,14 @@ fn lexicon_doc_pub_leaflet_document() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                "pages".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("pages"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: None,
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                         description: None,
                                         refs: vec![
-                                            "pub.leaflet.pages.linearDocument".into(),
-                                            "pub.leaflet.pages.canvas".into()
+                                            ::jacquard_common::CowStr::new_static("pub.leaflet.pages.linearDocument"),
+                                            ::jacquard_common::CowStr::new_static("pub.leaflet.pages.canvas")
                                         ],
                                         closed: None,
                                     }),
@@ -263,14 +276,18 @@ fn lexicon_doc_pub_leaflet_document() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                "postRef".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("postRef"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "com.atproto.repo.strongRef".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "com.atproto.repo.strongRef",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "publication".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "publication",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -287,7 +304,9 @@ fn lexicon_doc_pub_leaflet_document() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                "publishedAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "publishedAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -304,7 +323,7 @@ fn lexicon_doc_pub_leaflet_document() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                "title".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,

@@ -1,0 +1,126 @@
+{
+  "lexicon": 1,
+  "id": "com.atproto.sync.subscribeRepos",
+  "defs": {
+    "main": {
+      "type": "subscription",
+      "description": "Subscribe to repository update stream",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "cursor": {
+            "type": "integer",
+            "description": "The last known event seq number"
+          }
+        }
+      },
+      "message": {
+        "schema": {
+          "type": "union",
+          "refs": ["#commit", "#identity", "#account"]
+        }
+      }
+    },
+    "commit": {
+      "type": "object",
+      "required": ["seq", "rebase", "tooBig", "repo", "commit", "rev", "since", "blocks", "ops", "blobs", "time"],
+      "properties": {
+        "seq": {
+          "type": "integer"
+        },
+        "rebase": {
+          "type": "boolean"
+        },
+        "tooBig": {
+          "type": "boolean"
+        },
+        "repo": {
+          "type": "string",
+          "format": "did"
+        },
+        "commit": {
+          "type": "cid-link"
+        },
+        "rev": {
+          "type": "string"
+        },
+        "since": {
+          "type": "string"
+        },
+        "blocks": {
+          "type": "bytes"
+        },
+        "ops": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#repoOp"
+          }
+        },
+        "blobs": {
+          "type": "array",
+          "items": {
+            "type": "cid-link"
+          }
+        },
+        "time": {
+          "type": "string",
+          "format": "datetime"
+        }
+      }
+    },
+    "identity": {
+      "type": "object",
+      "required": ["seq", "did", "time"],
+      "properties": {
+        "seq": {
+          "type": "integer"
+        },
+        "did": {
+          "type": "string",
+          "format": "did"
+        },
+        "time": {
+          "type": "string",
+          "format": "datetime"
+        }
+      }
+    },
+    "account": {
+      "type": "object",
+      "required": ["seq", "did", "time", "active"],
+      "properties": {
+        "seq": {
+          "type": "integer"
+        },
+        "did": {
+          "type": "string",
+          "format": "did"
+        },
+        "time": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "active": {
+          "type": "boolean"
+        }
+      }
+    },
+    "repoOp": {
+      "type": "object",
+      "required": ["action", "path", "cid"],
+      "properties": {
+        "action": {
+          "type": "string",
+          "knownValues": ["create", "update", "delete"]
+        },
+        "path": {
+          "type": "string"
+        },
+        "cid": {
+          "type": "cid-link"
+        }
+      }
+    }
+  }
+}

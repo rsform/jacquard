@@ -32,13 +32,13 @@ fn lexicon_doc_app_rocksky_charts_defs() -> ::jacquard_lexicon::lexicon::Lexicon
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "app.rocksky.charts.defs".into(),
+        id: ::jacquard_common::CowStr::new_static("app.rocksky.charts.defs"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "chartsView".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("chartsView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -47,12 +47,16 @@ fn lexicon_doc_app_rocksky_charts_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "scrobbles".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "scrobbles",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "app.rocksky.charts.defs#scrobbleViewBasic".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "app.rocksky.charts.defs#scrobbleViewBasic",
+                                    ),
                                 }),
                                 min_length: None,
                                 max_length: None,
@@ -63,7 +67,7 @@ fn lexicon_doc_app_rocksky_charts_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                 }),
             );
             map.insert(
-                "scrobbleViewBasic".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("scrobbleViewBasic"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -72,7 +76,7 @@ fn lexicon_doc_app_rocksky_charts_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "count".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("count"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -83,9 +87,13 @@ fn lexicon_doc_app_rocksky_charts_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                             }),
                         );
                         map.insert(
-                            "date".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("date"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The date of the scrobble.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                 ),
@@ -111,6 +119,9 @@ fn lexicon_doc_app_rocksky_charts_defs() -> ::jacquard_lexicon::lexicon::Lexicon
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ChartsView<'a> {
     fn nsid() -> &'static str {
         "app.rocksky.charts.defs"
+    }
+    fn def_name() -> &'static str {
+        "chartsView"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_rocksky_charts_defs()
@@ -146,6 +157,9 @@ pub struct ScrobbleViewBasic<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ScrobbleViewBasic<'a> {
     fn nsid() -> &'static str {
         "app.rocksky.charts.defs"
+    }
+    fn def_name() -> &'static str {
+        "scrobbleViewBasic"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_rocksky_charts_defs()

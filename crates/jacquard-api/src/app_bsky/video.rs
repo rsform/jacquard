@@ -54,22 +54,28 @@ fn lexicon_doc_app_bsky_video_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "app.bsky.video.defs".into(),
+        id: ::jacquard_common::CowStr::new_static("app.bsky.video.defs"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "jobStatus".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("jobStatus"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["jobId".into(), "did".into(), "state".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("jobId"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("state")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "blob".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("blob"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
                                 description: None,
                                 accept: None,
@@ -77,7 +83,7 @@ fn lexicon_doc_app_bsky_video_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                             }),
                         );
                         map.insert(
-                            "did".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -94,7 +100,7 @@ fn lexicon_doc_app_bsky_video_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                             }),
                         );
                         map.insert(
-                            "error".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("error"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -109,7 +115,7 @@ fn lexicon_doc_app_bsky_video_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                             }),
                         );
                         map.insert(
-                            "jobId".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("jobId"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -124,7 +130,7 @@ fn lexicon_doc_app_bsky_video_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                             }),
                         );
                         map.insert(
-                            "message".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("message"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -139,7 +145,7 @@ fn lexicon_doc_app_bsky_video_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                             }),
                         );
                         map.insert(
-                            "progress".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("progress"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -150,9 +156,13 @@ fn lexicon_doc_app_bsky_video_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                             }),
                         );
                         map.insert(
-                            "state".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("state"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The state of the video processing job. All values not listed as a known value indicate that the job is in process.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -176,6 +186,9 @@ fn lexicon_doc_app_bsky_video_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for JobStatus<'a> {
     fn nsid() -> &'static str {
         "app.bsky.video.defs"
+    }
+    fn def_name() -> &'static str {
+        "jobStatus"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_video_defs()

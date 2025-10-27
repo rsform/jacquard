@@ -100,24 +100,30 @@ fn lexicon_doc_tools_ozone_signature_findRelatedAccounts() -> ::jacquard_lexicon
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "tools.ozone.signature.findRelatedAccounts".into(),
+        id: ::jacquard_common::CowStr::new_static(
+            "tools.ozone.signature.findRelatedAccounts",
+        ),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
                     description: None,
                     parameters: Some(
                         ::jacquard_lexicon::lexicon::LexXrpcQueryParameter::Params(::jacquard_lexicon::lexicon::LexXrpcParameters {
                             description: None,
-                            required: Some(vec!["did".into()]),
+                            required: Some(
+                                vec![
+                                    ::jacquard_common::smol_str::SmolStr::new_static("did")
+                                ],
+                            ),
                             properties: {
                                 #[allow(unused_mut)]
                                 let mut map = ::std::collections::BTreeMap::new();
                                 map.insert(
-                                    "cursor".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static("cursor"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
                                         description: None,
                                         format: None,
@@ -132,7 +138,7 @@ fn lexicon_doc_tools_ozone_signature_findRelatedAccounts() -> ::jacquard_lexicon
                                     }),
                                 );
                                 map.insert(
-                                    "did".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static("did"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
                                         description: None,
                                         format: Some(
@@ -149,7 +155,7 @@ fn lexicon_doc_tools_ozone_signature_findRelatedAccounts() -> ::jacquard_lexicon
                                     }),
                                 );
                                 map.insert(
-                                    "limit".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static("limit"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                         description: None,
                                         default: None,
@@ -168,28 +174,36 @@ fn lexicon_doc_tools_ozone_signature_findRelatedAccounts() -> ::jacquard_lexicon
                 }),
             );
             map.insert(
-                "relatedAccount".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("relatedAccount"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["account".into()]),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("account")],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "account".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("account"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "com.atproto.admin.defs#accountView".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "com.atproto.admin.defs#accountView",
+                                ),
                             }),
                         );
                         map.insert(
-                            "similarities".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "similarities",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "tools.ozone.signature.defs#sigDetail".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "tools.ozone.signature.defs#sigDetail",
+                                    ),
                                 }),
                                 min_length: None,
                                 max_length: None,
@@ -207,6 +221,9 @@ fn lexicon_doc_tools_ozone_signature_findRelatedAccounts() -> ::jacquard_lexicon
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RelatedAccount<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.signature.findRelatedAccounts"
+    }
+    fn def_name() -> &'static str {
+        "relatedAccount"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_signature_findRelatedAccounts()

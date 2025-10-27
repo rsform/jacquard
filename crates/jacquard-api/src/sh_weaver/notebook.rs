@@ -43,22 +43,27 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> ::jacquard_lexicon::lexicon::Lexicon
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "sh.weaver.notebook.defs".into(),
+        id: ::jacquard_common::CowStr::new_static("sh.weaver.notebook.defs"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "authorListView".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("authorListView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["profile".into(), "index".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("profile"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("index")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "cid".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("cid"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -75,7 +80,7 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                             }),
                         );
                         map.insert(
-                            "index".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("index"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -86,13 +91,13 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                             }),
                         );
                         map.insert(
-                            "record".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("record"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
                                 description: None,
                             }),
                         );
                         map.insert(
-                            "uri".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -113,19 +118,21 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                 }),
             );
             map.insert(
-                "bookEntryRef".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("bookEntryRef"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["entry".into()]),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("entry")],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "entry".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("entry"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#entryView".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static("#entryView"),
                             }),
                         );
                         map
@@ -133,23 +140,32 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                 }),
             );
             map.insert(
-                "bookEntryView".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("bookEntryView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["entry".into(), "index".into()]),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "An ordered entry in a Weaver notebook.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("entry"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("index")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "entry".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("entry"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#entryView".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static("#entryView"),
                             }),
                         );
                         map.insert(
-                            "index".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("index"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -160,17 +176,21 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                             }),
                         );
                         map.insert(
-                            "next".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("next"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#bookEntryRef".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "#bookEntryRef",
+                                ),
                             }),
                         );
                         map.insert(
-                            "prev".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("prev"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#bookEntryRef".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "#bookEntryRef",
+                                ),
                             }),
                         );
                         map
@@ -178,18 +198,26 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                 }),
             );
             map.insert(
-                "contentFormat".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("contentFormat"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "The format of the content. This is used to determine how to render the content.",
+                        ),
+                    ),
                     required: None,
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "markdown".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("markdown"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The format of the content. This is used to determine how to render the content.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -206,13 +234,16 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                 }),
             );
             map.insert(
-                "entryView".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("entryView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            "uri".into(), "cid".into(), "author".into(), "record".into(),
-                            "indexedAt".into()
+                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("cid"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("author"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("record"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("indexedAt")
                         ],
                     ),
                     nullable: None,
@@ -220,14 +251,16 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "authors".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("authors"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#authorListView".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "#authorListView",
+                                ),
                             }),
                         );
                         map.insert(
-                            "cid".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("cid"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -244,7 +277,9 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                             }),
                         );
                         map.insert(
-                            "indexedAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "indexedAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -261,34 +296,38 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                             }),
                         );
                         map.insert(
-                            "record".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("record"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
                                 description: None,
                             }),
                         );
                         map.insert(
-                            "renderedView".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "renderedView",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#renderedView".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "#renderedView",
+                                ),
                             }),
                         );
                         map.insert(
-                            "tags".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("tags"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#tags".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static("#tags"),
                             }),
                         );
                         map.insert(
-                            "title".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("title"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#title".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static("#title"),
                             }),
                         );
                         map.insert(
-                            "uri".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -309,13 +348,16 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                 }),
             );
             map.insert(
-                "notebookView".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("notebookView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            "uri".into(), "cid".into(), "author".into(), "record".into(),
-                            "indexedAt".into()
+                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("cid"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("author"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("record"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("indexedAt")
                         ],
                     ),
                     nullable: None,
@@ -323,14 +365,16 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "authors".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("authors"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#authorListView".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "#authorListView",
+                                ),
                             }),
                         );
                         map.insert(
-                            "cid".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("cid"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -347,7 +391,9 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                             }),
                         );
                         map.insert(
-                            "indexedAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "indexedAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -364,27 +410,27 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                             }),
                         );
                         map.insert(
-                            "record".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("record"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
                                 description: None,
                             }),
                         );
                         map.insert(
-                            "tags".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("tags"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#tags".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static("#tags"),
                             }),
                         );
                         map.insert(
-                            "title".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("title"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#title".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static("#title"),
                             }),
                         );
                         map.insert(
-                            "uri".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -405,16 +451,22 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                 }),
             );
             map.insert(
-                "renderedView".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("renderedView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["html".into()]),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "View of a rendered and cached notebook entry",
+                        ),
+                    ),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("html")],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "css".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("css"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
                                 description: None,
                                 accept: None,
@@ -422,7 +474,7 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                             }),
                         );
                         map.insert(
-                            "html".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("html"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
                                 description: None,
                                 accept: None,
@@ -434,7 +486,7 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                 }),
             );
             map.insert(
-                "tags".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("tags"),
                 ::jacquard_lexicon::lexicon::LexUserType::Array(::jacquard_lexicon::lexicon::LexArray {
                     description: None,
                     items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
@@ -454,9 +506,13 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                 }),
             );
             map.insert(
-                "title".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("title"),
                 ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "The title of the notebook entry.",
+                        ),
+                    ),
                     format: None,
                     default: None,
                     min_length: None,
@@ -476,6 +532,9 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> ::jacquard_lexicon::lexicon::Lexicon
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AuthorListView<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.defs"
+    }
+    fn def_name() -> &'static str {
+        "authorListView"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_notebook_defs()
@@ -507,6 +566,9 @@ pub struct BookEntryRef<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BookEntryRef<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.defs"
+    }
+    fn def_name() -> &'static str {
+        "bookEntryRef"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_notebook_defs()
@@ -549,6 +611,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BookEntryView<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.defs"
     }
+    fn def_name() -> &'static str {
+        "bookEntryView"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_notebook_defs()
     }
@@ -582,6 +647,9 @@ pub struct ContentFormat<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContentFormat<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.defs"
+    }
+    fn def_name() -> &'static str {
+        "contentFormat"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_notebook_defs()
@@ -635,6 +703,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EntryView<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.defs"
     }
+    fn def_name() -> &'static str {
+        "entryView"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_notebook_defs()
     }
@@ -683,6 +754,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NotebookView<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.defs"
     }
+    fn def_name() -> &'static str {
+        "notebookView"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_notebook_defs()
     }
@@ -718,6 +792,9 @@ pub struct RenderedView<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RenderedView<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.defs"
+    }
+    fn def_name() -> &'static str {
+        "renderedView"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_notebook_defs()

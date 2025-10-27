@@ -32,24 +32,32 @@ fn lexicon_doc_tools_smokesignal_blahg_content_post() -> ::jacquard_lexicon::lex
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "tools.smokesignal.blahg.content.post".into(),
+        id: ::jacquard_common::CowStr::new_static(
+            "tools.smokesignal.blahg.content.post",
+        ),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "attachment".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("attachment"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["content".into()]),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("content")],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "alt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("alt"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Alt text description of the content, for accessibility.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -62,7 +70,7 @@ fn lexicon_doc_tools_smokesignal_blahg_content_post() -> ::jacquard_lexicon::lex
                             }),
                         );
                         map.insert(
-                            "content".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("content"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
                                 description: None,
                                 accept: None,
@@ -74,10 +82,12 @@ fn lexicon_doc_tools_smokesignal_blahg_content_post() -> ::jacquard_lexicon::lex
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("any".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static("A blagh post"),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("any")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: None,
@@ -86,19 +96,21 @@ fn lexicon_doc_tools_smokesignal_blahg_content_post() -> ::jacquard_lexicon::lex
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "attachments".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "attachments",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: None,
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                         description: None,
-                                        r#ref: "#attachment".into(),
+                                        r#ref: ::jacquard_common::CowStr::new_static("#attachment"),
                                     }),
                                     min_length: None,
                                     max_length: None,
                                 }),
                             );
                             map.insert(
-                                "content".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("content"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
                                     description: None,
                                     accept: None,
@@ -106,9 +118,13 @@ fn lexicon_doc_tools_smokesignal_blahg_content_post() -> ::jacquard_lexicon::lex
                                 }),
                             );
                             map.insert(
-                                "langs".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("langs"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Indicates human language of text content.",
+                                        ),
+                                    ),
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
                                         description: None,
                                         format: Some(
@@ -128,7 +144,9 @@ fn lexicon_doc_tools_smokesignal_blahg_content_post() -> ::jacquard_lexicon::lex
                                 }),
                             );
                             map.insert(
-                                "publishedAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "publishedAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -145,7 +163,7 @@ fn lexicon_doc_tools_smokesignal_blahg_content_post() -> ::jacquard_lexicon::lex
                                 }),
                             );
                             map.insert(
-                                "title".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -172,6 +190,9 @@ fn lexicon_doc_tools_smokesignal_blahg_content_post() -> ::jacquard_lexicon::lex
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Attachment<'a> {
     fn nsid() -> &'static str {
         "tools.smokesignal.blahg.content.post"
+    }
+    fn def_name() -> &'static str {
+        "attachment"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_smokesignal_blahg_content_post()
@@ -286,6 +307,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Post<'a> {
     fn nsid() -> &'static str {
         "tools.smokesignal.blahg.content.post"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_smokesignal_blahg_content_post()
     }
@@ -293,6 +317,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Post<'a> {
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         if let Some(ref value) = self.langs {
+            #[allow(unused_comparisons)]
             if value.len() > 3usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "langs",
@@ -302,11 +327,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Post<'a> {
             }
         }
         if let Some(ref value) = self.title {
-            if value.as_ref().len() > 2000usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 2000usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "title",
                     max: 2000usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }

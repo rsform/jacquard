@@ -33,24 +33,34 @@ fn lexicon_doc_community_lexicon_location_hthree() -> ::jacquard_lexicon::lexico
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "community.lexicon.location.hthree".into(),
+        id: ::jacquard_common::CowStr::new_static("community.lexicon.location.hthree"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["value".into()]),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A physical location in the form of a H3 encoded location.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("value")],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "name".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The name of the location.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -63,9 +73,13 @@ fn lexicon_doc_community_lexicon_location_hthree() -> ::jacquard_lexicon::lexico
                             }),
                         );
                         map.insert(
-                            "value".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("value"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The h3 encoded location.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -89,6 +103,9 @@ fn lexicon_doc_community_lexicon_location_hthree() -> ::jacquard_lexicon::lexico
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Hthree<'a> {
     fn nsid() -> &'static str {
         "community.lexicon.location.hthree"
+    }
+    fn def_name() -> &'static str {
+        "main"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_community_lexicon_location_hthree()

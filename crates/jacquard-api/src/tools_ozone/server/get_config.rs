@@ -100,13 +100,13 @@ fn lexicon_doc_tools_ozone_server_getConfig() -> ::jacquard_lexicon::lexicon::Le
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "tools.ozone.server.getConfig".into(),
+        id: ::jacquard_common::CowStr::new_static("tools.ozone.server.getConfig"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
                     description: None,
                     parameters: None,
@@ -115,7 +115,7 @@ fn lexicon_doc_tools_ozone_server_getConfig() -> ::jacquard_lexicon::lexicon::Le
                 }),
             );
             map.insert(
-                "serviceConfig".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("serviceConfig"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -124,7 +124,7 @@ fn lexicon_doc_tools_ozone_server_getConfig() -> ::jacquard_lexicon::lexicon::Le
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "url".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("url"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -145,7 +145,7 @@ fn lexicon_doc_tools_ozone_server_getConfig() -> ::jacquard_lexicon::lexicon::Le
                 }),
             );
             map.insert(
-                "viewerConfig".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("viewerConfig"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -154,7 +154,7 @@ fn lexicon_doc_tools_ozone_server_getConfig() -> ::jacquard_lexicon::lexicon::Le
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "role".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("role"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -180,6 +180,9 @@ fn lexicon_doc_tools_ozone_server_getConfig() -> ::jacquard_lexicon::lexicon::Le
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ServiceConfig<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.server.getConfig"
+    }
+    fn def_name() -> &'static str {
+        "serviceConfig"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_server_getConfig()
@@ -212,6 +215,9 @@ pub struct ViewerConfig<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewerConfig<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.server.getConfig"
+    }
+    fn def_name() -> &'static str {
+        "viewerConfig"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_server_getConfig()

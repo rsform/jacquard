@@ -191,6 +191,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Scrobble<'a> {
     fn nsid() -> &'static str {
         "app.rocksky.scrobble"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_rocksky_scrobble()
     }
@@ -199,79 +202,87 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Scrobble<'a> {
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         {
             let value = &self.album;
-            if value.as_ref().len() > 256usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "album",
                     max: 256usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         {
             let value = &self.album;
-            if value.as_ref().len() < 1usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 1usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
                     field: "album",
                     min: 1usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         {
             let value = &self.album_artist;
-            if value.as_ref().len() > 256usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "album_artist",
                     max: 256usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         {
             let value = &self.album_artist;
-            if value.as_ref().len() < 1usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 1usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
                     field: "album_artist",
                     min: 1usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         {
             let value = &self.artist;
-            if value.as_ref().len() > 256usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "artist",
                     max: 256usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         {
             let value = &self.artist;
-            if value.as_ref().len() < 1usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 1usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
                     field: "artist",
                     min: 1usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         if let Some(ref value) = self.composer {
-            if value.as_ref().len() > 256usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "composer",
                     max: 256usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         if let Some(ref value) = self.copyright_message {
-            if value.as_ref().len() > 256usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "copyright_message",
                     max: 256usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -295,49 +306,54 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Scrobble<'a> {
             }
         }
         if let Some(ref value) = self.genre {
-            if value.as_ref().len() > 256usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "genre",
                     max: 256usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         if let Some(ref value) = self.label {
-            if value.as_ref().len() > 256usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "label",
                     max: 256usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         if let Some(ref value) = self.lyrics {
-            if value.as_ref().len() > 10000usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 10000usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "lyrics",
                     max: 10000usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         {
             let value = &self.title;
-            if value.as_ref().len() > 512usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 512usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "title",
                     max: 512usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         {
             let value = &self.title;
-            if value.as_ref().len() < 1usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 1usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
                     field: "title",
                     min: 1usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -351,11 +367,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Scrobble<'a> {
             }
         }
         if let Some(ref value) = self.wiki {
-            if value.as_ref().len() > 10000usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 10000usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "wiki",
                     max: 10000usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -368,22 +385,30 @@ fn lexicon_doc_app_rocksky_scrobble() -> ::jacquard_lexicon::lexicon::LexiconDoc
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "app.rocksky.scrobble".into(),
+        id: ::jacquard_common::CowStr::new_static("app.rocksky.scrobble"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("tid".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A declaration of a scrobble.",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: Some(
                             vec![
-                                "title".into(), "artist".into(), "album".into(),
-                                "albumArtist".into(), "duration".into(), "createdAt".into()
+                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("artist"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("album"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("albumArtist"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("duration"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -391,9 +416,13 @@ fn lexicon_doc_app_rocksky_scrobble() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "album".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("album"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The album of the song.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: Some(1usize),
@@ -406,7 +435,9 @@ fn lexicon_doc_app_rocksky_scrobble() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                "albumArt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "albumArt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
                                     description: None,
                                     accept: None,
@@ -414,9 +445,15 @@ fn lexicon_doc_app_rocksky_scrobble() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                "albumArtist".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "albumArtist",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The album artist of the song.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: Some(1usize),
@@ -429,9 +466,15 @@ fn lexicon_doc_app_rocksky_scrobble() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                "appleMusicLink".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "appleMusicLink",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The Apple Music link of the song.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                     ),
@@ -446,9 +489,13 @@ fn lexicon_doc_app_rocksky_scrobble() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                "artist".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("artist"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The artist of the song.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: Some(1usize),
@@ -461,9 +508,15 @@ fn lexicon_doc_app_rocksky_scrobble() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                "composer".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "composer",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The composer of the song.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -476,9 +529,15 @@ fn lexicon_doc_app_rocksky_scrobble() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                "copyrightMessage".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "copyrightMessage",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The copyright message of the song.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -491,9 +550,15 @@ fn lexicon_doc_app_rocksky_scrobble() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The date when the song was created.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -508,7 +573,9 @@ fn lexicon_doc_app_rocksky_scrobble() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                "discNumber".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "discNumber",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -519,7 +586,9 @@ fn lexicon_doc_app_rocksky_scrobble() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                "duration".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "duration",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -530,9 +599,13 @@ fn lexicon_doc_app_rocksky_scrobble() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                "genre".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("genre"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The genre of the song.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -545,9 +618,13 @@ fn lexicon_doc_app_rocksky_scrobble() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                "label".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("label"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The label of the song.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -560,9 +637,13 @@ fn lexicon_doc_app_rocksky_scrobble() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                "lyrics".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("lyrics"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The lyrics of the song.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -575,9 +656,13 @@ fn lexicon_doc_app_rocksky_scrobble() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                "mbid".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("mbid"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The MusicBrainz ID of the song.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -590,9 +675,15 @@ fn lexicon_doc_app_rocksky_scrobble() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                "releaseDate".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "releaseDate",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The release date of the song.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -607,9 +698,15 @@ fn lexicon_doc_app_rocksky_scrobble() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                "spotifyLink".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "spotifyLink",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The Spotify link of the song.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                     ),
@@ -624,9 +721,13 @@ fn lexicon_doc_app_rocksky_scrobble() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                "tags".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("tags"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The tags of the song.",
+                                        ),
+                                    ),
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
                                         description: None,
                                         format: None,
@@ -644,9 +745,15 @@ fn lexicon_doc_app_rocksky_scrobble() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                "tidalLink".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "tidalLink",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The Tidal link of the song.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                     ),
@@ -661,9 +768,13 @@ fn lexicon_doc_app_rocksky_scrobble() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                "title".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The title of the song.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: Some(1usize),
@@ -676,7 +787,9 @@ fn lexicon_doc_app_rocksky_scrobble() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                "trackNumber".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "trackNumber",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -687,9 +800,13 @@ fn lexicon_doc_app_rocksky_scrobble() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                "wiki".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("wiki"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Informations about the song",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -702,7 +819,7 @@ fn lexicon_doc_app_rocksky_scrobble() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                "year".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("year"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -713,9 +830,15 @@ fn lexicon_doc_app_rocksky_scrobble() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                "youtubeLink".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "youtubeLink",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The YouTube link of the song.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                     ),
@@ -802,13 +925,13 @@ fn lexicon_doc_app_rocksky_scrobble_defs() -> ::jacquard_lexicon::lexicon::Lexic
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "app.rocksky.scrobble.defs".into(),
+        id: ::jacquard_common::CowStr::new_static("app.rocksky.scrobble.defs"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "scrobbleViewBasic".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("scrobbleViewBasic"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -817,9 +940,13 @@ fn lexicon_doc_app_rocksky_scrobble_defs() -> ::jacquard_lexicon::lexicon::Lexic
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "album".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("album"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The album of the song.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -832,9 +959,13 @@ fn lexicon_doc_app_rocksky_scrobble_defs() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "albumUri".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("albumUri"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The URI of the album.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
                                 ),
@@ -849,9 +980,13 @@ fn lexicon_doc_app_rocksky_scrobble_defs() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "artist".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("artist"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The artist of the song.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -864,9 +999,15 @@ fn lexicon_doc_app_rocksky_scrobble_defs() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "artistUri".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "artistUri",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The URI of the artist.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
                                 ),
@@ -881,9 +1022,13 @@ fn lexicon_doc_app_rocksky_scrobble_defs() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "cover".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("cover"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The album art URL of the song.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                 ),
@@ -898,9 +1043,13 @@ fn lexicon_doc_app_rocksky_scrobble_defs() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "date".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("date"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The timestamp when the scrobble was created.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                 ),
@@ -915,9 +1064,13 @@ fn lexicon_doc_app_rocksky_scrobble_defs() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "id".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("id"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The unique identifier of the scrobble.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -930,9 +1083,13 @@ fn lexicon_doc_app_rocksky_scrobble_defs() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "sha256".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("sha256"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The SHA256 hash of the scrobble data.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -945,9 +1102,13 @@ fn lexicon_doc_app_rocksky_scrobble_defs() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "title".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("title"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The title of the scrobble.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -960,9 +1121,13 @@ fn lexicon_doc_app_rocksky_scrobble_defs() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "uri".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The URI of the scrobble.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                 ),
@@ -977,9 +1142,13 @@ fn lexicon_doc_app_rocksky_scrobble_defs() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "user".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("user"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The handle of the user who created the scrobble.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -996,7 +1165,7 @@ fn lexicon_doc_app_rocksky_scrobble_defs() -> ::jacquard_lexicon::lexicon::Lexic
                 }),
             );
             map.insert(
-                "scrobbleViewDetailed".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("scrobbleViewDetailed"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -1005,9 +1174,13 @@ fn lexicon_doc_app_rocksky_scrobble_defs() -> ::jacquard_lexicon::lexicon::Lexic
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "album".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("album"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The album of the song.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -1020,9 +1193,13 @@ fn lexicon_doc_app_rocksky_scrobble_defs() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "albumUri".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("albumUri"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The URI of the album.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
                                 ),
@@ -1037,9 +1214,13 @@ fn lexicon_doc_app_rocksky_scrobble_defs() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "artist".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("artist"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The artist of the song.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -1052,9 +1233,15 @@ fn lexicon_doc_app_rocksky_scrobble_defs() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "artistUri".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "artistUri",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The URI of the artist.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
                                 ),
@@ -1069,9 +1256,13 @@ fn lexicon_doc_app_rocksky_scrobble_defs() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "cover".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("cover"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The album art URL of the song.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                 ),
@@ -1086,9 +1277,13 @@ fn lexicon_doc_app_rocksky_scrobble_defs() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "date".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("date"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The timestamp when the scrobble was created.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                 ),
@@ -1103,9 +1298,13 @@ fn lexicon_doc_app_rocksky_scrobble_defs() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "id".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("id"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The unique identifier of the scrobble.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -1118,7 +1317,9 @@ fn lexicon_doc_app_rocksky_scrobble_defs() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "listeners".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "listeners",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -1129,7 +1330,9 @@ fn lexicon_doc_app_rocksky_scrobble_defs() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "scrobbles".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "scrobbles",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -1140,9 +1343,13 @@ fn lexicon_doc_app_rocksky_scrobble_defs() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "sha256".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("sha256"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The SHA256 hash of the scrobble data.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -1155,9 +1362,13 @@ fn lexicon_doc_app_rocksky_scrobble_defs() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "title".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("title"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The title of the scrobble.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -1170,9 +1381,13 @@ fn lexicon_doc_app_rocksky_scrobble_defs() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "uri".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The URI of the scrobble.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                 ),
@@ -1187,9 +1402,13 @@ fn lexicon_doc_app_rocksky_scrobble_defs() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "user".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("user"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The handle of the user who created the scrobble.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -1213,6 +1432,9 @@ fn lexicon_doc_app_rocksky_scrobble_defs() -> ::jacquard_lexicon::lexicon::Lexic
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ScrobbleViewBasic<'a> {
     fn nsid() -> &'static str {
         "app.rocksky.scrobble.defs"
+    }
+    fn def_name() -> &'static str {
+        "scrobbleViewBasic"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_rocksky_scrobble_defs()
@@ -1291,6 +1513,9 @@ pub struct ScrobbleViewDetailed<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ScrobbleViewDetailed<'a> {
     fn nsid() -> &'static str {
         "app.rocksky.scrobble.defs"
+    }
+    fn def_name() -> &'static str {
+        "scrobbleViewDetailed"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_rocksky_scrobble_defs()

@@ -94,6 +94,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Definition<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.poll.definition"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_poll_definition()
     }
@@ -102,11 +105,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Definition<'a> {
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         {
             let value = &self.name;
-            if value.as_ref().len() > 500usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 500usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "name",
                     max: 500usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -136,25 +140,32 @@ fn lexicon_doc_pub_leaflet_poll_definition() -> ::jacquard_lexicon::lexicon::Lex
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "pub.leaflet.poll.definition".into(),
+        id: ::jacquard_common::CowStr::new_static("pub.leaflet.poll.definition"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("tid".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static("Record declaring a poll"),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
-                        required: Some(vec!["name".into(), "options".into()]),
+                        required: Some(
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("options")
+                            ],
+                        ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "endDate".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("endDate"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -171,7 +182,7 @@ fn lexicon_doc_pub_leaflet_poll_definition() -> ::jacquard_lexicon::lexicon::Lex
                                 }),
                             );
                             map.insert(
-                                "name".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -186,12 +197,12 @@ fn lexicon_doc_pub_leaflet_poll_definition() -> ::jacquard_lexicon::lexicon::Lex
                                 }),
                             );
                             map.insert(
-                                "options".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("options"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: None,
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                         description: None,
-                                        r#ref: "#option".into(),
+                                        r#ref: ::jacquard_common::CowStr::new_static("#option"),
                                     }),
                                     min_length: None,
                                     max_length: None,
@@ -203,7 +214,7 @@ fn lexicon_doc_pub_leaflet_poll_definition() -> ::jacquard_lexicon::lexicon::Lex
                 }),
             );
             map.insert(
-                "option".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("option"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -212,7 +223,7 @@ fn lexicon_doc_pub_leaflet_poll_definition() -> ::jacquard_lexicon::lexicon::Lex
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "text".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("text"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -257,6 +268,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DefinitionOption<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.poll.definition"
     }
+    fn def_name() -> &'static str {
+        "option"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_poll_definition()
     }
@@ -264,11 +278,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DefinitionOption<'a> {
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         if let Some(ref value) = self.text {
-            if value.as_ref().len() > 500usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 500usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "text",
                     max: 500usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }

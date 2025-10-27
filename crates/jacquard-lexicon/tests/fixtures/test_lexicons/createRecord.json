@@ -1,0 +1,65 @@
+{
+  "lexicon": 1,
+  "id": "com.atproto.repo.createRecord",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Create a new record in a repository.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["repo", "collection", "record"],
+          "properties": {
+            "repo": {
+              "type": "string",
+              "format": "at-identifier",
+              "description": "The handle or DID of the repo"
+            },
+            "collection": {
+              "type": "string",
+              "format": "nsid"
+            },
+            "rkey": {
+              "type": "string",
+              "format": "record-key"
+            },
+            "validate": {
+              "type": "boolean",
+              "default": true
+            },
+            "record": {
+              "type": "unknown",
+              "description": "The record to create"
+            },
+            "swapCommit": {
+              "type": "string",
+              "format": "cid"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["uri", "cid"],
+          "properties": {
+            "uri": {
+              "type": "string",
+              "format": "at-uri"
+            },
+            "cid": {
+              "type": "string",
+              "format": "cid"
+            }
+          }
+        }
+      },
+      "errors": [
+        {"name": "InvalidSwap"},
+        {"name": "InvalidRecord"}
+      ]
+    }
+  }
+}

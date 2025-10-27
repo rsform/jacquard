@@ -1227,6 +1227,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Newsarticle<'a> {
     fn nsid() -> &'static str {
         "social.flockfeeds.lexical.newsarticle"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_flockfeeds_lexical_newsarticle()
     }
@@ -1242,16 +1245,22 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "social.flockfeeds.lexical.newsarticle".into(),
+        id: ::jacquard_common::CowStr::new_static(
+            "social.flockfeeds.lexical.newsarticle",
+        ),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("tid".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A NewsArticle is an article whose content reports news, or provides background context and supporting materials for understanding the news.\n\nA more detailed overview of [schema.org News markup](/docs/news.html) is also available.",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: None,
@@ -1260,16 +1269,24 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "about".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("about"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.thing".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.thing",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "abstract".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "abstract",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "An abstract is a short description that summarizes a [[CreativeWork]].",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -1282,9 +1299,15 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "accessMode".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "accessMode",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The human sensory perceptual system or cognitive faculty through which a person may process or perceive information. Values should be drawn from the [approved vocabulary](https://www.w3.org/2021/a11y-discov-vocab/latest/#accessMode-vocabulary).",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -1297,16 +1320,26 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "accessModeSufficient".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "accessModeSufficient",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.itemlist".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.itemlist",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "accessibilityAPI".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "accessibilityAPI",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Indicates that the resource is compatible with the referenced accessibility API. Values should be drawn from the [approved vocabulary](https://www.w3.org/2021/a11y-discov-vocab/latest/#accessibilityAPI-vocabulary).",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -1319,9 +1352,15 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "accessibilityControl".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "accessibilityControl",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Identifies input methods that are sufficient to fully control the described resource. Values should be drawn from the [approved vocabulary](https://www.w3.org/2021/a11y-discov-vocab/latest/#accessibilityControl-vocabulary).",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -1334,9 +1373,15 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "accessibilityFeature".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "accessibilityFeature",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Content features of the resource, such as accessible media, alternatives and supported enhancements for accessibility. Values should be drawn from the [approved vocabulary](https://www.w3.org/2021/a11y-discov-vocab/latest/#accessibilityFeature-vocabulary).",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -1349,9 +1394,15 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "accessibilityHazard".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "accessibilityHazard",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "A characteristic of the described resource that is physiologically dangerous to some users. Related to WCAG 2.0 guideline 2.3. Values should be drawn from the [approved vocabulary](https://www.w3.org/2021/a11y-discov-vocab/latest/#accessibilityHazard-vocabulary).",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -1364,9 +1415,15 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "accessibilitySummary".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "accessibilitySummary",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "A human-readable summary of specific accessibility features or deficiencies, consistent with the other accessibility metadata but expressing subtleties such as \"short descriptions are present but long descriptions will be needed for non-visual users\" or \"short descriptions are present and no long descriptions are needed\".",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -1379,23 +1436,37 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "accountablePerson".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "accountablePerson",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.person".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.person",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "acquireLicensePage".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "acquireLicensePage",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.creativework".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.creativework",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "additionalType".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "additionalType",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "An additional type for the item, typically used for adding more specific types from external vocabularies in microdata syntax. This is a relationship between something and a class that the thing is in. Typically the value is a URI-identified RDF class, and in this case corresponds to the\n    use of rdf:type in RDF. Text values can be used sparingly, for cases where useful information can be added without their being an appropriate schema to reference. In the case of text values, the class label should follow the schema.org <a href=\"https://schema.org/docs/styleguide.html\">style guide</a>.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -1408,16 +1479,26 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "aggregateRating".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "aggregateRating",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.aggregaterating".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.aggregaterating",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "alternateName".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "alternateName",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "An alias for the item.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -1430,9 +1511,15 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "alternativeHeadline".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "alternativeHeadline",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "A secondary title of the CreativeWork.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -1445,16 +1532,26 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "archivedAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "archivedAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.webpage".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.webpage",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "articleBody".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "articleBody",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The actual body of the article.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -1467,9 +1564,15 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "articleSection".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "articleSection",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Articles may belong to one or more 'sections' in a magazine or newspaper, such as Sports, Lifestyle, etc.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -1482,53 +1585,77 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "assesses".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "assesses",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.definedterm".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.definedterm",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "associatedMedia".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "associatedMedia",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.mediaobject".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.mediaobject",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "audience".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "audience",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.audience".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.audience",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "audio".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("audio"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "An embedded audio object.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.audioobject".into(),
-                                        "social.flockfeeds.lexical.musicrecording".into(),
-                                        "social.flockfeeds.lexical.clip".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.audioobject"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.musicrecording"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.clip")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "author".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("author"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The author of this content or rating. Please note that author is special in that HTML 5 provides a special mechanism for indicating authorship via the rel tag. That is equivalent to this and may be used interchangeably.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.person".into(),
-                                        "social.flockfeeds.lexical.organization".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.person"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.organization")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "award".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("award"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "An award won by or for this item.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -1541,9 +1668,13 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "awards".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("awards"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Awards won by or for this item.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -1556,35 +1687,51 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "backstory".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "backstory",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.creativework".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.creativework",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "character".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "character",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.person".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.person",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "citation".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "citation",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.creativework".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.creativework",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "comment".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("comment"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.comment".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.comment",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "commentCount".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "commentCount",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -1595,9 +1742,15 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "conditionsOfAccess".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "conditionsOfAccess",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Conditions that affect the availability of, or method(s) of access to, an item. Typically used for real world items such as an [[ArchiveComponent]] held by an [[ArchiveOrganization]]. This property is not suitable for use as a general Web access control mechanism. It is expressed only in natural language.\\n\\nFor example \"Available by appointment from the Reading Room\" or \"Accessible only from logged-in accounts \".",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -1610,23 +1763,37 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "contentLocation".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "contentLocation",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.place".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.place",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "contentRating".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "contentRating",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.rating".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.rating",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "contentReferenceTime".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "contentReferenceTime",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The specific time described by a creative work, for works (e.g. articles, video objects etc.) that emphasise a particular moment within an Event.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -1641,31 +1808,49 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "contributor".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "contributor",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "A secondary contributor to the CreativeWork or Event.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.organization".into(),
-                                        "social.flockfeeds.lexical.person".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.organization"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.person")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "copyrightHolder".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "copyrightHolder",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The party holding the legal copyright to the CreativeWork.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.person".into(),
-                                        "social.flockfeeds.lexical.organization".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.person"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.organization")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "copyrightNotice".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "copyrightNotice",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Text of a notice appropriate for describing the copyright aspects of this Creative Work, ideally indicating the owner of the copyright for the Work.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -1678,7 +1863,9 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "copyrightYear".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "copyrightYear",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -1689,41 +1876,63 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "correction".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "correction",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.correctioncomment".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.correctioncomment",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "countryOfOrigin".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "countryOfOrigin",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.country".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.country",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "creativeWorkStatus".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "creativeWorkStatus",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.definedterm".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.definedterm",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "creator".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("creator"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The creator/author of this CreativeWork. This is the same as the Author property for CreativeWork.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.person".into(),
-                                        "social.flockfeeds.lexical.organization".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.person"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.organization")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "creditText".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "creditText",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Text that can be used to credit person(s) and/or organization(s) associated with a published Creative Work.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -1736,9 +1945,15 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "dateCreated".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "dateCreated",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The date on which the CreativeWork was created or the item was added to a DataFeed.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -1753,9 +1968,15 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "dateModified".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "dateModified",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The date on which the CreativeWork was most recently modified or when the item's entry was modified within a DataFeed.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -1770,9 +1991,15 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "datePublished".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "datePublished",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Date of first publication or broadcast. For example the date a [[CreativeWork]] was broadcast or a [[Certification]] was issued.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -1787,9 +2014,15 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "dateline".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "dateline",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "A [dateline](https://en.wikipedia.org/wiki/Dateline) is a brief piece of text included in news articles that describes where and when the story was written or filed though the date is often omitted. Sometimes only a placename is provided.\n\nStructured representations of dateline-related information can also be expressed more explicitly using [[locationCreated]] (which represents where a work was created, e.g. where a news report was written).  For location depicted or described in the content, use [[contentLocation]].\n\nDateline summaries are oriented more towards human readers than towards automated processing, and can vary substantially. Some examples: \"BEIRUT, Lebanon, June 2.\", \"Paris, France\", \"December 19, 2017 11:43AM Reporting from Washington\", \"Beijing/Moscow\", \"QUEZON CITY, Philippines\".",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -1802,16 +2035,26 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "description".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "description",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.textobject".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.textobject",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "digitalSourceType".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "digitalSourceType",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Indicates an IPTCDigitalSourceEnumeration code indicating the nature of the digital source(s) for some [[CreativeWork]].",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -1824,9 +2067,15 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "disambiguatingDescription".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "disambiguatingDescription",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "A sub property of description. A short description of the item used to disambiguate from other, similar items. Information from other properties (in particular, name) may be necessary for the description to be useful for disambiguation.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -1839,9 +2088,15 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "discussionUrl".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "discussionUrl",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "A link to the page containing the comments of the CreativeWork.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                     ),
@@ -1856,9 +2111,15 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "editEIDR".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "editEIDR",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "An [EIDR](https://eidr.org/) (Entertainment Identifier Registry) [[identifier]] representing a specific edit / edition for a work of film or television.\n\nFor example, the motion picture known as \"Ghostbusters\" whose [[titleEIDR]] is \"10.5240/7EC7-228A-510A-053E-CBB8-J\" has several edits, e.g. \"10.5240/1F2A-E1C5-680A-14C6-E76B-I\" and \"10.5240/8A35-3BEE-6497-5D12-9E4F-3\".\n\nSince schema.org types like [[Movie]] and [[TVEpisode]] can be used for both works and their multiple expressions, it is possible to use [[titleEIDR]] alone (for a general description), or alongside [[editEIDR]] for a more edit-specific description.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -1871,44 +2132,68 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "editor".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("editor"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.person".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.person",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "educationalAlignment".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "educationalAlignment",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.alignmentobject".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.alignmentobject",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "educationalLevel".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "educationalLevel",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.definedterm".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.definedterm",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "educationalUse".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "educationalUse",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.definedterm".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.definedterm",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "encoding".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "encoding",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.mediaobject".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.mediaobject",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "encodingFormat".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "encodingFormat",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Media type typically expressed using a MIME format (see [IANA site](http://www.iana.org/assignments/media-types/media-types.xhtml) and [MDN reference](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types)), e.g. application/zip for a SoftwareApplication binary, audio/mpeg for .mp3 etc.\n\nIn cases where a [[CreativeWork]] has several media type representations, [[encoding]] can be used to indicate each [[MediaObject]] alongside particular [[encodingFormat]] information.\n\nUnregistered or niche encoding and file formats can be indicated instead via the most appropriate URL, e.g. defining Web page or a Wikipedia/Wikidata entry.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -1921,23 +2206,35 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "encodings".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "encodings",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.mediaobject".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.mediaobject",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "exampleOfWork".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "exampleOfWork",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.creativework".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.creativework",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "expires".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("expires"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Date the content expires and is no longer useful or available. For example a [[VideoObject]] or [[NewsArticle]] whose availability or relevance is time-limited, a [[ClaimReview]] fact check whose publisher wants to indicate that it may no longer be relevant (or helpful to highlight) after some date, or a [[Certification]] the validity has expired.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -1952,9 +2249,15 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "fileFormat".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "fileFormat",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Media type, typically MIME format (see [IANA site](http://www.iana.org/assignments/media-types/media-types.xhtml)) of the content, e.g. application/zip of a SoftwareApplication binary. In cases where a CreativeWork has several media type representations, 'encoding' can be used to indicate each MediaObject alongside particular fileFormat information. Unregistered or niche file formats can be indicated instead via the most appropriate URL, e.g. defining Web page or a Wikipedia entry.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -1967,27 +2270,37 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "funder".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("funder"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "A person or organization that supports (sponsors) something through some kind of financial contribution.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.organization".into(),
-                                        "social.flockfeeds.lexical.person".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.organization"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.person")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "funding".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("funding"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.grant".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.grant",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "genre".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("genre"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Genre of the creative work, broadcast channel or group.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -2000,16 +2313,24 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "hasPart".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("hasPart"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.creativework".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.creativework",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "headline".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "headline",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Headline of the article.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -2022,37 +2343,57 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "identifier".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "identifier",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.propertyvalue".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.propertyvalue",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "image".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("image"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.imageobject".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.imageobject",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "inLanguage".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "inLanguage",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.language".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.language",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "interactionStatistic".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "interactionStatistic",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.interactioncounter".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.interactioncounter",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "interactivityType".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "interactivityType",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The predominant mode of learning supported by the learning resource. Acceptable values are 'active', 'expositive', or 'mixed'.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -2065,14 +2406,20 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "interpretedAsClaim".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "interpretedAsClaim",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.claim".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.claim",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "isAccessibleForFree".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "isAccessibleForFree",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                     description: None,
                                     default: None,
@@ -2080,9 +2427,15 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "isBasedOn".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "isBasedOn",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "A resource from which this work is derived or from which it is a modification or adaptation.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                     ),
@@ -2097,7 +2450,9 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "isFamilyFriendly".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "isFamilyFriendly",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                     description: None,
                                     default: None,
@@ -2105,90 +2460,138 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "isPartOf".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "isPartOf",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.creativework".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.creativework",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "keywords".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "keywords",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.definedterm".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.definedterm",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "learningResourceType".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "learningResourceType",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.definedterm".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.definedterm",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "license".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("license"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.creativework".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.creativework",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "locationCreated".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "locationCreated",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.place".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.place",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "mainEntity".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "mainEntity",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.thing".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.thing",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "mainEntityOfPage".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "mainEntityOfPage",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.creativework".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.creativework",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "maintainer".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "maintainer",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "A maintainer of a [[Dataset]], software package ([[SoftwareApplication]]), or other [[Project]]. A maintainer is a [[Person]] or [[Organization]] that manages contributions to, and/or publication of, some (typically complex) artifact. It is common for distributions of software and data to be based on \"upstream\" sources. When [[maintainer]] is applied to a specific version of something e.g. a particular version or packaging of a [[Dataset]], it is always  possible that the upstream source has a different maintainer. The [[isBasedOn]] property can be used to indicate such relationships between datasets to make the different maintenance roles clear. Similarly in the case of software, a package may have dedicated maintainers working on integration into software distributions such as Ubuntu, as well as upstream maintainers of the underlying work.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.person".into(),
-                                        "social.flockfeeds.lexical.organization".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.person"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.organization")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "material".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "material",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.product".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.product",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "materialExtent".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "materialExtent",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.quantitativevalue".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.quantitativevalue",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "mentions".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "mentions",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.thing".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.thing",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "name".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The name of the item.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -2201,20 +2604,28 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "offers".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("offers"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "An offer to provide this item&#x2014;for example, an offer to sell a product, rent the DVD of a movie, perform a service, or give away tickets to an event. Use [[businessFunction]] to indicate the kind of transaction offered, i.e. sell, lease, etc. This property can also be used to describe a [[Demand]]. While this property is listed as expected on a number of common types, it can be used in others. In that case, using a second type, such as Product or a subtype of Product, can clarify the nature of the offer.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.demand".into(),
-                                        "social.flockfeeds.lexical.offer".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.demand"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.offer")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "pageEnd".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("pageEnd"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The page on which the work ends; for example \"138\" or \"xvi\".",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -2227,9 +2638,15 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "pageStart".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "pageStart",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The page on which the work starts; for example \"135\" or \"xiii\".",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -2242,9 +2659,15 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "pagination".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "pagination",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Any description of pages that is not separated into pageStart and pageEnd; for example, \"1-6, 9, 55\" or \"10-12, 46-49\".",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -2257,16 +2680,24 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "pattern".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("pattern"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.definedterm".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.definedterm",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "position".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "position",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The position of an item in a series or sequence of items.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -2279,16 +2710,26 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "potentialAction".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "potentialAction",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.action".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.action",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "printColumn".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "printColumn",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The number of the column in which the NewsArticle appears in the print edition.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -2301,9 +2742,15 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "printEdition".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "printEdition",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The edition of the print product in which the NewsArticle appears.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -2316,9 +2763,15 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "printPage".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "printPage",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "If this NewsArticle appears in print, this field indicates the name of the page on which the article is found. Please note that this field is intended for the exact page name (e.g. A5, B18).",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -2331,9 +2784,15 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "printSection".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "printSection",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "If this NewsArticle appears in print, this field indicates the print section in which the article appeared.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -2346,91 +2805,137 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "producer".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "producer",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The person or organization who produced the work (e.g. music album, movie, TV/radio series etc.).",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.person".into(),
-                                        "social.flockfeeds.lexical.organization".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.person"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.organization")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "provider".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "provider",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The service provider, service operator, or service performer; the goods producer. Another party (a seller) may offer those services or goods on behalf of the provider. A provider may also serve as the seller.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.person".into(),
-                                        "social.flockfeeds.lexical.organization".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.person"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.organization")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "publication".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "publication",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.publicationevent".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.publicationevent",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "publisher".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "publisher",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The publisher of the article in question.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.person".into(),
-                                        "social.flockfeeds.lexical.organization".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.person"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.organization")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "publisherImprint".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "publisherImprint",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.organization".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.organization",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "publishingPrinciples".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "publishingPrinciples",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.creativework".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.creativework",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "recordedAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "recordedAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.event".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.event",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "releasedEvent".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "releasedEvent",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.publicationevent".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.publicationevent",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "review".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("review"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.review".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.review",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "reviews".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("reviews"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.review".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.review",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "sameAs".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("sameAs"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "URL of a reference Web page that unambiguously indicates the item's identity. E.g. the URL of the item's Wikipedia page, Wikidata entry, or official website.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                     ),
@@ -2445,9 +2950,15 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "schemaVersion".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "schemaVersion",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Indicates (by URL or string) a particular version of a schema used in some CreativeWork. This property was created primarily to\n    indicate the use of a specific schema.org release, e.g. ```10.0``` as a simple string, or more explicitly via URL, ```https://schema.org/docs/releases.html#v10.0```. There may be situations in which other schemas might usefully be referenced this way, e.g. ```http://dublincore.org/specifications/dublin-core/dces/1999-07-02/``` but this has not been carefully explored in the community.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -2460,9 +2971,15 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "sdDatePublished".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "sdDatePublished",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Indicates the date on which the current structured data was generated / published. Typically used alongside [[sdPublisher]].",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -2477,97 +2994,142 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "sdLicense".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "sdLicense",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.creativework".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.creativework",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "sdPublisher".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "sdPublisher",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Indicates the party responsible for generating and publishing the current structured data markup, typically in cases where the structured data is derived automatically from existing published content but published on a different site. For example, student projects and open data initiatives often re-publish existing content with more explicitly structured metadata. The\n[[sdPublisher]] property helps make such practices more explicit.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.person".into(),
-                                        "social.flockfeeds.lexical.organization".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.person"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.organization")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "size".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("size"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "A standardized size of a product or creative work, specified either through a simple textual string (for example 'XL', '32Wx34L'), a  QuantitativeValue with a unitCode, or a comprehensive and structured [[SizeSpecification]]; in other cases, the [[width]], [[height]], [[depth]] and [[weight]] properties may be more applicable.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.definedterm".into(),
-                                        "social.flockfeeds.lexical.sizespecification".into(),
-                                        "social.flockfeeds.lexical.quantitativevalue".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.definedterm"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.sizespecification"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.quantitativevalue")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "sourceOrganization".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "sourceOrganization",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.organization".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.organization",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "spatial".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("spatial"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.place".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.place",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "spatialCoverage".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "spatialCoverage",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.place".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.place",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "speakable".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "speakable",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.speakablespecification"
-                                        .into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.speakablespecification",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "sponsor".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("sponsor"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "A person or organization that supports a thing through a pledge, promise, or financial contribution. E.g. a sponsor of a Medical Study or a corporate sponsor of an event.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.organization".into(),
-                                        "social.flockfeeds.lexical.person".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.organization"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.person")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "subjectOf".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "subjectOf",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "A CreativeWork or Event about this Thing.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.event".into(),
-                                        "social.flockfeeds.lexical.creativework".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.event"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.creativework")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "teaches".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("teaches"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.definedterm".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.definedterm",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "temporal".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "temporal",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The \"temporal\" property can be used in cases where more specific properties\n(e.g. [[temporalCoverage]], [[dateCreated]], [[dateModified]], [[datePublished]]) are not known to be appropriate.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -2580,9 +3142,15 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "temporalCoverage".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "temporalCoverage",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The temporalCoverage of a CreativeWork indicates the period that the content applies to, i.e. that it describes, either as a DateTime or as a textual string indicating a time period in [ISO 8601 time interval format](https://en.wikipedia.org/wiki/ISO_8601#Time_intervals). In\n      the case of a Dataset it will typically indicate the relevant time period in a precise notation (e.g. for a 2011 census dataset, the year 2011 would be written \"2011/2012\"). Other forms of content, e.g. ScholarlyArticle, Book, TVSeries or TVEpisode, may indicate their temporalCoverage in broader terms - textually or via well-known URL.\n      Written works such as books may sometimes have precise temporal coverage too, e.g. a work set in 1939 - 1945 can be indicated in ISO 8601 interval format format via \"1939/1945\".\n\nOpen-ended date ranges can be written with \"..\" in place of the end date. For example, \"2015-11/..\" indicates a range beginning in November 2015 and with no specified final date. This is tentative and might be updated in future when ISO 8601 is officially updated.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -2595,9 +3163,13 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "text".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("text"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The textual content of this CreativeWork.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -2610,16 +3182,26 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "thumbnail".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "thumbnail",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.imageobject".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.imageobject",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "thumbnailUrl".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "thumbnailUrl",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "A thumbnail image relevant to the Thing.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                     ),
@@ -2634,34 +3216,54 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "timeRequired".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "timeRequired",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.duration".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.duration",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "translationOfWork".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "translationOfWork",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.creativework".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.creativework",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "translator".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "translator",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Organization or person who adapts a creative work to different languages, regional differences and technical requirements of a target market, or that translates during some event.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.person".into(),
-                                        "social.flockfeeds.lexical.organization".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.person"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.organization")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "typicalAgeRange".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "typicalAgeRange",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The typical expected age range, e.g. '7-9', '11-'.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -2674,9 +3276,11 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "url".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("url"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static("URL of the item."),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                     ),
@@ -2691,16 +3295,24 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "usageInfo".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "usageInfo",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.creativework".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.creativework",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "version".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("version"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The version of the CreativeWork embodied by a specified resource.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -2713,18 +3325,24 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "video".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("video"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "An embedded video object.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.videoobject".into(),
-                                        "social.flockfeeds.lexical.clip".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.videoobject"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.clip")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "wordCount".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "wordCount",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -2735,17 +3353,25 @@ fn lexicon_doc_social_flockfeeds_lexical_newsarticle() -> ::jacquard_lexicon::le
                                 }),
                             );
                             map.insert(
-                                "workExample".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "workExample",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.creativework".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.creativework",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "workTranslation".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "workTranslation",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "social.flockfeeds.lexical.creativework".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "social.flockfeeds.lexical.creativework",
+                                    ),
                                 }),
                             );
                             map

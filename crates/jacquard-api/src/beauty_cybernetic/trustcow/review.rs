@@ -109,6 +109,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
     fn nsid() -> &'static str {
         "beauty.cybernetic.trustcow.review"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_beauty_cybernetic_trustcow_review()
     }
@@ -116,11 +119,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         if let Some(ref value) = self.description {
-            if value.as_ref().len() > 1000usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 1000usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "description",
                     max: 1000usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -145,11 +149,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
             }
         }
         if let Some(ref value) = self.title {
-            if value.as_ref().len() > 100usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "title",
                     max: 100usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -162,21 +167,27 @@ fn lexicon_doc_beauty_cybernetic_trustcow_review() -> ::jacquard_lexicon::lexico
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "beauty.cybernetic.trustcow.review".into(),
+        id: ::jacquard_common::CowStr::new_static("beauty.cybernetic.trustcow.review"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A review connected to a verified transaction, can only be created by one of the transaction parties",
+                        ),
+                    ),
                     key: None,
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: Some(
                             vec![
-                                "transaction".into(), "rating".into(), "createdAt".into()
+                                ::jacquard_common::smol_str::SmolStr::new_static("transaction"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("rating"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -184,9 +195,15 @@ fn lexicon_doc_beauty_cybernetic_trustcow_review() -> ::jacquard_lexicon::lexico
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "When the review was created",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -201,9 +218,15 @@ fn lexicon_doc_beauty_cybernetic_trustcow_review() -> ::jacquard_lexicon::lexico
                                 }),
                             );
                             map.insert(
-                                "description".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "description",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The detailed review text",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -216,7 +239,7 @@ fn lexicon_doc_beauty_cybernetic_trustcow_review() -> ::jacquard_lexicon::lexico
                                 }),
                             );
                             map.insert(
-                                "rating".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("rating"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -227,9 +250,15 @@ fn lexicon_doc_beauty_cybernetic_trustcow_review() -> ::jacquard_lexicon::lexico
                                 }),
                             );
                             map.insert(
-                                "reviewerRole".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "reviewerRole",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Whether this review is from the service provider or consumer",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -242,9 +271,13 @@ fn lexicon_doc_beauty_cybernetic_trustcow_review() -> ::jacquard_lexicon::lexico
                                 }),
                             );
                             map.insert(
-                                "title".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The title of the review",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -257,9 +290,15 @@ fn lexicon_doc_beauty_cybernetic_trustcow_review() -> ::jacquard_lexicon::lexico
                                 }),
                             );
                             map.insert(
-                                "transaction".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "transaction",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "AT URI reference to the transaction record (at://did/beauty.cybernetic.trustcow.transaction/rkey)",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,

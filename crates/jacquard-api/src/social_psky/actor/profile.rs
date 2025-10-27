@@ -90,6 +90,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
     fn nsid() -> &'static str {
         "social.psky.actor.profile"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_psky_actor_profile()
     }
@@ -97,11 +100,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         if let Some(ref value) = self.nickname {
-            if value.as_ref().len() > 320usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 320usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "nickname",
                     max: 320usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -130,16 +134,20 @@ fn lexicon_doc_social_psky_actor_profile() -> ::jacquard_lexicon::lexicon::Lexic
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "social.psky.actor.profile".into(),
+        id: ::jacquard_common::CowStr::new_static("social.psky.actor.profile"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("literal:self".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A declaration of a Picosky account profile.",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("literal:self")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: None,
@@ -148,7 +156,9 @@ fn lexicon_doc_social_psky_actor_profile() -> ::jacquard_lexicon::lexicon::Lexic
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "nickname".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "nickname",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,

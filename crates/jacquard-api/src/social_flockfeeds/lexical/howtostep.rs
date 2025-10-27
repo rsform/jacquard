@@ -84,6 +84,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Howtostep<'a> {
     fn nsid() -> &'static str {
         "social.flockfeeds.lexical.howtostep"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_flockfeeds_lexical_howtostep()
     }
@@ -99,16 +102,20 @@ fn lexicon_doc_social_flockfeeds_lexical_howtostep() -> ::jacquard_lexicon::lexi
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "social.flockfeeds.lexical.howtostep".into(),
+        id: ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.howtostep"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("tid".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A step in the instructions for how to achieve a result. It is an ordered list with HowToDirection and/or HowToTip items.",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: None,

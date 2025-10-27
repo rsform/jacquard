@@ -91,6 +91,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Request<'a> {
     fn nsid() -> &'static str {
         "network.slices.waitlist.request"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_network_slices_waitlist_request()
     }
@@ -106,27 +109,42 @@ fn lexicon_doc_network_slices_waitlist_request() -> ::jacquard_lexicon::lexicon:
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "network.slices.waitlist.request".into(),
+        id: ::jacquard_common::CowStr::new_static("network.slices.waitlist.request"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("literal:self".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A request to join the waitlist",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("literal:self")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
-                        required: Some(vec!["slice".into(), "createdAt".into()]),
+                        required: Some(
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("slice"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "When the user joined the waitlist",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -141,9 +159,13 @@ fn lexicon_doc_network_slices_waitlist_request() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                "slice".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("slice"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The AT URI of the slice being requested access to",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
                                     ),

@@ -41,26 +41,34 @@ fn lexicon_doc_fm_teal_alpha_stats_defs() -> ::jacquard_lexicon::lexicon::Lexico
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "fm.teal.alpha.stats.defs".into(),
+        id: ::jacquard_common::CowStr::new_static("fm.teal.alpha.stats.defs"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "artistView".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("artistView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
-                        vec!["mbid".into(), "name".into(), "playCount".into()],
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("mbid"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("playCount")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "mbid".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("mbid"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "MusicBrainz artist ID",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -73,9 +81,11 @@ fn lexicon_doc_fm_teal_alpha_stats_defs() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            "name".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static("Artist name"),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -88,7 +98,9 @@ fn lexicon_doc_fm_teal_alpha_stats_defs() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            "playCount".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "playCount",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -103,20 +115,28 @@ fn lexicon_doc_fm_teal_alpha_stats_defs() -> ::jacquard_lexicon::lexicon::Lexico
                 }),
             );
             map.insert(
-                "recordingView".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("recordingView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
-                        vec!["mbid".into(), "name".into(), "playCount".into()],
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("mbid"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("playCount")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "mbid".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("mbid"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "MusicBrainz recording ID",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -129,9 +149,13 @@ fn lexicon_doc_fm_teal_alpha_stats_defs() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            "name".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Recording/track name",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -144,7 +168,9 @@ fn lexicon_doc_fm_teal_alpha_stats_defs() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            "playCount".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "playCount",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -159,20 +185,28 @@ fn lexicon_doc_fm_teal_alpha_stats_defs() -> ::jacquard_lexicon::lexicon::Lexico
                 }),
             );
             map.insert(
-                "releaseView".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("releaseView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
-                        vec!["mbid".into(), "name".into(), "playCount".into()],
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("mbid"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("playCount")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "mbid".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("mbid"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "MusicBrainz release ID",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -185,9 +219,11 @@ fn lexicon_doc_fm_teal_alpha_stats_defs() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            "name".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static("Release/album name"),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -200,7 +236,9 @@ fn lexicon_doc_fm_teal_alpha_stats_defs() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            "playCount".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "playCount",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -222,6 +260,9 @@ fn lexicon_doc_fm_teal_alpha_stats_defs() -> ::jacquard_lexicon::lexicon::Lexico
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ArtistView<'a> {
     fn nsid() -> &'static str {
         "fm.teal.alpha.stats.defs"
+    }
+    fn def_name() -> &'static str {
+        "artistView"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_fm_teal_alpha_stats_defs()
@@ -262,6 +303,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RecordingView<'a> {
     fn nsid() -> &'static str {
         "fm.teal.alpha.stats.defs"
     }
+    fn def_name() -> &'static str {
+        "recordingView"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_fm_teal_alpha_stats_defs()
     }
@@ -300,6 +344,9 @@ pub struct ReleaseView<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReleaseView<'a> {
     fn nsid() -> &'static str {
         "fm.teal.alpha.stats.defs"
+    }
+    fn def_name() -> &'static str {
+        "releaseView"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_fm_teal_alpha_stats_defs()

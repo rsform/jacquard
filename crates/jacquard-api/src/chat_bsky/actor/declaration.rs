@@ -89,6 +89,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Declaration<'a> {
     fn nsid() -> &'static str {
         "chat.bsky.actor.declaration"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_chat_bsky_actor_declaration()
     }
@@ -104,25 +107,35 @@ fn lexicon_doc_chat_bsky_actor_declaration() -> ::jacquard_lexicon::lexicon::Lex
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "chat.bsky.actor.declaration".into(),
+        id: ::jacquard_common::CowStr::new_static("chat.bsky.actor.declaration"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("literal:self".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A declaration of a Bluesky chat account.",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("literal:self")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
-                        required: Some(vec!["allowIncoming".into()]),
+                        required: Some(
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("allowIncoming")
+                            ],
+                        ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "allowIncoming".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "allowIncoming",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,

@@ -27,25 +27,29 @@ fn lexicon_doc_fyi_frontpage_richtext_block() -> ::jacquard_lexicon::lexicon::Le
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "fyi.frontpage.richtext.block".into(),
+        id: ::jacquard_common::CowStr::new_static("fyi.frontpage.richtext.block"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["content".into()]),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("content")],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "content".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("content"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
-                                refs: vec!["#plaintextParagraph".into()],
+                                refs: vec![
+                                    ::jacquard_common::CowStr::new_static("#plaintextParagraph")
+                                ],
                                 closed: None,
                             }),
                         );
@@ -54,16 +58,18 @@ fn lexicon_doc_fyi_frontpage_richtext_block() -> ::jacquard_lexicon::lexicon::Le
                 }),
             );
             map.insert(
-                "plaintextParagraph".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("plaintextParagraph"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["text".into()]),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("text")],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "text".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("text"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -89,6 +95,9 @@ fn lexicon_doc_fyi_frontpage_richtext_block() -> ::jacquard_lexicon::lexicon::Le
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Block<'a> {
     fn nsid() -> &'static str {
         "fyi.frontpage.richtext.block"
+    }
+    fn def_name() -> &'static str {
+        "main"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_fyi_frontpage_richtext_block()
@@ -121,6 +130,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PlaintextParagraph<'a> {
     fn nsid() -> &'static str {
         "fyi.frontpage.richtext.block"
     }
+    fn def_name() -> &'static str {
+        "plaintextParagraph"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_fyi_frontpage_richtext_block()
     }
@@ -129,11 +141,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PlaintextParagraph<'a> {
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         {
             let value = &self.text;
-            if value.as_ref().len() > 100000usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100000usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "text",
                     max: 100000usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }

@@ -105,6 +105,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Definition<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.label.definition"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_label_definition()
     }
@@ -154,22 +157,24 @@ fn lexicon_doc_sh_tangled_label_definition() -> ::jacquard_lexicon::lexicon::Lex
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "sh.tangled.label.definition".into(),
+        id: ::jacquard_common::CowStr::new_static("sh.tangled.label.definition"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: None,
-                    key: Some("any".into()),
+                    key: Some(::jacquard_common::CowStr::new_static("any")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: Some(
                             vec![
-                                "name".into(), "valueType".into(), "scope".into(),
-                                "createdAt".into()
+                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("valueType"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("scope"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -177,9 +182,13 @@ fn lexicon_doc_sh_tangled_label_definition() -> ::jacquard_lexicon::lexicon::Lex
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "color".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("color"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The hex value for the background color for the label. Appviews may choose to respect this.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -192,7 +201,9 @@ fn lexicon_doc_sh_tangled_label_definition() -> ::jacquard_lexicon::lexicon::Lex
                                 }),
                             );
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -209,7 +220,9 @@ fn lexicon_doc_sh_tangled_label_definition() -> ::jacquard_lexicon::lexicon::Lex
                                 }),
                             );
                             map.insert(
-                                "multiple".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "multiple",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                     description: None,
                                     default: None,
@@ -217,9 +230,13 @@ fn lexicon_doc_sh_tangled_label_definition() -> ::jacquard_lexicon::lexicon::Lex
                                 }),
                             );
                             map.insert(
-                                "name".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The display name of this label.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -232,9 +249,13 @@ fn lexicon_doc_sh_tangled_label_definition() -> ::jacquard_lexicon::lexicon::Lex
                                 }),
                             );
                             map.insert(
-                                "scope".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("scope"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The areas of the repo this label may apply to, eg.: sh.tangled.repo.issue. Appviews may choose to respect this.",
+                                        ),
+                                    ),
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
                                         description: None,
                                         format: Some(
@@ -254,10 +275,12 @@ fn lexicon_doc_sh_tangled_label_definition() -> ::jacquard_lexicon::lexicon::Lex
                                 }),
                             );
                             map.insert(
-                                "valueType".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "valueType",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "#valueType".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static("#valueType"),
                                 }),
                             );
                             map
@@ -266,18 +289,27 @@ fn lexicon_doc_sh_tangled_label_definition() -> ::jacquard_lexicon::lexicon::Lex
                 }),
             );
             map.insert(
-                "valueType".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("valueType"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["type".into(), "format".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("type"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("format")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "enum".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("enum"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Closed set of values that this label can take.",
+                                    ),
+                                ),
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -295,9 +327,13 @@ fn lexicon_doc_sh_tangled_label_definition() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            "format".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("format"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "An optional constraint that can be applied on string concrete types.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -310,9 +346,13 @@ fn lexicon_doc_sh_tangled_label_definition() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            "type".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("type"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The concrete type of this label's value.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -361,6 +401,9 @@ pub struct ValueType<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ValueType<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.label.definition"
+    }
+    fn def_name() -> &'static str {
+        "valueType"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_label_definition()

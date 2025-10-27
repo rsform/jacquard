@@ -33,25 +33,33 @@ fn lexicon_doc_app_bsky_bookmark_defs() -> ::jacquard_lexicon::lexicon::LexiconD
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "app.bsky.bookmark.defs".into(),
+        id: ::jacquard_common::CowStr::new_static("app.bsky.bookmark.defs"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "bookmark".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("bookmark"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["subject".into()]),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Object used to store bookmark data in stash.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("subject")],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "subject".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("subject"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "com.atproto.repo.strongRef".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "com.atproto.repo.strongRef",
+                                ),
                             }),
                         );
                         map
@@ -59,16 +67,23 @@ fn lexicon_doc_app_bsky_bookmark_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                 }),
             );
             map.insert(
-                "bookmarkView".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("bookmarkView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["subject".into(), "item".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("subject"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("item")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "createdAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "createdAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -85,22 +100,24 @@ fn lexicon_doc_app_bsky_bookmark_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "item".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("item"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
-                                    "app.bsky.feed.defs#blockedPost".into(),
-                                    "app.bsky.feed.defs#notFoundPost".into(),
-                                    "app.bsky.feed.defs#postView".into()
+                                    ::jacquard_common::CowStr::new_static("app.bsky.feed.defs#blockedPost"),
+                                    ::jacquard_common::CowStr::new_static("app.bsky.feed.defs#notFoundPost"),
+                                    ::jacquard_common::CowStr::new_static("app.bsky.feed.defs#postView")
                                 ],
                                 closed: None,
                             }),
                         );
                         map.insert(
-                            "subject".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("subject"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "com.atproto.repo.strongRef".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "com.atproto.repo.strongRef",
+                                ),
                             }),
                         );
                         map
@@ -115,6 +132,9 @@ fn lexicon_doc_app_bsky_bookmark_defs() -> ::jacquard_lexicon::lexicon::LexiconD
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Bookmark<'a> {
     fn nsid() -> &'static str {
         "app.bsky.bookmark.defs"
+    }
+    fn def_name() -> &'static str {
+        "bookmark"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_bookmark_defs()
@@ -173,6 +193,9 @@ pub enum BookmarkViewItem<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BookmarkView<'a> {
     fn nsid() -> &'static str {
         "app.bsky.bookmark.defs"
+    }
+    fn def_name() -> &'static str {
+        "bookmarkView"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_bookmark_defs()

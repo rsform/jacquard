@@ -34,22 +34,31 @@ fn lexicon_doc_app_bsky_embed_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "app.bsky.embed.defs".into(),
+        id: ::jacquard_common::CowStr::new_static("app.bsky.embed.defs"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "aspectRatio".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("aspectRatio"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["width".into(), "height".into()]),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "width:height represents an aspect ratio. It may be approximate, and may not correspond to absolute dimensions in any given unit.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("width"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("height")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "height".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("height"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -60,7 +69,7 @@ fn lexicon_doc_app_bsky_embed_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                             }),
                         );
                         map.insert(
-                            "width".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("width"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -82,6 +91,9 @@ fn lexicon_doc_app_bsky_embed_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AspectRatio<'a> {
     fn nsid() -> &'static str {
         "app.bsky.embed.defs"
+    }
+    fn def_name() -> &'static str {
+        "aspectRatio"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_embed_defs()

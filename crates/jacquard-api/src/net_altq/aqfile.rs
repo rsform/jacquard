@@ -30,24 +30,37 @@ pub struct Checksum<'a> {
 fn lexicon_doc_net_altq_aqfile() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "net.altq.aqfile".into(),
+        id: ::jacquard_common::CowStr::new_static("net.altq.aqfile"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "checksum".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("checksum"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["algo".into(), "hash".into()]),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Cryptographic checksum for integrity verification.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("algo"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("hash")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "algo".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("algo"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Hash algorithm name.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -60,9 +73,13 @@ fn lexicon_doc_net_altq_aqfile() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            "hash".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("hash"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Hex or base64 encoded digest produced by the algorithm.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -79,18 +96,31 @@ fn lexicon_doc_net_altq_aqfile() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                 }),
             );
             map.insert(
-                "file".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("file"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["name".into(), "size".into()]),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "File metadata describing the uploaded blob.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("size")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "mimeType".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("mimeType"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "MIME type, e.g. 'video/mp4'.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -103,9 +133,15 @@ fn lexicon_doc_net_altq_aqfile() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            "modifiedAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "modifiedAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Client-side last-modified timestamp.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                 ),
@@ -120,9 +156,13 @@ fn lexicon_doc_net_altq_aqfile() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            "name".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "User-visible filename.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -135,7 +175,7 @@ fn lexicon_doc_net_altq_aqfile() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            "size".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("size"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -150,23 +190,37 @@ fn lexicon_doc_net_altq_aqfile() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("any".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A record representing an uploaded file blob with metadata.",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("any")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: Some(
-                            vec!["blob".into(), "createdAt".into(), "file".into()],
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("blob"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("file")
+                            ],
                         ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "attribution".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "attribution",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Handle or DID of the account to attribute this upload to.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::AtIdentifier,
                                     ),
@@ -181,7 +235,7 @@ fn lexicon_doc_net_altq_aqfile() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                                 }),
                             );
                             map.insert(
-                                "blob".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("blob"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
                                     description: None,
                                     accept: None,
@@ -189,16 +243,24 @@ fn lexicon_doc_net_altq_aqfile() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                                 }),
                             );
                             map.insert(
-                                "checksum".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "checksum",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "#checksum".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static("#checksum"),
                                 }),
                             );
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Timestamp when this record was created.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -213,10 +275,10 @@ fn lexicon_doc_net_altq_aqfile() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                                 }),
                             );
                             map.insert(
-                                "file".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("file"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "#file".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static("#file"),
                                 }),
                             );
                             map
@@ -233,6 +295,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Checksum<'a> {
     fn nsid() -> &'static str {
         "net.altq.aqfile"
     }
+    fn def_name() -> &'static str {
+        "checksum"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_altq_aqfile()
     }
@@ -241,21 +306,23 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Checksum<'a> {
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         {
             let value = &self.algo;
-            if value.as_ref().len() > 32usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 32usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "algo",
                     max: 32usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         {
             let value = &self.hash;
-            if value.as_ref().len() > 128usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 128usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "hash",
                     max: 128usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -298,6 +365,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for File<'a> {
     fn nsid() -> &'static str {
         "net.altq.aqfile"
     }
+    fn def_name() -> &'static str {
+        "file"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_altq_aqfile()
     }
@@ -305,21 +375,23 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for File<'a> {
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         if let Some(ref value) = self.mime_type {
-            if value.as_ref().len() > 255usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 255usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "mime_type",
                     max: 255usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         {
             let value = &self.name;
-            if value.as_ref().len() > 512usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 512usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "name",
                     max: 512usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -445,6 +517,9 @@ impl jacquard_common::types::collection::Collection for AqfileRecord {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Aqfile<'a> {
     fn nsid() -> &'static str {
         "net.altq.aqfile"
+    }
+    fn def_name() -> &'static str {
+        "main"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_altq_aqfile()

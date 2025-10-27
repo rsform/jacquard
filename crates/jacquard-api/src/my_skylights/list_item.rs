@@ -71,19 +71,19 @@ fn lexicon_doc_my_skylights_listItem() -> ::jacquard_lexicon::lexicon::LexiconDo
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "my.skylights.listItem".into(),
+        id: ::jacquard_common::CowStr::new_static("my.skylights.listItem"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "abandoned".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("abandoned"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
             );
             map.insert(
-                "builtin".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("builtin"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -92,15 +92,15 @@ fn lexicon_doc_my_skylights_listItem() -> ::jacquard_lexicon::lexicon::LexiconDo
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "type".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("type"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
-                                    "my.skylights.listItem#inProgress".into(),
-                                    "my.skylights.listItem#queue".into(),
-                                    "my.skylights.listItem#abandoned".into(),
-                                    "my.skylights.listItem#owned".into(),
-                                    "my.skylights.listItem#wishlist".into()
+                                    ::jacquard_common::CowStr::new_static("my.skylights.listItem#inProgress"),
+                                    ::jacquard_common::CowStr::new_static("my.skylights.listItem#queue"),
+                                    ::jacquard_common::CowStr::new_static("my.skylights.listItem#abandoned"),
+                                    ::jacquard_common::CowStr::new_static("my.skylights.listItem#owned"),
+                                    ::jacquard_common::CowStr::new_static("my.skylights.listItem#wishlist")
                                 ],
                                 closed: None,
                             }),
@@ -110,24 +110,28 @@ fn lexicon_doc_my_skylights_listItem() -> ::jacquard_lexicon::lexicon::LexiconDo
                 }),
             );
             map.insert(
-                "inProgress".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("inProgress"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
-                        vec!["list".into(), "addedAt".into(), "position".into()],
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("list"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("addedAt"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("position")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "addedAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("addedAt"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -144,22 +148,27 @@ fn lexicon_doc_my_skylights_listItem() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            "item".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("item"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "my.skylights.defs#item".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "my.skylights.defs#item",
+                                ),
                             }),
                         );
                         map.insert(
-                            "list".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("list"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
-                                refs: vec!["my.skylights.list".into(), "#builtin".into()],
+                                refs: vec![
+                                    ::jacquard_common::CowStr::new_static("my.skylights.list"),
+                                    ::jacquard_common::CowStr::new_static("#builtin")
+                                ],
                                 closed: None,
                             }),
                         );
                         map.insert(
-                            "note".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("note"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -174,7 +183,7 @@ fn lexicon_doc_my_skylights_listItem() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            "position".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("position"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -193,19 +202,19 @@ fn lexicon_doc_my_skylights_listItem() -> ::jacquard_lexicon::lexicon::LexiconDo
                 }),
             );
             map.insert(
-                "owned".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("owned"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
             );
             map.insert(
-                "queue".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("queue"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
             );
             map.insert(
-                "wishlist".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("wishlist"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
@@ -218,6 +227,9 @@ fn lexicon_doc_my_skylights_listItem() -> ::jacquard_lexicon::lexicon::LexiconDo
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Builtin<'a> {
     fn nsid() -> &'static str {
         "my.skylights.listItem"
+    }
+    fn def_name() -> &'static str {
+        "builtin"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_my_skylights_listItem()
@@ -298,6 +310,9 @@ pub enum ListItemList<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListItem<'a> {
     fn nsid() -> &'static str {
         "my.skylights.listItem"
+    }
+    fn def_name() -> &'static str {
+        "main"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_my_skylights_listItem()

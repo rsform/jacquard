@@ -30,13 +30,13 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> ::jacquard_lexicon::lexicon::Lexico
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "sh.tangled.git.refUpdate".into(),
+        id: ::jacquard_common::CowStr::new_static("sh.tangled.git.refUpdate"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "commitCountBreakdown".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("commitCountBreakdown"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(vec![]),
@@ -45,12 +45,14 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> ::jacquard_lexicon::lexicon::Lexico
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "byEmail".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("byEmail"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "#individualEmailCommitCount".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "#individualEmailCommitCount",
+                                    ),
                                 }),
                                 min_length: None,
                                 max_length: None,
@@ -61,16 +63,23 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> ::jacquard_lexicon::lexicon::Lexico
                 }),
             );
             map.insert(
-                "individualEmailCommitCount".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static(
+                    "individualEmailCommitCount",
+                ),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["email".into(), "count".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("email"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("count")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "count".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("count"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -81,7 +90,7 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            "email".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("email"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -100,16 +109,23 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> ::jacquard_lexicon::lexicon::Lexico
                 }),
             );
             map.insert(
-                "individualLanguageSize".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static(
+                    "individualLanguageSize",
+                ),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["lang".into(), "size".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("lang"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("size")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "lang".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("lang"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -124,7 +140,7 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            "size".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("size"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -139,7 +155,7 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> ::jacquard_lexicon::lexicon::Lexico
                 }),
             );
             map.insert(
-                "langBreakdown".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("langBreakdown"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -148,12 +164,14 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> ::jacquard_lexicon::lexicon::Lexico
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "inputs".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("inputs"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "#individualLanguageSize".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "#individualLanguageSize",
+                                    ),
                                 }),
                                 min_length: None,
                                 max_length: None,
@@ -164,17 +182,25 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> ::jacquard_lexicon::lexicon::Lexico
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("tid".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "An update to a git repository, emitted by knots.",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: Some(
                             vec![
-                                "ref".into(), "committerDid".into(), "repoDid".into(),
-                                "repoName".into(), "oldSha".into(), "newSha".into(), "meta"
-                                .into()
+                                ::jacquard_common::smol_str::SmolStr::new_static("ref"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("committerDid"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("repoDid"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("repoName"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("oldSha"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("newSha"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("meta")
                             ],
                         ),
                         nullable: None,
@@ -182,9 +208,15 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> ::jacquard_lexicon::lexicon::Lexico
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "committerDid".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "committerDid",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "did of the user that pushed this ref",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Did,
                                     ),
@@ -199,16 +231,18 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                "meta".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("meta"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "#meta".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static("#meta"),
                                 }),
                             );
                             map.insert(
-                                "newSha".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("newSha"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static("new SHA of this ref"),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: Some(40usize),
@@ -221,9 +255,11 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                "oldSha".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("oldSha"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static("old SHA of this ref"),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: Some(40usize),
@@ -236,9 +272,11 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                "ref".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("ref"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static("Ref being updated"),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -251,9 +289,13 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                "repoDid".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("repoDid"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "did of the owner of the repo",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Did,
                                     ),
@@ -268,9 +310,13 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                "repoName".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "repoName",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static("name of the repo"),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -288,23 +334,34 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> ::jacquard_lexicon::lexicon::Lexico
                 }),
             );
             map.insert(
-                "meta".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("meta"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["isDefaultRef".into(), "commitCount".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("isDefaultRef"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("commitCount")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "commitCount".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "commitCount",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#commitCountBreakdown".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "#commitCountBreakdown",
+                                ),
                             }),
                         );
                         map.insert(
-                            "isDefaultRef".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "isDefaultRef",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                 description: None,
                                 default: None,
@@ -312,10 +369,14 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            "langBreakdown".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "langBreakdown",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#langBreakdown".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "#langBreakdown",
+                                ),
                             }),
                         );
                         map
@@ -330,6 +391,9 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> ::jacquard_lexicon::lexicon::Lexico
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CommitCountBreakdown<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.git.refUpdate"
+    }
+    fn def_name() -> &'static str {
+        "commitCountBreakdown"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_git_refUpdate()
@@ -364,6 +428,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for IndividualEmailCommitCoun
     fn nsid() -> &'static str {
         "sh.tangled.git.refUpdate"
     }
+    fn def_name() -> &'static str {
+        "individualEmailCommitCount"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_git_refUpdate()
     }
@@ -396,6 +463,9 @@ pub struct IndividualLanguageSize<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for IndividualLanguageSize<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.git.refUpdate"
+    }
+    fn def_name() -> &'static str {
+        "individualLanguageSize"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_git_refUpdate()
@@ -430,6 +500,9 @@ pub struct LangBreakdown<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LangBreakdown<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.git.refUpdate"
+    }
+    fn def_name() -> &'static str {
+        "langBreakdown"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_git_refUpdate()
@@ -546,6 +619,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RefUpdate<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.git.refUpdate"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_git_refUpdate()
     }
@@ -554,51 +630,56 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RefUpdate<'a> {
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         {
             let value = &self.new_sha;
-            if value.as_ref().len() > 40usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 40usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "new_sha",
                     max: 40usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         {
             let value = &self.new_sha;
-            if value.as_ref().len() < 40usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 40usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
                     field: "new_sha",
                     min: 40usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         {
             let value = &self.old_sha;
-            if value.as_ref().len() > 40usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 40usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "old_sha",
                     max: 40usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         {
             let value = &self.old_sha;
-            if value.as_ref().len() < 40usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 40usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
                     field: "old_sha",
                     min: 40usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         {
             let value = &self.r#ref;
-            if value.as_ref().len() > 2560usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 2560usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "ref",
                     max: 2560usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -648,6 +729,9 @@ pub struct Meta<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Meta<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.git.refUpdate"
+    }
+    fn def_name() -> &'static str {
+        "meta"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_git_refUpdate()

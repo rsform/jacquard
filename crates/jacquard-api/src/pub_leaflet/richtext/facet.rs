@@ -24,15 +24,19 @@ fn lexicon_doc_pub_leaflet_richtext_facet() -> ::jacquard_lexicon::lexicon::Lexi
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "pub.leaflet.richtext.facet".into(),
+        id: ::jacquard_common::CowStr::new_static("pub.leaflet.richtext.facet"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "bold".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("bold"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Facet feature for bold text",
+                        ),
+                    ),
                     required: Some(vec![]),
                     nullable: None,
                     properties: {
@@ -43,16 +47,25 @@ fn lexicon_doc_pub_leaflet_richtext_facet() -> ::jacquard_lexicon::lexicon::Lexi
                 }),
             );
             map.insert(
-                "byteSlice".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("byteSlice"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["byteStart".into(), "byteEnd".into()]),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Specifies the sub-string range a facet feature applies to. Start index is inclusive, end index is exclusive. Indices are zero-indexed, counting bytes of the UTF-8 encoded text. NOTE: some languages, like Javascript, use UTF-16 or Unicode codepoints for string slice indexing; in these languages, convert to byte arrays before working with facets.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("byteStart"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("byteEnd")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "byteEnd".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("byteEnd"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -63,7 +76,9 @@ fn lexicon_doc_pub_leaflet_richtext_facet() -> ::jacquard_lexicon::lexicon::Lexi
                             }),
                         );
                         map.insert(
-                            "byteStart".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "byteStart",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -78,9 +93,13 @@ fn lexicon_doc_pub_leaflet_richtext_facet() -> ::jacquard_lexicon::lexicon::Lexi
                 }),
             );
             map.insert(
-                "code".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("code"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Facet feature for inline code.",
+                        ),
+                    ),
                     required: Some(vec![]),
                     nullable: None,
                     properties: {
@@ -91,9 +110,13 @@ fn lexicon_doc_pub_leaflet_richtext_facet() -> ::jacquard_lexicon::lexicon::Lexi
                 }),
             );
             map.insert(
-                "highlight".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("highlight"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Facet feature for highlighted text.",
+                        ),
+                    ),
                     required: Some(vec![]),
                     nullable: None,
                     properties: {
@@ -104,16 +127,20 @@ fn lexicon_doc_pub_leaflet_richtext_facet() -> ::jacquard_lexicon::lexicon::Lexi
                 }),
             );
             map.insert(
-                "id".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("id"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Facet feature for an identifier. Used for linking to a segment",
+                        ),
+                    ),
                     required: Some(vec![]),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "id".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("id"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -132,9 +159,13 @@ fn lexicon_doc_pub_leaflet_richtext_facet() -> ::jacquard_lexicon::lexicon::Lexi
                 }),
             );
             map.insert(
-                "italic".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("italic"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Facet feature for italic text",
+                        ),
+                    ),
                     required: Some(vec![]),
                     nullable: None,
                     properties: {
@@ -145,16 +176,22 @@ fn lexicon_doc_pub_leaflet_richtext_facet() -> ::jacquard_lexicon::lexicon::Lexi
                 }),
             );
             map.insert(
-                "link".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("link"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["uri".into()]),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Facet feature for a URL. The text URL may have been simplified or truncated, but the facet reference should be a complete URL.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("uri")],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "uri".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -173,24 +210,38 @@ fn lexicon_doc_pub_leaflet_richtext_facet() -> ::jacquard_lexicon::lexicon::Lexi
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["index".into(), "features".into()]),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Annotation of a sub-string within rich text.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("index"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("features")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "features".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("features"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
-                                        "#link".into(), "#code".into(), "#highlight".into(),
-                                        "#underline".into(), "#strikethrough".into(), "#id".into(),
-                                        "#bold".into(), "#italic".into()
+                                        ::jacquard_common::CowStr::new_static("#link"),
+                                        ::jacquard_common::CowStr::new_static("#code"),
+                                        ::jacquard_common::CowStr::new_static("#highlight"),
+                                        ::jacquard_common::CowStr::new_static("#underline"),
+                                        ::jacquard_common::CowStr::new_static("#strikethrough"),
+                                        ::jacquard_common::CowStr::new_static("#id"),
+                                        ::jacquard_common::CowStr::new_static("#bold"),
+                                        ::jacquard_common::CowStr::new_static("#italic")
                                     ],
                                     closed: None,
                                 }),
@@ -199,10 +250,10 @@ fn lexicon_doc_pub_leaflet_richtext_facet() -> ::jacquard_lexicon::lexicon::Lexi
                             }),
                         );
                         map.insert(
-                            "index".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("index"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#byteSlice".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static("#byteSlice"),
                             }),
                         );
                         map
@@ -210,9 +261,13 @@ fn lexicon_doc_pub_leaflet_richtext_facet() -> ::jacquard_lexicon::lexicon::Lexi
                 }),
             );
             map.insert(
-                "strikethrough".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("strikethrough"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Facet feature for strikethrough markup",
+                        ),
+                    ),
                     required: Some(vec![]),
                     nullable: None,
                     properties: {
@@ -223,9 +278,13 @@ fn lexicon_doc_pub_leaflet_richtext_facet() -> ::jacquard_lexicon::lexicon::Lexi
                 }),
             );
             map.insert(
-                "underline".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("underline"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Facet feature for underline markup",
+                        ),
+                    ),
                     required: Some(vec![]),
                     nullable: None,
                     properties: {
@@ -243,6 +302,9 @@ fn lexicon_doc_pub_leaflet_richtext_facet() -> ::jacquard_lexicon::lexicon::Lexi
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Bold<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.richtext.facet"
+    }
+    fn def_name() -> &'static str {
+        "bold"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_richtext_facet()
@@ -275,6 +337,9 @@ pub struct ByteSlice<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ByteSlice<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.richtext.facet"
+    }
+    fn def_name() -> &'static str {
+        "byteSlice"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_richtext_facet()
@@ -324,6 +389,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Code<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.richtext.facet"
     }
+    fn def_name() -> &'static str {
+        "code"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_richtext_facet()
     }
@@ -351,6 +419,9 @@ pub struct Highlight<'a> {}
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Highlight<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.richtext.facet"
+    }
+    fn def_name() -> &'static str {
+        "highlight"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_richtext_facet()
@@ -385,6 +456,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Id<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.richtext.facet"
     }
+    fn def_name() -> &'static str {
+        "id"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_richtext_facet()
     }
@@ -412,6 +486,9 @@ pub struct Italic<'a> {}
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Italic<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.richtext.facet"
+    }
+    fn def_name() -> &'static str {
+        "italic"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_richtext_facet()
@@ -444,6 +521,9 @@ pub struct Link<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Link<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.richtext.facet"
+    }
+    fn def_name() -> &'static str {
+        "link"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_richtext_facet()
@@ -510,6 +590,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Facet<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.richtext.facet"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_richtext_facet()
     }
@@ -538,6 +621,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Strikethrough<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.richtext.facet"
     }
+    fn def_name() -> &'static str {
+        "strikethrough"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_richtext_facet()
     }
@@ -565,6 +651,9 @@ pub struct Underline<'a> {}
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Underline<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.richtext.facet"
+    }
+    fn def_name() -> &'static str {
+        "underline"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_richtext_facet()

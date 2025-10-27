@@ -34,7 +34,6 @@ serde_html_form = { workspace = true }
 miette = { workspace = true }
 p256 = { workspace = true, features = ["ecdsa"] }
 signature = "2"
-rand_core.workspace = true
 jose-jwa = "0.1"
 jose-jwk = { workspace = true, features = ["p256"] }
 chrono.workspace = true
@@ -44,7 +43,6 @@ bytes.workspace = true
 rand = { version = "0.8.5", features = ["small_rng"] }
 dashmap = "6.1.0"
 tokio = { workspace = true, default-features = false, features = ["sync"] }
-reqwest.workspace = true
 trait-variant.workspace = true
 n0-future = { workspace = true, optional = true }
 webbrowser = { version = "0.8", optional = true }

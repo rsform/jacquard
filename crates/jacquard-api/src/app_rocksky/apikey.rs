@@ -45,13 +45,13 @@ fn lexicon_doc_app_rocksky_apikey_defs() -> ::jacquard_lexicon::lexicon::Lexicon
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "app.rocksky.apikey.defs".into(),
+        id: ::jacquard_common::CowStr::new_static("app.rocksky.apikey.defs"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "apiKeyView".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("apiKeyView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -60,9 +60,15 @@ fn lexicon_doc_app_rocksky_apikey_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "createdAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "createdAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The date and time when the API key was created.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                 ),
@@ -77,9 +83,15 @@ fn lexicon_doc_app_rocksky_apikey_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                             }),
                         );
                         map.insert(
-                            "description".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "description",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "A description for the API key.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -92,9 +104,13 @@ fn lexicon_doc_app_rocksky_apikey_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                             }),
                         );
                         map.insert(
-                            "id".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("id"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The unique identifier of the API key.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -107,9 +123,13 @@ fn lexicon_doc_app_rocksky_apikey_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                             }),
                         );
                         map.insert(
-                            "name".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The name of the API key.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -133,6 +153,9 @@ fn lexicon_doc_app_rocksky_apikey_defs() -> ::jacquard_lexicon::lexicon::Lexicon
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ApiKeyView<'a> {
     fn nsid() -> &'static str {
         "app.rocksky.apikey.defs"
+    }
+    fn def_name() -> &'static str {
+        "apiKeyView"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_rocksky_apikey_defs()

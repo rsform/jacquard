@@ -37,18 +37,21 @@ fn lexicon_doc_place_stream_broadcast_defs() -> ::jacquard_lexicon::lexicon::Lex
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "place.stream.broadcast.defs".into(),
+        id: ::jacquard_common::CowStr::new_static("place.stream.broadcast.defs"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "broadcastOriginView".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("broadcastOriginView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            "uri".into(), "cid".into(), "author".into(), "record".into()
+                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("cid"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("author"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("record")
                         ],
                     ),
                     nullable: None,
@@ -56,14 +59,16 @@ fn lexicon_doc_place_stream_broadcast_defs() -> ::jacquard_lexicon::lexicon::Lex
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "author".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("author"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "app.bsky.actor.defs#profileViewBasic".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "app.bsky.actor.defs#profileViewBasic",
+                                ),
                             }),
                         );
                         map.insert(
-                            "cid".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("cid"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -80,13 +85,13 @@ fn lexicon_doc_place_stream_broadcast_defs() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            "record".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("record"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
                                 description: None,
                             }),
                         );
                         map.insert(
-                            "uri".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -114,6 +119,9 @@ fn lexicon_doc_place_stream_broadcast_defs() -> ::jacquard_lexicon::lexicon::Lex
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BroadcastOriginView<'a> {
     fn nsid() -> &'static str {
         "place.stream.broadcast.defs"
+    }
+    fn def_name() -> &'static str {
+        "broadcastOriginView"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_broadcast_defs()

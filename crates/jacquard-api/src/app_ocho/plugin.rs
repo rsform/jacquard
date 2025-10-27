@@ -43,13 +43,13 @@ fn lexicon_doc_app_ocho_plugin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "app.ocho.plugin.defs".into(),
+        id: ::jacquard_common::CowStr::new_static("app.ocho.plugin.defs"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "adaptiveIcon".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("adaptiveIcon"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -58,9 +58,15 @@ fn lexicon_doc_app_ocho_plugin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "backgroundColor".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "backgroundColor",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The background color of the adaptive icon.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -73,9 +79,15 @@ fn lexicon_doc_app_ocho_plugin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "foregroundImage".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "foregroundImage",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The URL to the foreground image of the adaptive icon.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -88,7 +100,9 @@ fn lexicon_doc_app_ocho_plugin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "foregroundImageBlob".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "foregroundImageBlob",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
                                 description: None,
                                 accept: None,
@@ -100,7 +114,7 @@ fn lexicon_doc_app_ocho_plugin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                 }),
             );
             map.insert(
-                "android".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("android"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -109,14 +123,20 @@ fn lexicon_doc_app_ocho_plugin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "adaptiveIcon".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "adaptiveIcon",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#adaptiveIcon".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "#adaptiveIcon",
+                                ),
                             }),
                         );
                         map.insert(
-                            "edgeToEdgeEnabled".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "edgeToEdgeEnabled",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                 description: None,
                                 default: None,
@@ -128,18 +148,28 @@ fn lexicon_doc_app_ocho_plugin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                 }),
             );
             map.insert(
-                "androidStatusBar".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("androidStatusBar"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Android status bar configuration.",
+                        ),
+                    ),
                     required: None,
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "backgroundColor".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "backgroundColor",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The background color of the Android status bar.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -156,16 +186,22 @@ fn lexicon_doc_app_ocho_plugin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                 }),
             );
             map.insert(
-                "asset".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("asset"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["hash".into(), "blob".into(), "type".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("hash"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("blob"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("type")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "blob".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("blob"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
                                 description: None,
                                 accept: None,
@@ -173,9 +209,13 @@ fn lexicon_doc_app_ocho_plugin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "hash".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("hash"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The hash of the asset",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -188,9 +228,13 @@ fn lexicon_doc_app_ocho_plugin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "type".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("type"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The type of the asset",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -203,9 +247,15 @@ fn lexicon_doc_app_ocho_plugin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "updatedAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "updatedAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The date and time when this asset was last updated. Used to reset the jetstream cache, among other things.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                 ),
@@ -224,18 +274,24 @@ fn lexicon_doc_app_ocho_plugin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                 }),
             );
             map.insert(
-                "db".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("db"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["id".into()]),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("id")],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "id".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("id"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The ID of the database.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -252,18 +308,24 @@ fn lexicon_doc_app_ocho_plugin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                 }),
             );
             map.insert(
-                "developer".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("developer"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["tool".into()]),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("tool")],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "tool".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("tool"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The tool used for development, e.g., 'expo-cli'.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -280,44 +342,59 @@ fn lexicon_doc_app_ocho_plugin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                 }),
             );
             map.insert(
-                "expoClient".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("expoClient"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["name".into(), "slug".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("slug")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "android".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("android"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#android".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static("#android"),
                             }),
                         );
                         map.insert(
-                            "androidStatusBar".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "androidStatusBar",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#androidStatusBar".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "#androidStatusBar",
+                                ),
                             }),
                         );
                         map.insert(
-                            "expirements".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "expirements",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
                                 description: None,
                             }),
                         );
                         map.insert(
-                            "extra".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("extra"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
                                 description: None,
                             }),
                         );
                         map.insert(
-                            "icon".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("icon"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The URL to the app icon.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -330,22 +407,26 @@ fn lexicon_doc_app_ocho_plugin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "ios".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("ios"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#ios".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static("#ios"),
                             }),
                         );
                         map.insert(
-                            "locales".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("locales"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
                                 description: None,
                             }),
                         );
                         map.insert(
-                            "name".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The name of the Expo client application.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -358,7 +439,9 @@ fn lexicon_doc_app_ocho_plugin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "newArchEnabled".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "newArchEnabled",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                 description: None,
                                 default: None,
@@ -366,9 +449,15 @@ fn lexicon_doc_app_ocho_plugin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "orientation".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "orientation",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The default orientation of the app.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -381,9 +470,15 @@ fn lexicon_doc_app_ocho_plugin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "platforms".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "platforms",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The platforms supported by the app.",
+                                    ),
+                                ),
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -401,15 +496,19 @@ fn lexicon_doc_app_ocho_plugin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "plugins".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("plugins"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
                                 description: None,
                             }),
                         );
                         map.insert(
-                            "scheme".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("scheme"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The custom URI scheme for deep linking.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -422,9 +521,15 @@ fn lexicon_doc_app_ocho_plugin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "sdkVersion".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "sdkVersion",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The SDK version of the Expo client.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -437,9 +542,13 @@ fn lexicon_doc_app_ocho_plugin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "slug".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("slug"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "A URL-friendly identifier for the app.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -452,9 +561,15 @@ fn lexicon_doc_app_ocho_plugin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "userInterfaceStyle".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "userInterfaceStyle",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The default user interface style.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -467,9 +582,13 @@ fn lexicon_doc_app_ocho_plugin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "version".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("version"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The version of the app.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -482,10 +601,10 @@ fn lexicon_doc_app_ocho_plugin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "web".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("web"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#web".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static("#web"),
                             }),
                         );
                         map
@@ -493,19 +612,25 @@ fn lexicon_doc_app_ocho_plugin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                 }),
             );
             map.insert(
-                "expoGo".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("expoGo"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["developer".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("developer")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "developer".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "developer",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#developer".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static("#developer"),
                             }),
                         );
                         map
@@ -513,7 +638,7 @@ fn lexicon_doc_app_ocho_plugin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                 }),
             );
             map.insert(
-                "ios".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("ios"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -522,7 +647,9 @@ fn lexicon_doc_app_ocho_plugin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "supportsTablet".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "supportsTablet",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                 description: None,
                                 default: None,
@@ -534,20 +661,30 @@ fn lexicon_doc_app_ocho_plugin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                 }),
             );
             map.insert(
-                "launchAsset".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("launchAsset"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
-                        vec!["key".into(), "contentType".into(), "url".into()],
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("key"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("contentType"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("url")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "contentType".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "contentType",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The MIME type of the asset, e.g., 'image/png'.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -560,9 +697,13 @@ fn lexicon_doc_app_ocho_plugin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "key".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("key"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The unique key for this asset, used to reference it in the plugin.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -575,9 +716,13 @@ fn lexicon_doc_app_ocho_plugin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "url".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("url"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The URL where the asset can be accessed.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                 ),
@@ -596,13 +741,17 @@ fn lexicon_doc_app_ocho_plugin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                 }),
             );
             map.insert(
-                "manifest".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("manifest"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            "id".into(), "createdAt".into(), "runtimeVersion".into(),
-                            "launchAsset".into(), "metadata".into(), "extra".into()
+                            ::jacquard_common::smol_str::SmolStr::new_static("id"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("createdAt"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("runtimeVersion"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("launchAsset"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("metadata"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("extra")
                         ],
                     ),
                     nullable: None,
@@ -610,9 +759,15 @@ fn lexicon_doc_app_ocho_plugin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "createdAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "createdAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The date and time when this plugin manifest was created.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                 ),
@@ -627,16 +782,22 @@ fn lexicon_doc_app_ocho_plugin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "extra".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("extra"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "app.ocho.plugin.defs#manifestExtra".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "app.ocho.plugin.defs#manifestExtra",
+                                ),
                             }),
                         );
                         map.insert(
-                            "id".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("id"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The unique identifier for this plugin manifest.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -649,22 +810,32 @@ fn lexicon_doc_app_ocho_plugin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "launchAsset".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "launchAsset",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "app.ocho.plugin.defs#launchAsset".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "app.ocho.plugin.defs#launchAsset",
+                                ),
                             }),
                         );
                         map.insert(
-                            "metadata".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("metadata"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
                                 description: None,
                             }),
                         );
                         map.insert(
-                            "runtimeVersion".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "runtimeVersion",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The version of the Expo runtime this plugin is compatible with.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -681,26 +852,33 @@ fn lexicon_doc_app_ocho_plugin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                 }),
             );
             map.insert(
-                "manifestExtra".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("manifestExtra"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["expoClient".into(), "expoGo".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("expoClient"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("expoGo")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "expoClient".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "expoClient",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#expoClient".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static("#expoClient"),
                             }),
                         );
                         map.insert(
-                            "expoGo".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("expoGo"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#expoGo".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static("#expoGo"),
                             }),
                         );
                         map
@@ -708,12 +886,15 @@ fn lexicon_doc_app_ocho_plugin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                 }),
             );
             map.insert(
-                "plugin".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("plugin"),
                 ::jacquard_lexicon::lexicon::LexUserType::Array(::jacquard_lexicon::lexicon::LexArray {
                     description: None,
                     items: ::jacquard_lexicon::lexicon::LexArrayItem::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                         description: None,
-                        refs: vec!["#stringId".into(), "#pluginConfig".into()],
+                        refs: vec![
+                            ::jacquard_common::CowStr::new_static("#stringId"),
+                            ::jacquard_common::CowStr::new_static("#pluginConfig")
+                        ],
                         closed: None,
                     }),
                     min_length: None,
@@ -721,15 +902,19 @@ fn lexicon_doc_app_ocho_plugin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                 }),
             );
             map.insert(
-                "pluginConfig".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("pluginConfig"),
                 ::jacquard_lexicon::lexicon::LexUserType::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
                     description: None,
                 }),
             );
             map.insert(
-                "stringId".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("stringId"),
                 ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A string identifier for a plugin, used to reference it in the app.",
+                        ),
+                    ),
                     format: None,
                     default: None,
                     min_length: None,
@@ -742,7 +927,7 @@ fn lexicon_doc_app_ocho_plugin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                 }),
             );
             map.insert(
-                "web".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("web"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -751,9 +936,13 @@ fn lexicon_doc_app_ocho_plugin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "bundler".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("bundler"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The bundler used for the web app.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -766,9 +955,13 @@ fn lexicon_doc_app_ocho_plugin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "favicon".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("favicon"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The URL to the favicon for the web app.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -781,7 +974,9 @@ fn lexicon_doc_app_ocho_plugin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "faviconBlob".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "faviconBlob",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
                                 description: None,
                                 accept: None,
@@ -789,9 +984,13 @@ fn lexicon_doc_app_ocho_plugin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "output".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("output"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The output directory for the web app.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -815,6 +1014,9 @@ fn lexicon_doc_app_ocho_plugin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AdaptiveIcon<'a> {
     fn nsid() -> &'static str {
         "app.ocho.plugin.defs"
+    }
+    fn def_name() -> &'static str {
+        "adaptiveIcon"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_ocho_plugin_defs()
@@ -852,6 +1054,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Android<'a> {
     fn nsid() -> &'static str {
         "app.ocho.plugin.defs"
     }
+    fn def_name() -> &'static str {
+        "android"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_ocho_plugin_defs()
     }
@@ -885,6 +1090,9 @@ pub struct AndroidStatusBar<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AndroidStatusBar<'a> {
     fn nsid() -> &'static str {
         "app.ocho.plugin.defs"
+    }
+    fn def_name() -> &'static str {
+        "androidStatusBar"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_ocho_plugin_defs()
@@ -930,6 +1138,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Asset<'a> {
     fn nsid() -> &'static str {
         "app.ocho.plugin.defs"
     }
+    fn def_name() -> &'static str {
+        "asset"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_ocho_plugin_defs()
     }
@@ -962,6 +1173,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Db<'a> {
     fn nsid() -> &'static str {
         "app.ocho.plugin.defs"
     }
+    fn def_name() -> &'static str {
+        "db"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_ocho_plugin_defs()
     }
@@ -993,6 +1207,9 @@ pub struct Developer<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Developer<'a> {
     fn nsid() -> &'static str {
         "app.ocho.plugin.defs"
+    }
+    fn def_name() -> &'static str {
+        "developer"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_ocho_plugin_defs()
@@ -1094,6 +1311,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ExpoClient<'a> {
     fn nsid() -> &'static str {
         "app.ocho.plugin.defs"
     }
+    fn def_name() -> &'static str {
+        "expoClient"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_ocho_plugin_defs()
     }
@@ -1126,6 +1346,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ExpoGo<'a> {
     fn nsid() -> &'static str {
         "app.ocho.plugin.defs"
     }
+    fn def_name() -> &'static str {
+        "expoGo"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_ocho_plugin_defs()
     }
@@ -1157,6 +1380,9 @@ pub struct Ios<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Ios<'a> {
     fn nsid() -> &'static str {
         "app.ocho.plugin.defs"
+    }
+    fn def_name() -> &'static str {
+        "ios"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_ocho_plugin_defs()
@@ -1197,6 +1423,9 @@ pub struct LaunchAsset<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LaunchAsset<'a> {
     fn nsid() -> &'static str {
         "app.ocho.plugin.defs"
+    }
+    fn def_name() -> &'static str {
+        "launchAsset"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_ocho_plugin_defs()
@@ -1245,6 +1474,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Manifest<'a> {
     fn nsid() -> &'static str {
         "app.ocho.plugin.defs"
     }
+    fn def_name() -> &'static str {
+        "manifest"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_ocho_plugin_defs()
     }
@@ -1277,6 +1509,9 @@ pub struct ManifestExtra<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ManifestExtra<'a> {
     fn nsid() -> &'static str {
         "app.ocho.plugin.defs"
+    }
+    fn def_name() -> &'static str {
+        "manifestExtra"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_ocho_plugin_defs()
@@ -1344,6 +1579,9 @@ pub struct Web<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Web<'a> {
     fn nsid() -> &'static str {
         "app.ocho.plugin.defs"
+    }
+    fn def_name() -> &'static str {
+        "web"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_ocho_plugin_defs()

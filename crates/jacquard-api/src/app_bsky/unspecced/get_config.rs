@@ -29,22 +29,27 @@ fn lexicon_doc_app_bsky_unspecced_getConfig() -> ::jacquard_lexicon::lexicon::Le
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "app.bsky.unspecced.getConfig".into(),
+        id: ::jacquard_common::CowStr::new_static("app.bsky.unspecced.getConfig"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "liveNowConfig".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("liveNowConfig"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["did".into(), "domains".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("domains")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "did".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -61,7 +66,7 @@ fn lexicon_doc_app_bsky_unspecced_getConfig() -> ::jacquard_lexicon::lexicon::Le
                             }),
                         );
                         map.insert(
-                            "domains".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("domains"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
@@ -85,7 +90,7 @@ fn lexicon_doc_app_bsky_unspecced_getConfig() -> ::jacquard_lexicon::lexicon::Le
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
                     description: None,
                     parameters: None,
@@ -101,6 +106,9 @@ fn lexicon_doc_app_bsky_unspecced_getConfig() -> ::jacquard_lexicon::lexicon::Le
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LiveNowConfig<'a> {
     fn nsid() -> &'static str {
         "app.bsky.unspecced.getConfig"
+    }
+    fn def_name() -> &'static str {
+        "liveNowConfig"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_unspecced_getConfig()

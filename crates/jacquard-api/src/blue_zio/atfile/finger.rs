@@ -32,22 +32,26 @@ fn lexicon_doc_blue_zio_atfile_finger() -> ::jacquard_lexicon::lexicon::LexiconD
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "blue.zio.atfile.finger".into(),
+        id: ::jacquard_common::CowStr::new_static("blue.zio.atfile.finger"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "browser".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("browser"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A fingerprint of a browser upload.",
+                        ),
+                    ),
                     required: None,
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "id".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("id"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -62,7 +66,9 @@ fn lexicon_doc_blue_zio_atfile_finger() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "userAgent".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "userAgent",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -81,16 +87,20 @@ fn lexicon_doc_blue_zio_atfile_finger() -> ::jacquard_lexicon::lexicon::LexiconD
                 }),
             );
             map.insert(
-                "machine".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("machine"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A fingerprint of a machine upload.",
+                        ),
+                    ),
                     required: None,
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "app".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("app"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -105,7 +115,7 @@ fn lexicon_doc_blue_zio_atfile_finger() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "host".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("host"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -120,7 +130,7 @@ fn lexicon_doc_blue_zio_atfile_finger() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "id".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("id"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -135,7 +145,7 @@ fn lexicon_doc_blue_zio_atfile_finger() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "os".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("os"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -161,6 +171,9 @@ fn lexicon_doc_blue_zio_atfile_finger() -> ::jacquard_lexicon::lexicon::LexiconD
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Browser<'a> {
     fn nsid() -> &'static str {
         "blue.zio.atfile.finger"
+    }
+    fn def_name() -> &'static str {
+        "browser"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blue_zio_atfile_finger()
@@ -203,6 +216,9 @@ pub struct Machine<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Machine<'a> {
     fn nsid() -> &'static str {
         "blue.zio.atfile.finger"
+    }
+    fn def_name() -> &'static str {
+        "machine"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blue_zio_atfile_finger()

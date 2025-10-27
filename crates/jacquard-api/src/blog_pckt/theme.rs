@@ -97,6 +97,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Theme<'a> {
     fn nsid() -> &'static str {
         "blog.pckt.theme"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blog_pckt_theme()
     }
@@ -104,11 +107,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Theme<'a> {
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         if let Some(ref value) = self.font {
-            if value.as_ref().len() > 100usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "font",
                     max: 100usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -119,34 +123,47 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Theme<'a> {
 fn lexicon_doc_blog_pckt_theme() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "blog.pckt.theme".into(),
+        id: ::jacquard_common::CowStr::new_static("blog.pckt.theme"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("tid".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Theme configuration for a blog publication",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
-                        required: Some(vec!["light".into(), "dark".into()]),
+                        required: Some(
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("light"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("dark")
+                            ],
+                        ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "dark".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("dark"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "#palette".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static("#palette"),
                                 }),
                             );
                             map.insert(
-                                "font".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("font"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Font family name (optional)",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -159,10 +176,10 @@ fn lexicon_doc_blog_pckt_theme() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                                 }),
                             );
                             map.insert(
-                                "light".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("light"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "#palette".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static("#palette"),
                                 }),
                             );
                             map
@@ -171,13 +188,20 @@ fn lexicon_doc_blog_pckt_theme() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                 }),
             );
             map.insert(
-                "palette".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("palette"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Color palette with CSS hex values",
+                        ),
+                    ),
                     required: Some(
                         vec![
-                            "link".into(), "text".into(), "accent".into(), "background"
-                            .into(), "surfaceHover".into()
+                            ::jacquard_common::smol_str::SmolStr::new_static("link"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("text"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("accent"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("background"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("surfaceHover")
                         ],
                     ),
                     nullable: None,
@@ -185,9 +209,13 @@ fn lexicon_doc_blog_pckt_theme() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "accent".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("accent"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Accent color (hex value)",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -200,9 +228,15 @@ fn lexicon_doc_blog_pckt_theme() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            "background".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "background",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Background color (hex value)",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -215,9 +249,13 @@ fn lexicon_doc_blog_pckt_theme() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            "link".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("link"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Link color (hex value)",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -230,9 +268,15 @@ fn lexicon_doc_blog_pckt_theme() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            "surfaceHover".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "surfaceHover",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Surface hover color (hex value)",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -245,9 +289,13 @@ fn lexicon_doc_blog_pckt_theme() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             }),
                         );
                         map.insert(
-                            "text".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("text"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Primary text color (hex value)",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -303,6 +351,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Palette<'a> {
     fn nsid() -> &'static str {
         "blog.pckt.theme"
     }
+    fn def_name() -> &'static str {
+        "palette"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blog_pckt_theme()
     }
@@ -311,51 +362,56 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Palette<'a> {
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         {
             let value = &self.accent;
-            if value.as_ref().len() > 7usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 7usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "accent",
                     max: 7usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         {
             let value = &self.background;
-            if value.as_ref().len() > 7usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 7usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "background",
                     max: 7usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         {
             let value = &self.link;
-            if value.as_ref().len() > 7usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 7usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "link",
                     max: 7usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         {
             let value = &self.surface_hover;
-            if value.as_ref().len() > 7usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 7usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "surface_hover",
                     max: 7usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         {
             let value = &self.text;
-            if value.as_ref().len() > 7usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 7usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "text",
                     max: 7usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }

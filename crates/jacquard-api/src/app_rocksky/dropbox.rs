@@ -34,13 +34,13 @@ fn lexicon_doc_app_rocksky_dropbox_defs() -> ::jacquard_lexicon::lexicon::Lexico
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "app.rocksky.dropbox.defs".into(),
+        id: ::jacquard_common::CowStr::new_static("app.rocksky.dropbox.defs"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "fileListView".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("fileListView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -49,12 +49,18 @@ fn lexicon_doc_app_rocksky_dropbox_defs() -> ::jacquard_lexicon::lexicon::Lexico
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "files".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("files"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "A list of files in the Dropbox.",
+                                    ),
+                                ),
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "app.rocksky.dropbox.defs#fileView".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "app.rocksky.dropbox.defs#fileView",
+                                    ),
                                 }),
                                 min_length: None,
                                 max_length: None,
@@ -65,7 +71,7 @@ fn lexicon_doc_app_rocksky_dropbox_defs() -> ::jacquard_lexicon::lexicon::Lexico
                 }),
             );
             map.insert(
-                "fileView".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("fileView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -74,9 +80,15 @@ fn lexicon_doc_app_rocksky_dropbox_defs() -> ::jacquard_lexicon::lexicon::Lexico
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "clientModified".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "clientModified",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The last modified date and time of the file on the client.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                 ),
@@ -91,9 +103,13 @@ fn lexicon_doc_app_rocksky_dropbox_defs() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            "id".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("id"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The unique identifier of the file.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -106,9 +122,13 @@ fn lexicon_doc_app_rocksky_dropbox_defs() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            "name".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The name of the file.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -121,9 +141,15 @@ fn lexicon_doc_app_rocksky_dropbox_defs() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            "pathDisplay".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "pathDisplay",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The display path of the file.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -136,9 +162,15 @@ fn lexicon_doc_app_rocksky_dropbox_defs() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            "pathLower".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "pathLower",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The lowercased path of the file.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -151,9 +183,15 @@ fn lexicon_doc_app_rocksky_dropbox_defs() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            "serverModified".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "serverModified",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The last modified date and time of the file on the server.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                 ),
@@ -172,7 +210,7 @@ fn lexicon_doc_app_rocksky_dropbox_defs() -> ::jacquard_lexicon::lexicon::Lexico
                 }),
             );
             map.insert(
-                "temporaryLinkView".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("temporaryLinkView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -181,9 +219,13 @@ fn lexicon_doc_app_rocksky_dropbox_defs() -> ::jacquard_lexicon::lexicon::Lexico
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "link".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("link"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The temporary link to access the file.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                 ),
@@ -209,6 +251,9 @@ fn lexicon_doc_app_rocksky_dropbox_defs() -> ::jacquard_lexicon::lexicon::Lexico
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FileListView<'a> {
     fn nsid() -> &'static str {
         "app.rocksky.dropbox.defs"
+    }
+    fn def_name() -> &'static str {
+        "fileListView"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_rocksky_dropbox_defs()
@@ -261,6 +306,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FileView<'a> {
     fn nsid() -> &'static str {
         "app.rocksky.dropbox.defs"
     }
+    fn def_name() -> &'static str {
+        "fileView"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_rocksky_dropbox_defs()
     }
@@ -293,6 +341,9 @@ pub struct TemporaryLinkView<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TemporaryLinkView<'a> {
     fn nsid() -> &'static str {
         "app.rocksky.dropbox.defs"
+    }
+    fn def_name() -> &'static str {
+        "temporaryLinkView"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_rocksky_dropbox_defs()

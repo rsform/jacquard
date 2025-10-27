@@ -125,24 +125,30 @@ fn lexicon_doc_tools_ozone_moderation_getAccountTimeline() -> ::jacquard_lexicon
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "tools.ozone.moderation.getAccountTimeline".into(),
+        id: ::jacquard_common::CowStr::new_static(
+            "tools.ozone.moderation.getAccountTimeline",
+        ),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
                     description: None,
                     parameters: Some(
                         ::jacquard_lexicon::lexicon::LexXrpcQueryParameter::Params(::jacquard_lexicon::lexicon::LexXrpcParameters {
                             description: None,
-                            required: Some(vec!["did".into()]),
+                            required: Some(
+                                vec![
+                                    ::jacquard_common::smol_str::SmolStr::new_static("did")
+                                ],
+                            ),
                             properties: {
                                 #[allow(unused_mut)]
                                 let mut map = ::std::collections::BTreeMap::new();
                                 map.insert(
-                                    "did".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static("did"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
                                         description: None,
                                         format: Some(
@@ -167,16 +173,21 @@ fn lexicon_doc_tools_ozone_moderation_getAccountTimeline() -> ::jacquard_lexicon
                 }),
             );
             map.insert(
-                "timelineItem".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("timelineItem"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["day".into(), "summary".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("day"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("summary")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "day".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("day"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -191,12 +202,14 @@ fn lexicon_doc_tools_ozone_moderation_getAccountTimeline() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            "summary".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("summary"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "#timelineItemSummary".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "#timelineItemSummary",
+                                    ),
                                 }),
                                 min_length: None,
                                 max_length: None,
@@ -207,12 +220,14 @@ fn lexicon_doc_tools_ozone_moderation_getAccountTimeline() -> ::jacquard_lexicon
                 }),
             );
             map.insert(
-                "timelineItemSummary".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("timelineItemSummary"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            "eventSubjectType".into(), "eventType".into(), "count".into()
+                            ::jacquard_common::smol_str::SmolStr::new_static("eventSubjectType"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("eventType"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("count")
                         ],
                     ),
                     nullable: None,
@@ -220,7 +235,7 @@ fn lexicon_doc_tools_ozone_moderation_getAccountTimeline() -> ::jacquard_lexicon
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "count".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("count"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -231,7 +246,9 @@ fn lexicon_doc_tools_ozone_moderation_getAccountTimeline() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            "eventSubjectType".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "eventSubjectType",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -246,7 +263,9 @@ fn lexicon_doc_tools_ozone_moderation_getAccountTimeline() -> ::jacquard_lexicon
                             }),
                         );
                         map.insert(
-                            "eventType".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "eventType",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -272,6 +291,9 @@ fn lexicon_doc_tools_ozone_moderation_getAccountTimeline() -> ::jacquard_lexicon
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TimelineItem<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.getAccountTimeline"
+    }
+    fn def_name() -> &'static str {
+        "timelineItem"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_getAccountTimeline()
@@ -308,6 +330,9 @@ pub struct TimelineItemSummary<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TimelineItemSummary<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.getAccountTimeline"
+    }
+    fn def_name() -> &'static str {
+        "timelineItemSummary"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_getAccountTimeline()

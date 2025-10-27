@@ -112,6 +112,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Slice<'a> {
     fn nsid() -> &'static str {
         "network.slices.slice"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_network_slices_slice()
     }
@@ -120,21 +123,23 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Slice<'a> {
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         {
             let value = &self.domain;
-            if value.as_ref().len() > 256usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "domain",
                     max: 256usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         {
             let value = &self.name;
-            if value.as_ref().len() > 256usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "name",
                     max: 256usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -147,29 +152,39 @@ fn lexicon_doc_network_slices_slice() -> ::jacquard_lexicon::lexicon::LexiconDoc
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "network.slices.slice".into(),
+        id: ::jacquard_common::CowStr::new_static("network.slices.slice"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: None,
-                    key: Some("tid".into()),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: Some(
-                            vec!["name".into(), "domain".into(), "createdAt".into()],
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("domain"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                            ],
                         ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "When the slice was created",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -184,9 +199,13 @@ fn lexicon_doc_network_slices_slice() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                "domain".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("domain"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Primary domain namespace for this slice (e.g. social.grain)",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -199,9 +218,11 @@ fn lexicon_doc_network_slices_slice() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                "name".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static("Name of the slice"),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -284,19 +305,23 @@ fn lexicon_doc_network_slices_slice_defs() -> ::jacquard_lexicon::lexicon::Lexic
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "network.slices.slice.defs".into(),
+        id: ::jacquard_common::CowStr::new_static("network.slices.slice.defs"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "sliceView".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("sliceView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            "uri".into(), "cid".into(), "name".into(), "domain".into(),
-                            "creator".into(), "createdAt".into()
+                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("cid"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("domain"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("creator"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
                         ],
                     ),
                     nullable: None,
@@ -304,7 +329,7 @@ fn lexicon_doc_network_slices_slice_defs() -> ::jacquard_lexicon::lexicon::Lexic
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "cid".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("cid"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -321,7 +346,9 @@ fn lexicon_doc_network_slices_slice_defs() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "createdAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "createdAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -338,16 +365,22 @@ fn lexicon_doc_network_slices_slice_defs() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "creator".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("creator"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "network.slices.actor.defs#profileViewBasic".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "network.slices.actor.defs#profileViewBasic",
+                                ),
                             }),
                         );
                         map.insert(
-                            "domain".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("domain"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Primary domain namespace for this slice (e.g. social.grain)",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -360,7 +393,9 @@ fn lexicon_doc_network_slices_slice_defs() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "indexedActorCount".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "indexedActorCount",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -371,7 +406,9 @@ fn lexicon_doc_network_slices_slice_defs() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "indexedCollectionCount".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "indexedCollectionCount",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -382,7 +419,9 @@ fn lexicon_doc_network_slices_slice_defs() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "indexedRecordCount".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "indexedRecordCount",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -393,9 +432,13 @@ fn lexicon_doc_network_slices_slice_defs() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "name".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Display name of the slice",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -408,19 +451,27 @@ fn lexicon_doc_network_slices_slice_defs() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "sparkline".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "sparkline",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Recent activity sparkline data points for the last 24 hours",
+                                    ),
+                                ),
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "#sparklinePoint".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "#sparklinePoint",
+                                    ),
                                 }),
                                 min_length: None,
                                 max_length: None,
                             }),
                         );
                         map.insert(
-                            "uri".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -437,7 +488,9 @@ fn lexicon_doc_network_slices_slice_defs() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "waitlistInviteCount".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "waitlistInviteCount",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -448,7 +501,9 @@ fn lexicon_doc_network_slices_slice_defs() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "waitlistRequestCount".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "waitlistRequestCount",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -463,16 +518,21 @@ fn lexicon_doc_network_slices_slice_defs() -> ::jacquard_lexicon::lexicon::Lexic
                 }),
             );
             map.insert(
-                "sparklinePoint".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("sparklinePoint"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["timestamp".into(), "count".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("timestamp"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("count")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "count".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("count"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -483,7 +543,9 @@ fn lexicon_doc_network_slices_slice_defs() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "timestamp".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "timestamp",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -511,6 +573,9 @@ fn lexicon_doc_network_slices_slice_defs() -> ::jacquard_lexicon::lexicon::Lexic
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SliceView<'a> {
     fn nsid() -> &'static str {
         "network.slices.slice.defs"
+    }
+    fn def_name() -> &'static str {
+        "sliceView"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_network_slices_slice_defs()
@@ -542,6 +607,9 @@ pub struct SparklinePoint<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SparklinePoint<'a> {
     fn nsid() -> &'static str {
         "network.slices.slice.defs"
+    }
+    fn def_name() -> &'static str {
+        "sparklinePoint"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_network_slices_slice_defs()

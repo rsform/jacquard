@@ -115,6 +115,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Transaction<'a> {
     fn nsid() -> &'static str {
         "beauty.cybernetic.trustcow.transaction"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_beauty_cybernetic_trustcow_transaction()
     }
@@ -122,30 +125,33 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Transaction<'a> {
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         if let Some(ref value) = self.currency {
-            if value.as_ref().len() > 10usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 10usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "currency",
                     max: 10usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         if let Some(ref value) = self.description {
-            if value.as_ref().len() > 500usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 500usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "description",
                     max: 500usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         {
             let value = &self.transaction_id;
-            if value.as_ref().len() > 128usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 128usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "transaction_id",
                     max: 128usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -158,22 +164,30 @@ fn lexicon_doc_beauty_cybernetic_trustcow_transaction() -> ::jacquard_lexicon::l
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "beauty.cybernetic.trustcow.transaction".into(),
+        id: ::jacquard_common::CowStr::new_static(
+            "beauty.cybernetic.trustcow.transaction",
+        ),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A verified transaction between two ATProto identities that must be stored in both parties' PDS",
+                        ),
+                    ),
                     key: None,
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: Some(
                             vec![
-                                "serviceProvider".into(), "serviceConsumer".into(),
-                                "transactionId".into(), "createdAt".into()
+                                ::jacquard_common::smol_str::SmolStr::new_static("serviceProvider"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("serviceConsumer"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("transactionId"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -181,9 +195,13 @@ fn lexicon_doc_beauty_cybernetic_trustcow_transaction() -> ::jacquard_lexicon::l
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "amount".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("amount"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Transaction amount (optional, in whatever currency applies)",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -196,9 +214,15 @@ fn lexicon_doc_beauty_cybernetic_trustcow_transaction() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "When the transaction occurred",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -213,9 +237,15 @@ fn lexicon_doc_beauty_cybernetic_trustcow_transaction() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                "currency".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "currency",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Currency code (optional, e.g. USD, EUR, BTC)",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -228,9 +258,15 @@ fn lexicon_doc_beauty_cybernetic_trustcow_transaction() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                "description".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "description",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Description of the service or product transacted",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -243,9 +279,15 @@ fn lexicon_doc_beauty_cybernetic_trustcow_transaction() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                "serviceConsumer".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "serviceConsumer",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "DID of the service consumer identity",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -258,9 +300,15 @@ fn lexicon_doc_beauty_cybernetic_trustcow_transaction() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                "serviceProvider".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "serviceProvider",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "DID of the service provider identity",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -273,9 +321,15 @@ fn lexicon_doc_beauty_cybernetic_trustcow_transaction() -> ::jacquard_lexicon::l
                                 }),
                             );
                             map.insert(
-                                "transactionId".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "transactionId",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Unique identifier for this transaction, must be identical in both parties' records",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,

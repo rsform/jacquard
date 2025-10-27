@@ -136,13 +136,13 @@ fn lexicon_doc_tools_ozone_safelink_defs() -> ::jacquard_lexicon::lexicon::Lexic
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "tools.ozone.safelink.defs".into(),
+        id: ::jacquard_common::CowStr::new_static("tools.ozone.safelink.defs"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "actionType".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("actionType"),
                 ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
                     description: None,
                     format: None,
@@ -157,14 +157,23 @@ fn lexicon_doc_tools_ozone_safelink_defs() -> ::jacquard_lexicon::lexicon::Lexic
                 }),
             );
             map.insert(
-                "event".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("event"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "An event for URL safety decisions",
+                        ),
+                    ),
                     required: Some(
                         vec![
-                            "id".into(), "eventType".into(), "url".into(), "pattern"
-                            .into(), "action".into(), "reason".into(), "createdBy"
-                            .into(), "createdAt".into()
+                            ::jacquard_common::smol_str::SmolStr::new_static("id"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("eventType"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("url"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("pattern"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("action"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("reason"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("createdBy"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
                         ],
                     ),
                     nullable: None,
@@ -172,16 +181,20 @@ fn lexicon_doc_tools_ozone_safelink_defs() -> ::jacquard_lexicon::lexicon::Lexic
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "action".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("action"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#actionType".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static("#actionType"),
                             }),
                         );
                         map.insert(
-                            "comment".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("comment"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Optional comment about the decision",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -194,7 +207,9 @@ fn lexicon_doc_tools_ozone_safelink_defs() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "createdAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "createdAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -211,9 +226,15 @@ fn lexicon_doc_tools_ozone_safelink_defs() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "createdBy".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "createdBy",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "DID of the user who created this rule",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Did,
                                 ),
@@ -228,14 +249,16 @@ fn lexicon_doc_tools_ozone_safelink_defs() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "eventType".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "eventType",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#eventType".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static("#eventType"),
                             }),
                         );
                         map.insert(
-                            "id".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("id"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -246,23 +269,27 @@ fn lexicon_doc_tools_ozone_safelink_defs() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "pattern".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("pattern"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#patternType".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static("#patternType"),
                             }),
                         );
                         map.insert(
-                            "reason".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("reason"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#reasonType".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static("#reasonType"),
                             }),
                         );
                         map.insert(
-                            "url".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("url"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The URL that this rule applies to",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -279,7 +306,7 @@ fn lexicon_doc_tools_ozone_safelink_defs() -> ::jacquard_lexicon::lexicon::Lexic
                 }),
             );
             map.insert(
-                "eventType".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("eventType"),
                 ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
                     description: None,
                     format: None,
@@ -294,7 +321,7 @@ fn lexicon_doc_tools_ozone_safelink_defs() -> ::jacquard_lexicon::lexicon::Lexic
                 }),
             );
             map.insert(
-                "patternType".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("patternType"),
                 ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
                     description: None,
                     format: None,
@@ -309,7 +336,7 @@ fn lexicon_doc_tools_ozone_safelink_defs() -> ::jacquard_lexicon::lexicon::Lexic
                 }),
             );
             map.insert(
-                "reasonType".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("reasonType"),
                 ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
                     description: None,
                     format: None,
@@ -324,14 +351,22 @@ fn lexicon_doc_tools_ozone_safelink_defs() -> ::jacquard_lexicon::lexicon::Lexic
                 }),
             );
             map.insert(
-                "urlRule".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("urlRule"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Input for creating a URL safety rule",
+                        ),
+                    ),
                     required: Some(
                         vec![
-                            "url".into(), "pattern".into(), "action".into(), "reason"
-                            .into(), "createdBy".into(), "createdAt".into(), "updatedAt"
-                            .into()
+                            ::jacquard_common::smol_str::SmolStr::new_static("url"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("pattern"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("action"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("reason"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("createdBy"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("createdAt"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("updatedAt")
                         ],
                     ),
                     nullable: None,
@@ -339,16 +374,20 @@ fn lexicon_doc_tools_ozone_safelink_defs() -> ::jacquard_lexicon::lexicon::Lexic
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "action".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("action"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#actionType".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static("#actionType"),
                             }),
                         );
                         map.insert(
-                            "comment".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("comment"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Optional comment about the decision",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -361,9 +400,15 @@ fn lexicon_doc_tools_ozone_safelink_defs() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "createdAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "createdAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Timestamp when the rule was created",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                 ),
@@ -378,9 +423,15 @@ fn lexicon_doc_tools_ozone_safelink_defs() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "createdBy".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "createdBy",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "DID of the user added the rule.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Did,
                                 ),
@@ -395,23 +446,29 @@ fn lexicon_doc_tools_ozone_safelink_defs() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "pattern".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("pattern"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#patternType".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static("#patternType"),
                             }),
                         );
                         map.insert(
-                            "reason".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("reason"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#reasonType".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static("#reasonType"),
                             }),
                         );
                         map.insert(
-                            "updatedAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "updatedAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Timestamp when the rule was last updated",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                 ),
@@ -426,9 +483,13 @@ fn lexicon_doc_tools_ozone_safelink_defs() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "url".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("url"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The URL or domain to apply the rule to",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -452,6 +513,9 @@ fn lexicon_doc_tools_ozone_safelink_defs() -> ::jacquard_lexicon::lexicon::Lexic
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Event<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.safelink.defs"
+    }
+    fn def_name() -> &'static str {
+        "event"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_safelink_defs()
@@ -747,6 +811,9 @@ pub struct UrlRule<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UrlRule<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.safelink.defs"
+    }
+    fn def_name() -> &'static str {
+        "urlRule"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_safelink_defs()

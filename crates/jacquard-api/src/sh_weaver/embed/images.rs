@@ -61,24 +61,33 @@ fn lexicon_doc_sh_weaver_embed_images() -> ::jacquard_lexicon::lexicon::LexiconD
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "sh.weaver.embed.images".into(),
+        id: ::jacquard_common::CowStr::new_static("sh.weaver.embed.images"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "image".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("image"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["image".into(), "alt".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("image"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("alt")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "alt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("alt"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "alt text description of the image",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -91,9 +100,13 @@ fn lexicon_doc_sh_weaver_embed_images() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "blurhash".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("blurhash"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Blurhash string for the image, used for low-resolution placeholders. This must be a valid Blurhash string.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -106,19 +119,21 @@ fn lexicon_doc_sh_weaver_embed_images() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "dimensions".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "dimensions",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
-                                    "app.bsky.embed.defs#aspectRatio".into(),
-                                    "sh.weaver.embed.defs#percentSize".into(),
-                                    "sh.weaver.embed.defs#pixelSize".into()
+                                    ::jacquard_common::CowStr::new_static("app.bsky.embed.defs#aspectRatio"),
+                                    ::jacquard_common::CowStr::new_static("sh.weaver.embed.defs#percentSize"),
+                                    ::jacquard_common::CowStr::new_static("sh.weaver.embed.defs#pixelSize")
                                 ],
                                 closed: None,
                             }),
                         );
                         map.insert(
-                            "image".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("image"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
                                 description: None,
                                 accept: None,
@@ -130,21 +145,23 @@ fn lexicon_doc_sh_weaver_embed_images() -> ::jacquard_lexicon::lexicon::LexiconD
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["images".into()]),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("images")],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "images".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("images"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "#image".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static("#image"),
                                 }),
                                 min_length: None,
                                 max_length: Some(48usize),
@@ -163,6 +180,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Image<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.embed.images"
     }
+    fn def_name() -> &'static str {
+        "image"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_embed_images()
     }
@@ -170,11 +190,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Image<'a> {
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         if let Some(ref value) = self.blurhash {
-            if value.as_ref().len() > 32usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 32usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "blurhash",
                     max: 32usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -203,6 +224,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Images<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.embed.images"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_embed_images()
     }
@@ -211,6 +235,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Images<'a> {
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         {
             let value = &self.images;
+            #[allow(unused_comparisons)]
             if value.len() > 48usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "images",

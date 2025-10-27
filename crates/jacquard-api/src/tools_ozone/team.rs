@@ -52,22 +52,29 @@ fn lexicon_doc_tools_ozone_team_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "tools.ozone.team.defs".into(),
+        id: ::jacquard_common::CowStr::new_static("tools.ozone.team.defs"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "member".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("member"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["did".into(), "role".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("role")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "createdAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "createdAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -84,7 +91,7 @@ fn lexicon_doc_tools_ozone_team_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            "did".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -101,7 +108,7 @@ fn lexicon_doc_tools_ozone_team_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            "disabled".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("disabled"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                 description: None,
                                 default: None,
@@ -109,7 +116,9 @@ fn lexicon_doc_tools_ozone_team_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            "lastUpdatedBy".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "lastUpdatedBy",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -124,14 +133,16 @@ fn lexicon_doc_tools_ozone_team_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            "profile".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("profile"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "app.bsky.actor.defs#profileViewDetailed".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "app.bsky.actor.defs#profileViewDetailed",
+                                ),
                             }),
                         );
                         map.insert(
-                            "role".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("role"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -146,7 +157,9 @@ fn lexicon_doc_tools_ozone_team_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            "updatedAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "updatedAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -167,25 +180,25 @@ fn lexicon_doc_tools_ozone_team_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                 }),
             );
             map.insert(
-                "roleAdmin".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("roleAdmin"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
             );
             map.insert(
-                "roleModerator".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("roleModerator"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
             );
             map.insert(
-                "roleTriage".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("roleTriage"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
             );
             map.insert(
-                "roleVerifier".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("roleVerifier"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
@@ -198,6 +211,9 @@ fn lexicon_doc_tools_ozone_team_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Member<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.team.defs"
+    }
+    fn def_name() -> &'static str {
+        "member"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_team_defs()

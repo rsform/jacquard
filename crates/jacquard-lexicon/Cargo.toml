@@ -14,7 +14,6 @@ license.workspace = true
 [dependencies]
 cid.workspace = true
 dashmap.workspace = true
-glob = "0.3"
 heck.workspace = true
 inventory = "0.3"
 jacquard-common = { version = "0.8", path = "../jacquard-common" }
@@ -32,7 +31,8 @@ sha2.workspace = true
 syn.workspace = true
 thiserror.workspace = true
 unicode-segmentation = "1.12"
-walkdir = "2.5"
 
 [dev-dependencies]
+bytes = { workspace = true }
+jacquard-derive = { version = "0.8", path = "../jacquard-derive" }
 tempfile = { version = "3.23.0" }

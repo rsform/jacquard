@@ -64,26 +64,39 @@ fn lexicon_doc_com_atproto_label_defs() -> ::jacquard_lexicon::lexicon::LexiconD
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "com.atproto.label.defs".into(),
+        id: ::jacquard_common::CowStr::new_static("com.atproto.label.defs"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "label".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("label"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Metadata tag on an atproto resource (eg, repo or record).",
+                        ),
+                    ),
                     required: Some(
-                        vec!["src".into(), "uri".into(), "val".into(), "cts".into()],
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("src"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("val"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("cts")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "cid".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("cid"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Optionally, CID specifying the specific version of 'uri' resource this label applies to.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Cid,
                                 ),
@@ -98,9 +111,13 @@ fn lexicon_doc_com_atproto_label_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "cts".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("cts"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Timestamp when this label was created.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                 ),
@@ -115,9 +132,13 @@ fn lexicon_doc_com_atproto_label_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "exp".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("exp"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Timestamp at which this label expires (no longer applies).",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                 ),
@@ -132,7 +153,7 @@ fn lexicon_doc_com_atproto_label_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "neg".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("neg"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                 description: None,
                                 default: None,
@@ -140,7 +161,7 @@ fn lexicon_doc_com_atproto_label_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "sig".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("sig"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Bytes(::jacquard_lexicon::lexicon::LexBytes {
                                 description: None,
                                 max_length: None,
@@ -148,9 +169,13 @@ fn lexicon_doc_com_atproto_label_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "src".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("src"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "DID of the actor who created this label.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Did,
                                 ),
@@ -165,9 +190,13 @@ fn lexicon_doc_com_atproto_label_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "uri".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "AT URI of the record, repository (account), or other resource that this label applies to.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                 ),
@@ -182,9 +211,13 @@ fn lexicon_doc_com_atproto_label_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "val".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("val"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The short string name of the value or type of this label.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -197,7 +230,7 @@ fn lexicon_doc_com_atproto_label_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "ver".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("ver"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -212,7 +245,7 @@ fn lexicon_doc_com_atproto_label_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                 }),
             );
             map.insert(
-                "labelValue".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("labelValue"),
                 ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
                     description: None,
                     format: None,
@@ -227,13 +260,19 @@ fn lexicon_doc_com_atproto_label_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                 }),
             );
             map.insert(
-                "labelValueDefinition".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("labelValueDefinition"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Declares a label value and its expected interpretations and behaviors.",
+                        ),
+                    ),
                     required: Some(
                         vec![
-                            "identifier".into(), "severity".into(), "blurs".into(),
-                            "locales".into()
+                            ::jacquard_common::smol_str::SmolStr::new_static("identifier"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("severity"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("blurs"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("locales")
                         ],
                     ),
                     nullable: None,
@@ -241,7 +280,9 @@ fn lexicon_doc_com_atproto_label_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "adultOnly".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "adultOnly",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                 description: None,
                                 default: None,
@@ -249,9 +290,13 @@ fn lexicon_doc_com_atproto_label_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "blurs".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("blurs"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "What should this label hide in the UI, if applied? 'content' hides all of the target; 'media' hides the images/video/audio; 'none' hides nothing.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -264,9 +309,15 @@ fn lexicon_doc_com_atproto_label_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "defaultSetting".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "defaultSetting",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The default setting for this label.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -279,9 +330,15 @@ fn lexicon_doc_com_atproto_label_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "identifier".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "identifier",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The value of the label being defined. Must only include lowercase ascii and the '-' character ([a-z-]+).",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -294,21 +351,27 @@ fn lexicon_doc_com_atproto_label_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "locales".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("locales"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "#labelValueDefinitionStrings".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "#labelValueDefinitionStrings",
+                                    ),
                                 }),
                                 min_length: None,
                                 max_length: None,
                             }),
                         );
                         map.insert(
-                            "severity".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("severity"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "How should a client visually convey this label? 'inform' means neutral and informational; 'alert' means negative and warning; 'none' means show nothing.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -325,20 +388,36 @@ fn lexicon_doc_com_atproto_label_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                 }),
             );
             map.insert(
-                "labelValueDefinitionStrings".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static(
+                    "labelValueDefinitionStrings",
+                ),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Strings which describe the label in the UI, localized into a specific language.",
+                        ),
+                    ),
                     required: Some(
-                        vec!["lang".into(), "name".into(), "description".into()],
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("lang"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("description")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "description".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "description",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "A longer description of what the label means and why it might be applied.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -351,9 +430,13 @@ fn lexicon_doc_com_atproto_label_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "lang".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("lang"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The code of the language these strings are written in.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Language,
                                 ),
@@ -368,9 +451,13 @@ fn lexicon_doc_com_atproto_label_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "name".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "A short human-readable name for the label.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -387,18 +474,28 @@ fn lexicon_doc_com_atproto_label_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                 }),
             );
             map.insert(
-                "selfLabel".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("selfLabel"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["val".into()]),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Metadata tag on an atproto record, published by the author within the record. Note that schemas should use #selfLabels, not #selfLabel.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("val")],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "val".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("val"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The short string name of the value or type of this label.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -415,21 +512,27 @@ fn lexicon_doc_com_atproto_label_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                 }),
             );
             map.insert(
-                "selfLabels".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("selfLabels"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["values".into()]),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Metadata tags on an atproto record, published by the author within the record.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("values")],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "values".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("values"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "#selfLabel".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static("#selfLabel"),
                                 }),
                                 min_length: None,
                                 max_length: Some(10usize),
@@ -448,6 +551,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Label<'a> {
     fn nsid() -> &'static str {
         "com.atproto.label.defs"
     }
+    fn def_name() -> &'static str {
+        "label"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_label_defs()
     }
@@ -456,11 +562,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Label<'a> {
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         {
             let value = &self.val;
-            if value.as_ref().len() > 128usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 128usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "val",
                     max: 128usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -632,6 +739,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LabelValueDefinition<'a> 
     fn nsid() -> &'static str {
         "com.atproto.label.defs"
     }
+    fn def_name() -> &'static str {
+        "labelValueDefinition"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_label_defs()
     }
@@ -640,11 +750,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LabelValueDefinition<'a> 
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         {
             let value = &self.identifier;
-            if value.as_ref().len() > 100usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "identifier",
                     max: 100usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -699,6 +810,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LabelValueDefinitionStrin
     fn nsid() -> &'static str {
         "com.atproto.label.defs"
     }
+    fn def_name() -> &'static str {
+        "labelValueDefinitionStrings"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_label_defs()
     }
@@ -707,11 +821,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LabelValueDefinitionStrin
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         {
             let value = &self.description;
-            if value.as_ref().len() > 100000usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100000usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "description",
                     max: 100000usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -734,11 +849,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LabelValueDefinitionStrin
         }
         {
             let value = &self.name;
-            if value.as_ref().len() > 640usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 640usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "name",
                     max: 640usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -786,6 +902,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SelfLabel<'a> {
     fn nsid() -> &'static str {
         "com.atproto.label.defs"
     }
+    fn def_name() -> &'static str {
+        "selfLabel"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_label_defs()
     }
@@ -794,11 +913,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SelfLabel<'a> {
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         {
             let value = &self.val;
-            if value.as_ref().len() > 128usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 128usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "val",
                     max: 128usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -828,6 +948,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SelfLabels<'a> {
     fn nsid() -> &'static str {
         "com.atproto.label.defs"
     }
+    fn def_name() -> &'static str {
+        "selfLabels"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_label_defs()
     }
@@ -836,6 +959,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SelfLabels<'a> {
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         {
             let value = &self.values;
+            #[allow(unused_comparisons)]
             if value.len() > 10usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "values",

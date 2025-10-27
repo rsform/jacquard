@@ -112,6 +112,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Post<'a> {
     fn nsid() -> &'static str {
         "uk.skyblur.post"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_uk_skyblur_post()
     }
@@ -119,11 +122,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Post<'a> {
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         if let Some(ref value) = self.additional {
-            if value.as_ref().len() > 100000usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100000usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "additional",
                     max: 100000usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -145,11 +149,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Post<'a> {
         }
         {
             let value = &self.text;
-            if value.as_ref().len() > 3000usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 3000usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "text",
                     max: 3000usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -172,11 +177,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Post<'a> {
         }
         {
             let value = &self.visibility;
-            if value.as_ref().len() > 100usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "visibility",
                     max: 100usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -204,22 +210,28 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Post<'a> {
 fn lexicon_doc_uk_skyblur_post() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "uk.skyblur.post".into(),
+        id: ::jacquard_common::CowStr::new_static("uk.skyblur.post"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("tid".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Record containing a Skyblur post.",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: Some(
                             vec![
-                                "text".into(), "createdAt".into(), "uri".into(),
-                                "visibility".into()
+                                ::jacquard_common::smol_str::SmolStr::new_static("text"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("uri"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("visibility")
                             ],
                         ),
                         nullable: None,
@@ -227,9 +239,15 @@ fn lexicon_doc_uk_skyblur_post() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "additional".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "additional",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The post additional contents.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -242,9 +260,15 @@ fn lexicon_doc_uk_skyblur_post() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                                 }),
                             );
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Created date assigned by client",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -259,7 +283,9 @@ fn lexicon_doc_uk_skyblur_post() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                                 }),
                             );
                             map.insert(
-                                "encryptBody".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "encryptBody",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
                                     description: None,
                                     accept: None,
@@ -267,9 +293,13 @@ fn lexicon_doc_uk_skyblur_post() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                                 }),
                             );
                             map.insert(
-                                "text".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("text"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The post main contents. Blurred text must be enclosed in brackets [].",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -282,7 +312,7 @@ fn lexicon_doc_uk_skyblur_post() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                                 }),
                             );
                             map.insert(
-                                "uri".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("uri"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -299,9 +329,15 @@ fn lexicon_doc_uk_skyblur_post() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                                 }),
                             );
                             map.insert(
-                                "visibility".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "visibility",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "For 'password', the text only contains blurred text, and additional is always empty. The unblurred text and additional are included in the encryptBody.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,

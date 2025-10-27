@@ -111,6 +111,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Post<'a> {
     fn nsid() -> &'static str {
         "com.crabdance.nandi.post"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_crabdance_nandi_post()
     }
@@ -119,34 +122,38 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Post<'a> {
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         {
             let value = &self.content;
-            if value.as_ref().len() > 10000usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 10000usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "content",
                     max: 10000usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         {
             let value = &self.content;
-            if value.as_ref().len() < 1usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 1usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
                     field: "content",
                     min: 1usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         if let Some(ref value) = self.summary {
-            if value.as_ref().len() > 500usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 500usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "summary",
                     max: 500usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         if let Some(ref value) = self.tags {
+            #[allow(unused_comparisons)]
             if value.len() > 10usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "tags",
@@ -157,21 +164,23 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Post<'a> {
         }
         {
             let value = &self.title;
-            if value.as_ref().len() > 200usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 200usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "title",
                     max: 200usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         {
             let value = &self.title;
-            if value.as_ref().len() < 1usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 1usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
                     field: "title",
                     min: 1usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -184,29 +193,37 @@ fn lexicon_doc_com_crabdance_nandi_post() -> ::jacquard_lexicon::lexicon::Lexico
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "com.crabdance.nandi.post".into(),
+        id: ::jacquard_common::CowStr::new_static("com.crabdance.nandi.post"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: None,
-                    key: Some("tid".into()),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: Some(
-                            vec!["title".into(), "content".into(), "createdAt".into()],
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("content"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                            ],
                         ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "content".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("content"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The main content of the blog post in markdown",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: Some(1usize),
@@ -219,7 +236,9 @@ fn lexicon_doc_com_crabdance_nandi_post() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -236,7 +255,9 @@ fn lexicon_doc_com_crabdance_nandi_post() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                "published".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "published",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                     description: None,
                                     default: None,
@@ -244,9 +265,13 @@ fn lexicon_doc_com_crabdance_nandi_post() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                "summary".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("summary"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Optional summary/excerpt of the post",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -259,9 +284,13 @@ fn lexicon_doc_com_crabdance_nandi_post() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                "tags".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("tags"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Tags for categorizing the post",
+                                        ),
+                                    ),
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
                                         description: None,
                                         format: None,
@@ -279,9 +308,13 @@ fn lexicon_doc_com_crabdance_nandi_post() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                "title".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The title of the blog post",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: Some(1usize),
@@ -294,7 +327,9 @@ fn lexicon_doc_com_crabdance_nandi_post() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                "updatedAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "updatedAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(

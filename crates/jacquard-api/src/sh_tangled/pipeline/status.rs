@@ -106,6 +106,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Status<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.pipeline.status"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_pipeline_status()
     }
@@ -121,22 +124,24 @@ fn lexicon_doc_sh_tangled_pipeline_status() -> ::jacquard_lexicon::lexicon::Lexi
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "sh.tangled.pipeline.status".into(),
+        id: ::jacquard_common::CowStr::new_static("sh.tangled.pipeline.status"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: None,
-                    key: Some("tid".into()),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: Some(
                             vec![
-                                "pipeline".into(), "workflow".into(), "status".into(),
-                                "createdAt".into()
+                                ::jacquard_common::smol_str::SmolStr::new_static("pipeline"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("workflow"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("status"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -144,9 +149,15 @@ fn lexicon_doc_sh_tangled_pipeline_status() -> ::jacquard_lexicon::lexicon::Lexi
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "time of creation of this status update",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -161,9 +172,13 @@ fn lexicon_doc_sh_tangled_pipeline_status() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                "error".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("error"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "error message if failed",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -176,7 +191,9 @@ fn lexicon_doc_sh_tangled_pipeline_status() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                "exitCode".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "exitCode",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -187,9 +204,15 @@ fn lexicon_doc_sh_tangled_pipeline_status() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                "pipeline".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "pipeline",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "ATURI of the pipeline",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
                                     ),
@@ -204,9 +227,13 @@ fn lexicon_doc_sh_tangled_pipeline_status() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                "status".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("status"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "status of the workflow",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -219,9 +246,15 @@ fn lexicon_doc_sh_tangled_pipeline_status() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                "workflow".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "workflow",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "name of the workflow within this pipeline",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
                                     ),

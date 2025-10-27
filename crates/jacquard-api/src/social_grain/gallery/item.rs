@@ -93,6 +93,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Item<'a> {
     fn nsid() -> &'static str {
         "social.grain.gallery.item"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_grain_gallery_item()
     }
@@ -108,27 +111,33 @@ fn lexicon_doc_social_grain_gallery_item() -> ::jacquard_lexicon::lexicon::Lexic
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "social.grain.gallery.item".into(),
+        id: ::jacquard_common::CowStr::new_static("social.grain.gallery.item"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: None,
-                    key: Some("tid".into()),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: Some(
-                            vec!["createdAt".into(), "gallery".into(), "item".into()],
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("gallery"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("item")
+                            ],
                         ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -145,7 +154,7 @@ fn lexicon_doc_social_grain_gallery_item() -> ::jacquard_lexicon::lexicon::Lexic
                                 }),
                             );
                             map.insert(
-                                "gallery".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("gallery"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -162,7 +171,7 @@ fn lexicon_doc_social_grain_gallery_item() -> ::jacquard_lexicon::lexicon::Lexic
                                 }),
                             );
                             map.insert(
-                                "item".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("item"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -179,7 +188,9 @@ fn lexicon_doc_social_grain_gallery_item() -> ::jacquard_lexicon::lexicon::Lexic
                                 }),
                             );
                             map.insert(
-                                "position".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "position",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,

@@ -204,6 +204,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Event<'a> {
     fn nsid() -> &'static str {
         "community.lexicon.calendar.event"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_community_lexicon_calendar_event()
     }
@@ -219,45 +222,58 @@ fn lexicon_doc_community_lexicon_calendar_event() -> ::jacquard_lexicon::lexicon
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "community.lexicon.calendar.event".into(),
+        id: ::jacquard_common::CowStr::new_static("community.lexicon.calendar.event"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "cancelled".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("cancelled"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
             );
             map.insert(
-                "hybrid".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("hybrid"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
             );
             map.insert(
-                "inperson".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("inperson"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("tid".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static("A calendar event."),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
-                        required: Some(vec!["createdAt".into(), "name".into()]),
+                        required: Some(
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("name")
+                            ],
+                        ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Client-declared timestamp when the event was created.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -272,9 +288,15 @@ fn lexicon_doc_community_lexicon_calendar_event() -> ::jacquard_lexicon::lexicon
                                 }),
                             );
                             map.insert(
-                                "description".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "description",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The description of the event.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -287,9 +309,13 @@ fn lexicon_doc_community_lexicon_calendar_event() -> ::jacquard_lexicon::lexicon
                                 }),
                             );
                             map.insert(
-                                "endsAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("endsAt"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Client-declared timestamp when the event ends.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -304,17 +330,23 @@ fn lexicon_doc_community_lexicon_calendar_event() -> ::jacquard_lexicon::lexicon
                                 }),
                             );
                             map.insert(
-                                "locations".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "locations",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The locations where the event takes place.",
+                                        ),
+                                    ),
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                         description: None,
                                         refs: vec![
-                                            "community.lexicon.calendar.event#uri".into(),
-                                            "community.lexicon.location.address".into(),
-                                            "community.lexicon.location.fsq".into(),
-                                            "community.lexicon.location.geo".into(),
-                                            "community.lexicon.location.hthree".into()
+                                            ::jacquard_common::CowStr::new_static("community.lexicon.calendar.event#uri"),
+                                            ::jacquard_common::CowStr::new_static("community.lexicon.location.address"),
+                                            ::jacquard_common::CowStr::new_static("community.lexicon.location.fsq"),
+                                            ::jacquard_common::CowStr::new_static("community.lexicon.location.geo"),
+                                            ::jacquard_common::CowStr::new_static("community.lexicon.location.hthree")
                                         ],
                                         closed: None,
                                     }),
@@ -323,16 +355,22 @@ fn lexicon_doc_community_lexicon_calendar_event() -> ::jacquard_lexicon::lexicon
                                 }),
                             );
                             map.insert(
-                                "mode".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("mode"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "community.lexicon.calendar.event#mode".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "community.lexicon.calendar.event#mode",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "name".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The name of the event.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -345,9 +383,15 @@ fn lexicon_doc_community_lexicon_calendar_event() -> ::jacquard_lexicon::lexicon
                                 }),
                             );
                             map.insert(
-                                "startsAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "startsAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Client-declared timestamp when the event starts.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -362,19 +406,27 @@ fn lexicon_doc_community_lexicon_calendar_event() -> ::jacquard_lexicon::lexicon
                                 }),
                             );
                             map.insert(
-                                "status".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("status"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "community.lexicon.calendar.event#status".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "community.lexicon.calendar.event#status",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "uris".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("uris"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "URIs associated with the event.",
+                                        ),
+                                    ),
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                         description: None,
-                                        r#ref: "community.lexicon.calendar.event#uri".into(),
+                                        r#ref: ::jacquard_common::CowStr::new_static(
+                                            "community.lexicon.calendar.event#uri",
+                                        ),
                                     }),
                                     min_length: None,
                                     max_length: None,
@@ -386,9 +438,11 @@ fn lexicon_doc_community_lexicon_calendar_event() -> ::jacquard_lexicon::lexicon
                 }),
             );
             map.insert(
-                "mode".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("mode"),
                 ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static("The mode of the event."),
+                    ),
                     format: None,
                     default: None,
                     min_length: None,
@@ -401,33 +455,35 @@ fn lexicon_doc_community_lexicon_calendar_event() -> ::jacquard_lexicon::lexicon
                 }),
             );
             map.insert(
-                "planned".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("planned"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
             );
             map.insert(
-                "postponed".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("postponed"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
             );
             map.insert(
-                "rescheduled".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("rescheduled"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
             );
             map.insert(
-                "scheduled".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("scheduled"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
             );
             map.insert(
-                "status".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("status"),
                 ::jacquard_lexicon::lexicon::LexUserType::String(::jacquard_lexicon::lexicon::LexString {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static("The status of the event."),
+                    ),
                     format: None,
                     default: None,
                     min_length: None,
@@ -440,18 +496,28 @@ fn lexicon_doc_community_lexicon_calendar_event() -> ::jacquard_lexicon::lexicon
                 }),
             );
             map.insert(
-                "uri".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("uri"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["uri".into()]),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A URI associated with the event.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("uri")],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "name".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The display name of the URI.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -464,7 +530,7 @@ fn lexicon_doc_community_lexicon_calendar_event() -> ::jacquard_lexicon::lexicon
                             }),
                         );
                         map.insert(
-                            "uri".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -485,7 +551,7 @@ fn lexicon_doc_community_lexicon_calendar_event() -> ::jacquard_lexicon::lexicon
                 }),
             );
             map.insert(
-                "virtual".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("virtual"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
@@ -831,6 +897,9 @@ pub struct Uri<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Uri<'a> {
     fn nsid() -> &'static str {
         "community.lexicon.calendar.event"
+    }
+    fn def_name() -> &'static str {
+        "uri"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_community_lexicon_calendar_event()

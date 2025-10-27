@@ -27,22 +27,24 @@ fn lexicon_doc_app_bsky_feed_describeFeedGenerator() -> ::jacquard_lexicon::lexi
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "app.bsky.feed.describeFeedGenerator".into(),
+        id: ::jacquard_common::CowStr::new_static("app.bsky.feed.describeFeedGenerator"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "feed".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("feed"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["uri".into()]),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("uri")],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "uri".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -63,7 +65,7 @@ fn lexicon_doc_app_bsky_feed_describeFeedGenerator() -> ::jacquard_lexicon::lexi
                 }),
             );
             map.insert(
-                "links".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("links"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -72,7 +74,9 @@ fn lexicon_doc_app_bsky_feed_describeFeedGenerator() -> ::jacquard_lexicon::lexi
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "privacyPolicy".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "privacyPolicy",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -87,7 +91,9 @@ fn lexicon_doc_app_bsky_feed_describeFeedGenerator() -> ::jacquard_lexicon::lexi
                             }),
                         );
                         map.insert(
-                            "termsOfService".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "termsOfService",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -106,7 +112,7 @@ fn lexicon_doc_app_bsky_feed_describeFeedGenerator() -> ::jacquard_lexicon::lexi
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
                     description: None,
                     parameters: None,
@@ -122,6 +128,9 @@ fn lexicon_doc_app_bsky_feed_describeFeedGenerator() -> ::jacquard_lexicon::lexi
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Feed<'a> {
     fn nsid() -> &'static str {
         "app.bsky.feed.describeFeedGenerator"
+    }
+    fn def_name() -> &'static str {
+        "feed"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_feed_describeFeedGenerator()
@@ -157,6 +166,9 @@ pub struct Links<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Links<'a> {
     fn nsid() -> &'static str {
         "app.bsky.feed.describeFeedGenerator"
+    }
+    fn def_name() -> &'static str {
+        "links"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_feed_describeFeedGenerator()

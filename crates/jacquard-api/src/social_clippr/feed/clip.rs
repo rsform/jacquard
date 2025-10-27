@@ -119,6 +119,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Clip<'a> {
     fn nsid() -> &'static str {
         "social.clippr.feed.clip"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_clippr_feed_clip()
     }
@@ -127,11 +130,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Clip<'a> {
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         {
             let value = &self.description;
-            if value.as_ref().len() > 40960usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 40960usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "description",
                     max: 40960usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -153,6 +157,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Clip<'a> {
             }
         }
         if let Some(ref value) = self.languages {
+            #[allow(unused_comparisons)]
             if value.len() > 5usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "languages",
@@ -162,11 +167,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Clip<'a> {
             }
         }
         if let Some(ref value) = self.notes {
-            if value.as_ref().len() > 100000usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100000usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "notes",
                     max: 100000usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -188,11 +194,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Clip<'a> {
         }
         {
             let value = &self.title;
-            if value.as_ref().len() > 20480usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 20480usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "title",
                     max: 20480usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -215,11 +222,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Clip<'a> {
         }
         {
             let value = &self.url;
-            if value.as_ref().len() > 20000usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 20000usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "url",
                     max: 20000usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -249,22 +257,29 @@ fn lexicon_doc_social_clippr_feed_clip() -> ::jacquard_lexicon::lexicon::Lexicon
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "social.clippr.feed.clip".into(),
+        id: ::jacquard_common::CowStr::new_static("social.clippr.feed.clip"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("any".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Record containing a bookmarked item, or 'clip'.",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("any")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: Some(
                             vec![
-                                "url".into(), "title".into(), "description".into(),
-                                "unlisted".into(), "createdAt".into()
+                                ::jacquard_common::smol_str::SmolStr::new_static("url"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("description"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("unlisted"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -272,9 +287,15 @@ fn lexicon_doc_social_clippr_feed_clip() -> ::jacquard_lexicon::lexicon::Lexicon
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Client-declared timestamp when the bookmark is created",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -289,9 +310,15 @@ fn lexicon_doc_social_clippr_feed_clip() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                "description".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "description",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "A description of the bookmark's content. This should be ripped from the URL metadata and be static for all records using the URL.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -304,9 +331,15 @@ fn lexicon_doc_social_clippr_feed_clip() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                "languages".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "languages",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Indicates human language of the given URL",
+                                        ),
+                                    ),
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
                                         description: None,
                                         format: Some(
@@ -326,9 +359,13 @@ fn lexicon_doc_social_clippr_feed_clip() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                "notes".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("notes"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "User-written notes for the bookmark. Public and personal.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -341,21 +378,31 @@ fn lexicon_doc_social_clippr_feed_clip() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                "tags".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("tags"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "An array of tags. A format of solely alphanumeric characters and dashes should be used.",
+                                        ),
+                                    ),
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                         description: None,
-                                        r#ref: "com.atproto.repo.strongRef".into(),
+                                        r#ref: ::jacquard_common::CowStr::new_static(
+                                            "com.atproto.repo.strongRef",
+                                        ),
                                     }),
                                     min_length: None,
                                     max_length: None,
                                 }),
                             );
                             map.insert(
-                                "title".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The title of the bookmark. If left empty, reuse the URL.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -368,7 +415,9 @@ fn lexicon_doc_social_clippr_feed_clip() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                "unlisted".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "unlisted",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                     description: None,
                                     default: None,
@@ -376,7 +425,7 @@ fn lexicon_doc_social_clippr_feed_clip() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                "unread".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("unread"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                     description: None,
                                     default: None,
@@ -384,9 +433,13 @@ fn lexicon_doc_social_clippr_feed_clip() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                "url".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("url"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The URL of the bookmark. Cannot be left empty or be modified after creation.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                     ),

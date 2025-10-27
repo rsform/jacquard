@@ -49,24 +49,34 @@ fn lexicon_doc_community_lexicon_location_address() -> ::jacquard_lexicon::lexic
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "community.lexicon.location.address".into(),
+        id: ::jacquard_common::CowStr::new_static("community.lexicon.location.address"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["country".into()]),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A physical location in the form of a street address.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("country")],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "country".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("country"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The ISO 3166 country code. Preferably the 2-letter code.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: Some(2usize),
@@ -79,9 +89,13 @@ fn lexicon_doc_community_lexicon_location_address() -> ::jacquard_lexicon::lexic
                             }),
                         );
                         map.insert(
-                            "locality".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("locality"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The locality of the region. For example, a city in the USA.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -94,9 +108,13 @@ fn lexicon_doc_community_lexicon_location_address() -> ::jacquard_lexicon::lexic
                             }),
                         );
                         map.insert(
-                            "name".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The name of the location.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -109,9 +127,15 @@ fn lexicon_doc_community_lexicon_location_address() -> ::jacquard_lexicon::lexic
                             }),
                         );
                         map.insert(
-                            "postalCode".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "postalCode",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The postal code of the location.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -124,9 +148,13 @@ fn lexicon_doc_community_lexicon_location_address() -> ::jacquard_lexicon::lexic
                             }),
                         );
                         map.insert(
-                            "region".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("region"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The administrative region of the country. For example, a state in the USA.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -139,9 +167,11 @@ fn lexicon_doc_community_lexicon_location_address() -> ::jacquard_lexicon::lexic
                             }),
                         );
                         map.insert(
-                            "street".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("street"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static("The street address."),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -166,6 +196,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Address<'a> {
     fn nsid() -> &'static str {
         "community.lexicon.location.address"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_community_lexicon_location_address()
     }
@@ -174,21 +207,23 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Address<'a> {
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         {
             let value = &self.country;
-            if value.as_ref().len() > 10usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 10usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "country",
                     max: 10usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         {
             let value = &self.country;
-            if value.as_ref().len() < 2usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 2usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
                     field: "country",
                     min: 2usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }

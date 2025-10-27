@@ -37,19 +37,25 @@ pub struct SyncStatus<'a> {
 fn lexicon_doc_blue_2048_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "blue.2048.defs".into(),
+        id: ::jacquard_common::CowStr::new_static("blue.2048.defs"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "syncStatus".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("syncStatus"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "The sync status for a record used to help sync between your ATProto record and local record.",
+                        ),
+                    ),
                     required: Some(
                         vec![
-                            "hash".into(), "updatedAt".into(), "createdAt".into(),
-                            "syncedWithATRepo".into()
+                            ::jacquard_common::smol_str::SmolStr::new_static("hash"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("updatedAt"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("createdAt"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("syncedWithATRepo")
                         ],
                     ),
                     nullable: None,
@@ -57,7 +63,9 @@ fn lexicon_doc_blue_2048_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "createdAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "createdAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -74,9 +82,13 @@ fn lexicon_doc_blue_2048_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                             }),
                         );
                         map.insert(
-                            "hash".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("hash"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "A XXH3 hash of the record to tell if anything has changed",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -89,7 +101,9 @@ fn lexicon_doc_blue_2048_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                             }),
                         );
                         map.insert(
-                            "syncedWithATRepo".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "syncedWithATRepo",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                 description: None,
                                 default: None,
@@ -97,7 +111,9 @@ fn lexicon_doc_blue_2048_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                             }),
                         );
                         map.insert(
-                            "updatedAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "updatedAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -125,6 +141,9 @@ fn lexicon_doc_blue_2048_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SyncStatus<'a> {
     fn nsid() -> &'static str {
         "blue.2048.defs"
+    }
+    fn def_name() -> &'static str {
+        "syncStatus"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blue_2048_defs()

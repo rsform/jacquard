@@ -26,7 +26,6 @@ serde_bytes = "0.11"
 
 # IPLD primitives
 cid.workspace = true
-ipld-core.workspace = true
 multihash = "0.19.3"
 
 # CAR file I/O

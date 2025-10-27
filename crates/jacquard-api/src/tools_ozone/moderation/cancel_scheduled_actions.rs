@@ -33,36 +33,55 @@ fn lexicon_doc_tools_ozone_moderation_cancelScheduledActions() -> ::jacquard_lex
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "tools.ozone.moderation.cancelScheduledActions".into(),
+        id: ::jacquard_common::CowStr::new_static(
+            "tools.ozone.moderation.cancelScheduledActions",
+        ),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "cancellationResults".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("cancellationResults"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["succeeded".into(), "failed".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("succeeded"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("failed")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "failed".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("failed"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "DIDs for which cancellation failed with error details",
+                                    ),
+                                ),
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "#failedCancellation".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "#failedCancellation",
+                                    ),
                                 }),
                                 min_length: None,
                                 max_length: None,
                             }),
                         );
                         map.insert(
-                            "succeeded".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "succeeded",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "DIDs for which all pending scheduled actions were successfully cancelled",
+                                    ),
+                                ),
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -86,16 +105,21 @@ fn lexicon_doc_tools_ozone_moderation_cancelScheduledActions() -> ::jacquard_lex
                 }),
             );
             map.insert(
-                "failedCancellation".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("failedCancellation"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["did".into(), "error".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("error")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "did".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -112,7 +136,7 @@ fn lexicon_doc_tools_ozone_moderation_cancelScheduledActions() -> ::jacquard_lex
                             }),
                         );
                         map.insert(
-                            "error".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("error"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -127,7 +151,9 @@ fn lexicon_doc_tools_ozone_moderation_cancelScheduledActions() -> ::jacquard_lex
                             }),
                         );
                         map.insert(
-                            "errorCode".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "errorCode",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -146,25 +172,35 @@ fn lexicon_doc_tools_ozone_moderation_cancelScheduledActions() -> ::jacquard_lex
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcProcedure(::jacquard_lexicon::lexicon::LexXrpcProcedure {
                     description: None,
                     parameters: None,
                     input: Some(::jacquard_lexicon::lexicon::LexXrpcBody {
                         description: None,
-                        encoding: "application/json".into(),
+                        encoding: ::jacquard_common::CowStr::new_static(
+                            "application/json",
+                        ),
                         schema: Some(
                             ::jacquard_lexicon::lexicon::LexXrpcBodySchema::Object(::jacquard_lexicon::lexicon::LexObject {
                                 description: None,
-                                required: Some(vec!["subjects".into()]),
+                                required: Some(
+                                    vec![
+                                        ::jacquard_common::smol_str::SmolStr::new_static("subjects")
+                                    ],
+                                ),
                                 nullable: None,
                                 properties: {
                                     #[allow(unused_mut)]
                                     let mut map = ::std::collections::BTreeMap::new();
                                     map.insert(
-                                        "comment".into(),
+                                        ::jacquard_common::smol_str::SmolStr::new_static("comment"),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                            description: None,
+                                            description: Some(
+                                                ::jacquard_common::CowStr::new_static(
+                                                    "Optional comment describing the reason for cancellation",
+                                                ),
+                                            ),
                                             format: None,
                                             default: None,
                                             min_length: None,
@@ -177,9 +213,15 @@ fn lexicon_doc_tools_ozone_moderation_cancelScheduledActions() -> ::jacquard_lex
                                         }),
                                     );
                                     map.insert(
-                                        "subjects".into(),
+                                        ::jacquard_common::smol_str::SmolStr::new_static(
+                                            "subjects",
+                                        ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                            description: None,
+                                            description: Some(
+                                                ::jacquard_common::CowStr::new_static(
+                                                    "Array of DID subjects to cancel scheduled actions for",
+                                                ),
+                                            ),
                                             items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
                                                 description: None,
                                                 format: Some(
@@ -215,6 +257,9 @@ fn lexicon_doc_tools_ozone_moderation_cancelScheduledActions() -> ::jacquard_lex
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CancellationResults<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.cancelScheduledActions"
+    }
+    fn def_name() -> &'static str {
+        "cancellationResults"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_cancelScheduledActions()
@@ -253,6 +298,9 @@ pub struct FailedCancellation<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FailedCancellation<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.cancelScheduledActions"
+    }
+    fn def_name() -> &'static str {
+        "failedCancellation"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_cancelScheduledActions()

@@ -3,12 +3,12 @@
 //! This module provides infrastructure for validating untyped `Data` values against
 //! lexicon schemas, enabling partial deserialization, debugging, and schema migration.
 
-use crate::{lexicon::LexiconDoc, schema::LexiconSchemaRef};
+use crate::schema::SchemaRegistry;
 use cid::Cid as IpldCid;
 use dashmap::DashMap;
 use jacquard_common::{
     IntoStatic,
-    smol_str::{self, ToSmolStr},
+    smol_str,
     types::value::Data,
 };
 use sha2::{Digest, Sha256};
@@ -202,68 +202,6 @@ pub enum ValidationError {
 
     #[error(transparent)]
     Constraint(#[from] ConstraintError),
-}
-
-/// Registry of lexicon schemas for validation
-///
-/// Collects schemas from inventory at construction and supports runtime insertion.
-#[derive(Debug, Clone)]
-pub struct SchemaRegistry {
-    /// Schema documents indexed by NSID (concurrent access safe)
-    schemas: DashMap<SmolStr, LexiconDoc<'static>>,
-}
-
-impl SchemaRegistry {
-    /// Build registry from inventory-collected schemas
-    pub fn from_inventory() -> Self {
-        let schemas = DashMap::new();
-
-        for entry in inventory::iter::<LexiconSchemaRef> {
-            let doc = (entry.provider)();
-            schemas.insert(entry.nsid.to_smolstr(), doc);
-        }
-
-        Self { schemas }
-    }
-
-    /// Create an empty registry
-    pub fn new() -> Self {
-        Self {
-            schemas: DashMap::new(),
-        }
-    }
-
-    /// Get schema by NSID
-    ///
-    /// IMPORTANT: Clone the returned schema immediately to avoid holding DashMap ref
-    pub fn get(&self, nsid: &str) -> Option<LexiconDoc<'static>> {
-        self.schemas.get(nsid).map(|doc| doc.clone())
-    }
-
-    /// Insert or update a schema (for runtime schema loading)
-    pub fn insert(&self, nsid: SmolStr, doc: LexiconDoc<'static>) {
-        self.schemas.insert(nsid, doc);
-    }
-
-    /// Get specific def from a schema
-    ///
-    /// IMPORTANT: Returns cloned def to avoid holding DashMap ref
-    pub fn get_def(
-        &self,
-        nsid: &str,
-        def_name: &str,
-    ) -> Option<crate::lexicon::LexUserType<'static>> {
-        // Clone immediately to release DashMap ref before returning
-        self.schemas
-            .get(nsid)
-            .and_then(|doc| doc.defs.get(def_name).cloned())
-    }
-}
-
-impl Default for SchemaRegistry {
-    fn default() -> Self {
-        Self::from_inventory()
-    }
 }
 
 /// Cache key for validation results
@@ -473,7 +411,7 @@ impl SchemaValidator {
             return Ok((*cached).clone());
         }
 
-        // Validate (placeholder - actual validation in Phase 3)
+        // Perform validation
         let result = self.validate_uncached::<T>(data);
 
         // Cache result
@@ -610,8 +548,48 @@ fn validate_def(
 
             errors
         }
-        // Other def types (Record, Token, etc.) would go here
-        // For now, just handle Object since that's what our tests use
+        LexUserType::Record(rec) => {
+            // Records are objects with record-specific metadata
+            let crate::lexicon::LexRecordRecord::Object(obj) = &rec.record;
+
+            let Data::Object(obj_data) = data else {
+                return vec![StructuralError::TypeMismatch {
+                    path: path.clone(),
+                    expected: data.data_type(),
+                    actual: DataModelType::Object,
+                }];
+            };
+
+            let mut errors = Vec::new();
+
+            // Check required fields
+            if let Some(required) = &obj.required {
+                for field in required {
+                    if !obj_data.get(field.as_ref()).is_some() {
+                        errors.push(StructuralError::MissingRequiredField {
+                            path: path.clone(),
+                            field: field.clone(),
+                        });
+                    }
+                }
+            }
+
+            // Validate each property that's present
+            for (name, prop) in &obj.properties {
+                if let Some(field_data) = obj_data.get(name.as_ref()) {
+                    path.push_field(name.as_ref());
+                    errors.extend(validate_property(path, field_data, prop, registry, ctx));
+                    path.pop();
+                }
+            }
+
+            errors
+        }
+        // Token types are unit types, no validation needed beyond type checking
+        LexUserType::Token(_) => Vec::new(),
+        // XRPC types are endpoint definitions, not data types
+        LexUserType::XrpcQuery(_) | LexUserType::XrpcProcedure(_) | LexUserType::XrpcSubscription(_) => Vec::new(),
+        // Other types
         _ => Vec::new(),
     }
 }
@@ -1015,14 +993,47 @@ fn validate_constraints_impl(
             for (name, prop) in &obj.properties {
                 if let Some(field_data) = obj_data.get(name.as_ref()) {
                     path.push_field(name.as_ref());
-                    errors.extend(check_property_constraints(path, field_data, prop, registry));
+                    errors.extend(check_property_constraints(
+                        path,
+                        field_data,
+                        prop,
+                        nsid,
+                        registry,
+                    ));
                     path.pop();
                 }
             }
 
             errors
         }
-        // Other def types would go here
+        LexUserType::Record(rec) => {
+            // Records are objects with record-specific metadata
+            let crate::lexicon::LexRecordRecord::Object(obj) = &rec.record;
+
+            let Data::Object(obj_data) = data else {
+                return Vec::new();
+            };
+
+            let mut errors = Vec::new();
+
+            // Check constraints on each property
+            for (name, prop) in &obj.properties {
+                if let Some(field_data) = obj_data.get(name.as_ref()) {
+                    path.push_field(name.as_ref());
+                    errors.extend(check_property_constraints(
+                        path,
+                        field_data,
+                        prop,
+                        nsid,
+                        registry,
+                    ));
+                    path.pop();
+                }
+            }
+
+            errors
+        }
+        // Token types, XRPC types, and other types don't have constraints
         _ => Vec::new(),
     }
 }
@@ -1032,6 +1043,7 @@ fn check_property_constraints(
     path: &mut ValidationPath,
     data: &Data,
     prop: &crate::lexicon::LexObjectProperty,
+    current_nsid: &str,
     registry: &SchemaRegistry,
 ) -> Vec<ConstraintError> {
     use crate::lexicon::LexObjectProperty;
@@ -1061,7 +1073,11 @@ fn check_property_constraints(
                 for (idx, item) in array.iter().enumerate() {
                     path.push_index(idx);
                     errors.extend(check_array_item_constraints(
-                        path, item, &arr.items, registry,
+                        path,
+                        item,
+                        &arr.items,
+                        current_nsid,
+                        registry,
                     ));
                     path.pop();
                 }
@@ -1084,6 +1100,7 @@ fn check_property_constraints(
                             path,
                             field_data,
                             schema_prop,
+                            current_nsid,
                             registry,
                         ));
                         path.pop();
@@ -1098,7 +1115,7 @@ fn check_property_constraints(
 
         LexObjectProperty::Ref(r) => {
             // Follow ref and check constraints
-            let (ref_nsid, ref_def) = normalize_ref(r.r#ref.as_ref(), ""); // FIXME: need current nsid
+            let (ref_nsid, ref_def) = normalize_ref(r.r#ref.as_ref(), current_nsid);
 
             if registry.get_def(&ref_nsid, &ref_def).is_some() {
                 validate_constraints_impl(path, data, &ref_nsid, &ref_def, registry)
@@ -1240,6 +1257,7 @@ fn check_array_item_constraints(
     path: &mut ValidationPath,
     data: &Data,
     item_schema: &crate::lexicon::LexArrayItem,
+    current_nsid: &str,
     registry: &SchemaRegistry,
 ) -> Vec<ConstraintError> {
     use crate::lexicon::LexArrayItem;
@@ -1249,24 +1267,28 @@ fn check_array_item_constraints(
             path,
             data,
             &crate::lexicon::LexObjectProperty::String(s.clone()),
+            current_nsid,
             registry,
         ),
         LexArrayItem::Integer(i) => check_property_constraints(
             path,
             data,
             &crate::lexicon::LexObjectProperty::Integer(i.clone()),
+            current_nsid,
             registry,
         ),
         LexArrayItem::Object(o) => check_property_constraints(
             path,
             data,
             &crate::lexicon::LexObjectProperty::Object(o.clone()),
+            current_nsid,
             registry,
         ),
         LexArrayItem::Ref(r) => check_property_constraints(
             path,
             data,
             &crate::lexicon::LexObjectProperty::Ref(r.clone()),
+            current_nsid,
             registry,
         ),
         // Other array item types don't have constraints

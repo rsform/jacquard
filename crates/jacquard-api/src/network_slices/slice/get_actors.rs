@@ -39,26 +39,34 @@ fn lexicon_doc_network_slices_slice_getActors() -> ::jacquard_lexicon::lexicon::
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "network.slices.slice.getActors".into(),
+        id: ::jacquard_common::CowStr::new_static("network.slices.slice.getActors"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "actor".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("actor"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
-                        vec!["did".into(), "sliceUri".into(), "indexedAt".into()],
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("sliceUri"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("indexedAt")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "did".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Decentralized identifier of the actor",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Did,
                                 ),
@@ -73,9 +81,13 @@ fn lexicon_doc_network_slices_slice_getActors() -> ::jacquard_lexicon::lexicon::
                             }),
                         );
                         map.insert(
-                            "handle".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("handle"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Human-readable handle of the actor",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Handle,
                                 ),
@@ -90,9 +102,15 @@ fn lexicon_doc_network_slices_slice_getActors() -> ::jacquard_lexicon::lexicon::
                             }),
                         );
                         map.insert(
-                            "indexedAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "indexedAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "When this actor was indexed",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                 ),
@@ -107,9 +125,13 @@ fn lexicon_doc_network_slices_slice_getActors() -> ::jacquard_lexicon::lexicon::
                             }),
                         );
                         map.insert(
-                            "sliceUri".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("sliceUri"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "AT-URI of the slice this actor is indexed in",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -126,25 +148,35 @@ fn lexicon_doc_network_slices_slice_getActors() -> ::jacquard_lexicon::lexicon::
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcProcedure(::jacquard_lexicon::lexicon::LexXrpcProcedure {
                     description: None,
                     parameters: None,
                     input: Some(::jacquard_lexicon::lexicon::LexXrpcBody {
                         description: None,
-                        encoding: "application/json".into(),
+                        encoding: ::jacquard_common::CowStr::new_static(
+                            "application/json",
+                        ),
                         schema: Some(
                             ::jacquard_lexicon::lexicon::LexXrpcBodySchema::Object(::jacquard_lexicon::lexicon::LexObject {
                                 description: None,
-                                required: Some(vec!["slice".into()]),
+                                required: Some(
+                                    vec![
+                                        ::jacquard_common::smol_str::SmolStr::new_static("slice")
+                                    ],
+                                ),
                                 nullable: None,
                                 properties: {
                                     #[allow(unused_mut)]
                                     let mut map = ::std::collections::BTreeMap::new();
                                     map.insert(
-                                        "cursor".into(),
+                                        ::jacquard_common::smol_str::SmolStr::new_static("cursor"),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                            description: None,
+                                            description: Some(
+                                                ::jacquard_common::CowStr::new_static(
+                                                    "Pagination cursor from previous response",
+                                                ),
+                                            ),
                                             format: None,
                                             default: None,
                                             min_length: None,
@@ -157,7 +189,7 @@ fn lexicon_doc_network_slices_slice_getActors() -> ::jacquard_lexicon::lexicon::
                                         }),
                                     );
                                     map.insert(
-                                        "limit".into(),
+                                        ::jacquard_common::smol_str::SmolStr::new_static("limit"),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                             description: None,
                                             default: None,
@@ -168,9 +200,13 @@ fn lexicon_doc_network_slices_slice_getActors() -> ::jacquard_lexicon::lexicon::
                                         }),
                                     );
                                     map.insert(
-                                        "slice".into(),
+                                        ::jacquard_common::smol_str::SmolStr::new_static("slice"),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                            description: None,
+                                            description: Some(
+                                                ::jacquard_common::CowStr::new_static(
+                                                    "AT-URI of the slice to query",
+                                                ),
+                                            ),
                                             format: None,
                                             default: None,
                                             min_length: None,
@@ -183,7 +219,7 @@ fn lexicon_doc_network_slices_slice_getActors() -> ::jacquard_lexicon::lexicon::
                                         }),
                                     );
                                     map.insert(
-                                        "where".into(),
+                                        ::jacquard_common::smol_str::SmolStr::new_static("where"),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
                                             description: None,
                                         }),
@@ -205,6 +241,9 @@ fn lexicon_doc_network_slices_slice_getActors() -> ::jacquard_lexicon::lexicon::
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Actor<'a> {
     fn nsid() -> &'static str {
         "network.slices.slice.getActors"
+    }
+    fn def_name() -> &'static str {
+        "actor"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_network_slices_slice_getActors()

@@ -32,22 +32,33 @@ pub struct Key<'a> {
 fn lexicon_doc_blue_2048_key_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "blue.2048.key.defs".into(),
+        id: ::jacquard_common::CowStr::new_static("blue.2048.key.defs"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "key".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("key"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["key".into(), "createdAt".into()]),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A record that holds a did:key used to verify records. Use the collection to know the type of verification. Example blue.2048.key.game is for blue.2048.game records",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("key"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "createdAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "createdAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -64,9 +75,13 @@ fn lexicon_doc_blue_2048_key_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                             }),
                         );
                         map.insert(
-                            "key".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("key"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "A did:key used to verify records came from an at://2048 authority",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -83,20 +98,32 @@ fn lexicon_doc_blue_2048_key_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                 }),
             );
             map.insert(
-                "signatureRef".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("signatureRef"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "a signature for an at://2048 record meaning it has been verified by a service. Most likely @2048.blue",
+                        ),
+                    ),
                     required: Some(
-                        vec!["atURI".into(), "signature".into(), "createdAt".into()],
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("atURI"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("signature"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "atURI".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("atURI"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The at://uri for the public did:key to verify this record. This also counts as the authority of the verification (example @2048.blue). As well as the type of verification by the collection name (blue.2048.key.game).",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -109,7 +136,9 @@ fn lexicon_doc_blue_2048_key_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                             }),
                         );
                         map.insert(
-                            "createdAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "createdAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -126,9 +155,15 @@ fn lexicon_doc_blue_2048_key_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                             }),
                         );
                         map.insert(
-                            "signature".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "signature",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The public verifiable signature of the record. Serialization of the records value minus the signature field",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -152,6 +187,9 @@ fn lexicon_doc_blue_2048_key_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Key<'a> {
     fn nsid() -> &'static str {
         "blue.2048.key.defs"
+    }
+    fn def_name() -> &'static str {
+        "key"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blue_2048_key_defs()
@@ -191,6 +229,9 @@ pub struct SignatureRef<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SignatureRef<'a> {
     fn nsid() -> &'static str {
         "blue.2048.key.defs"
+    }
+    fn def_name() -> &'static str {
+        "signatureRef"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blue_2048_key_defs()

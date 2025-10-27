@@ -94,6 +94,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WebMonetization<'a> {
     fn nsid() -> &'static str {
         "community.lexicon.payments.webMonetization"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_community_lexicon_payments_webMonetization()
     }
@@ -109,27 +112,37 @@ fn lexicon_doc_community_lexicon_payments_webMonetization() -> ::jacquard_lexico
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "community.lexicon.payments.webMonetization".into(),
+        id: ::jacquard_common::CowStr::new_static(
+            "community.lexicon.payments.webMonetization",
+        ),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("any".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static("Web Monetization wallet."),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("any")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
-                        required: Some(vec!["address".into()]),
+                        required: Some(
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("address")
+                            ],
+                        ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "address".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("address"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static("Wallet address."),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                     ),
@@ -144,9 +157,13 @@ fn lexicon_doc_community_lexicon_payments_webMonetization() -> ::jacquard_lexico
                                 }),
                             );
                             map.insert(
-                                "note".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("note"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Short, human-readable description of how this wallet is related to this account.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,

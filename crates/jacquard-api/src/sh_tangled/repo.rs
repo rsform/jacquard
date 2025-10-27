@@ -141,6 +141,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Repo<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.repo"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_repo()
     }
@@ -186,27 +189,33 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Repo<'a> {
 fn lexicon_doc_sh_tangled_repo() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "sh.tangled.repo".into(),
+        id: ::jacquard_common::CowStr::new_static("sh.tangled.repo"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: None,
-                    key: Some("tid".into()),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: Some(
-                            vec!["name".into(), "knot".into(), "createdAt".into()],
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("knot"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                            ],
                         ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -223,7 +232,9 @@ fn lexicon_doc_sh_tangled_repo() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                                 }),
                             );
                             map.insert(
-                                "description".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "description",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -238,9 +249,13 @@ fn lexicon_doc_sh_tangled_repo() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                                 }),
                             );
                             map.insert(
-                                "knot".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("knot"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "knot where the repo was created",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -253,9 +268,13 @@ fn lexicon_doc_sh_tangled_repo() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                                 }),
                             );
                             map.insert(
-                                "labels".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("labels"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "List of labels that this repo subscribes to",
+                                        ),
+                                    ),
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
                                         description: None,
                                         format: Some(
@@ -275,9 +294,11 @@ fn lexicon_doc_sh_tangled_repo() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                                 }),
                             );
                             map.insert(
-                                "name".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static("name of the repo"),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -290,9 +311,11 @@ fn lexicon_doc_sh_tangled_repo() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                                 }),
                             );
                             map.insert(
-                                "source".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("source"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static("source of the repo"),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                     ),
@@ -307,9 +330,13 @@ fn lexicon_doc_sh_tangled_repo() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                                 }),
                             );
                             map.insert(
-                                "spindle".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("spindle"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "CI runner to send jobs to and receive results from",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,

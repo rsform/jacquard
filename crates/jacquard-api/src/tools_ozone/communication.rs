@@ -56,20 +56,24 @@ fn lexicon_doc_tools_ozone_communication_defs() -> ::jacquard_lexicon::lexicon::
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "tools.ozone.communication.defs".into(),
+        id: ::jacquard_common::CowStr::new_static("tools.ozone.communication.defs"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "templateView".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("templateView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            "id".into(), "name".into(), "contentMarkdown".into(),
-                            "disabled".into(), "lastUpdatedBy".into(), "createdAt"
-                            .into(), "updatedAt".into()
+                            ::jacquard_common::smol_str::SmolStr::new_static("id"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("contentMarkdown"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("disabled"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("lastUpdatedBy"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("createdAt"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("updatedAt")
                         ],
                     ),
                     nullable: None,
@@ -77,9 +81,15 @@ fn lexicon_doc_tools_ozone_communication_defs() -> ::jacquard_lexicon::lexicon::
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "contentMarkdown".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "contentMarkdown",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Subject of the message, used in emails.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -92,7 +102,9 @@ fn lexicon_doc_tools_ozone_communication_defs() -> ::jacquard_lexicon::lexicon::
                             }),
                         );
                         map.insert(
-                            "createdAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "createdAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -109,7 +121,7 @@ fn lexicon_doc_tools_ozone_communication_defs() -> ::jacquard_lexicon::lexicon::
                             }),
                         );
                         map.insert(
-                            "disabled".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("disabled"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                 description: None,
                                 default: None,
@@ -117,7 +129,7 @@ fn lexicon_doc_tools_ozone_communication_defs() -> ::jacquard_lexicon::lexicon::
                             }),
                         );
                         map.insert(
-                            "id".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("id"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -132,9 +144,11 @@ fn lexicon_doc_tools_ozone_communication_defs() -> ::jacquard_lexicon::lexicon::
                             }),
                         );
                         map.insert(
-                            "lang".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("lang"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static("Message language."),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Language,
                                 ),
@@ -149,9 +163,15 @@ fn lexicon_doc_tools_ozone_communication_defs() -> ::jacquard_lexicon::lexicon::
                             }),
                         );
                         map.insert(
-                            "lastUpdatedBy".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "lastUpdatedBy",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "DID of the user who last updated the template.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Did,
                                 ),
@@ -166,9 +186,13 @@ fn lexicon_doc_tools_ozone_communication_defs() -> ::jacquard_lexicon::lexicon::
                             }),
                         );
                         map.insert(
-                            "name".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Name of the template.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -181,9 +205,13 @@ fn lexicon_doc_tools_ozone_communication_defs() -> ::jacquard_lexicon::lexicon::
                             }),
                         );
                         map.insert(
-                            "subject".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("subject"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Content of the template, can contain markdown and variable placeholders.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -196,7 +224,9 @@ fn lexicon_doc_tools_ozone_communication_defs() -> ::jacquard_lexicon::lexicon::
                             }),
                         );
                         map.insert(
-                            "updatedAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "updatedAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -224,6 +254,9 @@ fn lexicon_doc_tools_ozone_communication_defs() -> ::jacquard_lexicon::lexicon::
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TemplateView<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.communication.defs"
+    }
+    fn def_name() -> &'static str {
+        "templateView"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_communication_defs()

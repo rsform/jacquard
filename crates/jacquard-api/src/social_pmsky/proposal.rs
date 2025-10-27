@@ -129,6 +129,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Proposal<'a> {
     fn nsid() -> &'static str {
         "social.pmsky.proposal"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_pmsky_proposal()
     }
@@ -137,11 +140,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Proposal<'a> {
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         {
             let value = &self.val;
-            if value.as_ref().len() > 128usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 128usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "val",
                     max: 128usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -154,22 +158,29 @@ fn lexicon_doc_social_pmsky_proposal() -> ::jacquard_lexicon::lexicon::LexiconDo
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "social.pmsky.proposal".into(),
+        id: ::jacquard_common::CowStr::new_static("social.pmsky.proposal"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: None,
-                    key: Some("tid".into()),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
+                        description: Some(
+                            ::jacquard_common::CowStr::new_static(
+                                "A proposed moderation action (e.g. adding a label or annotation to a post). Refers to some other resource via URI (e.g. an atproto post). Superset of 'com.atproto.proposal.defs#label.",
+                            ),
+                        ),
                         required: Some(
                             vec![
-                                "typ".into(), "src".into(), "uri".into(), "val".into(),
-                                "cts".into()
+                                ::jacquard_common::smol_str::SmolStr::new_static("typ"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("src"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("uri"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("val"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("cts")
                             ],
                         ),
                         nullable: None,
@@ -177,9 +188,13 @@ fn lexicon_doc_social_pmsky_proposal() -> ::jacquard_lexicon::lexicon::LexiconDo
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "aid".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("aid"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The persistent, anonymous identifier for the user creating the proposal.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -192,9 +207,13 @@ fn lexicon_doc_social_pmsky_proposal() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 }),
                             );
                             map.insert(
-                                "cid".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("cid"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Optionally, CID specifying the specific version of 'uri' resource this proposal applies to.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Cid,
                                     ),
@@ -209,9 +228,13 @@ fn lexicon_doc_social_pmsky_proposal() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 }),
                             );
                             map.insert(
-                                "cts".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("cts"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Timestamp when this proposal was created.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -226,9 +249,13 @@ fn lexicon_doc_social_pmsky_proposal() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 }),
                             );
                             map.insert(
-                                "note".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("note"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "For 'label' proposals where 'val' is 'needs-context', the full text of any proposed annotation (e.g. community note) to be shown below the post.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -241,9 +268,13 @@ fn lexicon_doc_social_pmsky_proposal() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 }),
                             );
                             map.insert(
-                                "reasons".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("reasons"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "An optional array of predefined reasons justifying the moderation action.",
+                                        ),
+                                    ),
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
                                         description: None,
                                         format: None,
@@ -261,7 +292,7 @@ fn lexicon_doc_social_pmsky_proposal() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 }),
                             );
                             map.insert(
-                                "sig".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("sig"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Bytes(::jacquard_lexicon::lexicon::LexBytes {
                                     description: None,
                                     max_length: None,
@@ -269,9 +300,13 @@ fn lexicon_doc_social_pmsky_proposal() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 }),
                             );
                             map.insert(
-                                "src".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("src"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "DID of the actor who created this proposal.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Did,
                                     ),
@@ -286,9 +321,13 @@ fn lexicon_doc_social_pmsky_proposal() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 }),
                             );
                             map.insert(
-                                "typ".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("typ"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The type of moderation action being proposed. Currently expected values are 'allowed_user' or 'label'",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -301,9 +340,13 @@ fn lexicon_doc_social_pmsky_proposal() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 }),
                             );
                             map.insert(
-                                "uri".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("uri"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "AT URI of the record, repository (account), or other resource that this proposal applies to.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                     ),
@@ -318,9 +361,13 @@ fn lexicon_doc_social_pmsky_proposal() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 }),
                             );
                             map.insert(
-                                "val".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("val"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "For 'label' proposals, the short string name of the value of the proposed label.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -333,7 +380,7 @@ fn lexicon_doc_social_pmsky_proposal() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 }),
                             );
                             map.insert(
-                                "ver".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("ver"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,

@@ -77,18 +77,20 @@ fn lexicon_doc_social_clippr_actor_defs() -> ::jacquard_lexicon::lexicon::Lexico
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "social.clippr.actor.defs".into(),
+        id: ::jacquard_common::CowStr::new_static("social.clippr.actor.defs"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "preferences".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("preferences"),
                 ::jacquard_lexicon::lexicon::LexUserType::Array(::jacquard_lexicon::lexicon::LexArray {
                     description: None,
                     items: ::jacquard_lexicon::lexicon::LexArrayItem::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                         description: None,
-                        refs: vec!["#publishingScopesPref".into()],
+                        refs: vec![
+                            ::jacquard_common::CowStr::new_static("#publishingScopesPref")
+                        ],
                         closed: None,
                     }),
                     min_length: None,
@@ -96,20 +98,32 @@ fn lexicon_doc_social_clippr_actor_defs() -> ::jacquard_lexicon::lexicon::Lexico
                 }),
             );
             map.insert(
-                "profileView".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("profileView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A view of an actor's profile.",
+                        ),
+                    ),
                     required: Some(
-                        vec!["did".into(), "handle".into(), "displayName".into()],
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("handle"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("displayName")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "avatar".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("avatar"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "A link to the profile's avatar",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                 ),
@@ -124,9 +138,15 @@ fn lexicon_doc_social_clippr_actor_defs() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            "createdAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "createdAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "When the profile record was first created",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                 ),
@@ -141,9 +161,15 @@ fn lexicon_doc_social_clippr_actor_defs() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            "description".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "description",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The biography associated to the profile",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -156,9 +182,13 @@ fn lexicon_doc_social_clippr_actor_defs() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            "did".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The DID of the profile",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Did,
                                 ),
@@ -173,9 +203,15 @@ fn lexicon_doc_social_clippr_actor_defs() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            "displayName".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "displayName",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The display name associated to the profile",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -188,9 +224,13 @@ fn lexicon_doc_social_clippr_actor_defs() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            "handle".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("handle"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The handle of the profile",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Handle,
                                 ),
@@ -209,18 +249,32 @@ fn lexicon_doc_social_clippr_actor_defs() -> ::jacquard_lexicon::lexicon::Lexico
                 }),
             );
             map.insert(
-                "publishingScopesPref".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("publishingScopesPref"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["defaultScope".into()]),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Preferences for an user's publishing scopes.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("defaultScope")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "defaultScope".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "defaultScope",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "What publishing scope to mark a clip as by default",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -245,6 +299,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileView<'a> {
     fn nsid() -> &'static str {
         "social.clippr.actor.defs"
     }
+    fn def_name() -> &'static str {
+        "profileView"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_clippr_actor_defs()
     }
@@ -252,11 +309,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileView<'a> {
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         if let Some(ref value) = self.description {
-            if value.as_ref().len() > 5000usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 5000usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "description",
                     max: 5000usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -278,11 +336,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileView<'a> {
         }
         {
             let value = &self.display_name;
-            if value.as_ref().len() > 640usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 640usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "display_name",
                     max: 640usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -329,6 +388,9 @@ pub struct PublishingScopesPref<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PublishingScopesPref<'a> {
     fn nsid() -> &'static str {
         "social.clippr.actor.defs"
+    }
+    fn def_name() -> &'static str {
+        "publishingScopesPref"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_clippr_actor_defs()

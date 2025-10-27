@@ -126,6 +126,9 @@ pub mod place_atwork;
 #[cfg(feature = "place_stream")]
 pub mod place_stream;
 
+#[cfg(feature = "place_wisp")]
+pub mod place_wisp;
+
 #[cfg(feature = "pub_leaflet")]
 pub mod pub_leaflet;
 

@@ -96,6 +96,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Mushies<'a> {
     fn nsid() -> &'static str {
         "org.robocracy.demo.mushies"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_robocracy_demo_mushies()
     }
@@ -104,11 +107,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Mushies<'a> {
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         {
             let value = &self.common_name;
-            if value.as_ref().len() > 2560usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 2560usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "common_name",
                     max: 2560usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -130,11 +134,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Mushies<'a> {
             }
         }
         if let Some(ref value) = self.species {
-            if value.as_ref().len() > 2560usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 2560usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "species",
                     max: 2560usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -163,25 +168,33 @@ fn lexicon_doc_org_robocracy_demo_mushies() -> ::jacquard_lexicon::lexicon::Lexi
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "org.robocracy.demo.mushies".into(),
+        id: ::jacquard_common::CowStr::new_static("org.robocracy.demo.mushies"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("any".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static("it's a kind of fungus!"),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("any")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
-                        required: Some(vec!["commonName".into()]),
+                        required: Some(
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("commonName")
+                            ],
+                        ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "commonName".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "commonName",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -196,7 +209,7 @@ fn lexicon_doc_org_robocracy_demo_mushies() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                "edible".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("edible"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                     description: None,
                                     default: None,
@@ -204,7 +217,7 @@ fn lexicon_doc_org_robocracy_demo_mushies() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                "species".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("species"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,

@@ -52,22 +52,30 @@ fn lexicon_doc_sh_weaver_notebook_authors() -> ::jacquard_lexicon::lexicon::Lexi
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "sh.weaver.notebook.authors".into(),
+        id: ::jacquard_common::CowStr::new_static("sh.weaver.notebook.authors"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "authorListItem".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("authorListItem"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["profile, index".into()]),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A single author in a Weaver notebook.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("profile, index")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "index".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("index"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -78,12 +86,12 @@ fn lexicon_doc_sh_weaver_notebook_authors() -> ::jacquard_lexicon::lexicon::Lexi
                             }),
                         );
                         map.insert(
-                            "profile".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("profile"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
-                                    "app.bsky.actor.defs#profileViewBasic".into(),
-                                    "sh.weaver.actor.defs#profileView".into()
+                                    ::jacquard_common::CowStr::new_static("app.bsky.actor.defs#profileViewBasic"),
+                                    ::jacquard_common::CowStr::new_static("sh.weaver.actor.defs#profileView")
                                 ],
                                 closed: None,
                             }),
@@ -93,31 +101,45 @@ fn lexicon_doc_sh_weaver_notebook_authors() -> ::jacquard_lexicon::lexicon::Lexi
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("tid".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Authors of a Weaver notebook.",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
-                        required: Some(vec!["authorList".into()]),
+                        required: Some(
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("authorList")
+                            ],
+                        ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "authorList".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "authorList",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: None,
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                         description: None,
-                                        r#ref: "#authorListItem".into(),
+                                        r#ref: ::jacquard_common::CowStr::new_static(
+                                            "#authorListItem",
+                                        ),
                                     }),
                                     min_length: None,
                                     max_length: None,
                                 }),
                             );
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -146,6 +168,9 @@ fn lexicon_doc_sh_weaver_notebook_authors() -> ::jacquard_lexicon::lexicon::Lexi
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AuthorListItem<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.authors"
+    }
+    fn def_name() -> &'static str {
+        "authorListItem"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_notebook_authors()
@@ -242,6 +267,9 @@ impl jacquard_common::types::collection::Collection for AuthorsRecord {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Authors<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.authors"
+    }
+    fn def_name() -> &'static str {
+        "main"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_notebook_authors()

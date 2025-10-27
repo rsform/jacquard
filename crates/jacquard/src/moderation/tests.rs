@@ -1,5 +1,3 @@
-use std::collections::BTreeMap;
-
 use crate::moderation::{
     Blur, LabelPref, LabelTarget, Labeled, LabelerDefs, Moderateable, ModerationPrefs, moderate,
     moderate_all,

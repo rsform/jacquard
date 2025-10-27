@@ -61,29 +61,38 @@ fn lexicon_doc_chat_bsky_actor_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "chat.bsky.actor.defs".into(),
+        id: ::jacquard_common::CowStr::new_static("chat.bsky.actor.defs"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "profileViewBasic".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("profileViewBasic"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["did".into(), "handle".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("handle")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "associated".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "associated",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "app.bsky.actor.defs#profileAssociated".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "app.bsky.actor.defs#profileAssociated",
+                                ),
                             }),
                         );
                         map.insert(
-                            "avatar".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("avatar"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -100,7 +109,9 @@ fn lexicon_doc_chat_bsky_actor_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "chatDisabled".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "chatDisabled",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                 description: None,
                                 default: None,
@@ -108,7 +119,7 @@ fn lexicon_doc_chat_bsky_actor_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "did".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -125,7 +136,9 @@ fn lexicon_doc_chat_bsky_actor_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "displayName".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "displayName",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -140,7 +153,7 @@ fn lexicon_doc_chat_bsky_actor_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "handle".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("handle"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -157,29 +170,37 @@ fn lexicon_doc_chat_bsky_actor_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "labels".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("labels"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "com.atproto.label.defs#label".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "com.atproto.label.defs#label",
+                                    ),
                                 }),
                                 min_length: None,
                                 max_length: None,
                             }),
                         );
                         map.insert(
-                            "verification".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "verification",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "app.bsky.actor.defs#verificationState".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "app.bsky.actor.defs#verificationState",
+                                ),
                             }),
                         );
                         map.insert(
-                            "viewer".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("viewer"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "app.bsky.actor.defs#viewerState".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "app.bsky.actor.defs#viewerState",
+                                ),
                             }),
                         );
                         map
@@ -195,6 +216,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileViewBasic<'a> {
     fn nsid() -> &'static str {
         "chat.bsky.actor.defs"
     }
+    fn def_name() -> &'static str {
+        "profileViewBasic"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_chat_bsky_actor_defs()
     }
@@ -202,11 +226,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileViewBasic<'a> {
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         if let Some(ref value) = self.display_name {
-            if value.as_ref().len() > 640usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 640usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "display_name",
                     max: 640usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }

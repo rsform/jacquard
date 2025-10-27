@@ -92,24 +92,30 @@ fn lexicon_doc_chat_bsky_moderation_getActorMetadata() -> ::jacquard_lexicon::le
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "chat.bsky.moderation.getActorMetadata".into(),
+        id: ::jacquard_common::CowStr::new_static(
+            "chat.bsky.moderation.getActorMetadata",
+        ),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
                     description: None,
                     parameters: Some(
                         ::jacquard_lexicon::lexicon::LexXrpcQueryParameter::Params(::jacquard_lexicon::lexicon::LexXrpcParameters {
                             description: None,
-                            required: Some(vec!["actor".into()]),
+                            required: Some(
+                                vec![
+                                    ::jacquard_common::smol_str::SmolStr::new_static("actor")
+                                ],
+                            ),
                             properties: {
                                 #[allow(unused_mut)]
                                 let mut map = ::std::collections::BTreeMap::new();
                                 map.insert(
-                                    "actor".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static("actor"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
                                         description: None,
                                         format: Some(
@@ -134,13 +140,15 @@ fn lexicon_doc_chat_bsky_moderation_getActorMetadata() -> ::jacquard_lexicon::le
                 }),
             );
             map.insert(
-                "metadata".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("metadata"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            "messagesSent".into(), "messagesReceived".into(), "convos"
-                            .into(), "convosStarted".into()
+                            ::jacquard_common::smol_str::SmolStr::new_static("messagesSent"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("messagesReceived"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("convos"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("convosStarted")
                         ],
                     ),
                     nullable: None,
@@ -148,7 +156,7 @@ fn lexicon_doc_chat_bsky_moderation_getActorMetadata() -> ::jacquard_lexicon::le
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "convos".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("convos"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -159,7 +167,9 @@ fn lexicon_doc_chat_bsky_moderation_getActorMetadata() -> ::jacquard_lexicon::le
                             }),
                         );
                         map.insert(
-                            "convosStarted".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "convosStarted",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -170,7 +180,9 @@ fn lexicon_doc_chat_bsky_moderation_getActorMetadata() -> ::jacquard_lexicon::le
                             }),
                         );
                         map.insert(
-                            "messagesReceived".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "messagesReceived",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -181,7 +193,9 @@ fn lexicon_doc_chat_bsky_moderation_getActorMetadata() -> ::jacquard_lexicon::le
                             }),
                         );
                         map.insert(
-                            "messagesSent".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "messagesSent",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -203,6 +217,9 @@ fn lexicon_doc_chat_bsky_moderation_getActorMetadata() -> ::jacquard_lexicon::le
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Metadata<'a> {
     fn nsid() -> &'static str {
         "chat.bsky.moderation.getActorMetadata"
+    }
+    fn def_name() -> &'static str {
+        "metadata"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_chat_bsky_moderation_getActorMetadata()

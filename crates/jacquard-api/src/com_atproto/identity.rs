@@ -43,22 +43,28 @@ fn lexicon_doc_com_atproto_identity_defs() -> ::jacquard_lexicon::lexicon::Lexic
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "com.atproto.identity.defs".into(),
+        id: ::jacquard_common::CowStr::new_static("com.atproto.identity.defs"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "identityInfo".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("identityInfo"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["did".into(), "handle".into(), "didDoc".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("handle"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("didDoc")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "did".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -75,15 +81,19 @@ fn lexicon_doc_com_atproto_identity_defs() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "didDoc".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("didDoc"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
                                 description: None,
                             }),
                         );
                         map.insert(
-                            "handle".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("handle"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The validated handle of the account; or 'handle.invalid' if the handle did not bi-directionally match the DID document.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Handle,
                                 ),
@@ -109,6 +119,9 @@ fn lexicon_doc_com_atproto_identity_defs() -> ::jacquard_lexicon::lexicon::Lexic
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for IdentityInfo<'a> {
     fn nsid() -> &'static str {
         "com.atproto.identity.defs"
+    }
+    fn def_name() -> &'static str {
+        "identityInfo"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_identity_defs()

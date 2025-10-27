@@ -132,6 +132,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
     fn nsid() -> &'static str {
         "app.bsky.actor.profile"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_actor_profile()
     }
@@ -139,11 +142,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         if let Some(ref value) = self.description {
-            if value.as_ref().len() > 2560usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 2560usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "description",
                     max: 2560usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -164,11 +168,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
             }
         }
         if let Some(ref value) = self.display_name {
-            if value.as_ref().len() > 640usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 640usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "display_name",
                     max: 640usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -189,11 +194,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
             }
         }
         if let Some(ref value) = self.pronouns {
-            if value.as_ref().len() > 200usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 200usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "pronouns",
                     max: 200usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -222,16 +228,20 @@ fn lexicon_doc_app_bsky_actor_profile() -> ::jacquard_lexicon::lexicon::LexiconD
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "app.bsky.actor.profile".into(),
+        id: ::jacquard_common::CowStr::new_static("app.bsky.actor.profile"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("literal:self".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A declaration of a Bluesky account profile.",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("literal:self")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: None,
@@ -240,7 +250,7 @@ fn lexicon_doc_app_bsky_actor_profile() -> ::jacquard_lexicon::lexicon::LexiconD
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "avatar".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("avatar"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
                                     description: None,
                                     accept: None,
@@ -248,7 +258,7 @@ fn lexicon_doc_app_bsky_actor_profile() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                "banner".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("banner"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
                                     description: None,
                                     accept: None,
@@ -256,7 +266,9 @@ fn lexicon_doc_app_bsky_actor_profile() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -273,9 +285,15 @@ fn lexicon_doc_app_bsky_actor_profile() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                "description".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "description",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Free-form profile description text.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -288,7 +306,9 @@ fn lexicon_doc_app_bsky_actor_profile() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                "displayName".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "displayName",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -303,31 +323,51 @@ fn lexicon_doc_app_bsky_actor_profile() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                "joinedViaStarterPack".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "joinedViaStarterPack",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "com.atproto.repo.strongRef".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "com.atproto.repo.strongRef",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "labels".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("labels"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
-                                    refs: vec!["com.atproto.label.defs#selfLabels".into()],
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Self-label values, specific to the Bluesky application, on the overall account.",
+                                        ),
+                                    ),
+                                    refs: vec![
+                                        ::jacquard_common::CowStr::new_static("com.atproto.label.defs#selfLabels")
+                                    ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "pinnedPost".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "pinnedPost",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "com.atproto.repo.strongRef".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "com.atproto.repo.strongRef",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "pronouns".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "pronouns",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Free-form pronouns text.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -340,7 +380,7 @@ fn lexicon_doc_app_bsky_actor_profile() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                "website".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("website"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(

@@ -49,29 +49,38 @@ fn lexicon_doc_place_stream_richtext_facet() -> ::jacquard_lexicon::lexicon::Lex
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "place.stream.richtext.facet".into(),
+        id: ::jacquard_common::CowStr::new_static("place.stream.richtext.facet"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["index".into(), "features".into()]),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Annotation of a sub-string within rich text.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("index"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("features")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "features".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("features"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
-                                        "app.bsky.richtext.facet#mention".into(),
-                                        "app.bsky.richtext.facet#link".into()
+                                        ::jacquard_common::CowStr::new_static("app.bsky.richtext.facet#mention"),
+                                        ::jacquard_common::CowStr::new_static("app.bsky.richtext.facet#link")
                                     ],
                                     closed: None,
                                 }),
@@ -80,10 +89,12 @@ fn lexicon_doc_place_stream_richtext_facet() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            "index".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("index"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "app.bsky.richtext.facet#byteSlice".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "app.bsky.richtext.facet#byteSlice",
+                                ),
                             }),
                         );
                         map
@@ -98,6 +109,9 @@ fn lexicon_doc_place_stream_richtext_facet() -> ::jacquard_lexicon::lexicon::Lex
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Facet<'a> {
     fn nsid() -> &'static str {
         "place.stream.richtext.facet"
+    }
+    fn def_name() -> &'static str {
+        "main"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_richtext_facet()

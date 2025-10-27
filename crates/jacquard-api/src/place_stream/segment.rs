@@ -30,24 +30,28 @@ fn lexicon_doc_place_stream_segment() -> ::jacquard_lexicon::lexicon::LexiconDoc
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "place.stream.segment".into(),
+        id: ::jacquard_common::CowStr::new_static("place.stream.segment"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "audio".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("audio"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
-                        vec!["codec".into(), "rate".into(), "channels".into()],
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("codec"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("rate"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("channels")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "channels".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("channels"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -58,7 +62,7 @@ fn lexicon_doc_place_stream_segment() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "codec".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("codec"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -73,7 +77,7 @@ fn lexicon_doc_place_stream_segment() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "rate".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("rate"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -88,16 +92,21 @@ fn lexicon_doc_place_stream_segment() -> ::jacquard_lexicon::lexicon::LexiconDoc
                 }),
             );
             map.insert(
-                "framerate".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("framerate"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["num".into(), "den".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("num"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("den")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "den".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("den"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -108,7 +117,7 @@ fn lexicon_doc_place_stream_segment() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "num".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("num"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -123,16 +132,22 @@ fn lexicon_doc_place_stream_segment() -> ::jacquard_lexicon::lexicon::LexiconDoc
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("tid".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Media file representing a segment of a livestream",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: Some(
                             vec![
-                                "id".into(), "signingKey".into(), "startTime".into(),
-                                "creator".into()
+                                ::jacquard_common::smol_str::SmolStr::new_static("id"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("signingKey"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("startTime"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("creator")
                             ],
                         ),
                         nullable: None,
@@ -140,33 +155,41 @@ fn lexicon_doc_place_stream_segment() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "audio".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("audio"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: None,
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                         description: None,
-                                        r#ref: "#audio".into(),
+                                        r#ref: ::jacquard_common::CowStr::new_static("#audio"),
                                     }),
                                     min_length: None,
                                     max_length: None,
                                 }),
                             );
                             map.insert(
-                                "contentRights".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "contentRights",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "place.stream.metadata.contentRights".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "place.stream.metadata.contentRights",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "contentWarnings".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "contentWarnings",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "place.stream.metadata.contentWarnings".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "place.stream.metadata.contentWarnings",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "creator".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("creator"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -183,14 +206,20 @@ fn lexicon_doc_place_stream_segment() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                "distributionPolicy".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "distributionPolicy",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "place.stream.metadata.distributionPolicy".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "place.stream.metadata.distributionPolicy",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "duration".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "duration",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -201,9 +230,13 @@ fn lexicon_doc_place_stream_segment() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                "id".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("id"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Unique identifier for the segment",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -216,9 +249,15 @@ fn lexicon_doc_place_stream_segment() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                "signingKey".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "signingKey",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The DID of the signing key used for this segment",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -231,7 +270,7 @@ fn lexicon_doc_place_stream_segment() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                "size".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("size"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -242,9 +281,15 @@ fn lexicon_doc_place_stream_segment() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                "startTime".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "startTime",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "When this segment started",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -259,12 +304,12 @@ fn lexicon_doc_place_stream_segment() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                "video".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("video"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: None,
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                         description: None,
-                                        r#ref: "#video".into(),
+                                        r#ref: ::jacquard_common::CowStr::new_static("#video"),
                                     }),
                                     min_length: None,
                                     max_length: None,
@@ -276,16 +321,21 @@ fn lexicon_doc_place_stream_segment() -> ::jacquard_lexicon::lexicon::LexiconDoc
                 }),
             );
             map.insert(
-                "segmentView".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("segmentView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["cid".into(), "record".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("cid"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("record")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "cid".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("cid"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -302,7 +352,7 @@ fn lexicon_doc_place_stream_segment() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "record".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("record"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
                                 description: None,
                             }),
@@ -312,18 +362,22 @@ fn lexicon_doc_place_stream_segment() -> ::jacquard_lexicon::lexicon::LexiconDoc
                 }),
             );
             map.insert(
-                "video".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("video"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
-                        vec!["codec".into(), "width".into(), "height".into()],
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("codec"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("width"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("height")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "bframes".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("bframes"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                 description: None,
                                 default: None,
@@ -331,7 +385,7 @@ fn lexicon_doc_place_stream_segment() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "codec".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("codec"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -346,14 +400,16 @@ fn lexicon_doc_place_stream_segment() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "framerate".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "framerate",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#framerate".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static("#framerate"),
                             }),
                         );
                         map.insert(
-                            "height".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("height"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -364,7 +420,7 @@ fn lexicon_doc_place_stream_segment() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "width".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("width"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -386,6 +442,9 @@ fn lexicon_doc_place_stream_segment() -> ::jacquard_lexicon::lexicon::LexiconDoc
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Audio<'a> {
     fn nsid() -> &'static str {
         "place.stream.segment"
+    }
+    fn def_name() -> &'static str {
+        "audio"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_segment()
@@ -417,6 +476,9 @@ pub struct Framerate<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Framerate<'a> {
     fn nsid() -> &'static str {
         "place.stream.segment"
+    }
+    fn def_name() -> &'static str {
+        "framerate"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_segment()
@@ -555,6 +617,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Segment<'a> {
     fn nsid() -> &'static str {
         "place.stream.segment"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_segment()
     }
@@ -587,6 +652,9 @@ pub struct SegmentView<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SegmentView<'a> {
     fn nsid() -> &'static str {
         "place.stream.segment"
+    }
+    fn def_name() -> &'static str {
+        "segmentView"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_segment()
@@ -628,6 +696,9 @@ pub struct Video<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Video<'a> {
     fn nsid() -> &'static str {
         "place.stream.segment"
+    }
+    fn def_name() -> &'static str {
+        "video"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_segment()

@@ -89,6 +89,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Schema<'a> {
     fn nsid() -> &'static str {
         "blue.rito.service.schema"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blue_rito_service_schema()
     }
@@ -104,27 +107,39 @@ fn lexicon_doc_blue_rito_service_schema() -> ::jacquard_lexicon::lexicon::Lexico
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "blue.rito.service.schema".into(),
+        id: ::jacquard_common::CowStr::new_static("blue.rito.service.schema"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("nsid".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "This record defines the schema associated with a specific NSID.",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("nsid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
-                        required: Some(vec!["schema".into()]),
+                        required: Some(
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("schema")
+                            ],
+                        ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "schema".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("schema"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The AppView URL for the NSID. For example, if the NSID is uk.skyblur.post, the URL should be https://skyblur.uk/post/{did}/{rkey}",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                     ),

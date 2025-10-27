@@ -108,6 +108,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Service<'a> {
     fn nsid() -> &'static str {
         "app.bsky.labeler.service"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_labeler_service()
     }
@@ -123,25 +126,36 @@ fn lexicon_doc_app_bsky_labeler_service() -> ::jacquard_lexicon::lexicon::Lexico
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "app.bsky.labeler.service".into(),
+        id: ::jacquard_common::CowStr::new_static("app.bsky.labeler.service"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("literal:self".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A declaration of the existence of labeler service.",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("literal:self")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
-                        required: Some(vec!["policies".into(), "createdAt".into()]),
+                        required: Some(
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("policies"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -158,36 +172,56 @@ fn lexicon_doc_app_bsky_labeler_service() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                "labels".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("labels"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
-                                    refs: vec!["com.atproto.label.defs#selfLabels".into()],
+                                    refs: vec![
+                                        ::jacquard_common::CowStr::new_static("com.atproto.label.defs#selfLabels")
+                                    ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "policies".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "policies",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "app.bsky.labeler.defs#labelerPolicies".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "app.bsky.labeler.defs#labelerPolicies",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "reasonTypes".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "reasonTypes",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The set of report reason 'codes' which are in-scope for this service to review and action. These usually align to policy categories. If not defined (distinct from empty array), all reason types are allowed.",
+                                        ),
+                                    ),
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                         description: None,
-                                        r#ref: "com.atproto.moderation.defs#reasonType".into(),
+                                        r#ref: ::jacquard_common::CowStr::new_static(
+                                            "com.atproto.moderation.defs#reasonType",
+                                        ),
                                     }),
                                     min_length: None,
                                     max_length: None,
                                 }),
                             );
                             map.insert(
-                                "subjectCollections".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "subjectCollections",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Set of record types (collection NSIDs) which can be reported to this service. If not defined (distinct from empty array), default is any record type.",
+                                        ),
+                                    ),
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
                                         description: None,
                                         format: Some(
@@ -207,12 +241,20 @@ fn lexicon_doc_app_bsky_labeler_service() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                "subjectTypes".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "subjectTypes",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The set of subject types (account, record, etc) this service accepts reports on.",
+                                        ),
+                                    ),
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                         description: None,
-                                        r#ref: "com.atproto.moderation.defs#subjectType".into(),
+                                        r#ref: ::jacquard_common::CowStr::new_static(
+                                            "com.atproto.moderation.defs#subjectType",
+                                        ),
                                     }),
                                     min_length: None,
                                     max_length: None,

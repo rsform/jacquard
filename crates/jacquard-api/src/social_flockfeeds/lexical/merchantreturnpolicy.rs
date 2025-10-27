@@ -582,6 +582,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Merchantreturnpolicy<'a> 
     fn nsid() -> &'static str {
         "social.flockfeeds.lexical.merchantreturnpolicy"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_flockfeeds_lexical_merchantreturnpolicy()
     }
@@ -597,16 +600,22 @@ fn lexicon_doc_social_flockfeeds_lexical_merchantreturnpolicy() -> ::jacquard_le
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "social.flockfeeds.lexical.merchantreturnpolicy".into(),
+        id: ::jacquard_common::CowStr::new_static(
+            "social.flockfeeds.lexical.merchantreturnpolicy",
+        ),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("tid".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A MerchantReturnPolicy provides information about product return policies associated with an [[Organization]], [[Product]], or [[Offer]].",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: None,
@@ -615,20 +624,32 @@ fn lexicon_doc_social_flockfeeds_lexical_merchantreturnpolicy() -> ::jacquard_le
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "additionalProperty".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "additionalProperty",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "A property-value pair representing an additional characteristic of the entity, e.g. a product feature or another characteristic for which there is no matching property in schema.org.\\n\\nNote: Publishers should be aware that applications designed to use specific schema.org properties (e.g. https://schema.org/width, https://schema.org/color, https://schema.org/gtin13, ...) will typically expect such data to be provided using those properties, rather than using the generic property/value mechanism.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.propertyvalue".into(),
-                                        "social.flockfeeds.lexical.itemlist".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.propertyvalue"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.itemlist")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "additionalType".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "additionalType",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "An additional type for the item, typically used for adding more specific types from external vocabularies in microdata syntax. This is a relationship between something and a class that the thing is in. Typically the value is a URI-identified RDF class, and in this case corresponds to the\n    use of rdf:type in RDF. Text values can be used sparingly, for cases where useful information can be added without their being an appropriate schema to reference. In the case of text values, the class label should follow the schema.org <a href=\"https://schema.org/docs/styleguide.html\">style guide</a>.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -641,9 +662,15 @@ fn lexicon_doc_social_flockfeeds_lexical_merchantreturnpolicy() -> ::jacquard_le
                                 }),
                             );
                             map.insert(
-                                "alternateName".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "alternateName",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "An alias for the item.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -656,20 +683,32 @@ fn lexicon_doc_social_flockfeeds_lexical_merchantreturnpolicy() -> ::jacquard_le
                                 }),
                             );
                             map.insert(
-                                "applicableCountry".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "applicableCountry",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "A country where a particular merchant return policy applies to, for example the two-letter ISO 3166-1 alpha-2 country code.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.country".into(),
-                                        "social.flockfeeds.lexical.itemlist".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.country"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.itemlist")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "customerRemorseReturnFees".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "customerRemorseReturnFees",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The type of return fees if the product is returned due to customer remorse.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -682,9 +721,15 @@ fn lexicon_doc_social_flockfeeds_lexical_merchantreturnpolicy() -> ::jacquard_le
                                 }),
                             );
                             map.insert(
-                                "customerRemorseReturnLabelSource".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "customerRemorseReturnLabelSource",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The method (from an enumeration) by which the customer obtains a return shipping label for a product returned due to customer remorse.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -697,31 +742,49 @@ fn lexicon_doc_social_flockfeeds_lexical_merchantreturnpolicy() -> ::jacquard_le
                                 }),
                             );
                             map.insert(
-                                "customerRemorseReturnShippingFeesAmount".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "customerRemorseReturnShippingFeesAmount",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The amount of shipping costs if a product is returned due to customer remorse. Applicable when property [[customerRemorseReturnFees]] equals [[ReturnShippingFees]].",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.monetaryamount".into(),
-                                        "social.flockfeeds.lexical.itemlist".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.monetaryamount"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.itemlist")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "description".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "description",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "A description of the item.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.textobject".into(),
-                                        "social.flockfeeds.lexical.itemlist".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.textobject"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.itemlist")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "disambiguatingDescription".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "disambiguatingDescription",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "A sub property of description. A short description of the item used to disambiguate from other, similar items. Information from other properties (in particular, name) may be necessary for the description to be useful for disambiguation.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -734,29 +797,41 @@ fn lexicon_doc_social_flockfeeds_lexical_merchantreturnpolicy() -> ::jacquard_le
                                 }),
                             );
                             map.insert(
-                                "identifier".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "identifier",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The identifier property represents any kind of identifier for any kind of [[Thing]], such as ISBNs, GTIN codes, UUIDs etc. Schema.org provides dedicated properties for representing many of these, either as textual strings or as URL (URI) links. See [background notes](/docs/datamodel.html#identifierBg) for more details.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.propertyvalue".into(),
-                                        "social.flockfeeds.lexical.itemlist".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.propertyvalue"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.itemlist")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "image".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("image"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "An image of the item. This can be a [[URL]] or a fully described [[ImageObject]].",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.imageobject".into(),
-                                        "social.flockfeeds.lexical.itemlist".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.imageobject"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.itemlist")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "inStoreReturnsOffered".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "inStoreReturnsOffered",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                     description: None,
                                     default: None,
@@ -764,20 +839,32 @@ fn lexicon_doc_social_flockfeeds_lexical_merchantreturnpolicy() -> ::jacquard_le
                                 }),
                             );
                             map.insert(
-                                "itemCondition".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "itemCondition",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "A predefined value from OfferItemCondition specifying the condition of the product or service, or the products or services included in the offer. Also used for product return policies to specify the condition of products accepted for returns.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.offeritemcondition".into(),
-                                        "social.flockfeeds.lexical.itemlist".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.offeritemcondition"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.itemlist")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "itemDefectReturnFees".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "itemDefectReturnFees",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The type of return fees for returns of defect products.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -790,9 +877,15 @@ fn lexicon_doc_social_flockfeeds_lexical_merchantreturnpolicy() -> ::jacquard_le
                                 }),
                             );
                             map.insert(
-                                "itemDefectReturnLabelSource".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "itemDefectReturnLabelSource",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The method (from an enumeration) by which the customer obtains a return shipping label for a defect product.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -805,31 +898,49 @@ fn lexicon_doc_social_flockfeeds_lexical_merchantreturnpolicy() -> ::jacquard_le
                                 }),
                             );
                             map.insert(
-                                "itemDefectReturnShippingFeesAmount".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "itemDefectReturnShippingFeesAmount",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Amount of shipping costs for defect product returns. Applicable when property [[itemDefectReturnFees]] equals [[ReturnShippingFees]].",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.monetaryamount".into(),
-                                        "social.flockfeeds.lexical.itemlist".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.monetaryamount"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.itemlist")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "mainEntityOfPage".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "mainEntityOfPage",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Indicates a page (or other CreativeWork) for which this thing is the main entity being described. See [background notes](/docs/datamodel.html#mainEntityBackground) for details.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.creativework".into(),
-                                        "social.flockfeeds.lexical.itemlist".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.creativework"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.itemlist")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "merchantReturnDays".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "merchantReturnDays",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Specifies either a fixed return date or the number of days (from the delivery date) that a product can be returned. Used when the [[returnPolicyCategory]] property is specified as [[MerchantReturnFiniteReturnWindow]].",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -842,9 +953,15 @@ fn lexicon_doc_social_flockfeeds_lexical_merchantreturnpolicy() -> ::jacquard_le
                                 }),
                             );
                             map.insert(
-                                "merchantReturnLink".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "merchantReturnLink",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Specifies a Web page or service by URL, for product returns.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                     ),
@@ -859,9 +976,13 @@ fn lexicon_doc_social_flockfeeds_lexical_merchantreturnpolicy() -> ::jacquard_le
                                 }),
                             );
                             map.insert(
-                                "name".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The name of the item.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -874,20 +995,32 @@ fn lexicon_doc_social_flockfeeds_lexical_merchantreturnpolicy() -> ::jacquard_le
                                 }),
                             );
                             map.insert(
-                                "potentialAction".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "potentialAction",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Indicates a potential Action, which describes an idealized action in which this thing would play an 'object' role.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.action".into(),
-                                        "social.flockfeeds.lexical.itemlist".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.action"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.itemlist")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "refundType".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "refundType",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "A refund type, from an enumerated list.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -900,20 +1033,32 @@ fn lexicon_doc_social_flockfeeds_lexical_merchantreturnpolicy() -> ::jacquard_le
                                 }),
                             );
                             map.insert(
-                                "restockingFee".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "restockingFee",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Use [[MonetaryAmount]] to specify a fixed restocking fee for product returns, or use [[Number]] to specify a percentage of the product price paid by the customer.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.monetaryamount".into(),
-                                        "social.flockfeeds.lexical.itemlist".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.monetaryamount"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.itemlist")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "returnFees".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "returnFees",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The type of return fees for purchased products (for any return reason).",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -926,9 +1071,15 @@ fn lexicon_doc_social_flockfeeds_lexical_merchantreturnpolicy() -> ::jacquard_le
                                 }),
                             );
                             map.insert(
-                                "returnLabelSource".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "returnLabelSource",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The method (from an enumeration) by which the customer obtains a return shipping label for a product returned for any reason.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -941,9 +1092,15 @@ fn lexicon_doc_social_flockfeeds_lexical_merchantreturnpolicy() -> ::jacquard_le
                                 }),
                             );
                             map.insert(
-                                "returnMethod".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "returnMethod",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The type of return method offered, specified from an enumeration.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -956,9 +1113,15 @@ fn lexicon_doc_social_flockfeeds_lexical_merchantreturnpolicy() -> ::jacquard_le
                                 }),
                             );
                             map.insert(
-                                "returnPolicyCategory".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "returnPolicyCategory",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Specifies an applicable return policy (from an enumeration).",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -971,42 +1134,64 @@ fn lexicon_doc_social_flockfeeds_lexical_merchantreturnpolicy() -> ::jacquard_le
                                 }),
                             );
                             map.insert(
-                                "returnPolicyCountry".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "returnPolicyCountry",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The country where the product has to be sent to for returns, for example \"Ireland\" using the [[name]] property of [[Country]]. You can also provide the two-letter [ISO 3166-1 alpha-2 country code](http://en.wikipedia.org/wiki/ISO_3166-1). Note that this can be different from the country where the product was originally shipped from or sent to.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.country".into(),
-                                        "social.flockfeeds.lexical.itemlist".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.country"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.itemlist")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "returnPolicySeasonalOverride".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "returnPolicySeasonalOverride",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Seasonal override of a return policy.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.merchantreturnpolicyseasonaloverride"
-                                        .into(), "social.flockfeeds.lexical.itemlist".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.merchantreturnpolicyseasonaloverride"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.itemlist")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "returnShippingFeesAmount".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "returnShippingFeesAmount",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Amount of shipping costs for product returns (for any reason). Applicable when property [[returnFees]] equals [[ReturnShippingFees]].",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.monetaryamount".into(),
-                                        "social.flockfeeds.lexical.itemlist".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.monetaryamount"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.itemlist")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "sameAs".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("sameAs"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "URL of a reference Web page that unambiguously indicates the item's identity. E.g. the URL of the item's Wikipedia page, Wikidata entry, or official website.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                     ),
@@ -1021,21 +1206,29 @@ fn lexicon_doc_social_flockfeeds_lexical_merchantreturnpolicy() -> ::jacquard_le
                                 }),
                             );
                             map.insert(
-                                "subjectOf".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "subjectOf",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "A CreativeWork or Event about this Thing.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.event".into(),
-                                        "social.flockfeeds.lexical.creativework".into(),
-                                        "social.flockfeeds.lexical.itemlist".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.event"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.creativework"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.itemlist")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "url".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("url"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static("URL of the item."),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                     ),
@@ -1050,12 +1243,18 @@ fn lexicon_doc_social_flockfeeds_lexical_merchantreturnpolicy() -> ::jacquard_le
                                 }),
                             );
                             map.insert(
-                                "validForMemberTier".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "validForMemberTier",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The membership program tier an Offer (or a PriceSpecification, OfferShippingDetails, or MerchantReturnPolicy under an Offer) is valid for.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.memberprogramtier".into(),
-                                        "social.flockfeeds.lexical.itemlist".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.memberprogramtier"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.itemlist")
                                     ],
                                     closed: None,
                                 }),

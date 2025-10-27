@@ -16,7 +16,7 @@
 //!     // req is ResolveHandle<'static>, ready to use
 //!     let handle = req.handle;
 //!     // ... resolve logic
-//! #   let output = ResolveHandleOutput { did: Did::new_static("did:plc:test").unwrap(), extra_data: BTreeMap::new()  };
+//! #   let output = ResolveHandleOutput { did: Did::new_static("did:plc:test").unwrap(), extra_data: None  };
 //!     Ok(Json(output))
 //! }
 //!

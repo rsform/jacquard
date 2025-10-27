@@ -104,6 +104,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Configuration<'a> {
     fn nsid() -> &'static str {
         "place.stream.metadata.configuration"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_metadata_configuration()
     }
@@ -119,16 +122,20 @@ fn lexicon_doc_place_stream_metadata_configuration() -> ::jacquard_lexicon::lexi
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "place.stream.metadata.configuration".into(),
+        id: ::jacquard_common::CowStr::new_static("place.stream.metadata.configuration"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("literal:self".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Default metadata record for livestream including content warnings, rights, and distribution policy",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("literal:self")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: None,
@@ -137,24 +144,36 @@ fn lexicon_doc_place_stream_metadata_configuration() -> ::jacquard_lexicon::lexi
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "contentRights".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "contentRights",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "place.stream.metadata.contentRights".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "place.stream.metadata.contentRights",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "contentWarnings".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "contentWarnings",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "place.stream.metadata.contentWarnings".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "place.stream.metadata.contentWarnings",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "distributionPolicy".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "distributionPolicy",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "place.stream.metadata.distributionPolicy".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "place.stream.metadata.distributionPolicy",
+                                    ),
                                 }),
                             );
                             map

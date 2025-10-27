@@ -92,6 +92,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Member<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.knot.member"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_knot_member()
     }
@@ -107,27 +110,33 @@ fn lexicon_doc_sh_tangled_knot_member() -> ::jacquard_lexicon::lexicon::LexiconD
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "sh.tangled.knot.member".into(),
+        id: ::jacquard_common::CowStr::new_static("sh.tangled.knot.member"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: None,
-                    key: Some("tid".into()),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: Some(
-                            vec!["subject".into(), "domain".into(), "createdAt".into()],
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("subject"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("domain"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                            ],
                         ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -144,9 +153,13 @@ fn lexicon_doc_sh_tangled_knot_member() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                "domain".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("domain"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "domain that this member now belongs to",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -159,7 +172,7 @@ fn lexicon_doc_sh_tangled_knot_member() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                "subject".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("subject"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(

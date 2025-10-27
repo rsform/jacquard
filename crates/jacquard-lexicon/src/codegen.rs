@@ -62,7 +62,8 @@ impl<'c> CodeGenerator<'c> {
         let mut generated = self.generated_shared_docs.borrow_mut();
         let shared_fn = if !generated.contains(nsid) {
             generated.insert(nsid.to_string());
-            let doc_literal = crate::derive_impl::doc_to_tokens::doc_to_tokens(lex_doc);
+            // Codegen from JSON doesn't have union_fields (those are for Rust -> lexicon derive)
+            let doc_literal = crate::derive_impl::doc_to_tokens::doc_to_tokens(lex_doc, &std::collections::BTreeMap::new());
             Some(quote! {
                 fn #shared_fn_ident() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
                     #doc_literal
@@ -439,5 +440,301 @@ mod tests {
             .expect("read post.rs");
         assert!(post_content.contains("pub struct Post"));
         assert!(post_content.contains("jacquard_common"));
+    }
+
+    #[test]
+    fn test_generate_procedure() {
+        let corpus =
+            LexiconCorpus::load_from_dir("tests/fixtures/test_lexicons").expect("load corpus");
+        let codegen = CodeGenerator::new(&corpus, "jacquard_api");
+
+        let doc = corpus
+            .get("com.atproto.repo.createRecord")
+            .expect("get createRecord");
+        let def = doc.defs.get("main").expect("get main def");
+
+        let tokens = codegen
+            .generate_def("com.atproto.repo.createRecord", "main", def)
+            .expect("generate");
+
+        let file: syn::File = syn::parse2(tokens).expect("parse tokens");
+        let formatted = prettyplease::unparse(&file);
+        println!("\n{}\n", formatted);
+
+        // Check structure - procedures have input, output, and error types
+        assert!(formatted.contains("struct CreateRecord"));
+        assert!(formatted.contains("struct CreateRecordOutput"));
+        assert!(formatted.contains("enum CreateRecordError"));
+        // Check input fields
+        assert!(formatted.contains("pub repo"));
+        assert!(formatted.contains("pub collection"));
+        assert!(formatted.contains("pub record"));
+        // Check output fields
+        assert!(formatted.contains("pub uri"));
+        assert!(formatted.contains("pub cid"));
+        // Check error variants
+        assert!(formatted.contains("InvalidSwap"));
+        assert!(formatted.contains("InvalidRecord"));
+    }
+
+    #[test]
+    fn test_generate_subscription() {
+        let corpus =
+            LexiconCorpus::load_from_dir("tests/fixtures/test_lexicons").expect("load corpus");
+        let codegen = CodeGenerator::new(&corpus, "jacquard_api");
+
+        let doc = corpus
+            .get("com.atproto.sync.subscribeRepos")
+            .expect("get subscribeRepos");
+        let def = doc.defs.get("main").expect("get main def");
+
+        let tokens = codegen
+            .generate_def("com.atproto.sync.subscribeRepos", "main", def)
+            .expect("generate");
+
+        let file: syn::File = syn::parse2(tokens).expect("parse tokens");
+        let formatted = prettyplease::unparse(&file);
+        println!("\n{}\n", formatted);
+
+        // Check subscription structure
+        assert!(formatted.contains("struct SubscribeRepos"));
+        assert!(formatted.contains("enum SubscribeReposMessage"));
+        // Check message union variants
+        assert!(formatted.contains("Commit"));
+        assert!(formatted.contains("Identity"));
+        assert!(formatted.contains("Account"));
+    }
+
+    #[test]
+    fn test_generate_token_type() {
+        let corpus =
+            LexiconCorpus::load_from_dir("tests/fixtures/test_lexicons").expect("load corpus");
+        let codegen = CodeGenerator::new(&corpus, "jacquard_api");
+
+        let doc = corpus
+            .get("app.bsky.embed.images")
+            .expect("get images");
+        let def = doc.defs.get("viewImage").expect("get viewImage def");
+
+        let tokens = codegen
+            .generate_def("app.bsky.embed.images", "viewImage", def)
+            .expect("generate");
+
+        let file: syn::File = syn::parse2(tokens).expect("parse tokens");
+        let formatted = prettyplease::unparse(&file);
+        println!("\n{}\n", formatted);
+
+        // Token types are unit structs
+        assert!(formatted.contains("struct ViewImage"));
+        // Should have Display implementation
+        assert!(formatted.contains("impl std::fmt::Display"));
+    }
+
+    #[test]
+    fn test_generate_array_types() {
+        let corpus =
+            LexiconCorpus::load_from_dir("tests/fixtures/test_lexicons").expect("load corpus");
+        let codegen = CodeGenerator::new(&corpus, "jacquard_api");
+
+        let doc = corpus
+            .get("test.array.types")
+            .expect("get array types");
+        let def = doc.defs.get("main").expect("get main def");
+
+        let tokens = codegen
+            .generate_def("test.array.types", "main", def)
+            .expect("generate");
+
+        let file: syn::File = syn::parse2(tokens).expect("parse tokens");
+        let formatted = prettyplease::unparse(&file);
+        println!("\n{}\n", formatted);
+
+        // Check different array item types
+        assert!(formatted.contains("simple_strings"));
+        assert!(formatted.contains("Vec<"));
+        // Union array items should generate enum
+        assert!(formatted.contains("union_items"));
+        // Ref array items
+        assert!(formatted.contains("ref_items"));
+        // CID link arrays
+        assert!(formatted.contains("cid_links"));
+    }
+
+    #[test]
+    fn test_generate_binary_types() {
+        let corpus =
+            LexiconCorpus::load_from_dir("tests/fixtures/test_lexicons").expect("load corpus");
+        let codegen = CodeGenerator::new(&corpus, "jacquard_api");
+
+        let doc = corpus
+            .get("test.binary.types")
+            .expect("get binary types");
+        let def = doc.defs.get("main").expect("get main def");
+
+        let tokens = codegen
+            .generate_def("test.binary.types", "main", def)
+            .expect("generate");
+
+        let file: syn::File = syn::parse2(tokens).expect("parse tokens");
+        let formatted = prettyplease::unparse(&file);
+        println!("\n{}\n", formatted);
+
+        // Check binary field types
+        assert!(formatted.contains("pub cid"));
+        assert!(formatted.contains("CidLink") || formatted.contains("types::cid"));
+        assert!(formatted.contains("pub data"));
+        assert!(formatted.contains("Bytes"));
+        assert!(formatted.contains("pub avatar"));
+        assert!(formatted.contains("BlobRef") || formatted.contains("types::blob"));
+    }
+
+    #[test]
+    fn test_generate_empty_object() {
+        let corpus =
+            LexiconCorpus::load_from_dir("tests/fixtures/test_lexicons").expect("load corpus");
+        let codegen = CodeGenerator::new(&corpus, "jacquard_api");
+
+        let doc = corpus
+            .get("test.empty.object")
+            .expect("get empty object");
+        let def = doc.defs.get("emptyDef").expect("get emptyDef");
+
+        let tokens = codegen
+            .generate_def("test.empty.object", "emptyDef", def)
+            .expect("generate");
+
+        let file: syn::File = syn::parse2(tokens).expect("parse tokens");
+        let formatted = prettyplease::unparse(&file);
+        println!("\n{}\n", formatted);
+
+        // Empty objects should generate type alias to Data<'a>
+        assert!(formatted.contains("type EmptyDef") || formatted.contains("Data<'a>"));
+    }
+
+    #[test]
+    fn test_generate_multi_def_lexicon() {
+        let corpus =
+            LexiconCorpus::load_from_dir("tests/fixtures/test_lexicons").expect("load corpus");
+        let codegen = CodeGenerator::new(&corpus, "jacquard_api");
+
+        let doc = corpus
+            .get("pub.leaflet.poll.definition")
+            .expect("get poll definition");
+
+        // Test main def
+        let main_def = doc.defs.get("main").expect("get main def");
+        let main_tokens = codegen
+            .generate_def("pub.leaflet.poll.definition", "main", main_def)
+            .expect("generate main");
+        let main_file: syn::File = syn::parse2(main_tokens).expect("parse main tokens");
+        let main_formatted = prettyplease::unparse(&main_file);
+        println!("\nMain:\n{}\n", main_formatted);
+        assert!(main_formatted.contains("struct Definition"));
+        assert!(main_formatted.contains("pub question"));
+        assert!(main_formatted.contains("pub options"));
+
+        // Test option fragment
+        let option_def = doc.defs.get("option").expect("get option def");
+        let option_tokens = codegen
+            .generate_def("pub.leaflet.poll.definition", "option", option_def)
+            .expect("generate option");
+        let option_file: syn::File = syn::parse2(option_tokens).expect("parse option tokens");
+        let option_formatted = prettyplease::unparse(&option_file);
+        println!("\nOption:\n{}\n", option_formatted);
+        assert!(option_formatted.contains("struct DefinitionOption"));
+        assert!(option_formatted.contains("pub text"));
+
+        // Test vote fragment
+        let vote_def = doc.defs.get("vote").expect("get vote def");
+        let vote_tokens = codegen
+            .generate_def("pub.leaflet.poll.definition", "vote", vote_def)
+            .expect("generate vote");
+        let vote_file: syn::File = syn::parse2(vote_tokens).expect("parse vote tokens");
+        let vote_formatted = prettyplease::unparse(&vote_file);
+        println!("\nVote:\n{}\n", vote_formatted);
+        assert!(vote_formatted.contains("struct DefinitionVote") || vote_formatted.contains("struct Vote"));
+        assert!(vote_formatted.contains("pub poll_ref"));
+        assert!(vote_formatted.contains("pub option_index"));
+    }
+
+    #[test]
+    fn test_generate_with_constraints_and_defaults() {
+        let corpus =
+            LexiconCorpus::load_from_dir("tests/fixtures/test_lexicons").expect("load corpus");
+        let codegen = CodeGenerator::new(&corpus, "jacquard_api");
+
+        let doc = corpus
+            .get("test.constraints.validation")
+            .expect("get constraints");
+        let def = doc.defs.get("main").expect("get main def");
+
+        let tokens = codegen
+            .generate_def("test.constraints.validation", "main", def)
+            .expect("generate");
+
+        let file: syn::File = syn::parse2(tokens).expect("parse tokens");
+        let formatted = prettyplease::unparse(&file);
+        println!("\n{}\n", formatted);
+
+        // Check fields with constraints are generated
+        assert!(formatted.contains("pub username"));
+        assert!(formatted.contains("pub bio"));
+        assert!(formatted.contains("pub age"));
+        assert!(formatted.contains("pub enabled"));
+        assert!(formatted.contains("pub tags"));
+        assert!(formatted.contains("pub role"));
+
+        // Constraints should be in docs or validation metadata
+        // (exact format depends on codegen implementation)
+    }
+
+    #[test]
+    fn test_local_refs_in_definitions() {
+        let corpus =
+            LexiconCorpus::load_from_dir("tests/fixtures/test_lexicons").expect("load corpus");
+        let codegen = CodeGenerator::new(&corpus, "jacquard_api");
+
+        let doc = corpus
+            .get("pub.leaflet.poll.definition")
+            .expect("get poll definition");
+        let def = doc.defs.get("main").expect("get main def");
+
+        let tokens = codegen
+            .generate_def("pub.leaflet.poll.definition", "main", def)
+            .expect("generate");
+
+        let file: syn::File = syn::parse2(tokens).expect("parse tokens");
+        let formatted = prettyplease::unparse(&file);
+        println!("\n{}\n", formatted);
+
+        // Local ref #option should resolve to DefinitionOption type (fully qualified or local)
+        assert!(
+            formatted.contains("Vec<DefinitionOption")
+                || formatted.contains("Vec<jacquard_api::pub_leaflet::poll::definition::DefinitionOption")
+        );
+    }
+
+    #[test]
+    fn test_nullable_optional_properties() {
+        let corpus =
+            LexiconCorpus::load_from_dir("tests/fixtures/test_lexicons").expect("load corpus");
+        let codegen = CodeGenerator::new(&corpus, "jacquard_api");
+
+        let doc = corpus
+            .get("test.binary.types")
+            .expect("get binary types");
+        let def = doc.defs.get("main").expect("get main def");
+
+        let tokens = codegen
+            .generate_def("test.binary.types", "main", def)
+            .expect("generate");
+
+        let file: syn::File = syn::parse2(tokens).expect("parse tokens");
+        let formatted = prettyplease::unparse(&file);
+        println!("\n{}\n", formatted);
+
+        // Optional fields should use Option<T>
+        assert!(formatted.contains("optional_cid"));
+        assert!(formatted.contains("Option<"));
     }
 }

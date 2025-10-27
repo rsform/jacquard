@@ -27,22 +27,27 @@ fn lexicon_doc_pub_leaflet_blocks_image() -> ::jacquard_lexicon::lexicon::Lexico
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "pub.leaflet.blocks.image".into(),
+        id: ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.image"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "aspectRatio".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("aspectRatio"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["width".into(), "height".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("width"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("height")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "height".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("height"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -53,7 +58,7 @@ fn lexicon_doc_pub_leaflet_blocks_image() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            "width".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("width"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -68,18 +73,27 @@ fn lexicon_doc_pub_leaflet_blocks_image() -> ::jacquard_lexicon::lexicon::Lexico
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["image".into(), "aspectRatio".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("image"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("aspectRatio")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "alt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("alt"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Alt text description of the image, for accessibility.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -92,14 +106,16 @@ fn lexicon_doc_pub_leaflet_blocks_image() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            "aspectRatio".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "aspectRatio",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#aspectRatio".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static("#aspectRatio"),
                             }),
                         );
                         map.insert(
-                            "image".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("image"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
                                 description: None,
                                 accept: None,
@@ -118,6 +134,9 @@ fn lexicon_doc_pub_leaflet_blocks_image() -> ::jacquard_lexicon::lexicon::Lexico
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AspectRatio<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.blocks.image"
+    }
+    fn def_name() -> &'static str {
+        "aspectRatio"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_blocks_image()
@@ -156,6 +175,9 @@ pub struct Image<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Image<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.blocks.image"
+    }
+    fn def_name() -> &'static str {
+        "main"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_blocks_image()

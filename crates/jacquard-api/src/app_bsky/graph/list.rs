@@ -110,6 +110,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for List<'a> {
     fn nsid() -> &'static str {
         "app.bsky.graph.list"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_graph_list()
     }
@@ -117,11 +120,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for List<'a> {
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         if let Some(ref value) = self.description {
-            if value.as_ref().len() > 3000usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 3000usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "description",
                     max: 3000usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -143,21 +147,23 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for List<'a> {
         }
         {
             let value = &self.name;
-            if value.as_ref().len() > 64usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 64usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "name",
                     max: 64usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         {
             let value = &self.name;
-            if value.as_ref().len() < 1usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 1usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
                     field: "name",
                     min: 1usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -170,27 +176,35 @@ fn lexicon_doc_app_bsky_graph_list() -> ::jacquard_lexicon::lexicon::LexiconDoc<
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "app.bsky.graph.list".into(),
+        id: ::jacquard_common::CowStr::new_static("app.bsky.graph.list"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("tid".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Record representing a list of accounts (actors). Scope includes both moderation-oriented lists and curration-oriented lists.",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: Some(
-                            vec!["name".into(), "purpose".into(), "createdAt".into()],
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("purpose"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                            ],
                         ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "avatar".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("avatar"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
                                     description: None,
                                     accept: None,
@@ -198,7 +212,9 @@ fn lexicon_doc_app_bsky_graph_list() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                                 }),
                             );
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -215,7 +231,9 @@ fn lexicon_doc_app_bsky_graph_list() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                                 }),
                             );
                             map.insert(
-                                "description".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "description",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -230,29 +248,39 @@ fn lexicon_doc_app_bsky_graph_list() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                                 }),
                             );
                             map.insert(
-                                "descriptionFacets".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "descriptionFacets",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: None,
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                         description: None,
-                                        r#ref: "app.bsky.richtext.facet".into(),
+                                        r#ref: ::jacquard_common::CowStr::new_static(
+                                            "app.bsky.richtext.facet",
+                                        ),
                                     }),
                                     min_length: None,
                                     max_length: None,
                                 }),
                             );
                             map.insert(
-                                "labels".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("labels"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
-                                    refs: vec!["com.atproto.label.defs#selfLabels".into()],
+                                    refs: vec![
+                                        ::jacquard_common::CowStr::new_static("com.atproto.label.defs#selfLabels")
+                                    ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "name".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Display name for list; can not be empty.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: Some(1usize),
@@ -265,10 +293,12 @@ fn lexicon_doc_app_bsky_graph_list() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                                 }),
                             );
                             map.insert(
-                                "purpose".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("purpose"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "app.bsky.graph.defs#listPurpose".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "app.bsky.graph.defs#listPurpose",
+                                    ),
                                 }),
                             );
                             map

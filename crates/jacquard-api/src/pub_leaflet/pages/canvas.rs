@@ -75,44 +75,50 @@ fn lexicon_doc_pub_leaflet_pages_canvas() -> ::jacquard_lexicon::lexicon::Lexico
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "pub.leaflet.pages.canvas".into(),
+        id: ::jacquard_common::CowStr::new_static("pub.leaflet.pages.canvas"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "block".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("block"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
-                        vec!["block".into(), "x".into(), "y".into(), "width".into()],
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("block"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("x"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("y"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("width")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "block".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("block"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
-                                    "pub.leaflet.blocks.iframe".into(),
-                                    "pub.leaflet.blocks.text".into(),
-                                    "pub.leaflet.blocks.blockquote".into(),
-                                    "pub.leaflet.blocks.header".into(),
-                                    "pub.leaflet.blocks.image".into(),
-                                    "pub.leaflet.blocks.unorderedList".into(),
-                                    "pub.leaflet.blocks.website".into(),
-                                    "pub.leaflet.blocks.math".into(), "pub.leaflet.blocks.code"
-                                    .into(), "pub.leaflet.blocks.horizontalRule".into(),
-                                    "pub.leaflet.blocks.bskyPost".into(),
-                                    "pub.leaflet.blocks.page".into()
+                                    ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.iframe"),
+                                    ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.text"),
+                                    ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.blockquote"),
+                                    ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.header"),
+                                    ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.image"),
+                                    ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.unorderedList"),
+                                    ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.website"),
+                                    ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.math"),
+                                    ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.code"),
+                                    ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.horizontalRule"),
+                                    ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.bskyPost"),
+                                    ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.page")
                                 ],
                                 closed: None,
                             }),
                         );
                         map.insert(
-                            "height".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("height"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -123,7 +129,7 @@ fn lexicon_doc_pub_leaflet_pages_canvas() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            "rotation".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("rotation"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -134,7 +140,7 @@ fn lexicon_doc_pub_leaflet_pages_canvas() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            "width".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("width"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -145,7 +151,7 @@ fn lexicon_doc_pub_leaflet_pages_canvas() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            "x".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("x"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -156,7 +162,7 @@ fn lexicon_doc_pub_leaflet_pages_canvas() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            "y".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("y"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -171,28 +177,30 @@ fn lexicon_doc_pub_leaflet_pages_canvas() -> ::jacquard_lexicon::lexicon::Lexico
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["blocks".into()]),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("blocks")],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "blocks".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("blocks"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "#block".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static("#block"),
                                 }),
                                 min_length: None,
                                 max_length: None,
                             }),
                         );
                         map.insert(
-                            "id".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("id"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -211,16 +219,21 @@ fn lexicon_doc_pub_leaflet_pages_canvas() -> ::jacquard_lexicon::lexicon::Lexico
                 }),
             );
             map.insert(
-                "position".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("position"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["block".into(), "offset".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("block"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("offset")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "block".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("block"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -236,7 +249,7 @@ fn lexicon_doc_pub_leaflet_pages_canvas() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            "offset".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("offset"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -251,26 +264,31 @@ fn lexicon_doc_pub_leaflet_pages_canvas() -> ::jacquard_lexicon::lexicon::Lexico
                 }),
             );
             map.insert(
-                "quote".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("quote"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["start".into(), "end".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("start"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("end")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "end".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("end"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#position".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static("#position"),
                             }),
                         );
                         map.insert(
-                            "start".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("start"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#position".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static("#position"),
                             }),
                         );
                         map
@@ -278,19 +296,19 @@ fn lexicon_doc_pub_leaflet_pages_canvas() -> ::jacquard_lexicon::lexicon::Lexico
                 }),
             );
             map.insert(
-                "textAlignCenter".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("textAlignCenter"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
             );
             map.insert(
-                "textAlignLeft".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("textAlignLeft"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
             );
             map.insert(
-                "textAlignRight".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("textAlignRight"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
@@ -303,6 +321,9 @@ fn lexicon_doc_pub_leaflet_pages_canvas() -> ::jacquard_lexicon::lexicon::Lexico
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Block<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.pages.canvas"
+    }
+    fn def_name() -> &'static str {
+        "block"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_pages_canvas()
@@ -339,6 +360,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Canvas<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.pages.canvas"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_pages_canvas()
     }
@@ -369,6 +393,9 @@ pub struct Position<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Position<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.pages.canvas"
+    }
+    fn def_name() -> &'static str {
+        "position"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_pages_canvas()
@@ -402,6 +429,9 @@ pub struct Quote<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Quote<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.pages.canvas"
+    }
+    fn def_name() -> &'static str {
+        "quote"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_pages_canvas()

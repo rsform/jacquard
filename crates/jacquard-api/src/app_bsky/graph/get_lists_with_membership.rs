@@ -32,32 +32,44 @@ fn lexicon_doc_app_bsky_graph_getListsWithMembership() -> ::jacquard_lexicon::le
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "app.bsky.graph.getListsWithMembership".into(),
+        id: ::jacquard_common::CowStr::new_static(
+            "app.bsky.graph.getListsWithMembership",
+        ),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "listWithMembership".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("listWithMembership"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["list".into()]),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A list and an optional list item indicating membership of a target user to that list.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("list")],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "list".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("list"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "app.bsky.graph.defs#listView".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "app.bsky.graph.defs#listView",
+                                ),
                             }),
                         );
                         map.insert(
-                            "listItem".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("listItem"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "app.bsky.graph.defs#listItemView".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "app.bsky.graph.defs#listItemView",
+                                ),
                             }),
                         );
                         map
@@ -65,20 +77,28 @@ fn lexicon_doc_app_bsky_graph_getListsWithMembership() -> ::jacquard_lexicon::le
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
                     description: None,
                     parameters: Some(
                         ::jacquard_lexicon::lexicon::LexXrpcQueryParameter::Params(::jacquard_lexicon::lexicon::LexXrpcParameters {
                             description: None,
-                            required: Some(vec!["actor".into()]),
+                            required: Some(
+                                vec![
+                                    ::jacquard_common::smol_str::SmolStr::new_static("actor")
+                                ],
+                            ),
                             properties: {
                                 #[allow(unused_mut)]
                                 let mut map = ::std::collections::BTreeMap::new();
                                 map.insert(
-                                    "actor".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static("actor"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
+                                        description: Some(
+                                            ::jacquard_common::CowStr::new_static(
+                                                "The account (actor) to check for membership.",
+                                            ),
+                                        ),
                                         format: Some(
                                             ::jacquard_lexicon::lexicon::LexStringFormat::AtIdentifier,
                                         ),
@@ -93,7 +113,7 @@ fn lexicon_doc_app_bsky_graph_getListsWithMembership() -> ::jacquard_lexicon::le
                                     }),
                                 );
                                 map.insert(
-                                    "cursor".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static("cursor"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
                                         description: None,
                                         format: None,
@@ -108,7 +128,7 @@ fn lexicon_doc_app_bsky_graph_getListsWithMembership() -> ::jacquard_lexicon::le
                                     }),
                                 );
                                 map.insert(
-                                    "limit".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static("limit"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                         description: None,
                                         default: None,
@@ -119,7 +139,9 @@ fn lexicon_doc_app_bsky_graph_getListsWithMembership() -> ::jacquard_lexicon::le
                                     }),
                                 );
                                 map.insert(
-                                    "purposes".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static(
+                                        "purposes",
+                                    ),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Array(::jacquard_lexicon::lexicon::LexPrimitiveArray {
                                         description: None,
                                         items: ::jacquard_lexicon::lexicon::LexPrimitiveArrayItem::String(::jacquard_lexicon::lexicon::LexString {
@@ -154,6 +176,9 @@ fn lexicon_doc_app_bsky_graph_getListsWithMembership() -> ::jacquard_lexicon::le
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListWithMembership<'a> {
     fn nsid() -> &'static str {
         "app.bsky.graph.getListsWithMembership"
+    }
+    fn def_name() -> &'static str {
+        "listWithMembership"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_graph_getListsWithMembership()

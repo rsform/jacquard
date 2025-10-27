@@ -101,6 +101,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Message<'a> {
     fn nsid() -> &'static str {
         "social.psky.chat.message"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_psky_chat_message()
     }
@@ -109,11 +112,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Message<'a> {
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         {
             let value = &self.content;
-            if value.as_ref().len() > 20480usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 20480usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "content",
                     max: 20480usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -143,27 +147,38 @@ fn lexicon_doc_social_psky_chat_message() -> ::jacquard_lexicon::lexicon::Lexico
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "social.psky.chat.message".into(),
+        id: ::jacquard_common::CowStr::new_static("social.psky.chat.message"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("tid".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A Picosky message containing at most 2048 graphemes.",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
-                        required: Some(vec!["content".into(), "room".into()]),
+                        required: Some(
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("content"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("room")
+                            ],
+                        ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "content".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("content"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static("Text content."),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -176,26 +191,34 @@ fn lexicon_doc_social_psky_chat_message() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                "facets".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("facets"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Annotations of text (mentions, URLs, hashtags, etc)",
+                                        ),
+                                    ),
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                         description: None,
-                                        r#ref: "social.psky.richtext.facet".into(),
+                                        r#ref: ::jacquard_common::CowStr::new_static(
+                                            "social.psky.richtext.facet",
+                                        ),
                                     }),
                                     min_length: None,
                                     max_length: None,
                                 }),
                             );
                             map.insert(
-                                "reply".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("reply"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "com.atproto.repo.strongRef".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "com.atproto.repo.strongRef",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "room".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("room"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(

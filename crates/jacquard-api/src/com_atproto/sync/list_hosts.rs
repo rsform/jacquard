@@ -36,22 +36,28 @@ fn lexicon_doc_com_atproto_sync_listHosts() -> ::jacquard_lexicon::lexicon::Lexi
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "com.atproto.sync.listHosts".into(),
+        id: ::jacquard_common::CowStr::new_static("com.atproto.sync.listHosts"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "host".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("host"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["hostname".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("hostname")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "accountCount".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "accountCount",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -62,9 +68,13 @@ fn lexicon_doc_com_atproto_sync_listHosts() -> ::jacquard_lexicon::lexicon::Lexi
                             }),
                         );
                         map.insert(
-                            "hostname".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("hostname"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "hostname of server; not a URL (no scheme)",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -77,7 +87,7 @@ fn lexicon_doc_com_atproto_sync_listHosts() -> ::jacquard_lexicon::lexicon::Lexi
                             }),
                         );
                         map.insert(
-                            "seq".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("seq"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -88,10 +98,12 @@ fn lexicon_doc_com_atproto_sync_listHosts() -> ::jacquard_lexicon::lexicon::Lexi
                             }),
                         );
                         map.insert(
-                            "status".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("status"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "com.atproto.sync.defs#hostStatus".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "com.atproto.sync.defs#hostStatus",
+                                ),
                             }),
                         );
                         map
@@ -99,7 +111,7 @@ fn lexicon_doc_com_atproto_sync_listHosts() -> ::jacquard_lexicon::lexicon::Lexi
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
                     description: None,
                     parameters: Some(
@@ -110,7 +122,7 @@ fn lexicon_doc_com_atproto_sync_listHosts() -> ::jacquard_lexicon::lexicon::Lexi
                                 #[allow(unused_mut)]
                                 let mut map = ::std::collections::BTreeMap::new();
                                 map.insert(
-                                    "cursor".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static("cursor"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
                                         description: None,
                                         format: None,
@@ -125,7 +137,7 @@ fn lexicon_doc_com_atproto_sync_listHosts() -> ::jacquard_lexicon::lexicon::Lexi
                                     }),
                                 );
                                 map.insert(
-                                    "limit".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static("limit"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                         description: None,
                                         default: None,
@@ -151,6 +163,9 @@ fn lexicon_doc_com_atproto_sync_listHosts() -> ::jacquard_lexicon::lexicon::Lexi
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Host<'a> {
     fn nsid() -> &'static str {
         "com.atproto.sync.listHosts"
+    }
+    fn def_name() -> &'static str {
+        "host"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_sync_listHosts()

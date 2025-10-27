@@ -46,13 +46,13 @@ fn lexicon_doc_fm_teal_alpha_actor_defs() -> ::jacquard_lexicon::lexicon::Lexico
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "fm.teal.alpha.actor.defs".into(),
+        id: ::jacquard_common::CowStr::new_static("fm.teal.alpha.actor.defs"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "miniProfileView".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("miniProfileView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -61,7 +61,45 @@ fn lexicon_doc_fm_teal_alpha_actor_defs() -> ::jacquard_lexicon::lexicon::Lexico
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "avatar".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("avatar"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static("IPLD of the avatar"),
+                                ),
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The decentralized identifier of the actor",
+                                    ),
+                                ),
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "displayName",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -76,37 +114,7 @@ fn lexicon_doc_fm_teal_alpha_actor_defs() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            "did".into(),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            "displayName".into(),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            "handle".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("handle"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -125,7 +133,7 @@ fn lexicon_doc_fm_teal_alpha_actor_defs() -> ::jacquard_lexicon::lexicon::Lexico
                 }),
             );
             map.insert(
-                "profileView".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("profileView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -134,9 +142,11 @@ fn lexicon_doc_fm_teal_alpha_actor_defs() -> ::jacquard_lexicon::lexicon::Lexico
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "avatar".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("avatar"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static("IPLD of the avatar"),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -149,9 +159,13 @@ fn lexicon_doc_fm_teal_alpha_actor_defs() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            "banner".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("banner"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "IPLD of the banner image",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -164,7 +178,9 @@ fn lexicon_doc_fm_teal_alpha_actor_defs() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            "createdAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "createdAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -181,9 +197,15 @@ fn lexicon_doc_fm_teal_alpha_actor_defs() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            "description".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "description",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Free-form profile description text.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -196,19 +218,48 @@ fn lexicon_doc_fm_teal_alpha_actor_defs() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            "descriptionFacets".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "descriptionFacets",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Annotations of text in the profile description (mentions, URLs, hashtags, etc). May be changed to another (backwards compatible) lexicon.",
+                                    ),
+                                ),
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "app.bsky.richtext.facet".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "app.bsky.richtext.facet",
+                                    ),
                                 }),
                                 min_length: None,
                                 max_length: None,
                             }),
                         );
                         map.insert(
-                            "did".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The decentralized identifier of the actor",
+                                    ),
+                                ),
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "displayName",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -223,32 +274,21 @@ fn lexicon_doc_fm_teal_alpha_actor_defs() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            "displayName".into(),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "featuredItem",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "fm.teal.alpha.actor.profile#featuredItem",
+                                ),
                             }),
                         );
                         map.insert(
-                            "featuredItem".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("status"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "fm.teal.alpha.actor.profile#featuredItem".into(),
-                            }),
-                        );
-                        map.insert(
-                            "status".into(),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: "#statusView".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static("#statusView"),
                             }),
                         );
                         map
@@ -256,18 +296,26 @@ fn lexicon_doc_fm_teal_alpha_actor_defs() -> ::jacquard_lexicon::lexicon::Lexico
                 }),
             );
             map.insert(
-                "statusView".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("statusView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A declaration of the status of the actor.",
+                        ),
+                    ),
                     required: None,
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "expiry".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("expiry"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The unix timestamp of the expiry time of the item. If unavailable, default to 10 minutes past the start time.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                 ),
@@ -282,16 +330,22 @@ fn lexicon_doc_fm_teal_alpha_actor_defs() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            "item".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("item"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "fm.teal.alpha.feed.defs#playView".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "fm.teal.alpha.feed.defs#playView",
+                                ),
                             }),
                         );
                         map.insert(
-                            "time".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("time"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The unix timestamp of when the item was recorded",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                 ),
@@ -317,6 +371,9 @@ fn lexicon_doc_fm_teal_alpha_actor_defs() -> ::jacquard_lexicon::lexicon::Lexico
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MiniProfileView<'a> {
     fn nsid() -> &'static str {
         "fm.teal.alpha.actor.defs"
+    }
+    fn def_name() -> &'static str {
+        "miniProfileView"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_fm_teal_alpha_actor_defs()
@@ -383,6 +440,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileView<'a> {
     fn nsid() -> &'static str {
         "fm.teal.alpha.actor.defs"
     }
+    fn def_name() -> &'static str {
+        "profileView"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_fm_teal_alpha_actor_defs()
     }
@@ -421,6 +481,9 @@ pub struct StatusView<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StatusView<'a> {
     fn nsid() -> &'static str {
         "fm.teal.alpha.actor.defs"
+    }
+    fn def_name() -> &'static str {
+        "statusView"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_fm_teal_alpha_actor_defs()

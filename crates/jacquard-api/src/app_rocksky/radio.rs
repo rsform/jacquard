@@ -115,6 +115,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Radio<'a> {
     fn nsid() -> &'static str {
         "app.rocksky.radio"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_rocksky_radio()
     }
@@ -122,58 +125,64 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Radio<'a> {
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         if let Some(ref value) = self.description {
-            if value.as_ref().len() > 1000usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 1000usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "description",
                     max: 1000usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         if let Some(ref value) = self.description {
-            if value.as_ref().len() < 1usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 1usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
                     field: "description",
                     min: 1usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         if let Some(ref value) = self.genre {
-            if value.as_ref().len() > 256usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "genre",
                     max: 256usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         if let Some(ref value) = self.genre {
-            if value.as_ref().len() < 1usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 1usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
                     field: "genre",
                     min: 1usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         {
             let value = &self.name;
-            if value.as_ref().len() > 512usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 512usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "name",
                     max: 512usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         {
             let value = &self.name;
-            if value.as_ref().len() < 1usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 1usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
                     field: "name",
                     min: 1usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -184,29 +193,43 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Radio<'a> {
 fn lexicon_doc_app_rocksky_radio() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "app.rocksky.radio".into(),
+        id: ::jacquard_common::CowStr::new_static("app.rocksky.radio"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("tid".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A declaration of a radio station.",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: Some(
-                            vec!["name".into(), "url".into(), "createdAt".into()],
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("url"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                            ],
                         ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The date when the radio station was created.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -221,9 +244,15 @@ fn lexicon_doc_app_rocksky_radio() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                                 }),
                             );
                             map.insert(
-                                "description".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "description",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "A description of the radio station.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: Some(1usize),
@@ -236,9 +265,13 @@ fn lexicon_doc_app_rocksky_radio() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                                 }),
                             );
                             map.insert(
-                                "genre".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("genre"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The genre of the radio station.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: Some(1usize),
@@ -251,7 +284,7 @@ fn lexicon_doc_app_rocksky_radio() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                                 }),
                             );
                             map.insert(
-                                "logo".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("logo"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
                                     description: None,
                                     accept: None,
@@ -259,9 +292,13 @@ fn lexicon_doc_app_rocksky_radio() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                                 }),
                             );
                             map.insert(
-                                "name".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The name of the radio station.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: Some(1usize),
@@ -274,9 +311,13 @@ fn lexicon_doc_app_rocksky_radio() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                                 }),
                             );
                             map.insert(
-                                "url".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("url"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The URL of the radio station.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                     ),
@@ -291,9 +332,13 @@ fn lexicon_doc_app_rocksky_radio() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                                 }),
                             );
                             map.insert(
-                                "website".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("website"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The website of the radio station.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                     ),
@@ -352,13 +397,13 @@ fn lexicon_doc_app_rocksky_radio_defs() -> ::jacquard_lexicon::lexicon::LexiconD
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "app.rocksky.radio.defs".into(),
+        id: ::jacquard_common::CowStr::new_static("app.rocksky.radio.defs"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "radioViewBasic".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("radioViewBasic"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -367,9 +412,15 @@ fn lexicon_doc_app_rocksky_radio_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "createdAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "createdAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The date and time when the radio was created.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                 ),
@@ -384,9 +435,15 @@ fn lexicon_doc_app_rocksky_radio_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "description".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "description",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "A brief description of the radio.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -399,9 +456,13 @@ fn lexicon_doc_app_rocksky_radio_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "id".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("id"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The unique identifier of the radio.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -414,9 +475,13 @@ fn lexicon_doc_app_rocksky_radio_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "name".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The name of the radio.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -433,7 +498,7 @@ fn lexicon_doc_app_rocksky_radio_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                 }),
             );
             map.insert(
-                "radioViewDetailed".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("radioViewDetailed"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -442,9 +507,15 @@ fn lexicon_doc_app_rocksky_radio_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "createdAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "createdAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The date and time when the radio was created.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                 ),
@@ -459,9 +530,15 @@ fn lexicon_doc_app_rocksky_radio_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "description".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "description",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "A brief description of the radio.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -474,9 +551,13 @@ fn lexicon_doc_app_rocksky_radio_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "genre".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("genre"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The genre of the radio.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -489,9 +570,13 @@ fn lexicon_doc_app_rocksky_radio_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "id".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("id"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The unique identifier of the radio.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -504,9 +589,13 @@ fn lexicon_doc_app_rocksky_radio_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "logo".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("logo"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The logo of the radio station.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -519,9 +608,13 @@ fn lexicon_doc_app_rocksky_radio_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "name".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The name of the radio.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -534,9 +627,13 @@ fn lexicon_doc_app_rocksky_radio_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "url".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("url"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The streaming URL of the radio.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                 ),
@@ -551,9 +648,13 @@ fn lexicon_doc_app_rocksky_radio_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "website".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("website"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The website of the radio.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                 ),
@@ -579,6 +680,9 @@ fn lexicon_doc_app_rocksky_radio_defs() -> ::jacquard_lexicon::lexicon::LexiconD
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RadioViewBasic<'a> {
     fn nsid() -> &'static str {
         "app.rocksky.radio.defs"
+    }
+    fn def_name() -> &'static str {
+        "radioViewBasic"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_rocksky_radio_defs()
@@ -639,6 +743,9 @@ pub struct RadioViewDetailed<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RadioViewDetailed<'a> {
     fn nsid() -> &'static str {
         "app.rocksky.radio.defs"
+    }
+    fn def_name() -> &'static str {
+        "radioViewDetailed"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_rocksky_radio_defs()

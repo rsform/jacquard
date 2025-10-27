@@ -33,31 +33,45 @@ pub struct Entity<'a> {
 fn lexicon_doc_app_bsky_feed_post() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "app.bsky.feed.post".into(),
+        id: ::jacquard_common::CowStr::new_static("app.bsky.feed.post"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "entity".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("entity"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["index".into(), "type".into(), "value".into()]),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Deprecated: use facets instead.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("index"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("type"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("value")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "index".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("index"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#textSlice".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static("#textSlice"),
                             }),
                         );
                         map.insert(
-                            "type".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("type"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Expected values are 'mention' and 'link'.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -70,7 +84,7 @@ fn lexicon_doc_app_bsky_feed_post() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                             }),
                         );
                         map.insert(
-                            "value".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("value"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -89,21 +103,36 @@ fn lexicon_doc_app_bsky_feed_post() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("tid".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Record containing a Bluesky post.",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
-                        required: Some(vec!["text".into(), "createdAt".into()]),
+                        required: Some(
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("text"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Client-declared timestamp when this post was originally created.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -118,54 +147,77 @@ fn lexicon_doc_app_bsky_feed_post() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                                 }),
                             );
                             map.insert(
-                                "embed".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("embed"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
-                                        "app.bsky.embed.images".into(), "app.bsky.embed.video"
-                                        .into(), "app.bsky.embed.external".into(),
-                                        "app.bsky.embed.record".into(),
-                                        "app.bsky.embed.recordWithMedia".into()
+                                        ::jacquard_common::CowStr::new_static("app.bsky.embed.images"),
+                                        ::jacquard_common::CowStr::new_static("app.bsky.embed.video"),
+                                        ::jacquard_common::CowStr::new_static("app.bsky.embed.external"),
+                                        ::jacquard_common::CowStr::new_static("app.bsky.embed.record"),
+                                        ::jacquard_common::CowStr::new_static("app.bsky.embed.recordWithMedia")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "entities".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "entities",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "DEPRECATED: replaced by app.bsky.richtext.facet.",
+                                        ),
+                                    ),
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                         description: None,
-                                        r#ref: "#entity".into(),
+                                        r#ref: ::jacquard_common::CowStr::new_static("#entity"),
                                     }),
                                     min_length: None,
                                     max_length: None,
                                 }),
                             );
                             map.insert(
-                                "facets".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("facets"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Annotations of text (mentions, URLs, hashtags, etc)",
+                                        ),
+                                    ),
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                         description: None,
-                                        r#ref: "app.bsky.richtext.facet".into(),
+                                        r#ref: ::jacquard_common::CowStr::new_static(
+                                            "app.bsky.richtext.facet",
+                                        ),
                                     }),
                                     min_length: None,
                                     max_length: None,
                                 }),
                             );
                             map.insert(
-                                "labels".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("labels"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
-                                    refs: vec!["com.atproto.label.defs#selfLabels".into()],
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Self-label values for this post. Effectively content warnings.",
+                                        ),
+                                    ),
+                                    refs: vec![
+                                        ::jacquard_common::CowStr::new_static("com.atproto.label.defs#selfLabels")
+                                    ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "langs".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("langs"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Indicates human language of post primary text content.",
+                                        ),
+                                    ),
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
                                         description: None,
                                         format: Some(
@@ -185,16 +237,20 @@ fn lexicon_doc_app_bsky_feed_post() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                                 }),
                             );
                             map.insert(
-                                "reply".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("reply"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "#replyRef".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static("#replyRef"),
                                 }),
                             );
                             map.insert(
-                                "tags".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("tags"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Additional hashtags, in addition to any included in post text and facets.",
+                                        ),
+                                    ),
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
                                         description: None,
                                         format: None,
@@ -212,9 +268,13 @@ fn lexicon_doc_app_bsky_feed_post() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                                 }),
                             );
                             map.insert(
-                                "text".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("text"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The primary post content. May be an empty string, if there are embeds.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -232,26 +292,35 @@ fn lexicon_doc_app_bsky_feed_post() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                 }),
             );
             map.insert(
-                "replyRef".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("replyRef"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["root".into(), "parent".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("root"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("parent")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "parent".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("parent"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "com.atproto.repo.strongRef".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "com.atproto.repo.strongRef",
+                                ),
                             }),
                         );
                         map.insert(
-                            "root".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("root"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "com.atproto.repo.strongRef".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "com.atproto.repo.strongRef",
+                                ),
                             }),
                         );
                         map
@@ -259,16 +328,25 @@ fn lexicon_doc_app_bsky_feed_post() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                 }),
             );
             map.insert(
-                "textSlice".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("textSlice"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["start".into(), "end".into()]),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Deprecated. Use app.bsky.richtext instead -- A text segment. Start is inclusive, end is exclusive. Indices are for utf16-encoded strings.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("start"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("end")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "end".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("end"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -279,7 +357,7 @@ fn lexicon_doc_app_bsky_feed_post() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                             }),
                         );
                         map.insert(
-                            "start".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("start"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -301,6 +379,9 @@ fn lexicon_doc_app_bsky_feed_post() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Entity<'a> {
     fn nsid() -> &'static str {
         "app.bsky.feed.post"
+    }
+    fn def_name() -> &'static str {
+        "entity"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_feed_post()
@@ -456,6 +537,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Post<'a> {
     fn nsid() -> &'static str {
         "app.bsky.feed.post"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_feed_post()
     }
@@ -463,6 +547,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Post<'a> {
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         if let Some(ref value) = self.langs {
+            #[allow(unused_comparisons)]
             if value.len() > 3usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "langs",
@@ -472,6 +557,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Post<'a> {
             }
         }
         if let Some(ref value) = self.tags {
+            #[allow(unused_comparisons)]
             if value.len() > 8usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "tags",
@@ -482,11 +568,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Post<'a> {
         }
         {
             let value = &self.text;
-            if value.as_ref().len() > 3000usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 3000usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "text",
                     max: 3000usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -534,6 +621,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReplyRef<'a> {
     fn nsid() -> &'static str {
         "app.bsky.feed.post"
     }
+    fn def_name() -> &'static str {
+        "replyRef"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_feed_post()
     }
@@ -565,6 +655,9 @@ pub struct TextSlice<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TextSlice<'a> {
     fn nsid() -> &'static str {
         "app.bsky.feed.post"
+    }
+    fn def_name() -> &'static str {
+        "textSlice"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_feed_post()

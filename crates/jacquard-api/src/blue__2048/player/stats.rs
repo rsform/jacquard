@@ -104,6 +104,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Stats<'a> {
     fn nsid() -> &'static str {
         "blue.2048.player.stats"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blue_2048_player_stats()
     }
@@ -119,25 +122,33 @@ fn lexicon_doc_blue_2048_player_stats() -> ::jacquard_lexicon::lexicon::LexiconD
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "blue.2048.player.stats".into(),
+        id: ::jacquard_common::CowStr::new_static("blue.2048.player.stats"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("literal:self".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A declaration of a at://2048 player's stats over the course of their playtime",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("literal:self")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: Some(
                             vec![
-                                "highestScore".into(), "gamesPlayed".into(), "totalScore"
-                                .into(), "highestNumberBlock".into(),
-                                "timesTwentyFortyEightBeenFound".into(),
-                                "leastMovesToFindTwentyFortyEight".into(), "averageScore"
-                                .into(), "syncStatus".into(), "createdAt".into()
+                                ::jacquard_common::smol_str::SmolStr::new_static("highestScore"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("gamesPlayed"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("totalScore"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("highestNumberBlock"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("timesTwentyFortyEightBeenFound"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("leastMovesToFindTwentyFortyEight"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("averageScore"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("syncStatus"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -145,7 +156,9 @@ fn lexicon_doc_blue_2048_player_stats() -> ::jacquard_lexicon::lexicon::LexiconD
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "averageScore".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "averageScore",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -156,7 +169,9 @@ fn lexicon_doc_blue_2048_player_stats() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -173,7 +188,9 @@ fn lexicon_doc_blue_2048_player_stats() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                "gamesPlayed".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "gamesPlayed",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -184,7 +201,9 @@ fn lexicon_doc_blue_2048_player_stats() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                "highestNumberBlock".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "highestNumberBlock",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -195,7 +214,9 @@ fn lexicon_doc_blue_2048_player_stats() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                "highestScore".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "highestScore",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -206,7 +227,9 @@ fn lexicon_doc_blue_2048_player_stats() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                "leastMovesToFindTwentyFortyEight".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "leastMovesToFindTwentyFortyEight",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -217,14 +240,20 @@ fn lexicon_doc_blue_2048_player_stats() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                "syncStatus".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "syncStatus",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "blue.2048.defs#syncStatus".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "blue.2048.defs#syncStatus",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "timesTwentyFortyEightBeenFound".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "timesTwentyFortyEightBeenFound",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -235,7 +264,9 @@ fn lexicon_doc_blue_2048_player_stats() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                "totalScore".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "totalScore",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,

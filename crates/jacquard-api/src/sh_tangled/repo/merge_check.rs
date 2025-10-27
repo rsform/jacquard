@@ -31,24 +31,33 @@ fn lexicon_doc_sh_tangled_repo_mergeCheck() -> ::jacquard_lexicon::lexicon::Lexi
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "sh.tangled.repo.mergeCheck".into(),
+        id: ::jacquard_common::CowStr::new_static("sh.tangled.repo.mergeCheck"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "conflictInfo".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("conflictInfo"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["filename".into(), "reason".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("filename"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("reason")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "filename".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("filename"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Name of the conflicted file",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -61,9 +70,13 @@ fn lexicon_doc_sh_tangled_repo_mergeCheck() -> ::jacquard_lexicon::lexicon::Lexi
                             }),
                         );
                         map.insert(
-                            "reason".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("reason"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Reason for the conflict",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -80,19 +93,24 @@ fn lexicon_doc_sh_tangled_repo_mergeCheck() -> ::jacquard_lexicon::lexicon::Lexi
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcProcedure(::jacquard_lexicon::lexicon::LexXrpcProcedure {
                     description: None,
                     parameters: None,
                     input: Some(::jacquard_lexicon::lexicon::LexXrpcBody {
                         description: None,
-                        encoding: "application/json".into(),
+                        encoding: ::jacquard_common::CowStr::new_static(
+                            "application/json",
+                        ),
                         schema: Some(
                             ::jacquard_lexicon::lexicon::LexXrpcBodySchema::Object(::jacquard_lexicon::lexicon::LexObject {
                                 description: None,
                                 required: Some(
                                     vec![
-                                        "did".into(), "name".into(), "patch".into(), "branch".into()
+                                        ::jacquard_common::smol_str::SmolStr::new_static("did"),
+                                        ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                                        ::jacquard_common::smol_str::SmolStr::new_static("patch"),
+                                        ::jacquard_common::smol_str::SmolStr::new_static("branch")
                                     ],
                                 ),
                                 nullable: None,
@@ -100,9 +118,13 @@ fn lexicon_doc_sh_tangled_repo_mergeCheck() -> ::jacquard_lexicon::lexicon::Lexi
                                     #[allow(unused_mut)]
                                     let mut map = ::std::collections::BTreeMap::new();
                                     map.insert(
-                                        "branch".into(),
+                                        ::jacquard_common::smol_str::SmolStr::new_static("branch"),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                            description: None,
+                                            description: Some(
+                                                ::jacquard_common::CowStr::new_static(
+                                                    "Target branch to merge into",
+                                                ),
+                                            ),
                                             format: None,
                                             default: None,
                                             min_length: None,
@@ -115,9 +137,13 @@ fn lexicon_doc_sh_tangled_repo_mergeCheck() -> ::jacquard_lexicon::lexicon::Lexi
                                         }),
                                     );
                                     map.insert(
-                                        "did".into(),
+                                        ::jacquard_common::smol_str::SmolStr::new_static("did"),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                            description: None,
+                                            description: Some(
+                                                ::jacquard_common::CowStr::new_static(
+                                                    "DID of the repository owner",
+                                                ),
+                                            ),
                                             format: Some(
                                                 ::jacquard_lexicon::lexicon::LexStringFormat::Did,
                                             ),
@@ -132,9 +158,13 @@ fn lexicon_doc_sh_tangled_repo_mergeCheck() -> ::jacquard_lexicon::lexicon::Lexi
                                         }),
                                     );
                                     map.insert(
-                                        "name".into(),
+                                        ::jacquard_common::smol_str::SmolStr::new_static("name"),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                            description: None,
+                                            description: Some(
+                                                ::jacquard_common::CowStr::new_static(
+                                                    "Name of the repository",
+                                                ),
+                                            ),
                                             format: None,
                                             default: None,
                                             min_length: None,
@@ -147,9 +177,13 @@ fn lexicon_doc_sh_tangled_repo_mergeCheck() -> ::jacquard_lexicon::lexicon::Lexi
                                         }),
                                     );
                                     map.insert(
-                                        "patch".into(),
+                                        ::jacquard_common::smol_str::SmolStr::new_static("patch"),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                            description: None,
+                                            description: Some(
+                                                ::jacquard_common::CowStr::new_static(
+                                                    "Patch or pull request to check for merge conflicts",
+                                                ),
+                                            ),
                                             format: None,
                                             default: None,
                                             min_length: None,
@@ -178,6 +212,9 @@ fn lexicon_doc_sh_tangled_repo_mergeCheck() -> ::jacquard_lexicon::lexicon::Lexi
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ConflictInfo<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.repo.mergeCheck"
+    }
+    fn def_name() -> &'static str {
+        "conflictInfo"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_repo_mergeCheck()

@@ -242,7 +242,6 @@ where
         };
 
         // Build and send createSession
-        use std::collections::BTreeMap;
         let req = CreateSession {
             allow_takendown,
             auth_factor_token,

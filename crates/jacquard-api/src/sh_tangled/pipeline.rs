@@ -30,24 +30,28 @@ fn lexicon_doc_sh_tangled_pipeline() -> ::jacquard_lexicon::lexicon::LexiconDoc<
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "sh.tangled.pipeline".into(),
+        id: ::jacquard_common::CowStr::new_static("sh.tangled.pipeline"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "cloneOpts".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("cloneOpts"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
-                        vec!["skip".into(), "depth".into(), "submodules".into()],
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("skip"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("depth"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("submodules")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "depth".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("depth"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -58,7 +62,7 @@ fn lexicon_doc_sh_tangled_pipeline() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                             }),
                         );
                         map.insert(
-                            "skip".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("skip"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                 description: None,
                                 default: None,
@@ -66,7 +70,9 @@ fn lexicon_doc_sh_tangled_pipeline() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                             }),
                         );
                         map.insert(
-                            "submodules".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "submodules",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                 description: None,
                                 default: None,
@@ -78,33 +84,42 @@ fn lexicon_doc_sh_tangled_pipeline() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: None,
-                    key: Some("tid".into()),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: Some(
-                            vec!["triggerMetadata".into(), "workflows".into()],
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("triggerMetadata"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("workflows")
+                            ],
                         ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "triggerMetadata".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "triggerMetadata",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "#triggerMetadata".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "#triggerMetadata",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "workflows".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "workflows",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: None,
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                         description: None,
-                                        r#ref: "#workflow".into(),
+                                        r#ref: ::jacquard_common::CowStr::new_static("#workflow"),
                                     }),
                                     min_length: None,
                                     max_length: None,
@@ -116,7 +131,7 @@ fn lexicon_doc_sh_tangled_pipeline() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                 }),
             );
             map.insert(
-                "manualTriggerData".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("manualTriggerData"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -125,12 +140,12 @@ fn lexicon_doc_sh_tangled_pipeline() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "inputs".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("inputs"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "#pair".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static("#pair"),
                                 }),
                                 min_length: None,
                                 max_length: None,
@@ -141,56 +156,13 @@ fn lexicon_doc_sh_tangled_pipeline() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                 }),
             );
             map.insert(
-                "pair".into(),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["key".into(), "value".into()]),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
-                        map.insert(
-                            "key".into(),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            "value".into(),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map
-                    },
-                }),
-            );
-            map.insert(
-                "pullRequestTriggerData".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("pair"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            "sourceBranch".into(), "targetBranch".into(), "sourceSha"
-                            .into(), "action".into()
+                            ::jacquard_common::smol_str::SmolStr::new_static("key"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("value")
                         ],
                     ),
                     nullable: None,
@@ -198,7 +170,7 @@ fn lexicon_doc_sh_tangled_pipeline() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "action".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("key"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -213,37 +185,7 @@ fn lexicon_doc_sh_tangled_pipeline() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                             }),
                         );
                         map.insert(
-                            "sourceBranch".into(),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            "sourceSha".into(),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: Some(40usize),
-                                max_length: Some(40usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            "targetBranch".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("value"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -262,127 +204,17 @@ fn lexicon_doc_sh_tangled_pipeline() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                 }),
             );
             map.insert(
-                "pushTriggerData".into(),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["ref".into(), "newSha".into(), "oldSha".into()]),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
-                        map.insert(
-                            "newSha".into(),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: Some(40usize),
-                                max_length: Some(40usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            "oldSha".into(),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: Some(40usize),
-                                max_length: Some(40usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            "ref".into(),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map
-                    },
-                }),
-            );
-            map.insert(
-                "triggerMetadata".into(),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["kind".into(), "repo".into()]),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
-                        map.insert(
-                            "kind".into(),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            "manual".into(),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: "#manualTriggerData".into(),
-                            }),
-                        );
-                        map.insert(
-                            "pullRequest".into(),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: "#pullRequestTriggerData".into(),
-                            }),
-                        );
-                        map.insert(
-                            "push".into(),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: "#pushTriggerData".into(),
-                            }),
-                        );
-                        map.insert(
-                            "repo".into(),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: "#triggerRepo".into(),
-                            }),
-                        );
-                        map
-                    },
-                }),
-            );
-            map.insert(
-                "triggerRepo".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static(
+                    "pullRequestTriggerData",
+                ),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            "knot".into(), "did".into(), "repo".into(), "defaultBranch"
-                            .into()
+                            ::jacquard_common::smol_str::SmolStr::new_static("sourceBranch"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("targetBranch"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("sourceSha"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("action")
                         ],
                     ),
                     nullable: None,
@@ -390,7 +222,7 @@ fn lexicon_doc_sh_tangled_pipeline() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "defaultBranch".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("action"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -405,7 +237,228 @@ fn lexicon_doc_sh_tangled_pipeline() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                             }),
                         );
                         map.insert(
-                            "did".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "sourceBranch",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "sourceSha",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: Some(40usize),
+                                max_length: Some(40usize),
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "targetBranch",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map
+                    },
+                }),
+            );
+            map.insert(
+                ::jacquard_common::smol_str::SmolStr::new_static("pushTriggerData"),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("ref"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("newSha"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("oldSha")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::std::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("newSha"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: Some(40usize),
+                                max_length: Some(40usize),
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("oldSha"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: Some(40usize),
+                                max_length: Some(40usize),
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("ref"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map
+                    },
+                }),
+            );
+            map.insert(
+                ::jacquard_common::smol_str::SmolStr::new_static("triggerMetadata"),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("kind"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("repo")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::std::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("kind"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("manual"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "#manualTriggerData",
+                                ),
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "pullRequest",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "#pullRequestTriggerData",
+                                ),
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("push"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "#pushTriggerData",
+                                ),
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("repo"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: ::jacquard_common::CowStr::new_static("#triggerRepo"),
+                            }),
+                        );
+                        map
+                    },
+                }),
+            );
+            map.insert(
+                ::jacquard_common::smol_str::SmolStr::new_static("triggerRepo"),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("knot"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("repo"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("defaultBranch")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::std::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "defaultBranch",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -422,7 +475,7 @@ fn lexicon_doc_sh_tangled_pipeline() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                             }),
                         );
                         map.insert(
-                            "knot".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("knot"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -437,7 +490,7 @@ fn lexicon_doc_sh_tangled_pipeline() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                             }),
                         );
                         map.insert(
-                            "repo".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("repo"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -456,12 +509,15 @@ fn lexicon_doc_sh_tangled_pipeline() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                 }),
             );
             map.insert(
-                "workflow".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("workflow"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            "name".into(), "engine".into(), "clone".into(), "raw".into()
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("engine"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("clone"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("raw")
                         ],
                     ),
                     nullable: None,
@@ -469,14 +525,14 @@ fn lexicon_doc_sh_tangled_pipeline() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "clone".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("clone"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#cloneOpts".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static("#cloneOpts"),
                             }),
                         );
                         map.insert(
-                            "engine".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("engine"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -491,7 +547,7 @@ fn lexicon_doc_sh_tangled_pipeline() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                             }),
                         );
                         map.insert(
-                            "name".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -506,7 +562,7 @@ fn lexicon_doc_sh_tangled_pipeline() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                             }),
                         );
                         map.insert(
-                            "raw".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("raw"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -532,6 +588,9 @@ fn lexicon_doc_sh_tangled_pipeline() -> ::jacquard_lexicon::lexicon::LexiconDoc<
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CloneOpts<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.pipeline"
+    }
+    fn def_name() -> &'static str {
+        "cloneOpts"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_pipeline()
@@ -627,6 +686,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Pipeline<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.pipeline"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_pipeline()
     }
@@ -658,6 +720,9 @@ pub struct ManualTriggerData<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ManualTriggerData<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.pipeline"
+    }
+    fn def_name() -> &'static str {
+        "manualTriggerData"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_pipeline()
@@ -691,6 +756,9 @@ pub struct Pair<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Pair<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.pipeline"
+    }
+    fn def_name() -> &'static str {
+        "pair"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_pipeline()
@@ -729,6 +797,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PullRequestTriggerData<'a
     fn nsid() -> &'static str {
         "sh.tangled.pipeline"
     }
+    fn def_name() -> &'static str {
+        "pullRequestTriggerData"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_pipeline()
     }
@@ -737,21 +808,23 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PullRequestTriggerData<'a
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         {
             let value = &self.source_sha;
-            if value.as_ref().len() > 40usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 40usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "source_sha",
                     max: 40usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         {
             let value = &self.source_sha;
-            if value.as_ref().len() < 40usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 40usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
                     field: "source_sha",
                     min: 40usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -784,6 +857,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PushTriggerData<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.pipeline"
     }
+    fn def_name() -> &'static str {
+        "pushTriggerData"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_pipeline()
     }
@@ -792,41 +868,45 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PushTriggerData<'a> {
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         {
             let value = &self.new_sha;
-            if value.as_ref().len() > 40usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 40usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "new_sha",
                     max: 40usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         {
             let value = &self.new_sha;
-            if value.as_ref().len() < 40usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 40usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
                     field: "new_sha",
                     min: 40usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         {
             let value = &self.old_sha;
-            if value.as_ref().len() > 40usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 40usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "old_sha",
                     max: 40usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         {
             let value = &self.old_sha;
-            if value.as_ref().len() < 40usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 40usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
                     field: "old_sha",
                     min: 40usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -870,6 +950,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TriggerMetadata<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.pipeline"
     }
+    fn def_name() -> &'static str {
+        "triggerMetadata"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_pipeline()
     }
@@ -910,6 +993,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TriggerRepo<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.pipeline"
     }
+    fn def_name() -> &'static str {
+        "triggerRepo"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_pipeline()
     }
@@ -949,6 +1035,9 @@ pub struct Workflow<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Workflow<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.pipeline"
+    }
+    fn def_name() -> &'static str {
+        "workflow"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_pipeline()

@@ -110,6 +110,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Howtosection<'a> {
     fn nsid() -> &'static str {
         "social.flockfeeds.lexical.howtosection"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_flockfeeds_lexical_howtosection()
     }
@@ -125,16 +128,22 @@ fn lexicon_doc_social_flockfeeds_lexical_howtosection() -> ::jacquard_lexicon::l
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "social.flockfeeds.lexical.howtosection".into(),
+        id: ::jacquard_common::CowStr::new_static(
+            "social.flockfeeds.lexical.howtosection",
+        ),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("tid".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A sub-grouping of steps in the instructions for how to achieve a result (e.g. steps for making a pie crust within a pie recipe).",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: None,
@@ -143,12 +152,16 @@ fn lexicon_doc_social_flockfeeds_lexical_howtosection() -> ::jacquard_lexicon::l
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "steps".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("steps"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "A single step item (as HowToStep, text, document, video, etc.) or a HowToSection (originally misnamed 'steps'; 'step' is preferred).",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.creativework".into(),
-                                        "social.flockfeeds.lexical.itemlist".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.creativework"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.itemlist")
                                     ],
                                     closed: None,
                                 }),

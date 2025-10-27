@@ -33,24 +33,36 @@ fn lexicon_doc_place_stream_metadata_distributionPolicy() -> ::jacquard_lexicon:
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "place.stream.metadata.distributionPolicy".into(),
+        id: ::jacquard_common::CowStr::new_static(
+            "place.stream.metadata.distributionPolicy",
+        ),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Distribution and rebroadcast policy.",
+                        ),
+                    ),
                     required: None,
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "allowedBroadcasters".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "allowedBroadcasters",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "List of did:webs of the broadcasters you want to allow to distribute your content. \"*\" allows anyone. Starting a line with a \"!\" bans that broadcaster.",
+                                    ),
+                                ),
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -68,7 +80,9 @@ fn lexicon_doc_place_stream_metadata_distributionPolicy() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            "deleteAfter".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "deleteAfter",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -90,6 +104,9 @@ fn lexicon_doc_place_stream_metadata_distributionPolicy() -> ::jacquard_lexicon:
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DistributionPolicy<'a> {
     fn nsid() -> &'static str {
         "place.stream.metadata.distributionPolicy"
+    }
+    fn def_name() -> &'static str {
+        "main"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_metadata_distributionPolicy()

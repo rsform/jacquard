@@ -43,19 +43,21 @@ pub struct AuthCallback<'a> {
 fn lexicon_doc_app_ocho_auth_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "app.ocho.auth.defs".into(),
+        id: ::jacquard_common::CowStr::new_static("app.ocho.auth.defs"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "authCallback".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("authCallback"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            "refreshJwt".into(), "accessJwt".into(), "handle".into(),
-                            "did".into()
+                            ::jacquard_common::smol_str::SmolStr::new_static("refreshJwt"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("accessJwt"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("handle"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("did")
                         ],
                     ),
                     nullable: None,
@@ -63,7 +65,9 @@ fn lexicon_doc_app_ocho_auth_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "accessJwt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "accessJwt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -78,7 +82,7 @@ fn lexicon_doc_app_ocho_auth_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                             }),
                         );
                         map.insert(
-                            "did".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -95,7 +99,7 @@ fn lexicon_doc_app_ocho_auth_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                             }),
                         );
                         map.insert(
-                            "handle".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("handle"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -110,7 +114,9 @@ fn lexicon_doc_app_ocho_auth_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                             }),
                         );
                         map.insert(
-                            "refreshJwt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "refreshJwt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -136,6 +142,9 @@ fn lexicon_doc_app_ocho_auth_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AuthCallback<'a> {
     fn nsid() -> &'static str {
         "app.ocho.auth.defs"
+    }
+    fn def_name() -> &'static str {
+        "authCallback"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_ocho_auth_defs()

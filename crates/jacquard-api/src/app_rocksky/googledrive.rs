@@ -32,13 +32,13 @@ fn lexicon_doc_app_rocksky_googledrive_defs() -> ::jacquard_lexicon::lexicon::Le
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "app.rocksky.googledrive.defs".into(),
+        id: ::jacquard_common::CowStr::new_static("app.rocksky.googledrive.defs"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "fileListView".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("fileListView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -47,12 +47,14 @@ fn lexicon_doc_app_rocksky_googledrive_defs() -> ::jacquard_lexicon::lexicon::Le
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "files".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("files"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "app.rocksky.googledrive.defs#fileView".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "app.rocksky.googledrive.defs#fileView",
+                                    ),
                                 }),
                                 min_length: None,
                                 max_length: None,
@@ -63,7 +65,7 @@ fn lexicon_doc_app_rocksky_googledrive_defs() -> ::jacquard_lexicon::lexicon::Le
                 }),
             );
             map.insert(
-                "fileView".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("fileView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -72,9 +74,13 @@ fn lexicon_doc_app_rocksky_googledrive_defs() -> ::jacquard_lexicon::lexicon::Le
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "id".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("id"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The unique identifier of the file.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -98,6 +104,9 @@ fn lexicon_doc_app_rocksky_googledrive_defs() -> ::jacquard_lexicon::lexicon::Le
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FileListView<'a> {
     fn nsid() -> &'static str {
         "app.rocksky.googledrive.defs"
+    }
+    fn def_name() -> &'static str {
+        "fileListView"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_rocksky_googledrive_defs()
@@ -131,6 +140,9 @@ pub struct FileView<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FileView<'a> {
     fn nsid() -> &'static str {
         "app.rocksky.googledrive.defs"
+    }
+    fn def_name() -> &'static str {
+        "fileView"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_rocksky_googledrive_defs()

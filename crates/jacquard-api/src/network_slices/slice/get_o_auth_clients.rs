@@ -137,26 +137,36 @@ fn lexicon_doc_network_slices_slice_getOAuthClients() -> ::jacquard_lexicon::lex
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "network.slices.slice.getOAuthClients".into(),
+        id: ::jacquard_common::CowStr::new_static(
+            "network.slices.slice.getOAuthClients",
+        ),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
                     description: None,
                     parameters: Some(
                         ::jacquard_lexicon::lexicon::LexXrpcQueryParameter::Params(::jacquard_lexicon::lexicon::LexXrpcParameters {
                             description: None,
-                            required: Some(vec!["slice".into()]),
+                            required: Some(
+                                vec![
+                                    ::jacquard_common::smol_str::SmolStr::new_static("slice")
+                                ],
+                            ),
                             properties: {
                                 #[allow(unused_mut)]
                                 let mut map = ::std::collections::BTreeMap::new();
                                 map.insert(
-                                    "slice".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static("slice"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
+                                        description: Some(
+                                            ::jacquard_common::CowStr::new_static(
+                                                "AT-URI of the slice to get OAuth clients for",
+                                            ),
+                                        ),
                                         format: None,
                                         default: None,
                                         min_length: None,
@@ -177,14 +187,18 @@ fn lexicon_doc_network_slices_slice_getOAuthClients() -> ::jacquard_lexicon::lex
                 }),
             );
             map.insert(
-                "oauthClientDetails".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("oauthClientDetails"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            "clientId".into(), "clientName".into(), "redirectUris"
-                            .into(), "grantTypes".into(), "responseTypes".into(),
-                            "createdAt".into(), "createdByDid".into()
+                            ::jacquard_common::smol_str::SmolStr::new_static("clientId"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("clientName"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("redirectUris"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("grantTypes"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("responseTypes"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("createdAt"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("createdByDid")
                         ],
                     ),
                     nullable: None,
@@ -192,9 +206,11 @@ fn lexicon_doc_network_slices_slice_getOAuthClients() -> ::jacquard_lexicon::lex
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "clientId".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("clientId"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static("OAuth client ID"),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -207,9 +223,15 @@ fn lexicon_doc_network_slices_slice_getOAuthClients() -> ::jacquard_lexicon::lex
                             }),
                         );
                         map.insert(
-                            "clientName".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "clientName",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Human-readable name of the OAuth client",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -222,9 +244,15 @@ fn lexicon_doc_network_slices_slice_getOAuthClients() -> ::jacquard_lexicon::lex
                             }),
                         );
                         map.insert(
-                            "clientSecret".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "clientSecret",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "OAuth client secret (only returned on creation)",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -237,9 +265,15 @@ fn lexicon_doc_network_slices_slice_getOAuthClients() -> ::jacquard_lexicon::lex
                             }),
                         );
                         map.insert(
-                            "clientUri".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "clientUri",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "URI of the client application",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                 ),
@@ -254,9 +288,15 @@ fn lexicon_doc_network_slices_slice_getOAuthClients() -> ::jacquard_lexicon::lex
                             }),
                         );
                         map.insert(
-                            "createdAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "createdAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "When the OAuth client was created",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                 ),
@@ -271,9 +311,15 @@ fn lexicon_doc_network_slices_slice_getOAuthClients() -> ::jacquard_lexicon::lex
                             }),
                         );
                         map.insert(
-                            "createdByDid".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "createdByDid",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "DID of the user who created this client",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Did,
                                 ),
@@ -288,9 +334,15 @@ fn lexicon_doc_network_slices_slice_getOAuthClients() -> ::jacquard_lexicon::lex
                             }),
                         );
                         map.insert(
-                            "grantTypes".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "grantTypes",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Allowed OAuth grant types",
+                                    ),
+                                ),
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -308,9 +360,13 @@ fn lexicon_doc_network_slices_slice_getOAuthClients() -> ::jacquard_lexicon::lex
                             }),
                         );
                         map.insert(
-                            "logoUri".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("logoUri"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "URI of the client logo",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                 ),
@@ -325,9 +381,15 @@ fn lexicon_doc_network_slices_slice_getOAuthClients() -> ::jacquard_lexicon::lex
                             }),
                         );
                         map.insert(
-                            "policyUri".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "policyUri",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "URI of the privacy policy",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                 ),
@@ -342,9 +404,15 @@ fn lexicon_doc_network_slices_slice_getOAuthClients() -> ::jacquard_lexicon::lex
                             }),
                         );
                         map.insert(
-                            "redirectUris".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "redirectUris",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Allowed redirect URIs for OAuth flow",
+                                    ),
+                                ),
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -364,9 +432,15 @@ fn lexicon_doc_network_slices_slice_getOAuthClients() -> ::jacquard_lexicon::lex
                             }),
                         );
                         map.insert(
-                            "responseTypes".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "responseTypes",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Allowed OAuth response types",
+                                    ),
+                                ),
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -384,9 +458,11 @@ fn lexicon_doc_network_slices_slice_getOAuthClients() -> ::jacquard_lexicon::lex
                             }),
                         );
                         map.insert(
-                            "scope".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("scope"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static("OAuth scope"),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -399,9 +475,13 @@ fn lexicon_doc_network_slices_slice_getOAuthClients() -> ::jacquard_lexicon::lex
                             }),
                         );
                         map.insert(
-                            "tosUri".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("tosUri"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "URI of the terms of service",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                 ),
@@ -427,6 +507,9 @@ fn lexicon_doc_network_slices_slice_getOAuthClients() -> ::jacquard_lexicon::lex
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for OauthClientDetails<'a> {
     fn nsid() -> &'static str {
         "network.slices.slice.getOAuthClients"
+    }
+    fn def_name() -> &'static str {
+        "oauthClientDetails"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_network_slices_slice_getOAuthClients()

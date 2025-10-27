@@ -11,6 +11,7 @@ use std::collections::BTreeMap;
 #[derive(Debug, Clone)]
 struct SimpleRecord<'a> {
     text: CowStr<'a>,
+    #[allow(dead_code)]
     timestamp: Datetime,
 }
 

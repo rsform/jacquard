@@ -47,26 +47,34 @@ fn lexicon_doc_sh_tangled_repo_languages() -> ::jacquard_lexicon::lexicon::Lexic
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "sh.tangled.repo.languages".into(),
+        id: ::jacquard_common::CowStr::new_static("sh.tangled.repo.languages"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "language".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("language"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
-                        vec!["name".into(), "size".into(), "percentage".into()],
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("size"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("percentage")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "color".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("color"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Hex color code for this language",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -79,9 +87,15 @@ fn lexicon_doc_sh_tangled_repo_languages() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "extensions".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "extensions",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "File extensions associated with this language",
+                                    ),
+                                ),
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -99,7 +113,9 @@ fn lexicon_doc_sh_tangled_repo_languages() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "fileCount".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "fileCount",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -110,9 +126,13 @@ fn lexicon_doc_sh_tangled_repo_languages() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "name".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Programming language name",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -125,7 +145,9 @@ fn lexicon_doc_sh_tangled_repo_languages() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "percentage".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "percentage",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -136,7 +158,7 @@ fn lexicon_doc_sh_tangled_repo_languages() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "size".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("size"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -151,20 +173,28 @@ fn lexicon_doc_sh_tangled_repo_languages() -> ::jacquard_lexicon::lexicon::Lexic
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
                     description: None,
                     parameters: Some(
                         ::jacquard_lexicon::lexicon::LexXrpcQueryParameter::Params(::jacquard_lexicon::lexicon::LexXrpcParameters {
                             description: None,
-                            required: Some(vec!["repo".into()]),
+                            required: Some(
+                                vec![
+                                    ::jacquard_common::smol_str::SmolStr::new_static("repo")
+                                ],
+                            ),
                             properties: {
                                 #[allow(unused_mut)]
                                 let mut map = ::std::collections::BTreeMap::new();
                                 map.insert(
-                                    "ref".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static("ref"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
+                                        description: Some(
+                                            ::jacquard_common::CowStr::new_static(
+                                                "Git reference (branch, tag, or commit SHA)",
+                                            ),
+                                        ),
                                         format: None,
                                         default: None,
                                         min_length: None,
@@ -177,9 +207,13 @@ fn lexicon_doc_sh_tangled_repo_languages() -> ::jacquard_lexicon::lexicon::Lexic
                                     }),
                                 );
                                 map.insert(
-                                    "repo".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static("repo"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
+                                        description: Some(
+                                            ::jacquard_common::CowStr::new_static(
+                                                "Repository identifier in format 'did:plc:.../repoName'",
+                                            ),
+                                        ),
                                         format: None,
                                         default: None,
                                         min_length: None,
@@ -207,6 +241,9 @@ fn lexicon_doc_sh_tangled_repo_languages() -> ::jacquard_lexicon::lexicon::Lexic
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Language<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.repo.languages"
+    }
+    fn def_name() -> &'static str {
+        "language"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_repo_languages()

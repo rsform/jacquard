@@ -27,25 +27,29 @@ fn lexicon_doc_pub_leaflet_blocks_poll() -> ::jacquard_lexicon::lexicon::Lexicon
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "pub.leaflet.blocks.poll".into(),
+        id: ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.poll"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["pollRef".into()]),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("pollRef")],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "pollRef".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("pollRef"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "com.atproto.repo.strongRef".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "com.atproto.repo.strongRef",
+                                ),
                             }),
                         );
                         map
@@ -60,6 +64,9 @@ fn lexicon_doc_pub_leaflet_blocks_poll() -> ::jacquard_lexicon::lexicon::Lexicon
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Poll<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.blocks.poll"
+    }
+    fn def_name() -> &'static str {
+        "main"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_blocks_poll()

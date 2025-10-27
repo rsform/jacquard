@@ -39,19 +39,22 @@ fn lexicon_doc_place_stream_livestream() -> ::jacquard_lexicon::lexicon::Lexicon
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "place.stream.livestream".into(),
+        id: ::jacquard_common::CowStr::new_static("place.stream.livestream"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "livestreamView".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("livestreamView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            "uri".into(), "cid".into(), "author".into(), "record".into(),
-                            "indexedAt".into()
+                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("cid"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("author"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("record"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("indexedAt")
                         ],
                     ),
                     nullable: None,
@@ -59,14 +62,16 @@ fn lexicon_doc_place_stream_livestream() -> ::jacquard_lexicon::lexicon::Lexicon
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "author".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("author"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "app.bsky.actor.defs#profileViewBasic".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "app.bsky.actor.defs#profileViewBasic",
+                                ),
                             }),
                         );
                         map.insert(
-                            "cid".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("cid"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -83,7 +88,9 @@ fn lexicon_doc_place_stream_livestream() -> ::jacquard_lexicon::lexicon::Lexicon
                             }),
                         );
                         map.insert(
-                            "indexedAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "indexedAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -100,13 +107,13 @@ fn lexicon_doc_place_stream_livestream() -> ::jacquard_lexicon::lexicon::Lexicon
                             }),
                         );
                         map.insert(
-                            "record".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("record"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
                                 description: None,
                             }),
                         );
                         map.insert(
-                            "uri".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -123,10 +130,12 @@ fn lexicon_doc_place_stream_livestream() -> ::jacquard_lexicon::lexicon::Lexicon
                             }),
                         );
                         map.insert(
-                            "viewerCount".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "viewerCount",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#viewerCount".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static("#viewerCount"),
                             }),
                         );
                         map
@@ -134,21 +143,34 @@ fn lexicon_doc_place_stream_livestream() -> ::jacquard_lexicon::lexicon::Lexicon
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("tid".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Record announcing a livestream is happening",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
-                        required: Some(vec!["title".into(), "createdAt".into()]),
+                        required: Some(
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "agent".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("agent"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The source of the livestream, if available, in a User Agent format: `<product> / <product-version> <comment>` e.g. Streamplace/0.7.5 iOS",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -161,9 +183,15 @@ fn lexicon_doc_place_stream_livestream() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                "canonicalUrl".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "canonicalUrl",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The primary URL where this livestream can be viewed, if available.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                     ),
@@ -178,9 +206,15 @@ fn lexicon_doc_place_stream_livestream() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Client-declared timestamp when this livestream started.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -195,21 +229,27 @@ fn lexicon_doc_place_stream_livestream() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                "notificationSettings".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "notificationSettings",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "place.stream.livestream#notificationSettings".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "place.stream.livestream#notificationSettings",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "post".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("post"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "com.atproto.repo.strongRef".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "com.atproto.repo.strongRef",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "thumb".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("thumb"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
                                     description: None,
                                     accept: None,
@@ -217,9 +257,13 @@ fn lexicon_doc_place_stream_livestream() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                "title".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The title of the livestream, as it will be announced to followers.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -232,9 +276,13 @@ fn lexicon_doc_place_stream_livestream() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                "url".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("url"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The URL where this stream can be found. This is primarily a hint for other Streamplace nodes to locate and replicate the stream.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                     ),
@@ -254,7 +302,7 @@ fn lexicon_doc_place_stream_livestream() -> ::jacquard_lexicon::lexicon::Lexicon
                 }),
             );
             map.insert(
-                "notificationSettings".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("notificationSettings"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -263,7 +311,9 @@ fn lexicon_doc_place_stream_livestream() -> ::jacquard_lexicon::lexicon::Lexicon
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "pushNotification".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "pushNotification",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                 description: None,
                                 default: None,
@@ -275,24 +325,31 @@ fn lexicon_doc_place_stream_livestream() -> ::jacquard_lexicon::lexicon::Lexicon
                 }),
             );
             map.insert(
-                "streamplaceAnything".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("streamplaceAnything"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["livestream".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("livestream")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "livestream".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "livestream",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
-                                    "#livestreamView".into(), "#viewerCount".into(),
-                                    "place.stream.defs#blockView".into(),
-                                    "place.stream.defs#renditions".into(),
-                                    "place.stream.defs#rendition".into(),
-                                    "place.stream.chat.defs#messageView".into()
+                                    ::jacquard_common::CowStr::new_static("#livestreamView"),
+                                    ::jacquard_common::CowStr::new_static("#viewerCount"),
+                                    ::jacquard_common::CowStr::new_static("place.stream.defs#blockView"),
+                                    ::jacquard_common::CowStr::new_static("place.stream.defs#renditions"),
+                                    ::jacquard_common::CowStr::new_static("place.stream.defs#rendition"),
+                                    ::jacquard_common::CowStr::new_static("place.stream.chat.defs#messageView")
                                 ],
                                 closed: None,
                             }),
@@ -302,16 +359,18 @@ fn lexicon_doc_place_stream_livestream() -> ::jacquard_lexicon::lexicon::Lexicon
                 }),
             );
             map.insert(
-                "viewerCount".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("viewerCount"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["count".into()]),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("count")],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "count".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("count"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -333,6 +392,9 @@ fn lexicon_doc_place_stream_livestream() -> ::jacquard_lexicon::lexicon::Lexicon
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LivestreamView<'a> {
     fn nsid() -> &'static str {
         "place.stream.livestream"
+    }
+    fn def_name() -> &'static str {
+        "livestreamView"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_livestream()
@@ -461,6 +523,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Livestream<'a> {
     fn nsid() -> &'static str {
         "place.stream.livestream"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_livestream()
     }
@@ -469,11 +534,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Livestream<'a> {
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         {
             let value = &self.title;
-            if value.as_ref().len() > 1400usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 1400usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "title",
                     max: 1400usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -519,6 +585,9 @@ pub struct NotificationSettings<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NotificationSettings<'a> {
     fn nsid() -> &'static str {
         "place.stream.livestream"
+    }
+    fn def_name() -> &'static str {
+        "notificationSettings"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_livestream()
@@ -578,6 +647,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StreamplaceAnything<'a> {
     fn nsid() -> &'static str {
         "place.stream.livestream"
     }
+    fn def_name() -> &'static str {
+        "streamplaceAnything"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_livestream()
     }
@@ -607,6 +679,9 @@ pub struct ViewerCount<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewerCount<'a> {
     fn nsid() -> &'static str {
         "place.stream.livestream"
+    }
+    fn def_name() -> &'static str {
+        "viewerCount"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_livestream()

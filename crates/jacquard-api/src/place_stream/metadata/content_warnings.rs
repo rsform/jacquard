@@ -137,58 +137,64 @@ fn lexicon_doc_place_stream_metadata_contentWarnings() -> ::jacquard_lexicon::le
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "place.stream.metadata.contentWarnings".into(),
+        id: ::jacquard_common::CowStr::new_static(
+            "place.stream.metadata.contentWarnings",
+        ),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "PII".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("PII"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
             );
             map.insert(
-                "death".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("death"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
             );
             map.insert(
-                "drugUse".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("drugUse"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
             );
             map.insert(
-                "fantasyViolence".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("fantasyViolence"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
             );
             map.insert(
-                "flashingLights".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("flashingLights"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
             );
             map.insert(
-                "language".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("language"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Content warnings for a stream.",
+                        ),
+                    ),
                     required: None,
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "warnings".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("warnings"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
@@ -212,25 +218,25 @@ fn lexicon_doc_place_stream_metadata_contentWarnings() -> ::jacquard_lexicon::le
                 }),
             );
             map.insert(
-                "nudity".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("nudity"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
             );
             map.insert(
-                "sexuality".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("sexuality"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
             );
             map.insert(
-                "suffering".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("suffering"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
             );
             map.insert(
-                "violence".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("violence"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
@@ -243,6 +249,9 @@ fn lexicon_doc_place_stream_metadata_contentWarnings() -> ::jacquard_lexicon::le
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContentWarnings<'a> {
     fn nsid() -> &'static str {
         "place.stream.metadata.contentWarnings"
+    }
+    fn def_name() -> &'static str {
+        "main"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_metadata_contentWarnings()

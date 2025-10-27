@@ -117,6 +117,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Post<'a> {
     fn nsid() -> &'static str {
         "us.polhem.blog.post"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_us_polhem_blog_post()
     }
@@ -125,40 +128,44 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Post<'a> {
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         {
             let value = &self.content;
-            if value.as_ref().len() > 100000usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100000usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "content",
                     max: 100000usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         if let Some(ref value) = self.excerpt {
-            if value.as_ref().len() > 1000usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 1000usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "excerpt",
                     max: 1000usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         {
             let value = &self.slug;
-            if value.as_ref().len() > 100usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "slug",
                     max: 100usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         {
             let value = &self.title;
-            if value.as_ref().len() > 1000usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 1000usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "title",
                     max: 1000usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -171,22 +178,28 @@ fn lexicon_doc_us_polhem_blog_post() -> ::jacquard_lexicon::lexicon::LexiconDoc<
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "us.polhem.blog.post".into(),
+        id: ::jacquard_common::CowStr::new_static("us.polhem.blog.post"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("tid".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Record describing a blog post.",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: Some(
                             vec![
-                                "title".into(), "content".into(), "slug".into(), "createdAt"
-                                .into()
+                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("content"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("slug"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -194,7 +207,7 @@ fn lexicon_doc_us_polhem_blog_post() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "content".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("content"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -209,7 +222,9 @@ fn lexicon_doc_us_polhem_blog_post() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                                 }),
                             );
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -226,7 +241,7 @@ fn lexicon_doc_us_polhem_blog_post() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                                 }),
                             );
                             map.insert(
-                                "excerpt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("excerpt"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -241,26 +256,32 @@ fn lexicon_doc_us_polhem_blog_post() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                                 }),
                             );
                             map.insert(
-                                "featuredImage".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "featuredImage",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "app.bsky.embed.images#image".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "app.bsky.embed.images#image",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "images".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("images"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: None,
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                         description: None,
-                                        r#ref: "app.bsky.embed.images#image".into(),
+                                        r#ref: ::jacquard_common::CowStr::new_static(
+                                            "app.bsky.embed.images#image",
+                                        ),
                                     }),
                                     min_length: None,
                                     max_length: None,
                                 }),
                             );
                             map.insert(
-                                "slug".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("slug"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -275,11 +296,15 @@ fn lexicon_doc_us_polhem_blog_post() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                                 }),
                             );
                             map.insert(
-                                "tags".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("tags"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: None,
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
+                                        description: Some(
+                                            ::jacquard_common::CowStr::new_static(
+                                                "Reference (AT-URI) to a tag record (us.polhem.blog.tag).",
+                                            ),
+                                        ),
                                         format: Some(
                                             ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
                                         ),
@@ -297,7 +322,7 @@ fn lexicon_doc_us_polhem_blog_post() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                                 }),
                             );
                             map.insert(
-                                "title".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -312,9 +337,15 @@ fn lexicon_doc_us_polhem_blog_post() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                                 }),
                             );
                             map.insert(
-                                "visibility".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "visibility",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Tells the visibility of the article to AppView.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,

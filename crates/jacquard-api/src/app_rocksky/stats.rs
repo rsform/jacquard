@@ -42,13 +42,13 @@ fn lexicon_doc_app_rocksky_stats_defs() -> ::jacquard_lexicon::lexicon::LexiconD
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "app.rocksky.stats.defs".into(),
+        id: ::jacquard_common::CowStr::new_static("app.rocksky.stats.defs"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "statsView".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("statsView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -57,7 +57,7 @@ fn lexicon_doc_app_rocksky_stats_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "albums".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("albums"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -68,7 +68,7 @@ fn lexicon_doc_app_rocksky_stats_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "artists".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("artists"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -79,7 +79,9 @@ fn lexicon_doc_app_rocksky_stats_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "lovedTracks".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "lovedTracks",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -90,7 +92,9 @@ fn lexicon_doc_app_rocksky_stats_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "scrobbles".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "scrobbles",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -101,7 +105,7 @@ fn lexicon_doc_app_rocksky_stats_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "tracks".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("tracks"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -123,6 +127,9 @@ fn lexicon_doc_app_rocksky_stats_defs() -> ::jacquard_lexicon::lexicon::LexiconD
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StatsView<'a> {
     fn nsid() -> &'static str {
         "app.rocksky.stats.defs"
+    }
+    fn def_name() -> &'static str {
+        "statsView"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_rocksky_stats_defs()

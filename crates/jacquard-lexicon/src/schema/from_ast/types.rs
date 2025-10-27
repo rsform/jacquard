@@ -16,6 +16,8 @@ pub struct BuiltSchema {
     pub validation_checks: Vec<ValidationCheck>,
     /// Unresolved type refs (for two-pass resolution in workspace discovery)
     pub unresolved_refs: Vec<UnresolvedRef>,
+    /// Union field mappings (schema_name -> type_path for runtime LEXICON_UNION_REFS access)
+    pub union_fields: std::collections::BTreeMap<String, String>,
 }
 
 /// A reference to a type that couldn't be resolved at build time
@@ -40,6 +42,8 @@ pub struct ValidationCheck {
     pub field_type: String,
     /// Is this field required (not Option<T>)?
     pub is_required: bool,
+    /// Is this validating an array length (vs string length)?
+    pub is_array: bool,
     /// The specific constraint to check
     pub check: ConstraintCheck,
 }
@@ -81,14 +85,27 @@ pub enum LexiconTypeKind {
 /// Parsed lexicon attributes from field
 #[derive(Debug, Default, Clone)]
 pub struct LexiconFieldAttrs {
+    // Field-level constraints (for strings, integers, etc.)
     pub max_length: Option<usize>,
     pub max_graphemes: Option<usize>,
     pub min_length: Option<usize>,
     pub min_graphemes: Option<usize>,
     pub minimum: Option<i64>,
     pub maximum: Option<i64>,
+
+    // Array-level constraints
+    pub max_items: Option<usize>,
+    pub min_items: Option<usize>,
+
+    // Item-level constraints (for array items)
+    pub item_max_length: Option<usize>,
+    pub item_max_graphemes: Option<usize>,
+    pub item_min_length: Option<usize>,
+    pub item_min_graphemes: Option<usize>,
+
     pub explicit_ref: Option<String>,
     pub format: Option<String>,
+    pub union_type: Option<Option<String>>, // None = no union, Some(None) = infer, Some(Some(name)) = explicit
 }
 
 /// Parsed serde attributes relevant to lexicon schema
@@ -147,4 +164,6 @@ pub struct FieldProperty {
     pub validations: Vec<ValidationCheck>,
     /// Unresolved refs from this field
     pub unresolved_refs: Vec<UnresolvedRef>,
+    /// If this is a union field, contains the type path for accessing LEXICON_UNION_REFS at runtime
+    pub union_type_path: Option<String>,
 }

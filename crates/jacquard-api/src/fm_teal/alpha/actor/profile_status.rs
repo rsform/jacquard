@@ -98,6 +98,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileStatus<'a> {
     fn nsid() -> &'static str {
         "fm.teal.alpha.actor.profileStatus"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_fm_teal_alpha_actor_profileStatus()
     }
@@ -113,27 +116,41 @@ fn lexicon_doc_fm_teal_alpha_actor_profileStatus() -> ::jacquard_lexicon::lexico
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "fm.teal.alpha.actor.profileStatus".into(),
+        id: ::jacquard_common::CowStr::new_static("fm.teal.alpha.actor.profileStatus"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("literal:self".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "This lexicon is in a not officially released state. It is subject to change. | A declaration of the profile status of the actor.",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("literal:self")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
-                        required: Some(vec!["completedOnboarding".into()]),
+                        required: Some(
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("completedOnboarding")
+                            ],
+                        ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "completedOnboarding".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "completedOnboarding",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The onboarding completion status",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -146,9 +163,15 @@ fn lexicon_doc_fm_teal_alpha_actor_profileStatus() -> ::jacquard_lexicon::lexico
                                 }),
                             );
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The timestamp when this status was created",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -163,9 +186,15 @@ fn lexicon_doc_fm_teal_alpha_actor_profileStatus() -> ::jacquard_lexicon::lexico
                                 }),
                             );
                             map.insert(
-                                "updatedAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "updatedAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The timestamp when this status was last updated",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),

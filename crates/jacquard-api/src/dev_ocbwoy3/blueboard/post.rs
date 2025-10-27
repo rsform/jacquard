@@ -99,6 +99,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Post<'a> {
     fn nsid() -> &'static str {
         "dev.ocbwoy3.blueboard.post"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_dev_ocbwoy3_blueboard_post()
     }
@@ -107,11 +110,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Post<'a> {
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         {
             let value = &self.text;
-            if value.as_ref().len() > 1000usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 1000usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "text",
                     max: 1000usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -124,27 +128,33 @@ fn lexicon_doc_dev_ocbwoy3_blueboard_post() -> ::jacquard_lexicon::lexicon::Lexi
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "dev.ocbwoy3.blueboard.post".into(),
+        id: ::jacquard_common::CowStr::new_static("dev.ocbwoy3.blueboard.post"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: None,
-                    key: Some("tid".into()),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: Some(
-                            vec!["text".into(), "createdAt".into(), "parent".into()],
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("text"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("parent")
+                            ],
                         ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "attachment".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "attachment",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
                                     description: None,
                                     accept: None,
@@ -152,9 +162,15 @@ fn lexicon_doc_dev_ocbwoy3_blueboard_post() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The date and time when the post was created",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -169,9 +185,13 @@ fn lexicon_doc_dev_ocbwoy3_blueboard_post() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                "parent".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("parent"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Determines the parent of the post. Must either be a `dev.ocbwoy3.blueboard.board` or a `dev.ocbwoy3.blueboard.post`.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
                                     ),
@@ -186,9 +206,11 @@ fn lexicon_doc_dev_ocbwoy3_blueboard_post() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                "text".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("text"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static("The post's text"),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,

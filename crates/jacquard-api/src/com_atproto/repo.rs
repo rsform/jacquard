@@ -40,22 +40,27 @@ fn lexicon_doc_com_atproto_repo_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "com.atproto.repo.defs".into(),
+        id: ::jacquard_common::CowStr::new_static("com.atproto.repo.defs"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "commitMeta".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("commitMeta"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["cid".into(), "rev".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("cid"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("rev")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "cid".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("cid"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -72,7 +77,7 @@ fn lexicon_doc_com_atproto_repo_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            "rev".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("rev"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -100,6 +105,9 @@ fn lexicon_doc_com_atproto_repo_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CommitMeta<'a> {
     fn nsid() -> &'static str {
         "com.atproto.repo.defs"
+    }
+    fn def_name() -> &'static str {
+        "commitMeta"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_repo_defs()

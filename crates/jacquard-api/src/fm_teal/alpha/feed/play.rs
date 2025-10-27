@@ -162,6 +162,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Play<'a> {
     fn nsid() -> &'static str {
         "fm.teal.alpha.feed.play"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_fm_teal_alpha_feed_play()
     }
@@ -169,11 +172,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Play<'a> {
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         if let Some(ref value) = self.release_discriminant {
-            if value.as_ref().len() > 128usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 128usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "release_discriminant",
                     max: 128usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -194,11 +198,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Play<'a> {
             }
         }
         if let Some(ref value) = self.release_name {
-            if value.as_ref().len() > 256usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "release_name",
                     max: 256usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -219,11 +224,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Play<'a> {
             }
         }
         if let Some(ref value) = self.submission_client_agent {
-            if value.as_ref().len() > 256usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "submission_client_agent",
                     max: 256usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -244,11 +250,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Play<'a> {
             }
         }
         if let Some(ref value) = self.track_discriminant {
-            if value.as_ref().len() > 128usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 128usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "track_discriminant",
                     max: 128usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -270,21 +277,23 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Play<'a> {
         }
         {
             let value = &self.track_name;
-            if value.as_ref().len() > 256usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "track_name",
                     max: 256usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         {
             let value = &self.track_name;
-            if value.as_ref().len() < 1usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 1usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
                     field: "track_name",
                     min: 1usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -314,27 +323,37 @@ fn lexicon_doc_fm_teal_alpha_feed_play() -> ::jacquard_lexicon::lexicon::Lexicon
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "fm.teal.alpha.feed.play".into(),
+        id: ::jacquard_common::CowStr::new_static("fm.teal.alpha.feed.play"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: None,
-                    key: Some("tid".into()),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
-                        required: Some(vec!["trackName".into()]),
+                        required: Some(
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("trackName")
+                            ],
+                        ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "artistMbIds".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "artistMbIds",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Array of Musicbrainz artist IDs. Prefer using 'artists'.",
+                                        ),
+                                    ),
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
                                         description: None,
                                         format: None,
@@ -352,9 +371,15 @@ fn lexicon_doc_fm_teal_alpha_feed_play() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                "artistNames".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "artistNames",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Array of artist names in order of original appearance. Prefer using 'artists'.",
+                                        ),
+                                    ),
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
                                         description: None,
                                         format: None,
@@ -372,19 +397,27 @@ fn lexicon_doc_fm_teal_alpha_feed_play() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                "artists".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("artists"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Array of artists in order of original appearance.",
+                                        ),
+                                    ),
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                         description: None,
-                                        r#ref: "fm.teal.alpha.feed.defs#artist".into(),
+                                        r#ref: ::jacquard_common::CowStr::new_static(
+                                            "fm.teal.alpha.feed.defs#artist",
+                                        ),
                                     }),
                                     min_length: None,
                                     max_length: None,
                                 }),
                             );
                             map.insert(
-                                "duration".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "duration",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -395,9 +428,13 @@ fn lexicon_doc_fm_teal_alpha_feed_play() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                "isrc".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("isrc"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The ISRC code associated with the recording",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -410,9 +447,15 @@ fn lexicon_doc_fm_teal_alpha_feed_play() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                "musicServiceBaseDomain".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "musicServiceBaseDomain",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The base domain of the music service. e.g. music.apple.com, tidal.com, spotify.com. Defaults to 'local' if unavailable or not provided.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -425,9 +468,15 @@ fn lexicon_doc_fm_teal_alpha_feed_play() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                "originUrl".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "originUrl",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The URL associated with this track",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -440,9 +489,15 @@ fn lexicon_doc_fm_teal_alpha_feed_play() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                "playedTime".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "playedTime",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The unix timestamp of when the track was played",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -457,9 +512,15 @@ fn lexicon_doc_fm_teal_alpha_feed_play() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                "recordingMbId".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "recordingMbId",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The Musicbrainz recording ID of the track",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -472,9 +533,15 @@ fn lexicon_doc_fm_teal_alpha_feed_play() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                "releaseDiscriminant".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "releaseDiscriminant",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Distinguishing information for release variants (e.g. 'Deluxe Edition', 'Remastered', '2023 Remaster', 'Special Edition'). Used to differentiate between different versions of the same base release while maintaining grouping capabilities.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -487,9 +554,15 @@ fn lexicon_doc_fm_teal_alpha_feed_play() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                "releaseMbId".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "releaseMbId",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The Musicbrainz release ID",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -502,9 +575,15 @@ fn lexicon_doc_fm_teal_alpha_feed_play() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                "releaseName".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "releaseName",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The name of the release/album",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -517,9 +596,15 @@ fn lexicon_doc_fm_teal_alpha_feed_play() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                "submissionClientAgent".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "submissionClientAgent",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "A metadata string specifying the user agent where the format is `<app-identifier>/<version> (<kernel/OS-base>; <platform/OS-version>; <device-model>)`. If string is provided, only `app-identifier` and `version` are required. `app-identifier` is recommended to be in reverse dns format. Defaults to 'manual/unknown' if unavailable or not provided.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -532,9 +617,15 @@ fn lexicon_doc_fm_teal_alpha_feed_play() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                "trackDiscriminant".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "trackDiscriminant",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Distinguishing information for track variants (e.g. 'Acoustic Version', 'Live at Wembley', 'Radio Edit', 'Demo'). Used to differentiate between different versions of the same base track while maintaining grouping capabilities.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -547,9 +638,15 @@ fn lexicon_doc_fm_teal_alpha_feed_play() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                "trackMbId".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "trackMbId",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The Musicbrainz ID of the track",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -562,9 +659,15 @@ fn lexicon_doc_fm_teal_alpha_feed_play() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                "trackName".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "trackName",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The name of the track",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: Some(1usize),

@@ -90,6 +90,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Settings<'a> {
     fn nsid() -> &'static str {
         "place.stream.server.settings"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_server_settings()
     }
@@ -105,16 +108,20 @@ fn lexicon_doc_place_stream_server_settings() -> ::jacquard_lexicon::lexicon::Le
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "place.stream.server.settings".into(),
+        id: ::jacquard_common::CowStr::new_static("place.stream.server.settings"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("any".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Record containing user settings for a particular Streamplace node",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("any")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: Some(vec![]),
@@ -123,7 +130,9 @@ fn lexicon_doc_place_stream_server_settings() -> ::jacquard_lexicon::lexicon::Le
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "debugRecording".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "debugRecording",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                     description: None,
                                     default: None,

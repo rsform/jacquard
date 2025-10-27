@@ -55,19 +55,21 @@ fn lexicon_doc_network_slices_slice_getJobStatus() -> ::jacquard_lexicon::lexico
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "network.slices.slice.getJobStatus".into(),
+        id: ::jacquard_common::CowStr::new_static("network.slices.slice.getJobStatus"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "jobStatus".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("jobStatus"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            "jobId".into(), "status".into(), "createdAt".into(),
-                            "retryCount".into()
+                            ::jacquard_common::smol_str::SmolStr::new_static("jobId"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("status"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("createdAt"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("retryCount")
                         ],
                     ),
                     nullable: None,
@@ -75,9 +77,15 @@ fn lexicon_doc_network_slices_slice_getJobStatus() -> ::jacquard_lexicon::lexico
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "completedAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "completedAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "When the job completed",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                 ),
@@ -92,9 +100,15 @@ fn lexicon_doc_network_slices_slice_getJobStatus() -> ::jacquard_lexicon::lexico
                             }),
                         );
                         map.insert(
-                            "createdAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "createdAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "When the job was created",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                 ),
@@ -109,9 +123,13 @@ fn lexicon_doc_network_slices_slice_getJobStatus() -> ::jacquard_lexicon::lexico
                             }),
                         );
                         map.insert(
-                            "error".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("error"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Error message if job failed",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -124,9 +142,11 @@ fn lexicon_doc_network_slices_slice_getJobStatus() -> ::jacquard_lexicon::lexico
                             }),
                         );
                         map.insert(
-                            "jobId".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("jobId"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static("UUID of the job"),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -139,14 +159,18 @@ fn lexicon_doc_network_slices_slice_getJobStatus() -> ::jacquard_lexicon::lexico
                             }),
                         );
                         map.insert(
-                            "result".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("result"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#syncJobResult".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "#syncJobResult",
+                                ),
                             }),
                         );
                         map.insert(
-                            "retryCount".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "retryCount",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -157,9 +181,15 @@ fn lexicon_doc_network_slices_slice_getJobStatus() -> ::jacquard_lexicon::lexico
                             }),
                         );
                         map.insert(
-                            "startedAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "startedAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "When the job started executing",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                 ),
@@ -174,9 +204,13 @@ fn lexicon_doc_network_slices_slice_getJobStatus() -> ::jacquard_lexicon::lexico
                             }),
                         );
                         map.insert(
-                            "status".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("status"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Current status of the job",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -193,20 +227,28 @@ fn lexicon_doc_network_slices_slice_getJobStatus() -> ::jacquard_lexicon::lexico
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
                     description: None,
                     parameters: Some(
                         ::jacquard_lexicon::lexicon::LexXrpcQueryParameter::Params(::jacquard_lexicon::lexicon::LexXrpcParameters {
                             description: None,
-                            required: Some(vec!["jobId".into()]),
+                            required: Some(
+                                vec![
+                                    ::jacquard_common::smol_str::SmolStr::new_static("jobId")
+                                ],
+                            ),
                             properties: {
                                 #[allow(unused_mut)]
                                 let mut map = ::std::collections::BTreeMap::new();
                                 map.insert(
-                                    "jobId".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static("jobId"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
+                                        description: Some(
+                                            ::jacquard_common::CowStr::new_static(
+                                                "UUID of the sync job",
+                                            ),
+                                        ),
                                         format: None,
                                         default: None,
                                         min_length: None,
@@ -227,13 +269,16 @@ fn lexicon_doc_network_slices_slice_getJobStatus() -> ::jacquard_lexicon::lexico
                 }),
             );
             map.insert(
-                "syncJobResult".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("syncJobResult"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            "success".into(), "totalRecords".into(), "collectionsSynced"
-                            .into(), "reposProcessed".into(), "message".into()
+                            ::jacquard_common::smol_str::SmolStr::new_static("success"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("totalRecords"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("collectionsSynced"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("reposProcessed"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("message")
                         ],
                     ),
                     nullable: None,
@@ -241,9 +286,15 @@ fn lexicon_doc_network_slices_slice_getJobStatus() -> ::jacquard_lexicon::lexico
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "collectionsSynced".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "collectionsSynced",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "List of collection NSIDs that were synced",
+                                    ),
+                                ),
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -263,9 +314,13 @@ fn lexicon_doc_network_slices_slice_getJobStatus() -> ::jacquard_lexicon::lexico
                             }),
                         );
                         map.insert(
-                            "message".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("message"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Human-readable message about the job completion",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -278,7 +333,9 @@ fn lexicon_doc_network_slices_slice_getJobStatus() -> ::jacquard_lexicon::lexico
                             }),
                         );
                         map.insert(
-                            "reposProcessed".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "reposProcessed",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -289,7 +346,7 @@ fn lexicon_doc_network_slices_slice_getJobStatus() -> ::jacquard_lexicon::lexico
                             }),
                         );
                         map.insert(
-                            "success".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("success"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                 description: None,
                                 default: None,
@@ -297,7 +354,9 @@ fn lexicon_doc_network_slices_slice_getJobStatus() -> ::jacquard_lexicon::lexico
                             }),
                         );
                         map.insert(
-                            "totalRecords".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "totalRecords",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -319,6 +378,9 @@ fn lexicon_doc_network_slices_slice_getJobStatus() -> ::jacquard_lexicon::lexico
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for JobStatus<'a> {
     fn nsid() -> &'static str {
         "network.slices.slice.getJobStatus"
+    }
+    fn def_name() -> &'static str {
+        "jobStatus"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_network_slices_slice_getJobStatus()
@@ -422,6 +484,9 @@ pub struct SyncJobResult<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SyncJobResult<'a> {
     fn nsid() -> &'static str {
         "network.slices.slice.getJobStatus"
+    }
+    fn def_name() -> &'static str {
+        "syncJobResult"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_network_slices_slice_getJobStatus()

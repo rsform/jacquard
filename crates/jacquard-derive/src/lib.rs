@@ -175,3 +175,24 @@ pub fn derive_xrpc_request(input: TokenStream) -> TokenStream {
 pub fn derive_lexicon_schema(input: TokenStream) -> TokenStream {
     jacquard_lexicon::derive_impl::impl_derive_lexicon_schema(input.into()).into()
 }
+
+/// Attribute macro for union enums.
+///
+/// Marks an enum as a lexicon union type and generates a const containing the union refs
+/// extracted from `#[nsid = "..."]` or `#[serde(rename = "...")]` attributes on variants.
+///
+/// ```ignore
+/// #[lexicon_union]
+/// #[serde(tag = "$type")]
+/// pub enum PostEmbed<'a> {
+///     #[serde(rename = "app.bsky.embed.images")]
+///     Images(Images<'a>),
+///     #[nsid = "app.bsky.embed.video"]
+///     Video(Video<'a>),
+/// }
+/// // Generates: PostEmbed::LEXICON_UNION_REFS const
+/// ```
+#[proc_macro_attribute]
+pub fn lexicon_union(attr: TokenStream, item: TokenStream) -> TokenStream {
+    jacquard_lexicon::derive_impl::impl_lexicon_union(attr.into(), item.into()).into()
+}

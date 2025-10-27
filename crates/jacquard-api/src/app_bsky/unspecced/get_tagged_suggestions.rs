@@ -88,13 +88,15 @@ fn lexicon_doc_app_bsky_unspecced_getTaggedSuggestions() -> ::jacquard_lexicon::
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "app.bsky.unspecced.getTaggedSuggestions".into(),
+        id: ::jacquard_common::CowStr::new_static(
+            "app.bsky.unspecced.getTaggedSuggestions",
+        ),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
                     description: None,
                     parameters: Some(
@@ -113,18 +115,22 @@ fn lexicon_doc_app_bsky_unspecced_getTaggedSuggestions() -> ::jacquard_lexicon::
                 }),
             );
             map.insert(
-                "suggestion".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("suggestion"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
-                        vec!["tag".into(), "subjectType".into(), "subject".into()],
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("tag"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("subjectType"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("subject")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "subject".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("subject"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -141,7 +147,9 @@ fn lexicon_doc_app_bsky_unspecced_getTaggedSuggestions() -> ::jacquard_lexicon::
                             }),
                         );
                         map.insert(
-                            "subjectType".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "subjectType",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -156,7 +164,7 @@ fn lexicon_doc_app_bsky_unspecced_getTaggedSuggestions() -> ::jacquard_lexicon::
                             }),
                         );
                         map.insert(
-                            "tag".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("tag"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -182,6 +190,9 @@ fn lexicon_doc_app_bsky_unspecced_getTaggedSuggestions() -> ::jacquard_lexicon::
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Suggestion<'a> {
     fn nsid() -> &'static str {
         "app.bsky.unspecced.getTaggedSuggestions"
+    }
+    fn def_name() -> &'static str {
+        "suggestion"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_unspecced_getTaggedSuggestions()

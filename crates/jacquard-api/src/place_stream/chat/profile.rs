@@ -29,22 +29,32 @@ fn lexicon_doc_place_stream_chat_profile() -> ::jacquard_lexicon::lexicon::Lexic
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "place.stream.chat.profile".into(),
+        id: ::jacquard_common::CowStr::new_static("place.stream.chat.profile"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "color".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("color"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["red".into(), "green".into(), "blue".into()]),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Customizations for the color of a user's name in chat",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("red"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("green"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("blue")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "blue".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("blue"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -55,7 +65,7 @@ fn lexicon_doc_place_stream_chat_profile() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "green".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("green"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -66,7 +76,7 @@ fn lexicon_doc_place_stream_chat_profile() -> ::jacquard_lexicon::lexicon::Lexic
                             }),
                         );
                         map.insert(
-                            "red".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("red"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -81,10 +91,14 @@ fn lexicon_doc_place_stream_chat_profile() -> ::jacquard_lexicon::lexicon::Lexic
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("literal:self".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Record containing customizations for a user's chat profile.",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("literal:self")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: None,
@@ -93,10 +107,10 @@ fn lexicon_doc_place_stream_chat_profile() -> ::jacquard_lexicon::lexicon::Lexic
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "color".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("color"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "#color".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static("#color"),
                                 }),
                             );
                             map
@@ -112,6 +126,9 @@ fn lexicon_doc_place_stream_chat_profile() -> ::jacquard_lexicon::lexicon::Lexic
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Color<'a> {
     fn nsid() -> &'static str {
         "place.stream.chat.profile"
+    }
+    fn def_name() -> &'static str {
+        "color"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_chat_profile()
@@ -267,6 +284,9 @@ impl jacquard_common::types::collection::Collection for ProfileRecord {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
     fn nsid() -> &'static str {
         "place.stream.chat.profile"
+    }
+    fn def_name() -> &'static str {
+        "main"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_chat_profile()

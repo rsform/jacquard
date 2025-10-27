@@ -137,6 +137,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HiveBook<'a> {
     fn nsid() -> &'static str {
         "buzz.bookhive.hiveBook"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_buzz_bookhive_hiveBook()
     }
@@ -145,30 +148,33 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HiveBook<'a> {
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         {
             let value = &self.authors;
-            if value.as_ref().len() > 512usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 512usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "authors",
                     max: 512usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         {
             let value = &self.authors;
-            if value.as_ref().len() < 1usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 1usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
                     field: "authors",
                     min: 1usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         if let Some(ref value) = self.description {
-            if value.as_ref().len() > 5000usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 5000usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "description",
                     max: 5000usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -192,21 +198,23 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HiveBook<'a> {
         }
         {
             let value = &self.title;
-            if value.as_ref().len() > 512usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 512usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "title",
                     max: 512usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         {
             let value = &self.title;
-            if value.as_ref().len() < 1usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 1usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
                     field: "title",
                     min: 1usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -219,22 +227,28 @@ fn lexicon_doc_buzz_bookhive_hiveBook() -> ::jacquard_lexicon::lexicon::LexiconD
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "buzz.bookhive.hiveBook".into(),
+        id: ::jacquard_common::CowStr::new_static("buzz.bookhive.hiveBook"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("tid".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static("A book within the hive"),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: Some(
                             vec![
-                                "id".into(), "title".into(), "authors".into(), "createdAt"
-                                .into(), "updatedAt".into(), "thumbnail".into()
+                                ::jacquard_common::smol_str::SmolStr::new_static("id"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("authors"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("updatedAt"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("thumbnail")
                             ],
                         ),
                         nullable: None,
@@ -242,9 +256,13 @@ fn lexicon_doc_buzz_bookhive_hiveBook() -> ::jacquard_lexicon::lexicon::LexiconD
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "authors".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("authors"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The authors of the book (tab separated)",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: Some(1usize),
@@ -257,9 +275,13 @@ fn lexicon_doc_buzz_bookhive_hiveBook() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                "cover".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("cover"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "URL to full-size cover image",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -272,7 +294,9 @@ fn lexicon_doc_buzz_bookhive_hiveBook() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -289,9 +313,15 @@ fn lexicon_doc_buzz_bookhive_hiveBook() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                "description".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "description",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Book description/summary",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -304,9 +334,13 @@ fn lexicon_doc_buzz_bookhive_hiveBook() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                "id".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("id"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The book's hive id, used to correlate user's books with the hive",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -319,7 +353,7 @@ fn lexicon_doc_buzz_bookhive_hiveBook() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                "rating".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("rating"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -330,7 +364,9 @@ fn lexicon_doc_buzz_bookhive_hiveBook() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                "ratingsCount".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "ratingsCount",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -341,9 +377,13 @@ fn lexicon_doc_buzz_bookhive_hiveBook() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                "source".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("source"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The source service name (e.g. Goodreads)",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -356,9 +396,15 @@ fn lexicon_doc_buzz_bookhive_hiveBook() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                "sourceId".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "sourceId",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "ID of the book in the source service",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -371,9 +417,15 @@ fn lexicon_doc_buzz_bookhive_hiveBook() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                "sourceUrl".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "sourceUrl",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "URL to the book on the source service",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -386,9 +438,15 @@ fn lexicon_doc_buzz_bookhive_hiveBook() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                "thumbnail".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "thumbnail",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "URL to thumbnail image",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -401,9 +459,13 @@ fn lexicon_doc_buzz_bookhive_hiveBook() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                "title".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The title of the book",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: Some(1usize),
@@ -416,7 +478,9 @@ fn lexicon_doc_buzz_bookhive_hiveBook() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                "updatedAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "updatedAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(

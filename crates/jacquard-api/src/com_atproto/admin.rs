@@ -79,24 +79,30 @@ fn lexicon_doc_com_atproto_admin_defs() -> ::jacquard_lexicon::lexicon::LexiconD
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "com.atproto.admin.defs".into(),
+        id: ::jacquard_common::CowStr::new_static("com.atproto.admin.defs"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "accountView".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("accountView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
-                        vec!["did".into(), "handle".into(), "indexedAt".into()],
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("handle"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("indexedAt")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "deactivatedAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "deactivatedAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -113,7 +119,7 @@ fn lexicon_doc_com_atproto_admin_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "did".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -130,7 +136,7 @@ fn lexicon_doc_com_atproto_admin_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "email".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("email"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -145,7 +151,9 @@ fn lexicon_doc_com_atproto_admin_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "emailConfirmedAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "emailConfirmedAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -162,7 +170,7 @@ fn lexicon_doc_com_atproto_admin_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "handle".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("handle"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -179,7 +187,9 @@ fn lexicon_doc_com_atproto_admin_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "indexedAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "indexedAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -196,7 +206,9 @@ fn lexicon_doc_com_atproto_admin_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "inviteNote".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "inviteNote",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -211,26 +223,34 @@ fn lexicon_doc_com_atproto_admin_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "invitedBy".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "invitedBy",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "com.atproto.server.defs#inviteCode".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "com.atproto.server.defs#inviteCode",
+                                ),
                             }),
                         );
                         map.insert(
-                            "invites".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("invites"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "com.atproto.server.defs#inviteCode".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "com.atproto.server.defs#inviteCode",
+                                    ),
                                 }),
                                 min_length: None,
                                 max_length: None,
                             }),
                         );
                         map.insert(
-                            "invitesDisabled".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "invitesDisabled",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                 description: None,
                                 default: None,
@@ -238,7 +258,9 @@ fn lexicon_doc_com_atproto_admin_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "relatedRecords".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "relatedRecords",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
@@ -249,12 +271,16 @@ fn lexicon_doc_com_atproto_admin_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "threatSignatures".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "threatSignatures",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "#threatSignature".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "#threatSignature",
+                                    ),
                                 }),
                                 min_length: None,
                                 max_length: None,
@@ -265,16 +291,21 @@ fn lexicon_doc_com_atproto_admin_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                 }),
             );
             map.insert(
-                "repoBlobRef".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("repoBlobRef"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["did".into(), "cid".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("cid")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "cid".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("cid"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -291,7 +322,7 @@ fn lexicon_doc_com_atproto_admin_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "did".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -308,7 +339,9 @@ fn lexicon_doc_com_atproto_admin_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "recordUri".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "recordUri",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -329,16 +362,18 @@ fn lexicon_doc_com_atproto_admin_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                 }),
             );
             map.insert(
-                "repoRef".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("repoRef"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["did".into()]),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("did")],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "did".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -359,16 +394,18 @@ fn lexicon_doc_com_atproto_admin_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                 }),
             );
             map.insert(
-                "statusAttr".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("statusAttr"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["applied".into()]),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("applied")],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "applied".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("applied"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                 description: None,
                                 default: None,
@@ -376,7 +413,7 @@ fn lexicon_doc_com_atproto_admin_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "ref".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("ref"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -395,16 +432,21 @@ fn lexicon_doc_com_atproto_admin_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                 }),
             );
             map.insert(
-                "threatSignature".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("threatSignature"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["property".into(), "value".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("property"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("value")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "property".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("property"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -419,7 +461,7 @@ fn lexicon_doc_com_atproto_admin_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "value".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("value"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -445,6 +487,9 @@ fn lexicon_doc_com_atproto_admin_defs() -> ::jacquard_lexicon::lexicon::LexiconD
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AccountView<'a> {
     fn nsid() -> &'static str {
         "com.atproto.admin.defs"
+    }
+    fn def_name() -> &'static str {
+        "accountView"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_admin_defs()
@@ -483,6 +528,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RepoBlobRef<'a> {
     fn nsid() -> &'static str {
         "com.atproto.admin.defs"
     }
+    fn def_name() -> &'static str {
+        "repoBlobRef"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_admin_defs()
     }
@@ -513,6 +561,9 @@ pub struct RepoRef<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RepoRef<'a> {
     fn nsid() -> &'static str {
         "com.atproto.admin.defs"
+    }
+    fn def_name() -> &'static str {
+        "repoRef"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_admin_defs()
@@ -548,6 +599,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StatusAttr<'a> {
     fn nsid() -> &'static str {
         "com.atproto.admin.defs"
     }
+    fn def_name() -> &'static str {
+        "statusAttr"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_admin_defs()
     }
@@ -580,6 +634,9 @@ pub struct ThreatSignature<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThreatSignature<'a> {
     fn nsid() -> &'static str {
         "com.atproto.admin.defs"
+    }
+    fn def_name() -> &'static str {
+        "threatSignature"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_admin_defs()

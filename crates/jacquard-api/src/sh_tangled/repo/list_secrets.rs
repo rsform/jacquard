@@ -92,24 +92,28 @@ fn lexicon_doc_sh_tangled_repo_listSecrets() -> ::jacquard_lexicon::lexicon::Lex
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "sh.tangled.repo.listSecrets".into(),
+        id: ::jacquard_common::CowStr::new_static("sh.tangled.repo.listSecrets"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
                     description: None,
                     parameters: Some(
                         ::jacquard_lexicon::lexicon::LexXrpcQueryParameter::Params(::jacquard_lexicon::lexicon::LexXrpcParameters {
                             description: None,
-                            required: Some(vec!["repo".into()]),
+                            required: Some(
+                                vec![
+                                    ::jacquard_common::smol_str::SmolStr::new_static("repo")
+                                ],
+                            ),
                             properties: {
                                 #[allow(unused_mut)]
                                 let mut map = ::std::collections::BTreeMap::new();
                                 map.insert(
-                                    "repo".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static("repo"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
                                         description: None,
                                         format: Some(
@@ -134,13 +138,15 @@ fn lexicon_doc_sh_tangled_repo_listSecrets() -> ::jacquard_lexicon::lexicon::Lex
                 }),
             );
             map.insert(
-                "secret".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("secret"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            "repo".into(), "key".into(), "createdAt".into(), "createdBy"
-                            .into()
+                            ::jacquard_common::smol_str::SmolStr::new_static("repo"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("key"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("createdAt"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("createdBy")
                         ],
                     ),
                     nullable: None,
@@ -148,7 +154,9 @@ fn lexicon_doc_sh_tangled_repo_listSecrets() -> ::jacquard_lexicon::lexicon::Lex
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "createdAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "createdAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -165,7 +173,9 @@ fn lexicon_doc_sh_tangled_repo_listSecrets() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            "createdBy".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "createdBy",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -182,7 +192,7 @@ fn lexicon_doc_sh_tangled_repo_listSecrets() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            "key".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("key"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -197,7 +207,7 @@ fn lexicon_doc_sh_tangled_repo_listSecrets() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            "repo".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("repo"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -226,6 +236,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Secret<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.repo.listSecrets"
     }
+    fn def_name() -> &'static str {
+        "secret"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_repo_listSecrets()
     }
@@ -234,21 +247,23 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Secret<'a> {
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         {
             let value = &self.key;
-            if value.as_ref().len() > 50usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 50usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "key",
                     max: 50usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         {
             let value = &self.key;
-            if value.as_ref().len() < 1usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 1usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
                     field: "key",
                     min: 1usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }

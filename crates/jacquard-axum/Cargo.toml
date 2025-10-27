@@ -30,7 +30,6 @@ miette.workspace = true
 multibase = { version = "0.9.1", optional = true }
 serde.workspace = true
 serde_html_form.workspace = true
-serde_ipld_dagcbor.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
 tokio.workspace = true

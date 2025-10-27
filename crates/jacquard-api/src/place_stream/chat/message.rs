@@ -104,6 +104,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Message<'a> {
     fn nsid() -> &'static str {
         "place.stream.chat.message"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_chat_message()
     }
@@ -112,11 +115,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Message<'a> {
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         {
             let value = &self.text;
-            if value.as_ref().len() > 3000usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 3000usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "text",
                     max: 3000usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -146,29 +150,43 @@ fn lexicon_doc_place_stream_chat_message() -> ::jacquard_lexicon::lexicon::Lexic
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "place.stream.chat.message".into(),
+        id: ::jacquard_common::CowStr::new_static("place.stream.chat.message"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("tid".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Record containing a Streamplace chat message.",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: Some(
-                            vec!["text".into(), "createdAt".into(), "streamer".into()],
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("text"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("streamer")
+                            ],
                         ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Client-declared timestamp when this message was originally created.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -183,28 +201,40 @@ fn lexicon_doc_place_stream_chat_message() -> ::jacquard_lexicon::lexicon::Lexic
                                 }),
                             );
                             map.insert(
-                                "facets".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("facets"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Annotations of text (mentions, URLs, etc)",
+                                        ),
+                                    ),
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                         description: None,
-                                        r#ref: "place.stream.richtext.facet".into(),
+                                        r#ref: ::jacquard_common::CowStr::new_static(
+                                            "place.stream.richtext.facet",
+                                        ),
                                     }),
                                     min_length: None,
                                     max_length: None,
                                 }),
                             );
                             map.insert(
-                                "reply".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("reply"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "#replyRef".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static("#replyRef"),
                                 }),
                             );
                             map.insert(
-                                "streamer".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "streamer",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The DID of the streamer whose chat this is.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Did,
                                     ),
@@ -219,9 +249,13 @@ fn lexicon_doc_place_stream_chat_message() -> ::jacquard_lexicon::lexicon::Lexic
                                 }),
                             );
                             map.insert(
-                                "text".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("text"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The primary message content. May be an empty string, if there are embeds.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -239,26 +273,35 @@ fn lexicon_doc_place_stream_chat_message() -> ::jacquard_lexicon::lexicon::Lexic
                 }),
             );
             map.insert(
-                "replyRef".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("replyRef"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["root".into(), "parent".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("root"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("parent")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "parent".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("parent"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "com.atproto.repo.strongRef".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "com.atproto.repo.strongRef",
+                                ),
                             }),
                         );
                         map.insert(
-                            "root".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("root"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "com.atproto.repo.strongRef".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "com.atproto.repo.strongRef",
+                                ),
                             }),
                         );
                         map
@@ -292,6 +335,9 @@ pub struct ReplyRef<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReplyRef<'a> {
     fn nsid() -> &'static str {
         "place.stream.chat.message"
+    }
+    fn def_name() -> &'static str {
+        "replyRef"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_chat_message()

@@ -104,6 +104,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Record<'a> {
     fn nsid() -> &'static str {
         "app.blebbit.authr.group.record"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_blebbit_authr_group_record()
     }
@@ -119,16 +122,16 @@ fn lexicon_doc_app_blebbit_authr_group_record() -> ::jacquard_lexicon::lexicon::
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "app.blebbit.authr.group.record".into(),
+        id: ::jacquard_common::CowStr::new_static("app.blebbit.authr.group.record"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: None,
-                    key: Some("tid".into()),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: None,
@@ -137,7 +140,7 @@ fn lexicon_doc_app_blebbit_authr_group_record() -> ::jacquard_lexicon::lexicon::
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "cuid".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("cuid"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -152,7 +155,9 @@ fn lexicon_doc_app_blebbit_authr_group_record() -> ::jacquard_lexicon::lexicon::
                                 }),
                             );
                             map.insert(
-                                "description".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "description",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -167,7 +172,7 @@ fn lexicon_doc_app_blebbit_authr_group_record() -> ::jacquard_lexicon::lexicon::
                                 }),
                             );
                             map.insert(
-                                "display".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("display"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -182,7 +187,7 @@ fn lexicon_doc_app_blebbit_authr_group_record() -> ::jacquard_lexicon::lexicon::
                                 }),
                             );
                             map.insert(
-                                "name".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -197,7 +202,7 @@ fn lexicon_doc_app_blebbit_authr_group_record() -> ::jacquard_lexicon::lexicon::
                                 }),
                             );
                             map.insert(
-                                "public".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("public"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                     description: None,
                                     default: None,

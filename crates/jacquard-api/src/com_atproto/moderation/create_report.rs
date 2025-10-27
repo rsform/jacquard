@@ -163,38 +163,49 @@ fn lexicon_doc_com_atproto_moderation_createReport() -> ::jacquard_lexicon::lexi
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "com.atproto.moderation.createReport".into(),
+        id: ::jacquard_common::CowStr::new_static("com.atproto.moderation.createReport"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcProcedure(::jacquard_lexicon::lexicon::LexXrpcProcedure {
                     description: None,
                     parameters: None,
                     input: Some(::jacquard_lexicon::lexicon::LexXrpcBody {
                         description: None,
-                        encoding: "application/json".into(),
+                        encoding: ::jacquard_common::CowStr::new_static(
+                            "application/json",
+                        ),
                         schema: Some(
                             ::jacquard_lexicon::lexicon::LexXrpcBodySchema::Object(::jacquard_lexicon::lexicon::LexObject {
                                 description: None,
-                                required: Some(vec!["reasonType".into(), "subject".into()]),
+                                required: Some(
+                                    vec![
+                                        ::jacquard_common::smol_str::SmolStr::new_static("reasonType"),
+                                        ::jacquard_common::smol_str::SmolStr::new_static("subject")
+                                    ],
+                                ),
                                 nullable: None,
                                 properties: {
                                     #[allow(unused_mut)]
                                     let mut map = ::std::collections::BTreeMap::new();
                                     map.insert(
-                                        "modTool".into(),
+                                        ::jacquard_common::smol_str::SmolStr::new_static("modTool"),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                             description: None,
-                                            r#ref: "#modTool".into(),
+                                            r#ref: ::jacquard_common::CowStr::new_static("#modTool"),
                                         }),
                                     );
                                     map.insert(
-                                        "reason".into(),
+                                        ::jacquard_common::smol_str::SmolStr::new_static("reason"),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                            description: None,
+                                            description: Some(
+                                                ::jacquard_common::CowStr::new_static(
+                                                    "Additional context about the content and violation.",
+                                                ),
+                                            ),
                                             format: None,
                                             default: None,
                                             min_length: None,
@@ -207,19 +218,23 @@ fn lexicon_doc_com_atproto_moderation_createReport() -> ::jacquard_lexicon::lexi
                                         }),
                                     );
                                     map.insert(
-                                        "reasonType".into(),
+                                        ::jacquard_common::smol_str::SmolStr::new_static(
+                                            "reasonType",
+                                        ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                             description: None,
-                                            r#ref: "com.atproto.moderation.defs#reasonType".into(),
+                                            r#ref: ::jacquard_common::CowStr::new_static(
+                                                "com.atproto.moderation.defs#reasonType",
+                                            ),
                                         }),
                                     );
                                     map.insert(
-                                        "subject".into(),
+                                        ::jacquard_common::smol_str::SmolStr::new_static("subject"),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                             description: None,
                                             refs: vec![
-                                                "com.atproto.admin.defs#repoRef".into(),
-                                                "com.atproto.repo.strongRef".into()
+                                                ::jacquard_common::CowStr::new_static("com.atproto.admin.defs#repoRef"),
+                                                ::jacquard_common::CowStr::new_static("com.atproto.repo.strongRef")
                                             ],
                                             closed: None,
                                         }),
@@ -234,24 +249,34 @@ fn lexicon_doc_com_atproto_moderation_createReport() -> ::jacquard_lexicon::lexi
                 }),
             );
             map.insert(
-                "modTool".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("modTool"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["name".into()]),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Moderation tool information for tracing the source of the action",
+                        ),
+                    ),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("name")],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "meta".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("meta"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
                                 description: None,
                             }),
                         );
                         map.insert(
-                            "name".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Name/identifier of the source (e.g., 'bsky-app/android', 'bsky-web/chrome')",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -275,6 +300,9 @@ fn lexicon_doc_com_atproto_moderation_createReport() -> ::jacquard_lexicon::lexi
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ModTool<'a> {
     fn nsid() -> &'static str {
         "com.atproto.moderation.createReport"
+    }
+    fn def_name() -> &'static str {
+        "modTool"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_moderation_createReport()

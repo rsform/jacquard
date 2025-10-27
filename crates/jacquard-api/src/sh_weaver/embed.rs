@@ -34,22 +34,31 @@ fn lexicon_doc_sh_weaver_embed_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "sh.weaver.embed.defs".into(),
+        id: ::jacquard_common::CowStr::new_static("sh.weaver.embed.defs"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "percentSize".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("percentSize"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["width".into(), "height".into()]),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Proportional size of the embed relative to the viewport in larger windows. The dimensions are percentage out of 100. Could we use more granularity? Maybe, but come on.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("width"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("height")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "height".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("height"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -60,7 +69,7 @@ fn lexicon_doc_sh_weaver_embed_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "width".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("width"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -75,16 +84,25 @@ fn lexicon_doc_sh_weaver_embed_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                 }),
             );
             map.insert(
-                "pixelSize".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("pixelSize"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["width".into(), "height".into()]),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Pixel-exact embed size. The dimensions are logical pixels, subject to scaling, so 200px at X2 scale is 400px.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("width"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("height")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "height".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("height"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -95,7 +113,7 @@ fn lexicon_doc_sh_weaver_embed_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "width".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("width"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -117,6 +135,9 @@ fn lexicon_doc_sh_weaver_embed_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PercentSize<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.embed.defs"
+    }
+    fn def_name() -> &'static str {
+        "percentSize"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_embed_defs()
@@ -149,6 +170,9 @@ pub struct PixelSize<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PixelSize<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.embed.defs"
+    }
+    fn def_name() -> &'static str {
+        "pixelSize"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_embed_defs()

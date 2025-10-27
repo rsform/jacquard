@@ -35,24 +35,33 @@ fn lexicon_doc_blue_rito_feed_bookmark() -> ::jacquard_lexicon::lexicon::Lexicon
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "blue.rito.feed.bookmark".into(),
+        id: ::jacquard_common::CowStr::new_static("blue.rito.feed.bookmark"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "locale".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("locale"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["lang".into(), "title".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("lang"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("title")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "comment".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("comment"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "URI's comment. It can use GitHub Flavored Markdown.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -65,9 +74,11 @@ fn lexicon_doc_blue_rito_feed_bookmark() -> ::jacquard_lexicon::lexicon::Lexicon
                             }),
                         );
                         map.insert(
-                            "lang".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("lang"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static("Comments Language"),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -80,9 +91,11 @@ fn lexicon_doc_blue_rito_feed_bookmark() -> ::jacquard_lexicon::lexicon::Lexicon
                             }),
                         );
                         map.insert(
-                            "title".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("title"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static("URI's title"),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -99,33 +112,49 @@ fn lexicon_doc_blue_rito_feed_bookmark() -> ::jacquard_lexicon::lexicon::Lexicon
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("tid".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static("Records a bookmark."),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: Some(
-                            vec!["comments".into(), "subject".into(), "createdAt".into()],
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("comments"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("subject"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                            ],
                         ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "comments".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "comments",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Title and comment in different languages.",
+                                        ),
+                                    ),
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                         description: None,
-                                        r#ref: "blue.rito.feed.bookmark#locale".into(),
+                                        r#ref: ::jacquard_common::CowStr::new_static(
+                                            "blue.rito.feed.bookmark#locale",
+                                        ),
                                     }),
                                     min_length: Some(1usize),
                                     max_length: None,
                                 }),
                             );
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -142,9 +171,13 @@ fn lexicon_doc_blue_rito_feed_bookmark() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                "ogpDescription".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "ogpDescription",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static("OGP Description"),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -157,7 +190,47 @@ fn lexicon_doc_blue_rito_feed_bookmark() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                "ogpImage".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "ogpImage",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static("OGP Image Uri"),
+                                    ),
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "ogpTitle",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static("OGP Title"),
+                                    ),
+                                    format: None,
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static("subject"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -174,41 +247,13 @@ fn lexicon_doc_blue_rito_feed_bookmark() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                "ogpTitle".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
-                            );
-                            map.insert(
-                                "subject".into(),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
-                            );
-                            map.insert(
-                                "tags".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("tags"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Tags describing the uri's description (max 10 tags, 25 charactors)",
+                                        ),
+                                    ),
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
                                         description: None,
                                         format: None,
@@ -239,6 +284,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Locale<'a> {
     fn nsid() -> &'static str {
         "blue.rito.feed.bookmark"
     }
+    fn def_name() -> &'static str {
+        "locale"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blue_rito_feed_bookmark()
     }
@@ -246,11 +294,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Locale<'a> {
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         if let Some(ref value) = self.comment {
-            if value.as_ref().len() > 100000usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100000usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "comment",
                     max: 100000usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -272,21 +321,23 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Locale<'a> {
         }
         {
             let value = &self.lang;
-            if value.as_ref().len() > 6usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 6usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "lang",
                     max: 6usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         {
             let value = &self.title;
-            if value.as_ref().len() > 500usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 500usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "title",
                     max: 500usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -418,6 +469,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Bookmark<'a> {
     fn nsid() -> &'static str {
         "blue.rito.feed.bookmark"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blue_rito_feed_bookmark()
     }
@@ -426,6 +480,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Bookmark<'a> {
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         {
             let value = &self.comments;
+            #[allow(unused_comparisons)]
             if value.len() < 1usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
                     field: "comments",
@@ -435,6 +490,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Bookmark<'a> {
             }
         }
         if let Some(ref value) = self.tags {
+            #[allow(unused_comparisons)]
             if value.len() > 10usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "tags",

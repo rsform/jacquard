@@ -28,13 +28,13 @@ fn lexicon_doc_com_atproto_server_describeServer() -> ::jacquard_lexicon::lexico
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "com.atproto.server.describeServer".into(),
+        id: ::jacquard_common::CowStr::new_static("com.atproto.server.describeServer"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "contact".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("contact"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -43,7 +43,7 @@ fn lexicon_doc_com_atproto_server_describeServer() -> ::jacquard_lexicon::lexico
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "email".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("email"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -62,7 +62,7 @@ fn lexicon_doc_com_atproto_server_describeServer() -> ::jacquard_lexicon::lexico
                 }),
             );
             map.insert(
-                "links".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("links"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -71,7 +71,9 @@ fn lexicon_doc_com_atproto_server_describeServer() -> ::jacquard_lexicon::lexico
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "privacyPolicy".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "privacyPolicy",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -88,7 +90,9 @@ fn lexicon_doc_com_atproto_server_describeServer() -> ::jacquard_lexicon::lexico
                             }),
                         );
                         map.insert(
-                            "termsOfService".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "termsOfService",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -109,7 +113,7 @@ fn lexicon_doc_com_atproto_server_describeServer() -> ::jacquard_lexicon::lexico
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
                     description: None,
                     parameters: None,
@@ -125,6 +129,9 @@ fn lexicon_doc_com_atproto_server_describeServer() -> ::jacquard_lexicon::lexico
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Contact<'a> {
     fn nsid() -> &'static str {
         "com.atproto.server.describeServer"
+    }
+    fn def_name() -> &'static str {
+        "contact"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_server_describeServer()
@@ -160,6 +167,9 @@ pub struct Links<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Links<'a> {
     fn nsid() -> &'static str {
         "com.atproto.server.describeServer"
+    }
+    fn def_name() -> &'static str {
+        "links"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_server_describeServer()

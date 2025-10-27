@@ -35,24 +35,33 @@ fn lexicon_doc_app_bsky_embed_images() -> ::jacquard_lexicon::lexicon::LexiconDo
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "app.bsky.embed.images".into(),
+        id: ::jacquard_common::CowStr::new_static("app.bsky.embed.images"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "image".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("image"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["image".into(), "alt".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("image"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("alt")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "alt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("alt"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Alt text description of the image, for accessibility.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -65,14 +74,18 @@ fn lexicon_doc_app_bsky_embed_images() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            "aspectRatio".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "aspectRatio",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "app.bsky.embed.defs#aspectRatio".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "app.bsky.embed.defs#aspectRatio",
+                                ),
                             }),
                         );
                         map.insert(
-                            "image".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("image"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
                                 description: None,
                                 accept: None,
@@ -84,70 +97,82 @@ fn lexicon_doc_app_bsky_embed_images() -> ::jacquard_lexicon::lexicon::LexiconDo
                 }),
             );
             map.insert(
-                "main".into(),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["images".into()]),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
-                        map.insert(
-                            "images".into(),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#image".into(),
-                                }),
-                                min_length: None,
-                                max_length: Some(4usize),
-                            }),
-                        );
-                        map
-                    },
-                }),
-            );
-            map.insert(
-                "view".into(),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["images".into()]),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
-                        map.insert(
-                            "images".into(),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: "#viewImage".into(),
-                                }),
-                                min_length: None,
-                                max_length: Some(4usize),
-                            }),
-                        );
-                        map
-                    },
-                }),
-            );
-            map.insert(
-                "viewImage".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
-                        vec!["thumb".into(), "fullsize".into(), "alt".into()],
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("images")],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "alt".into(),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            ::jacquard_common::smol_str::SmolStr::new_static("images"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
+                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: ::jacquard_common::CowStr::new_static("#image"),
+                                }),
+                                min_length: None,
+                                max_length: Some(4usize),
+                            }),
+                        );
+                        map
+                    },
+                }),
+            );
+            map.insert(
+                ::jacquard_common::smol_str::SmolStr::new_static("view"),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("images")],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::std::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("images"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                description: None,
+                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: ::jacquard_common::CowStr::new_static("#viewImage"),
+                                }),
+                                min_length: None,
+                                max_length: Some(4usize),
+                            }),
+                        );
+                        map
+                    },
+                }),
+            );
+            map.insert(
+                ::jacquard_common::smol_str::SmolStr::new_static("viewImage"),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("thumb"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("fullsize"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("alt")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::std::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("alt"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Alt text description of the image, for accessibility.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -160,16 +185,24 @@ fn lexicon_doc_app_bsky_embed_images() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            "aspectRatio".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "aspectRatio",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "app.bsky.embed.defs#aspectRatio".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "app.bsky.embed.defs#aspectRatio",
+                                ),
                             }),
                         );
                         map.insert(
-                            "fullsize".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("fullsize"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Fully-qualified URL where a large version of the image can be fetched. May or may not be the exact original blob. For example, CDN location provided by the App View.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                 ),
@@ -184,9 +217,13 @@ fn lexicon_doc_app_bsky_embed_images() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            "thumb".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("thumb"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Fully-qualified URL where a thumbnail of the image can be fetched. For example, CDN location provided by the App View.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                 ),
@@ -212,6 +249,9 @@ fn lexicon_doc_app_bsky_embed_images() -> ::jacquard_lexicon::lexicon::LexiconDo
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Image<'a> {
     fn nsid() -> &'static str {
         "app.bsky.embed.images"
+    }
+    fn def_name() -> &'static str {
+        "image"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_embed_images()
@@ -244,6 +284,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Images<'a> {
     fn nsid() -> &'static str {
         "app.bsky.embed.images"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_embed_images()
     }
@@ -252,6 +295,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Images<'a> {
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         {
             let value = &self.images;
+            #[allow(unused_comparisons)]
             if value.len() > 4usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "images",
@@ -285,6 +329,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for View<'a> {
     fn nsid() -> &'static str {
         "app.bsky.embed.images"
     }
+    fn def_name() -> &'static str {
+        "view"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_embed_images()
     }
@@ -293,6 +340,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for View<'a> {
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         {
             let value = &self.images;
+            #[allow(unused_comparisons)]
             if value.len() > 4usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "images",
@@ -337,6 +385,9 @@ pub struct ViewImage<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewImage<'a> {
     fn nsid() -> &'static str {
         "app.bsky.embed.images"
+    }
+    fn def_name() -> &'static str {
+        "viewImage"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_embed_images()

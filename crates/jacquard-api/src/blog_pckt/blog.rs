@@ -111,6 +111,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Blog<'a> {
     fn nsid() -> &'static str {
         "blog.pckt.blog"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blog_pckt_blog()
     }
@@ -124,25 +127,31 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Blog<'a> {
 fn lexicon_doc_blog_pckt_blog() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "blog.pckt.blog".into(),
+        id: ::jacquard_common::CowStr::new_static("blog.pckt.blog"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: None,
-                    key: Some("tid".into()),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
-                        required: Some(vec!["name".into()]),
+                        required: Some(
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("name")
+                            ],
+                        ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "description".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "description",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -157,7 +166,7 @@ fn lexicon_doc_blog_pckt_blog() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                                 }),
                             );
                             map.insert(
-                                "icon".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("icon"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
                                     description: None,
                                     accept: None,
@@ -165,7 +174,7 @@ fn lexicon_doc_blog_pckt_blog() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                                 }),
                             );
                             map.insert(
-                                "name".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -180,7 +189,7 @@ fn lexicon_doc_blog_pckt_blog() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                                 }),
                             );
                             map.insert(
-                                "rss".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("rss"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -197,14 +206,16 @@ fn lexicon_doc_blog_pckt_blog() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                                 }),
                             );
                             map.insert(
-                                "theme".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("theme"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "#theme".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static("#theme"),
                                 }),
                             );
                             map.insert(
-                                "updatedAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "updatedAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -221,7 +232,7 @@ fn lexicon_doc_blog_pckt_blog() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                                 }),
                             );
                             map.insert(
-                                "url".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("url"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -243,7 +254,7 @@ fn lexicon_doc_blog_pckt_blog() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                 }),
             );
             map.insert(
-                "palette".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("palette"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -252,7 +263,7 @@ fn lexicon_doc_blog_pckt_blog() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "accent".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("accent"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -267,7 +278,9 @@ fn lexicon_doc_blog_pckt_blog() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                             }),
                         );
                         map.insert(
-                            "background".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "background",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -282,7 +295,7 @@ fn lexicon_doc_blog_pckt_blog() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                             }),
                         );
                         map.insert(
-                            "link".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("link"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -297,7 +310,9 @@ fn lexicon_doc_blog_pckt_blog() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                             }),
                         );
                         map.insert(
-                            "surfaceHover".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "surfaceHover",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -312,7 +327,7 @@ fn lexicon_doc_blog_pckt_blog() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                             }),
                         );
                         map.insert(
-                            "text".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("text"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -331,7 +346,7 @@ fn lexicon_doc_blog_pckt_blog() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                 }),
             );
             map.insert(
-                "theme".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("theme"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -340,14 +355,14 @@ fn lexicon_doc_blog_pckt_blog() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "dark".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("dark"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#palette".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static("#palette"),
                             }),
                         );
                         map.insert(
-                            "font".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("font"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -362,10 +377,10 @@ fn lexicon_doc_blog_pckt_blog() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                             }),
                         );
                         map.insert(
-                            "light".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("light"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#palette".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static("#palette"),
                             }),
                         );
                         map
@@ -411,6 +426,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Palette<'a> {
     fn nsid() -> &'static str {
         "blog.pckt.blog"
     }
+    fn def_name() -> &'static str {
+        "palette"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blog_pckt_blog()
     }
@@ -448,6 +466,9 @@ pub struct Theme<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Theme<'a> {
     fn nsid() -> &'static str {
         "blog.pckt.blog"
+    }
+    fn def_name() -> &'static str {
+        "theme"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blog_pckt_blog()

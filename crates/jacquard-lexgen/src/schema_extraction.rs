@@ -10,7 +10,7 @@
 //!
 //! ### Simple Usage
 //!
-//! ```rust,no_run
+//! ```rust,ignore
 //! // bin/extract_schemas.rs
 //! use jacquard_lexgen::schema_extraction;
 //!
@@ -27,7 +27,7 @@
 //!
 //! ### Advanced Usage
 //!
-//! ```rust,no_run
+//! ```rust,ignore
 //! use jacquard_lexgen::schema_extraction::{ExtractOptions, SchemaExtractor};
 //! use my_app::models::*;  // Your schema types
 //!
@@ -117,7 +117,7 @@ impl Default for ExtractOptions {
 ///
 /// # Example
 ///
-/// ```rust,no_run
+/// ```rust,ignore
 /// use jacquard_lexgen::schema_extraction;
 /// use my_app::models::*;  // Your types with #[derive(LexiconSchema)]
 ///
@@ -325,7 +325,7 @@ impl SchemaExtractor {
 
     /// Serialize a lexicon doc with "main" def first
     fn serialize_with_main_first(&self, doc: &LexiconDoc) -> Result<String> {
-        use serde_json::{json, Map, Value};
+        use serde_json::{Map, Value, json};
 
         // Build defs map with main first
         let mut defs_map = Map::new();
@@ -417,15 +417,18 @@ mod tests {
         let refs = vec![
             LexiconSchemaRef {
                 nsid: "com.example.test",
-                provider: || todo!(),
+                def_name: "main",
+                provider: || unimplemented!("test provider"),
             },
             LexiconSchemaRef {
                 nsid: "com.example.test#fragment",
-                provider: || todo!(),
+                def_name: "fragment",
+                provider: || unimplemented!("test provider"),
             },
             LexiconSchemaRef {
                 nsid: "com.example.other",
-                provider: || todo!(),
+                def_name: "main",
+                provider: || unimplemented!("test provider"),
             },
         ];
 

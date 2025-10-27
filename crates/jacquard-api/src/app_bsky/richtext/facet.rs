@@ -28,22 +28,31 @@ fn lexicon_doc_app_bsky_richtext_facet() -> ::jacquard_lexicon::lexicon::Lexicon
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "app.bsky.richtext.facet".into(),
+        id: ::jacquard_common::CowStr::new_static("app.bsky.richtext.facet"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "byteSlice".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("byteSlice"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["byteStart".into(), "byteEnd".into()]),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Specifies the sub-string range a facet feature applies to. Start index is inclusive, end index is exclusive. Indices are zero-indexed, counting bytes of the UTF-8 encoded text. NOTE: some languages, like Javascript, use UTF-16 or Unicode codepoints for string slice indexing; in these languages, convert to byte arrays before working with facets.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("byteStart"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("byteEnd")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "byteEnd".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("byteEnd"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -54,7 +63,9 @@ fn lexicon_doc_app_bsky_richtext_facet() -> ::jacquard_lexicon::lexicon::Lexicon
                             }),
                         );
                         map.insert(
-                            "byteStart".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "byteStart",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -69,16 +80,22 @@ fn lexicon_doc_app_bsky_richtext_facet() -> ::jacquard_lexicon::lexicon::Lexicon
                 }),
             );
             map.insert(
-                "link".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("link"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["uri".into()]),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Facet feature for a URL. The text URL may have been simplified or truncated, but the facet reference should be a complete URL.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("uri")],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "uri".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -99,22 +116,33 @@ fn lexicon_doc_app_bsky_richtext_facet() -> ::jacquard_lexicon::lexicon::Lexicon
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["index".into(), "features".into()]),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Annotation of a sub-string within rich text.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("index"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("features")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "features".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("features"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
-                                        "#mention".into(), "#link".into(), "#tag".into()
+                                        ::jacquard_common::CowStr::new_static("#mention"),
+                                        ::jacquard_common::CowStr::new_static("#link"),
+                                        ::jacquard_common::CowStr::new_static("#tag")
                                     ],
                                     closed: None,
                                 }),
@@ -123,10 +151,10 @@ fn lexicon_doc_app_bsky_richtext_facet() -> ::jacquard_lexicon::lexicon::Lexicon
                             }),
                         );
                         map.insert(
-                            "index".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("index"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#byteSlice".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static("#byteSlice"),
                             }),
                         );
                         map
@@ -134,16 +162,22 @@ fn lexicon_doc_app_bsky_richtext_facet() -> ::jacquard_lexicon::lexicon::Lexicon
                 }),
             );
             map.insert(
-                "mention".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("mention"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["did".into()]),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Facet feature for mention of another account. The text is usually a handle, including a '@' prefix, but the facet reference is a DID.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("did")],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "did".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -164,16 +198,22 @@ fn lexicon_doc_app_bsky_richtext_facet() -> ::jacquard_lexicon::lexicon::Lexicon
                 }),
             );
             map.insert(
-                "tag".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("tag"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["tag".into()]),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Facet feature for a hashtag. The text usually includes a '#' prefix, but the facet reference should not (except in the case of 'double hash tags').",
+                        ),
+                    ),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("tag")],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "tag".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("tag"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -199,6 +239,9 @@ fn lexicon_doc_app_bsky_richtext_facet() -> ::jacquard_lexicon::lexicon::Lexicon
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ByteSlice<'a> {
     fn nsid() -> &'static str {
         "app.bsky.richtext.facet"
+    }
+    fn def_name() -> &'static str {
+        "byteSlice"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_richtext_facet()
@@ -251,6 +294,9 @@ pub struct Link<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Link<'a> {
     fn nsid() -> &'static str {
         "app.bsky.richtext.facet"
+    }
+    fn def_name() -> &'static str {
+        "link"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_richtext_facet()
@@ -307,6 +353,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Facet<'a> {
     fn nsid() -> &'static str {
         "app.bsky.richtext.facet"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_richtext_facet()
     }
@@ -338,6 +387,9 @@ pub struct Mention<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Mention<'a> {
     fn nsid() -> &'static str {
         "app.bsky.richtext.facet"
+    }
+    fn def_name() -> &'static str {
+        "mention"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_richtext_facet()
@@ -371,6 +423,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tag<'a> {
     fn nsid() -> &'static str {
         "app.bsky.richtext.facet"
     }
+    fn def_name() -> &'static str {
+        "tag"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_richtext_facet()
     }
@@ -379,11 +434,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tag<'a> {
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         {
             let value = &self.tag;
-            if value.as_ref().len() > 640usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 640usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "tag",
                     max: 640usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }

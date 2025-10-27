@@ -10,6 +10,9 @@ mod parse;
 mod properties;
 mod types;
 
+#[cfg(test)]
+mod tests;
+
 // Re-export public API
 pub use builders::{build_enum_schema, build_struct_schema};
 pub use types::{

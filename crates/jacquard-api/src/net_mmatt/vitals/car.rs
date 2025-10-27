@@ -113,6 +113,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Car<'a> {
     fn nsid() -> &'static str {
         "net.mmatt.vitals.car"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_mmatt_vitals_car()
     }
@@ -128,23 +131,25 @@ fn lexicon_doc_net_mmatt_vitals_car() -> ::jacquard_lexicon::lexicon::LexiconDoc
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "net.mmatt.vitals.car".into(),
+        id: ::jacquard_common::CowStr::new_static("net.mmatt.vitals.car"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: None,
-                    key: Some("tid".into()),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: Some(
                             vec![
-                                "createdAt".into(), "carFuelRange".into(),
-                                "carPercentFuelRemaining".into(), "amountRemaining".into(),
-                                "carTraveledDistance".into()
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("carFuelRange"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("carPercentFuelRemaining"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("amountRemaining"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("carTraveledDistance")
                             ],
                         ),
                         nullable: None,
@@ -152,9 +157,15 @@ fn lexicon_doc_net_mmatt_vitals_car() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "amountRemaining".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "amountRemaining",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The car fuel amount remaining value (floating point string)",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -167,7 +178,9 @@ fn lexicon_doc_net_mmatt_vitals_car() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                "carFuelRange".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "carFuelRange",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -178,9 +191,11 @@ fn lexicon_doc_net_mmatt_vitals_car() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                "carMake".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("carMake"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static("The car make value"),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -193,9 +208,13 @@ fn lexicon_doc_net_mmatt_vitals_car() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                "carModel".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "carModel",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static("The car model value"),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -208,9 +227,15 @@ fn lexicon_doc_net_mmatt_vitals_car() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                "carPercentFuelRemaining".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "carPercentFuelRemaining",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The car fuel level value in percentage (floating point string)",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -223,7 +248,9 @@ fn lexicon_doc_net_mmatt_vitals_car() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                "carTraveledDistance".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "carTraveledDistance",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -234,7 +261,7 @@ fn lexicon_doc_net_mmatt_vitals_car() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                "carYear".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("carYear"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -245,9 +272,15 @@ fn lexicon_doc_net_mmatt_vitals_car() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The unix timestamp of when the vital was recorded",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),

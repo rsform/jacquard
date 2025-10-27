@@ -35,13 +35,13 @@ pub struct Card<'a> {
 fn lexicon_doc_blue_linkat_board() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "blue.linkat.board".into(),
+        id: ::jacquard_common::CowStr::new_static("blue.linkat.board"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "card".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("card"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -50,9 +50,11 @@ fn lexicon_doc_blue_linkat_board() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "emoji".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("emoji"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static("Emoji of the card"),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -65,9 +67,11 @@ fn lexicon_doc_blue_linkat_board() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                             }),
                         );
                         map.insert(
-                            "text".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("text"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static("Text of the card"),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -80,9 +84,11 @@ fn lexicon_doc_blue_linkat_board() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                             }),
                         );
                         map.insert(
-                            "url".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("url"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static("URL of the link"),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -99,24 +105,36 @@ fn lexicon_doc_blue_linkat_board() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("literal:self".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Record containing a cards of your profile.",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("literal:self")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
-                        required: Some(vec!["cards".into()]),
+                        required: Some(
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("cards")
+                            ],
+                        ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "cards".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("cards"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "List of cards in the board.",
+                                        ),
+                                    ),
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                         description: None,
-                                        r#ref: "#card".into(),
+                                        r#ref: ::jacquard_common::CowStr::new_static("#card"),
                                     }),
                                     min_length: None,
                                     max_length: None,
@@ -135,6 +153,9 @@ fn lexicon_doc_blue_linkat_board() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Card<'a> {
     fn nsid() -> &'static str {
         "blue.linkat.board"
+    }
+    fn def_name() -> &'static str {
+        "card"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blue_linkat_board()
@@ -229,6 +250,9 @@ impl jacquard_common::types::collection::Collection for BoardRecord {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Board<'a> {
     fn nsid() -> &'static str {
         "blue.linkat.board"
+    }
+    fn def_name() -> &'static str {
+        "main"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blue_linkat_board()

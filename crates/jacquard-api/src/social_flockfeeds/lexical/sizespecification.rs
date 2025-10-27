@@ -621,6 +621,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sizespecification<'a> {
     fn nsid() -> &'static str {
         "social.flockfeeds.lexical.sizespecification"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_flockfeeds_lexical_sizespecification()
     }
@@ -636,16 +639,22 @@ fn lexicon_doc_social_flockfeeds_lexical_sizespecification() -> ::jacquard_lexic
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "social.flockfeeds.lexical.sizespecification".into(),
+        id: ::jacquard_common::CowStr::new_static(
+            "social.flockfeeds.lexical.sizespecification",
+        ),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("tid".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Size related properties of a product, typically a size code ([[name]]) and optionally a [[sizeSystem]], [[sizeGroup]], and product measurements ([[hasMeasurement]]). In addition, the intended audience can be defined through [[suggestedAge]], [[suggestedGender]], and suggested body measurements ([[suggestedMeasurement]]).",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: None,
@@ -654,20 +663,32 @@ fn lexicon_doc_social_flockfeeds_lexical_sizespecification() -> ::jacquard_lexic
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "additionalProperty".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "additionalProperty",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "A property-value pair representing an additional characteristic of the entity, e.g. a product feature or another characteristic for which there is no matching property in schema.org.\\n\\nNote: Publishers should be aware that applications designed to use specific schema.org properties (e.g. https://schema.org/width, https://schema.org/color, https://schema.org/gtin13, ...) will typically expect such data to be provided using those properties, rather than using the generic property/value mechanism.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.propertyvalue".into(),
-                                        "social.flockfeeds.lexical.itemlist".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.propertyvalue"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.itemlist")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "additionalType".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "additionalType",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "An additional type for the item, typically used for adding more specific types from external vocabularies in microdata syntax. This is a relationship between something and a class that the thing is in. Typically the value is a URI-identified RDF class, and in this case corresponds to the\n    use of rdf:type in RDF. Text values can be used sparingly, for cases where useful information can be added without their being an appropriate schema to reference. In the case of text values, the class label should follow the schema.org <a href=\"https://schema.org/docs/styleguide.html\">style guide</a>.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -680,9 +701,15 @@ fn lexicon_doc_social_flockfeeds_lexical_sizespecification() -> ::jacquard_lexic
                                 }),
                             );
                             map.insert(
-                                "alternateName".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "alternateName",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "An alias for the item.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -695,20 +722,32 @@ fn lexicon_doc_social_flockfeeds_lexical_sizespecification() -> ::jacquard_lexic
                                 }),
                             );
                             map.insert(
-                                "description".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "description",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "A description of the item.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.textobject".into(),
-                                        "social.flockfeeds.lexical.itemlist".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.textobject"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.itemlist")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "disambiguatingDescription".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "disambiguatingDescription",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "A sub property of description. A short description of the item used to disambiguate from other, similar items. Information from other properties (in particular, name) may be necessary for the description to be useful for disambiguation.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -721,108 +760,158 @@ fn lexicon_doc_social_flockfeeds_lexical_sizespecification() -> ::jacquard_lexic
                                 }),
                             );
                             map.insert(
-                                "equal".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("equal"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "This ordering relation for qualitative values indicates that the subject is equal to the object.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.qualitativevalue".into(),
-                                        "social.flockfeeds.lexical.itemlist".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.qualitativevalue"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.itemlist")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "greater".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("greater"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "This ordering relation for qualitative values indicates that the subject is greater than the object.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.qualitativevalue".into(),
-                                        "social.flockfeeds.lexical.itemlist".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.qualitativevalue"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.itemlist")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "greaterOrEqual".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "greaterOrEqual",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "This ordering relation for qualitative values indicates that the subject is greater than or equal to the object.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.qualitativevalue".into(),
-                                        "social.flockfeeds.lexical.itemlist".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.qualitativevalue"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.itemlist")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "hasMeasurement".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "hasMeasurement",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "A measurement of an item, For example, the inseam of pants, the wheel size of a bicycle, the gauge of a screw, or the carbon footprint measured for certification by an authority. Usually an exact measurement, but can also be a range of measurements for adjustable products, for example belts and ski bindings.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.quantitativevalue".into(),
-                                        "social.flockfeeds.lexical.itemlist".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.quantitativevalue"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.itemlist")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "identifier".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "identifier",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The identifier property represents any kind of identifier for any kind of [[Thing]], such as ISBNs, GTIN codes, UUIDs etc. Schema.org provides dedicated properties for representing many of these, either as textual strings or as URL (URI) links. See [background notes](/docs/datamodel.html#identifierBg) for more details.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.propertyvalue".into(),
-                                        "social.flockfeeds.lexical.itemlist".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.propertyvalue"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.itemlist")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "image".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("image"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "An image of the item. This can be a [[URL]] or a fully described [[ImageObject]].",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.imageobject".into(),
-                                        "social.flockfeeds.lexical.itemlist".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.imageobject"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.itemlist")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "lesser".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("lesser"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "This ordering relation for qualitative values indicates that the subject is lesser than the object.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.qualitativevalue".into(),
-                                        "social.flockfeeds.lexical.itemlist".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.qualitativevalue"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.itemlist")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "lesserOrEqual".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "lesserOrEqual",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "This ordering relation for qualitative values indicates that the subject is lesser than or equal to the object.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.qualitativevalue".into(),
-                                        "social.flockfeeds.lexical.itemlist".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.qualitativevalue"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.itemlist")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "mainEntityOfPage".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "mainEntityOfPage",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Indicates a page (or other CreativeWork) for which this thing is the main entity being described. See [background notes](/docs/datamodel.html#mainEntityBackground) for details.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.creativework".into(),
-                                        "social.flockfeeds.lexical.itemlist".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.creativework"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.itemlist")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "name".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The name of the item.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -835,31 +924,47 @@ fn lexicon_doc_social_flockfeeds_lexical_sizespecification() -> ::jacquard_lexic
                                 }),
                             );
                             map.insert(
-                                "nonEqual".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "nonEqual",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "This ordering relation for qualitative values indicates that the subject is not equal to the object.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.qualitativevalue".into(),
-                                        "social.flockfeeds.lexical.itemlist".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.qualitativevalue"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.itemlist")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "potentialAction".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "potentialAction",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Indicates a potential Action, which describes an idealized action in which this thing would play an 'object' role.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.action".into(),
-                                        "social.flockfeeds.lexical.itemlist".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.action"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.itemlist")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "sameAs".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("sameAs"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "URL of a reference Web page that unambiguously indicates the item's identity. E.g. the URL of the item's Wikipedia page, Wikidata entry, or official website.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                     ),
@@ -874,89 +979,133 @@ fn lexicon_doc_social_flockfeeds_lexical_sizespecification() -> ::jacquard_lexic
                                 }),
                             );
                             map.insert(
-                                "sizeGroup".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "sizeGroup",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The size group (also known as \"size type\") for a product's size. Size groups are common in the fashion industry to define size segments and suggested audiences for wearable products. Multiple values can be combined, for example \"men's big and tall\", \"petite maternity\" or \"regular\".",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.sizegroupenumeration".into(),
-                                        "social.flockfeeds.lexical.itemlist".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.sizegroupenumeration"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.itemlist")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "sizeSystem".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "sizeSystem",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The size system used to identify a product's size. Typically either a standard (for example, \"GS1\" or \"ISO-EN13402\"), country code (for example \"US\" or \"JP\"), or a measuring system (for example \"Metric\" or \"Imperial\").",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.sizesystemenumeration".into(),
-                                        "social.flockfeeds.lexical.itemlist".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.sizesystemenumeration"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.itemlist")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "subjectOf".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "subjectOf",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "A CreativeWork or Event about this Thing.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.event".into(),
-                                        "social.flockfeeds.lexical.creativework".into(),
-                                        "social.flockfeeds.lexical.itemlist".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.event"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.creativework"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.itemlist")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "suggestedAge".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "suggestedAge",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The age or age range for the intended audience or person, for example 3-12 months for infants, 1-5 years for toddlers.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.quantitativevalue".into(),
-                                        "social.flockfeeds.lexical.itemlist".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.quantitativevalue"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.itemlist")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "suggestedGender".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "suggestedGender",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The suggested gender of the intended person or audience, for example \"male\", \"female\", or \"unisex\".",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.gendertype".into(),
-                                        "social.flockfeeds.lexical.itemlist".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.gendertype"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.itemlist")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "suggestedMeasurement".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "suggestedMeasurement",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "A suggested range of body measurements for the intended audience or person, for example inseam between 32 and 34 inches or height between 170 and 190 cm. Typically found on a size chart for wearable products.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.quantitativevalue".into(),
-                                        "social.flockfeeds.lexical.itemlist".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.quantitativevalue"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.itemlist")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "supersededBy".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "supersededBy",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Relates a term (i.e. a property, class or enumeration) to one that supersedes it.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.enumeration".into(),
-                                        "social.flockfeeds.lexical.class".into(),
-                                        "social.flockfeeds.lexical.property".into(),
-                                        "social.flockfeeds.lexical.itemlist".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.enumeration"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.class"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.property"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.itemlist")
                                     ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "url".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("url"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static("URL of the item."),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                     ),
@@ -971,18 +1120,24 @@ fn lexicon_doc_social_flockfeeds_lexical_sizespecification() -> ::jacquard_lexic
                                 }),
                             );
                             map.insert(
-                                "valueReference".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "valueReference",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "A secondary value that provides additional information on the original value, e.g. a reference temperature or a type of measurement.",
+                                        ),
+                                    ),
                                     refs: vec![
-                                        "social.flockfeeds.lexical.definedterm".into(),
-                                        "social.flockfeeds.lexical.measurementtypeenumeration"
-                                        .into(), "social.flockfeeds.lexical.enumeration".into(),
-                                        "social.flockfeeds.lexical.qualitativevalue".into(),
-                                        "social.flockfeeds.lexical.quantitativevalue".into(),
-                                        "social.flockfeeds.lexical.propertyvalue".into(),
-                                        "social.flockfeeds.lexical.structuredvalue".into(),
-                                        "social.flockfeeds.lexical.itemlist".into()
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.definedterm"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.measurementtypeenumeration"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.enumeration"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.qualitativevalue"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.quantitativevalue"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.propertyvalue"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.structuredvalue"),
+                                        ::jacquard_common::CowStr::new_static("social.flockfeeds.lexical.itemlist")
                                     ],
                                     closed: None,
                                 }),

@@ -103,6 +103,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Workout<'a> {
     fn nsid() -> &'static str {
         "dev.baileytownsend.health.workout"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_dev_baileytownsend_health_workout()
     }
@@ -118,23 +121,26 @@ fn lexicon_doc_dev_baileytownsend_health_workout() -> ::jacquard_lexicon::lexico
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "dev.baileytownsend.health.workout".into(),
+        id: ::jacquard_common::CowStr::new_static("dev.baileytownsend.health.workout"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: None,
-                    key: Some("any".into()),
+                    key: Some(::jacquard_common::CowStr::new_static("any")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: Some(
                             vec![
-                                "activity".into(), "caloriesBurned".into(), "duration"
-                                .into(), "startTime".into(), "endTime".into(), "createdAt"
-                                .into()
+                                ::jacquard_common::smol_str::SmolStr::new_static("activity"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("caloriesBurned"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("duration"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("startTime"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("endTime"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -142,9 +148,15 @@ fn lexicon_doc_dev_baileytownsend_health_workout() -> ::jacquard_lexicon::lexico
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "activity".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "activity",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Type of activity. Walking, running, weights, etc.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -157,7 +169,9 @@ fn lexicon_doc_dev_baileytownsend_health_workout() -> ::jacquard_lexicon::lexico
                                 }),
                             );
                             map.insert(
-                                "caloriesBurned".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "caloriesBurned",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -168,7 +182,9 @@ fn lexicon_doc_dev_baileytownsend_health_workout() -> ::jacquard_lexicon::lexico
                                 }),
                             );
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -185,9 +201,15 @@ fn lexicon_doc_dev_baileytownsend_health_workout() -> ::jacquard_lexicon::lexico
                                 }),
                             );
                             map.insert(
-                                "distance".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "distance",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Distance covered during the workout (optional).",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -200,9 +222,15 @@ fn lexicon_doc_dev_baileytownsend_health_workout() -> ::jacquard_lexicon::lexico
                                 }),
                             );
                             map.insert(
-                                "duration".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "duration",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "How long the workout lasted in minutes.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -215,7 +243,7 @@ fn lexicon_doc_dev_baileytownsend_health_workout() -> ::jacquard_lexicon::lexico
                                 }),
                             );
                             map.insert(
-                                "endTime".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("endTime"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -232,7 +260,9 @@ fn lexicon_doc_dev_baileytownsend_health_workout() -> ::jacquard_lexicon::lexico
                                 }),
                             );
                             map.insert(
-                                "startTime".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "startTime",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(

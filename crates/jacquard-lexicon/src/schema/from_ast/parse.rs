@@ -93,6 +93,36 @@ pub fn parse_field_attrs(attrs: &[Attribute]) -> syn::Result<LexiconFieldAttrs> 
                 let lit: syn::LitInt = value.parse()?;
                 result.maximum = Some(lit.base10_parse()?);
                 Ok(())
+            } else if meta.path.is_ident("max_items") {
+                let value = meta.value()?;
+                let lit: syn::LitInt = value.parse()?;
+                result.max_items = Some(lit.base10_parse()?);
+                Ok(())
+            } else if meta.path.is_ident("min_items") {
+                let value = meta.value()?;
+                let lit: syn::LitInt = value.parse()?;
+                result.min_items = Some(lit.base10_parse()?);
+                Ok(())
+            } else if meta.path.is_ident("item_max_length") {
+                let value = meta.value()?;
+                let lit: syn::LitInt = value.parse()?;
+                result.item_max_length = Some(lit.base10_parse()?);
+                Ok(())
+            } else if meta.path.is_ident("item_max_graphemes") {
+                let value = meta.value()?;
+                let lit: syn::LitInt = value.parse()?;
+                result.item_max_graphemes = Some(lit.base10_parse()?);
+                Ok(())
+            } else if meta.path.is_ident("item_min_length") {
+                let value = meta.value()?;
+                let lit: syn::LitInt = value.parse()?;
+                result.item_min_length = Some(lit.base10_parse()?);
+                Ok(())
+            } else if meta.path.is_ident("item_min_graphemes") {
+                let value = meta.value()?;
+                let lit: syn::LitInt = value.parse()?;
+                result.item_min_graphemes = Some(lit.base10_parse()?);
+                Ok(())
             } else if meta.path.is_ident("ref") {
                 let value = meta.value()?;
                 let lit: LitStr = value.parse()?;
@@ -102,6 +132,17 @@ pub fn parse_field_attrs(attrs: &[Attribute]) -> syn::Result<LexiconFieldAttrs> 
                 let value = meta.value()?;
                 let lit: LitStr = value.parse()?;
                 result.format = Some(lit.value());
+                Ok(())
+            } else if meta.path.is_ident("union") {
+                // Check if there's a value (explicit type name)
+                if meta.input.peek(syn::Token![=]) {
+                    let value = meta.value()?;
+                    let lit: LitStr = value.parse()?;
+                    result.union_type = Some(Some(lit.value()));
+                } else {
+                    // Just #[lexicon(union)] - infer from field type
+                    result.union_type = Some(None);
+                }
                 Ok(())
             } else {
                 Err(meta.error("unknown lexicon field attribute"))
@@ -121,7 +162,8 @@ pub fn parse_serde_attrs(attrs: &[Attribute]) -> syn::Result<SerdeAttrs> {
             continue;
         }
 
-        attr.parse_nested_meta(|meta| {
+        // Use parse_args instead of parse_nested_meta to avoid consuming unknown attributes incorrectly
+        let _ = attr.parse_nested_meta(|meta| {
             if meta.path.is_ident("rename") {
                 let value = meta.value()?;
                 let lit: LitStr = value.parse()?;
@@ -131,10 +173,14 @@ pub fn parse_serde_attrs(attrs: &[Attribute]) -> syn::Result<SerdeAttrs> {
                 result.skip = true;
                 Ok(())
             } else {
-                // Ignore other serde attributes
+                // Skip unknown attributes - but we need to consume the value if present
+                if meta.input.peek(syn::Token![=]) {
+                    let _ = meta.value()?;
+                    let _ = meta.input.parse::<proc_macro2::TokenTree>();
+                }
                 Ok(())
             }
-        })?;
+        });
     }
 
     Ok(result)

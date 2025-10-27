@@ -733,7 +733,6 @@ pub enum RichTextError {
 impl RichTextBuilder<Resolved> {
     /// Build the richtext (sync - all facets must be resolved)
     pub fn build(self) -> Result<RichText<'static>, RichTextError> {
-        use std::collections::BTreeMap;
         if self.facet_candidates.is_empty() {
             return Ok(RichText {
                 text: CowStr::from(self.text),
@@ -882,7 +881,6 @@ impl RichTextBuilder<Unresolved> {
         use crate::api::app_bsky::richtext::facet::{
             ByteSlice, FacetFeaturesItem, Link, Mention, Tag,
         };
-        use std::collections::BTreeMap;
 
         if self.facet_candidates.is_empty() {
             return Ok(RichText {

@@ -84,19 +84,22 @@ fn lexicon_doc_chat_bsky_convo_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "chat.bsky.convo.defs".into(),
+        id: ::jacquard_common::CowStr::new_static("chat.bsky.convo.defs"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "convoView".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("convoView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            "id".into(), "rev".into(), "members".into(), "muted".into(),
-                            "unreadCount".into()
+                            ::jacquard_common::smol_str::SmolStr::new_static("id"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("rev"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("members"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("muted"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("unreadCount")
                         ],
                     ),
                     nullable: None,
@@ -104,7 +107,7 @@ fn lexicon_doc_chat_bsky_convo_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "id".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("id"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -119,37 +122,46 @@ fn lexicon_doc_chat_bsky_convo_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "lastMessage".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "lastMessage",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
-                                    "#messageView".into(), "#deletedMessageView".into()
+                                    ::jacquard_common::CowStr::new_static("#messageView"),
+                                    ::jacquard_common::CowStr::new_static("#deletedMessageView")
                                 ],
                                 closed: None,
                             }),
                         );
                         map.insert(
-                            "lastReaction".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "lastReaction",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
-                                refs: vec!["#messageAndReactionView".into()],
+                                refs: vec![
+                                    ::jacquard_common::CowStr::new_static("#messageAndReactionView")
+                                ],
                                 closed: None,
                             }),
                         );
                         map.insert(
-                            "members".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("members"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "chat.bsky.actor.defs#profileViewBasic".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "chat.bsky.actor.defs#profileViewBasic",
+                                    ),
                                 }),
                                 min_length: None,
                                 max_length: None,
                             }),
                         );
                         map.insert(
-                            "muted".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("muted"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                 description: None,
                                 default: None,
@@ -157,7 +169,7 @@ fn lexicon_doc_chat_bsky_convo_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "rev".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("rev"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -172,7 +184,7 @@ fn lexicon_doc_chat_bsky_convo_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "status".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("status"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -187,7 +199,9 @@ fn lexicon_doc_chat_bsky_convo_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "unreadCount".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "unreadCount",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -202,18 +216,23 @@ fn lexicon_doc_chat_bsky_convo_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                 }),
             );
             map.insert(
-                "deletedMessageView".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("deletedMessageView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
-                        vec!["id".into(), "rev".into(), "sender".into(), "sentAt".into()],
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("id"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("rev"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("sender"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("sentAt")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "id".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("id"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -228,7 +247,7 @@ fn lexicon_doc_chat_bsky_convo_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "rev".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("rev"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -243,14 +262,16 @@ fn lexicon_doc_chat_bsky_convo_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "sender".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("sender"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#messageViewSender".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "#messageViewSender",
+                                ),
                             }),
                         );
                         map.insert(
-                            "sentAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("sentAt"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -271,56 +292,13 @@ fn lexicon_doc_chat_bsky_convo_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                 }),
             );
             map.insert(
-                "logAcceptConvo".into(),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["rev".into(), "convoId".into()]),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
-                        map.insert(
-                            "convoId".into(),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            "rev".into(),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map
-                    },
-                }),
-            );
-            map.insert(
-                "logAddReaction".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("logAcceptConvo"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            "rev".into(), "convoId".into(), "message".into(), "reaction"
-                            .into()
+                            ::jacquard_common::smol_str::SmolStr::new_static("rev"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("convoId")
                         ],
                     ),
                     nullable: None,
@@ -328,7 +306,7 @@ fn lexicon_doc_chat_bsky_convo_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "convoId".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("convoId"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -343,24 +321,7 @@ fn lexicon_doc_chat_bsky_convo_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "message".into(),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
-                                refs: vec![
-                                    "#messageView".into(), "#deletedMessageView".into()
-                                ],
-                                closed: None,
-                            }),
-                        );
-                        map.insert(
-                            "reaction".into(),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: "#reactionView".into(),
-                            }),
-                        );
-                        map.insert(
-                            "rev".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("rev"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -379,307 +340,15 @@ fn lexicon_doc_chat_bsky_convo_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                 }),
             );
             map.insert(
-                "logBeginConvo".into(),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["rev".into(), "convoId".into()]),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
-                        map.insert(
-                            "convoId".into(),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            "rev".into(),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map
-                    },
-                }),
-            );
-            map.insert(
-                "logCreateMessage".into(),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec!["rev".into(), "convoId".into(), "message".into()],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
-                        map.insert(
-                            "convoId".into(),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            "message".into(),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
-                                refs: vec![
-                                    "#messageView".into(), "#deletedMessageView".into()
-                                ],
-                                closed: None,
-                            }),
-                        );
-                        map.insert(
-                            "rev".into(),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map
-                    },
-                }),
-            );
-            map.insert(
-                "logDeleteMessage".into(),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec!["rev".into(), "convoId".into(), "message".into()],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
-                        map.insert(
-                            "convoId".into(),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            "message".into(),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
-                                refs: vec![
-                                    "#messageView".into(), "#deletedMessageView".into()
-                                ],
-                                closed: None,
-                            }),
-                        );
-                        map.insert(
-                            "rev".into(),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map
-                    },
-                }),
-            );
-            map.insert(
-                "logLeaveConvo".into(),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["rev".into(), "convoId".into()]),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
-                        map.insert(
-                            "convoId".into(),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            "rev".into(),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map
-                    },
-                }),
-            );
-            map.insert(
-                "logMuteConvo".into(),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["rev".into(), "convoId".into()]),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
-                        map.insert(
-                            "convoId".into(),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            "rev".into(),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map
-                    },
-                }),
-            );
-            map.insert(
-                "logReadMessage".into(),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec!["rev".into(), "convoId".into(), "message".into()],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
-                        map.insert(
-                            "convoId".into(),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            "message".into(),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                description: None,
-                                refs: vec![
-                                    "#messageView".into(), "#deletedMessageView".into()
-                                ],
-                                closed: None,
-                            }),
-                        );
-                        map.insert(
-                            "rev".into(),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map
-                    },
-                }),
-            );
-            map.insert(
-                "logRemoveReaction".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("logAddReaction"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            "rev".into(), "convoId".into(), "message".into(), "reaction"
-                            .into()
+                            ::jacquard_common::smol_str::SmolStr::new_static("rev"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("convoId"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("message"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("reaction")
                         ],
                     ),
                     nullable: None,
@@ -687,7 +356,7 @@ fn lexicon_doc_chat_bsky_convo_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "convoId".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("convoId"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -702,24 +371,27 @@ fn lexicon_doc_chat_bsky_convo_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "message".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("message"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
-                                    "#messageView".into(), "#deletedMessageView".into()
+                                    ::jacquard_common::CowStr::new_static("#messageView"),
+                                    ::jacquard_common::CowStr::new_static("#deletedMessageView")
                                 ],
                                 closed: None,
                             }),
                         );
                         map.insert(
-                            "reaction".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("reaction"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#reactionView".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "#reactionView",
+                                ),
                             }),
                         );
                         map.insert(
-                            "rev".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("rev"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -738,16 +410,21 @@ fn lexicon_doc_chat_bsky_convo_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                 }),
             );
             map.insert(
-                "logUnmuteConvo".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("logBeginConvo"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["rev".into(), "convoId".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("rev"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("convoId")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "convoId".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("convoId"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -762,7 +439,7 @@ fn lexicon_doc_chat_bsky_convo_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "rev".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("rev"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -781,63 +458,476 @@ fn lexicon_doc_chat_bsky_convo_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                 }),
             );
             map.insert(
-                "messageAndReactionView".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("logCreateMessage"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["message".into(), "reaction".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("rev"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("convoId"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("message")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "message".into(),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                            ::jacquard_common::smol_str::SmolStr::new_static("convoId"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
-                                r#ref: "#messageView".into(),
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
                             }),
                         );
                         map.insert(
-                            "reaction".into(),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: "#reactionView".into(),
-                            }),
-                        );
-                        map
-                    },
-                }),
-            );
-            map.insert(
-                "messageInput".into(),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["text".into()]),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
-                        map.insert(
-                            "embed".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("message"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
-                                refs: vec!["app.bsky.embed.record".into()],
+                                refs: vec![
+                                    ::jacquard_common::CowStr::new_static("#messageView"),
+                                    ::jacquard_common::CowStr::new_static("#deletedMessageView")
+                                ],
                                 closed: None,
                             }),
                         );
                         map.insert(
-                            "facets".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("rev"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map
+                    },
+                }),
+            );
+            map.insert(
+                ::jacquard_common::smol_str::SmolStr::new_static("logDeleteMessage"),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("rev"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("convoId"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("message")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::std::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("convoId"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("message"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                description: None,
+                                refs: vec![
+                                    ::jacquard_common::CowStr::new_static("#messageView"),
+                                    ::jacquard_common::CowStr::new_static("#deletedMessageView")
+                                ],
+                                closed: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("rev"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map
+                    },
+                }),
+            );
+            map.insert(
+                ::jacquard_common::smol_str::SmolStr::new_static("logLeaveConvo"),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("rev"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("convoId")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::std::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("convoId"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("rev"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map
+                    },
+                }),
+            );
+            map.insert(
+                ::jacquard_common::smol_str::SmolStr::new_static("logMuteConvo"),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("rev"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("convoId")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::std::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("convoId"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("rev"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map
+                    },
+                }),
+            );
+            map.insert(
+                ::jacquard_common::smol_str::SmolStr::new_static("logReadMessage"),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("rev"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("convoId"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("message")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::std::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("convoId"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("message"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                description: None,
+                                refs: vec![
+                                    ::jacquard_common::CowStr::new_static("#messageView"),
+                                    ::jacquard_common::CowStr::new_static("#deletedMessageView")
+                                ],
+                                closed: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("rev"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map
+                    },
+                }),
+            );
+            map.insert(
+                ::jacquard_common::smol_str::SmolStr::new_static("logRemoveReaction"),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("rev"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("convoId"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("message"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("reaction")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::std::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("convoId"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("message"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                description: None,
+                                refs: vec![
+                                    ::jacquard_common::CowStr::new_static("#messageView"),
+                                    ::jacquard_common::CowStr::new_static("#deletedMessageView")
+                                ],
+                                closed: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("reaction"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "#reactionView",
+                                ),
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("rev"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map
+                    },
+                }),
+            );
+            map.insert(
+                ::jacquard_common::smol_str::SmolStr::new_static("logUnmuteConvo"),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("rev"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("convoId")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::std::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("convoId"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("rev"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map
+                    },
+                }),
+            );
+            map.insert(
+                ::jacquard_common::smol_str::SmolStr::new_static(
+                    "messageAndReactionView",
+                ),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("message"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("reaction")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::std::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("message"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: ::jacquard_common::CowStr::new_static("#messageView"),
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("reaction"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "#reactionView",
+                                ),
+                            }),
+                        );
+                        map
+                    },
+                }),
+            );
+            map.insert(
+                ::jacquard_common::smol_str::SmolStr::new_static("messageInput"),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("text")],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::std::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("embed"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                description: None,
+                                refs: vec![
+                                    ::jacquard_common::CowStr::new_static("app.bsky.embed.record")
+                                ],
+                                closed: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("facets"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Annotations of text (mentions, URLs, hashtags, etc)",
+                                    ),
+                                ),
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "app.bsky.richtext.facet".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "app.bsky.richtext.facet",
+                                    ),
                                 }),
                                 min_length: None,
                                 max_length: None,
                             }),
                         );
                         map.insert(
-                            "text".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("text"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -856,18 +946,22 @@ fn lexicon_doc_chat_bsky_convo_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                 }),
             );
             map.insert(
-                "messageRef".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("messageRef"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
-                        vec!["did".into(), "messageId".into(), "convoId".into()],
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("messageId"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("convoId")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "convoId".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("convoId"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -882,7 +976,7 @@ fn lexicon_doc_chat_bsky_convo_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "did".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -899,7 +993,9 @@ fn lexicon_doc_chat_bsky_convo_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "messageId".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "messageId",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -918,13 +1014,16 @@ fn lexicon_doc_chat_bsky_convo_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                 }),
             );
             map.insert(
-                "messageView".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("messageView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            "id".into(), "rev".into(), "text".into(), "sender".into(),
-                            "sentAt".into()
+                            ::jacquard_common::smol_str::SmolStr::new_static("id"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("rev"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("text"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("sender"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("sentAt")
                         ],
                     ),
                     nullable: None,
@@ -932,27 +1031,35 @@ fn lexicon_doc_chat_bsky_convo_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "embed".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("embed"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
-                                refs: vec!["app.bsky.embed.record#view".into()],
+                                refs: vec![
+                                    ::jacquard_common::CowStr::new_static("app.bsky.embed.record#view")
+                                ],
                                 closed: None,
                             }),
                         );
                         map.insert(
-                            "facets".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("facets"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Annotations of text (mentions, URLs, hashtags, etc)",
+                                    ),
+                                ),
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "app.bsky.richtext.facet".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "app.bsky.richtext.facet",
+                                    ),
                                 }),
                                 min_length: None,
                                 max_length: None,
                             }),
                         );
                         map.insert(
-                            "id".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("id"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -967,19 +1074,27 @@ fn lexicon_doc_chat_bsky_convo_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "reactions".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "reactions",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Reactions to this message, in ascending order of creation time.",
+                                    ),
+                                ),
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "#reactionView".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "#reactionView",
+                                    ),
                                 }),
                                 min_length: None,
                                 max_length: None,
                             }),
                         );
                         map.insert(
-                            "rev".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("rev"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -994,14 +1109,16 @@ fn lexicon_doc_chat_bsky_convo_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "sender".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("sender"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#messageViewSender".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "#messageViewSender",
+                                ),
                             }),
                         );
                         map.insert(
-                            "sentAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("sentAt"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -1018,7 +1135,7 @@ fn lexicon_doc_chat_bsky_convo_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "text".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("text"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -1037,16 +1154,18 @@ fn lexicon_doc_chat_bsky_convo_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                 }),
             );
             map.insert(
-                "messageViewSender".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("messageViewSender"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["did".into()]),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("did")],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "did".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -1067,18 +1186,24 @@ fn lexicon_doc_chat_bsky_convo_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                 }),
             );
             map.insert(
-                "reactionView".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("reactionView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
-                        vec!["value".into(), "sender".into(), "createdAt".into()],
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("value"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("sender"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "createdAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "createdAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -1095,14 +1220,16 @@ fn lexicon_doc_chat_bsky_convo_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "sender".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("sender"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#reactionViewSender".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "#reactionViewSender",
+                                ),
                             }),
                         );
                         map.insert(
-                            "value".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("value"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -1121,16 +1248,18 @@ fn lexicon_doc_chat_bsky_convo_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                 }),
             );
             map.insert(
-                "reactionViewSender".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("reactionViewSender"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["did".into()]),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("did")],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "did".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -1158,6 +1287,9 @@ fn lexicon_doc_chat_bsky_convo_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ConvoView<'a> {
     fn nsid() -> &'static str {
         "chat.bsky.convo.defs"
+    }
+    fn def_name() -> &'static str {
+        "convoView"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_chat_bsky_convo_defs()
@@ -1197,6 +1329,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DeletedMessageView<'a> {
     fn nsid() -> &'static str {
         "chat.bsky.convo.defs"
     }
+    fn def_name() -> &'static str {
+        "deletedMessageView"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_chat_bsky_convo_defs()
     }
@@ -1229,6 +1364,9 @@ pub struct LogAcceptConvo<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LogAcceptConvo<'a> {
     fn nsid() -> &'static str {
         "chat.bsky.convo.defs"
+    }
+    fn def_name() -> &'static str {
+        "logAcceptConvo"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_chat_bsky_convo_defs()
@@ -1288,6 +1426,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LogAddReaction<'a> {
     fn nsid() -> &'static str {
         "chat.bsky.convo.defs"
     }
+    fn def_name() -> &'static str {
+        "logAddReaction"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_chat_bsky_convo_defs()
     }
@@ -1320,6 +1461,9 @@ pub struct LogBeginConvo<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LogBeginConvo<'a> {
     fn nsid() -> &'static str {
         "chat.bsky.convo.defs"
+    }
+    fn def_name() -> &'static str {
+        "logBeginConvo"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_chat_bsky_convo_defs()
@@ -1377,6 +1521,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LogCreateMessage<'a> {
     fn nsid() -> &'static str {
         "chat.bsky.convo.defs"
     }
+    fn def_name() -> &'static str {
+        "logCreateMessage"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_chat_bsky_convo_defs()
     }
@@ -1433,6 +1580,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LogDeleteMessage<'a> {
     fn nsid() -> &'static str {
         "chat.bsky.convo.defs"
     }
+    fn def_name() -> &'static str {
+        "logDeleteMessage"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_chat_bsky_convo_defs()
     }
@@ -1466,6 +1616,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LogLeaveConvo<'a> {
     fn nsid() -> &'static str {
         "chat.bsky.convo.defs"
     }
+    fn def_name() -> &'static str {
+        "logLeaveConvo"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_chat_bsky_convo_defs()
     }
@@ -1498,6 +1651,9 @@ pub struct LogMuteConvo<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LogMuteConvo<'a> {
     fn nsid() -> &'static str {
         "chat.bsky.convo.defs"
+    }
+    fn def_name() -> &'static str {
+        "logMuteConvo"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_chat_bsky_convo_defs()
@@ -1554,6 +1710,9 @@ pub enum LogReadMessageMessage<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LogReadMessage<'a> {
     fn nsid() -> &'static str {
         "chat.bsky.convo.defs"
+    }
+    fn def_name() -> &'static str {
+        "logReadMessage"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_chat_bsky_convo_defs()
@@ -1613,6 +1772,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LogRemoveReaction<'a> {
     fn nsid() -> &'static str {
         "chat.bsky.convo.defs"
     }
+    fn def_name() -> &'static str {
+        "logRemoveReaction"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_chat_bsky_convo_defs()
     }
@@ -1646,6 +1808,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LogUnmuteConvo<'a> {
     fn nsid() -> &'static str {
         "chat.bsky.convo.defs"
     }
+    fn def_name() -> &'static str {
+        "logUnmuteConvo"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_chat_bsky_convo_defs()
     }
@@ -1678,6 +1843,9 @@ pub struct MessageAndReactionView<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MessageAndReactionView<'a> {
     fn nsid() -> &'static str {
         "chat.bsky.convo.defs"
+    }
+    fn def_name() -> &'static str {
+        "messageAndReactionView"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_chat_bsky_convo_defs()
@@ -1717,6 +1885,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MessageInput<'a> {
     fn nsid() -> &'static str {
         "chat.bsky.convo.defs"
     }
+    fn def_name() -> &'static str {
+        "messageInput"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_chat_bsky_convo_defs()
     }
@@ -1725,11 +1896,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MessageInput<'a> {
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         {
             let value = &self.text;
-            if value.as_ref().len() > 10000usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 10000usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "text",
                     max: 10000usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -1780,6 +1952,9 @@ pub struct MessageRef<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MessageRef<'a> {
     fn nsid() -> &'static str {
         "chat.bsky.convo.defs"
+    }
+    fn def_name() -> &'static str {
+        "messageRef"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_chat_bsky_convo_defs()
@@ -1836,6 +2011,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MessageView<'a> {
     fn nsid() -> &'static str {
         "chat.bsky.convo.defs"
     }
+    fn def_name() -> &'static str {
+        "messageView"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_chat_bsky_convo_defs()
     }
@@ -1844,11 +2022,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MessageView<'a> {
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         {
             let value = &self.text;
-            if value.as_ref().len() > 10000usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 10000usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "text",
                     max: 10000usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -1894,6 +2073,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MessageViewSender<'a> {
     fn nsid() -> &'static str {
         "chat.bsky.convo.defs"
     }
+    fn def_name() -> &'static str {
+        "messageViewSender"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_chat_bsky_convo_defs()
     }
@@ -1929,6 +2111,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReactionView<'a> {
     fn nsid() -> &'static str {
         "chat.bsky.convo.defs"
     }
+    fn def_name() -> &'static str {
+        "reactionView"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_chat_bsky_convo_defs()
     }
@@ -1959,6 +2144,9 @@ pub struct ReactionViewSender<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReactionViewSender<'a> {
     fn nsid() -> &'static str {
         "chat.bsky.convo.defs"
+    }
+    fn def_name() -> &'static str {
+        "reactionViewSender"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_chat_bsky_convo_defs()

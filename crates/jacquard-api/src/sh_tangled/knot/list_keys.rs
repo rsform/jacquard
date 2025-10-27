@@ -137,13 +137,13 @@ fn lexicon_doc_sh_tangled_knot_listKeys() -> ::jacquard_lexicon::lexicon::Lexico
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "sh.tangled.knot.listKeys".into(),
+        id: ::jacquard_common::CowStr::new_static("sh.tangled.knot.listKeys"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
                     description: None,
                     parameters: Some(
@@ -154,9 +154,11 @@ fn lexicon_doc_sh_tangled_knot_listKeys() -> ::jacquard_lexicon::lexicon::Lexico
                                 #[allow(unused_mut)]
                                 let mut map = ::std::collections::BTreeMap::new();
                                 map.insert(
-                                    "cursor".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static("cursor"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
+                                        description: Some(
+                                            ::jacquard_common::CowStr::new_static("Pagination cursor"),
+                                        ),
                                         format: None,
                                         default: None,
                                         min_length: None,
@@ -169,7 +171,7 @@ fn lexicon_doc_sh_tangled_knot_listKeys() -> ::jacquard_lexicon::lexicon::Lexico
                                     }),
                                 );
                                 map.insert(
-                                    "limit".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static("limit"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                         description: None,
                                         default: None,
@@ -188,18 +190,30 @@ fn lexicon_doc_sh_tangled_knot_listKeys() -> ::jacquard_lexicon::lexicon::Lexico
                 }),
             );
             map.insert(
-                "publicKey".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("publicKey"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["did".into(), "key".into(), "createdAt".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("key"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "createdAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "createdAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Key upload timestamp",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                 ),
@@ -214,9 +228,13 @@ fn lexicon_doc_sh_tangled_knot_listKeys() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            "did".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "DID associated with the public key",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Did,
                                 ),
@@ -231,9 +249,11 @@ fn lexicon_doc_sh_tangled_knot_listKeys() -> ::jacquard_lexicon::lexicon::Lexico
                             }),
                         );
                         map.insert(
-                            "key".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("key"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static("Public key contents"),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -258,6 +278,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PublicKey<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.knot.listKeys"
     }
+    fn def_name() -> &'static str {
+        "publicKey"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_knot_listKeys()
     }
@@ -266,11 +289,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PublicKey<'a> {
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         {
             let value = &self.key;
-            if value.as_ref().len() > 4096usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 4096usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "key",
                     max: 4096usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }

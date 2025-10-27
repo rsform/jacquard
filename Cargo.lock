@@ -2236,10 +2236,8 @@ checksum = "4a5f13b858c8d314ee3e8f639011f7ccefe71f97f96e50151fb991f267928e2c"
 name = "jacquard"
 version = "0.8.0"
 dependencies = [
- "bon",
  "bytes",
  "clap",
- "futures",
  "getrandom 0.2.16",
  "http",
  "image",
@@ -2251,14 +2249,10 @@ dependencies = [
  "jose-jwk",
  "miette",
  "n0-future",
- "p256",
- "percent-encoding",
- "rand_core 0.6.4",
  "regex",
  "reqwest",
  "serde",
  "serde_html_form",
- "serde_ipld_dagcbor",
  "serde_json",
  "smol_str",
  "thiserror 2.0.17",
@@ -2308,7 +2302,6 @@ dependencies = [
  "reqwest",
  "serde",
  "serde_html_form",
- "serde_ipld_dagcbor",
  "serde_json",
  "thiserror 2.0.17",
  "tokio",
@@ -2407,7 +2400,6 @@ dependencies = [
 name = "jacquard-lexgen"
 version = "0.8.0"
 dependencies = [
- "async-trait",
  "clap",
  "clap_complete",
  "clap_mangen",
@@ -2435,12 +2427,13 @@ dependencies = [
 name = "jacquard-lexicon"
 version = "0.8.0"
 dependencies = [
+ "bytes",
  "cid",
  "dashmap",
- "glob",
  "heck 0.5.0",
  "inventory",
  "jacquard-common",
+ "jacquard-derive",
  "miette",
  "multihash",
  "prettyplease",
@@ -2456,7 +2449,6 @@ dependencies = [
  "tempfile",
  "thiserror 2.0.17",
  "unicode-segmentation",
- "walkdir",
 ]
 
 [[package]]
@@ -2477,8 +2469,6 @@ dependencies = [
  "n0-future",
  "p256",
  "rand 0.8.5",
- "rand_core 0.6.4",
- "reqwest",
  "rouille",
  "serde",
  "serde_html_form",
@@ -2503,7 +2493,6 @@ dependencies = [
  "cid",
  "ed25519-dalek",
  "hex",
- "ipld-core",
  "iroh-car",
  "jacquard-common",
  "jacquard-derive",

@@ -45,22 +45,26 @@ fn lexicon_doc_app_blebbit_authr_group_defs() -> ::jacquard_lexicon::lexicon::Le
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "app.blebbit.authr.group.defs".into(),
+        id: ::jacquard_common::CowStr::new_static("app.blebbit.authr.group.defs"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "groupForm".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("groupForm"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["name".into()]),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("name")],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "description".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "description",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -75,7 +79,7 @@ fn lexicon_doc_app_blebbit_authr_group_defs() -> ::jacquard_lexicon::lexicon::Le
                             }),
                         );
                         map.insert(
-                            "display".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("display"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -90,7 +94,7 @@ fn lexicon_doc_app_blebbit_authr_group_defs() -> ::jacquard_lexicon::lexicon::Le
                             }),
                         );
                         map.insert(
-                            "name".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -105,7 +109,7 @@ fn lexicon_doc_app_blebbit_authr_group_defs() -> ::jacquard_lexicon::lexicon::Le
                             }),
                         );
                         map.insert(
-                            "public".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("public"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                 description: None,
                                 default: None,
@@ -117,7 +121,7 @@ fn lexicon_doc_app_blebbit_authr_group_defs() -> ::jacquard_lexicon::lexicon::Le
                 }),
             );
             map.insert(
-                "groupView".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("groupView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -126,7 +130,7 @@ fn lexicon_doc_app_blebbit_authr_group_defs() -> ::jacquard_lexicon::lexicon::Le
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "cuid".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("cuid"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -141,7 +145,9 @@ fn lexicon_doc_app_blebbit_authr_group_defs() -> ::jacquard_lexicon::lexicon::Le
                             }),
                         );
                         map.insert(
-                            "description".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "description",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -156,7 +162,7 @@ fn lexicon_doc_app_blebbit_authr_group_defs() -> ::jacquard_lexicon::lexicon::Le
                             }),
                         );
                         map.insert(
-                            "display".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("display"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -171,7 +177,7 @@ fn lexicon_doc_app_blebbit_authr_group_defs() -> ::jacquard_lexicon::lexicon::Le
                             }),
                         );
                         map.insert(
-                            "name".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -186,7 +192,7 @@ fn lexicon_doc_app_blebbit_authr_group_defs() -> ::jacquard_lexicon::lexicon::Le
                             }),
                         );
                         map.insert(
-                            "public".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("public"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                 description: None,
                                 default: None,
@@ -205,6 +211,9 @@ fn lexicon_doc_app_blebbit_authr_group_defs() -> ::jacquard_lexicon::lexicon::Le
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GroupForm<'a> {
     fn nsid() -> &'static str {
         "app.blebbit.authr.group.defs"
+    }
+    fn def_name() -> &'static str {
+        "groupForm"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_blebbit_authr_group_defs()
@@ -248,6 +257,9 @@ pub struct GroupView<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GroupView<'a> {
     fn nsid() -> &'static str {
         "app.blebbit.authr.group.defs"
+    }
+    fn def_name() -> &'static str {
+        "groupView"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_blebbit_authr_group_defs()

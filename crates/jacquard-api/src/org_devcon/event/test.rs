@@ -111,6 +111,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Test<'a> {
     fn nsid() -> &'static str {
         "org.devcon.event.test"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_devcon_event_test()
     }
@@ -126,27 +129,33 @@ fn lexicon_doc_org_devcon_event_test() -> ::jacquard_lexicon::lexicon::LexiconDo
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "org.devcon.event.test".into(),
+        id: ::jacquard_common::CowStr::new_static("org.devcon.event.test"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: None,
-                    key: Some("tid".into()),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: Some(
-                            vec!["title".into(), "start".into(), "end".into()],
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("start"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("end")
+                            ],
                         ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -163,9 +172,15 @@ fn lexicon_doc_org_devcon_event_test() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 }),
                             );
                             map.insert(
-                                "description".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "description",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Description of the event",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -178,9 +193,13 @@ fn lexicon_doc_org_devcon_event_test() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 }),
                             );
                             map.insert(
-                                "end".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("end"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "End time of the event",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -195,9 +214,15 @@ fn lexicon_doc_org_devcon_event_test() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 }),
                             );
                             map.insert(
-                                "location".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "location",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Location of the event",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -210,9 +235,13 @@ fn lexicon_doc_org_devcon_event_test() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 }),
                             );
                             map.insert(
-                                "start".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("start"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Start time of the event",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -227,9 +256,11 @@ fn lexicon_doc_org_devcon_event_test() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 }),
                             );
                             map.insert(
-                                "title".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static("Title of the event"),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -242,9 +273,11 @@ fn lexicon_doc_org_devcon_event_test() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 }),
                             );
                             map.insert(
-                                "url".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("url"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static("URL of the event"),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,

@@ -28,22 +28,28 @@ fn lexicon_doc_pub_leaflet_theme_color() -> ::jacquard_lexicon::lexicon::Lexicon
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "pub.leaflet.theme.color".into(),
+        id: ::jacquard_common::CowStr::new_static("pub.leaflet.theme.color"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "rgb".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("rgb"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["r".into(), "g".into(), "b".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("r"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("g"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("b")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "b".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("b"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -54,7 +60,7 @@ fn lexicon_doc_pub_leaflet_theme_color() -> ::jacquard_lexicon::lexicon::Lexicon
                             }),
                         );
                         map.insert(
-                            "g".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("g"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -65,7 +71,7 @@ fn lexicon_doc_pub_leaflet_theme_color() -> ::jacquard_lexicon::lexicon::Lexicon
                             }),
                         );
                         map.insert(
-                            "r".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("r"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -80,16 +86,23 @@ fn lexicon_doc_pub_leaflet_theme_color() -> ::jacquard_lexicon::lexicon::Lexicon
                 }),
             );
             map.insert(
-                "rgba".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("rgba"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["r".into(), "g".into(), "b".into(), "a".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("r"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("g"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("b"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("a")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "a".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("a"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -100,7 +113,7 @@ fn lexicon_doc_pub_leaflet_theme_color() -> ::jacquard_lexicon::lexicon::Lexicon
                             }),
                         );
                         map.insert(
-                            "b".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("b"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -111,7 +124,7 @@ fn lexicon_doc_pub_leaflet_theme_color() -> ::jacquard_lexicon::lexicon::Lexicon
                             }),
                         );
                         map.insert(
-                            "g".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("g"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -122,7 +135,7 @@ fn lexicon_doc_pub_leaflet_theme_color() -> ::jacquard_lexicon::lexicon::Lexicon
                             }),
                         );
                         map.insert(
-                            "r".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("r"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -144,6 +157,9 @@ fn lexicon_doc_pub_leaflet_theme_color() -> ::jacquard_lexicon::lexicon::Lexicon
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Rgb<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.theme.color"
+    }
+    fn def_name() -> &'static str {
+        "rgb"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_theme_color()
@@ -237,6 +253,9 @@ pub struct Rgba<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Rgba<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.theme.color"
+    }
+    fn def_name() -> &'static str {
+        "rgba"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_theme_color()

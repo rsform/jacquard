@@ -4,6 +4,7 @@ use super::*;
 use crate::{lexicon::*, schema::LexiconSchema};
 use jacquard_common::{
     CowStr,
+    smol_str::ToSmolStr,
     types::{string::AtprotoStr, value::Data},
 };
 use std::collections::BTreeMap;
@@ -728,9 +729,7 @@ fn test_constraint_validation_is_lazy() {
         data_string("this string is too long!"),
     )])));
 
-    let result = validator
-        .validate::<StringConstraintSchema>(&data)
-        .unwrap();
+    let result = validator.validate::<StringConstraintSchema>(&data).unwrap();
 
     // Structurally valid - type is correct, required field present
     assert!(result.is_structurally_valid());
@@ -753,9 +752,7 @@ fn test_string_max_length() {
         data_string("this string is way too long"),
     )])));
 
-    let result = validator
-        .validate::<StringConstraintSchema>(&data)
-        .unwrap();
+    let result = validator.validate::<StringConstraintSchema>(&data).unwrap();
 
     assert!(!result.is_valid());
     assert!(result.is_structurally_valid());
@@ -765,7 +762,11 @@ fn test_string_max_length() {
     assert_eq!(constraint_errors.len(), 1);
     assert!(matches!(
         &constraint_errors[0],
-        ConstraintError::MaxLength { max: 20, actual: 27, .. }
+        ConstraintError::MaxLength {
+            max: 20,
+            actual: 27,
+            ..
+        }
     ));
 }
 
@@ -783,9 +784,7 @@ fn test_string_min_length() {
         data_string("hi"),
     )])));
 
-    let result = validator
-        .validate::<StringConstraintSchema>(&data)
-        .unwrap();
+    let result = validator.validate::<StringConstraintSchema>(&data).unwrap();
 
     assert!(!result.is_valid());
     assert!(result.is_structurally_valid());
@@ -794,7 +793,11 @@ fn test_string_min_length() {
     assert_eq!(constraint_errors.len(), 1);
     assert!(matches!(
         &constraint_errors[0],
-        ConstraintError::MinLength { min: 5, actual: 2, .. }
+        ConstraintError::MinLength {
+            min: 5,
+            actual: 2,
+            ..
+        }
     ));
 }
 
@@ -823,7 +826,11 @@ fn test_string_max_graphemes() {
     assert_eq!(constraint_errors.len(), 1);
     assert!(matches!(
         &constraint_errors[0],
-        ConstraintError::MaxGraphemes { max: 5, actual: 6, .. }
+        ConstraintError::MaxGraphemes {
+            max: 5,
+            actual: 6,
+            ..
+        }
     ));
 }
 
@@ -852,7 +859,11 @@ fn test_string_min_graphemes() {
     assert_eq!(constraint_errors.len(), 1);
     assert!(matches!(
         &constraint_errors[0],
-        ConstraintError::MinGraphemes { min: 2, actual: 1, .. }
+        ConstraintError::MinGraphemes {
+            min: 2,
+            actual: 1,
+            ..
+        }
     ));
 }
 
@@ -870,9 +881,7 @@ fn test_string_within_constraints() {
         data_string("valid text"),
     )])));
 
-    let result = validator
-        .validate::<StringConstraintSchema>(&data)
-        .unwrap();
+    let result = validator.validate::<StringConstraintSchema>(&data).unwrap();
 
     assert!(result.is_valid());
     assert!(result.is_structurally_valid());
@@ -904,7 +913,11 @@ fn test_integer_maximum() {
     assert_eq!(constraint_errors.len(), 1);
     assert!(matches!(
         &constraint_errors[0],
-        ConstraintError::Maximum { max: 100, actual: 150, .. }
+        ConstraintError::Maximum {
+            max: 100,
+            actual: 150,
+            ..
+        }
     ));
 }
 
@@ -933,7 +946,11 @@ fn test_integer_minimum() {
     assert_eq!(constraint_errors.len(), 1);
     assert!(matches!(
         &constraint_errors[0],
-        ConstraintError::Minimum { min: 0, actual: -5, .. }
+        ConstraintError::Minimum {
+            min: 0,
+            actual: -5,
+            ..
+        }
     ));
 }
 
@@ -981,9 +998,7 @@ fn test_array_max_length() {
         ])),
     )])));
 
-    let result = validator
-        .validate::<ArrayConstraintSchema>(&data)
-        .unwrap();
+    let result = validator.validate::<ArrayConstraintSchema>(&data).unwrap();
 
     assert!(!result.is_valid());
     assert!(result.is_structurally_valid());
@@ -992,7 +1007,11 @@ fn test_array_max_length() {
     assert_eq!(constraint_errors.len(), 1);
     assert!(matches!(
         &constraint_errors[0],
-        ConstraintError::MaxLength { max: 5, actual: 6, .. }
+        ConstraintError::MaxLength {
+            max: 5,
+            actual: 6,
+            ..
+        }
     ));
 }
 
@@ -1012,9 +1031,7 @@ fn test_array_min_length() {
         )])),
     )])));
 
-    let result = validator
-        .validate::<ArrayConstraintSchema>(&data)
-        .unwrap();
+    let result = validator.validate::<ArrayConstraintSchema>(&data).unwrap();
 
     assert!(!result.is_valid());
     assert!(result.is_structurally_valid());
@@ -1023,7 +1040,11 @@ fn test_array_min_length() {
     assert_eq!(constraint_errors.len(), 1);
     assert!(matches!(
         &constraint_errors[0],
-        ConstraintError::MinLength { min: 2, actual: 1, .. }
+        ConstraintError::MinLength {
+            min: 2,
+            actual: 1,
+            ..
+        }
     ));
 }
 
@@ -1045,9 +1066,7 @@ fn test_array_within_constraints() {
         ])),
     )])));
 
-    let result = validator
-        .validate::<ArrayConstraintSchema>(&data)
-        .unwrap();
+    let result = validator.validate::<ArrayConstraintSchema>(&data).unwrap();
 
     assert!(result.is_valid());
     assert!(result.is_structurally_valid());
@@ -1068,9 +1087,7 @@ fn test_structurally_invalid_skips_constraints() {
         Data::Integer(42),
     )])));
 
-    let result = validator
-        .validate::<StringConstraintSchema>(&data)
-        .unwrap();
+    let result = validator.validate::<StringConstraintSchema>(&data).unwrap();
 
     assert!(!result.is_valid());
     assert!(!result.is_structurally_valid());
@@ -1096,9 +1113,7 @@ fn test_structurally_valid_with_constraint_errors() {
         data_string("too long string here!!!"),
     )])));
 
-    let result = validator
-        .validate::<StringConstraintSchema>(&data)
-        .unwrap();
+    let result = validator.validate::<StringConstraintSchema>(&data).unwrap();
 
     assert!(!result.is_valid());
     assert!(result.is_structurally_valid());

@@ -43,19 +43,26 @@ fn lexicon_doc_blue_2048_verification_defs() -> ::jacquard_lexicon::lexicon::Lex
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "blue.2048.verification.defs".into(),
+        id: ::jacquard_common::CowStr::new_static("blue.2048.verification.defs"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "verificationRef".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("verificationRef"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Holds the signature for another record showing it has verified it to the best of it's ability and it should be trusted if the signatures match.",
+                        ),
+                    ),
                     required: Some(
                         vec![
-                            "keyRef".into(), "recordRef".into(), "subject".into(),
-                            "signature".into(), "createdAt".into()
+                            ::jacquard_common::smol_str::SmolStr::new_static("keyRef"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("recordRef"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("subject"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("signature"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
                         ],
                     ),
                     nullable: None,
@@ -63,7 +70,9 @@ fn lexicon_doc_blue_2048_verification_defs() -> ::jacquard_lexicon::lexicon::Lex
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "createdAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "createdAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -80,9 +89,13 @@ fn lexicon_doc_blue_2048_verification_defs() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            "keyRef".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("keyRef"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The at://uri for the public did:key to verify the remote record. This also counts as the authority of the verification (example @2048.blue). As well as the type of verification by the collection name (blue.2048.key.game).",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
                                 ),
@@ -97,9 +110,15 @@ fn lexicon_doc_blue_2048_verification_defs() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            "recordRef".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "recordRef",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The at://uri for the record that is being verified.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
                                 ),
@@ -114,9 +133,15 @@ fn lexicon_doc_blue_2048_verification_defs() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            "signature".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "signature",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The public verifiable signature of the record. Serialization of the records valued",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -129,9 +154,13 @@ fn lexicon_doc_blue_2048_verification_defs() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
-                            "subject".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("subject"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "DID of the subject the verification applies to.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Did,
                                 ),
@@ -157,6 +186,9 @@ fn lexicon_doc_blue_2048_verification_defs() -> ::jacquard_lexicon::lexicon::Lex
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for VerificationRef<'a> {
     fn nsid() -> &'static str {
         "blue.2048.verification.defs"
+    }
+    fn def_name() -> &'static str {
+        "verificationRef"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blue_2048_verification_defs()

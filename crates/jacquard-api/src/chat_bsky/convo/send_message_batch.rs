@@ -30,22 +30,27 @@ fn lexicon_doc_chat_bsky_convo_sendMessageBatch() -> ::jacquard_lexicon::lexicon
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "chat.bsky.convo.sendMessageBatch".into(),
+        id: ::jacquard_common::CowStr::new_static("chat.bsky.convo.sendMessageBatch"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "batchItem".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("batchItem"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["convoId".into(), "message".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("convoId"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("message")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "convoId".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("convoId"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -60,10 +65,12 @@ fn lexicon_doc_chat_bsky_convo_sendMessageBatch() -> ::jacquard_lexicon::lexicon
                             }),
                         );
                         map.insert(
-                            "message".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("message"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "chat.bsky.convo.defs#messageInput".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "chat.bsky.convo.defs#messageInput",
+                                ),
                             }),
                         );
                         map
@@ -71,28 +78,34 @@ fn lexicon_doc_chat_bsky_convo_sendMessageBatch() -> ::jacquard_lexicon::lexicon
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcProcedure(::jacquard_lexicon::lexicon::LexXrpcProcedure {
                     description: None,
                     parameters: None,
                     input: Some(::jacquard_lexicon::lexicon::LexXrpcBody {
                         description: None,
-                        encoding: "application/json".into(),
+                        encoding: ::jacquard_common::CowStr::new_static(
+                            "application/json",
+                        ),
                         schema: Some(
                             ::jacquard_lexicon::lexicon::LexXrpcBodySchema::Object(::jacquard_lexicon::lexicon::LexObject {
                                 description: None,
-                                required: Some(vec!["items".into()]),
+                                required: Some(
+                                    vec![
+                                        ::jacquard_common::smol_str::SmolStr::new_static("items")
+                                    ],
+                                ),
                                 nullable: None,
                                 properties: {
                                     #[allow(unused_mut)]
                                     let mut map = ::std::collections::BTreeMap::new();
                                     map.insert(
-                                        "items".into(),
+                                        ::jacquard_common::smol_str::SmolStr::new_static("items"),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                             description: None,
                                             items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                                 description: None,
-                                                r#ref: "#batchItem".into(),
+                                                r#ref: ::jacquard_common::CowStr::new_static("#batchItem"),
                                             }),
                                             min_length: None,
                                             max_length: Some(100usize),
@@ -115,6 +128,9 @@ fn lexicon_doc_chat_bsky_convo_sendMessageBatch() -> ::jacquard_lexicon::lexicon
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BatchItem<'a> {
     fn nsid() -> &'static str {
         "chat.bsky.convo.sendMessageBatch"
+    }
+    fn def_name() -> &'static str {
+        "batchItem"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_chat_bsky_convo_sendMessageBatch()

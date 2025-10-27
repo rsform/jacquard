@@ -104,6 +104,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Origin<'a> {
     fn nsid() -> &'static str {
         "place.stream.broadcast.origin"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_broadcast_origin()
     }
@@ -111,11 +114,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Origin<'a> {
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         if let Some(ref value) = self.iroh_ticket {
-            if value.as_ref().len() > 2048usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 2048usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "iroh_ticket",
                     max: 2048usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -128,29 +132,43 @@ fn lexicon_doc_place_stream_broadcast_origin() -> ::jacquard_lexicon::lexicon::L
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "place.stream.broadcast.origin".into(),
+        id: ::jacquard_common::CowStr::new_static("place.stream.broadcast.origin"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("any".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Record indicating a livestream is published and available for replication at a given address. By convention, the record key is streamer::server",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("any")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: Some(
-                            vec!["streamer".into(), "server".into(), "updatedAt".into()],
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("streamer"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("server"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("updatedAt")
+                            ],
                         ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "broadcaster".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "broadcaster",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "did of the broadcaster that operates the server syndicating the livestream",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Did,
                                     ),
@@ -165,9 +183,15 @@ fn lexicon_doc_place_stream_broadcast_origin() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                "irohTicket".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "irohTicket",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Iroh ticket that can be used to access the livestream from the server",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -180,9 +204,13 @@ fn lexicon_doc_place_stream_broadcast_origin() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                "server".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("server"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "did of the server that's currently rebroadcasting the livestream",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Did,
                                     ),
@@ -197,9 +225,15 @@ fn lexicon_doc_place_stream_broadcast_origin() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                "streamer".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "streamer",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "DID of the streamer whose livestream is being published",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Did,
                                     ),
@@ -214,9 +248,15 @@ fn lexicon_doc_place_stream_broadcast_origin() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                "updatedAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "updatedAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Periodically updated timestamp when this origin last saw a livestream",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),

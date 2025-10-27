@@ -52,40 +52,42 @@ fn lexicon_doc_pub_leaflet_blocks_unorderedList() -> ::jacquard_lexicon::lexicon
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "pub.leaflet.blocks.unorderedList".into(),
+        id: ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.unorderedList"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "listItem".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("listItem"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["content".into()]),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("content")],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "children".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("children"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "#listItem".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static("#listItem"),
                                 }),
                                 min_length: None,
                                 max_length: None,
                             }),
                         );
                         map.insert(
-                            "content".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("content"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
-                                    "pub.leaflet.blocks.text".into(),
-                                    "pub.leaflet.blocks.header".into(),
-                                    "pub.leaflet.blocks.image".into()
+                                    ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.text"),
+                                    ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.header"),
+                                    ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.image")
                                 ],
                                 closed: None,
                             }),
@@ -95,21 +97,25 @@ fn lexicon_doc_pub_leaflet_blocks_unorderedList() -> ::jacquard_lexicon::lexicon
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["children".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("children")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "children".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("children"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "#listItem".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static("#listItem"),
                                 }),
                                 min_length: None,
                                 max_length: None,
@@ -127,6 +133,9 @@ fn lexicon_doc_pub_leaflet_blocks_unorderedList() -> ::jacquard_lexicon::lexicon
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListItem<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.blocks.unorderedList"
+    }
+    fn def_name() -> &'static str {
+        "listItem"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_blocks_unorderedList()
@@ -158,6 +167,9 @@ pub struct UnorderedList<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UnorderedList<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.blocks.unorderedList"
+    }
+    fn def_name() -> &'static str {
+        "main"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_blocks_unorderedList()

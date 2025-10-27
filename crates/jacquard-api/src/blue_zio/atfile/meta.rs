@@ -29,22 +29,26 @@ fn lexicon_doc_blue_zio_atfile_meta() -> ::jacquard_lexicon::lexicon::LexiconDoc
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "blue.zio.atfile.meta".into(),
+        id: ::jacquard_common::CowStr::new_static("blue.zio.atfile.meta"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "unknown".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("unknown"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Unknown metadata for an uploaded file.",
+                        ),
+                    ),
                     required: None,
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "reason".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("reason"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -70,6 +74,9 @@ fn lexicon_doc_blue_zio_atfile_meta() -> ::jacquard_lexicon::lexicon::LexiconDoc
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Unknown<'a> {
     fn nsid() -> &'static str {
         "blue.zio.atfile.meta"
+    }
+    fn def_name() -> &'static str {
+        "unknown"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blue_zio_atfile_meta()

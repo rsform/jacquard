@@ -116,19 +116,27 @@ fn lexicon_doc_tools_ozone_verification_defs() -> ::jacquard_lexicon::lexicon::L
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "tools.ozone.verification.defs".into(),
+        id: ::jacquard_common::CowStr::new_static("tools.ozone.verification.defs"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "verificationView".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("verificationView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Verification data for the associated subject.",
+                        ),
+                    ),
                     required: Some(
                         vec![
-                            "issuer".into(), "uri".into(), "subject".into(), "handle"
-                            .into(), "displayName".into(), "createdAt".into()
+                            ::jacquard_common::smol_str::SmolStr::new_static("issuer"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("subject"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("handle"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("displayName"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
                         ],
                     ),
                     nullable: None,
@@ -136,9 +144,15 @@ fn lexicon_doc_tools_ozone_verification_defs() -> ::jacquard_lexicon::lexicon::L
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "createdAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "createdAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Timestamp when the verification was created.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                 ),
@@ -153,9 +167,15 @@ fn lexicon_doc_tools_ozone_verification_defs() -> ::jacquard_lexicon::lexicon::L
                             }),
                         );
                         map.insert(
-                            "displayName".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "displayName",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Display name of the subject the verification applies to at the moment of verifying, which might not be the same at the time of viewing. The verification is only valid if the current displayName matches the one at the time of verifying.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -168,9 +188,13 @@ fn lexicon_doc_tools_ozone_verification_defs() -> ::jacquard_lexicon::lexicon::L
                             }),
                         );
                         map.insert(
-                            "handle".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("handle"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Handle of the subject the verification applies to at the moment of verifying, which might not be the same at the time of viewing. The verification is only valid if the current handle matches the one at the time of verifying.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Handle,
                                 ),
@@ -185,9 +209,13 @@ fn lexicon_doc_tools_ozone_verification_defs() -> ::jacquard_lexicon::lexicon::L
                             }),
                         );
                         map.insert(
-                            "issuer".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("issuer"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The user who issued this verification.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Did,
                                 ),
@@ -202,7 +230,9 @@ fn lexicon_doc_tools_ozone_verification_defs() -> ::jacquard_lexicon::lexicon::L
                             }),
                         );
                         map.insert(
-                            "issuerProfile".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "issuerProfile",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![],
@@ -210,20 +240,28 @@ fn lexicon_doc_tools_ozone_verification_defs() -> ::jacquard_lexicon::lexicon::L
                             }),
                         );
                         map.insert(
-                            "issuerRepo".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "issuerRepo",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
-                                    "tools.ozone.moderation.defs#repoViewDetail".into(),
-                                    "tools.ozone.moderation.defs#repoViewNotFound".into()
+                                    ::jacquard_common::CowStr::new_static("tools.ozone.moderation.defs#repoViewDetail"),
+                                    ::jacquard_common::CowStr::new_static("tools.ozone.moderation.defs#repoViewNotFound")
                                 ],
                                 closed: None,
                             }),
                         );
                         map.insert(
-                            "revokeReason".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "revokeReason",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Describes the reason for revocation, also indicating that the verification is no longer valid.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -236,9 +274,15 @@ fn lexicon_doc_tools_ozone_verification_defs() -> ::jacquard_lexicon::lexicon::L
                             }),
                         );
                         map.insert(
-                            "revokedAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "revokedAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Timestamp when the verification was revoked.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                 ),
@@ -253,9 +297,15 @@ fn lexicon_doc_tools_ozone_verification_defs() -> ::jacquard_lexicon::lexicon::L
                             }),
                         );
                         map.insert(
-                            "revokedBy".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "revokedBy",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The user who revoked this verification.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Did,
                                 ),
@@ -270,9 +320,13 @@ fn lexicon_doc_tools_ozone_verification_defs() -> ::jacquard_lexicon::lexicon::L
                             }),
                         );
                         map.insert(
-                            "subject".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("subject"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The subject of the verification.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Did,
                                 ),
@@ -287,7 +341,9 @@ fn lexicon_doc_tools_ozone_verification_defs() -> ::jacquard_lexicon::lexicon::L
                             }),
                         );
                         map.insert(
-                            "subjectProfile".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "subjectProfile",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![],
@@ -295,20 +351,26 @@ fn lexicon_doc_tools_ozone_verification_defs() -> ::jacquard_lexicon::lexicon::L
                             }),
                         );
                         map.insert(
-                            "subjectRepo".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "subjectRepo",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
-                                    "tools.ozone.moderation.defs#repoViewDetail".into(),
-                                    "tools.ozone.moderation.defs#repoViewNotFound".into()
+                                    ::jacquard_common::CowStr::new_static("tools.ozone.moderation.defs#repoViewDetail"),
+                                    ::jacquard_common::CowStr::new_static("tools.ozone.moderation.defs#repoViewNotFound")
                                 ],
                                 closed: None,
                             }),
                         );
                         map.insert(
-                            "uri".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The AT-URI of the verification record.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
                                 ),
@@ -334,6 +396,9 @@ fn lexicon_doc_tools_ozone_verification_defs() -> ::jacquard_lexicon::lexicon::L
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for VerificationView<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.verification.defs"
+    }
+    fn def_name() -> &'static str {
+        "verificationView"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_verification_defs()

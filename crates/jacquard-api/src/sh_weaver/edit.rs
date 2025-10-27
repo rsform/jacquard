@@ -50,25 +50,30 @@ fn lexicon_doc_sh_weaver_edit_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "sh.weaver.edit.defs".into(),
+        id: ::jacquard_common::CowStr::new_static("sh.weaver.edit.defs"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "docRef".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("docRef"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["value".into()]),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("value")],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "value".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("value"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
-                                refs: vec!["#notebookRef".into(), "#entryRef".into()],
+                                refs: vec![
+                                    ::jacquard_common::CowStr::new_static("#notebookRef"),
+                                    ::jacquard_common::CowStr::new_static("#entryRef")
+                                ],
                                 closed: None,
                             }),
                         );
@@ -77,19 +82,25 @@ fn lexicon_doc_sh_weaver_edit_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                 }),
             );
             map.insert(
-                "entryRef".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("entryRef"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["notebook".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("notebook")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "notebook".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("notebook"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "com.atproto.repo.strongRef".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "com.atproto.repo.strongRef",
+                                ),
                             }),
                         );
                         map
@@ -97,19 +108,25 @@ fn lexicon_doc_sh_weaver_edit_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                 }),
             );
             map.insert(
-                "notebookRef".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("notebookRef"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["notebook".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("notebook")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "notebook".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("notebook"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "com.atproto.repo.strongRef".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "com.atproto.repo.strongRef",
+                                ),
                             }),
                         );
                         map
@@ -124,6 +141,9 @@ fn lexicon_doc_sh_weaver_edit_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DocRef<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.defs"
+    }
+    fn def_name() -> &'static str {
+        "docRef"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_edit_defs()
@@ -156,6 +176,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EntryRef<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.defs"
     }
+    fn def_name() -> &'static str {
+        "entryRef"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_edit_defs()
     }
@@ -186,6 +209,9 @@ pub struct NotebookRef<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NotebookRef<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.defs"
+    }
+    fn def_name() -> &'static str {
+        "notebookRef"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_edit_defs()

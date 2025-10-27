@@ -51,26 +51,40 @@ fn lexicon_doc_network_slices_waitlist_defs() -> ::jacquard_lexicon::lexicon::Le
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "network.slices.waitlist.defs".into(),
+        id: ::jacquard_common::CowStr::new_static("network.slices.waitlist.defs"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "inviteView".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("inviteView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "An invite granting a DID access with profile information",
+                        ),
+                    ),
                     required: Some(
-                        vec!["did".into(), "slice".into(), "createdAt".into()],
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("slice"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "createdAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "createdAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "When this invitation was created",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                 ),
@@ -85,9 +99,13 @@ fn lexicon_doc_network_slices_waitlist_defs() -> ::jacquard_lexicon::lexicon::Le
                             }),
                         );
                         map.insert(
-                            "did".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The DID being invited",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Did,
                                 ),
@@ -102,9 +120,15 @@ fn lexicon_doc_network_slices_waitlist_defs() -> ::jacquard_lexicon::lexicon::Le
                             }),
                         );
                         map.insert(
-                            "expiresAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "expiresAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Optional expiration date for this invitation",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                 ),
@@ -119,16 +143,22 @@ fn lexicon_doc_network_slices_waitlist_defs() -> ::jacquard_lexicon::lexicon::Le
                             }),
                         );
                         map.insert(
-                            "profile".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("profile"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "app.bsky.actor.defs#profileViewBasic".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "app.bsky.actor.defs#profileViewBasic",
+                                ),
                             }),
                         );
                         map.insert(
-                            "slice".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("slice"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The AT URI of the slice this invite is for",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
                                 ),
@@ -143,9 +173,13 @@ fn lexicon_doc_network_slices_waitlist_defs() -> ::jacquard_lexicon::lexicon::Le
                             }),
                         );
                         map.insert(
-                            "uri".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The AT URI of this invite record",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
                                 ),
@@ -164,18 +198,33 @@ fn lexicon_doc_network_slices_waitlist_defs() -> ::jacquard_lexicon::lexicon::Le
                 }),
             );
             map.insert(
-                "requestView".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("requestView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["slice".into(), "createdAt".into()]),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A request to join the waitlist with profile information",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("slice"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "createdAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "createdAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "When the user joined the waitlist",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                 ),
@@ -190,16 +239,22 @@ fn lexicon_doc_network_slices_waitlist_defs() -> ::jacquard_lexicon::lexicon::Le
                             }),
                         );
                         map.insert(
-                            "profile".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("profile"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "app.bsky.actor.defs#profileViewBasic".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "app.bsky.actor.defs#profileViewBasic",
+                                ),
                             }),
                         );
                         map.insert(
-                            "slice".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("slice"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The AT URI of the slice being requested access to",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
                                 ),
@@ -225,6 +280,9 @@ fn lexicon_doc_network_slices_waitlist_defs() -> ::jacquard_lexicon::lexicon::Le
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for InviteView<'a> {
     fn nsid() -> &'static str {
         "network.slices.waitlist.defs"
+    }
+    fn def_name() -> &'static str {
+        "inviteView"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_network_slices_waitlist_defs()
@@ -265,6 +323,9 @@ pub struct RequestView<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RequestView<'a> {
     fn nsid() -> &'static str {
         "network.slices.waitlist.defs"
+    }
+    fn def_name() -> &'static str {
+        "requestView"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_network_slices_waitlist_defs()

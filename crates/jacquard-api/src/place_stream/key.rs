@@ -97,6 +97,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Key<'a> {
     fn nsid() -> &'static str {
         "place.stream.key"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_key()
     }
@@ -105,21 +108,23 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Key<'a> {
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         {
             let value = &self.signing_key;
-            if value.as_ref().len() > 57usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 57usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "signing_key",
                     max: 57usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         {
             let value = &self.signing_key;
-            if value.as_ref().len() < 57usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 57usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
                     field: "signing_key",
                     min: 57usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -130,27 +135,42 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Key<'a> {
 fn lexicon_doc_place_stream_key() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "place.stream.key".into(),
+        id: ::jacquard_common::CowStr::new_static("place.stream.key"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("tid".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Record linking an atproto identity with a stream signing key",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
-                        required: Some(vec!["signingKey".into(), "createdAt".into()]),
+                        required: Some(
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("signingKey"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Client-declared timestamp when this key was created.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -165,9 +185,15 @@ fn lexicon_doc_place_stream_key() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                                 }),
                             );
                             map.insert(
-                                "createdBy".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdBy",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The name of the client that created this key.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -180,9 +206,15 @@ fn lexicon_doc_place_stream_key() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                                 }),
                             );
                             map.insert(
-                                "signingKey".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "signingKey",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The did:key signing key for the stream.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: Some(57usize),

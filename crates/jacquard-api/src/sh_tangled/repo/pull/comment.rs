@@ -91,6 +91,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Comment<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.repo.pull.comment"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_repo_pull_comment()
     }
@@ -106,27 +109,31 @@ fn lexicon_doc_sh_tangled_repo_pull_comment() -> ::jacquard_lexicon::lexicon::Le
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "sh.tangled.repo.pull.comment".into(),
+        id: ::jacquard_common::CowStr::new_static("sh.tangled.repo.pull.comment"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: None,
-                    key: Some("tid".into()),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: Some(
-                            vec!["pull".into(), "body".into(), "createdAt".into()],
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("pull"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("body"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                            ],
                         ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "body".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("body"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -141,7 +148,9 @@ fn lexicon_doc_sh_tangled_repo_pull_comment() -> ::jacquard_lexicon::lexicon::Le
                                 }),
                             );
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -158,7 +167,7 @@ fn lexicon_doc_sh_tangled_repo_pull_comment() -> ::jacquard_lexicon::lexicon::Le
                                 }),
                             );
                             map.insert(
-                                "pull".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("pull"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(

@@ -38,39 +38,59 @@ fn lexicon_doc_app_bsky_labeler_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "app.bsky.labeler.defs".into(),
+        id: ::jacquard_common::CowStr::new_static("app.bsky.labeler.defs"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "labelerPolicies".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("labelerPolicies"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["labelValues".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("labelValues")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "labelValueDefinitions".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "labelValueDefinitions",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Label values created by this labeler and scoped exclusively to it. Labels defined here will override global label definitions for this labeler.",
+                                    ),
+                                ),
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "com.atproto.label.defs#labelValueDefinition".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "com.atproto.label.defs#labelValueDefinition",
+                                    ),
                                 }),
                                 min_length: None,
                                 max_length: None,
                             }),
                         );
                         map.insert(
-                            "labelValues".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "labelValues",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The label values which this labeler publishes. May include global or custom labels.",
+                                    ),
+                                ),
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "com.atproto.label.defs#labelValue".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "com.atproto.label.defs#labelValue",
+                                    ),
                                 }),
                                 min_length: None,
                                 max_length: None,
@@ -81,13 +101,15 @@ fn lexicon_doc_app_bsky_labeler_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                 }),
             );
             map.insert(
-                "labelerView".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("labelerView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            "uri".into(), "cid".into(), "creator".into(), "indexedAt"
-                            .into()
+                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("cid"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("creator"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("indexedAt")
                         ],
                     ),
                     nullable: None,
@@ -95,7 +117,7 @@ fn lexicon_doc_app_bsky_labeler_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "cid".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("cid"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -112,14 +134,18 @@ fn lexicon_doc_app_bsky_labeler_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            "creator".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("creator"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "app.bsky.actor.defs#profileView".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "app.bsky.actor.defs#profileView",
+                                ),
                             }),
                         );
                         map.insert(
-                            "indexedAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "indexedAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -136,19 +162,23 @@ fn lexicon_doc_app_bsky_labeler_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            "labels".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("labels"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "com.atproto.label.defs#label".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "com.atproto.label.defs#label",
+                                    ),
                                 }),
                                 min_length: None,
                                 max_length: None,
                             }),
                         );
                         map.insert(
-                            "likeCount".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "likeCount",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -159,7 +189,7 @@ fn lexicon_doc_app_bsky_labeler_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            "uri".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -176,10 +206,12 @@ fn lexicon_doc_app_bsky_labeler_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            "viewer".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("viewer"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#labelerViewerState".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "#labelerViewerState",
+                                ),
                             }),
                         );
                         map
@@ -187,13 +219,16 @@ fn lexicon_doc_app_bsky_labeler_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                 }),
             );
             map.insert(
-                "labelerViewDetailed".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("labelerViewDetailed"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            "uri".into(), "cid".into(), "creator".into(), "policies"
-                            .into(), "indexedAt".into()
+                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("cid"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("creator"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("policies"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("indexedAt")
                         ],
                     ),
                     nullable: None,
@@ -201,7 +236,7 @@ fn lexicon_doc_app_bsky_labeler_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "cid".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("cid"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -218,14 +253,18 @@ fn lexicon_doc_app_bsky_labeler_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            "creator".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("creator"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "app.bsky.actor.defs#profileView".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "app.bsky.actor.defs#profileView",
+                                ),
                             }),
                         );
                         map.insert(
-                            "indexedAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "indexedAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -242,19 +281,23 @@ fn lexicon_doc_app_bsky_labeler_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            "labels".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("labels"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "com.atproto.label.defs#label".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "com.atproto.label.defs#label",
+                                    ),
                                 }),
                                 min_length: None,
                                 max_length: None,
                             }),
                         );
                         map.insert(
-                            "likeCount".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "likeCount",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -265,28 +308,44 @@ fn lexicon_doc_app_bsky_labeler_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            "policies".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("policies"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "app.bsky.labeler.defs#labelerPolicies".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "app.bsky.labeler.defs#labelerPolicies",
+                                ),
                             }),
                         );
                         map.insert(
-                            "reasonTypes".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "reasonTypes",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The set of report reason 'codes' which are in-scope for this service to review and action. These usually align to policy categories. If not defined (distinct from empty array), all reason types are allowed.",
+                                    ),
+                                ),
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "com.atproto.moderation.defs#reasonType".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "com.atproto.moderation.defs#reasonType",
+                                    ),
                                 }),
                                 min_length: None,
                                 max_length: None,
                             }),
                         );
                         map.insert(
-                            "subjectCollections".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "subjectCollections",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Set of record types (collection NSIDs) which can be reported to this service. If not defined (distinct from empty array), default is any record type.",
+                                    ),
+                                ),
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -306,19 +365,27 @@ fn lexicon_doc_app_bsky_labeler_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            "subjectTypes".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "subjectTypes",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The set of subject types (account, record, etc) this service accepts reports on.",
+                                    ),
+                                ),
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "com.atproto.moderation.defs#subjectType".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "com.atproto.moderation.defs#subjectType",
+                                    ),
                                 }),
                                 min_length: None,
                                 max_length: None,
                             }),
                         );
                         map.insert(
-                            "uri".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -335,10 +402,12 @@ fn lexicon_doc_app_bsky_labeler_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            "viewer".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("viewer"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#labelerViewerState".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "#labelerViewerState",
+                                ),
                             }),
                         );
                         map
@@ -346,7 +415,7 @@ fn lexicon_doc_app_bsky_labeler_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                 }),
             );
             map.insert(
-                "labelerViewerState".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("labelerViewerState"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -355,7 +424,7 @@ fn lexicon_doc_app_bsky_labeler_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "like".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("like"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -383,6 +452,9 @@ fn lexicon_doc_app_bsky_labeler_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LabelerPolicies<'a> {
     fn nsid() -> &'static str {
         "app.bsky.labeler.defs"
+    }
+    fn def_name() -> &'static str {
+        "labelerPolicies"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_labeler_defs()
@@ -430,6 +502,9 @@ pub struct LabelerView<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LabelerView<'a> {
     fn nsid() -> &'static str {
         "app.bsky.labeler.defs"
+    }
+    fn def_name() -> &'static str {
+        "labelerView"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_labeler_defs()
@@ -504,6 +579,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LabelerViewDetailed<'a> {
     fn nsid() -> &'static str {
         "app.bsky.labeler.defs"
     }
+    fn def_name() -> &'static str {
+        "labelerViewDetailed"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_labeler_defs()
     }
@@ -544,6 +622,9 @@ pub struct LabelerViewerState<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LabelerViewerState<'a> {
     fn nsid() -> &'static str {
         "app.bsky.labeler.defs"
+    }
+    fn def_name() -> &'static str {
+        "labelerViewerState"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_labeler_defs()

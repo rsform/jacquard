@@ -94,6 +94,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for State<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.repo.issue.state"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_repo_issue_state()
     }
@@ -109,25 +112,30 @@ fn lexicon_doc_sh_tangled_repo_issue_state() -> ::jacquard_lexicon::lexicon::Lex
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "sh.tangled.repo.issue.state".into(),
+        id: ::jacquard_common::CowStr::new_static("sh.tangled.repo.issue.state"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: None,
-                    key: Some("tid".into()),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
-                        required: Some(vec!["issue".into(), "state".into()]),
+                        required: Some(
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("issue"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("state")
+                            ],
+                        ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "issue".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("issue"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -144,9 +152,11 @@ fn lexicon_doc_sh_tangled_repo_issue_state() -> ::jacquard_lexicon::lexicon::Lex
                                 }),
                             );
                             map.insert(
-                                "state".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("state"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static("state of the issue"),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,

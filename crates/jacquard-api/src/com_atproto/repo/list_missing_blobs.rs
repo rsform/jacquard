@@ -96,13 +96,13 @@ fn lexicon_doc_com_atproto_repo_listMissingBlobs() -> ::jacquard_lexicon::lexico
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "com.atproto.repo.listMissingBlobs".into(),
+        id: ::jacquard_common::CowStr::new_static("com.atproto.repo.listMissingBlobs"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
                     description: None,
                     parameters: Some(
@@ -113,7 +113,7 @@ fn lexicon_doc_com_atproto_repo_listMissingBlobs() -> ::jacquard_lexicon::lexico
                                 #[allow(unused_mut)]
                                 let mut map = ::std::collections::BTreeMap::new();
                                 map.insert(
-                                    "cursor".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static("cursor"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
                                         description: None,
                                         format: None,
@@ -128,7 +128,7 @@ fn lexicon_doc_com_atproto_repo_listMissingBlobs() -> ::jacquard_lexicon::lexico
                                     }),
                                 );
                                 map.insert(
-                                    "limit".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static("limit"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                         description: None,
                                         default: None,
@@ -147,16 +147,21 @@ fn lexicon_doc_com_atproto_repo_listMissingBlobs() -> ::jacquard_lexicon::lexico
                 }),
             );
             map.insert(
-                "recordBlob".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("recordBlob"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["cid".into(), "recordUri".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("cid"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("recordUri")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "cid".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("cid"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -173,7 +178,9 @@ fn lexicon_doc_com_atproto_repo_listMissingBlobs() -> ::jacquard_lexicon::lexico
                             }),
                         );
                         map.insert(
-                            "recordUri".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "recordUri",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -201,6 +208,9 @@ fn lexicon_doc_com_atproto_repo_listMissingBlobs() -> ::jacquard_lexicon::lexico
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RecordBlob<'a> {
     fn nsid() -> &'static str {
         "com.atproto.repo.listMissingBlobs"
+    }
+    fn def_name() -> &'static str {
+        "recordBlob"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_repo_listMissingBlobs()

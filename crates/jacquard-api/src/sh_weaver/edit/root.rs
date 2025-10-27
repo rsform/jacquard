@@ -94,6 +94,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Root<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.root"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_edit_root()
     }
@@ -109,21 +112,28 @@ fn lexicon_doc_sh_weaver_edit_root() -> ::jacquard_lexicon::lexicon::LexiconDoc<
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "sh.weaver.edit.root".into(),
+        id: ::jacquard_common::CowStr::new_static("sh.weaver.edit.root"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("tid".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "The starting point for edit history on a notebook.",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: Some(
                             vec![
-                                "cid".into(), "uri".into(), "doc".into(), "snapshot".into()
+                                ::jacquard_common::smol_str::SmolStr::new_static("cid"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("uri"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("doc"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("snapshot")
                             ],
                         ),
                         nullable: None,
@@ -131,7 +141,7 @@ fn lexicon_doc_sh_weaver_edit_root() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "cid".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("cid"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -148,14 +158,18 @@ fn lexicon_doc_sh_weaver_edit_root() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                                 }),
                             );
                             map.insert(
-                                "doc".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("doc"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "sh.weaver.edit.defs#docRef".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "sh.weaver.edit.defs#docRef",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "snapshot".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "snapshot",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
                                     description: None,
                                     accept: None,
@@ -163,7 +177,7 @@ fn lexicon_doc_sh_weaver_edit_root() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                                 }),
                             );
                             map.insert(
-                                "uri".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("uri"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(

@@ -35,24 +35,28 @@ fn lexicon_doc_club_stellz_evm_addressControl() -> ::jacquard_lexicon::lexicon::
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "club.stellz.evm.addressControl".into(),
+        id: ::jacquard_common::CowStr::new_static("club.stellz.evm.addressControl"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
-                        vec!["address".into(), "signature".into(), "siwe".into()],
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("address"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("signature"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("siwe")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "address".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("address"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Bytes(::jacquard_lexicon::lexicon::LexBytes {
                                 description: None,
                                 max_length: None,
@@ -60,9 +64,13 @@ fn lexicon_doc_club_stellz_evm_addressControl() -> ::jacquard_lexicon::lexicon::
                             }),
                         );
                         map.insert(
-                            "alsoOn".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("alsoOn"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "List of all Chain IDs (besides the one in the sign-in message, though you can include it) that the holder of this address is also active on & accepts tokens thru.",
+                                    ),
+                                ),
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -76,7 +84,9 @@ fn lexicon_doc_club_stellz_evm_addressControl() -> ::jacquard_lexicon::lexicon::
                             }),
                         );
                         map.insert(
-                            "signature".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "signature",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Bytes(::jacquard_lexicon::lexicon::LexBytes {
                                 description: None,
                                 max_length: None,
@@ -84,10 +94,10 @@ fn lexicon_doc_club_stellz_evm_addressControl() -> ::jacquard_lexicon::lexicon::
                             }),
                         );
                         map.insert(
-                            "siwe".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("siwe"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#siweMessage".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static("#siweMessage"),
                             }),
                         );
                         map
@@ -95,14 +105,19 @@ fn lexicon_doc_club_stellz_evm_addressControl() -> ::jacquard_lexicon::lexicon::
                 }),
             );
             map.insert(
-                "siweMessage".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("siweMessage"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            "domain".into(), "address".into(), "statement".into(), "uri"
-                            .into(), "version".into(), "chainId".into(), "nonce".into(),
-                            "issuedAt".into()
+                            ::jacquard_common::smol_str::SmolStr::new_static("domain"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("address"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("statement"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("version"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("chainId"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("nonce"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("issuedAt")
                         ],
                     ),
                     nullable: None,
@@ -110,9 +125,13 @@ fn lexicon_doc_club_stellz_evm_addressControl() -> ::jacquard_lexicon::lexicon::
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "address".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("address"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Ethereum address in 0x-prefixed, checksummed hex format",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: Some(42usize),
@@ -125,7 +144,7 @@ fn lexicon_doc_club_stellz_evm_addressControl() -> ::jacquard_lexicon::lexicon::
                             }),
                         );
                         map.insert(
-                            "chainId".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("chainId"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -136,9 +155,13 @@ fn lexicon_doc_club_stellz_evm_addressControl() -> ::jacquard_lexicon::lexicon::
                             }),
                         );
                         map.insert(
-                            "domain".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("domain"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Domain of the application requesting the signature, e.g. 'wallet-link.stellz.club'",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -151,9 +174,13 @@ fn lexicon_doc_club_stellz_evm_addressControl() -> ::jacquard_lexicon::lexicon::
                             }),
                         );
                         map.insert(
-                            "issuedAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("issuedAt"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Timestamp when the message was signed",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                 ),
@@ -168,9 +195,13 @@ fn lexicon_doc_club_stellz_evm_addressControl() -> ::jacquard_lexicon::lexicon::
                             }),
                         );
                         map.insert(
-                            "nonce".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("nonce"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Random nonce the message was signed with",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: Some(8usize),
@@ -183,9 +214,15 @@ fn lexicon_doc_club_stellz_evm_addressControl() -> ::jacquard_lexicon::lexicon::
                             }),
                         );
                         map.insert(
-                            "statement".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "statement",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The message shown to the user in their wallet before signing, which MUST be of the format 'Prove control of ${address} to link it to ${did}', where ${address} is the linked Ethereum address in 0x-prefixed, checksummed hex format, and ${did} is the DID of the user.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: Some(78usize),
@@ -198,9 +235,13 @@ fn lexicon_doc_club_stellz_evm_addressControl() -> ::jacquard_lexicon::lexicon::
                             }),
                         );
                         map.insert(
-                            "uri".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "URI of the application requesting the signature, e.g. 'https://wallet-link.stellz.club'",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                 ),
@@ -215,9 +256,13 @@ fn lexicon_doc_club_stellz_evm_addressControl() -> ::jacquard_lexicon::lexicon::
                             }),
                         );
                         map.insert(
-                            "version".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("version"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Sign in With Ethereum message version",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -241,6 +286,9 @@ fn lexicon_doc_club_stellz_evm_addressControl() -> ::jacquard_lexicon::lexicon::
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AddressControl<'a> {
     fn nsid() -> &'static str {
         "club.stellz.evm.addressControl"
+    }
+    fn def_name() -> &'static str {
+        "main"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_club_stellz_evm_addressControl()
@@ -298,6 +346,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SiweMessage<'a> {
     fn nsid() -> &'static str {
         "club.stellz.evm.addressControl"
     }
+    fn def_name() -> &'static str {
+        "siweMessage"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_club_stellz_evm_addressControl()
     }
@@ -306,51 +357,56 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SiweMessage<'a> {
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         {
             let value = &self.address;
-            if value.as_ref().len() > 42usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 42usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "address",
                     max: 42usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         {
             let value = &self.address;
-            if value.as_ref().len() < 42usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 42usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
                     field: "address",
                     min: 42usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         {
             let value = &self.nonce;
-            if value.as_ref().len() > 256usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "nonce",
                     max: 256usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         {
             let value = &self.nonce;
-            if value.as_ref().len() < 8usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 8usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
                     field: "nonce",
                     min: 8usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         {
             let value = &self.statement;
-            if value.as_ref().len() < 78usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 78usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
                     field: "statement",
                     min: 78usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }

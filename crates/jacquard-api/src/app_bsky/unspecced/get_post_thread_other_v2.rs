@@ -94,26 +94,36 @@ fn lexicon_doc_app_bsky_unspecced_getPostThreadOtherV2() -> ::jacquard_lexicon::
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "app.bsky.unspecced.getPostThreadOtherV2".into(),
+        id: ::jacquard_common::CowStr::new_static(
+            "app.bsky.unspecced.getPostThreadOtherV2",
+        ),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
                     description: None,
                     parameters: Some(
                         ::jacquard_lexicon::lexicon::LexXrpcQueryParameter::Params(::jacquard_lexicon::lexicon::LexXrpcParameters {
                             description: None,
-                            required: Some(vec!["anchor".into()]),
+                            required: Some(
+                                vec![
+                                    ::jacquard_common::smol_str::SmolStr::new_static("anchor")
+                                ],
+                            ),
                             properties: {
                                 #[allow(unused_mut)]
                                 let mut map = ::std::collections::BTreeMap::new();
                                 map.insert(
-                                    "anchor".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static("anchor"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
+                                        description: Some(
+                                            ::jacquard_common::CowStr::new_static(
+                                                "Reference (AT-URI) to post record. This is the anchor post.",
+                                            ),
+                                        ),
                                         format: Some(
                                             ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
                                         ),
@@ -128,7 +138,9 @@ fn lexicon_doc_app_bsky_unspecced_getPostThreadOtherV2() -> ::jacquard_lexicon::
                                     }),
                                 );
                                 map.insert(
-                                    "prioritizeFollowedUsers".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static(
+                                        "prioritizeFollowedUsers",
+                                    ),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                         description: None,
                                         default: None,
@@ -144,16 +156,22 @@ fn lexicon_doc_app_bsky_unspecced_getPostThreadOtherV2() -> ::jacquard_lexicon::
                 }),
             );
             map.insert(
-                "threadItem".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("threadItem"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["uri".into(), "depth".into(), "value".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("depth"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("value")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "depth".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("depth"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -164,7 +182,7 @@ fn lexicon_doc_app_bsky_unspecced_getPostThreadOtherV2() -> ::jacquard_lexicon::
                             }),
                         );
                         map.insert(
-                            "uri".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -181,10 +199,12 @@ fn lexicon_doc_app_bsky_unspecced_getPostThreadOtherV2() -> ::jacquard_lexicon::
                             }),
                         );
                         map.insert(
-                            "value".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("value"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
-                                refs: vec!["app.bsky.unspecced.defs#threadItemPost".into()],
+                                refs: vec![
+                                    ::jacquard_common::CowStr::new_static("app.bsky.unspecced.defs#threadItemPost")
+                                ],
                                 closed: None,
                             }),
                         );
@@ -200,6 +220,9 @@ fn lexicon_doc_app_bsky_unspecced_getPostThreadOtherV2() -> ::jacquard_lexicon::
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThreadItem<'a> {
     fn nsid() -> &'static str {
         "app.bsky.unspecced.getPostThreadOtherV2"
+    }
+    fn def_name() -> &'static str {
+        "threadItem"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_unspecced_getPostThreadOtherV2()

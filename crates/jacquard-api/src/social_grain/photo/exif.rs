@@ -124,6 +124,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Exif<'a> {
     fn nsid() -> &'static str {
         "social.grain.photo.exif"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_grain_photo_exif()
     }
@@ -139,25 +142,36 @@ fn lexicon_doc_social_grain_photo_exif() -> ::jacquard_lexicon::lexicon::Lexicon
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "social.grain.photo.exif".into(),
+        id: ::jacquard_common::CowStr::new_static("social.grain.photo.exif"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("tid".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Basic EXIF metadata for a photo. Integers are scaled by 1000000 to accommodate decimal values and potentially other tags in the future.",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
-                        required: Some(vec!["photo".into(), "createdAt".into()]),
+                        required: Some(
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("photo"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -174,7 +188,9 @@ fn lexicon_doc_social_grain_photo_exif() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                "dateTimeOriginal".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "dateTimeOriginal",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -191,7 +207,9 @@ fn lexicon_doc_social_grain_photo_exif() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                "exposureTime".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "exposureTime",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -202,7 +220,7 @@ fn lexicon_doc_social_grain_photo_exif() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                "fNumber".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("fNumber"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -213,7 +231,7 @@ fn lexicon_doc_social_grain_photo_exif() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                "flash".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("flash"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -228,7 +246,9 @@ fn lexicon_doc_social_grain_photo_exif() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                "focalLengthIn35mmFormat".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "focalLengthIn35mmFormat",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -239,7 +259,7 @@ fn lexicon_doc_social_grain_photo_exif() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                "iSO".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("iSO"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -250,7 +270,9 @@ fn lexicon_doc_social_grain_photo_exif() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                "lensMake".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "lensMake",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -265,7 +287,9 @@ fn lexicon_doc_social_grain_photo_exif() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                "lensModel".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "lensModel",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -280,7 +304,7 @@ fn lexicon_doc_social_grain_photo_exif() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                "make".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("make"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -295,7 +319,7 @@ fn lexicon_doc_social_grain_photo_exif() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                "model".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("model"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -310,7 +334,7 @@ fn lexicon_doc_social_grain_photo_exif() -> ::jacquard_lexicon::lexicon::Lexicon
                                 }),
                             );
                             map.insert(
-                                "photo".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("photo"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(

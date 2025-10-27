@@ -125,13 +125,15 @@ fn lexicon_doc_app_bsky_notification_listNotifications() -> ::jacquard_lexicon::
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "app.bsky.notification.listNotifications".into(),
+        id: ::jacquard_common::CowStr::new_static(
+            "app.bsky.notification.listNotifications",
+        ),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
                     description: None,
                     parameters: Some(
@@ -142,7 +144,7 @@ fn lexicon_doc_app_bsky_notification_listNotifications() -> ::jacquard_lexicon::
                                 #[allow(unused_mut)]
                                 let mut map = ::std::collections::BTreeMap::new();
                                 map.insert(
-                                    "cursor".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static("cursor"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
                                         description: None,
                                         format: None,
@@ -157,7 +159,7 @@ fn lexicon_doc_app_bsky_notification_listNotifications() -> ::jacquard_lexicon::
                                     }),
                                 );
                                 map.insert(
-                                    "limit".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static("limit"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                         description: None,
                                         default: None,
@@ -168,7 +170,9 @@ fn lexicon_doc_app_bsky_notification_listNotifications() -> ::jacquard_lexicon::
                                     }),
                                 );
                                 map.insert(
-                                    "priority".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static(
+                                        "priority",
+                                    ),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                         description: None,
                                         default: None,
@@ -176,11 +180,15 @@ fn lexicon_doc_app_bsky_notification_listNotifications() -> ::jacquard_lexicon::
                                     }),
                                 );
                                 map.insert(
-                                    "reasons".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static("reasons"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Array(::jacquard_lexicon::lexicon::LexPrimitiveArray {
                                         description: None,
                                         items: ::jacquard_lexicon::lexicon::LexPrimitiveArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                            description: None,
+                                            description: Some(
+                                                ::jacquard_common::CowStr::new_static(
+                                                    "A reason that matches the reason property of #notification.",
+                                                ),
+                                            ),
                                             format: None,
                                             default: None,
                                             min_length: None,
@@ -196,7 +204,7 @@ fn lexicon_doc_app_bsky_notification_listNotifications() -> ::jacquard_lexicon::
                                     }),
                                 );
                                 map.insert(
-                                    "seenAt".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static("seenAt"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
                                         description: None,
                                         format: Some(
@@ -221,13 +229,18 @@ fn lexicon_doc_app_bsky_notification_listNotifications() -> ::jacquard_lexicon::
                 }),
             );
             map.insert(
-                "notification".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("notification"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            "uri".into(), "cid".into(), "author".into(), "reason".into(),
-                            "record".into(), "isRead".into(), "indexedAt".into()
+                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("cid"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("author"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("reason"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("record"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("isRead"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("indexedAt")
                         ],
                     ),
                     nullable: None,
@@ -235,14 +248,16 @@ fn lexicon_doc_app_bsky_notification_listNotifications() -> ::jacquard_lexicon::
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "author".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("author"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "app.bsky.actor.defs#profileView".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "app.bsky.actor.defs#profileView",
+                                ),
                             }),
                         );
                         map.insert(
-                            "cid".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("cid"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -259,7 +274,9 @@ fn lexicon_doc_app_bsky_notification_listNotifications() -> ::jacquard_lexicon::
                             }),
                         );
                         map.insert(
-                            "indexedAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "indexedAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -276,7 +293,7 @@ fn lexicon_doc_app_bsky_notification_listNotifications() -> ::jacquard_lexicon::
                             }),
                         );
                         map.insert(
-                            "isRead".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("isRead"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                 description: None,
                                 default: None,
@@ -284,21 +301,27 @@ fn lexicon_doc_app_bsky_notification_listNotifications() -> ::jacquard_lexicon::
                             }),
                         );
                         map.insert(
-                            "labels".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("labels"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "com.atproto.label.defs#label".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "com.atproto.label.defs#label",
+                                    ),
                                 }),
                                 min_length: None,
                                 max_length: None,
                             }),
                         );
                         map.insert(
-                            "reason".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("reason"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The reason why this notification was delivered - e.g. your post was liked, or you received a new follower.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -311,7 +334,9 @@ fn lexicon_doc_app_bsky_notification_listNotifications() -> ::jacquard_lexicon::
                             }),
                         );
                         map.insert(
-                            "reasonSubject".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "reasonSubject",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -328,13 +353,13 @@ fn lexicon_doc_app_bsky_notification_listNotifications() -> ::jacquard_lexicon::
                             }),
                         );
                         map.insert(
-                            "record".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("record"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
                                 description: None,
                             }),
                         );
                         map.insert(
-                            "uri".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -362,6 +387,9 @@ fn lexicon_doc_app_bsky_notification_listNotifications() -> ::jacquard_lexicon::
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Notification<'a> {
     fn nsid() -> &'static str {
         "app.bsky.notification.listNotifications"
+    }
+    fn def_name() -> &'static str {
+        "notification"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_notification_listNotifications()

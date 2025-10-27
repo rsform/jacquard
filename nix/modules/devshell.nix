@@ -17,7 +17,7 @@
         nixd # Nix language server
         bacon
         rust-analyzer
-        cargo-release
+        cargo-machete
         cargo-semver-checks
         cargo-binstall
         cargo-dist

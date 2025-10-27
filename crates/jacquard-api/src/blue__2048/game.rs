@@ -100,6 +100,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Game<'a> {
     fn nsid() -> &'static str {
         "blue.2048.game"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blue_2048_game()
     }
@@ -113,23 +116,30 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Game<'a> {
 fn lexicon_doc_blue_2048_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "blue.2048.game".into(),
+        id: ::jacquard_common::CowStr::new_static("blue.2048.game"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("tid".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A declaration of an instance of a at://2048 game",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: Some(
                             vec![
-                                "currentScore".into(), "won".into(), "completed".into(),
-                                "seededRecording".into(), "syncStatus".into(), "createdAt"
-                                .into()
+                                ::jacquard_common::smol_str::SmolStr::new_static("currentScore"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("won"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("completed"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("seededRecording"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("syncStatus"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -137,7 +147,9 @@ fn lexicon_doc_blue_2048_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "completed".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "completed",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                     description: None,
                                     default: None,
@@ -145,7 +157,9 @@ fn lexicon_doc_blue_2048_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                                 }),
                             );
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -162,7 +176,9 @@ fn lexicon_doc_blue_2048_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                                 }),
                             );
                             map.insert(
-                                "currentScore".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "currentScore",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -173,9 +189,15 @@ fn lexicon_doc_blue_2048_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                                 }),
                             );
                             map.insert(
-                                "seededRecording".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "seededRecording",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "This is the recording of the game. Like chess notation, but for 2048",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -188,14 +210,18 @@ fn lexicon_doc_blue_2048_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                                 }),
                             );
                             map.insert(
-                                "syncStatus".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "syncStatus",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "blue.2048.defs#syncStatus".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "blue.2048.defs#syncStatus",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "won".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("won"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                     description: None,
                                     default: None,

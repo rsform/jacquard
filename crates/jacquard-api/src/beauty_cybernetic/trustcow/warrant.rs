@@ -111,6 +111,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Warrant<'a> {
     fn nsid() -> &'static str {
         "beauty.cybernetic.trustcow.warrant"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_beauty_cybernetic_trustcow_warrant()
     }
@@ -118,11 +121,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Warrant<'a> {
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         if let Some(ref value) = self.description {
-            if value.as_ref().len() > 300usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 300usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "description",
                     max: 300usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -135,27 +139,42 @@ fn lexicon_doc_beauty_cybernetic_trustcow_warrant() -> ::jacquard_lexicon::lexic
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "beauty.cybernetic.trustcow.warrant".into(),
+        id: ::jacquard_common::CowStr::new_static("beauty.cybernetic.trustcow.warrant"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A warrant where one ATProto identity vouches for the trustworthiness of another identity",
+                        ),
+                    ),
                     key: None,
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
-                        required: Some(vec!["subject".into(), "createdAt".into()]),
+                        required: Some(
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("subject"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "When the warrant was created",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -170,9 +189,15 @@ fn lexicon_doc_beauty_cybernetic_trustcow_warrant() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                "description".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "description",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Optional description explaining the basis for this warrant",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -185,9 +210,15 @@ fn lexicon_doc_beauty_cybernetic_trustcow_warrant() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                "expiresAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "expiresAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Optional expiration date for this warrant",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -202,9 +233,13 @@ fn lexicon_doc_beauty_cybernetic_trustcow_warrant() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                "subject".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("subject"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "DID of the identity being warranted for",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -217,9 +252,15 @@ fn lexicon_doc_beauty_cybernetic_trustcow_warrant() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                "trustLevel".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "trustLevel",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Level of trust being warranted",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -232,9 +273,15 @@ fn lexicon_doc_beauty_cybernetic_trustcow_warrant() -> ::jacquard_lexicon::lexic
                                 }),
                             );
                             map.insert(
-                                "warrantType".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "warrantType",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Type of warrant being provided",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,

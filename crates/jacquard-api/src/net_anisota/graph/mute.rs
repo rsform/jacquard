@@ -38,22 +38,26 @@ fn lexicon_doc_net_anisota_graph_mute() -> ::jacquard_lexicon::lexicon::LexiconD
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "net.anisota.graph.mute".into(),
+        id: ::jacquard_common::CowStr::new_static("net.anisota.graph.mute"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "contentTypes".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("contentTypes"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Configuration for which types of content to mute",
+                        ),
+                    ),
                     required: None,
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "posts".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("posts"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                 description: None,
                                 default: None,
@@ -61,7 +65,7 @@ fn lexicon_doc_net_anisota_graph_mute() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "quotes".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("quotes"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                 description: None,
                                 default: None,
@@ -69,7 +73,7 @@ fn lexicon_doc_net_anisota_graph_mute() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "replies".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("replies"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                 description: None,
                                 default: None,
@@ -77,7 +81,7 @@ fn lexicon_doc_net_anisota_graph_mute() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "reposts".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("reposts"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                 description: None,
                                 default: None,
@@ -89,28 +93,47 @@ fn lexicon_doc_net_anisota_graph_mute() -> ::jacquard_lexicon::lexicon::LexiconD
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("tid".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A record for muting content from a specific account with fine-grained control over content types and duration",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
-                        required: Some(vec!["subject".into(), "createdAt".into()]),
+                        required: Some(
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("subject"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "contentTypes".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "contentTypes",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "#contentTypes".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "#contentTypes",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "When the mute was created",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -125,9 +148,15 @@ fn lexicon_doc_net_anisota_graph_mute() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                "expiresAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "expiresAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "When this mute expires. If not set, mute is permanent",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -142,9 +171,13 @@ fn lexicon_doc_net_anisota_graph_mute() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                "reason".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("reason"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Optional reason for muting this account",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -157,9 +190,13 @@ fn lexicon_doc_net_anisota_graph_mute() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                "subject".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("subject"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "DID of the account to mute",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Did,
                                     ),
@@ -174,9 +211,15 @@ fn lexicon_doc_net_anisota_graph_mute() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                "targetFeeds".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "targetFeeds",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Specific feeds where this mute should apply. If empty, applies to all feeds",
+                                        ),
+                                    ),
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
                                         description: None,
                                         format: Some(
@@ -208,6 +251,9 @@ fn lexicon_doc_net_anisota_graph_mute() -> ::jacquard_lexicon::lexicon::LexiconD
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContentTypes<'a> {
     fn nsid() -> &'static str {
         "net.anisota.graph.mute"
+    }
+    fn def_name() -> &'static str {
+        "contentTypes"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_graph_mute()
@@ -324,6 +370,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Mute<'a> {
     fn nsid() -> &'static str {
         "net.anisota.graph.mute"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_graph_mute()
     }
@@ -331,15 +380,17 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Mute<'a> {
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         if let Some(ref value) = self.reason {
-            if value.as_ref().len() > 300usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 300usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "reason",
                     max: 300usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         if let Some(ref value) = self.target_feeds {
+            #[allow(unused_comparisons)]
             if value.len() > 50usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "target_feeds",

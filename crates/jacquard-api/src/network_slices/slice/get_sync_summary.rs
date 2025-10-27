@@ -30,19 +30,20 @@ fn lexicon_doc_network_slices_slice_getSyncSummary() -> ::jacquard_lexicon::lexi
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "network.slices.slice.getSyncSummary".into(),
+        id: ::jacquard_common::CowStr::new_static("network.slices.slice.getSyncSummary"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "collectionSummary".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("collectionSummary"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            "collection".into(), "estimatedRepos".into(), "isExternal"
-                            .into()
+                            ::jacquard_common::smol_str::SmolStr::new_static("collection"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("estimatedRepos"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("isExternal")
                         ],
                     ),
                     nullable: None,
@@ -50,7 +51,9 @@ fn lexicon_doc_network_slices_slice_getSyncSummary() -> ::jacquard_lexicon::lexi
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "collection".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "collection",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -65,7 +68,9 @@ fn lexicon_doc_network_slices_slice_getSyncSummary() -> ::jacquard_lexicon::lexi
                             }),
                         );
                         map.insert(
-                            "estimatedRepos".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "estimatedRepos",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -76,7 +81,9 @@ fn lexicon_doc_network_slices_slice_getSyncSummary() -> ::jacquard_lexicon::lexi
                             }),
                         );
                         map.insert(
-                            "isExternal".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "isExternal",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                 description: None,
                                 default: None,
@@ -88,18 +95,24 @@ fn lexicon_doc_network_slices_slice_getSyncSummary() -> ::jacquard_lexicon::lexi
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
                     description: None,
                     parameters: Some(
                         ::jacquard_lexicon::lexicon::LexXrpcQueryParameter::Params(::jacquard_lexicon::lexicon::LexXrpcParameters {
                             description: None,
-                            required: Some(vec!["slice".into()]),
+                            required: Some(
+                                vec![
+                                    ::jacquard_common::smol_str::SmolStr::new_static("slice")
+                                ],
+                            ),
                             properties: {
                                 #[allow(unused_mut)]
                                 let mut map = ::std::collections::BTreeMap::new();
                                 map.insert(
-                                    "collections".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static(
+                                        "collections",
+                                    ),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Array(::jacquard_lexicon::lexicon::LexPrimitiveArray {
                                         description: None,
                                         items: ::jacquard_lexicon::lexicon::LexPrimitiveArrayItem::String(::jacquard_lexicon::lexicon::LexString {
@@ -119,7 +132,9 @@ fn lexicon_doc_network_slices_slice_getSyncSummary() -> ::jacquard_lexicon::lexi
                                     }),
                                 );
                                 map.insert(
-                                    "externalCollections".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static(
+                                        "externalCollections",
+                                    ),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Array(::jacquard_lexicon::lexicon::LexPrimitiveArray {
                                         description: None,
                                         items: ::jacquard_lexicon::lexicon::LexPrimitiveArrayItem::String(::jacquard_lexicon::lexicon::LexString {
@@ -139,7 +154,7 @@ fn lexicon_doc_network_slices_slice_getSyncSummary() -> ::jacquard_lexicon::lexi
                                     }),
                                 );
                                 map.insert(
-                                    "repos".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static("repos"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Array(::jacquard_lexicon::lexicon::LexPrimitiveArray {
                                         description: None,
                                         items: ::jacquard_lexicon::lexicon::LexPrimitiveArrayItem::String(::jacquard_lexicon::lexicon::LexString {
@@ -159,9 +174,13 @@ fn lexicon_doc_network_slices_slice_getSyncSummary() -> ::jacquard_lexicon::lexi
                                     }),
                                 );
                                 map.insert(
-                                    "slice".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static("slice"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
+                                        description: Some(
+                                            ::jacquard_common::CowStr::new_static(
+                                                "URI of the slice to sync",
+                                            ),
+                                        ),
                                         format: None,
                                         default: None,
                                         min_length: None,
@@ -189,6 +208,9 @@ fn lexicon_doc_network_slices_slice_getSyncSummary() -> ::jacquard_lexicon::lexi
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CollectionSummary<'a> {
     fn nsid() -> &'static str {
         "network.slices.slice.getSyncSummary"
+    }
+    fn def_name() -> &'static str {
+        "collectionSummary"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_network_slices_slice_getSyncSummary()

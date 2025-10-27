@@ -98,6 +98,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Rel<'a> {
     fn nsid() -> &'static str {
         "my.skylights.rel"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_my_skylights_rel()
     }
@@ -111,25 +114,31 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Rel<'a> {
 fn lexicon_doc_my_skylights_rel() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "my.skylights.rel".into(),
+        id: ::jacquard_common::CowStr::new_static("my.skylights.rel"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: None,
-                    key: Some("tid".into()),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
-                        required: Some(vec!["item".into()]),
+                        required: Some(
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("item")
+                            ],
+                        ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "finishedAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "finishedAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: None,
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
@@ -151,24 +160,26 @@ fn lexicon_doc_my_skylights_rel() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                                 }),
                             );
                             map.insert(
-                                "item".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("item"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "my.skylights.defs#item".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "my.skylights.defs#item",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "note".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("note"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "#note".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static("#note"),
                                 }),
                             );
                             map.insert(
-                                "rating".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("rating"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "#rating".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static("#rating"),
                                 }),
                             );
                             map
@@ -177,18 +188,24 @@ fn lexicon_doc_my_skylights_rel() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                 }),
             );
             map.insert(
-                "note".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("note"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
-                        vec!["value".into(), "createdAt".into(), "updatedAt".into()],
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("value"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("createdAt"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("updatedAt")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "createdAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "createdAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -205,7 +222,9 @@ fn lexicon_doc_my_skylights_rel() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                             }),
                         );
                         map.insert(
-                            "updatedAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "updatedAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -222,7 +241,7 @@ fn lexicon_doc_my_skylights_rel() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                             }),
                         );
                         map.insert(
-                            "value".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("value"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -241,16 +260,23 @@ fn lexicon_doc_my_skylights_rel() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                 }),
             );
             map.insert(
-                "rating".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("rating"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["value".into(), "createdAt".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("value"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "createdAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "createdAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -267,7 +293,7 @@ fn lexicon_doc_my_skylights_rel() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                             }),
                         );
                         map.insert(
-                            "value".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("value"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -310,6 +336,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Note<'a> {
     fn nsid() -> &'static str {
         "my.skylights.rel"
     }
+    fn def_name() -> &'static str {
+        "note"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_my_skylights_rel()
     }
@@ -340,6 +369,9 @@ pub struct Rating<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Rating<'a> {
     fn nsid() -> &'static str {
         "my.skylights.rel"
+    }
+    fn def_name() -> &'static str {
+        "rating"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_my_skylights_rel()

@@ -115,31 +115,43 @@ fn lexicon_doc_network_slices_slice_getSparklines() -> ::jacquard_lexicon::lexic
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "network.slices.slice.getSparklines".into(),
+        id: ::jacquard_common::CowStr::new_static("network.slices.slice.getSparklines"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcProcedure(::jacquard_lexicon::lexicon::LexXrpcProcedure {
                     description: None,
                     parameters: None,
                     input: Some(::jacquard_lexicon::lexicon::LexXrpcBody {
                         description: None,
-                        encoding: "application/json".into(),
+                        encoding: ::jacquard_common::CowStr::new_static(
+                            "application/json",
+                        ),
                         schema: Some(
                             ::jacquard_lexicon::lexicon::LexXrpcBodySchema::Object(::jacquard_lexicon::lexicon::LexObject {
                                 description: None,
-                                required: Some(vec!["slices".into()]),
+                                required: Some(
+                                    vec![
+                                        ::jacquard_common::smol_str::SmolStr::new_static("slices")
+                                    ],
+                                ),
                                 nullable: None,
                                 properties: {
                                     #[allow(unused_mut)]
                                     let mut map = ::std::collections::BTreeMap::new();
                                     map.insert(
-                                        "duration".into(),
+                                        ::jacquard_common::smol_str::SmolStr::new_static(
+                                            "duration",
+                                        ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                            description: None,
+                                            description: Some(
+                                                ::jacquard_common::CowStr::new_static(
+                                                    "Time range to fetch data for",
+                                                ),
+                                            ),
                                             format: None,
                                             default: None,
                                             min_length: None,
@@ -152,9 +164,15 @@ fn lexicon_doc_network_slices_slice_getSparklines() -> ::jacquard_lexicon::lexic
                                         }),
                                     );
                                     map.insert(
-                                        "interval".into(),
+                                        ::jacquard_common::smol_str::SmolStr::new_static(
+                                            "interval",
+                                        ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                            description: None,
+                                            description: Some(
+                                                ::jacquard_common::CowStr::new_static(
+                                                    "Time interval for data points",
+                                                ),
+                                            ),
                                             format: None,
                                             default: None,
                                             min_length: None,
@@ -167,9 +185,13 @@ fn lexicon_doc_network_slices_slice_getSparklines() -> ::jacquard_lexicon::lexic
                                         }),
                                     );
                                     map.insert(
-                                        "slices".into(),
+                                        ::jacquard_common::smol_str::SmolStr::new_static("slices"),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                            description: None,
+                                            description: Some(
+                                                ::jacquard_common::CowStr::new_static(
+                                                    "Array of slice AT-URIs to get sparkline data for",
+                                                ),
+                                            ),
                                             items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
                                                 description: None,
                                                 format: None,
@@ -196,30 +218,43 @@ fn lexicon_doc_network_slices_slice_getSparklines() -> ::jacquard_lexicon::lexic
                 }),
             );
             map.insert(
-                "sparklineEntry".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("sparklineEntry"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["sliceUri".into(), "points".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("sliceUri"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("points")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "points".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("points"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Array of sparkline data points",
+                                    ),
+                                ),
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "network.slices.slice.defs#sparklinePoint".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "network.slices.slice.defs#sparklinePoint",
+                                    ),
                                 }),
                                 min_length: None,
                                 max_length: None,
                             }),
                         );
                         map.insert(
-                            "sliceUri".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("sliceUri"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static("AT-URI of the slice"),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -243,6 +278,9 @@ fn lexicon_doc_network_slices_slice_getSparklines() -> ::jacquard_lexicon::lexic
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SparklineEntry<'a> {
     fn nsid() -> &'static str {
         "network.slices.slice.getSparklines"
+    }
+    fn def_name() -> &'static str {
+        "sparklineEntry"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_network_slices_slice_getSparklines()

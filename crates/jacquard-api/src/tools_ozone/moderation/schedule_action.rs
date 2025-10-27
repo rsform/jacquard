@@ -34,22 +34,29 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::le
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "tools.ozone.moderation.scheduleAction".into(),
+        id: ::jacquard_common::CowStr::new_static(
+            "tools.ozone.moderation.scheduleAction",
+        ),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "failedScheduling".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("failedScheduling"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["subject".into(), "error".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("subject"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("error")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "error".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("error"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -64,7 +71,9 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::le
                             }),
                         );
                         map.insert(
-                            "errorCode".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "errorCode",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -79,7 +88,7 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::le
                             }),
                         );
                         map.insert(
-                            "subject".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("subject"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -100,20 +109,24 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::le
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcProcedure(::jacquard_lexicon::lexicon::LexXrpcProcedure {
                     description: None,
                     parameters: None,
                     input: Some(::jacquard_lexicon::lexicon::LexXrpcBody {
                         description: None,
-                        encoding: "application/json".into(),
+                        encoding: ::jacquard_common::CowStr::new_static(
+                            "application/json",
+                        ),
                         schema: Some(
                             ::jacquard_lexicon::lexicon::LexXrpcBodySchema::Object(::jacquard_lexicon::lexicon::LexObject {
                                 description: None,
                                 required: Some(
                                     vec![
-                                        "action".into(), "subjects".into(), "createdBy".into(),
-                                        "scheduling".into()
+                                        ::jacquard_common::smol_str::SmolStr::new_static("action"),
+                                        ::jacquard_common::smol_str::SmolStr::new_static("subjects"),
+                                        ::jacquard_common::smol_str::SmolStr::new_static("createdBy"),
+                                        ::jacquard_common::smol_str::SmolStr::new_static("scheduling")
                                     ],
                                 ),
                                 nullable: None,
@@ -121,15 +134,19 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::le
                                     #[allow(unused_mut)]
                                     let mut map = ::std::collections::BTreeMap::new();
                                     map.insert(
-                                        "action".into(),
+                                        ::jacquard_common::smol_str::SmolStr::new_static("action"),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                             description: None,
-                                            refs: vec!["#takedown".into()],
+                                            refs: vec![
+                                                ::jacquard_common::CowStr::new_static("#takedown")
+                                            ],
                                             closed: None,
                                         }),
                                     );
                                     map.insert(
-                                        "createdBy".into(),
+                                        ::jacquard_common::smol_str::SmolStr::new_static(
+                                            "createdBy",
+                                        ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                             description: None,
                                             format: Some(
@@ -146,23 +163,35 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::le
                                         }),
                                     );
                                     map.insert(
-                                        "modTool".into(),
+                                        ::jacquard_common::smol_str::SmolStr::new_static("modTool"),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                             description: None,
-                                            r#ref: "tools.ozone.moderation.defs#modTool".into(),
+                                            r#ref: ::jacquard_common::CowStr::new_static(
+                                                "tools.ozone.moderation.defs#modTool",
+                                            ),
                                         }),
                                     );
                                     map.insert(
-                                        "scheduling".into(),
+                                        ::jacquard_common::smol_str::SmolStr::new_static(
+                                            "scheduling",
+                                        ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                             description: None,
-                                            r#ref: "#schedulingConfig".into(),
+                                            r#ref: ::jacquard_common::CowStr::new_static(
+                                                "#schedulingConfig",
+                                            ),
                                         }),
                                     );
                                     map.insert(
-                                        "subjects".into(),
+                                        ::jacquard_common::smol_str::SmolStr::new_static(
+                                            "subjects",
+                                        ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                            description: None,
+                                            description: Some(
+                                                ::jacquard_common::CowStr::new_static(
+                                                    "Array of DID subjects to schedule the action for",
+                                                ),
+                                            ),
                                             items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
                                                 description: None,
                                                 format: Some(
@@ -191,28 +220,39 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::le
                 }),
             );
             map.insert(
-                "scheduledActionResults".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static(
+                    "scheduledActionResults",
+                ),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["succeeded".into(), "failed".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("succeeded"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("failed")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "failed".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("failed"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "#failedScheduling".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "#failedScheduling",
+                                    ),
                                 }),
                                 min_length: None,
                                 max_length: None,
                             }),
                         );
                         map.insert(
-                            "succeeded".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "succeeded",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
@@ -238,18 +278,28 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::le
                 }),
             );
             map.insert(
-                "schedulingConfig".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("schedulingConfig"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Configuration for when the action should be executed",
+                        ),
+                    ),
                     required: None,
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "executeAfter".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "executeAfter",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Earliest time to execute the action (for randomized scheduling)",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                 ),
@@ -264,9 +314,15 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::le
                             }),
                         );
                         map.insert(
-                            "executeAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "executeAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Exact time to execute the action",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                 ),
@@ -281,9 +337,15 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::le
                             }),
                         );
                         map.insert(
-                            "executeUntil".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "executeUntil",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Latest time to execute the action (for randomized scheduling)",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                 ),
@@ -302,16 +364,22 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::le
                 }),
             );
             map.insert(
-                "takedown".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("takedown"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Schedule a takedown action",
+                        ),
+                    ),
                     required: None,
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "acknowledgeAccountSubjects".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "acknowledgeAccountSubjects",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                 description: None,
                                 default: None,
@@ -319,7 +387,7 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::le
                             }),
                         );
                         map.insert(
-                            "comment".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("comment"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -334,7 +402,9 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::le
                             }),
                         );
                         map.insert(
-                            "durationInHours".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "durationInHours",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -345,9 +415,13 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::le
                             }),
                         );
                         map.insert(
-                            "policies".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("policies"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Names/Keywords of the policies that drove the decision.",
+                                    ),
+                                ),
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -376,6 +450,9 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::le
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FailedScheduling<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.scheduleAction"
+    }
+    fn def_name() -> &'static str {
+        "failedScheduling"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_scheduleAction()
@@ -496,6 +573,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ScheduledActionResults<'a
     fn nsid() -> &'static str {
         "tools.ozone.moderation.scheduleAction"
     }
+    fn def_name() -> &'static str {
+        "scheduledActionResults"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_scheduleAction()
     }
@@ -534,6 +614,9 @@ pub struct SchedulingConfig<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SchedulingConfig<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.scheduleAction"
+    }
+    fn def_name() -> &'static str {
+        "schedulingConfig"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_scheduleAction()
@@ -578,6 +661,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Takedown<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.scheduleAction"
     }
+    fn def_name() -> &'static str {
+        "takedown"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_scheduleAction()
     }
@@ -585,6 +671,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Takedown<'a> {
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         if let Some(ref value) = self.policies {
+            #[allow(unused_comparisons)]
             if value.len() > 5usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "policies",

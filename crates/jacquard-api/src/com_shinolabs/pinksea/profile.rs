@@ -106,6 +106,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
     fn nsid() -> &'static str {
         "com.shinolabs.pinksea.profile"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_shinolabs_pinksea_profile()
     }
@@ -113,11 +116,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         if let Some(ref value) = self.bio {
-            if value.as_ref().len() > 2400usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 2400usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "bio",
                     max: 2400usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -138,6 +142,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
             }
         }
         if let Some(ref value) = self.links {
+            #[allow(unused_comparisons)]
             if value.len() > 5usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "links",
@@ -147,11 +152,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
             }
         }
         if let Some(ref value) = self.nickname {
-            if value.as_ref().len() > 640usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 640usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "nickname",
                     max: 640usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -180,15 +186,19 @@ fn lexicon_doc_com_shinolabs_pinksea_profile() -> ::jacquard_lexicon::lexicon::L
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "com.shinolabs.pinksea.profile".into(),
+        id: ::jacquard_common::CowStr::new_static("com.shinolabs.pinksea.profile"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A profile of a PinkSea user.",
+                        ),
+                    ),
                     key: None,
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
@@ -198,16 +208,22 @@ fn lexicon_doc_com_shinolabs_pinksea_profile() -> ::jacquard_lexicon::lexicon::L
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "avatar".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("avatar"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "com.atproto.repo.strongRef".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "com.atproto.repo.strongRef",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "bio".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("bio"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The bio of the user.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -220,21 +236,31 @@ fn lexicon_doc_com_shinolabs_pinksea_profile() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                "links".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("links"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The links to outside platforms for this user",
+                                        ),
+                                    ),
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                         description: None,
-                                        r#ref: "#profileLink".into(),
+                                        r#ref: ::jacquard_common::CowStr::new_static("#profileLink"),
                                     }),
                                     min_length: None,
                                     max_length: Some(5usize),
                                 }),
                             );
                             map.insert(
-                                "nickname".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "nickname",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The display name of the user.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -252,18 +278,27 @@ fn lexicon_doc_com_shinolabs_pinksea_profile() -> ::jacquard_lexicon::lexicon::L
                 }),
             );
             map.insert(
-                "profileLink".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("profileLink"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["name".into(), "link".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("link")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "link".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("link"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The URL of the link.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                 ),
@@ -278,9 +313,13 @@ fn lexicon_doc_com_shinolabs_pinksea_profile() -> ::jacquard_lexicon::lexicon::L
                             }),
                         );
                         map.insert(
-                            "name".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The name of the link.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -327,6 +366,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileLink<'a> {
     fn nsid() -> &'static str {
         "com.shinolabs.pinksea.profile"
     }
+    fn def_name() -> &'static str {
+        "profileLink"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_shinolabs_pinksea_profile()
     }
@@ -335,11 +377,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileLink<'a> {
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         {
             let value = &self.name;
-            if value.as_ref().len() > 500usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 500usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "name",
                     max: 500usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }

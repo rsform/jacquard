@@ -90,6 +90,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Declaration<'a> {
     fn nsid() -> &'static str {
         "app.bsky.notification.declaration"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_notification_declaration()
     }
@@ -105,27 +108,41 @@ fn lexicon_doc_app_bsky_notification_declaration() -> ::jacquard_lexicon::lexico
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "app.bsky.notification.declaration".into(),
+        id: ::jacquard_common::CowStr::new_static("app.bsky.notification.declaration"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("literal:self".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A declaration of the user's choices related to notifications that can be produced by them.",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("literal:self")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
-                        required: Some(vec!["allowSubscriptions".into()]),
+                        required: Some(
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("allowSubscriptions")
+                            ],
+                        ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "allowSubscriptions".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "allowSubscriptions",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "A declaration of the user's preference for allowing activity subscriptions from other users. Absence of a record implies 'followers'.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,

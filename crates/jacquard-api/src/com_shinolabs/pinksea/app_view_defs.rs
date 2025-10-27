@@ -32,24 +32,37 @@ fn lexicon_doc_com_shinolabs_pinksea_appViewDefs() -> ::jacquard_lexicon::lexico
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "com.shinolabs.pinksea.appViewDefs".into(),
+        id: ::jacquard_common::CowStr::new_static("com.shinolabs.pinksea.appViewDefs"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "author".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("author"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["did".into(), "handle".into()]),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "An author for an oekaki post",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("handle")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "did".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The DID of the author",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Did,
                                 ),
@@ -64,9 +77,13 @@ fn lexicon_doc_com_shinolabs_pinksea_appViewDefs() -> ::jacquard_lexicon::lexico
                             }),
                         );
                         map.insert(
-                            "handle".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("handle"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The handle of the author.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Handle,
                                 ),
@@ -85,13 +102,21 @@ fn lexicon_doc_com_shinolabs_pinksea_appViewDefs() -> ::jacquard_lexicon::lexico
                 }),
             );
             map.insert(
-                "hydratedOekaki".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("hydratedOekaki"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A hydrated oekaki post returned from the PinkSea app view.",
+                        ),
+                    ),
                     required: Some(
                         vec![
-                            "author".into(), "image".into(), "at".into(), "cid".into(),
-                            "creationTime".into(), "nsfw".into()
+                            ::jacquard_common::smol_str::SmolStr::new_static("author"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("image"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("at"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("cid"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("creationTime"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("nsfw")
                         ],
                     ),
                     nullable: None,
@@ -99,9 +124,13 @@ fn lexicon_doc_com_shinolabs_pinksea_appViewDefs() -> ::jacquard_lexicon::lexico
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "alt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("alt"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Alt text description of the image, for accessibility.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -114,9 +143,13 @@ fn lexicon_doc_com_shinolabs_pinksea_appViewDefs() -> ::jacquard_lexicon::lexico
                             }),
                         );
                         map.insert(
-                            "at".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("at"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The AT protocol link.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                 ),
@@ -131,16 +164,18 @@ fn lexicon_doc_com_shinolabs_pinksea_appViewDefs() -> ::jacquard_lexicon::lexico
                             }),
                         );
                         map.insert(
-                            "author".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("author"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#author".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static("#author"),
                             }),
                         );
                         map.insert(
-                            "cid".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("cid"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static("The oekaki CID."),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Cid,
                                 ),
@@ -155,9 +190,13 @@ fn lexicon_doc_com_shinolabs_pinksea_appViewDefs() -> ::jacquard_lexicon::lexico
                             }),
                         );
                         map.insert(
-                            "creationTime".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "creationTime",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static("The creation time."),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                 ),
@@ -172,9 +211,11 @@ fn lexicon_doc_com_shinolabs_pinksea_appViewDefs() -> ::jacquard_lexicon::lexico
                             }),
                         );
                         map.insert(
-                            "image".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("image"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static("The image link."),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                 ),
@@ -189,7 +230,7 @@ fn lexicon_doc_com_shinolabs_pinksea_appViewDefs() -> ::jacquard_lexicon::lexico
                             }),
                         );
                         map.insert(
-                            "nsfw".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("nsfw"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                 description: None,
                                 default: None,
@@ -197,9 +238,13 @@ fn lexicon_doc_com_shinolabs_pinksea_appViewDefs() -> ::jacquard_lexicon::lexico
                             }),
                         );
                         map.insert(
-                            "tags".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("tags"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "An array of tags this image had.",
+                                    ),
+                                ),
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -221,18 +266,30 @@ fn lexicon_doc_com_shinolabs_pinksea_appViewDefs() -> ::jacquard_lexicon::lexico
                 }),
             );
             map.insert(
-                "oekakiTombstone".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("oekakiTombstone"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["formerAt".into()]),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A tombstone for a missing oekaki.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("formerAt")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "formerAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("formerAt"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The AT uri of the former oekaki.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
                                 ),
@@ -258,6 +315,9 @@ fn lexicon_doc_com_shinolabs_pinksea_appViewDefs() -> ::jacquard_lexicon::lexico
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Author<'a> {
     fn nsid() -> &'static str {
         "com.shinolabs.pinksea.appViewDefs"
+    }
+    fn def_name() -> &'static str {
+        "author"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_shinolabs_pinksea_appViewDefs()
@@ -314,6 +374,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HydratedOekaki<'a> {
     fn nsid() -> &'static str {
         "com.shinolabs.pinksea.appViewDefs"
     }
+    fn def_name() -> &'static str {
+        "hydratedOekaki"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_shinolabs_pinksea_appViewDefs()
     }
@@ -321,6 +384,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HydratedOekaki<'a> {
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         if let Some(ref value) = self.tags {
+            #[allow(unused_comparisons)]
             if value.len() > 10usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "tags",
@@ -355,6 +419,9 @@ pub struct OekakiTombstone<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for OekakiTombstone<'a> {
     fn nsid() -> &'static str {
         "com.shinolabs.pinksea.appViewDefs"
+    }
+    fn def_name() -> &'static str {
+        "oekakiTombstone"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_shinolabs_pinksea_appViewDefs()

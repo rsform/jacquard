@@ -32,19 +32,20 @@ fn lexicon_doc_network_slices_slice_stats() -> ::jacquard_lexicon::lexicon::Lexi
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "network.slices.slice.stats".into(),
+        id: ::jacquard_common::CowStr::new_static("network.slices.slice.stats"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "collectionStats".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("collectionStats"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            "collection".into(), "recordCount".into(), "uniqueActors"
-                            .into()
+                            ::jacquard_common::smol_str::SmolStr::new_static("collection"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("recordCount"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("uniqueActors")
                         ],
                     ),
                     nullable: None,
@@ -52,9 +53,13 @@ fn lexicon_doc_network_slices_slice_stats() -> ::jacquard_lexicon::lexicon::Lexi
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "collection".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "collection",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static("Collection NSID"),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Nsid,
                                 ),
@@ -69,7 +74,9 @@ fn lexicon_doc_network_slices_slice_stats() -> ::jacquard_lexicon::lexicon::Lexi
                             }),
                         );
                         map.insert(
-                            "recordCount".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "recordCount",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -80,7 +87,9 @@ fn lexicon_doc_network_slices_slice_stats() -> ::jacquard_lexicon::lexicon::Lexi
                             }),
                         );
                         map.insert(
-                            "uniqueActors".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "uniqueActors",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -95,20 +104,28 @@ fn lexicon_doc_network_slices_slice_stats() -> ::jacquard_lexicon::lexicon::Lexi
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
                     description: None,
                     parameters: Some(
                         ::jacquard_lexicon::lexicon::LexXrpcQueryParameter::Params(::jacquard_lexicon::lexicon::LexXrpcParameters {
                             description: None,
-                            required: Some(vec!["slice".into()]),
+                            required: Some(
+                                vec![
+                                    ::jacquard_common::smol_str::SmolStr::new_static("slice")
+                                ],
+                            ),
                             properties: {
                                 #[allow(unused_mut)]
                                 let mut map = ::std::collections::BTreeMap::new();
                                 map.insert(
-                                    "slice".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static("slice"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
+                                        description: Some(
+                                            ::jacquard_common::CowStr::new_static(
+                                                "AT-URI of the slice to get statistics for",
+                                            ),
+                                        ),
                                         format: None,
                                         default: None,
                                         min_length: None,
@@ -136,6 +153,9 @@ fn lexicon_doc_network_slices_slice_stats() -> ::jacquard_lexicon::lexicon::Lexi
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CollectionStats<'a> {
     fn nsid() -> &'static str {
         "network.slices.slice.stats"
+    }
+    fn def_name() -> &'static str {
+        "collectionStats"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_network_slices_slice_stats()

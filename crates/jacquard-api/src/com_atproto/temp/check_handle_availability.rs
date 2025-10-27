@@ -150,26 +150,38 @@ fn lexicon_doc_com_atproto_temp_checkHandleAvailability() -> ::jacquard_lexicon:
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "com.atproto.temp.checkHandleAvailability".into(),
+        id: ::jacquard_common::CowStr::new_static(
+            "com.atproto.temp.checkHandleAvailability",
+        ),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
                     description: None,
                     parameters: Some(
                         ::jacquard_lexicon::lexicon::LexXrpcQueryParameter::Params(::jacquard_lexicon::lexicon::LexXrpcParameters {
                             description: None,
-                            required: Some(vec!["handle".into()]),
+                            required: Some(
+                                vec![
+                                    ::jacquard_common::smol_str::SmolStr::new_static("handle")
+                                ],
+                            ),
                             properties: {
                                 #[allow(unused_mut)]
                                 let mut map = ::std::collections::BTreeMap::new();
                                 map.insert(
-                                    "birthDate".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static(
+                                        "birthDate",
+                                    ),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
+                                        description: Some(
+                                            ::jacquard_common::CowStr::new_static(
+                                                "User-provided birth date. Might be used to build handle suggestions.",
+                                            ),
+                                        ),
                                         format: Some(
                                             ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                         ),
@@ -184,9 +196,13 @@ fn lexicon_doc_com_atproto_temp_checkHandleAvailability() -> ::jacquard_lexicon:
                                     }),
                                 );
                                 map.insert(
-                                    "email".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static("email"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
+                                        description: Some(
+                                            ::jacquard_common::CowStr::new_static(
+                                                "User-provided email. Might be used to build handle suggestions.",
+                                            ),
+                                        ),
                                         format: None,
                                         default: None,
                                         min_length: None,
@@ -199,9 +215,13 @@ fn lexicon_doc_com_atproto_temp_checkHandleAvailability() -> ::jacquard_lexicon:
                                     }),
                                 );
                                 map.insert(
-                                    "handle".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static("handle"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
+                                        description: Some(
+                                            ::jacquard_common::CowStr::new_static(
+                                                "Tentative handle. Will be checked for availability or used to build handle suggestions.",
+                                            ),
+                                        ),
                                         format: Some(
                                             ::jacquard_lexicon::lexicon::LexStringFormat::Handle,
                                         ),
@@ -224,9 +244,13 @@ fn lexicon_doc_com_atproto_temp_checkHandleAvailability() -> ::jacquard_lexicon:
                 }),
             );
             map.insert(
-                "resultAvailable".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("resultAvailable"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Indicates the provided handle is available.",
+                        ),
+                    ),
                     required: None,
                     nullable: None,
                     properties: {
@@ -237,21 +261,35 @@ fn lexicon_doc_com_atproto_temp_checkHandleAvailability() -> ::jacquard_lexicon:
                 }),
             );
             map.insert(
-                "resultUnavailable".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("resultUnavailable"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["suggestions".into()]),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Indicates the provided handle is unavailable and gives suggestions of available handles.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("suggestions")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "suggestions".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "suggestions",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "List of suggested handles based on the provided inputs.",
+                                    ),
+                                ),
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "#suggestion".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static("#suggestion"),
                                 }),
                                 min_length: None,
                                 max_length: None,
@@ -262,16 +300,21 @@ fn lexicon_doc_com_atproto_temp_checkHandleAvailability() -> ::jacquard_lexicon:
                 }),
             );
             map.insert(
-                "suggestion".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("suggestion"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["handle".into(), "method".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("handle"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("method")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "handle".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("handle"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -288,9 +331,13 @@ fn lexicon_doc_com_atproto_temp_checkHandleAvailability() -> ::jacquard_lexicon:
                             }),
                         );
                         map.insert(
-                            "method".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("method"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Method used to build this suggestion. Should be considered opaque to clients. Can be used for metrics.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -314,6 +361,9 @@ fn lexicon_doc_com_atproto_temp_checkHandleAvailability() -> ::jacquard_lexicon:
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ResultAvailable<'a> {
     fn nsid() -> &'static str {
         "com.atproto.temp.checkHandleAvailability"
+    }
+    fn def_name() -> &'static str {
+        "resultAvailable"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_temp_checkHandleAvailability()
@@ -350,6 +400,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ResultUnavailable<'a> {
     fn nsid() -> &'static str {
         "com.atproto.temp.checkHandleAvailability"
     }
+    fn def_name() -> &'static str {
+        "resultUnavailable"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_temp_checkHandleAvailability()
     }
@@ -384,6 +437,9 @@ pub struct Suggestion<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Suggestion<'a> {
     fn nsid() -> &'static str {
         "com.atproto.temp.checkHandleAvailability"
+    }
+    fn def_name() -> &'static str {
+        "suggestion"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_temp_checkHandleAvailability()

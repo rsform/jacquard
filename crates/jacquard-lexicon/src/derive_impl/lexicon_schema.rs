@@ -46,15 +46,36 @@ fn impl_for_struct(input: &DeriveInput) -> syn::Result<TokenStream> {
     let built = crate::schema::from_ast::build_struct_schema(input)?;
 
     // Convert to tokens for code generation
-    let doc_tokens = super::doc_to_tokens::doc_to_tokens(&built.doc);
+    let doc_tokens = super::doc_to_tokens::doc_to_tokens(&built.doc, &built.union_fields);
     let validation_tokens = super::doc_to_tokens::validations_to_tokens(&built.validation_checks);
 
     let nsid = &built.nsid;
     let schema_id_expr = if built.schema_id != built.nsid {
         let sid = &built.schema_id;
-        quote! { ::jacquard_common::CowStr::from(#sid) }
+        quote! { ::jacquard_common::CowStr::new_static(#sid) }
     } else {
         quote! { ::jacquard_common::CowStr::new_static(#nsid) }
+    };
+
+    // Generate def_name override if this is a fragment
+    let def_name_fn = if built.schema_id != built.nsid {
+        // Extract fragment name from schema_id (strip "nsid#")
+        let fragment_name = built.schema_id.strip_prefix(&format!("{}#", built.nsid))
+            .unwrap_or("main");
+        quote! {
+            fn def_name() -> &'static str {
+                #fragment_name
+            }
+        }
+    } else {
+        quote! {}
+    };
+
+    // Generate fragment name for def_name
+    let fragment_name = if let Some(stripped) = built.schema_id.strip_prefix(&format!("{}#", built.nsid)) {
+        stripped.to_string()
+    } else {
+        "main".to_string()
     };
 
     // Generate trait impl
@@ -63,6 +84,8 @@ fn impl_for_struct(input: &DeriveInput) -> syn::Result<TokenStream> {
             fn nsid() -> &'static str {
                 #nsid
             }
+
+            #def_name_fn
 
             fn schema_id() -> ::jacquard_common::CowStr<'static> {
                 #schema_id_expr
@@ -82,6 +105,7 @@ fn impl_for_struct(input: &DeriveInput) -> syn::Result<TokenStream> {
         ::inventory::submit! {
             ::jacquard_lexicon::schema::LexiconSchemaRef {
                 nsid: #nsid,
+                def_name: #fragment_name,
                 provider: || {
                     <#name as ::jacquard_lexicon::schema::LexiconSchema>::lexicon_doc()
                 },
@@ -107,7 +131,7 @@ fn impl_for_enum(input: &DeriveInput) -> syn::Result<TokenStream> {
     let built = crate::schema::from_ast::build_enum_schema(input)?;
 
     // Convert to tokens for code generation
-    let doc_tokens = super::doc_to_tokens::doc_to_tokens(&built.doc);
+    let doc_tokens = super::doc_to_tokens::doc_to_tokens(&built.doc, &built.union_fields);
 
     let nsid = &built.nsid;
 
@@ -134,6 +158,7 @@ fn impl_for_enum(input: &DeriveInput) -> syn::Result<TokenStream> {
         ::inventory::submit! {
             ::jacquard_lexicon::schema::LexiconSchemaRef {
                 nsid: #nsid,
+                def_name: "main",
                 provider: || {
                     <#name as ::jacquard_lexicon::schema::LexiconSchema>::lexicon_doc()
                 },

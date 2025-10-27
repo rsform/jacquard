@@ -28,22 +28,27 @@ fn lexicon_doc_sh_weaver_embed_video() -> ::jacquard_lexicon::lexicon::LexiconDo
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "sh.weaver.embed.video".into(),
+        id: ::jacquard_common::CowStr::new_static("sh.weaver.embed.video"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "caption".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("caption"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["lang".into(), "file".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("lang"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("file")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "file".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("file"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
                                 description: None,
                                 accept: None,
@@ -51,7 +56,7 @@ fn lexicon_doc_sh_weaver_embed_video() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            "lang".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("lang"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -72,18 +77,24 @@ fn lexicon_doc_sh_weaver_embed_video() -> ::jacquard_lexicon::lexicon::LexiconDo
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["video".into()]),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("video")],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "alt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("alt"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Alt text description of the video, for accessibility.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -96,26 +107,30 @@ fn lexicon_doc_sh_weaver_embed_video() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            "aspectRatio".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "aspectRatio",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "app.bsky.embed.defs#aspectRatio".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "app.bsky.embed.defs#aspectRatio",
+                                ),
                             }),
                         );
                         map.insert(
-                            "captions".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("captions"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "#caption".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static("#caption"),
                                 }),
                                 min_length: None,
                                 max_length: Some(20usize),
                             }),
                         );
                         map.insert(
-                            "video".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("video"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
                                 description: None,
                                 accept: None,
@@ -127,16 +142,21 @@ fn lexicon_doc_sh_weaver_embed_video() -> ::jacquard_lexicon::lexicon::LexiconDo
                 }),
             );
             map.insert(
-                "view".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("view"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["cid".into(), "playlist".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("cid"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("playlist")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "alt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("alt"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -151,14 +171,18 @@ fn lexicon_doc_sh_weaver_embed_video() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            "aspectRatio".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "aspectRatio",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "app.bsky.embed.defs#aspectRatio".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "app.bsky.embed.defs#aspectRatio",
+                                ),
                             }),
                         );
                         map.insert(
-                            "cid".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("cid"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -175,7 +199,7 @@ fn lexicon_doc_sh_weaver_embed_video() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            "playlist".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("playlist"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -192,7 +216,9 @@ fn lexicon_doc_sh_weaver_embed_video() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            "thumbnail".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "thumbnail",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -220,6 +246,9 @@ fn lexicon_doc_sh_weaver_embed_video() -> ::jacquard_lexicon::lexicon::LexiconDo
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Caption<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.embed.video"
+    }
+    fn def_name() -> &'static str {
+        "caption"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_embed_video()
@@ -266,6 +295,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Video<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.embed.video"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_embed_video()
     }
@@ -273,11 +305,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Video<'a> {
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         if let Some(ref value) = self.alt {
-            if value.as_ref().len() > 10000usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 10000usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "alt",
                     max: 10000usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -298,6 +331,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Video<'a> {
             }
         }
         if let Some(ref value) = self.captions {
+            #[allow(unused_comparisons)]
             if value.len() > 20usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "captions",
@@ -345,6 +379,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for View<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.embed.video"
     }
+    fn def_name() -> &'static str {
+        "view"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_embed_video()
     }
@@ -352,11 +389,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for View<'a> {
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         if let Some(ref value) = self.alt {
-            if value.as_ref().len() > 10000usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 10000usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "alt",
                     max: 10000usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }

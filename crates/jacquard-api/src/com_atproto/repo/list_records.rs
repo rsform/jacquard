@@ -104,26 +104,37 @@ fn lexicon_doc_com_atproto_repo_listRecords() -> ::jacquard_lexicon::lexicon::Le
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "com.atproto.repo.listRecords".into(),
+        id: ::jacquard_common::CowStr::new_static("com.atproto.repo.listRecords"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
                     description: None,
                     parameters: Some(
                         ::jacquard_lexicon::lexicon::LexXrpcQueryParameter::Params(::jacquard_lexicon::lexicon::LexXrpcParameters {
                             description: None,
-                            required: Some(vec!["repo".into(), "collection".into()]),
+                            required: Some(
+                                vec![
+                                    ::jacquard_common::smol_str::SmolStr::new_static("repo"),
+                                    ::jacquard_common::smol_str::SmolStr::new_static("collection")
+                                ],
+                            ),
                             properties: {
                                 #[allow(unused_mut)]
                                 let mut map = ::std::collections::BTreeMap::new();
                                 map.insert(
-                                    "collection".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static(
+                                        "collection",
+                                    ),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
+                                        description: Some(
+                                            ::jacquard_common::CowStr::new_static(
+                                                "The NSID of the record type.",
+                                            ),
+                                        ),
                                         format: Some(
                                             ::jacquard_lexicon::lexicon::LexStringFormat::Nsid,
                                         ),
@@ -138,7 +149,7 @@ fn lexicon_doc_com_atproto_repo_listRecords() -> ::jacquard_lexicon::lexicon::Le
                                     }),
                                 );
                                 map.insert(
-                                    "cursor".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static("cursor"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
                                         description: None,
                                         format: None,
@@ -153,7 +164,7 @@ fn lexicon_doc_com_atproto_repo_listRecords() -> ::jacquard_lexicon::lexicon::Le
                                     }),
                                 );
                                 map.insert(
-                                    "limit".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static("limit"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                         description: None,
                                         default: None,
@@ -164,9 +175,13 @@ fn lexicon_doc_com_atproto_repo_listRecords() -> ::jacquard_lexicon::lexicon::Le
                                     }),
                                 );
                                 map.insert(
-                                    "repo".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static("repo"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
+                                        description: Some(
+                                            ::jacquard_common::CowStr::new_static(
+                                                "The handle or DID of the repo.",
+                                            ),
+                                        ),
                                         format: Some(
                                             ::jacquard_lexicon::lexicon::LexStringFormat::AtIdentifier,
                                         ),
@@ -181,7 +196,7 @@ fn lexicon_doc_com_atproto_repo_listRecords() -> ::jacquard_lexicon::lexicon::Le
                                     }),
                                 );
                                 map.insert(
-                                    "reverse".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static("reverse"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                         description: None,
                                         default: None,
@@ -197,16 +212,22 @@ fn lexicon_doc_com_atproto_repo_listRecords() -> ::jacquard_lexicon::lexicon::Le
                 }),
             );
             map.insert(
-                "record".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("record"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["uri".into(), "cid".into(), "value".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("cid"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("value")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "cid".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("cid"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -223,7 +244,7 @@ fn lexicon_doc_com_atproto_repo_listRecords() -> ::jacquard_lexicon::lexicon::Le
                             }),
                         );
                         map.insert(
-                            "uri".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -240,7 +261,7 @@ fn lexicon_doc_com_atproto_repo_listRecords() -> ::jacquard_lexicon::lexicon::Le
                             }),
                         );
                         map.insert(
-                            "value".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("value"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
                                 description: None,
                             }),
@@ -257,6 +278,9 @@ fn lexicon_doc_com_atproto_repo_listRecords() -> ::jacquard_lexicon::lexicon::Le
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Record<'a> {
     fn nsid() -> &'static str {
         "com.atproto.repo.listRecords"
+    }
+    fn def_name() -> &'static str {
+        "record"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_repo_listRecords()

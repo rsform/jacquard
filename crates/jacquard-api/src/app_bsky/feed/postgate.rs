@@ -24,15 +24,19 @@ fn lexicon_doc_app_bsky_feed_postgate() -> ::jacquard_lexicon::lexicon::LexiconD
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "app.bsky.feed.postgate".into(),
+        id: ::jacquard_common::CowStr::new_static("app.bsky.feed.postgate"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "disableRule".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("disableRule"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Disables embedding of this post.",
+                        ),
+                    ),
                     required: None,
                     nullable: None,
                     properties: {
@@ -43,19 +47,30 @@ fn lexicon_doc_app_bsky_feed_postgate() -> ::jacquard_lexicon::lexicon::LexiconD
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("tid".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Record defining interaction rules for a post. The record key (rkey) of the postgate record must match the record key of the post, and that record must be in the same repository.",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
-                        required: Some(vec!["post".into(), "createdAt".into()]),
+                        required: Some(
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("post"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -72,9 +87,15 @@ fn lexicon_doc_app_bsky_feed_postgate() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                "detachedEmbeddingUris".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "detachedEmbeddingUris",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "List of AT-URIs embedding this post that the author has detached from.",
+                                        ),
+                                    ),
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
                                         description: None,
                                         format: Some(
@@ -94,12 +115,20 @@ fn lexicon_doc_app_bsky_feed_postgate() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                "embeddingRules".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "embeddingRules",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "List of rules defining who can embed this post. If value is an empty array or is undefined, no particular rules apply and anyone can embed.",
+                                        ),
+                                    ),
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                         description: None,
-                                        refs: vec!["#disableRule".into()],
+                                        refs: vec![
+                                            ::jacquard_common::CowStr::new_static("#disableRule")
+                                        ],
                                         closed: None,
                                     }),
                                     min_length: None,
@@ -107,9 +136,13 @@ fn lexicon_doc_app_bsky_feed_postgate() -> ::jacquard_lexicon::lexicon::LexiconD
                                 }),
                             );
                             map.insert(
-                                "post".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("post"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Reference (AT-URI) to the post record.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
                                     ),
@@ -136,6 +169,9 @@ fn lexicon_doc_app_bsky_feed_postgate() -> ::jacquard_lexicon::lexicon::LexiconD
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DisableRule<'a> {
     fn nsid() -> &'static str {
         "app.bsky.feed.postgate"
+    }
+    fn def_name() -> &'static str {
+        "disableRule"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_feed_postgate()
@@ -242,6 +278,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Postgate<'a> {
     fn nsid() -> &'static str {
         "app.bsky.feed.postgate"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_feed_postgate()
     }
@@ -249,6 +288,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Postgate<'a> {
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         if let Some(ref value) = self.detached_embedding_uris {
+            #[allow(unused_comparisons)]
             if value.len() > 50usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "detached_embedding_uris",
@@ -258,6 +298,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Postgate<'a> {
             }
         }
         if let Some(ref value) = self.embedding_rules {
+            #[allow(unused_comparisons)]
             if value.len() > 5usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "embedding_rules",

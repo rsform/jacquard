@@ -90,6 +90,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FavClient<'a> {
     fn nsid() -> &'static str {
         "blue.atplane.favClient"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blue_atplane_favClient()
     }
@@ -98,11 +101,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FavClient<'a> {
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         {
             let value = &self.fav_client;
-            if value.as_ref().len() > 32usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 32usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "fav_client",
                     max: 32usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -115,27 +119,41 @@ fn lexicon_doc_blue_atplane_favClient() -> ::jacquard_lexicon::lexicon::LexiconD
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "blue.atplane.favClient".into(),
+        id: ::jacquard_common::CowStr::new_static("blue.atplane.favClient"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("literal:self".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A declaration of a favorite client.",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("literal:self")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
-                        required: Some(vec!["favClient".into()]),
+                        required: Some(
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("favClient")
+                            ],
+                        ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "favClient".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "favClient",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Set to your favorite client.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,

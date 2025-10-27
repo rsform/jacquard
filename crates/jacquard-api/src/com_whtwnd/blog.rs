@@ -37,22 +37,24 @@ fn lexicon_doc_com_whtwnd_blog_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "com.whtwnd.blog.defs".into(),
+        id: ::jacquard_common::CowStr::new_static("com.whtwnd.blog.defs"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "blobMetadata".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("blobMetadata"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["blobref".into()]),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("blobref")],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "blobref".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("blobref"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
                                 description: None,
                                 accept: None,
@@ -60,7 +62,7 @@ fn lexicon_doc_com_whtwnd_blog_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "name".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -79,16 +81,18 @@ fn lexicon_doc_com_whtwnd_blog_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                 }),
             );
             map.insert(
-                "blogEntry".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("blogEntry"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["content".into()]),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("content")],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "content".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("content"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -103,7 +107,9 @@ fn lexicon_doc_com_whtwnd_blog_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "createdAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "createdAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -124,16 +130,21 @@ fn lexicon_doc_com_whtwnd_blog_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                 }),
             );
             map.insert(
-                "comment".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("comment"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["content".into(), "entryUri".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("content"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("entryUri")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "content".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("content"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -148,7 +159,7 @@ fn lexicon_doc_com_whtwnd_blog_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "entryUri".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("entryUri"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -169,16 +180,18 @@ fn lexicon_doc_com_whtwnd_blog_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                 }),
             );
             map.insert(
-                "ogp".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("ogp"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["url".into()]),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("url")],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "height".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("height"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -189,7 +202,7 @@ fn lexicon_doc_com_whtwnd_blog_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "url".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("url"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -206,7 +219,7 @@ fn lexicon_doc_com_whtwnd_blog_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                             }),
                         );
                         map.insert(
-                            "width".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("width"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -228,6 +241,9 @@ fn lexicon_doc_com_whtwnd_blog_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BlobMetadata<'a> {
     fn nsid() -> &'static str {
         "com.whtwnd.blog.defs"
+    }
+    fn def_name() -> &'static str {
+        "blobMetadata"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_whtwnd_blog_defs()
@@ -262,6 +278,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BlogEntry<'a> {
     fn nsid() -> &'static str {
         "com.whtwnd.blog.defs"
     }
+    fn def_name() -> &'static str {
+        "blogEntry"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_whtwnd_blog_defs()
     }
@@ -270,11 +289,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BlogEntry<'a> {
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         {
             let value = &self.content;
-            if value.as_ref().len() > 100000usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100000usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "content",
                     max: 100000usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -306,6 +326,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Comment<'a> {
     fn nsid() -> &'static str {
         "com.whtwnd.blog.defs"
     }
+    fn def_name() -> &'static str {
+        "comment"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_whtwnd_blog_defs()
     }
@@ -314,11 +337,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Comment<'a> {
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         {
             let value = &self.content;
-            if value.as_ref().len() > 1000usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 1000usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "content",
                     max: 1000usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -352,6 +376,9 @@ pub struct Ogp<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Ogp<'a> {
     fn nsid() -> &'static str {
         "com.whtwnd.blog.defs"
+    }
+    fn def_name() -> &'static str {
+        "ogp"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_whtwnd_blog_defs()

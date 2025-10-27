@@ -24,15 +24,19 @@ fn lexicon_doc_app_bsky_feed_threadgate() -> ::jacquard_lexicon::lexicon::Lexico
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "app.bsky.feed.threadgate".into(),
+        id: ::jacquard_common::CowStr::new_static("app.bsky.feed.threadgate"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "followerRule".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("followerRule"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Allow replies from actors who follow you.",
+                        ),
+                    ),
                     required: None,
                     nullable: None,
                     properties: {
@@ -43,9 +47,13 @@ fn lexicon_doc_app_bsky_feed_threadgate() -> ::jacquard_lexicon::lexicon::Lexico
                 }),
             );
             map.insert(
-                "followingRule".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("followingRule"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Allow replies from actors you follow.",
+                        ),
+                    ),
                     required: None,
                     nullable: None,
                     properties: {
@@ -56,16 +64,22 @@ fn lexicon_doc_app_bsky_feed_threadgate() -> ::jacquard_lexicon::lexicon::Lexico
                 }),
             );
             map.insert(
-                "listRule".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("listRule"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["list".into()]),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Allow replies from actors on a list.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("list")],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "list".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("list"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -86,26 +100,41 @@ fn lexicon_doc_app_bsky_feed_threadgate() -> ::jacquard_lexicon::lexicon::Lexico
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("tid".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Record defining interaction gating rules for a thread (aka, reply controls). The record key (rkey) of the threadgate record must match the record key of the thread's root post, and that record must be in the same repository.",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
-                        required: Some(vec!["post".into(), "createdAt".into()]),
+                        required: Some(
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("post"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "allow".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("allow"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "List of rules defining who can reply to this post. If value is an empty array, no one can reply. If value is undefined, anyone can reply.",
+                                        ),
+                                    ),
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                         description: None,
                                         refs: vec![
-                                            "#mentionRule".into(), "#followerRule".into(),
-                                            "#followingRule".into(), "#listRule".into()
+                                            ::jacquard_common::CowStr::new_static("#mentionRule"),
+                                            ::jacquard_common::CowStr::new_static("#followerRule"),
+                                            ::jacquard_common::CowStr::new_static("#followingRule"),
+                                            ::jacquard_common::CowStr::new_static("#listRule")
                                         ],
                                         closed: None,
                                     }),
@@ -114,7 +143,9 @@ fn lexicon_doc_app_bsky_feed_threadgate() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -131,9 +162,15 @@ fn lexicon_doc_app_bsky_feed_threadgate() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                "hiddenReplies".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "hiddenReplies",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "List of hidden reply URIs.",
+                                        ),
+                                    ),
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
                                         description: None,
                                         format: Some(
@@ -153,9 +190,13 @@ fn lexicon_doc_app_bsky_feed_threadgate() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                "post".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("post"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Reference (AT-URI) to the post record.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
                                     ),
@@ -175,9 +216,13 @@ fn lexicon_doc_app_bsky_feed_threadgate() -> ::jacquard_lexicon::lexicon::Lexico
                 }),
             );
             map.insert(
-                "mentionRule".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("mentionRule"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Allow replies from actors mentioned in your post.",
+                        ),
+                    ),
                     required: None,
                     nullable: None,
                     properties: {
@@ -195,6 +240,9 @@ fn lexicon_doc_app_bsky_feed_threadgate() -> ::jacquard_lexicon::lexicon::Lexico
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FollowerRule<'a> {
     fn nsid() -> &'static str {
         "app.bsky.feed.threadgate"
+    }
+    fn def_name() -> &'static str {
+        "followerRule"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_feed_threadgate()
@@ -223,6 +271,9 @@ pub struct FollowingRule<'a> {}
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FollowingRule<'a> {
     fn nsid() -> &'static str {
         "app.bsky.feed.threadgate"
+    }
+    fn def_name() -> &'static str {
+        "followingRule"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_feed_threadgate()
@@ -255,6 +306,9 @@ pub struct ListRule<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListRule<'a> {
     fn nsid() -> &'static str {
         "app.bsky.feed.threadgate"
+    }
+    fn def_name() -> &'static str {
+        "listRule"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_feed_threadgate()
@@ -384,6 +438,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Threadgate<'a> {
     fn nsid() -> &'static str {
         "app.bsky.feed.threadgate"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_feed_threadgate()
     }
@@ -391,6 +448,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Threadgate<'a> {
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         if let Some(ref value) = self.allow {
+            #[allow(unused_comparisons)]
             if value.len() > 5usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "allow",
@@ -400,6 +458,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Threadgate<'a> {
             }
         }
         if let Some(ref value) = self.hidden_replies {
+            #[allow(unused_comparisons)]
             if value.len() > 300usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "hidden_replies",
@@ -429,6 +488,9 @@ pub struct MentionRule<'a> {}
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MentionRule<'a> {
     fn nsid() -> &'static str {
         "app.bsky.feed.threadgate"
+    }
+    fn def_name() -> &'static str {
+        "mentionRule"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_feed_threadgate()

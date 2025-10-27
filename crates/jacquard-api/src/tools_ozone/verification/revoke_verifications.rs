@@ -114,31 +114,45 @@ fn lexicon_doc_tools_ozone_verification_revokeVerifications() -> ::jacquard_lexi
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "tools.ozone.verification.revokeVerifications".into(),
+        id: ::jacquard_common::CowStr::new_static(
+            "tools.ozone.verification.revokeVerifications",
+        ),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcProcedure(::jacquard_lexicon::lexicon::LexXrpcProcedure {
                     description: None,
                     parameters: None,
                     input: Some(::jacquard_lexicon::lexicon::LexXrpcBody {
                         description: None,
-                        encoding: "application/json".into(),
+                        encoding: ::jacquard_common::CowStr::new_static(
+                            "application/json",
+                        ),
                         schema: Some(
                             ::jacquard_lexicon::lexicon::LexXrpcBodySchema::Object(::jacquard_lexicon::lexicon::LexObject {
                                 description: None,
-                                required: Some(vec!["uris".into()]),
+                                required: Some(
+                                    vec![
+                                        ::jacquard_common::smol_str::SmolStr::new_static("uris")
+                                    ],
+                                ),
                                 nullable: None,
                                 properties: {
                                     #[allow(unused_mut)]
                                     let mut map = ::std::collections::BTreeMap::new();
                                     map.insert(
-                                        "revokeReason".into(),
+                                        ::jacquard_common::smol_str::SmolStr::new_static(
+                                            "revokeReason",
+                                        ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                            description: None,
+                                            description: Some(
+                                                ::jacquard_common::CowStr::new_static(
+                                                    "Reason for revoking the verification. This is optional and can be omitted if not needed.",
+                                                ),
+                                            ),
                                             format: None,
                                             default: None,
                                             min_length: None,
@@ -151,11 +165,19 @@ fn lexicon_doc_tools_ozone_verification_revokeVerifications() -> ::jacquard_lexi
                                         }),
                                     );
                                     map.insert(
-                                        "uris".into(),
+                                        ::jacquard_common::smol_str::SmolStr::new_static("uris"),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                            description: None,
+                                            description: Some(
+                                                ::jacquard_common::CowStr::new_static(
+                                                    "Array of verification record uris to revoke",
+                                                ),
+                                            ),
                                             items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                                description: None,
+                                                description: Some(
+                                                    ::jacquard_common::CowStr::new_static(
+                                                        "The AT-URI of the verification record to revoke.",
+                                                    ),
+                                                ),
                                                 format: Some(
                                                     ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
                                                 ),
@@ -182,18 +204,31 @@ fn lexicon_doc_tools_ozone_verification_revokeVerifications() -> ::jacquard_lexi
                 }),
             );
             map.insert(
-                "revokeError".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("revokeError"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["uri".into(), "error".into()]),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Error object for failed revocations",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("error")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "error".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("error"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Description of the error that occurred during revocation.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -206,9 +241,13 @@ fn lexicon_doc_tools_ozone_verification_revokeVerifications() -> ::jacquard_lexi
                             }),
                         );
                         map.insert(
-                            "uri".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The AT-URI of the verification record that failed to revoke.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
                                 ),
@@ -234,6 +273,9 @@ fn lexicon_doc_tools_ozone_verification_revokeVerifications() -> ::jacquard_lexi
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RevokeError<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.verification.revokeVerifications"
+    }
+    fn def_name() -> &'static str {
+        "revokeError"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_verification_revokeVerifications()

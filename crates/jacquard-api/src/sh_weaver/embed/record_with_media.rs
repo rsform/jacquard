@@ -73,40 +73,46 @@ fn lexicon_doc_sh_weaver_embed_recordWithMedia() -> ::jacquard_lexicon::lexicon:
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "sh.weaver.embed.recordWithMedia".into(),
+        id: ::jacquard_common::CowStr::new_static("sh.weaver.embed.recordWithMedia"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["record".into(), "media".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("record"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("media")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "media".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("media"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
-                                    "sh.weaver.embed.images".into(), "sh.weaver.embed.external"
-                                    .into(), "app.bsky.embed.images".into(),
-                                    "app.bsky.embed.video".into(), "app.bsky.embed.external"
-                                    .into()
+                                    ::jacquard_common::CowStr::new_static("sh.weaver.embed.images"),
+                                    ::jacquard_common::CowStr::new_static("sh.weaver.embed.external"),
+                                    ::jacquard_common::CowStr::new_static("app.bsky.embed.images"),
+                                    ::jacquard_common::CowStr::new_static("app.bsky.embed.video"),
+                                    ::jacquard_common::CowStr::new_static("app.bsky.embed.external")
                                 ],
                                 closed: None,
                             }),
                         );
                         map.insert(
-                            "record".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("record"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
-                                    "app.bsky.embed.record".into(), "sh.weaver.embed.records"
-                                    .into()
+                                    ::jacquard_common::CowStr::new_static("app.bsky.embed.record"),
+                                    ::jacquard_common::CowStr::new_static("sh.weaver.embed.records")
                                 ],
                                 closed: None,
                             }),
@@ -116,35 +122,40 @@ fn lexicon_doc_sh_weaver_embed_recordWithMedia() -> ::jacquard_lexicon::lexicon:
                 }),
             );
             map.insert(
-                "view".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("view"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["record".into(), "media".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("record"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("media")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "media".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("media"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
-                                    "sh.weaver.embed.images".into(),
-                                    "sh.weaver.embed.external#view".into(),
-                                    "app.bsky.embed.images#view".into(),
-                                    "app.bsky.embed.video#view".into(),
-                                    "app.bsky.embed.external#view".into()
+                                    ::jacquard_common::CowStr::new_static("sh.weaver.embed.images"),
+                                    ::jacquard_common::CowStr::new_static("sh.weaver.embed.external#view"),
+                                    ::jacquard_common::CowStr::new_static("app.bsky.embed.images#view"),
+                                    ::jacquard_common::CowStr::new_static("app.bsky.embed.video#view"),
+                                    ::jacquard_common::CowStr::new_static("app.bsky.embed.external#view")
                                 ],
                                 closed: None,
                             }),
                         );
                         map.insert(
-                            "record".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("record"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
-                                    "sh.weaver.embed.records#view".into(),
-                                    "app.bsky.embed.record#view".into()
+                                    ::jacquard_common::CowStr::new_static("sh.weaver.embed.records#view"),
+                                    ::jacquard_common::CowStr::new_static("app.bsky.embed.record#view")
                                 ],
                                 closed: None,
                             }),
@@ -161,6 +172,9 @@ fn lexicon_doc_sh_weaver_embed_recordWithMedia() -> ::jacquard_lexicon::lexicon:
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RecordWithMedia<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.embed.recordWithMedia"
+    }
+    fn def_name() -> &'static str {
+        "main"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_embed_recordWithMedia()
@@ -238,6 +252,9 @@ pub enum ViewRecord<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for View<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.embed.recordWithMedia"
+    }
+    fn def_name() -> &'static str {
+        "view"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_embed_recordWithMedia()

@@ -36,13 +36,15 @@ fn lexicon_doc_app_rocksky_player_defs() -> ::jacquard_lexicon::lexicon::Lexicon
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "app.rocksky.player.defs".into(),
+        id: ::jacquard_common::CowStr::new_static("app.rocksky.player.defs"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "currentlyPlayingViewDetailed".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static(
+                    "currentlyPlayingViewDetailed",
+                ),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: None,
@@ -51,9 +53,13 @@ fn lexicon_doc_app_rocksky_player_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "title".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("title"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The title of the currently playing track",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -77,6 +83,9 @@ fn lexicon_doc_app_rocksky_player_defs() -> ::jacquard_lexicon::lexicon::Lexicon
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CurrentlyPlayingViewDetailed<'a> {
     fn nsid() -> &'static str {
         "app.rocksky.player.defs"
+    }
+    fn def_name() -> &'static str {
+        "currentlyPlayingViewDetailed"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_rocksky_player_defs()

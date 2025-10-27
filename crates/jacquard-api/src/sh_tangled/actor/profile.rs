@@ -111,6 +111,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.actor.profile"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_actor_profile()
     }
@@ -118,11 +121,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         if let Some(ref value) = self.description {
-            if value.as_ref().len() > 2560usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 2560usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "description",
                     max: 2560usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -143,6 +147,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
             }
         }
         if let Some(ref value) = self.links {
+            #[allow(unused_comparisons)]
             if value.len() > 5usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "links",
@@ -152,6 +157,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
             }
         }
         if let Some(ref value) = self.links {
+            #[allow(unused_comparisons)]
             if value.len() < 0usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
                     field: "links",
@@ -161,11 +167,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
             }
         }
         if let Some(ref value) = self.location {
-            if value.as_ref().len() > 400usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 400usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "location",
                     max: 400usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -186,6 +193,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
             }
         }
         if let Some(ref value) = self.pinned_repositories {
+            #[allow(unused_comparisons)]
             if value.len() > 6usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "pinned_repositories",
@@ -195,6 +203,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
             }
         }
         if let Some(ref value) = self.pinned_repositories {
+            #[allow(unused_comparisons)]
             if value.len() < 0usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
                     field: "pinned_repositories",
@@ -204,6 +213,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
             }
         }
         if let Some(ref value) = self.stats {
+            #[allow(unused_comparisons)]
             if value.len() > 2usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "stats",
@@ -213,6 +223,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
             }
         }
         if let Some(ref value) = self.stats {
+            #[allow(unused_comparisons)]
             if value.len() < 0usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MinLength {
                     field: "stats",
@@ -230,25 +241,33 @@ fn lexicon_doc_sh_tangled_actor_profile() -> ::jacquard_lexicon::lexicon::Lexico
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "sh.tangled.actor.profile".into(),
+        id: ::jacquard_common::CowStr::new_static("sh.tangled.actor.profile"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("literal:self".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A declaration of a Tangled account profile.",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("literal:self")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
-                        required: Some(vec!["bluesky".into()]),
+                        required: Some(
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("bluesky")
+                            ],
+                        ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "bluesky".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("bluesky"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                     description: None,
                                     default: None,
@@ -256,9 +275,15 @@ fn lexicon_doc_sh_tangled_actor_profile() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                "description".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "description",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Free-form profile description text.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -271,11 +296,15 @@ fn lexicon_doc_sh_tangled_actor_profile() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                "links".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("links"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: None,
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
+                                        description: Some(
+                                            ::jacquard_common::CowStr::new_static(
+                                                "Any URI, intended for social profiles or websites, can be used to link DIDs/AT-URIs too.",
+                                            ),
+                                        ),
                                         format: Some(
                                             ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                         ),
@@ -293,9 +322,15 @@ fn lexicon_doc_sh_tangled_actor_profile() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                "location".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "location",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Free-form location text.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -308,9 +343,15 @@ fn lexicon_doc_sh_tangled_actor_profile() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                "pinnedRepositories".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "pinnedRepositories",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Any ATURI, it is up to appviews to validate these fields.",
+                                        ),
+                                    ),
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
                                         description: None,
                                         format: Some(
@@ -330,11 +371,13 @@ fn lexicon_doc_sh_tangled_actor_profile() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                "stats".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("stats"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: None,
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                        description: None,
+                                        description: Some(
+                                            ::jacquard_common::CowStr::new_static("Vanity stats."),
+                                        ),
                                         format: None,
                                         default: None,
                                         min_length: None,

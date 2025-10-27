@@ -31,22 +31,27 @@ pub struct Item<'a> {
 fn lexicon_doc_my_skylights_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "my.skylights.defs".into(),
+        id: ::jacquard_common::CowStr::new_static("my.skylights.defs"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "item".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("item"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["ref".into(), "value".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("ref"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("value")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "ref".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("ref"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -61,7 +66,7 @@ fn lexicon_doc_my_skylights_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                             }),
                         );
                         map.insert(
-                            "value".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("value"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -87,6 +92,9 @@ fn lexicon_doc_my_skylights_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Item<'a> {
     fn nsid() -> &'static str {
         "my.skylights.defs"
+    }
+    fn def_name() -> &'static str {
+        "item"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_my_skylights_defs()

@@ -111,6 +111,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Room<'a> {
     fn nsid() -> &'static str {
         "social.psky.chat.room"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_psky_chat_room()
     }
@@ -118,6 +121,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Room<'a> {
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         if let Some(ref value) = self.languages {
+            #[allow(unused_comparisons)]
             if value.len() > 3usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "languages",
@@ -128,11 +132,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Room<'a> {
         }
         {
             let value = &self.name;
-            if value.as_ref().len() > 320usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 320usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "name",
                     max: 320usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -154,6 +159,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Room<'a> {
             }
         }
         if let Some(ref value) = self.tags {
+            #[allow(unused_comparisons)]
             if value.len() > 20usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "tags",
@@ -163,11 +169,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Room<'a> {
             }
         }
         if let Some(ref value) = self.topic {
-            if value.as_ref().len() > 2560usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 2560usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "topic",
                     max: 2560usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -196,39 +203,53 @@ fn lexicon_doc_social_psky_chat_room() -> ::jacquard_lexicon::lexicon::LexiconDo
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "social.psky.chat.room".into(),
+        id: ::jacquard_common::CowStr::new_static("social.psky.chat.room"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("tid".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A Picosky room belonging to the user.",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
-                        required: Some(vec!["name".into()]),
+                        required: Some(
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("name")
+                            ],
+                        ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "allowlist".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "allowlist",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "#modlistRef".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static("#modlistRef"),
                                 }),
                             );
                             map.insert(
-                                "denylist".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "denylist",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "#modlistRef".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static("#modlistRef"),
                                 }),
                             );
                             map.insert(
-                                "languages".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "languages",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: None,
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
@@ -250,7 +271,7 @@ fn lexicon_doc_social_psky_chat_room() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 }),
                             );
                             map.insert(
-                                "name".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -265,7 +286,7 @@ fn lexicon_doc_social_psky_chat_room() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 }),
                             );
                             map.insert(
-                                "tags".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("tags"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                     description: None,
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
@@ -285,9 +306,13 @@ fn lexicon_doc_social_psky_chat_room() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 }),
                             );
                             map.insert(
-                                "topic".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("topic"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Topic title of the room.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -305,16 +330,21 @@ fn lexicon_doc_social_psky_chat_room() -> ::jacquard_lexicon::lexicon::LexiconDo
                 }),
             );
             map.insert(
-                "modlistRef".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("modlistRef"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["active".into(), "users".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("active"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("users")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "active".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("active"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                 description: None,
                                 default: None,
@@ -322,7 +352,7 @@ fn lexicon_doc_social_psky_chat_room() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            "users".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("users"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
@@ -373,6 +403,9 @@ pub struct ModlistRef<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ModlistRef<'a> {
     fn nsid() -> &'static str {
         "social.psky.chat.room"
+    }
+    fn def_name() -> &'static str {
+        "modlistRef"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_psky_chat_room()

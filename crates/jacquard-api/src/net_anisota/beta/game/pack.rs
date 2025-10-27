@@ -109,6 +109,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Pack<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.pack"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_pack()
     }
@@ -125,6 +128,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Pack<'a> {
             }
         }
         if let Some(ref value) = self.pack_history {
+            #[allow(unused_comparisons)]
             if value.len() > 30usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "pack_history",
@@ -162,22 +166,28 @@ fn lexicon_doc_net_anisota_beta_game_pack() -> ::jacquard_lexicon::lexicon::Lexi
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "net.anisota.beta.game.pack".into(),
+        id: ::jacquard_common::CowStr::new_static("net.anisota.beta.game.pack"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("tid".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Beta version: Record tracking daily pack openings and streak information",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: Some(
                             vec![
-                                "lastOpenTime".into(), "totalOpens".into(), "streak".into(),
-                                "createdAt".into()
+                                ::jacquard_common::smol_str::SmolStr::new_static("lastOpenTime"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("totalOpens"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("streak"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -185,9 +195,15 @@ fn lexicon_doc_net_anisota_beta_game_pack() -> ::jacquard_lexicon::lexicon::Lexi
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "When the record was created",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -202,9 +218,15 @@ fn lexicon_doc_net_anisota_beta_game_pack() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                "lastModified".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "lastModified",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "When the record was last modified",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -219,9 +241,15 @@ fn lexicon_doc_net_anisota_beta_game_pack() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                "lastOpenTime".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "lastOpenTime",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "When daily pack was last opened",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -236,7 +264,9 @@ fn lexicon_doc_net_anisota_beta_game_pack() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                "longestStreak".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "longestStreak",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -247,19 +277,27 @@ fn lexicon_doc_net_anisota_beta_game_pack() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                "packHistory".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "packHistory",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "History of the last few pack openings",
+                                        ),
+                                    ),
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                         description: None,
-                                        r#ref: "#packHistoryEntry".into(),
+                                        r#ref: ::jacquard_common::CowStr::new_static(
+                                            "#packHistoryEntry",
+                                        ),
                                     }),
                                     min_length: None,
                                     max_length: Some(30usize),
                                 }),
                             );
                             map.insert(
-                                "streak".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("streak"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -270,7 +308,9 @@ fn lexicon_doc_net_anisota_beta_game_pack() -> ::jacquard_lexicon::lexicon::Lexi
                                 }),
                             );
                             map.insert(
-                                "totalOpens".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "totalOpens",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -286,30 +326,46 @@ fn lexicon_doc_net_anisota_beta_game_pack() -> ::jacquard_lexicon::lexicon::Lexi
                 }),
             );
             map.insert(
-                "packHistoryEntry".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("packHistoryEntry"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A single pack opening entry in the history",
+                        ),
+                    ),
                     required: None,
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "itemsReceived".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "itemsReceived",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Items received from this pack",
+                                    ),
+                                ),
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "#receivedItem".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "#receivedItem",
+                                    ),
                                 }),
                                 min_length: None,
                                 max_length: None,
                             }),
                         );
                         map.insert(
-                            "openTime".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("openTime"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "When this pack was opened",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                 ),
@@ -324,7 +380,9 @@ fn lexicon_doc_net_anisota_beta_game_pack() -> ::jacquard_lexicon::lexicon::Lexi
                             }),
                         );
                         map.insert(
-                            "streakCount".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "streakCount",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -339,18 +397,26 @@ fn lexicon_doc_net_anisota_beta_game_pack() -> ::jacquard_lexicon::lexicon::Lexi
                 }),
             );
             map.insert(
-                "receivedItem".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("receivedItem"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "An item received from a pack opening",
+                        ),
+                    ),
                     required: None,
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "itemId".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("itemId"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "ID of the item received",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -363,7 +429,7 @@ fn lexicon_doc_net_anisota_beta_game_pack() -> ::jacquard_lexicon::lexicon::Lexi
                             }),
                         );
                         map.insert(
-                            "quantity".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("quantity"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -374,9 +440,11 @@ fn lexicon_doc_net_anisota_beta_game_pack() -> ::jacquard_lexicon::lexicon::Lexi
                             }),
                         );
                         map.insert(
-                            "rarity".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("rarity"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static("Rarity of the item"),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -429,6 +497,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PackHistoryEntry<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.pack"
     }
+    fn def_name() -> &'static str {
+        "packHistoryEntry"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_pack()
     }
@@ -469,6 +540,9 @@ pub struct ReceivedItem<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReceivedItem<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.pack"
+    }
+    fn def_name() -> &'static str {
+        "receivedItem"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_pack()

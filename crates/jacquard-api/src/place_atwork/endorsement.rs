@@ -103,6 +103,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Endorsement<'a> {
     fn nsid() -> &'static str {
         "place.atwork.endorsement"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_atwork_endorsement()
     }
@@ -111,11 +114,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Endorsement<'a> {
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         {
             let value = &self.text;
-            if value.as_ref().len() > 1000usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 1000usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "text",
                     max: 1000usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -145,22 +149,28 @@ fn lexicon_doc_place_atwork_endorsement() -> ::jacquard_lexicon::lexicon::Lexico
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "place.atwork.endorsement".into(),
+        id: ::jacquard_common::CowStr::new_static("place.atwork.endorsement"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("tid".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A cryptographically-verified professional endorsement between two identities.",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: Some(
                             vec![
-                                "giver".into(), "receiver".into(), "text".into(),
-                                "createdAt".into()
+                                ::jacquard_common::smol_str::SmolStr::new_static("giver"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("receiver"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("text"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -168,9 +178,15 @@ fn lexicon_doc_place_atwork_endorsement() -> ::jacquard_lexicon::lexicon::Lexico
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Timestamp when the endorsement was created.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -185,9 +201,13 @@ fn lexicon_doc_place_atwork_endorsement() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                "giver".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("giver"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The DID of the identity giving the endorsement.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Did,
                                     ),
@@ -202,9 +222,15 @@ fn lexicon_doc_place_atwork_endorsement() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                "receiver".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "receiver",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The DID of the identity receiving the endorsement.",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Did,
                                     ),
@@ -219,12 +245,20 @@ fn lexicon_doc_place_atwork_endorsement() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                "signatures".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "signatures",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Verified signatures from endorsement proofs (strong references).",
+                                        ),
+                                    ),
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                         description: None,
-                                        refs: vec!["com.atproto.repo.strongRef".into()],
+                                        refs: vec![
+                                            ::jacquard_common::CowStr::new_static("com.atproto.repo.strongRef")
+                                        ],
                                         closed: None,
                                     }),
                                     min_length: None,
@@ -232,9 +266,13 @@ fn lexicon_doc_place_atwork_endorsement() -> ::jacquard_lexicon::lexicon::Lexico
                                 }),
                             );
                             map.insert(
-                                "text".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("text"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The endorsement text content.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,

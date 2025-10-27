@@ -34,34 +34,40 @@ fn lexicon_doc_win_tomo_x_pushat_defs() -> ::jacquard_lexicon::lexicon::LexiconD
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "win.tomo-x.pushat.defs".into(),
+        id: ::jacquard_common::CowStr::new_static("win.tomo-x.pushat.defs"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "deviceList".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("deviceList"),
                 ::jacquard_lexicon::lexicon::LexUserType::Array(::jacquard_lexicon::lexicon::LexArray {
                     description: None,
                     items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                         description: None,
-                        r#ref: "#deviceListItem".into(),
+                        r#ref: ::jacquard_common::CowStr::new_static("#deviceListItem"),
                     }),
                     min_length: None,
                     max_length: None,
                 }),
             );
             map.insert(
-                "deviceListItem".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("deviceListItem"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["name".into(), "id".into(), "current".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("id"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("current")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "current".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("current"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                 description: None,
                                 default: None,
@@ -69,7 +75,7 @@ fn lexicon_doc_win_tomo_x_pushat_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "id".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("id"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -86,7 +92,7 @@ fn lexicon_doc_win_tomo_x_pushat_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "name".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -105,18 +111,27 @@ fn lexicon_doc_win_tomo_x_pushat_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                 }),
             );
             map.insert(
-                "notifyBody".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("notifyBody"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["title".into(), "body".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("title"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("body")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "body".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("body"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Body text of the notification.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -129,9 +144,13 @@ fn lexicon_doc_win_tomo_x_pushat_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "icon".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("icon"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The URI of the icon displayed in the notification.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                 ),
@@ -146,9 +165,13 @@ fn lexicon_doc_win_tomo_x_pushat_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "link".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("link"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Experimental — do not use. The URI to open when the notification is clicked.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                 ),
@@ -163,9 +186,13 @@ fn lexicon_doc_win_tomo_x_pushat_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                             }),
                         );
                         map.insert(
-                            "title".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("title"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Title text of the notification.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -190,6 +217,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DeviceListItem<'a> {
     fn nsid() -> &'static str {
         "win.tomo-x.pushat.defs"
     }
+    fn def_name() -> &'static str {
+        "deviceListItem"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_win_tomo_x_pushat_defs()
     }
@@ -198,11 +228,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DeviceListItem<'a> {
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         {
             let value = &self.name;
-            if value.as_ref().len() > 300usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 300usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "name",
                     max: 300usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -259,6 +290,9 @@ pub struct NotifyBody<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NotifyBody<'a> {
     fn nsid() -> &'static str {
         "win.tomo-x.pushat.defs"
+    }
+    fn def_name() -> &'static str {
+        "notifyBody"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_win_tomo_x_pushat_defs()

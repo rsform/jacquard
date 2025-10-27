@@ -33,24 +33,39 @@ fn lexicon_doc_tools_ozone_verification_grantVerifications() -> ::jacquard_lexic
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "tools.ozone.verification.grantVerifications".into(),
+        id: ::jacquard_common::CowStr::new_static(
+            "tools.ozone.verification.grantVerifications",
+        ),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "grantError".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("grantError"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["error".into(), "subject".into()]),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Error object for failed verifications.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("error"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("subject")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "error".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("error"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Error message describing the reason for failure.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -63,9 +78,13 @@ fn lexicon_doc_tools_ozone_verification_grantVerifications() -> ::jacquard_lexic
                             }),
                         );
                         map.insert(
-                            "subject".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("subject"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The did of the subject being verified",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Did,
                                 ),
@@ -84,28 +103,42 @@ fn lexicon_doc_tools_ozone_verification_grantVerifications() -> ::jacquard_lexic
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcProcedure(::jacquard_lexicon::lexicon::LexXrpcProcedure {
                     description: None,
                     parameters: None,
                     input: Some(::jacquard_lexicon::lexicon::LexXrpcBody {
                         description: None,
-                        encoding: "application/json".into(),
+                        encoding: ::jacquard_common::CowStr::new_static(
+                            "application/json",
+                        ),
                         schema: Some(
                             ::jacquard_lexicon::lexicon::LexXrpcBodySchema::Object(::jacquard_lexicon::lexicon::LexObject {
                                 description: None,
-                                required: Some(vec!["verifications".into()]),
+                                required: Some(
+                                    vec![
+                                        ::jacquard_common::smol_str::SmolStr::new_static("verifications")
+                                    ],
+                                ),
                                 nullable: None,
                                 properties: {
                                     #[allow(unused_mut)]
                                     let mut map = ::std::collections::BTreeMap::new();
                                     map.insert(
-                                        "verifications".into(),
+                                        ::jacquard_common::smol_str::SmolStr::new_static(
+                                            "verifications",
+                                        ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                            description: None,
+                                            description: Some(
+                                                ::jacquard_common::CowStr::new_static(
+                                                    "Array of verification requests to process",
+                                                ),
+                                            ),
                                             items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                                 description: None,
-                                                r#ref: "#verificationInput".into(),
+                                                r#ref: ::jacquard_common::CowStr::new_static(
+                                                    "#verificationInput",
+                                                ),
                                             }),
                                             min_length: None,
                                             max_length: Some(100usize),
@@ -121,20 +154,30 @@ fn lexicon_doc_tools_ozone_verification_grantVerifications() -> ::jacquard_lexic
                 }),
             );
             map.insert(
-                "verificationInput".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("verificationInput"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
-                        vec!["subject".into(), "handle".into(), "displayName".into()],
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("subject"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("handle"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("displayName")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "createdAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "createdAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Timestamp for verification record. Defaults to current time when not specified.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                 ),
@@ -149,9 +192,15 @@ fn lexicon_doc_tools_ozone_verification_grantVerifications() -> ::jacquard_lexic
                             }),
                         );
                         map.insert(
-                            "displayName".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "displayName",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Display name of the subject the verification applies to at the moment of verifying.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -164,9 +213,13 @@ fn lexicon_doc_tools_ozone_verification_grantVerifications() -> ::jacquard_lexic
                             }),
                         );
                         map.insert(
-                            "handle".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("handle"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Handle of the subject the verification applies to at the moment of verifying.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Handle,
                                 ),
@@ -181,9 +234,13 @@ fn lexicon_doc_tools_ozone_verification_grantVerifications() -> ::jacquard_lexic
                             }),
                         );
                         map.insert(
-                            "subject".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("subject"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The did of the subject being verified",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Did,
                                 ),
@@ -209,6 +266,9 @@ fn lexicon_doc_tools_ozone_verification_grantVerifications() -> ::jacquard_lexic
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GrantError<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.verification.grantVerifications"
+    }
+    fn def_name() -> &'static str {
+        "grantError"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_verification_grantVerifications()
@@ -326,6 +386,9 @@ pub struct VerificationInput<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for VerificationInput<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.verification.grantVerifications"
+    }
+    fn def_name() -> &'static str {
+        "verificationInput"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_verification_grantVerifications()

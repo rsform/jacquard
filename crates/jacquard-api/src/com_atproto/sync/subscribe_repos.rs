@@ -37,24 +37,33 @@ fn lexicon_doc_com_atproto_sync_subscribeRepos() -> ::jacquard_lexicon::lexicon:
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "com.atproto.sync.subscribeRepos".into(),
+        id: ::jacquard_common::CowStr::new_static("com.atproto.sync.subscribeRepos"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "account".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("account"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Represents a change to an account's status on a host (eg, PDS or Relay). The semantics of this event are that the status is at the host which emitted the event, not necessarily that at the currently active PDS. Eg, a Relay takedown would emit a takedown with active=false, even if the PDS is still active.",
+                        ),
+                    ),
                     required: Some(
-                        vec!["seq".into(), "did".into(), "time".into(), "active".into()],
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("seq"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("time"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("active")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "active".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("active"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                 description: None,
                                 default: None,
@@ -62,7 +71,7 @@ fn lexicon_doc_com_atproto_sync_subscribeRepos() -> ::jacquard_lexicon::lexicon:
                             }),
                         );
                         map.insert(
-                            "did".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -79,7 +88,7 @@ fn lexicon_doc_com_atproto_sync_subscribeRepos() -> ::jacquard_lexicon::lexicon:
                             }),
                         );
                         map.insert(
-                            "seq".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("seq"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -90,9 +99,13 @@ fn lexicon_doc_com_atproto_sync_subscribeRepos() -> ::jacquard_lexicon::lexicon:
                             }),
                         );
                         map.insert(
-                            "status".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("status"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "If active=false, this optional field indicates a reason for why the account is not active.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -105,7 +118,7 @@ fn lexicon_doc_com_atproto_sync_subscribeRepos() -> ::jacquard_lexicon::lexicon:
                             }),
                         );
                         map.insert(
-                            "time".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("time"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -126,14 +139,26 @@ fn lexicon_doc_com_atproto_sync_subscribeRepos() -> ::jacquard_lexicon::lexicon:
                 }),
             );
             map.insert(
-                "commit".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("commit"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Represents an update of repository state. Note that empty commits are allowed, which include no repo data changes, but an update to rev and signature.",
+                        ),
+                    ),
                     required: Some(
                         vec![
-                            "seq".into(), "rebase".into(), "tooBig".into(), "repo"
-                            .into(), "commit".into(), "rev".into(), "since".into(),
-                            "blocks".into(), "ops".into(), "blobs".into(), "time".into()
+                            ::jacquard_common::smol_str::SmolStr::new_static("seq"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("rebase"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("tooBig"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("repo"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("commit"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("rev"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("since"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("blocks"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("ops"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("blobs"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("time")
                         ],
                     ),
                     nullable: None,
@@ -141,7 +166,7 @@ fn lexicon_doc_com_atproto_sync_subscribeRepos() -> ::jacquard_lexicon::lexicon:
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "blobs".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("blobs"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::CidLink(::jacquard_lexicon::lexicon::LexCidLink {
@@ -152,7 +177,7 @@ fn lexicon_doc_com_atproto_sync_subscribeRepos() -> ::jacquard_lexicon::lexicon:
                             }),
                         );
                         map.insert(
-                            "blocks".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("blocks"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Bytes(::jacquard_lexicon::lexicon::LexBytes {
                                 description: None,
                                 max_length: Some(2000000usize),
@@ -160,31 +185,31 @@ fn lexicon_doc_com_atproto_sync_subscribeRepos() -> ::jacquard_lexicon::lexicon:
                             }),
                         );
                         map.insert(
-                            "commit".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("commit"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::CidLink(::jacquard_lexicon::lexicon::LexCidLink {
                                 description: None,
                             }),
                         );
                         map.insert(
-                            "ops".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("ops"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "#repoOp".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static("#repoOp"),
                                 }),
                                 min_length: None,
                                 max_length: Some(200usize),
                             }),
                         );
                         map.insert(
-                            "prevData".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("prevData"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::CidLink(::jacquard_lexicon::lexicon::LexCidLink {
                                 description: None,
                             }),
                         );
                         map.insert(
-                            "rebase".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("rebase"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                 description: None,
                                 default: None,
@@ -192,9 +217,13 @@ fn lexicon_doc_com_atproto_sync_subscribeRepos() -> ::jacquard_lexicon::lexicon:
                             }),
                         );
                         map.insert(
-                            "repo".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("repo"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The repo this event comes from. Note that all other message types name this field 'did'.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Did,
                                 ),
@@ -209,9 +238,13 @@ fn lexicon_doc_com_atproto_sync_subscribeRepos() -> ::jacquard_lexicon::lexicon:
                             }),
                         );
                         map.insert(
-                            "rev".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("rev"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The rev of the emitted commit. Note that this information is also in the commit object included in blocks, unless this is a tooBig event.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Tid,
                                 ),
@@ -226,7 +259,7 @@ fn lexicon_doc_com_atproto_sync_subscribeRepos() -> ::jacquard_lexicon::lexicon:
                             }),
                         );
                         map.insert(
-                            "seq".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("seq"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -237,9 +270,13 @@ fn lexicon_doc_com_atproto_sync_subscribeRepos() -> ::jacquard_lexicon::lexicon:
                             }),
                         );
                         map.insert(
-                            "since".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("since"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The rev of the last emitted commit from this repo (if any).",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Tid,
                                 ),
@@ -254,9 +291,13 @@ fn lexicon_doc_com_atproto_sync_subscribeRepos() -> ::jacquard_lexicon::lexicon:
                             }),
                         );
                         map.insert(
-                            "time".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("time"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Timestamp of when this message was originally broadcast.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                 ),
@@ -271,7 +312,7 @@ fn lexicon_doc_com_atproto_sync_subscribeRepos() -> ::jacquard_lexicon::lexicon:
                             }),
                         );
                         map.insert(
-                            "tooBig".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("tooBig"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                 description: None,
                                 default: None,
@@ -283,16 +324,26 @@ fn lexicon_doc_com_atproto_sync_subscribeRepos() -> ::jacquard_lexicon::lexicon:
                 }),
             );
             map.insert(
-                "identity".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("identity"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["seq".into(), "did".into(), "time".into()]),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Represents a change to an account's identity. Could be an updated handle, signing key, or pds hosting endpoint. Serves as a prod to all downstream services to refresh their identity cache.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("seq"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("time")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "did".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -309,9 +360,13 @@ fn lexicon_doc_com_atproto_sync_subscribeRepos() -> ::jacquard_lexicon::lexicon:
                             }),
                         );
                         map.insert(
-                            "handle".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("handle"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The current handle for the account, or 'handle.invalid' if validation fails. This field is optional, might have been validated or passed-through from an upstream source. Semantics and behaviors for PDS vs Relay may evolve in the future; see atproto specs for more details.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Handle,
                                 ),
@@ -326,7 +381,7 @@ fn lexicon_doc_com_atproto_sync_subscribeRepos() -> ::jacquard_lexicon::lexicon:
                             }),
                         );
                         map.insert(
-                            "seq".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("seq"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -337,7 +392,7 @@ fn lexicon_doc_com_atproto_sync_subscribeRepos() -> ::jacquard_lexicon::lexicon:
                             }),
                         );
                         map.insert(
-                            "time".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("time"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -358,16 +413,18 @@ fn lexicon_doc_com_atproto_sync_subscribeRepos() -> ::jacquard_lexicon::lexicon:
                 }),
             );
             map.insert(
-                "info".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("info"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["name".into()]),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("name")],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "message".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("message"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -382,7 +439,7 @@ fn lexicon_doc_com_atproto_sync_subscribeRepos() -> ::jacquard_lexicon::lexicon:
                             }),
                         );
                         map.insert(
-                            "name".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -401,7 +458,7 @@ fn lexicon_doc_com_atproto_sync_subscribeRepos() -> ::jacquard_lexicon::lexicon:
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcSubscription(::jacquard_lexicon::lexicon::LexXrpcSubscription {
                     description: None,
                     parameters: Some(
@@ -412,7 +469,7 @@ fn lexicon_doc_com_atproto_sync_subscribeRepos() -> ::jacquard_lexicon::lexicon:
                                 #[allow(unused_mut)]
                                 let mut map = ::std::collections::BTreeMap::new();
                                 map.insert(
-                                    "cursor".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static("cursor"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                         description: None,
                                         default: None,
@@ -432,16 +489,26 @@ fn lexicon_doc_com_atproto_sync_subscribeRepos() -> ::jacquard_lexicon::lexicon:
                 }),
             );
             map.insert(
-                "repoOp".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("repoOp"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["action".into(), "path".into(), "cid".into()]),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A repo operation, ie a mutation of a single record.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("action"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("path"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("cid")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "action".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("action"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -456,13 +523,13 @@ fn lexicon_doc_com_atproto_sync_subscribeRepos() -> ::jacquard_lexicon::lexicon:
                             }),
                         );
                         map.insert(
-                            "cid".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("cid"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::CidLink(::jacquard_lexicon::lexicon::LexCidLink {
                                 description: None,
                             }),
                         );
                         map.insert(
-                            "path".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("path"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -477,7 +544,7 @@ fn lexicon_doc_com_atproto_sync_subscribeRepos() -> ::jacquard_lexicon::lexicon:
                             }),
                         );
                         map.insert(
-                            "prev".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("prev"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::CidLink(::jacquard_lexicon::lexicon::LexCidLink {
                                 description: None,
                             }),
@@ -487,13 +554,20 @@ fn lexicon_doc_com_atproto_sync_subscribeRepos() -> ::jacquard_lexicon::lexicon:
                 }),
             );
             map.insert(
-                "sync".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("sync"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Updates the repo to a new state, without necessarily including that state on the firehose. Used to recover from broken commit streams, data loss incidents, or in situations where upstream host does not know recent state of the repository.",
+                        ),
+                    ),
                     required: Some(
                         vec![
-                            "seq".into(), "did".into(), "blocks".into(), "rev".into(),
-                            "time".into()
+                            ::jacquard_common::smol_str::SmolStr::new_static("seq"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("blocks"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("rev"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("time")
                         ],
                     ),
                     nullable: None,
@@ -501,7 +575,7 @@ fn lexicon_doc_com_atproto_sync_subscribeRepos() -> ::jacquard_lexicon::lexicon:
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "blocks".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("blocks"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Bytes(::jacquard_lexicon::lexicon::LexBytes {
                                 description: None,
                                 max_length: Some(10000usize),
@@ -509,9 +583,13 @@ fn lexicon_doc_com_atproto_sync_subscribeRepos() -> ::jacquard_lexicon::lexicon:
                             }),
                         );
                         map.insert(
-                            "did".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The account this repo event corresponds to. Must match that in the commit object.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Did,
                                 ),
@@ -526,9 +604,13 @@ fn lexicon_doc_com_atproto_sync_subscribeRepos() -> ::jacquard_lexicon::lexicon:
                             }),
                         );
                         map.insert(
-                            "rev".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("rev"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The rev of the commit. This value must match that in the commit object.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -541,7 +623,7 @@ fn lexicon_doc_com_atproto_sync_subscribeRepos() -> ::jacquard_lexicon::lexicon:
                             }),
                         );
                         map.insert(
-                            "seq".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("seq"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -552,9 +634,13 @@ fn lexicon_doc_com_atproto_sync_subscribeRepos() -> ::jacquard_lexicon::lexicon:
                             }),
                         );
                         map.insert(
-                            "time".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("time"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Timestamp of when this message was originally broadcast.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                 ),
@@ -580,6 +666,9 @@ fn lexicon_doc_com_atproto_sync_subscribeRepos() -> ::jacquard_lexicon::lexicon:
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Account<'a> {
     fn nsid() -> &'static str {
         "com.atproto.sync.subscribeRepos"
+    }
+    fn def_name() -> &'static str {
+        "account"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_sync_subscribeRepos()
@@ -640,6 +729,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Commit<'a> {
     fn nsid() -> &'static str {
         "com.atproto.sync.subscribeRepos"
     }
+    fn def_name() -> &'static str {
+        "commit"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_sync_subscribeRepos()
     }
@@ -648,6 +740,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Commit<'a> {
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         {
             let value = &self.ops;
+            #[allow(unused_comparisons)]
             if value.len() > 200usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "ops",
@@ -689,6 +782,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Identity<'a> {
     fn nsid() -> &'static str {
         "com.atproto.sync.subscribeRepos"
     }
+    fn def_name() -> &'static str {
+        "identity"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_sync_subscribeRepos()
     }
@@ -722,6 +818,9 @@ pub struct Info<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Info<'a> {
     fn nsid() -> &'static str {
         "com.atproto.sync.subscribeRepos"
+    }
+    fn def_name() -> &'static str {
+        "info"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_sync_subscribeRepos()
@@ -920,6 +1019,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RepoOp<'a> {
     fn nsid() -> &'static str {
         "com.atproto.sync.subscribeRepos"
     }
+    fn def_name() -> &'static str {
+        "repoOp"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_sync_subscribeRepos()
     }
@@ -962,6 +1064,9 @@ pub struct Sync<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sync<'a> {
     fn nsid() -> &'static str {
         "com.atproto.sync.subscribeRepos"
+    }
+    fn def_name() -> &'static str {
+        "sync"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_sync_subscribeRepos()

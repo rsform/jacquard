@@ -148,6 +148,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Inventory<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.inventory"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_inventory()
     }
@@ -156,29 +159,32 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Inventory<'a> {
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         {
             let value = &self.item_id;
-            if value.as_ref().len() > 100usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "item_id",
                     max: 100usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         if let Some(ref value) = self.item_name {
-            if value.as_ref().len() > 200usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 200usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "item_name",
                     max: 200usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
         if let Some(ref value) = self.item_type {
-            if value.as_ref().len() > 50usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 50usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "item_type",
                     max: 50usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -219,22 +225,28 @@ fn lexicon_doc_net_anisota_beta_game_inventory() -> ::jacquard_lexicon::lexicon:
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "net.anisota.beta.game.inventory".into(),
+        id: ::jacquard_common::CowStr::new_static("net.anisota.beta.game.inventory"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("tid".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Beta version: Record representing an item in a player's game inventory",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: Some(
                             vec![
-                                "itemId".into(), "quantity".into(), "acquiredAt".into(),
-                                "createdAt".into()
+                                ::jacquard_common::smol_str::SmolStr::new_static("itemId"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("quantity"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("acquiredAt"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -242,9 +254,15 @@ fn lexicon_doc_net_anisota_beta_game_inventory() -> ::jacquard_lexicon::lexicon:
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "acquiredAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "acquiredAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "When the item was acquired",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -259,9 +277,15 @@ fn lexicon_doc_net_anisota_beta_game_inventory() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "When the record was created",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -276,9 +300,13 @@ fn lexicon_doc_net_anisota_beta_game_inventory() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                "itemId".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("itemId"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Unique identifier for the item from gameItems.json",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -291,9 +319,15 @@ fn lexicon_doc_net_anisota_beta_game_inventory() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                "itemName".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "itemName",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Display name of the item",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -306,9 +340,15 @@ fn lexicon_doc_net_anisota_beta_game_inventory() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                "itemType".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "itemType",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Type category of the item (consumable, tool, equipment, etc.)",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -321,7 +361,9 @@ fn lexicon_doc_net_anisota_beta_game_inventory() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                "itemValue".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "itemValue",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -332,9 +374,15 @@ fn lexicon_doc_net_anisota_beta_game_inventory() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                "lastModified".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "lastModified",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "When the record was last modified",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -349,9 +397,15 @@ fn lexicon_doc_net_anisota_beta_game_inventory() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                "logRecordUri".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "logRecordUri",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "URI of the game.log record that documents the acquisition of this item",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -364,7 +418,9 @@ fn lexicon_doc_net_anisota_beta_game_inventory() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                "maxStack".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "maxStack",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -375,13 +431,17 @@ fn lexicon_doc_net_anisota_beta_game_inventory() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                "metadata".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "metadata",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
                                     description: None,
                                 }),
                             );
                             map.insert(
-                                "quantity".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "quantity",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -392,9 +452,13 @@ fn lexicon_doc_net_anisota_beta_game_inventory() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                "rarity".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("rarity"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Rarity level of the item",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -407,9 +471,13 @@ fn lexicon_doc_net_anisota_beta_game_inventory() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                "source".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("source"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "How the item was acquired",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -422,14 +490,20 @@ fn lexicon_doc_net_anisota_beta_game_inventory() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                "sourceDetails".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "sourceDetails",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "#sourceDetails".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "#sourceDetails",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "stackable".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "stackable",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                     description: None,
                                     default: None,
@@ -442,18 +516,28 @@ fn lexicon_doc_net_anisota_beta_game_inventory() -> ::jacquard_lexicon::lexicon:
                 }),
             );
             map.insert(
-                "sourceDetails".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("sourceDetails"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Additional details about how the item was acquired",
+                        ),
+                    ),
                     required: None,
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "gameCardUri".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "gameCardUri",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "URI of the game card that provided this item",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -466,9 +550,13 @@ fn lexicon_doc_net_anisota_beta_game_inventory() -> ::jacquard_lexicon::lexicon:
                             }),
                         );
                         map.insert(
-                            "questId".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("questId"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "ID of the quest that rewarded this item",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -481,7 +569,9 @@ fn lexicon_doc_net_anisota_beta_game_inventory() -> ::jacquard_lexicon::lexicon:
                             }),
                         );
                         map.insert(
-                            "rewardStreak".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "rewardStreak",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -530,6 +620,9 @@ pub struct SourceDetails<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SourceDetails<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.inventory"
+    }
+    fn def_name() -> &'static str {
+        "sourceDetails"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_inventory()

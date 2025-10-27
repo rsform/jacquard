@@ -12,32 +12,14 @@
 //!
 //! ## Usage
 //!
-//! ### Manual Implementation
+//! ### Derive Macro
 //!
-//! Implement the `LexiconSchema` trait for your types:
-//!
-//! ```rust
-//! # use jacquard_lexicon::schema::LexiconSchema;
-//! # use jacquard_lexicon::lexicon::LexiconDoc;
-//! struct MyType;
-//!
-//! impl LexiconSchema for MyType {
-//!     fn nsid() -> &'static str {
-//!         "com.example.myType"
-//!     }
-//!
-//!     fn lexicon_doc() -> LexiconDoc<'static> {
-//!         // Build schema using builder API or const literals
-//!         todo!()
-//!     }
-//! }
-//! ```
-//!
-//! ### Derive Macro (Future)
-//!
-//! In Phase 2, a derive macro will automate trait implementation:
+//! Use `#[derive(LexiconSchema)]` to automatically generate schemas:
 //!
 //! ```rust,ignore
+//! use jacquard_lexicon::schema::LexiconSchema;
+//! use jacquard_common::CowStr;
+//!
 //! #[derive(LexiconSchema)]
 //! #[lexicon(nsid = "app.bsky.feed.post", record, key = "tid")]
 //! struct Post<'a> {
@@ -47,10 +29,47 @@
 //! }
 //! ```
 //!
+//! #### Constraint Attributes
+//!
+//! - **Field constraints**: `max_length`, `max_graphemes`, `min_length`, `min_graphemes`
+//! - **Array constraints**: `max_items`, `min_items` (for the array itself)
+//! - **Item constraints**: `item_max_length`, `item_max_graphemes`, etc. (for array items)
+//! - **Integer constraints**: `minimum`, `maximum`
+//! - **Refs**: `ref = "nsid"` to explicitly reference another type
+//! - **Unions**: `union` to mark a field as a union type
+//!
+//! #### Fragments
+//!
+//! Multiple types can share the same NSID using fragments:
+//!
+//! ```rust,ignore
+//! #[derive(LexiconSchema)]
+//! #[lexicon(nsid = "app.bsky.feed.post", fragment = "textSlice")]
+//! struct TextSlice {
+//!     start: i64,
+//!     end: i64,
+//! }
+//! ```
+//!
+//! ### Runtime Registry
+//!
+//! Access complete schemas (with all fragments merged) via the global registry:
+//!
+//! ```rust,ignore
+//! let registry = jacquard_lexicon::schema::global_registry();
+//! let post_doc = registry.get("app.bsky.feed.post").expect("schema exists");
+//!
+//! // The doc contains all defs: main, textSlice, entity, replyRef, etc.
+//! for (def_name, def) in &post_doc.defs {
+//!     println!("Def: {}", def_name);
+//! }
+//! ```
+//!
 //! ## Design Pattern
 //!
 //! - **Trait-based**: Types implement `LexiconSchema` trait
 //! - **Inventory-based discovery**: Runtime schema registry via `inventory` crate
+//! - **Fragment merging**: Multiple types with same NSID have their defs merged
 //! - **Const literals**: Generated code emits schema as const data
 //! - **Validation**: Runtime constraint checking via `validate()` method
 
@@ -167,15 +186,101 @@ pub enum ValidationError {
 /// Registry entry for schema discovery via inventory
 ///
 /// Generated automatically by `#[derive(LexiconSchema)]` to enable runtime schema discovery.
-/// Phase 3 will use this to extract all schemas from a binary.
 pub struct LexiconSchemaRef {
     /// The NSID for this schema
     pub nsid: &'static str,
+    /// The def name within the lexicon (e.g., "main", "textSlice")
+    pub def_name: &'static str,
     /// Function that generates the lexicon document
     pub provider: fn() -> crate::lexicon::LexiconDoc<'static>,
 }
 
 inventory::collect!(LexiconSchemaRef);
+
+/// Registry of lexicon schemas
+///
+/// Collects schemas from inventory at construction and supports runtime insertion.
+#[derive(Debug, Clone)]
+pub struct SchemaRegistry {
+    /// Schema documents indexed by NSID (concurrent access safe)
+    schemas: dashmap::DashMap<jacquard_common::smol_str::SmolStr, crate::lexicon::LexiconDoc<'static>>,
+}
+
+impl SchemaRegistry {
+    /// Build registry from inventory-collected schemas
+    pub fn from_inventory() -> Self {
+        use jacquard_common::smol_str::ToSmolStr;
+        let schemas = dashmap::DashMap::new();
+
+        for entry in inventory::iter::<LexiconSchemaRef> {
+            let doc = (entry.provider)();
+
+            // Get existing doc or create new one
+            let mut doc_entry = schemas.entry(entry.nsid.to_smolstr()).or_insert_with(|| {
+                crate::lexicon::LexiconDoc {
+                    lexicon: crate::lexicon::Lexicon::Lexicon1,
+                    id: jacquard_common::CowStr::new_static(entry.nsid),
+                    revision: None,
+                    description: None,
+                    defs: Default::default(),
+                }
+            });
+
+            // Merge the defs from this schema
+            // Each type's lexicon_doc() now returns a doc with the def under its proper name
+            for (def_name, def) in doc.defs {
+                doc_entry.defs.insert(def_name, def);
+            }
+        }
+
+        Self { schemas }
+    }
+
+    /// Create an empty registry
+    pub fn new() -> Self {
+        Self {
+            schemas: dashmap::DashMap::new(),
+        }
+    }
+
+    /// Get schema by NSID
+    ///
+    /// IMPORTANT: Clone the returned schema immediately to avoid holding DashMap ref
+    pub fn get(&self, nsid: &str) -> Option<crate::lexicon::LexiconDoc<'static>> {
+        self.schemas.get(nsid).map(|doc| doc.clone())
+    }
+
+    /// Insert or update a schema (for runtime schema loading)
+    pub fn insert(&self, nsid: jacquard_common::smol_str::SmolStr, doc: crate::lexicon::LexiconDoc<'static>) {
+        self.schemas.insert(nsid, doc);
+    }
+
+    /// Get specific def from a schema
+    ///
+    /// IMPORTANT: Returns cloned def to avoid holding DashMap ref
+    pub fn get_def(
+        &self,
+        nsid: &str,
+        def_name: &str,
+    ) -> Option<crate::lexicon::LexUserType<'static>> {
+        // Clone immediately to release DashMap ref before returning
+        self.schemas
+            .get(nsid)
+            .and_then(|doc| doc.defs.get(def_name).cloned())
+    }
+}
+
+impl Default for SchemaRegistry {
+    fn default() -> Self {
+        Self::from_inventory()
+    }
+}
+
+/// Global schema registry built from inventory
+pub fn global_registry() -> &'static SchemaRegistry {
+    static REGISTRY: std::sync::LazyLock<SchemaRegistry> = std::sync::LazyLock::new(SchemaRegistry::from_inventory);
+    &REGISTRY
+}
 
 #[cfg(test)]
 mod tests {

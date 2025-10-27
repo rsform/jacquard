@@ -118,6 +118,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Status<'a> {
     fn nsid() -> &'static str {
         "app.bsky.actor.status"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_actor_status()
     }
@@ -142,31 +145,42 @@ fn lexicon_doc_app_bsky_actor_status() -> ::jacquard_lexicon::lexicon::LexiconDo
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "app.bsky.actor.status".into(),
+        id: ::jacquard_common::CowStr::new_static("app.bsky.actor.status"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "live".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("live"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("literal:self".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A declaration of a Bluesky account status.",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("literal:self")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
-                        required: Some(vec!["status".into(), "createdAt".into()]),
+                        required: Some(
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("status"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -183,7 +197,9 @@ fn lexicon_doc_app_bsky_actor_status() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 }),
                             );
                             map.insert(
-                                "durationMinutes".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "durationMinutes",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -194,17 +210,27 @@ fn lexicon_doc_app_bsky_actor_status() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 }),
                             );
                             map.insert(
-                                "embed".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("embed"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
-                                    refs: vec!["app.bsky.embed.external".into()],
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "An optional embed associated with the status.",
+                                        ),
+                                    ),
+                                    refs: vec![
+                                        ::jacquard_common::CowStr::new_static("app.bsky.embed.external")
+                                    ],
                                     closed: None,
                                 }),
                             );
                             map.insert(
-                                "status".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("status"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The status for the account.",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,

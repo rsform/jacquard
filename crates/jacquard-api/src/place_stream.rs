@@ -43,19 +43,22 @@ pub struct BlockView<'a> {
 fn lexicon_doc_place_stream_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "place.stream.defs".into(),
+        id: ::jacquard_common::CowStr::new_static("place.stream.defs"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "blockView".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("blockView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
                         vec![
-                            "uri".into(), "cid".into(), "blocker".into(), "record"
-                            .into(), "indexedAt".into()
+                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("cid"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("blocker"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("record"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("indexedAt")
                         ],
                     ),
                     nullable: None,
@@ -63,14 +66,16 @@ fn lexicon_doc_place_stream_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "blocker".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("blocker"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "app.bsky.actor.defs#profileViewBasic".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "app.bsky.actor.defs#profileViewBasic",
+                                ),
                             }),
                         );
                         map.insert(
-                            "cid".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("cid"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -87,7 +92,9 @@ fn lexicon_doc_place_stream_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                             }),
                         );
                         map.insert(
-                            "indexedAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "indexedAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -104,14 +111,16 @@ fn lexicon_doc_place_stream_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                             }),
                         );
                         map.insert(
-                            "record".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("record"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "app.bsky.graph.block".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "app.bsky.graph.block",
+                                ),
                             }),
                         );
                         map.insert(
-                            "uri".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -132,16 +141,18 @@ fn lexicon_doc_place_stream_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                 }),
             );
             map.insert(
-                "rendition".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("rendition"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["name".into()]),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("name")],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "name".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -160,21 +171,27 @@ fn lexicon_doc_place_stream_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                 }),
             );
             map.insert(
-                "renditions".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("renditions"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["renditions".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("renditions")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "renditions".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "renditions",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "#rendition".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static("#rendition"),
                                 }),
                                 min_length: None,
                                 max_length: None,
@@ -192,6 +209,9 @@ fn lexicon_doc_place_stream_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BlockView<'a> {
     fn nsid() -> &'static str {
         "place.stream.defs"
+    }
+    fn def_name() -> &'static str {
+        "blockView"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_defs()
@@ -224,6 +244,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Rendition<'a> {
     fn nsid() -> &'static str {
         "place.stream.defs"
     }
+    fn def_name() -> &'static str {
+        "rendition"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_defs()
     }
@@ -254,6 +277,9 @@ pub struct Renditions<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Renditions<'a> {
     fn nsid() -> &'static str {
         "place.stream.defs"
+    }
+    fn def_name() -> &'static str {
+        "renditions"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_defs()

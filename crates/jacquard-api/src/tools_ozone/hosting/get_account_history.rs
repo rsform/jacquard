@@ -31,13 +31,15 @@ fn lexicon_doc_tools_ozone_hosting_getAccountHistory() -> ::jacquard_lexicon::le
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "tools.ozone.hosting.getAccountHistory".into(),
+        id: ::jacquard_common::CowStr::new_static(
+            "tools.ozone.hosting.getAccountHistory",
+        ),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "accountCreated".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("accountCreated"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(vec![]),
@@ -46,7 +48,7 @@ fn lexicon_doc_tools_ozone_hosting_getAccountHistory() -> ::jacquard_lexicon::le
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "email".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("email"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -61,7 +63,7 @@ fn lexicon_doc_tools_ozone_hosting_getAccountHistory() -> ::jacquard_lexicon::le
                             }),
                         );
                         map.insert(
-                            "handle".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("handle"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -82,74 +84,84 @@ fn lexicon_doc_tools_ozone_hosting_getAccountHistory() -> ::jacquard_lexicon::le
                 }),
             );
             map.insert(
-                "emailConfirmed".into(),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["email".into()]),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
-                        map.insert(
-                            "email".into(),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map
-                    },
-                }),
-            );
-            map.insert(
-                "emailUpdated".into(),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["email".into()]),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
-                        map.insert(
-                            "email".into(),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map
-                    },
-                }),
-            );
-            map.insert(
-                "event".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("emailConfirmed"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
-                        vec!["details".into(), "createdBy".into(), "createdAt".into()],
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("email")],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "createdAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("email"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map
+                    },
+                }),
+            );
+            map.insert(
+                ::jacquard_common::smol_str::SmolStr::new_static("emailUpdated"),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("email")],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::std::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("email"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map
+                    },
+                }),
+            );
+            map.insert(
+                ::jacquard_common::smol_str::SmolStr::new_static("event"),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("details"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("createdBy"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::std::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "createdAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -166,7 +178,9 @@ fn lexicon_doc_tools_ozone_hosting_getAccountHistory() -> ::jacquard_lexicon::le
                             }),
                         );
                         map.insert(
-                            "createdBy".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "createdBy",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -181,13 +195,15 @@ fn lexicon_doc_tools_ozone_hosting_getAccountHistory() -> ::jacquard_lexicon::le
                             }),
                         );
                         map.insert(
-                            "details".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("details"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
                                 refs: vec![
-                                    "#accountCreated".into(), "#emailUpdated".into(),
-                                    "#emailConfirmed".into(), "#passwordUpdated".into(),
-                                    "#handleUpdated".into()
+                                    ::jacquard_common::CowStr::new_static("#accountCreated"),
+                                    ::jacquard_common::CowStr::new_static("#emailUpdated"),
+                                    ::jacquard_common::CowStr::new_static("#emailConfirmed"),
+                                    ::jacquard_common::CowStr::new_static("#passwordUpdated"),
+                                    ::jacquard_common::CowStr::new_static("#handleUpdated")
                                 ],
                                 closed: None,
                             }),
@@ -197,16 +213,18 @@ fn lexicon_doc_tools_ozone_hosting_getAccountHistory() -> ::jacquard_lexicon::le
                 }),
             );
             map.insert(
-                "handleUpdated".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("handleUpdated"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["handle".into()]),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("handle")],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "handle".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("handle"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -227,18 +245,22 @@ fn lexicon_doc_tools_ozone_hosting_getAccountHistory() -> ::jacquard_lexicon::le
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
                     description: None,
                     parameters: Some(
                         ::jacquard_lexicon::lexicon::LexXrpcQueryParameter::Params(::jacquard_lexicon::lexicon::LexXrpcParameters {
                             description: None,
-                            required: Some(vec!["did".into()]),
+                            required: Some(
+                                vec![
+                                    ::jacquard_common::smol_str::SmolStr::new_static("did")
+                                ],
+                            ),
                             properties: {
                                 #[allow(unused_mut)]
                                 let mut map = ::std::collections::BTreeMap::new();
                                 map.insert(
-                                    "cursor".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static("cursor"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
                                         description: None,
                                         format: None,
@@ -253,7 +275,7 @@ fn lexicon_doc_tools_ozone_hosting_getAccountHistory() -> ::jacquard_lexicon::le
                                     }),
                                 );
                                 map.insert(
-                                    "did".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static("did"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
                                         description: None,
                                         format: Some(
@@ -270,7 +292,7 @@ fn lexicon_doc_tools_ozone_hosting_getAccountHistory() -> ::jacquard_lexicon::le
                                     }),
                                 );
                                 map.insert(
-                                    "events".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static("events"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Array(::jacquard_lexicon::lexicon::LexPrimitiveArray {
                                         description: None,
                                         items: ::jacquard_lexicon::lexicon::LexPrimitiveArrayItem::String(::jacquard_lexicon::lexicon::LexString {
@@ -290,7 +312,7 @@ fn lexicon_doc_tools_ozone_hosting_getAccountHistory() -> ::jacquard_lexicon::le
                                     }),
                                 );
                                 map.insert(
-                                    "limit".into(),
+                                    ::jacquard_common::smol_str::SmolStr::new_static("limit"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                         description: None,
                                         default: None,
@@ -309,7 +331,7 @@ fn lexicon_doc_tools_ozone_hosting_getAccountHistory() -> ::jacquard_lexicon::le
                 }),
             );
             map.insert(
-                "passwordUpdated".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("passwordUpdated"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(vec![]),
@@ -329,6 +351,9 @@ fn lexicon_doc_tools_ozone_hosting_getAccountHistory() -> ::jacquard_lexicon::le
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AccountCreated<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.hosting.getAccountHistory"
+    }
+    fn def_name() -> &'static str {
+        "accountCreated"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_hosting_getAccountHistory()
@@ -361,6 +386,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EmailConfirmed<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.hosting.getAccountHistory"
     }
+    fn def_name() -> &'static str {
+        "emailConfirmed"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_hosting_getAccountHistory()
     }
@@ -391,6 +419,9 @@ pub struct EmailUpdated<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EmailUpdated<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.hosting.getAccountHistory"
+    }
+    fn def_name() -> &'static str {
+        "emailUpdated"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_hosting_getAccountHistory()
@@ -462,6 +493,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Event<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.hosting.getAccountHistory"
     }
+    fn def_name() -> &'static str {
+        "event"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_hosting_getAccountHistory()
     }
@@ -492,6 +526,9 @@ pub struct HandleUpdated<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HandleUpdated<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.hosting.getAccountHistory"
+    }
+    fn def_name() -> &'static str {
+        "handleUpdated"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_hosting_getAccountHistory()
@@ -591,6 +628,9 @@ pub struct PasswordUpdated<'a> {}
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PasswordUpdated<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.hosting.getAccountHistory"
+    }
+    fn def_name() -> &'static str {
+        "passwordUpdated"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_hosting_getAccountHistory()

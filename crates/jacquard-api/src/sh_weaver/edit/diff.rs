@@ -92,6 +92,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Diff<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.diff"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_edit_diff()
     }
@@ -107,41 +110,55 @@ fn lexicon_doc_sh_weaver_edit_diff() -> ::jacquard_lexicon::lexicon::LexiconDoc<
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "sh.weaver.edit.diff".into(),
+        id: ::jacquard_common::CowStr::new_static("sh.weaver.edit.diff"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("tid".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "An edit record for a notebook.",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: Some(
-                            vec!["snapshot".into(), "root".into(), "doc".into()],
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("snapshot"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("root"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("doc")
+                            ],
                         ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "doc".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("doc"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "sh.weaver.edit.defs#docRef".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "sh.weaver.edit.defs#docRef",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "root".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("root"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "com.atproto.repo.strongRef".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "com.atproto.repo.strongRef",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "snapshot".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "snapshot",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
                                     description: None,
                                     accept: None,

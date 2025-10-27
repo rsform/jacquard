@@ -1,0 +1,23 @@
+{
+  "lexicon": 1,
+  "id": "test.empty.object",
+  "defs": {
+    "main": {
+      "type": "object",
+      "properties": {
+        "withEmpty": {
+          "type": "ref",
+          "ref": "#emptyDef"
+        },
+        "normal": {
+          "type": "string"
+        }
+      }
+    },
+    "emptyDef": {
+      "type": "object",
+      "description": "Object with no properties - should generate Data<'a>",
+      "properties": {}
+    }
+  }
+}

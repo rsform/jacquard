@@ -29,7 +29,8 @@ pub fn generate_schema_impl(
     };
 
     // Generate the lexicon doc literal using existing doc_to_tokens
-    let doc_literal = doc_to_tokens::doc_to_tokens(doc);
+    // Codegen from JSON doesn't have union_fields (those are for Rust -> lexicon derive)
+    let doc_literal = doc_to_tokens::doc_to_tokens(doc, &std::collections::BTreeMap::new());
 
     // Extract validation checks from lexicon doc for the specific def
     let validation_checks = extract_validation_checks(doc, def_name);
@@ -148,6 +149,7 @@ fn extract_property_validations(
                     schema_name: schema_name.to_string(),
                     field_type: "Vec<_>".to_string(),
                     is_required,
+                    is_array: true,
                     check: ConstraintCheck::MaxLength { max },
                 });
             }
@@ -157,6 +159,7 @@ fn extract_property_validations(
                     schema_name: schema_name.to_string(),
                     field_type: "Vec<_>".to_string(),
                     is_required,
+                    is_array: true,
                     check: ConstraintCheck::MinLength { min },
                 });
             }
@@ -184,6 +187,7 @@ fn extract_string_validations(
             schema_name: schema_name.to_string(),
             field_type: "String".to_string(),
             is_required,
+            is_array: false,
             check: ConstraintCheck::MaxLength { max },
         });
     }
@@ -194,6 +198,7 @@ fn extract_string_validations(
             schema_name: schema_name.to_string(),
             field_type: "String".to_string(),
             is_required,
+            is_array: false,
             check: ConstraintCheck::MinLength { min },
         });
     }
@@ -204,6 +209,7 @@ fn extract_string_validations(
             schema_name: schema_name.to_string(),
             field_type: "String".to_string(),
             is_required,
+            is_array: false,
             check: ConstraintCheck::MaxGraphemes { max },
         });
     }
@@ -214,6 +220,7 @@ fn extract_string_validations(
             schema_name: schema_name.to_string(),
             field_type: "String".to_string(),
             is_required,
+            is_array: false,
             check: ConstraintCheck::MinGraphemes { min },
         });
     }
@@ -236,6 +243,7 @@ fn extract_integer_validations(
             schema_name: schema_name.to_string(),
             field_type: "i64".to_string(),
             is_required,
+            is_array: false,
             check: ConstraintCheck::Maximum { max },
         });
     }
@@ -246,6 +254,7 @@ fn extract_integer_validations(
             schema_name: schema_name.to_string(),
             field_type: "i64".to_string(),
             is_required,
+            is_array: false,
             check: ConstraintCheck::Minimum { min },
         });
     }

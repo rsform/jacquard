@@ -99,6 +99,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Rings<'a> {
     fn nsid() -> &'static str {
         "dev.baileytownsend.health.rings"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_dev_baileytownsend_health_rings()
     }
@@ -114,23 +117,31 @@ fn lexicon_doc_dev_baileytownsend_health_rings() -> ::jacquard_lexicon::lexicon:
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "dev.baileytownsend.health.rings".into(),
+        id: ::jacquard_common::CowStr::new_static("dev.baileytownsend.health.rings"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("any".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A record of daily activity rings (Apple Fitness), including move, exercise, and stand goals.",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("any")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: Some(
                             vec![
-                                "move".into(), "moveGoal".into(), "exercise".into(),
-                                "exerciseGoal".into(), "standHours".into(), "standGoal"
-                                .into(), "createdAt".into()
+                                ::jacquard_common::smol_str::SmolStr::new_static("move"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("moveGoal"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("exercise"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("exerciseGoal"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("standHours"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("standGoal"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
                             ],
                         ),
                         nullable: None,
@@ -138,7 +149,9 @@ fn lexicon_doc_dev_baileytownsend_health_rings() -> ::jacquard_lexicon::lexicon:
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: Some(
@@ -155,7 +168,9 @@ fn lexicon_doc_dev_baileytownsend_health_rings() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                "exercise".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "exercise",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -166,7 +181,9 @@ fn lexicon_doc_dev_baileytownsend_health_rings() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                "exerciseGoal".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "exerciseGoal",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -177,7 +194,7 @@ fn lexicon_doc_dev_baileytownsend_health_rings() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                "move".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("move"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -188,7 +205,9 @@ fn lexicon_doc_dev_baileytownsend_health_rings() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                "moveGoal".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "moveGoal",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -199,7 +218,9 @@ fn lexicon_doc_dev_baileytownsend_health_rings() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                "standGoal".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "standGoal",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -210,7 +231,9 @@ fn lexicon_doc_dev_baileytownsend_health_rings() -> ::jacquard_lexicon::lexicon:
                                 }),
                             );
                             map.insert(
-                                "standHours".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "standHours",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,

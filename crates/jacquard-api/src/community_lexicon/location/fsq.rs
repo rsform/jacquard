@@ -39,22 +39,51 @@ fn lexicon_doc_community_lexicon_location_fsq() -> ::jacquard_lexicon::lexicon::
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "community.lexicon.location.fsq".into(),
+        id: ::jacquard_common::CowStr::new_static("community.lexicon.location.fsq"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["fsq_place_id".into()]),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A physical location contained in the Foursquare Open Source Places dataset.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("fsq_place_id")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "fsq_place_id".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "fsq_place_id",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The unique identifier of a Foursquare POI.",
+                                    ),
+                                ),
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("latitude"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -69,7 +98,9 @@ fn lexicon_doc_community_lexicon_location_fsq() -> ::jacquard_lexicon::lexicon::
                             }),
                         );
                         map.insert(
-                            "latitude".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "longitude",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -84,24 +115,13 @@ fn lexicon_doc_community_lexicon_location_fsq() -> ::jacquard_lexicon::lexicon::
                             }),
                         );
                         map.insert(
-                            "longitude".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            "name".into(),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "The name of the location.",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -125,6 +145,9 @@ fn lexicon_doc_community_lexicon_location_fsq() -> ::jacquard_lexicon::lexicon::
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Fsq<'a> {
     fn nsid() -> &'static str {
         "community.lexicon.location.fsq"
+    }
+    fn def_name() -> &'static str {
+        "main"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_community_lexicon_location_fsq()

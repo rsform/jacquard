@@ -47,22 +47,28 @@ fn lexicon_doc_net_anisota_beta_game_session() -> ::jacquard_lexicon::lexicon::L
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "net.anisota.beta.game.session".into(),
+        id: ::jacquard_common::CowStr::new_static("net.anisota.beta.game.session"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "activitySummary".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("activitySummary"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Summary of activity during this session",
+                        ),
+                    ),
                     required: None,
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "currentLevel".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "currentLevel",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -73,7 +79,9 @@ fn lexicon_doc_net_anisota_beta_game_session() -> ::jacquard_lexicon::lexicon::L
                             }),
                         );
                         map.insert(
-                            "currentXP".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "currentXP",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -84,16 +92,24 @@ fn lexicon_doc_net_anisota_beta_game_session() -> ::jacquard_lexicon::lexicon::L
                             }),
                         );
                         map.insert(
-                            "gameActions".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "gameActions",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#gameActions".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static("#gameActions"),
                             }),
                         );
                         map.insert(
-                            "pagesVisited".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "pagesVisited",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "List of unique pages/routes visited",
+                                    ),
+                                ),
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -111,7 +127,9 @@ fn lexicon_doc_net_anisota_beta_game_session() -> ::jacquard_lexicon::lexicon::L
                             }),
                         );
                         map.insert(
-                            "totalEvents".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "totalEvents",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -122,7 +140,9 @@ fn lexicon_doc_net_anisota_beta_game_session() -> ::jacquard_lexicon::lexicon::L
                             }),
                         );
                         map.insert(
-                            "xpGainedThisSession".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "xpGainedThisSession",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -137,16 +157,22 @@ fn lexicon_doc_net_anisota_beta_game_session() -> ::jacquard_lexicon::lexicon::L
                 }),
             );
             map.insert(
-                "gameActions".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("gameActions"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Game-specific actions performed",
+                        ),
+                    ),
                     required: None,
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "dailyRewardsClaimed".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "dailyRewardsClaimed",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -157,7 +183,9 @@ fn lexicon_doc_net_anisota_beta_game_session() -> ::jacquard_lexicon::lexicon::L
                             }),
                         );
                         map.insert(
-                            "feedsLoaded".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "feedsLoaded",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -168,7 +196,9 @@ fn lexicon_doc_net_anisota_beta_game_session() -> ::jacquard_lexicon::lexicon::L
                             }),
                         );
                         map.insert(
-                            "itemsCollected".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "itemsCollected",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -179,7 +209,7 @@ fn lexicon_doc_net_anisota_beta_game_session() -> ::jacquard_lexicon::lexicon::L
                             }),
                         );
                         map.insert(
-                            "levelUps".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("levelUps"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -190,7 +220,9 @@ fn lexicon_doc_net_anisota_beta_game_session() -> ::jacquard_lexicon::lexicon::L
                             }),
                         );
                         map.insert(
-                            "postsViewed".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "postsViewed",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -201,7 +233,9 @@ fn lexicon_doc_net_anisota_beta_game_session() -> ::jacquard_lexicon::lexicon::L
                             }),
                         );
                         map.insert(
-                            "specimensCollected".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "specimensCollected",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -216,16 +250,22 @@ fn lexicon_doc_net_anisota_beta_game_session() -> ::jacquard_lexicon::lexicon::L
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: None,
-                    key: Some("tid".into()),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A game session record tracking a continuous period of user engagement with the application",
+                        ),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: Some(
                             vec![
-                                "startedAt".into(), "status".into(), "platform".into(),
-                                "clientVersion".into()
+                                ::jacquard_common::smol_str::SmolStr::new_static("startedAt"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("status"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("platform"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("clientVersion")
                             ],
                         ),
                         nullable: None,
@@ -233,16 +273,26 @@ fn lexicon_doc_net_anisota_beta_game_session() -> ::jacquard_lexicon::lexicon::L
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
-                                "activitySummary".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "activitySummary",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "#activitySummary".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "#activitySummary",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "clientVersion".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "clientVersion",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Version of the client application",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -255,9 +305,15 @@ fn lexicon_doc_net_anisota_beta_game_session() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                "createdAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "When the session record was created",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -272,7 +328,9 @@ fn lexicon_doc_net_anisota_beta_game_session() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                "duration".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "duration",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                     description: None,
                                     default: None,
@@ -283,9 +341,15 @@ fn lexicon_doc_net_anisota_beta_game_session() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                "endReason".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "endReason",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Why the session ended",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -298,9 +362,13 @@ fn lexicon_doc_net_anisota_beta_game_session() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                "endedAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("endedAt"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "When the session ended (ISO 8601)",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -315,9 +383,15 @@ fn lexicon_doc_net_anisota_beta_game_session() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                "lastActivityAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "lastActivityAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Timestamp of the last recorded activity in this session",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -332,16 +406,24 @@ fn lexicon_doc_net_anisota_beta_game_session() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                "metadata".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "metadata",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "#metadata".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static("#metadata"),
                                 }),
                             );
                             map.insert(
-                                "parentSessionUri".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "parentSessionUri",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "URI of the previous session if this is a continuation (e.g., after brief inactivity)",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -354,9 +436,15 @@ fn lexicon_doc_net_anisota_beta_game_session() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                "platform".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "platform",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Platform where the session occurred",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -369,9 +457,15 @@ fn lexicon_doc_net_anisota_beta_game_session() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                "relatedLogUris".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "relatedLogUris",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "URIs of log records that occurred during this session",
+                                        ),
+                                    ),
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
                                         description: None,
                                         format: None,
@@ -389,9 +483,15 @@ fn lexicon_doc_net_anisota_beta_game_session() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                "relatedProgressUris".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "relatedProgressUris",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "URIs of progress records created during this session",
+                                        ),
+                                    ),
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
                                         description: None,
                                         format: None,
@@ -409,9 +509,15 @@ fn lexicon_doc_net_anisota_beta_game_session() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                "relatedSessionUris".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "relatedSessionUris",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "URIs of related sessions (e.g., same day, same device)",
+                                        ),
+                                    ),
                                     items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
                                         description: None,
                                         format: None,
@@ -429,16 +535,26 @@ fn lexicon_doc_net_anisota_beta_game_session() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                "sessionContext".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "sessionContext",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: "#sessionContext".into(),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "#sessionContext",
+                                    ),
                                 }),
                             );
                             map.insert(
-                                "startedAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "startedAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "When the session began (ISO 8601)",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -453,9 +569,13 @@ fn lexicon_doc_net_anisota_beta_game_session() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                "status".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static("status"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Current status of the session",
+                                        ),
+                                    ),
                                     format: None,
                                     default: None,
                                     min_length: None,
@@ -468,9 +588,15 @@ fn lexicon_doc_net_anisota_beta_game_session() -> ::jacquard_lexicon::lexicon::L
                                 }),
                             );
                             map.insert(
-                                "updatedAt".into(),
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "updatedAt",
+                                ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "When the session record was last updated",
+                                        ),
+                                    ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
@@ -490,18 +616,26 @@ fn lexicon_doc_net_anisota_beta_game_session() -> ::jacquard_lexicon::lexicon::L
                 }),
             );
             map.insert(
-                "metadata".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("metadata"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Additional session metadata",
+                        ),
+                    ),
                     required: None,
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "features".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("features"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "List of features used during the session",
+                                    ),
+                                ),
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
                                     format: None,
@@ -519,9 +653,15 @@ fn lexicon_doc_net_anisota_beta_game_session() -> ::jacquard_lexicon::lexicon::L
                             }),
                         );
                         map.insert(
-                            "networkCondition".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "networkCondition",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Network condition during session",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -534,10 +674,14 @@ fn lexicon_doc_net_anisota_beta_game_session() -> ::jacquard_lexicon::lexicon::L
                             }),
                         );
                         map.insert(
-                            "performanceMetrics".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "performanceMetrics",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                r#ref: "#performanceMetrics".into(),
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "#performanceMetrics",
+                                ),
                             }),
                         );
                         map
@@ -545,16 +689,20 @@ fn lexicon_doc_net_anisota_beta_game_session() -> ::jacquard_lexicon::lexicon::L
                 }),
             );
             map.insert(
-                "performanceMetrics".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("performanceMetrics"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static("Performance-related data"),
+                    ),
                     required: None,
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "averageResponseTime".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "averageResponseTime",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -565,7 +713,9 @@ fn lexicon_doc_net_anisota_beta_game_session() -> ::jacquard_lexicon::lexicon::L
                             }),
                         );
                         map.insert(
-                            "errorCount".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "errorCount",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
                                 description: None,
                                 default: None,
@@ -580,18 +730,28 @@ fn lexicon_doc_net_anisota_beta_game_session() -> ::jacquard_lexicon::lexicon::L
                 }),
             );
             map.insert(
-                "sessionContext".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("sessionContext"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Context about how the session started",
+                        ),
+                    ),
                     required: None,
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "authenticationMethod".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "authenticationMethod",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "How the user was authenticated",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -604,9 +764,15 @@ fn lexicon_doc_net_anisota_beta_game_session() -> ::jacquard_lexicon::lexicon::L
                             }),
                         );
                         map.insert(
-                            "entryPoint".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "entryPoint",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "How the user entered the app",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -619,7 +785,9 @@ fn lexicon_doc_net_anisota_beta_game_session() -> ::jacquard_lexicon::lexicon::L
                             }),
                         );
                         map.insert(
-                            "isNewUser".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "isNewUser",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                 description: None,
                                 default: None,
@@ -627,9 +795,13 @@ fn lexicon_doc_net_anisota_beta_game_session() -> ::jacquard_lexicon::lexicon::L
                             }),
                         );
                         map.insert(
-                            "referrer".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("referrer"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Referrer URL if applicable",
+                                    ),
+                                ),
                                 format: None,
                                 default: None,
                                 min_length: None,
@@ -653,6 +825,9 @@ fn lexicon_doc_net_anisota_beta_game_session() -> ::jacquard_lexicon::lexicon::L
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ActivitySummary<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.session"
+    }
+    fn def_name() -> &'static str {
+        "activitySummary"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_session()
@@ -731,6 +906,9 @@ pub struct GameActions<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GameActions<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.session"
+    }
+    fn def_name() -> &'static str {
+        "gameActions"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_session()
@@ -952,6 +1130,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Session<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.session"
     }
+    fn def_name() -> &'static str {
+        "main"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_session()
     }
@@ -1004,6 +1185,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Metadata<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.session"
     }
+    fn def_name() -> &'static str {
+        "metadata"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_session()
     }
@@ -1039,6 +1223,9 @@ pub struct PerformanceMetrics<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PerformanceMetrics<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.session"
+    }
+    fn def_name() -> &'static str {
+        "performanceMetrics"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_session()
@@ -1102,6 +1289,9 @@ pub struct SessionContext<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SessionContext<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.session"
+    }
+    fn def_name() -> &'static str {
+        "sessionContext"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_session()

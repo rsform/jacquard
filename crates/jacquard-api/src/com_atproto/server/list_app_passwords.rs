@@ -32,22 +32,29 @@ fn lexicon_doc_com_atproto_server_listAppPasswords() -> ::jacquard_lexicon::lexi
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "com.atproto.server.listAppPasswords".into(),
+        id: ::jacquard_common::CowStr::new_static("com.atproto.server.listAppPasswords"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "appPassword".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("appPassword"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["name".into(), "createdAt".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "createdAt".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "createdAt",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -64,7 +71,7 @@ fn lexicon_doc_com_atproto_server_listAppPasswords() -> ::jacquard_lexicon::lexi
                             }),
                         );
                         map.insert(
-                            "name".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -79,7 +86,9 @@ fn lexicon_doc_com_atproto_server_listAppPasswords() -> ::jacquard_lexicon::lexi
                             }),
                         );
                         map.insert(
-                            "privileged".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "privileged",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                 description: None,
                                 default: None,
@@ -91,7 +100,7 @@ fn lexicon_doc_com_atproto_server_listAppPasswords() -> ::jacquard_lexicon::lexi
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
                     description: None,
                     parameters: None,
@@ -107,6 +116,9 @@ fn lexicon_doc_com_atproto_server_listAppPasswords() -> ::jacquard_lexicon::lexi
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AppPassword<'a> {
     fn nsid() -> &'static str {
         "com.atproto.server.listAppPasswords"
+    }
+    fn def_name() -> &'static str {
+        "appPassword"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_server_listAppPasswords()

@@ -39,22 +39,33 @@ fn lexicon_doc_com_atproto_repo_applyWrites() -> ::jacquard_lexicon::lexicon::Le
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: "com.atproto.repo.applyWrites".into(),
+        id: ::jacquard_common::CowStr::new_static("com.atproto.repo.applyWrites"),
         revision: None,
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                "create".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("create"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["collection".into(), "value".into()]),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Operation which creates a new record.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("collection"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("value")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "collection".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "collection",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -71,9 +82,13 @@ fn lexicon_doc_com_atproto_repo_applyWrites() -> ::jacquard_lexicon::lexicon::Le
                             }),
                         );
                         map.insert(
-                            "rkey".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("rkey"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "NOTE: maxLength is redundant with record-key format. Keeping it temporarily to ensure backwards compatibility.",
+                                    ),
+                                ),
                                 format: Some(
                                     ::jacquard_lexicon::lexicon::LexStringFormat::RecordKey,
                                 ),
@@ -88,7 +103,7 @@ fn lexicon_doc_com_atproto_repo_applyWrites() -> ::jacquard_lexicon::lexicon::Le
                             }),
                         );
                         map.insert(
-                            "value".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("value"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
                                 description: None,
                             }),
@@ -98,16 +113,21 @@ fn lexicon_doc_com_atproto_repo_applyWrites() -> ::jacquard_lexicon::lexicon::Le
                 }),
             );
             map.insert(
-                "createResult".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("createResult"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["uri".into(), "cid".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("cid")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "cid".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("cid"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -124,7 +144,7 @@ fn lexicon_doc_com_atproto_repo_applyWrites() -> ::jacquard_lexicon::lexicon::Le
                             }),
                         );
                         map.insert(
-                            "uri".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -141,7 +161,9 @@ fn lexicon_doc_com_atproto_repo_applyWrites() -> ::jacquard_lexicon::lexicon::Le
                             }),
                         );
                         map.insert(
-                            "validationStatus".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "validationStatus",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -160,16 +182,27 @@ fn lexicon_doc_com_atproto_repo_applyWrites() -> ::jacquard_lexicon::lexicon::Le
                 }),
             );
             map.insert(
-                "delete".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("delete"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(vec!["collection".into(), "rkey".into()]),
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Operation which deletes an existing record.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("collection"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("rkey")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "collection".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "collection",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -186,7 +219,7 @@ fn lexicon_doc_com_atproto_repo_applyWrites() -> ::jacquard_lexicon::lexicon::Le
                             }),
                         );
                         map.insert(
-                            "rkey".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("rkey"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -207,7 +240,7 @@ fn lexicon_doc_com_atproto_repo_applyWrites() -> ::jacquard_lexicon::lexicon::Le
                 }),
             );
             map.insert(
-                "deleteResult".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("deleteResult"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(vec![]),
@@ -220,25 +253,36 @@ fn lexicon_doc_com_atproto_repo_applyWrites() -> ::jacquard_lexicon::lexicon::Le
                 }),
             );
             map.insert(
-                "main".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcProcedure(::jacquard_lexicon::lexicon::LexXrpcProcedure {
                     description: None,
                     parameters: None,
                     input: Some(::jacquard_lexicon::lexicon::LexXrpcBody {
                         description: None,
-                        encoding: "application/json".into(),
+                        encoding: ::jacquard_common::CowStr::new_static(
+                            "application/json",
+                        ),
                         schema: Some(
                             ::jacquard_lexicon::lexicon::LexXrpcBodySchema::Object(::jacquard_lexicon::lexicon::LexObject {
                                 description: None,
-                                required: Some(vec!["repo".into(), "writes".into()]),
+                                required: Some(
+                                    vec![
+                                        ::jacquard_common::smol_str::SmolStr::new_static("repo"),
+                                        ::jacquard_common::smol_str::SmolStr::new_static("writes")
+                                    ],
+                                ),
                                 nullable: None,
                                 properties: {
                                     #[allow(unused_mut)]
                                     let mut map = ::std::collections::BTreeMap::new();
                                     map.insert(
-                                        "repo".into(),
+                                        ::jacquard_common::smol_str::SmolStr::new_static("repo"),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                            description: None,
+                                            description: Some(
+                                                ::jacquard_common::CowStr::new_static(
+                                                    "The handle or DID of the repo (aka, current account).",
+                                                ),
+                                            ),
                                             format: Some(
                                                 ::jacquard_lexicon::lexicon::LexStringFormat::AtIdentifier,
                                             ),
@@ -253,9 +297,15 @@ fn lexicon_doc_com_atproto_repo_applyWrites() -> ::jacquard_lexicon::lexicon::Le
                                         }),
                                     );
                                     map.insert(
-                                        "swapCommit".into(),
+                                        ::jacquard_common::smol_str::SmolStr::new_static(
+                                            "swapCommit",
+                                        ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                            description: None,
+                                            description: Some(
+                                                ::jacquard_common::CowStr::new_static(
+                                                    "If provided, the entire operation will fail if the current repo commit CID does not match this value. Used to prevent conflicting repo mutations.",
+                                                ),
+                                            ),
                                             format: Some(
                                                 ::jacquard_lexicon::lexicon::LexStringFormat::Cid,
                                             ),
@@ -270,7 +320,9 @@ fn lexicon_doc_com_atproto_repo_applyWrites() -> ::jacquard_lexicon::lexicon::Le
                                         }),
                                     );
                                     map.insert(
-                                        "validate".into(),
+                                        ::jacquard_common::smol_str::SmolStr::new_static(
+                                            "validate",
+                                        ),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                             description: None,
                                             default: None,
@@ -278,13 +330,15 @@ fn lexicon_doc_com_atproto_repo_applyWrites() -> ::jacquard_lexicon::lexicon::Le
                                         }),
                                     );
                                     map.insert(
-                                        "writes".into(),
+                                        ::jacquard_common::smol_str::SmolStr::new_static("writes"),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                             description: None,
                                             items: ::jacquard_lexicon::lexicon::LexArrayItem::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                                 description: None,
                                                 refs: vec![
-                                                    "#create".into(), "#update".into(), "#delete".into()
+                                                    ::jacquard_common::CowStr::new_static("#create"),
+                                                    ::jacquard_common::CowStr::new_static("#update"),
+                                                    ::jacquard_common::CowStr::new_static("#delete")
                                                 ],
                                                 closed: Some(true),
                                             }),
@@ -302,18 +356,28 @@ fn lexicon_doc_com_atproto_repo_applyWrites() -> ::jacquard_lexicon::lexicon::Le
                 }),
             );
             map.insert(
-                "update".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("update"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Operation which updates an existing record.",
+                        ),
+                    ),
                     required: Some(
-                        vec!["collection".into(), "rkey".into(), "value".into()],
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("collection"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("rkey"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("value")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "collection".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "collection",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -330,7 +394,7 @@ fn lexicon_doc_com_atproto_repo_applyWrites() -> ::jacquard_lexicon::lexicon::Le
                             }),
                         );
                         map.insert(
-                            "rkey".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("rkey"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -347,7 +411,7 @@ fn lexicon_doc_com_atproto_repo_applyWrites() -> ::jacquard_lexicon::lexicon::Le
                             }),
                         );
                         map.insert(
-                            "value".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("value"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
                                 description: None,
                             }),
@@ -357,16 +421,21 @@ fn lexicon_doc_com_atproto_repo_applyWrites() -> ::jacquard_lexicon::lexicon::Le
                 }),
             );
             map.insert(
-                "updateResult".into(),
+                ::jacquard_common::smol_str::SmolStr::new_static("updateResult"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
-                    required: Some(vec!["uri".into(), "cid".into()]),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("cid")
+                        ],
+                    ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            "cid".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("cid"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -383,7 +452,7 @@ fn lexicon_doc_com_atproto_repo_applyWrites() -> ::jacquard_lexicon::lexicon::Le
                             }),
                         );
                         map.insert(
-                            "uri".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: Some(
@@ -400,7 +469,9 @@ fn lexicon_doc_com_atproto_repo_applyWrites() -> ::jacquard_lexicon::lexicon::Le
                             }),
                         );
                         map.insert(
-                            "validationStatus".into(),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "validationStatus",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
@@ -427,6 +498,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Create<'a> {
     fn nsid() -> &'static str {
         "com.atproto.repo.applyWrites"
     }
+    fn def_name() -> &'static str {
+        "create"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_repo_applyWrites()
     }
@@ -434,11 +508,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Create<'a> {
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::schema::ValidationError> {
         if let Some(ref value) = self.rkey {
-            if value.as_ref().len() > 512usize {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 512usize {
                 return Err(::jacquard_lexicon::schema::ValidationError::MaxLength {
                     field: "rkey",
                     max: 512usize,
-                    actual: value.as_ref().len(),
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -472,6 +547,9 @@ pub struct CreateResult<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CreateResult<'a> {
     fn nsid() -> &'static str {
         "com.atproto.repo.applyWrites"
+    }
+    fn def_name() -> &'static str {
+        "createResult"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_repo_applyWrites()
@@ -509,6 +587,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Delete<'a> {
     fn nsid() -> &'static str {
         "com.atproto.repo.applyWrites"
     }
+    fn def_name() -> &'static str {
+        "delete"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_repo_applyWrites()
     }
@@ -535,6 +616,9 @@ pub struct DeleteResult<'a> {}
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DeleteResult<'a> {
     fn nsid() -> &'static str {
         "com.atproto.repo.applyWrites"
+    }
+    fn def_name() -> &'static str {
+        "deleteResult"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_repo_applyWrites()
@@ -737,6 +821,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Update<'a> {
     fn nsid() -> &'static str {
         "com.atproto.repo.applyWrites"
     }
+    fn def_name() -> &'static str {
+        "update"
+    }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_repo_applyWrites()
     }
@@ -773,6 +860,9 @@ pub struct UpdateResult<'a> {
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UpdateResult<'a> {
     fn nsid() -> &'static str {
         "com.atproto.repo.applyWrites"
+    }
+    fn def_name() -> &'static str {
+        "updateResult"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_repo_applyWrites()
