@@ -104,14 +104,23 @@ pub enum CodegenError {
         source: syn::Error,
     },
 
-    /// Generic error with context
-    #[error("{message}")]
-    #[diagnostic(code(lexicon::error))]
-    Other {
-        message: String,
-        /// Optional source error
+    /// Failed to parse generated tokens back into syn AST
+    #[error("Failed to parse generated code for {path:?}")]
+    #[diagnostic(code(lexicon::token_parse_error))]
+    TokenParseError {
+        path: PathBuf,
         #[source]
-        source: Option<Box<dyn std::error::Error + Send + Sync>>,
+        source: syn::Error,
+        tokens: String,
+    },
+
+    /// Failed to parse module path string
+    #[error("Failed to parse module path: {path_str}")]
+    #[diagnostic(code(lexicon::path_parse_error))]
+    PathParseError {
+        path_str: String,
+        #[source]
+        source: syn::Error,
     },
 }
 

@@ -1123,3 +1123,59 @@ fn test_structurally_valid_with_constraint_errors() {
     assert_eq!(result.structural_errors().len(), 0);
     assert!(result.constraint_errors().len() > 0);
 }
+
+#[test]
+fn test_validate_structural_only() {
+    let validator = SchemaValidator::new();
+    validator.registry().insert(
+        "test.string.constraints".to_smolstr(),
+        StringConstraintSchema::lexicon_doc(),
+    );
+
+    // String too long (violates constraints)
+    let data = Data::Object(jacquard_common::types::value::Object(BTreeMap::from([(
+        "text".into(),
+        data_string("this string is way too long"),
+    )])));
+
+    // Use structural validation only
+    let result = validator.validate_structural::<StringConstraintSchema>(&data);
+
+    // Structurally valid - type is correct, required field present
+    assert!(result.is_structurally_valid());
+
+    // No constraint errors computed
+    assert_eq!(result.constraint_errors().len(), 0);
+
+    // Result should be StructuralOnly variant
+    match result {
+        ValidationResult::StructuralOnly { .. } => {}
+        ValidationResult::Complete { .. } => panic!("Expected StructuralOnly variant"),
+    }
+}
+
+#[test]
+fn test_validate_structural_only_with_errors() {
+    let validator = SchemaValidator::new();
+    validator.registry().insert(
+        "test.string.constraints".to_smolstr(),
+        StringConstraintSchema::lexicon_doc(),
+    );
+
+    // Structurally invalid: integer instead of string
+    let data = Data::Object(jacquard_common::types::value::Object(BTreeMap::from([(
+        "text".into(),
+        Data::Integer(42),
+    )])));
+
+    let result = validator.validate_structural::<StringConstraintSchema>(&data);
+
+    // Not structurally valid
+    assert!(!result.is_structurally_valid());
+
+    // Structural errors should be present
+    assert_eq!(result.structural_errors().len(), 1);
+
+    // No constraint errors
+    assert_eq!(result.constraint_errors().len(), 0);
+}

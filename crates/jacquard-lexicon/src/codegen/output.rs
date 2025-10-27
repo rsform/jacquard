@@ -173,19 +173,14 @@ impl<'c> CodeGenerator<'c> {
 
             // Create parent directories
             if let Some(parent) = full_path.parent() {
-                std::fs::create_dir_all(parent).map_err(|e| CodegenError::Other {
-                    message: format!("Failed to create directory {:?}: {}", parent, e),
-                    source: None,
-                })?;
+                std::fs::create_dir_all(parent)?;
             }
 
             // Format code
-            let file: syn::File = syn::parse2(tokens.clone()).map_err(|e| CodegenError::Other {
-                message: format!(
-                    "Failed to parse tokens for {:?}: {}\nTokens: {}",
-                    path, e, tokens
-                ),
-                source: None,
+            let file: syn::File = syn::parse2(tokens.clone()).map_err(|e| CodegenError::TokenParseError {
+                path: path.clone(),
+                source: e,
+                tokens: tokens.to_string(),
             })?;
             let mut formatted = prettyplease::unparse(&file);
 
@@ -224,10 +219,7 @@ impl<'c> CodeGenerator<'c> {
             formatted = format!("{}{}", header, formatted);
 
             // Write file
-            std::fs::write(&full_path, formatted).map_err(|e| CodegenError::Other {
-                message: format!("Failed to write file {:?}: {}", full_path, e),
-                source: None,
-            })?;
+            std::fs::write(&full_path, formatted)?;
         }
 
         Ok(())

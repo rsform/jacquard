@@ -244,9 +244,9 @@ impl<'c> CodeGenerator<'c> {
             join_path_parts(&[&self.root_module, &module_path, &file_module, &type_name])
         };
 
-        let path: syn::Path = syn::parse_str(&path_str).map_err(|e| CodegenError::Other {
-            message: format!("Failed to parse path: {} {}", path_str, e),
-            source: None,
+        let path: syn::Path = syn::parse_str(&path_str).map_err(|e| CodegenError::PathParseError {
+            path_str: path_str.clone(),
+            source: e,
         })?;
 
         // Only add lifetime if the target type needs it

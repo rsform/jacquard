@@ -8,17 +8,10 @@ use crate::ref_utils::RefPath;
 use crate::schema::SchemaRegistry;
 use cid::Cid as IpldCid;
 use dashmap::DashMap;
-use jacquard_common::{
-    IntoStatic,
-    smol_str,
-    types::value::Data,
-};
+use jacquard_common::{smol_str, types::value::Data};
 use sha2::{Digest, Sha256};
 use smol_str::SmolStr;
-use std::{
-    fmt,
-    sync::{Arc, LazyLock, OnceLock},
-};
+use std::{fmt, sync::{Arc, LazyLock}};
 
 /// Path to a value within a data structure
 ///
@@ -293,96 +286,54 @@ impl<'a> IntoObjectProperty<'a> for LexArrayItem<'a> {
 /// Result of validating Data against a schema
 ///
 /// Distinguishes between structural errors (type mismatches, missing fields) and
-/// constraint violations (max_length, ranges, etc.). Constraint validation is lazy.
+/// constraint violations (max_length, ranges, etc.).
 #[derive(Debug, Clone)]
-pub struct ValidationResult {
-    /// Structural errors (computed immediately)
-    structural: Vec<StructuralError>,
-
-    /// Constraint errors (computed on first access)
-    constraints: OnceLock<Vec<ConstraintError>>,
-
-    /// Context for lazy constraint validation
-    data: Option<Arc<Data<'static>>>,
-    schema_ref: Option<(SmolStr, SmolStr)>, // (nsid, def_name)
-    registry: Option<Arc<SchemaRegistry>>,
+pub enum ValidationResult {
+    /// Only structural validation was performed (or data was structurally invalid)
+    StructuralOnly {
+        structural: Vec<StructuralError>,
+    },
+    /// Both structural and constraint validation were performed
+    Complete {
+        structural: Vec<StructuralError>,
+        constraints: Vec<ConstraintError>,
+    },
 }
 
 impl ValidationResult {
-    /// Create a validation result with no errors
-    pub fn valid() -> Self {
-        Self {
-            structural: Vec::new(),
-            constraints: OnceLock::new(),
-            data: None,
-            schema_ref: None,
-            registry: None,
-        }
-    }
-
-    /// Create a validation result with structural errors
-    pub fn with_structural_errors(errors: Vec<StructuralError>) -> Self {
-        Self {
-            structural: errors,
-            constraints: OnceLock::new(),
-            data: None,
-            schema_ref: None,
-            registry: None,
-        }
-    }
-
-    /// Create a validation result with context for lazy constraint validation
-    pub fn with_context(
-        structural: Vec<StructuralError>,
-        data: Arc<Data<'static>>,
-        nsid: SmolStr,
-        def_name: SmolStr,
-        registry: Arc<SchemaRegistry>,
-    ) -> Self {
-        Self {
-            structural,
-            constraints: OnceLock::new(),
-            data: Some(data),
-            schema_ref: Some((nsid, def_name)),
-            registry: Some(registry),
-        }
-    }
-
     /// Check if validation passed (no structural or constraint errors)
     pub fn is_valid(&self) -> bool {
-        self.structural.is_empty() && self.constraint_errors().is_empty()
+        match self {
+            ValidationResult::StructuralOnly { structural } => structural.is_empty(),
+            ValidationResult::Complete {
+                structural,
+                constraints,
+            } => structural.is_empty() && constraints.is_empty(),
+        }
     }
 
     /// Check if structurally valid (ignoring constraint checks)
     pub fn is_structurally_valid(&self) -> bool {
-        self.structural.is_empty()
+        match self {
+            ValidationResult::StructuralOnly { structural } => structural.is_empty(),
+            ValidationResult::Complete { structural, .. } => structural.is_empty(),
+        }
     }
 
     /// Get structural errors
     pub fn structural_errors(&self) -> &[StructuralError] {
-        &self.structural
+        match self {
+            ValidationResult::StructuralOnly { structural } => structural,
+            ValidationResult::Complete { structural, .. } => structural,
+        }
     }
 
-    /// Get constraint errors (computed lazily on first access)
+    /// Get constraint errors
     pub fn constraint_errors(&self) -> &[ConstraintError] {
-        self.constraints.get_or_init(|| {
-            // If no context or structurally invalid, skip constraint validation
-            if !self.is_structurally_valid() || self.data.is_none() || self.schema_ref.is_none() {
-                return Vec::new();
-            }
-
-            let data = self.data.as_ref().unwrap();
-            let (nsid, def_name) = self.schema_ref.as_ref().unwrap();
-
-            let mut path = ValidationPath::new();
-            validate_constraints(
-                &mut path,
-                data,
-                nsid.as_str(),
-                def_name.as_str(),
-                self.registry.as_ref(),
-            )
-        })
+        match self {
+            ValidationResult::StructuralOnly { .. } => &[],
+            ValidationResult::Complete { constraints, .. } => constraints,
+        }
     }
 
     /// Check if there are any constraint violations
@@ -392,7 +343,7 @@ impl ValidationResult {
 
     /// Get all errors (structural and constraint)
     pub fn all_errors(&self) -> impl Iterator<Item = ValidationError> + '_ {
-        self.structural
+        self.structural_errors()
             .iter()
             .cloned()
             .map(ValidationError::Structural)
@@ -431,9 +382,10 @@ impl SchemaValidator {
         }
     }
 
-    /// Validate data against a schema
+    /// Validate data against a schema (structural and constraints)
     ///
-    /// Results are cached by content hash for efficiency.
+    /// Performs both structural validation (types, required fields) and constraint
+    /// validation (max_length, ranges, etc.). Results are cached by content hash.
     pub fn validate<T: crate::schema::LexiconSchema>(
         &self,
         data: &Data,
@@ -455,39 +407,86 @@ impl SchemaValidator {
         Ok(result)
     }
 
+    /// Validate only the structural aspects of data against a schema
+    ///
+    /// Only checks types, required fields, and schema structure. Does not check
+    /// constraints like max_length, ranges, etc. This is faster when you only
+    /// care about type correctness.
+    pub fn validate_structural<T: crate::schema::LexiconSchema>(
+        &self,
+        data: &Data,
+    ) -> ValidationResult {
+        self.validate_structural_uncached::<T>(data)
+    }
+
     /// Validate without caching (internal)
     fn validate_uncached<T: crate::schema::LexiconSchema>(&self, data: &Data) -> ValidationResult {
         let def = match self.registry.get_def(T::nsid(), T::def_name()) {
             Some(d) => d,
             None => {
                 // Schema not found - this is a structural error
-                return ValidationResult::with_structural_errors(vec![
-                    StructuralError::UnresolvedRef {
+                return ValidationResult::StructuralOnly {
+                    structural: vec![StructuralError::UnresolvedRef {
                         path: ValidationPath::new(),
                         ref_nsid: format!("{}#{}", T::nsid(), T::def_name()).into(),
-                    },
-                ]);
+                    }],
+                };
             }
         };
 
         let mut path = ValidationPath::new();
         let mut ctx = ValidationContext::new(T::nsid(), T::def_name());
 
-        let errors = validate_def(&mut path, data, &def, &self.registry, &mut ctx);
+        let structural_errors = validate_def(&mut path, data, &def, &self.registry, &mut ctx);
 
-        // If structurally valid, create result with context for lazy constraint validation
-        if errors.is_empty() {
-            // Convert data to owned for constraint validation
-            let owned_data = Arc::new(data.clone().into_static());
-            ValidationResult::with_context(
-                errors,
-                owned_data,
-                SmolStr::new_static(T::nsid()),
-                SmolStr::new_static(T::def_name()),
-                Arc::new(self.registry.clone()),
-            )
-        } else {
-            ValidationResult::with_structural_errors(errors)
+        // If structurally invalid, return structural errors only
+        if !structural_errors.is_empty() {
+            return ValidationResult::StructuralOnly {
+                structural: structural_errors,
+            };
+        }
+
+        // Structurally valid - compute constraints eagerly
+        let mut path = ValidationPath::new();
+        let constraint_errors = validate_constraints(
+            &mut path,
+            data,
+            T::nsid(),
+            T::def_name(),
+            Some(&Arc::new(self.registry.clone())),
+        );
+
+        ValidationResult::Complete {
+            structural: structural_errors,
+            constraints: constraint_errors,
+        }
+    }
+
+    /// Validate structural aspects only without caching (internal)
+    fn validate_structural_uncached<T: crate::schema::LexiconSchema>(
+        &self,
+        data: &Data,
+    ) -> ValidationResult {
+        let def = match self.registry.get_def(T::nsid(), T::def_name()) {
+            Some(d) => d,
+            None => {
+                // Schema not found - this is a structural error
+                return ValidationResult::StructuralOnly {
+                    structural: vec![StructuralError::UnresolvedRef {
+                        path: ValidationPath::new(),
+                        ref_nsid: format!("{}#{}", T::nsid(), T::def_name()).into(),
+                    }],
+                };
+            }
+        };
+
+        let mut path = ValidationPath::new();
+        let mut ctx = ValidationContext::new(T::nsid(), T::def_name());
+
+        let structural_errors = validate_def(&mut path, data, &def, &self.registry, &mut ctx);
+
+        ValidationResult::StructuralOnly {
+            structural: structural_errors,
         }
     }
 
