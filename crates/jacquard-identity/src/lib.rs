@@ -180,18 +180,29 @@ impl CacheConfig {
 }
 
 /// Cache layer for resolver operations
+///
+/// Fairly simple, in-memory only. If you want something more complex with persistence,
+/// implemement the appropriate resolver traits on your own struct, or wrap
+/// JacquardResolver in a custom cache layer. The intent here is to allow your
+/// backend service to not hammer people's DNS or PDS/entryway if you make requests
+/// that need to do resolution first (e.g. the get_record helper functions), not
+/// to provide a complete caching solution for all use cases of the resolver.
+///
+/// **Note from the author:** If there is desire or need, I can break out cache operation
+/// functions into a trait to make this more pluggable, but this solves the typical
+/// use case.
 #[cfg(feature = "cache")]
 #[derive(Clone)]
-struct ResolverCaches {
-    handle_to_did: Cache<Handle<'static>, Did<'static>>,
-    did_to_doc: Cache<Did<'static>, Arc<DidDocResponse>>,
-    authority_to_did: Cache<SmolStr, Did<'static>>,
-    nsid_to_schema: Cache<Nsid<'static>, Arc<ResolvedLexiconSchema<'static>>>,
+pub struct ResolverCaches {
+    pub handle_to_did: Cache<Handle<'static>, Did<'static>>,
+    pub did_to_doc: Cache<Did<'static>, Arc<DidDocResponse>>,
+    pub authority_to_did: Cache<SmolStr, Did<'static>>,
+    pub nsid_to_schema: Cache<Nsid<'static>, Arc<ResolvedLexiconSchema<'static>>>,
 }
 
 #[cfg(feature = "cache")]
 impl ResolverCaches {
-    fn new(config: &CacheConfig) -> Self {
+    pub fn new(config: &CacheConfig) -> Self {
         Self {
             handle_to_did: Cache::builder()
                 .max_capacity(config.handle_to_did_capacity)
@@ -910,6 +921,8 @@ impl Default for PublicResolver {
         let resolver = JacquardResolver::new(http, opts);
         #[cfg(feature = "dns")]
         let resolver = resolver.with_system_dns();
+        #[cfg(feature = "cache")]
+        let resolver = resolver.with_cache();
         resolver
     }
 }
@@ -923,6 +936,8 @@ pub fn slingshot_resolver_default() -> PublicResolver {
     let resolver = JacquardResolver::new(http, opts);
     #[cfg(feature = "dns")]
     let resolver = resolver.with_system_dns();
+    #[cfg(feature = "cache")]
+    let resolver = resolver.with_cache();
     resolver
 }
 
