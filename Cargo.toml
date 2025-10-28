@@ -52,6 +52,7 @@ cid = { version = "0.11.1", features = ["serde", "std"] }
 ipld-core = { version = "0.4.2", features = ["serde"] }
 multihash = "0.19"
 dashmap = "6.1"
+moka = "0.12"
 
 # Proc macros
 proc-macro2 = "1.0"

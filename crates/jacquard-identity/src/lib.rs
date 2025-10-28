@@ -96,6 +96,54 @@ use {
     std::sync::Arc,
 };
 
+#[cfg(feature = "cache")]
+use {
+    crate::lexicon_resolver::ResolvedLexiconSchema,
+    jacquard_common::{smol_str::SmolStr, types::string::Nsid},
+    moka::future::Cache,
+    std::time::Duration,
+};
+
+#[cfg(all(
+    feature = "cache",
+    not(all(feature = "dns", not(target_family = "wasm")))
+))]
+use std::sync::Arc;
+
+/// Cache layer for resolver operations
+#[cfg(feature = "cache")]
+#[derive(Clone)]
+struct ResolverCaches {
+    handle_to_did: Cache<Handle<'static>, Did<'static>>,
+    did_to_doc: Cache<Did<'static>, Arc<DidDocResponse>>,
+    authority_to_did: Cache<SmolStr, Did<'static>>,
+    nsid_to_schema: Cache<Nsid<'static>, Arc<ResolvedLexiconSchema<'static>>>,
+}
+
+#[cfg(feature = "cache")]
+impl ResolverCaches {
+    fn new() -> Self {
+        Self {
+            handle_to_did: Cache::builder()
+                .max_capacity(2000)
+                .time_to_live(Duration::from_secs(24 * 3600))
+                .build(),
+            did_to_doc: Cache::builder()
+                .max_capacity(1000)
+                .time_to_live(Duration::from_secs(72 * 3600))
+                .build(),
+            authority_to_did: Cache::builder()
+                .max_capacity(200)
+                .time_to_live(Duration::from_secs(168 * 3600))
+                .build(),
+            nsid_to_schema: Cache::builder()
+                .max_capacity(500)
+                .time_to_live(Duration::from_secs(168 * 3600))
+                .build(),
+        }
+    }
+}
+
 /// Default resolver implementation with configurable fallback order.
 #[derive(Clone)]
 pub struct JacquardResolver {
@@ -103,6 +151,8 @@ pub struct JacquardResolver {
     opts: ResolverOptions,
     #[cfg(feature = "dns")]
     dns: Option<Arc<TokioAsyncResolver>>,
+    #[cfg(feature = "cache")]
+    caches: Option<ResolverCaches>,
 }
 
 impl JacquardResolver {
@@ -121,6 +171,8 @@ impl JacquardResolver {
             opts,
             #[cfg(feature = "dns")]
             dns: None,
+            #[cfg(feature = "cache")]
+            caches: None,
         }
     }
 
@@ -134,6 +186,8 @@ impl JacquardResolver {
                 ResolverConfig::default(),
                 Default::default(),
             ))),
+            #[cfg(feature = "cache")]
+            caches: None,
         }
     }
 
@@ -162,6 +216,13 @@ impl JacquardResolver {
     /// Enable/disable doc id validation
     pub fn with_validate_doc_id(mut self, enable: bool) -> Self {
         self.opts.validate_doc_id = enable;
+        self
+    }
+
+    #[cfg(feature = "cache")]
+    /// Enable caching with default configuration
+    pub fn with_cache(mut self) -> Self {
+        self.caches = Some(ResolverCaches::new());
         self
     }
 
@@ -339,8 +400,19 @@ impl IdentityResolver for JacquardResolver {
     }
     #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug", skip(self), fields(handle = %handle)))]
     async fn resolve_handle(&self, handle: &Handle<'_>) -> resolver::Result<Did<'static>> {
+        // Try cache first
+        #[cfg(feature = "cache")]
+        if let Some(caches) = &self.caches {
+            let key = handle.clone().into_static();
+            if let Some(did) = caches.handle_to_did.get(&key).await {
+                return Ok(did);
+            }
+        }
+
         let host = handle.as_str();
-        for step in &self.opts.handle_order {
+        let mut resolved_did: Option<Did<'static>> = None;
+
+        'outer: for step in &self.opts.handle_order {
             match step {
                 HandleStep::DnsTxt => {
                     #[cfg(feature = "dns")]
@@ -349,7 +421,8 @@ impl IdentityResolver for JacquardResolver {
                             for txt in txts {
                                 if let Some(did_str) = txt.strip_prefix("did=") {
                                     if let Ok(did) = Did::new(did_str) {
-                                        return Ok(did.into_static());
+                                        resolved_did = Some(did.into_static());
+                                        break 'outer;
                                     }
                                 }
                             }
@@ -360,14 +433,16 @@ impl IdentityResolver for JacquardResolver {
                     let url = Url::parse(&format!("https://{host}/.well-known/atproto-did"))?;
                     if let Ok(text) = self.get_text(url).await {
                         if let Ok(did) = Self::parse_atproto_did_body(&text) {
-                            return Ok(did);
+                            resolved_did = Some(did);
+                            break 'outer;
                         }
                     }
                 }
                 HandleStep::PdsResolveHandle => {
                     // Prefer PDS XRPC via stateless client
                     if let Ok(did) = self.resolve_handle_via_pds(handle).await {
-                        return Ok(did);
+                        resolved_did = Some(did);
+                        break 'outer;
                     }
                     // Public unauth fallback
                     if self.opts.public_fallback_for_handle {
@@ -389,7 +464,8 @@ impl IdentityResolver for JacquardResolver {
                                             val.get("did").and_then(|v| v.as_str())
                                         {
                                             if let Ok(did) = Did::new_owned(did_str) {
-                                                return Ok(did.into_static());
+                                                resolved_did = Some(did.into_static());
+                                                break 'outer;
                                             }
                                         }
                                     }
@@ -413,7 +489,8 @@ impl IdentityResolver for JacquardResolver {
                                 if let Ok(val) = serde_json::from_slice::<serde_json::Value>(&buf) {
                                     if let Some(did_str) = val.get("did").and_then(|v| v.as_str()) {
                                         if let Ok(did) = Did::new_owned(did_str) {
-                                            return Ok(did.into_static());
+                                            resolved_did = Some(did.into_static());
+                                            break 'outer;
                                         }
                                     }
                                 }
@@ -423,22 +500,51 @@ impl IdentityResolver for JacquardResolver {
                 }
             }
         }
-        Err(IdentityError::invalid_well_known())
+
+        // Handle result
+        if let Some(did) = resolved_did {
+            // Cache successful resolution
+            #[cfg(feature = "cache")]
+            if let Some(caches) = &self.caches {
+                caches
+                    .handle_to_did
+                    .insert(handle.clone().into_static(), did.clone())
+                    .await;
+            }
+            Ok(did)
+        } else {
+            // Invalidate on error
+            #[cfg(feature = "cache")]
+            self.invalidate_handle_chain(handle).await;
+            Err(IdentityError::invalid_well_known())
+        }
     }
 
     #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug", skip(self), fields(did = %did)))]
     async fn resolve_did_doc(&self, did: &Did<'_>) -> resolver::Result<DidDocResponse> {
+        // Try cache first
+        #[cfg(feature = "cache")]
+        if let Some(caches) = &self.caches {
+            let key = did.clone().into_static();
+            if let Some(doc_resp) = caches.did_to_doc.get(&key).await {
+                return Ok((*doc_resp).clone());
+            }
+        }
+
         let s = did.as_str();
-        for step in &self.opts.did_order {
+        let mut resolved_doc: Option<DidDocResponse> = None;
+
+        'outer: for step in &self.opts.did_order {
             match step {
                 DidStep::DidWebHttps if s.starts_with("did:web:") => {
                     let url = self.did_web_url(did)?;
                     if let Ok((buf, status)) = self.get_json_bytes(url).await {
-                        return Ok(DidDocResponse {
+                        resolved_doc = Some(DidDocResponse {
                             buffer: buf,
                             status,
                             requested: Some(did.clone().into_static()),
                         });
+                        break 'outer;
                     }
                 }
                 DidStep::PlcHttp if s.starts_with("did:plc:") => {
@@ -450,38 +556,58 @@ impl IdentityResolver for JacquardResolver {
                         PlcSource::Slingshot { base } => base.join(did.as_str())?,
                     };
                     if let Ok((buf, status)) = self.get_json_bytes(url).await {
-                        return Ok(DidDocResponse {
+                        resolved_doc = Some(DidDocResponse {
                             buffer: buf,
                             status,
                             requested: Some(did.clone().into_static()),
                         });
+                        break 'outer;
                     }
                 }
                 DidStep::PdsResolveDid => {
                     // Try PDS XRPC for full DID doc
                     if let Ok(doc) = self.fetch_did_doc_via_pds_owned(did).await {
                         let buf = serde_json::to_vec(&doc).unwrap_or_default();
-                        return Ok(DidDocResponse {
+                        resolved_doc = Some(DidDocResponse {
                             buffer: Bytes::from(buf),
                             status: StatusCode::OK,
                             requested: Some(did.clone().into_static()),
                         });
+                        break 'outer;
                     }
                     // Fallback: if Slingshot configured, return mini-doc response (partial doc)
                     if let PlcSource::Slingshot { base } = &self.opts.plc_source {
                         let url = self.slingshot_mini_doc_url(base, did.as_str())?;
                         let (buf, status) = self.get_json_bytes(url).await?;
-                        return Ok(DidDocResponse {
+                        resolved_doc = Some(DidDocResponse {
                             buffer: buf,
                             status,
                             requested: Some(did.clone().into_static()),
                         });
+                        break 'outer;
                     }
                 }
                 _ => {}
             }
         }
-        Err(IdentityError::unsupported_did_method(s))
+
+        // Handle result
+        if let Some(doc_resp) = resolved_doc {
+            // Cache successful resolution
+            #[cfg(feature = "cache")]
+            if let Some(caches) = &self.caches {
+                caches
+                    .did_to_doc
+                    .insert(did.clone().into_static(), Arc::new(doc_resp.clone()))
+                    .await;
+            }
+            Ok(doc_resp)
+        } else {
+            // Invalidate on error
+            #[cfg(feature = "cache")]
+            self.invalidate_did_chain(did).await;
+            Err(IdentityError::unsupported_did_method(s))
+        }
     }
 }
 
@@ -587,6 +713,59 @@ impl JacquardResolver {
             urlencoding::Encoded::new(identifier)
         )));
         Ok(url)
+    }
+
+    #[cfg(feature = "cache")]
+    async fn invalidate_handle_chain(&self, handle: &Handle<'_>) {
+        if let Some(caches) = &self.caches {
+            let key = handle.clone().into_static();
+            caches.handle_to_did.invalidate(&key).await;
+        }
+    }
+
+    #[cfg(feature = "cache")]
+    async fn invalidate_did_chain(&self, did: &Did<'_>) {
+        if let Some(caches) = &self.caches {
+            let did_key = did.clone().into_static();
+            // Get doc before evicting to extract handles
+            if let Some(doc_resp) = caches.did_to_doc.get(&did_key).await {
+                let doc_resp_clone = (*doc_resp).clone();
+                if let Ok(doc) = doc_resp_clone.parse() {
+                    if let Some(aliases) = &doc.also_known_as {
+                        for alias in aliases {
+                            if let Some(handle_str) = alias.as_ref().strip_prefix("at://") {
+                                if let Ok(handle) = Handle::new(handle_str) {
+                                    let handle_key = handle.into_static();
+                                    caches.handle_to_did.invalidate(&handle_key).await;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            caches.did_to_doc.invalidate(&did_key).await;
+        }
+    }
+
+    #[cfg(feature = "cache")]
+    async fn invalidate_authority_chain(&self, authority: &str) {
+        if let Some(caches) = &self.caches {
+            let authority = SmolStr::from(authority);
+            caches.authority_to_did.invalidate(&authority).await;
+        }
+    }
+
+    #[cfg(feature = "cache")]
+    async fn invalidate_lexicon_chain(&self, nsid: &jacquard_common::types::string::Nsid<'_>) {
+        if let Some(caches) = &self.caches {
+            let nsid_key = nsid.clone().into_static();
+            if let Some(schema) = caches.nsid_to_schema.get(&nsid_key).await {
+                let authority = SmolStr::from(nsid.domain_authority());
+                caches.authority_to_did.invalidate(&authority).await;
+                self.invalidate_did_chain(&schema.repo).await;
+            }
+            caches.nsid_to_schema.invalidate(&nsid_key).await;
+        }
     }
 
     /// Fetch a minimal DID document via Slingshot's mini-doc endpoint using a generic at-identifier

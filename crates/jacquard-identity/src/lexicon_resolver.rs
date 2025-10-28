@@ -6,7 +6,7 @@
 
 use crate::resolver::{IdentityError, IdentityResolver};
 use jacquard_common::{
-    IntoStatic, smol_str,
+    smol_str,
     types::{cid::Cid, did::Did, string::Nsid},
 };
 use smol_str::SmolStr;
@@ -223,6 +223,8 @@ impl crate::JacquardResolver {
             for data in txt.txt_data().iter() {
                 let text = std::str::from_utf8(data).unwrap_or("");
                 if let Some(did_str) = text.strip_prefix("did=") {
+                    use jacquard_common::IntoStatic;
+
                     return Did::new_owned(did_str)
                         .map(|d| d.into_static())
                         .map_err(|_| LexiconResolutionError::invalid_did(authority, did_str));
@@ -240,7 +242,37 @@ impl LexiconAuthorityResolver for crate::JacquardResolver {
         &self,
         nsid: &Nsid<'_>,
     ) -> std::result::Result<Did<'static>, LexiconResolutionError> {
-        self.resolve_lexicon_authority_dns(nsid).await
+        // Try cache first
+        #[cfg(feature = "cache")]
+        if let Some(caches) = &self.caches {
+            let authority = jacquard_common::smol_str::SmolStr::from(nsid.domain_authority());
+            if let Some(did) = caches.authority_to_did.get(&authority).await {
+                return Ok(did);
+            }
+        }
+
+        // Resolve via DNS
+        let result = self.resolve_lexicon_authority_dns(nsid).await;
+
+        // Cache on success, invalidate on error
+        match &result {
+            Ok(did) =>
+            {
+                #[cfg(feature = "cache")]
+                if let Some(caches) = &self.caches {
+                    let authority =
+                        jacquard_common::smol_str::SmolStr::from(nsid.domain_authority());
+                    caches.authority_to_did.insert(authority, did.clone()).await;
+                }
+            }
+            Err(_) => {
+                #[cfg(feature = "cache")]
+                self.invalidate_authority_chain(nsid.domain_authority())
+                    .await;
+            }
+        }
+
+        result
     }
 }
 
@@ -262,66 +294,100 @@ impl LexiconSchemaResolver for crate::JacquardResolver {
         use jacquard_api::com_atproto::repo::get_record::GetRecord;
         use jacquard_common::{IntoStatic, xrpc::XrpcExt};
 
-        // 1. Resolve authority DID via DNS
-        let authority_did = self.resolve_lexicon_authority(nsid).await?;
+        // Try cache first
+        #[cfg(feature = "cache")]
+        if let Some(caches) = &self.caches {
+            let key = nsid.clone().into_static();
+            if let Some(schema) = caches.nsid_to_schema.get(&key).await {
+                return Ok((*schema).clone());
+            }
+        }
 
-        #[cfg(feature = "tracing")]
-        tracing::debug!(
-            "resolved lexicon authority {} -> {}",
-            nsid.domain_authority(),
-            authority_did
-        );
+        // Perform resolution
+        let result = async {
+            // 1. Resolve authority DID via DNS
+            let authority_did = self.resolve_lexicon_authority(nsid).await?;
 
-        // 2. Resolve DID document to get PDS endpoint
-        let did_doc_resp = self.resolve_did_doc(&authority_did).await?;
-        let did_doc = did_doc_resp.parse()?;
-        let pds = did_doc
-            .pds_endpoint()
-            .ok_or_else(|| IdentityError::missing_pds_endpoint())?;
+            #[cfg(feature = "tracing")]
+            tracing::debug!(
+                "resolved lexicon authority {} -> {}",
+                nsid.domain_authority(),
+                authority_did
+            );
 
-        #[cfg(feature = "tracing")]
-        tracing::debug!("fetching lexicon {} from PDS {}", nsid, pds);
+            // 2. Resolve DID document to get PDS endpoint
+            let did_doc_resp = self.resolve_did_doc(&authority_did).await?;
+            let did_doc = did_doc_resp.parse()?;
+            let pds = did_doc
+                .pds_endpoint()
+                .ok_or_else(|| IdentityError::missing_pds_endpoint())?;
 
-        // 3. Fetch lexicon record via XRPC getRecord
-        let collection = Nsid::new("com.atproto.lexicon.schema")
-            .map_err(|_| LexiconResolutionError::invalid_collection())?;
+            #[cfg(feature = "tracing")]
+            tracing::debug!("fetching lexicon {} from PDS {}", nsid, pds);
 
-        let request = GetRecord::new()
-            .repo(authority_did.clone())
-            .collection(collection.into_static())
-            .rkey(nsid.clone())
-            .build();
+            // 3. Fetch lexicon record via XRPC getRecord
+            let collection = Nsid::new("com.atproto.lexicon.schema")
+                .map_err(|_| LexiconResolutionError::invalid_collection())?;
 
-        let response = self
-            .xrpc(pds)
-            .send(&request)
-            .await
-            .map_err(|e| LexiconResolutionError::fetch_failed(nsid.as_str(), e))?;
+            let request = GetRecord::new()
+                .repo(authority_did.clone())
+                .collection(collection.into_static())
+                .rkey(nsid.clone())
+                .build();
 
-        let output = response
-            .into_output()
-            .map_err(|e| LexiconResolutionError::fetch_failed(nsid.as_str(), e))?;
+            let response = self
+                .xrpc(pds)
+                .send(&request)
+                .await
+                .map_err(|e| LexiconResolutionError::fetch_failed(nsid.as_str(), e))?;
 
-        // 4. Parse lexicon document from value
-        let json_str = serde_json::to_string(&output.value)
-            .map_err(|e| LexiconResolutionError::parse_failed(nsid.as_str(), e))?;
+            let output = response
+                .into_output()
+                .map_err(|e| LexiconResolutionError::fetch_failed(nsid.as_str(), e))?;
 
-        let doc: jacquard_lexicon::lexicon::LexiconDoc = serde_json::from_str(&json_str)
-            .map_err(|e| LexiconResolutionError::parse_failed(nsid.as_str(), e))?;
+            // 4. Parse lexicon document from value
+            let json_str = serde_json::to_string(&output.value)
+                .map_err(|e| LexiconResolutionError::parse_failed(nsid.as_str(), e))?;
 
-        #[cfg(feature = "tracing")]
-        tracing::debug!("successfully parsed lexicon schema {}", nsid);
+            let doc: jacquard_lexicon::lexicon::LexiconDoc = serde_json::from_str(&json_str)
+                .map_err(|e| LexiconResolutionError::parse_failed(nsid.as_str(), e))?;
 
-        let cid = output
-            .cid
-            .ok_or_else(|| LexiconResolutionError::missing_cid(nsid.as_str()))?
-            .into_static();
+            #[cfg(feature = "tracing")]
+            tracing::debug!("successfully parsed lexicon schema {}", nsid);
 
-        Ok(ResolvedLexiconSchema {
-            nsid: nsid.clone().into_static(),
-            repo: authority_did.into_static(),
-            cid,
-            doc: doc.into_static(),
-        })
+            let cid = output
+                .cid
+                .ok_or_else(|| LexiconResolutionError::missing_cid(nsid.as_str()))?
+                .into_static();
+
+            Ok(ResolvedLexiconSchema {
+                nsid: nsid.clone().into_static(),
+                repo: authority_did.into_static(),
+                cid,
+                doc: doc.into_static(),
+            })
+        }
+        .await;
+
+        // Handle result
+        match result {
+            Ok(schema) => {
+                // Cache successful resolution
+                #[cfg(feature = "cache")]
+                if let Some(caches) = &self.caches {
+                    caches
+                        .nsid_to_schema
+                        .insert(nsid.clone().into_static(), std::sync::Arc::new(schema.clone()))
+                        .await;
+                }
+                Ok(schema)
+            }
+            Err(e) => {
+                // Invalidate on error
+                #[cfg(feature = "cache")]
+                self.invalidate_lexicon_chain(nsid).await;
+                Err(e)
+            }
+        }
     }
 }
