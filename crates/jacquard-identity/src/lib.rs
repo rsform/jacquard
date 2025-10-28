@@ -224,6 +224,7 @@ impl ResolverCaches {
     }
 }
 
+#[cfg(feature = "cache")]
 impl Default for ResolverCaches {
     fn default() -> Self {
         Self::new(&CacheConfig::default())
