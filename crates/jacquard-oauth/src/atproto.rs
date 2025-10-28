@@ -76,12 +76,13 @@ impl From<GrantType> for CowStr<'static> {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct AtprotoClientMetadata<'m> {
     pub client_id: Url,
     pub client_uri: Option<Url>,
     pub redirect_uris: Vec<Url>,
     pub grant_types: Vec<GrantType>,
+    #[serde(borrow)]
     pub scopes: Vec<Scope<'m>>,
     pub jwks_uri: Option<Url>,
 }

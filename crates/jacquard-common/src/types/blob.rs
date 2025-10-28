@@ -1,3 +1,4 @@
+use crate::types::cid::Cid;
 use crate::{CowStr, IntoStatic, types::cid::CidLink};
 use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Error};
 use smol_str::ToSmolStr;
@@ -22,6 +23,13 @@ pub struct Blob<'b> {
     pub mime_type: MimeType<'b>,
     /// Size of the blob in bytes
     pub size: usize,
+}
+
+impl<'b> Blob<'b> {
+    /// Create a new Blob reference with the given CID, MIME type, and size.
+    pub fn cid(&self) -> &Cid<'b> {
+        &self.r#ref.0
+    }
 }
 
 impl Serialize for Blob<'_> {
