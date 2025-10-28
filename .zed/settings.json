@@ -10,7 +10,7 @@
           "analyzerTargetDir": true
         },
         "cargo": {
-          //"allFeatures": true
+          "allFeatures": true
         }
       }
     }

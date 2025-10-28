@@ -5,6 +5,7 @@ use jacquard_common::types::string::Nsid;
 use jacquard_common::xrpc::XrpcExt;
 use jacquard_common::{CowStr, IntoStatic};
 use jacquard_identity::JacquardResolver;
+use jacquard_identity::lexicon_resolver::LexiconSchemaResolver;
 use jacquard_identity::resolver::{IdentityResolver, ResolverOptions};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use miette::{Result, miette};
@@ -17,6 +18,23 @@ pub struct AtProtoSource {
 }
 
 impl AtProtoSource {
+    /// Fetch a single lexicon schema by NSID using DNS + XRPC resolution
+    async fn fetch_single_lexicon(
+        &self,
+        resolver: &JacquardResolver,
+        nsid: &Nsid<'_>,
+    ) -> Result<HashMap<String, LexiconDoc<'_>>> {
+        let schema = resolver
+            .resolve_lexicon_schema(nsid)
+            .await
+            .map_err(|e| miette!("Failed to resolve lexicon '{}': {}", nsid, e))?;
+
+        let mut lexicons = HashMap::new();
+        lexicons.insert(schema.nsid.to_string(), schema.doc);
+
+        Ok(lexicons)
+    }
+
     fn parse_lexicon_record(record_data: &Record<'_>) -> Option<LexiconDoc<'static>> {
         // // Extract the 'value' field from the record
         // let value = match record_data {
@@ -46,9 +64,14 @@ impl AtProtoSource {
 impl LexiconSource for AtProtoSource {
     async fn fetch(&self) -> Result<HashMap<String, LexiconDoc<'_>>> {
         let http = reqwest::Client::new();
-        let resolver = JacquardResolver::new(http, ResolverOptions::default());
+        let resolver = JacquardResolver::new_dns(http.clone(), ResolverOptions::default());
 
-        // Parse endpoint as at-identifier (handle or DID)
+        // Try parsing as NSID first (for single lexicon fetch)
+        if let Ok(nsid) = Nsid::new(&self.endpoint) {
+            return self.fetch_single_lexicon(&resolver, &nsid).await;
+        }
+
+        // Otherwise parse as at-identifier (handle or DID) for bulk fetch
         let identifier = AtIdentifier::new(&self.endpoint)
             .map_err(|e| miette!("Invalid endpoint '{}': {}", self.endpoint, e))?;
 

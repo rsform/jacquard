@@ -23,6 +23,7 @@ bon.workspace = true
 bytes.workspace = true
 jacquard-common = { version = "0.8", path = "../jacquard-common", features = ["reqwest-client"] }
 jacquard-api = {  version = "0.8", path = "../jacquard-api", default-features = false, features = ["minimal"] }
+jacquard-lexicon = { version = "0.8", path = "../jacquard-lexicon", default-features = false }
 percent-encoding.workspace = true
 reqwest.workspace = true
 url.workspace = true
@@ -39,3 +40,8 @@ n0-future = { workspace = true, optional = true }
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 hickory-resolver = { optional = true, version = "0.24", default-features = false, features = ["system-config", "tokio-runtime"]}
 tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
+
+[[example]]
+name = "resolve_lexicon"
+path = "../../examples/resolve_lexicon.rs"
+required-features = ["dns"]

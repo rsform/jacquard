@@ -23,6 +23,12 @@ path = "src/bin/lex_fetch.rs"
 name = "extract-schemas"
 path = "src/bin/extract_schemas.rs"
 
+[[example]]
+name = "extract_inventory"
+path = "../../examples/extract_inventory.rs"
+required-features = ["codegen"]
+
+
 [dependencies]
 clap.workspace = true
 glob = "0.3"
@@ -30,7 +36,7 @@ inventory = "0.3"
 jacquard-api = { version = "0.8", path = "../jacquard-api", default-features = false, features = [ "minimal" ]  }
 jacquard-common = { version = "0.8", features = [ "reqwest-client" ], path = "../jacquard-common" }
 jacquard-derive = { version = "0.8", path = "../jacquard-derive" }
-jacquard-identity = { version = "0.8", path = "../jacquard-identity" }
+jacquard-identity = { version = "0.8", path = "../jacquard-identity", features = ["dns"] }
 jacquard-lexicon = { version = "0.8", path = "../jacquard-lexicon" }
 kdl = "6"
 miette = { workspace = true, features = ["fancy"] }

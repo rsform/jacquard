@@ -68,6 +68,7 @@
 // use crate::CowStr; // not currently needed directly here
 
 #![cfg_attr(target_arch = "wasm32", allow(unused))]
+pub mod lexicon_resolver;
 pub mod resolver;
 
 use crate::resolver::{

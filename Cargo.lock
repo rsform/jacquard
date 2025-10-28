@@ -2382,6 +2382,7 @@ dependencies = [
  "http",
  "jacquard-api",
  "jacquard-common",
+ "jacquard-lexicon",
  "miette",
  "n0-future",
  "percent-encoding",

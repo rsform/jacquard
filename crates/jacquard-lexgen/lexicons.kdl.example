@@ -20,6 +20,11 @@ source "atproto" type="git" priority=101 {
     pattern "lexicons/**/*.json"
 }
 
+// Fetch a single lexicon by NSID - will use DNS to resolve authority
+source "bsky-post" type="atproto" priority=30 {
+    endpoint "app.bsky.feed.post"
+}
+
 // Fetch lexicons from a Git repository
 source "my-lexicons" type="git" priority=100 {
     repo "https://github.com/example/my-lexicons"
