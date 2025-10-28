@@ -47,7 +47,7 @@ bon = "3.8.0"
 # Data types
 bytes = "1.10"
 smol_str = { version = "0.3", features = ["serde"] }
-url = "2.5"
+url = { version = "2.5", features = ["serde"] }
 cid = { version = "0.11.1", features = ["serde", "std"] }
 ipld-core = { version = "0.4.2", features = ["serde"] }
 multihash = "0.19"
