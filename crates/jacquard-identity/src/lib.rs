@@ -110,6 +110,75 @@ use {
 ))]
 use std::sync::Arc;
 
+/// Configuration for resolver caching
+#[cfg(feature = "cache")]
+#[derive(Clone, Debug)]
+pub struct CacheConfig {
+    /// Maximum capacity for handle→DID cache
+    pub handle_to_did_capacity: u64,
+    /// TTL for handle→DID cache
+    pub handle_to_did_ttl: Duration,
+    /// Maximum capacity for DID→document cache
+    pub did_to_doc_capacity: u64,
+    /// TTL for DID→document cache
+    pub did_to_doc_ttl: Duration,
+    /// Maximum capacity for authority→DID cache
+    pub authority_to_did_capacity: u64,
+    /// TTL for authority→DID cache
+    pub authority_to_did_ttl: Duration,
+    /// Maximum capacity for NSID→schema cache
+    pub nsid_to_schema_capacity: u64,
+    /// TTL for NSID→schema cache
+    pub nsid_to_schema_ttl: Duration,
+}
+
+#[cfg(feature = "cache")]
+impl Default for CacheConfig {
+    fn default() -> Self {
+        Self {
+            handle_to_did_capacity: 2000,
+            handle_to_did_ttl: Duration::from_secs(24 * 3600),
+            did_to_doc_capacity: 1000,
+            did_to_doc_ttl: Duration::from_secs(72 * 3600),
+            authority_to_did_capacity: 1000,
+            authority_to_did_ttl: Duration::from_secs(168 * 3600),
+            nsid_to_schema_capacity: 1000,
+            nsid_to_schema_ttl: Duration::from_secs(168 * 3600),
+        }
+    }
+}
+
+#[cfg(feature = "cache")]
+impl CacheConfig {
+    /// Set handle→DID cache parameters
+    pub fn with_handle_cache(mut self, capacity: u64, ttl: Duration) -> Self {
+        self.handle_to_did_capacity = capacity;
+        self.handle_to_did_ttl = ttl;
+        self
+    }
+
+    /// Set DID→document cache parameters
+    pub fn with_did_doc_cache(mut self, capacity: u64, ttl: Duration) -> Self {
+        self.did_to_doc_capacity = capacity;
+        self.did_to_doc_ttl = ttl;
+        self
+    }
+
+    /// Set authority→DID cache parameters
+    pub fn with_authority_cache(mut self, capacity: u64, ttl: Duration) -> Self {
+        self.authority_to_did_capacity = capacity;
+        self.authority_to_did_ttl = ttl;
+        self
+    }
+
+    /// Set NSID→schema cache parameters
+    pub fn with_schema_cache(mut self, capacity: u64, ttl: Duration) -> Self {
+        self.nsid_to_schema_capacity = capacity;
+        self.nsid_to_schema_ttl = ttl;
+        self
+    }
+}
+
 /// Cache layer for resolver operations
 #[cfg(feature = "cache")]
 #[derive(Clone)]
@@ -122,25 +191,31 @@ struct ResolverCaches {
 
 #[cfg(feature = "cache")]
 impl ResolverCaches {
-    fn new() -> Self {
+    fn new(config: &CacheConfig) -> Self {
         Self {
             handle_to_did: Cache::builder()
-                .max_capacity(2000)
-                .time_to_live(Duration::from_secs(24 * 3600))
+                .max_capacity(config.handle_to_did_capacity)
+                .time_to_live(config.handle_to_did_ttl)
                 .build(),
             did_to_doc: Cache::builder()
-                .max_capacity(1000)
-                .time_to_live(Duration::from_secs(72 * 3600))
+                .max_capacity(config.did_to_doc_capacity)
+                .time_to_live(config.did_to_doc_ttl)
                 .build(),
             authority_to_did: Cache::builder()
-                .max_capacity(200)
-                .time_to_live(Duration::from_secs(168 * 3600))
+                .max_capacity(config.authority_to_did_capacity)
+                .time_to_live(config.authority_to_did_ttl)
                 .build(),
             nsid_to_schema: Cache::builder()
-                .max_capacity(500)
-                .time_to_live(Duration::from_secs(168 * 3600))
+                .max_capacity(config.nsid_to_schema_capacity)
+                .time_to_live(config.nsid_to_schema_ttl)
                 .build(),
         }
+    }
+}
+
+impl Default for ResolverCaches {
+    fn default() -> Self {
+        Self::new(&CacheConfig::default())
     }
 }
 
@@ -222,7 +297,14 @@ impl JacquardResolver {
     #[cfg(feature = "cache")]
     /// Enable caching with default configuration
     pub fn with_cache(mut self) -> Self {
-        self.caches = Some(ResolverCaches::new());
+        self.caches = Some(ResolverCaches::default());
+        self
+    }
+
+    #[cfg(feature = "cache")]
+    /// Enable caching with custom configuration
+    pub fn with_cache_config(mut self, config: CacheConfig) -> Self {
+        self.caches = Some(ResolverCaches::new(&config));
         self
     }
 
