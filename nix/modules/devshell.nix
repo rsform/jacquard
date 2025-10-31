@@ -24,5 +24,8 @@
         zip
       ];
     };
+    apps = {
+      default.program = "${self'.packages.jacquard-lexgen}/bin/lex-fetch";
+    };
   };
 }
