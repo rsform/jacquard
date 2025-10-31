@@ -18,6 +18,15 @@
             ],
             "maxSize": 1000000
           },
+          "banner": {
+            "type": "blob",
+            "description": "Larger horizontal image to display behind profile view.",
+            "accept": [
+              "image/png",
+              "image/jpeg"
+            ],
+            "maxSize": 1000000
+          },
           "bluesky": {
             "type": "boolean",
             "description": "Include link to this account on Bluesky."
@@ -29,13 +38,20 @@
           "description": {
             "type": "string",
             "description": "Free-form profile description text.",
-            "maxLength": 2560,
-            "maxGraphemes": 256
+            "maxLength": 10240,
+            "maxGraphemes": 1024
           },
           "displayName": {
             "type": "string",
             "maxLength": 640,
             "maxGraphemes": 64
+          },
+          "labels": {
+            "type": "union",
+            "description": "Self-label values, specific to the application, on the overall account.",
+            "refs": [
+              "com.atproto.label.defs#selfLabels"
+            ]
           },
           "links": {
             "type": "array",
@@ -53,36 +69,25 @@
             "maxLength": 400,
             "maxGraphemes": 40
           },
-          "pinnedPost": {
+          "pinned": {
             "type": "ref",
-            "ref": "com.atproto.repo.strongRef"
+            "description": "Notebooks or other records pinned for display.",
+            "ref": "sh.weaver.actor.defs#pinnedList"
           },
           "pronouns": {
             "type": "ref",
             "description": "Pronouns to use in user-generated content.",
-            "ref": "#pronounsList"
+            "ref": "sh.weaver.actor.defs#pronounsList"
+          },
+          "streamplace": {
+            "type": "boolean",
+            "description": "Include link to this account on stream.place."
           },
           "tangled": {
             "type": "boolean",
             "description": "Include link to this account on Tangled."
           }
         }
-      }
-    },
-    "pronounsList": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "enum": [
-          "she/her",
-          "he/him",
-          "they/them",
-          "it/its",
-          "she/they",
-          "he/they",
-          "they/he",
-          "they/she"
-        ]
       }
     }
   }

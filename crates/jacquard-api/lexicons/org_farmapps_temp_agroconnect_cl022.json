@@ -1,0 +1,76 @@
+{
+  "lexicon": 1,
+  "id": "org.farmapps.temp.agroconnect.cl022",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Fertilizer codelist",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "description": "Codelist ferilizers",
+        "required": [
+          "id",
+          "description"
+        ],
+        "properties": {
+          "added": {
+            "type": "string",
+            "description": "Date when added to the list",
+            "format": "datetime"
+          },
+          "comment": {
+            "type": "string",
+            "description": "Comment"
+          },
+          "denominator": {
+            "type": "integer",
+            "description": "Denominator used for all fertilizer content properties",
+            "minimum": 1
+          },
+          "description": {
+            "type": "string",
+            "description": "Description / name of the fertilizer"
+          },
+          "id": {
+            "type": "ref",
+            "description": "Id off the fertilizer",
+            "ref": "org.farmapps.temp.ecrop.defs#codeType"
+          },
+          "k2o": {
+            "type": "integer",
+            "description": "<unit> Potassium oxide content of this fertilizer ",
+            "minimum": 0
+          },
+          "n": {
+            "type": "integer",
+            "description": "<unit> Nitrogen content of this fertilizer ",
+            "minimum": 0
+          },
+          "p2o5": {
+            "type": "integer",
+            "description": "<unit> Phosphate content of this fertilizer ",
+            "minimum": 0
+          },
+          "type": {
+            "type": "string",
+            "description": "Fertlizer type",
+            "enum": [
+              "Organic",
+              "Inorganic"
+            ]
+          },
+          "unit": {
+            "type": "string",
+            "description": "Unit "
+          },
+          "updated": {
+            "type": "string",
+            "description": "Date when updated",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

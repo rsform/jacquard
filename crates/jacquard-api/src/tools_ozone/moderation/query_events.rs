@@ -80,6 +80,8 @@ pub struct QueryEvents<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub types: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub with_strike: std::option::Option<bool>,
 }
 
 pub mod query_events_state {
@@ -127,6 +129,7 @@ pub struct QueryEventsBuilder<'a, S: query_events_state::State> {
         ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+        ::core::option::Option<bool>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -144,6 +147,7 @@ impl<'a> QueryEventsBuilder<'a, query_events_state::Empty> {
         QueryEventsBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
+                None,
                 None,
                 None,
                 None,
@@ -563,6 +567,19 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     }
 }
 
+impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
+    /// Set the `withStrike` field (optional)
+    pub fn with_strike(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.22 = value.into();
+        self
+    }
+    /// Set the `withStrike` field to an Option value (optional)
+    pub fn maybe_with_strike(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.22 = value;
+        self
+    }
+}
+
 impl<'a, S> QueryEventsBuilder<'a, S>
 where
     S: query_events_state::State,
@@ -592,6 +609,7 @@ where
             subject: self.__unsafe_private_named.19,
             subject_type: self.__unsafe_private_named.20,
             types: self.__unsafe_private_named.21,
+            with_strike: self.__unsafe_private_named.22,
         }
     }
 }

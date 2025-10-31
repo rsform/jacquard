@@ -190,6 +190,8 @@ pub enum BlockBlock<'a> {
     Page(Box<crate::pub_leaflet::blocks::page::Page<'a>>),
     #[serde(rename = "pub.leaflet.blocks.poll")]
     Poll(Box<crate::pub_leaflet::blocks::poll::Poll<'a>>),
+    #[serde(rename = "pub.leaflet.blocks.button")]
+    Button(Box<crate::pub_leaflet::blocks::button::Button<'a>>),
 }
 
 fn lexicon_doc_pub_leaflet_pages_linearDocument() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -247,7 +249,8 @@ fn lexicon_doc_pub_leaflet_pages_linearDocument() -> ::jacquard_lexicon::lexicon
                                     ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.horizontalRule"),
                                     ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.bskyPost"),
                                     ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.page"),
-                                    ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.poll")
+                                    ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.poll"),
+                                    ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.button")
                                 ],
                                 closed: None,
                             }),
@@ -377,6 +380,12 @@ fn lexicon_doc_pub_leaflet_pages_linearDocument() -> ::jacquard_lexicon::lexicon
             );
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("textAlignCenter"),
+                ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
+                    description: None,
+                }),
+            );
+            map.insert(
+                ::jacquard_common::smol_str::SmolStr::new_static("textAlignJustify"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
                     description: None,
                 }),
@@ -936,6 +945,23 @@ pub struct TextAlignCenter;
 impl std::fmt::Display for TextAlignCenter {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "textAlignCenter")
+    }
+}
+
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    jacquard_derive::IntoStatic
+)]
+pub struct TextAlignJustify;
+impl std::fmt::Display for TextAlignJustify {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "textAlignJustify")
     }
 }
 

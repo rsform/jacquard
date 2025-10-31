@@ -275,11 +275,57 @@ fn lexicon_doc_place_wisp_fs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stati
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("base64"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("blob"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
                                 description: None,
                                 accept: None,
                                 max_size: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("encoding"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Content encoding (e.g., gzip for compressed files)",
+                                    ),
+                                ),
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("mimeType"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Original MIME type before compression",
+                                    ),
+                                ),
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
                             }),
                         );
                         map.insert(
@@ -636,9 +682,20 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct File<'a> {
+    /// True if blob content is base64-encoded (used to bypass PDS content sniffing)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub base64: Option<bool>,
     /// Content blob ref
     #[serde(borrow)]
     pub blob: jacquard_common::types::blob::BlobRef<'a>,
+    /// Content encoding (e.g., gzip for compressed files)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub encoding: Option<jacquard_common::CowStr<'a>>,
+    /// Original MIME type before compression
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub mime_type: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub r#type: jacquard_common::CowStr<'a>,
 }
@@ -691,7 +748,10 @@ pub mod file_state {
 pub struct FileBuilder<'a, S: file_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
+        ::core::option::Option<bool>,
         ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
@@ -709,9 +769,22 @@ impl<'a> FileBuilder<'a, file_state::Empty> {
     pub fn new() -> Self {
         FileBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None),
+            __unsafe_private_named: (None, None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
+    }
+}
+
+impl<'a, S: file_state::State> FileBuilder<'a, S> {
+    /// Set the `base64` field (optional)
+    pub fn base64(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `base64` field to an Option value (optional)
+    pub fn maybe_base64(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
     }
 }
 
@@ -725,12 +798,47 @@ where
         mut self,
         value: impl Into<jacquard_common::types::blob::BlobRef<'a>>,
     ) -> FileBuilder<'a, file_state::SetBlob<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
         FileBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
             _phantom: ::core::marker::PhantomData,
         }
+    }
+}
+
+impl<'a, S: file_state::State> FileBuilder<'a, S> {
+    /// Set the `encoding` field (optional)
+    pub fn encoding(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `encoding` field to an Option value (optional)
+    pub fn maybe_encoding(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: file_state::State> FileBuilder<'a, S> {
+    /// Set the `mimeType` field (optional)
+    pub fn mime_type(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `mimeType` field to an Option value (optional)
+    pub fn maybe_mime_type(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
     }
 }
 
@@ -744,7 +852,7 @@ where
         mut self,
         value: impl Into<jacquard_common::CowStr<'a>>,
     ) -> FileBuilder<'a, file_state::SetType<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
         FileBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -762,8 +870,11 @@ where
     /// Build the final struct
     pub fn build(self) -> File<'a> {
         File {
-            blob: self.__unsafe_private_named.0.unwrap(),
-            r#type: self.__unsafe_private_named.1.unwrap(),
+            base64: self.__unsafe_private_named.0,
+            blob: self.__unsafe_private_named.1.unwrap(),
+            encoding: self.__unsafe_private_named.2,
+            mime_type: self.__unsafe_private_named.3,
+            r#type: self.__unsafe_private_named.4.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -776,8 +887,11 @@ where
         >,
     ) -> File<'a> {
         File {
-            blob: self.__unsafe_private_named.0.unwrap(),
-            r#type: self.__unsafe_private_named.1.unwrap(),
+            base64: self.__unsafe_private_named.0,
+            blob: self.__unsafe_private_named.1.unwrap(),
+            encoding: self.__unsafe_private_named.2,
+            mime_type: self.__unsafe_private_named.3,
+            r#type: self.__unsafe_private_named.4.unwrap(),
             extra_data: Some(extra_data),
         }
     }

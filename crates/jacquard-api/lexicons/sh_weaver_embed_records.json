@@ -13,9 +13,49 @@
           "type": "array",
           "items": {
             "type": "ref",
-            "ref": "com.atproto.repo.strongRef"
+            "ref": "#recordEmbed"
           },
           "maxLength": 48
+        }
+      }
+    },
+    "recordEmbed": {
+      "type": "object",
+      "required": [
+        "record"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "record": {
+          "type": "ref",
+          "ref": "com.atproto.repo.strongRef"
+        }
+      }
+    },
+    "recordEmbedView": {
+      "type": "object",
+      "required": [
+        "recordView"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "recordView": {
+          "type": "union",
+          "refs": [
+            "app.bsky.embed.images#view",
+            "app.bsky.embed.video#view",
+            "app.bsky.embed.external#view",
+            "app.bsky.embed.record#view",
+            "app.bsky.embed.recordWithMedia#view",
+            "sh.weaver.embed.records#view",
+            "sh.weaver.embed.images#view"
+          ]
         }
       }
     },
@@ -107,10 +147,8 @@
       ],
       "properties": {
         "author": {
-          "type": "union",
-          "refs": [
-            "app.bsky.actor.defs#profileViewBasic"
-          ]
+          "type": "ref",
+          "ref": "sh.weaver.actor.defs#profileDataViewBasic"
         },
         "cid": {
           "type": "string",
@@ -119,15 +157,8 @@
         "embeds": {
           "type": "array",
           "items": {
-            "type": "union",
-            "refs": [
-              "app.bsky.embed.images#view",
-              "app.bsky.embed.video#view",
-              "app.bsky.embed.external#view",
-              "app.bsky.embed.record#view",
-              "app.bsky.embed.recordWithMedia#view",
-              "sh.weaver.embed.records#view"
-            ]
+            "type": "ref",
+            "ref": "#recordEmbedView"
           }
         },
         "indexedAt": {

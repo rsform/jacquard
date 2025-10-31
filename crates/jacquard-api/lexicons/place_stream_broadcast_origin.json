@@ -38,6 +38,11 @@
             "type": "string",
             "description": "Periodically updated timestamp when this origin last saw a livestream",
             "format": "datetime"
+          },
+          "websocketURL": {
+            "type": "string",
+            "description": "URL of the websocket endpoint for the livestream",
+            "format": "uri"
           }
         }
       }

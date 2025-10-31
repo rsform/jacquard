@@ -5,6 +5,7 @@
 
 pub mod blockquote;
 pub mod bsky_post;
+pub mod button;
 pub mod code;
 pub mod header;
 pub mod horizontal_rule;

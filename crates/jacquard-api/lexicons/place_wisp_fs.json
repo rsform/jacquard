@@ -50,6 +50,10 @@
         "blob"
       ],
       "properties": {
+        "base64": {
+          "type": "boolean",
+          "description": "True if blob content is base64-encoded (used to bypass PDS content sniffing)"
+        },
         "blob": {
           "type": "blob",
           "description": "Content blob ref",
@@ -57,6 +61,17 @@
             "*/*"
           ],
           "maxSize": 1000000
+        },
+        "encoding": {
+          "type": "string",
+          "description": "Content encoding (e.g., gzip for compressed files)",
+          "enum": [
+            "gzip"
+          ]
+        },
+        "mimeType": {
+          "type": "string",
+          "description": "Original MIME type before compression"
         },
         "type": {
           "type": "string",

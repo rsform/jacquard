@@ -21,6 +21,9 @@ pub struct Follow<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::Did<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub via: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
 }
 
 pub mod follow_state {
@@ -73,6 +76,7 @@ pub struct FollowBuilder<'a, S: follow_state::State> {
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -89,7 +93,7 @@ impl<'a> FollowBuilder<'a, follow_state::Empty> {
     pub fn new() -> Self {
         FollowBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None),
+            __unsafe_private_named: (None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -133,6 +137,25 @@ where
     }
 }
 
+impl<'a, S: follow_state::State> FollowBuilder<'a, S> {
+    /// Set the `via` field (optional)
+    pub fn via(
+        mut self,
+        value: impl Into<Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `via` field to an Option value (optional)
+    pub fn maybe_via(
+        mut self,
+        value: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
 impl<'a, S> FollowBuilder<'a, S>
 where
     S: follow_state::State,
@@ -144,6 +167,7 @@ where
         Follow {
             created_at: self.__unsafe_private_named.0.unwrap(),
             subject: self.__unsafe_private_named.1.unwrap(),
+            via: self.__unsafe_private_named.2,
             extra_data: Default::default(),
         }
     }
@@ -158,6 +182,7 @@ where
         Follow {
             created_at: self.__unsafe_private_named.0.unwrap(),
             subject: self.__unsafe_private_named.1.unwrap(),
+            via: self.__unsafe_private_named.2,
             extra_data: Some(extra_data),
         }
     }
@@ -306,6 +331,15 @@ fn lexicon_doc_app_bsky_graph_follow() -> ::jacquard_lexicon::lexicon::LexiconDo
                                     r#enum: None,
                                     r#const: None,
                                     known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static("via"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "com.atproto.repo.strongRef",
+                                    ),
                                 }),
                             );
                             map

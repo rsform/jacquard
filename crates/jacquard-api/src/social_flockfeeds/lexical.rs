@@ -69,5 +69,6 @@ pub mod speakablespecification;
 pub mod textobject;
 pub mod thing;
 pub mod videoobject;
+pub mod vocab;
 pub mod webcontent;
 pub mod webpage;

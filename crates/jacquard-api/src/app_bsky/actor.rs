@@ -1217,6 +1217,12 @@ fn lexicon_doc_app_bsky_actor_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                             }),
                         );
                         map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("debug"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
+                                description: None,
+                            }),
+                        );
+                        map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
                                 "description",
                             ),
@@ -1423,6 +1429,12 @@ fn lexicon_doc_app_bsky_actor_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                             }),
                         );
                         map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("debug"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
+                                description: None,
+                            }),
+                        );
+                        map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("did"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
@@ -1607,6 +1619,12 @@ fn lexicon_doc_app_bsky_actor_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                                 r#enum: None,
                                 r#const: None,
                                 known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("debug"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
+                                description: None,
                             }),
                         );
                         map.insert(
@@ -4549,6 +4567,10 @@ pub struct ProfileView<'a> {
     pub avatar: Option<jacquard_common::types::string::Uri<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub created_at: Option<jacquard_common::types::string::Datetime>,
+    /// Debug information for internal development
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub debug: Option<jacquard_common::types::value::Data<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub description: Option<jacquard_common::CowStr<'a>>,
@@ -4629,6 +4651,7 @@ pub struct ProfileViewBuilder<'a, S: profile_view_state::State> {
         ::core::option::Option<crate::app_bsky::actor::ProfileAssociated<'a>>,
         ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::types::string::Did<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
@@ -4656,6 +4679,7 @@ impl<'a> ProfileViewBuilder<'a, profile_view_state::Empty> {
         ProfileViewBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
+                None,
                 None,
                 None,
                 None,
@@ -4733,12 +4757,31 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
 }
 
 impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
+    /// Set the `debug` field (optional)
+    pub fn debug(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::value::Data<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `debug` field to an Option value (optional)
+    pub fn maybe_debug(
+        mut self,
+        value: Option<jacquard_common::types::value::Data<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(
         mut self,
         value: impl Into<Option<jacquard_common::CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
@@ -4746,7 +4789,7 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
         mut self,
         value: Option<jacquard_common::CowStr<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self.__unsafe_private_named.4 = value;
         self
     }
 }
@@ -4761,7 +4804,7 @@ where
         mut self,
         value: impl Into<jacquard_common::types::string::Did<'a>>,
     ) -> ProfileViewBuilder<'a, profile_view_state::SetDid<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
         ProfileViewBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -4776,7 +4819,7 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `displayName` field to an Option value (optional)
@@ -4784,7 +4827,7 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
         mut self,
         value: Option<jacquard_common::CowStr<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self.__unsafe_private_named.6 = value;
         self
     }
 }
@@ -4799,7 +4842,7 @@ where
         mut self,
         value: impl Into<jacquard_common::types::string::Handle<'a>>,
     ) -> ProfileViewBuilder<'a, profile_view_state::SetHandle<S>> {
-        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
         ProfileViewBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -4814,7 +4857,7 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::types::string::Datetime>>,
     ) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self.__unsafe_private_named.8 = value.into();
         self
     }
     /// Set the `indexedAt` field to an Option value (optional)
@@ -4822,7 +4865,7 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
         mut self,
         value: Option<jacquard_common::types::string::Datetime>,
     ) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self.__unsafe_private_named.8 = value;
         self
     }
 }
@@ -4833,7 +4876,7 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<crate::com_atproto::label::Label<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self.__unsafe_private_named.9 = value.into();
         self
     }
     /// Set the `labels` field to an Option value (optional)
@@ -4841,7 +4884,7 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
         mut self,
         value: Option<Vec<crate::com_atproto::label::Label<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self.__unsafe_private_named.9 = value;
         self
     }
 }
@@ -4852,12 +4895,12 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self.__unsafe_private_named.10 = value.into();
         self
     }
     /// Set the `pronouns` field to an Option value (optional)
     pub fn maybe_pronouns(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self.__unsafe_private_named.10 = value;
         self
     }
 }
@@ -4868,7 +4911,7 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<crate::app_bsky::actor::StatusView<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self.__unsafe_private_named.11 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
@@ -4876,7 +4919,7 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
         mut self,
         value: Option<crate::app_bsky::actor::StatusView<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self.__unsafe_private_named.11 = value;
         self
     }
 }
@@ -4887,7 +4930,7 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<crate::app_bsky::actor::VerificationState<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self.__unsafe_private_named.12 = value.into();
         self
     }
     /// Set the `verification` field to an Option value (optional)
@@ -4895,7 +4938,7 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
         mut self,
         value: Option<crate::app_bsky::actor::VerificationState<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self.__unsafe_private_named.12 = value;
         self
     }
 }
@@ -4906,7 +4949,7 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<crate::app_bsky::actor::ViewerState<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self.__unsafe_private_named.13 = value.into();
         self
     }
     /// Set the `viewer` field to an Option value (optional)
@@ -4914,7 +4957,7 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
         mut self,
         value: Option<crate::app_bsky::actor::ViewerState<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self.__unsafe_private_named.13 = value;
         self
     }
 }
@@ -4931,16 +4974,17 @@ where
             associated: self.__unsafe_private_named.0,
             avatar: self.__unsafe_private_named.1,
             created_at: self.__unsafe_private_named.2,
-            description: self.__unsafe_private_named.3,
-            did: self.__unsafe_private_named.4.unwrap(),
-            display_name: self.__unsafe_private_named.5,
-            handle: self.__unsafe_private_named.6.unwrap(),
-            indexed_at: self.__unsafe_private_named.7,
-            labels: self.__unsafe_private_named.8,
-            pronouns: self.__unsafe_private_named.9,
-            status: self.__unsafe_private_named.10,
-            verification: self.__unsafe_private_named.11,
-            viewer: self.__unsafe_private_named.12,
+            debug: self.__unsafe_private_named.3,
+            description: self.__unsafe_private_named.4,
+            did: self.__unsafe_private_named.5.unwrap(),
+            display_name: self.__unsafe_private_named.6,
+            handle: self.__unsafe_private_named.7.unwrap(),
+            indexed_at: self.__unsafe_private_named.8,
+            labels: self.__unsafe_private_named.9,
+            pronouns: self.__unsafe_private_named.10,
+            status: self.__unsafe_private_named.11,
+            verification: self.__unsafe_private_named.12,
+            viewer: self.__unsafe_private_named.13,
             extra_data: Default::default(),
         }
     }
@@ -4956,16 +5000,17 @@ where
             associated: self.__unsafe_private_named.0,
             avatar: self.__unsafe_private_named.1,
             created_at: self.__unsafe_private_named.2,
-            description: self.__unsafe_private_named.3,
-            did: self.__unsafe_private_named.4.unwrap(),
-            display_name: self.__unsafe_private_named.5,
-            handle: self.__unsafe_private_named.6.unwrap(),
-            indexed_at: self.__unsafe_private_named.7,
-            labels: self.__unsafe_private_named.8,
-            pronouns: self.__unsafe_private_named.9,
-            status: self.__unsafe_private_named.10,
-            verification: self.__unsafe_private_named.11,
-            viewer: self.__unsafe_private_named.12,
+            debug: self.__unsafe_private_named.3,
+            description: self.__unsafe_private_named.4,
+            did: self.__unsafe_private_named.5.unwrap(),
+            display_name: self.__unsafe_private_named.6,
+            handle: self.__unsafe_private_named.7.unwrap(),
+            indexed_at: self.__unsafe_private_named.8,
+            labels: self.__unsafe_private_named.9,
+            pronouns: self.__unsafe_private_named.10,
+            status: self.__unsafe_private_named.11,
+            verification: self.__unsafe_private_named.12,
+            viewer: self.__unsafe_private_named.13,
             extra_data: Some(extra_data),
         }
     }
@@ -5068,6 +5113,10 @@ pub struct ProfileViewBasic<'a> {
     pub avatar: Option<jacquard_common::types::string::Uri<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub created_at: Option<jacquard_common::types::string::Datetime>,
+    /// Debug information for internal development
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub debug: Option<jacquard_common::types::value::Data<'a>>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -5143,6 +5192,7 @@ pub struct ProfileViewBasicBuilder<'a, S: profile_view_basic_state::State> {
         ::core::option::Option<crate::app_bsky::actor::ProfileAssociated<'a>>,
         ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
         ::core::option::Option<jacquard_common::types::string::Did<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::types::string::Handle<'a>>,
@@ -5168,6 +5218,7 @@ impl<'a> ProfileViewBasicBuilder<'a, profile_view_basic_state::Empty> {
         ProfileViewBasicBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
+                None,
                 None,
                 None,
                 None,
@@ -5242,6 +5293,25 @@ impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
     }
 }
 
+impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
+    /// Set the `debug` field (optional)
+    pub fn debug(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::value::Data<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `debug` field to an Option value (optional)
+    pub fn maybe_debug(
+        mut self,
+        value: Option<jacquard_common::types::value::Data<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
 impl<'a, S> ProfileViewBasicBuilder<'a, S>
 where
     S: profile_view_basic_state::State,
@@ -5252,7 +5322,7 @@ where
         mut self,
         value: impl Into<jacquard_common::types::string::Did<'a>>,
     ) -> ProfileViewBasicBuilder<'a, profile_view_basic_state::SetDid<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
         ProfileViewBasicBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -5267,7 +5337,7 @@ impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `displayName` field to an Option value (optional)
@@ -5275,7 +5345,7 @@ impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
         mut self,
         value: Option<jacquard_common::CowStr<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self.__unsafe_private_named.5 = value;
         self
     }
 }
@@ -5290,7 +5360,7 @@ where
         mut self,
         value: impl Into<jacquard_common::types::string::Handle<'a>>,
     ) -> ProfileViewBasicBuilder<'a, profile_view_basic_state::SetHandle<S>> {
-        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
         ProfileViewBasicBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -5305,7 +5375,7 @@ impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<crate::com_atproto::label::Label<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `labels` field to an Option value (optional)
@@ -5313,7 +5383,7 @@ impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
         mut self,
         value: Option<Vec<crate::com_atproto::label::Label<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self.__unsafe_private_named.7 = value;
         self
     }
 }
@@ -5324,12 +5394,12 @@ impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self.__unsafe_private_named.8 = value.into();
         self
     }
     /// Set the `pronouns` field to an Option value (optional)
     pub fn maybe_pronouns(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self.__unsafe_private_named.8 = value;
         self
     }
 }
@@ -5340,7 +5410,7 @@ impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
         mut self,
         value: impl Into<Option<crate::app_bsky::actor::StatusView<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self.__unsafe_private_named.9 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
@@ -5348,7 +5418,7 @@ impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
         mut self,
         value: Option<crate::app_bsky::actor::StatusView<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self.__unsafe_private_named.9 = value;
         self
     }
 }
@@ -5359,7 +5429,7 @@ impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
         mut self,
         value: impl Into<Option<crate::app_bsky::actor::VerificationState<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self.__unsafe_private_named.10 = value.into();
         self
     }
     /// Set the `verification` field to an Option value (optional)
@@ -5367,7 +5437,7 @@ impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
         mut self,
         value: Option<crate::app_bsky::actor::VerificationState<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self.__unsafe_private_named.10 = value;
         self
     }
 }
@@ -5378,7 +5448,7 @@ impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
         mut self,
         value: impl Into<Option<crate::app_bsky::actor::ViewerState<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self.__unsafe_private_named.11 = value.into();
         self
     }
     /// Set the `viewer` field to an Option value (optional)
@@ -5386,7 +5456,7 @@ impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
         mut self,
         value: Option<crate::app_bsky::actor::ViewerState<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self.__unsafe_private_named.11 = value;
         self
     }
 }
@@ -5403,14 +5473,15 @@ where
             associated: self.__unsafe_private_named.0,
             avatar: self.__unsafe_private_named.1,
             created_at: self.__unsafe_private_named.2,
-            did: self.__unsafe_private_named.3.unwrap(),
-            display_name: self.__unsafe_private_named.4,
-            handle: self.__unsafe_private_named.5.unwrap(),
-            labels: self.__unsafe_private_named.6,
-            pronouns: self.__unsafe_private_named.7,
-            status: self.__unsafe_private_named.8,
-            verification: self.__unsafe_private_named.9,
-            viewer: self.__unsafe_private_named.10,
+            debug: self.__unsafe_private_named.3,
+            did: self.__unsafe_private_named.4.unwrap(),
+            display_name: self.__unsafe_private_named.5,
+            handle: self.__unsafe_private_named.6.unwrap(),
+            labels: self.__unsafe_private_named.7,
+            pronouns: self.__unsafe_private_named.8,
+            status: self.__unsafe_private_named.9,
+            verification: self.__unsafe_private_named.10,
+            viewer: self.__unsafe_private_named.11,
             extra_data: Default::default(),
         }
     }
@@ -5426,14 +5497,15 @@ where
             associated: self.__unsafe_private_named.0,
             avatar: self.__unsafe_private_named.1,
             created_at: self.__unsafe_private_named.2,
-            did: self.__unsafe_private_named.3.unwrap(),
-            display_name: self.__unsafe_private_named.4,
-            handle: self.__unsafe_private_named.5.unwrap(),
-            labels: self.__unsafe_private_named.6,
-            pronouns: self.__unsafe_private_named.7,
-            status: self.__unsafe_private_named.8,
-            verification: self.__unsafe_private_named.9,
-            viewer: self.__unsafe_private_named.10,
+            debug: self.__unsafe_private_named.3,
+            did: self.__unsafe_private_named.4.unwrap(),
+            display_name: self.__unsafe_private_named.5,
+            handle: self.__unsafe_private_named.6.unwrap(),
+            labels: self.__unsafe_private_named.7,
+            pronouns: self.__unsafe_private_named.8,
+            status: self.__unsafe_private_named.9,
+            verification: self.__unsafe_private_named.10,
+            viewer: self.__unsafe_private_named.11,
             extra_data: Some(extra_data),
         }
     }
@@ -5509,6 +5581,10 @@ pub struct ProfileViewDetailed<'a> {
     pub banner: Option<jacquard_common::types::string::Uri<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub created_at: Option<jacquard_common::types::string::Datetime>,
+    /// Debug information for internal development
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub debug: Option<jacquard_common::types::value::Data<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub description: Option<jacquard_common::CowStr<'a>>,
@@ -5607,6 +5683,7 @@ pub struct ProfileViewDetailedBuilder<'a, S: profile_view_detailed_state::State>
         ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
         ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::types::string::Did<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
@@ -5640,6 +5717,7 @@ impl<'a> ProfileViewDetailedBuilder<'a, profile_view_detailed_state::Empty> {
         ProfileViewDetailedBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
+                None,
                 None,
                 None,
                 None,
@@ -5743,12 +5821,31 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
 }
 
 impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S> {
+    /// Set the `debug` field (optional)
+    pub fn debug(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::value::Data<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `debug` field to an Option value (optional)
+    pub fn maybe_debug(
+        mut self,
+        value: Option<jacquard_common::types::value::Data<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(
         mut self,
         value: impl Into<Option<jacquard_common::CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
@@ -5756,7 +5853,7 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
         mut self,
         value: Option<jacquard_common::CowStr<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self.__unsafe_private_named.5 = value;
         self
     }
 }
@@ -5771,7 +5868,7 @@ where
         mut self,
         value: impl Into<jacquard_common::types::string::Did<'a>>,
     ) -> ProfileViewDetailedBuilder<'a, profile_view_detailed_state::SetDid<S>> {
-        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
         ProfileViewDetailedBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -5786,7 +5883,7 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
         mut self,
         value: impl Into<Option<jacquard_common::CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `displayName` field to an Option value (optional)
@@ -5794,7 +5891,7 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
         mut self,
         value: Option<jacquard_common::CowStr<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self.__unsafe_private_named.7 = value;
         self
     }
 }
@@ -5802,12 +5899,12 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
 impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S> {
     /// Set the `followersCount` field (optional)
     pub fn followers_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self.__unsafe_private_named.8 = value.into();
         self
     }
     /// Set the `followersCount` field to an Option value (optional)
     pub fn maybe_followers_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self.__unsafe_private_named.8 = value;
         self
     }
 }
@@ -5815,12 +5912,12 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
 impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S> {
     /// Set the `followsCount` field (optional)
     pub fn follows_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self.__unsafe_private_named.9 = value.into();
         self
     }
     /// Set the `followsCount` field to an Option value (optional)
     pub fn maybe_follows_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self.__unsafe_private_named.9 = value;
         self
     }
 }
@@ -5835,7 +5932,7 @@ where
         mut self,
         value: impl Into<jacquard_common::types::string::Handle<'a>>,
     ) -> ProfileViewDetailedBuilder<'a, profile_view_detailed_state::SetHandle<S>> {
-        self.__unsafe_private_named.9 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.10 = ::core::option::Option::Some(value.into());
         ProfileViewDetailedBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -5850,7 +5947,7 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
         mut self,
         value: impl Into<Option<jacquard_common::types::string::Datetime>>,
     ) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self.__unsafe_private_named.11 = value.into();
         self
     }
     /// Set the `indexedAt` field to an Option value (optional)
@@ -5858,7 +5955,7 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
         mut self,
         value: Option<jacquard_common::types::string::Datetime>,
     ) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self.__unsafe_private_named.11 = value;
         self
     }
 }
@@ -5869,7 +5966,7 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
         mut self,
         value: impl Into<Option<crate::app_bsky::graph::StarterPackViewBasic<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self.__unsafe_private_named.12 = value.into();
         self
     }
     /// Set the `joinedViaStarterPack` field to an Option value (optional)
@@ -5877,7 +5974,7 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
         mut self,
         value: Option<crate::app_bsky::graph::StarterPackViewBasic<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self.__unsafe_private_named.12 = value;
         self
     }
 }
@@ -5888,7 +5985,7 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
         mut self,
         value: impl Into<Option<Vec<crate::com_atproto::label::Label<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self.__unsafe_private_named.13 = value.into();
         self
     }
     /// Set the `labels` field to an Option value (optional)
@@ -5896,7 +5993,7 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
         mut self,
         value: Option<Vec<crate::com_atproto::label::Label<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self.__unsafe_private_named.13 = value;
         self
     }
 }
@@ -5907,7 +6004,7 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
         mut self,
         value: impl Into<Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.13 = value.into();
+        self.__unsafe_private_named.14 = value.into();
         self
     }
     /// Set the `pinnedPost` field to an Option value (optional)
@@ -5915,7 +6012,7 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
         mut self,
         value: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.13 = value;
+        self.__unsafe_private_named.14 = value;
         self
     }
 }
@@ -5923,12 +6020,12 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
 impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S> {
     /// Set the `postsCount` field (optional)
     pub fn posts_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.14 = value.into();
+        self.__unsafe_private_named.15 = value.into();
         self
     }
     /// Set the `postsCount` field to an Option value (optional)
     pub fn maybe_posts_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.14 = value;
+        self.__unsafe_private_named.15 = value;
         self
     }
 }
@@ -5939,12 +6036,12 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
         mut self,
         value: impl Into<Option<jacquard_common::CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.15 = value.into();
+        self.__unsafe_private_named.16 = value.into();
         self
     }
     /// Set the `pronouns` field to an Option value (optional)
     pub fn maybe_pronouns(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.15 = value;
+        self.__unsafe_private_named.16 = value;
         self
     }
 }
@@ -5955,7 +6052,7 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
         mut self,
         value: impl Into<Option<crate::app_bsky::actor::StatusView<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.16 = value.into();
+        self.__unsafe_private_named.17 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
@@ -5963,7 +6060,7 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
         mut self,
         value: Option<crate::app_bsky::actor::StatusView<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.16 = value;
+        self.__unsafe_private_named.17 = value;
         self
     }
 }
@@ -5974,7 +6071,7 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
         mut self,
         value: impl Into<Option<crate::app_bsky::actor::VerificationState<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.17 = value.into();
+        self.__unsafe_private_named.18 = value.into();
         self
     }
     /// Set the `verification` field to an Option value (optional)
@@ -5982,7 +6079,7 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
         mut self,
         value: Option<crate::app_bsky::actor::VerificationState<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.17 = value;
+        self.__unsafe_private_named.18 = value;
         self
     }
 }
@@ -5993,7 +6090,7 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
         mut self,
         value: impl Into<Option<crate::app_bsky::actor::ViewerState<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.18 = value.into();
+        self.__unsafe_private_named.19 = value.into();
         self
     }
     /// Set the `viewer` field to an Option value (optional)
@@ -6001,7 +6098,7 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
         mut self,
         value: Option<crate::app_bsky::actor::ViewerState<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.18 = value;
+        self.__unsafe_private_named.19 = value;
         self
     }
 }
@@ -6012,7 +6109,7 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
         mut self,
         value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.19 = value.into();
+        self.__unsafe_private_named.20 = value.into();
         self
     }
     /// Set the `website` field to an Option value (optional)
@@ -6020,7 +6117,7 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
         mut self,
         value: Option<jacquard_common::types::string::Uri<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.19 = value;
+        self.__unsafe_private_named.20 = value;
         self
     }
 }
@@ -6038,22 +6135,23 @@ where
             avatar: self.__unsafe_private_named.1,
             banner: self.__unsafe_private_named.2,
             created_at: self.__unsafe_private_named.3,
-            description: self.__unsafe_private_named.4,
-            did: self.__unsafe_private_named.5.unwrap(),
-            display_name: self.__unsafe_private_named.6,
-            followers_count: self.__unsafe_private_named.7,
-            follows_count: self.__unsafe_private_named.8,
-            handle: self.__unsafe_private_named.9.unwrap(),
-            indexed_at: self.__unsafe_private_named.10,
-            joined_via_starter_pack: self.__unsafe_private_named.11,
-            labels: self.__unsafe_private_named.12,
-            pinned_post: self.__unsafe_private_named.13,
-            posts_count: self.__unsafe_private_named.14,
-            pronouns: self.__unsafe_private_named.15,
-            status: self.__unsafe_private_named.16,
-            verification: self.__unsafe_private_named.17,
-            viewer: self.__unsafe_private_named.18,
-            website: self.__unsafe_private_named.19,
+            debug: self.__unsafe_private_named.4,
+            description: self.__unsafe_private_named.5,
+            did: self.__unsafe_private_named.6.unwrap(),
+            display_name: self.__unsafe_private_named.7,
+            followers_count: self.__unsafe_private_named.8,
+            follows_count: self.__unsafe_private_named.9,
+            handle: self.__unsafe_private_named.10.unwrap(),
+            indexed_at: self.__unsafe_private_named.11,
+            joined_via_starter_pack: self.__unsafe_private_named.12,
+            labels: self.__unsafe_private_named.13,
+            pinned_post: self.__unsafe_private_named.14,
+            posts_count: self.__unsafe_private_named.15,
+            pronouns: self.__unsafe_private_named.16,
+            status: self.__unsafe_private_named.17,
+            verification: self.__unsafe_private_named.18,
+            viewer: self.__unsafe_private_named.19,
+            website: self.__unsafe_private_named.20,
             extra_data: Default::default(),
         }
     }
@@ -6070,22 +6168,23 @@ where
             avatar: self.__unsafe_private_named.1,
             banner: self.__unsafe_private_named.2,
             created_at: self.__unsafe_private_named.3,
-            description: self.__unsafe_private_named.4,
-            did: self.__unsafe_private_named.5.unwrap(),
-            display_name: self.__unsafe_private_named.6,
-            followers_count: self.__unsafe_private_named.7,
-            follows_count: self.__unsafe_private_named.8,
-            handle: self.__unsafe_private_named.9.unwrap(),
-            indexed_at: self.__unsafe_private_named.10,
-            joined_via_starter_pack: self.__unsafe_private_named.11,
-            labels: self.__unsafe_private_named.12,
-            pinned_post: self.__unsafe_private_named.13,
-            posts_count: self.__unsafe_private_named.14,
-            pronouns: self.__unsafe_private_named.15,
-            status: self.__unsafe_private_named.16,
-            verification: self.__unsafe_private_named.17,
-            viewer: self.__unsafe_private_named.18,
-            website: self.__unsafe_private_named.19,
+            debug: self.__unsafe_private_named.4,
+            description: self.__unsafe_private_named.5,
+            did: self.__unsafe_private_named.6.unwrap(),
+            display_name: self.__unsafe_private_named.7,
+            followers_count: self.__unsafe_private_named.8,
+            follows_count: self.__unsafe_private_named.9,
+            handle: self.__unsafe_private_named.10.unwrap(),
+            indexed_at: self.__unsafe_private_named.11,
+            joined_via_starter_pack: self.__unsafe_private_named.12,
+            labels: self.__unsafe_private_named.13,
+            pinned_post: self.__unsafe_private_named.14,
+            posts_count: self.__unsafe_private_named.15,
+            pronouns: self.__unsafe_private_named.16,
+            status: self.__unsafe_private_named.17,
+            verification: self.__unsafe_private_named.18,
+            viewer: self.__unsafe_private_named.19,
+            website: self.__unsafe_private_named.20,
             extra_data: Some(extra_data),
         }
     }

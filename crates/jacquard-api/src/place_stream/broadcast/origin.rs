@@ -34,6 +34,10 @@ pub struct Origin<'a> {
     pub streamer: jacquard_common::types::string::Did<'a>,
     /// Periodically updated timestamp when this origin last saw a livestream
     pub updated_at: jacquard_common::types::string::Datetime,
+    /// URL of the websocket endpoint for the livestream
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub websocket_url: Option<jacquard_common::types::string::Uri<'a>>,
 }
 
 pub mod origin_state {
@@ -103,6 +107,7 @@ pub struct OriginBuilder<'a, S: origin_state::State> {
         ::core::option::Option<jacquard_common::types::string::Did<'a>>,
         ::core::option::Option<jacquard_common::types::string::Did<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -119,7 +124,7 @@ impl<'a> OriginBuilder<'a, origin_state::Empty> {
     pub fn new() -> Self {
         OriginBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
+            __unsafe_private_named: (None, None, None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -220,6 +225,25 @@ where
     }
 }
 
+impl<'a, S: origin_state::State> OriginBuilder<'a, S> {
+    /// Set the `websocketURL` field (optional)
+    pub fn websocket_url(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `websocketURL` field to an Option value (optional)
+    pub fn maybe_websocket_url(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
 impl<'a, S> OriginBuilder<'a, S>
 where
     S: origin_state::State,
@@ -235,6 +259,7 @@ where
             server: self.__unsafe_private_named.2.unwrap(),
             streamer: self.__unsafe_private_named.3.unwrap(),
             updated_at: self.__unsafe_private_named.4.unwrap(),
+            websocket_url: self.__unsafe_private_named.5,
             extra_data: Default::default(),
         }
     }
@@ -252,6 +277,7 @@ where
             server: self.__unsafe_private_named.2.unwrap(),
             streamer: self.__unsafe_private_named.3.unwrap(),
             updated_at: self.__unsafe_private_named.4.unwrap(),
+            websocket_url: self.__unsafe_private_named.5,
             extra_data: Some(extra_data),
         }
     }
@@ -479,6 +505,29 @@ fn lexicon_doc_place_stream_broadcast_origin() -> ::jacquard_lexicon::lexicon::L
                                     ),
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "websocketURL",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "URL of the websocket endpoint for the livestream",
+                                        ),
+                                    ),
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
                                     ),
                                     default: None,
                                     min_length: None,

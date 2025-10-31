@@ -57,7 +57,7 @@
         "type": "object",
         "required": [
           "container",
-          "die"
+          "id"
         ],
         "properties": {
           "container": {

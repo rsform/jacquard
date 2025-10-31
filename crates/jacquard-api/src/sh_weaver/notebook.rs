@@ -696,7 +696,7 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                     format: None,
                     default: None,
                     min_length: None,
-                    max_length: Some(420usize),
+                    max_length: Some(300usize),
                     min_graphemes: None,
                     max_graphemes: None,
                     r#enum: None,

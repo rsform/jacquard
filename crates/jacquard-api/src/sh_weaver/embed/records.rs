@@ -18,7 +18,7 @@
 #[serde(rename_all = "camelCase")]
 pub struct Records<'a> {
     #[serde(borrow)]
-    pub records: Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    pub records: Vec<crate::sh_weaver::embed::records::RecordEmbed<'a>>,
 }
 
 pub mod records_state {
@@ -57,7 +57,7 @@ pub mod records_state {
 pub struct RecordsBuilder<'a, S: records_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
+        ::core::option::Option<Vec<crate::sh_weaver::embed::records::RecordEmbed<'a>>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -88,7 +88,7 @@ where
     /// Set the `records` field (required)
     pub fn records(
         mut self,
-        value: impl Into<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
+        value: impl Into<Vec<crate::sh_weaver::embed::records::RecordEmbed<'a>>>,
     ) -> RecordsBuilder<'a, records_state::SetRecords<S>> {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
         RecordsBuilder {
@@ -153,12 +153,99 @@ fn lexicon_doc_sh_weaver_embed_records() -> ::jacquard_lexicon::lexicon::Lexicon
                                 description: None,
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "com.atproto.repo.strongRef",
-                                    ),
+                                    r#ref: ::jacquard_common::CowStr::new_static("#recordEmbed"),
                                 }),
                                 min_length: None,
                                 max_length: Some(48usize),
+                            }),
+                        );
+                        map
+                    },
+                }),
+            );
+            map.insert(
+                ::jacquard_common::smol_str::SmolStr::new_static("recordEmbed"),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("record")],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::std::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: Some(128usize),
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("record"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "com.atproto.repo.strongRef",
+                                ),
+                            }),
+                        );
+                        map
+                    },
+                }),
+            );
+            map.insert(
+                ::jacquard_common::smol_str::SmolStr::new_static("recordEmbedView"),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("recordView")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::std::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: Some(128usize),
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "recordView",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                description: None,
+                                refs: vec![
+                                    ::jacquard_common::CowStr::new_static("app.bsky.embed.images#view"),
+                                    ::jacquard_common::CowStr::new_static("app.bsky.embed.video#view"),
+                                    ::jacquard_common::CowStr::new_static("app.bsky.embed.external#view"),
+                                    ::jacquard_common::CowStr::new_static("app.bsky.embed.record#view"),
+                                    ::jacquard_common::CowStr::new_static("app.bsky.embed.recordWithMedia#view"),
+                                    ::jacquard_common::CowStr::new_static("sh.weaver.embed.records#view"),
+                                    ::jacquard_common::CowStr::new_static("sh.weaver.embed.images#view")
+                                ],
+                                closed: None,
                             }),
                         );
                         map
@@ -355,12 +442,11 @@ fn lexicon_doc_sh_weaver_embed_records() -> ::jacquard_lexicon::lexicon::Lexicon
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("author"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
-                                refs: vec![
-                                    ::jacquard_common::CowStr::new_static("app.bsky.actor.defs#profileViewBasic")
-                                ],
-                                closed: None,
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "sh.weaver.actor.defs#profileDataViewBasic",
+                                ),
                             }),
                         );
                         map.insert(
@@ -384,17 +470,11 @@ fn lexicon_doc_sh_weaver_embed_records() -> ::jacquard_lexicon::lexicon::Lexicon
                             ::jacquard_common::smol_str::SmolStr::new_static("embeds"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    refs: vec![
-                                        ::jacquard_common::CowStr::new_static("app.bsky.embed.images#view"),
-                                        ::jacquard_common::CowStr::new_static("app.bsky.embed.video#view"),
-                                        ::jacquard_common::CowStr::new_static("app.bsky.embed.external#view"),
-                                        ::jacquard_common::CowStr::new_static("app.bsky.embed.record#view"),
-                                        ::jacquard_common::CowStr::new_static("app.bsky.embed.recordWithMedia#view"),
-                                        ::jacquard_common::CowStr::new_static("sh.weaver.embed.records#view")
-                                    ],
-                                    closed: None,
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "#recordEmbedView",
+                                    ),
                                 }),
                                 min_length: None,
                                 max_length: None,
@@ -540,6 +620,379 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Records<'a> {
                     ),
                     max: 48usize,
                     actual: value.len(),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct RecordEmbed<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub name: Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub record: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+}
+
+pub mod record_embed_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Record;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Record = Unset;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecord<S> {}
+    impl<S: State> State for SetRecord<S> {
+        type Record = Set<members::record>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `record` field
+        pub struct record(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct RecordEmbedBuilder<'a, S: record_embed_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> RecordEmbed<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> RecordEmbedBuilder<'a, record_embed_state::Empty> {
+        RecordEmbedBuilder::new()
+    }
+}
+
+impl<'a> RecordEmbedBuilder<'a, record_embed_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        RecordEmbedBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: record_embed_state::State> RecordEmbedBuilder<'a, S> {
+    /// Set the `name` field (optional)
+    pub fn name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `name` field to an Option value (optional)
+    pub fn maybe_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> RecordEmbedBuilder<'a, S>
+where
+    S: record_embed_state::State,
+    S::Record: record_embed_state::IsUnset,
+{
+    /// Set the `record` field (required)
+    pub fn record(
+        mut self,
+        value: impl Into<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    ) -> RecordEmbedBuilder<'a, record_embed_state::SetRecord<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        RecordEmbedBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RecordEmbedBuilder<'a, S>
+where
+    S: record_embed_state::State,
+    S::Record: record_embed_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> RecordEmbed<'a> {
+        RecordEmbed {
+            name: self.__unsafe_private_named.0,
+            record: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> RecordEmbed<'a> {
+        RecordEmbed {
+            name: self.__unsafe_private_named.0,
+            record: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RecordEmbed<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.embed.records"
+    }
+    fn def_name() -> &'static str {
+        "recordEmbed"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_embed_records()
+    }
+    fn validate(
+        &self,
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.name {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 128usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
+                    max: 128usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct RecordEmbedView<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub name: Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub record_view: RecordEmbedViewRecordView<'a>,
+}
+
+pub mod record_embed_view_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type RecordView;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type RecordView = Unset;
+    }
+    ///State transition - sets the `record_view` field to Set
+    pub struct SetRecordView<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecordView<S> {}
+    impl<S: State> State for SetRecordView<S> {
+        type RecordView = Set<members::record_view>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `record_view` field
+        pub struct record_view(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct RecordEmbedViewBuilder<'a, S: record_embed_view_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<RecordEmbedViewRecordView<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> RecordEmbedView<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> RecordEmbedViewBuilder<'a, record_embed_view_state::Empty> {
+        RecordEmbedViewBuilder::new()
+    }
+}
+
+impl<'a> RecordEmbedViewBuilder<'a, record_embed_view_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        RecordEmbedViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: record_embed_view_state::State> RecordEmbedViewBuilder<'a, S> {
+    /// Set the `name` field (optional)
+    pub fn name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `name` field to an Option value (optional)
+    pub fn maybe_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> RecordEmbedViewBuilder<'a, S>
+where
+    S: record_embed_view_state::State,
+    S::RecordView: record_embed_view_state::IsUnset,
+{
+    /// Set the `recordView` field (required)
+    pub fn record_view(
+        mut self,
+        value: impl Into<RecordEmbedViewRecordView<'a>>,
+    ) -> RecordEmbedViewBuilder<'a, record_embed_view_state::SetRecordView<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        RecordEmbedViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> RecordEmbedViewBuilder<'a, S>
+where
+    S: record_embed_view_state::State,
+    S::RecordView: record_embed_view_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> RecordEmbedView<'a> {
+        RecordEmbedView {
+            name: self.__unsafe_private_named.0,
+            record_view: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> RecordEmbedView<'a> {
+        RecordEmbedView {
+            name: self.__unsafe_private_named.0,
+            record_view: self.__unsafe_private_named.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum RecordEmbedViewRecordView<'a> {
+    #[serde(rename = "app.bsky.embed.images#view")]
+    BskyImagesView(Box<crate::app_bsky::embed::images::View<'a>>),
+    #[serde(rename = "app.bsky.embed.video#view")]
+    VideoView(Box<crate::app_bsky::embed::video::View<'a>>),
+    #[serde(rename = "app.bsky.embed.external#view")]
+    ExternalView(Box<crate::app_bsky::embed::external::View<'a>>),
+    #[serde(rename = "app.bsky.embed.record#view")]
+    RecordView(Box<crate::app_bsky::embed::record::View<'a>>),
+    #[serde(rename = "app.bsky.embed.recordWithMedia#view")]
+    RecordWithMediaView(Box<crate::app_bsky::embed::record_with_media::View<'a>>),
+    #[serde(rename = "sh.weaver.embed.records#view")]
+    View(Box<crate::sh_weaver::embed::records::View<'a>>),
+    #[serde(rename = "sh.weaver.embed.images#view")]
+    ImagesView(Box<crate::sh_weaver::embed::images::View<'a>>),
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RecordEmbedView<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.embed.records"
+    }
+    fn def_name() -> &'static str {
+        "recordEmbedView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_embed_records()
+    }
+    fn validate(
+        &self,
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.name {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 128usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
+                    max: 128usize,
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -1288,12 +1741,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewNotFound<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct ViewRecord<'a> {
     #[serde(borrow)]
-    pub author: crate::app_bsky::actor::ProfileViewBasic<'a>,
+    pub author: crate::sh_weaver::actor::ProfileDataViewBasic<'a>,
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub embeds: Option<Vec<ViewRecordEmbedsItem<'a>>>,
+    pub embeds: Option<Vec<crate::sh_weaver::embed::records::RecordEmbedView<'a>>>,
     pub indexed_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -1409,9 +1862,11 @@ pub mod view_record_state {
 pub struct ViewRecordBuilder<'a, S: view_record_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<crate::app_bsky::actor::ProfileViewBasic<'a>>,
+        ::core::option::Option<crate::sh_weaver::actor::ProfileDataViewBasic<'a>>,
         ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
-        ::core::option::Option<Vec<ViewRecordEmbedsItem<'a>>>,
+        ::core::option::Option<
+            Vec<crate::sh_weaver::embed::records::RecordEmbedView<'a>>,
+        >,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
         ::core::option::Option<i64>,
@@ -1462,7 +1917,7 @@ where
     /// Set the `author` field (required)
     pub fn author(
         mut self,
-        value: impl Into<crate::app_bsky::actor::ProfileViewBasic<'a>>,
+        value: impl Into<crate::sh_weaver::actor::ProfileDataViewBasic<'a>>,
     ) -> ViewRecordBuilder<'a, view_record_state::SetAuthor<S>> {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
         ViewRecordBuilder {
@@ -1496,13 +1951,18 @@ impl<'a, S: view_record_state::State> ViewRecordBuilder<'a, S> {
     /// Set the `embeds` field (optional)
     pub fn embeds(
         mut self,
-        value: impl Into<Option<Vec<ViewRecordEmbedsItem<'a>>>>,
+        value: impl Into<
+            Option<Vec<crate::sh_weaver::embed::records::RecordEmbedView<'a>>>,
+        >,
     ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `embeds` field to an Option value (optional)
-    pub fn maybe_embeds(mut self, value: Option<Vec<ViewRecordEmbedsItem<'a>>>) -> Self {
+    pub fn maybe_embeds(
+        mut self,
+        value: Option<Vec<crate::sh_weaver::embed::records::RecordEmbedView<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -1685,33 +2145,6 @@ where
             extra_data: Some(extra_data),
         }
     }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ViewRecordEmbedsItem<'a> {
-    #[serde(rename = "app.bsky.embed.images#view")]
-    ImagesView(Box<crate::app_bsky::embed::images::View<'a>>),
-    #[serde(rename = "app.bsky.embed.video#view")]
-    VideoView(Box<crate::app_bsky::embed::video::View<'a>>),
-    #[serde(rename = "app.bsky.embed.external#view")]
-    ExternalView(Box<crate::app_bsky::embed::external::View<'a>>),
-    #[serde(rename = "app.bsky.embed.record#view")]
-    RecordView(Box<crate::app_bsky::embed::record::View<'a>>),
-    #[serde(rename = "app.bsky.embed.recordWithMedia#view")]
-    RecordWithMediaView(Box<crate::app_bsky::embed::record_with_media::View<'a>>),
-    #[serde(rename = "sh.weaver.embed.records#view")]
-    View(Box<crate::sh_weaver::embed::records::View<'a>>),
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewRecord<'a> {

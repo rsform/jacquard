@@ -24,6 +24,13 @@
         }
       }
     },
+    "pinnedList": {
+      "type": "array",
+      "items": {
+        "type": "ref",
+        "ref": "com.atproto.repo.strongRef"
+      }
+    },
     "profileDataView": {
       "type": "object",
       "required": [
@@ -33,8 +40,25 @@
         "inner": {
           "type": "union",
           "refs": [
-            "sh.weaver.actor.defs#profileView",
-            "app.bsky.actor.defs#profileViewDetailed"
+            "#profileView",
+            "app.bsky.actor.defs#profileViewDetailed",
+            "#tangledProfileView"
+          ]
+        }
+      }
+    },
+    "profileDataViewBasic": {
+      "type": "object",
+      "required": [
+        "inner"
+      ],
+      "properties": {
+        "inner": {
+          "type": "union",
+          "refs": [
+            "#profileViewBasic",
+            "app.bsky.actor.defs#profileViewBasic",
+            "#tangledProfileView"
           ]
         }
       }
@@ -50,14 +74,18 @@
           "type": "string",
           "format": "uri"
         },
+        "banner": {
+          "type": "string",
+          "format": "uri"
+        },
         "createdAt": {
           "type": "string",
           "format": "datetime"
         },
         "description": {
           "type": "string",
-          "maxLength": 2560,
-          "maxGraphemes": 256
+          "maxLength": 10240,
+          "maxGraphemes": 1024
         },
         "did": {
           "type": "string",
@@ -99,12 +127,89 @@
           "maxLength": 400,
           "maxGraphemes": 40
         },
+        "pinned": {
+          "type": "ref",
+          "description": "Notebooks or other records pinned for display.",
+          "ref": "#pinnedList"
+        },
         "pronouns": {
           "type": "ref",
           "description": "Pronouns to use in user-generated content.",
-          "ref": "sh.weaver.actor.profile#pronounsList"
+          "ref": "#pronounsList"
+        },
+        "subscribedCount": {
+          "type": "integer"
+        },
+        "subscriberCount": {
+          "type": "integer"
         }
       }
+    },
+    "profileViewBasic": {
+      "type": "object",
+      "required": [
+        "did",
+        "handle"
+      ],
+      "properties": {
+        "avatar": {
+          "type": "string",
+          "format": "uri"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "did": {
+          "type": "string",
+          "format": "did"
+        },
+        "displayName": {
+          "type": "string",
+          "maxLength": 640,
+          "maxGraphemes": 64
+        },
+        "handle": {
+          "type": "string",
+          "format": "handle"
+        },
+        "indexedAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "com.atproto.label.defs#label"
+          }
+        },
+        "pronouns": {
+          "type": "ref",
+          "description": "Pronouns to use in user-generated content.",
+          "ref": "#pronounsList"
+        }
+      }
+    },
+    "pronounsList": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 500,
+        "maxGraphemes": 50,
+        "knownValues": [
+          "she/her",
+          "he/him",
+          "they/them",
+          "it/its",
+          "she/they",
+          "he/they",
+          "they/he",
+          "they/she",
+          "any/all"
+        ]
+      },
+      "maxLength": 5
     },
     "tangledProfileView": {
       "type": "object",

@@ -878,6 +878,12 @@ fn lexicon_doc_app_bsky_feed_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                             }),
                         );
                         map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("debug"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
+                                description: None,
+                            }),
+                        );
+                        map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("embed"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
@@ -3158,6 +3164,10 @@ pub struct PostView<'a> {
     pub bookmark_count: Option<i64>,
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
+    /// Debug information for internal development
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub debug: Option<jacquard_common::types::value::Data<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub embed: Option<PostViewEmbed<'a>>,
@@ -3284,6 +3294,7 @@ pub struct PostViewBuilder<'a, S: post_view_state::State> {
         ::core::option::Option<crate::app_bsky::actor::ProfileViewBasic<'a>>,
         ::core::option::Option<i64>,
         ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
+        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
         ::core::option::Option<PostViewEmbed<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
@@ -3312,6 +3323,7 @@ impl<'a> PostViewBuilder<'a, post_view_state::Empty> {
         PostViewBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
+                None,
                 None,
                 None,
                 None,
@@ -3384,14 +3396,33 @@ where
 }
 
 impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
+    /// Set the `debug` field (optional)
+    pub fn debug(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::value::Data<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `debug` field to an Option value (optional)
+    pub fn maybe_debug(
+        mut self,
+        value: Option<jacquard_common::types::value::Data<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
     /// Set the `embed` field (optional)
     pub fn embed(mut self, value: impl Into<Option<PostViewEmbed<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `embed` field to an Option value (optional)
     pub fn maybe_embed(mut self, value: Option<PostViewEmbed<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self.__unsafe_private_named.4 = value;
         self
     }
 }
@@ -3406,7 +3437,7 @@ where
         mut self,
         value: impl Into<jacquard_common::types::string::Datetime>,
     ) -> PostViewBuilder<'a, post_view_state::SetIndexedAt<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
         PostViewBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -3421,7 +3452,7 @@ impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<crate::com_atproto::label::Label<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `labels` field to an Option value (optional)
@@ -3429,7 +3460,7 @@ impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
         mut self,
         value: Option<Vec<crate::com_atproto::label::Label<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self.__unsafe_private_named.6 = value;
         self
     }
 }
@@ -3437,12 +3468,12 @@ impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
 impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
     /// Set the `likeCount` field (optional)
     pub fn like_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `likeCount` field to an Option value (optional)
     pub fn maybe_like_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self.__unsafe_private_named.7 = value;
         self
     }
 }
@@ -3450,12 +3481,12 @@ impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
 impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
     /// Set the `quoteCount` field (optional)
     pub fn quote_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self.__unsafe_private_named.8 = value.into();
         self
     }
     /// Set the `quoteCount` field to an Option value (optional)
     pub fn maybe_quote_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self.__unsafe_private_named.8 = value;
         self
     }
 }
@@ -3470,7 +3501,7 @@ where
         mut self,
         value: impl Into<jacquard_common::types::value::Data<'a>>,
     ) -> PostViewBuilder<'a, post_view_state::SetRecord<S>> {
-        self.__unsafe_private_named.8 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.9 = ::core::option::Option::Some(value.into());
         PostViewBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -3482,12 +3513,12 @@ where
 impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
     /// Set the `replyCount` field (optional)
     pub fn reply_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self.__unsafe_private_named.10 = value.into();
         self
     }
     /// Set the `replyCount` field to an Option value (optional)
     pub fn maybe_reply_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self.__unsafe_private_named.10 = value;
         self
     }
 }
@@ -3495,12 +3526,12 @@ impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
 impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
     /// Set the `repostCount` field (optional)
     pub fn repost_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self.__unsafe_private_named.11 = value.into();
         self
     }
     /// Set the `repostCount` field to an Option value (optional)
     pub fn maybe_repost_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self.__unsafe_private_named.11 = value;
         self
     }
 }
@@ -3511,7 +3542,7 @@ impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<crate::app_bsky::feed::ThreadgateView<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self.__unsafe_private_named.12 = value.into();
         self
     }
     /// Set the `threadgate` field to an Option value (optional)
@@ -3519,7 +3550,7 @@ impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
         mut self,
         value: Option<crate::app_bsky::feed::ThreadgateView<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self.__unsafe_private_named.12 = value;
         self
     }
 }
@@ -3534,7 +3565,7 @@ where
         mut self,
         value: impl Into<jacquard_common::types::string::AtUri<'a>>,
     ) -> PostViewBuilder<'a, post_view_state::SetUri<S>> {
-        self.__unsafe_private_named.12 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.13 = ::core::option::Option::Some(value.into());
         PostViewBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -3549,7 +3580,7 @@ impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<crate::app_bsky::feed::ViewerState<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.13 = value.into();
+        self.__unsafe_private_named.14 = value.into();
         self
     }
     /// Set the `viewer` field to an Option value (optional)
@@ -3557,7 +3588,7 @@ impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
         mut self,
         value: Option<crate::app_bsky::feed::ViewerState<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.13 = value;
+        self.__unsafe_private_named.14 = value;
         self
     }
 }
@@ -3577,17 +3608,18 @@ where
             author: self.__unsafe_private_named.0.unwrap(),
             bookmark_count: self.__unsafe_private_named.1,
             cid: self.__unsafe_private_named.2.unwrap(),
-            embed: self.__unsafe_private_named.3,
-            indexed_at: self.__unsafe_private_named.4.unwrap(),
-            labels: self.__unsafe_private_named.5,
-            like_count: self.__unsafe_private_named.6,
-            quote_count: self.__unsafe_private_named.7,
-            record: self.__unsafe_private_named.8.unwrap(),
-            reply_count: self.__unsafe_private_named.9,
-            repost_count: self.__unsafe_private_named.10,
-            threadgate: self.__unsafe_private_named.11,
-            uri: self.__unsafe_private_named.12.unwrap(),
-            viewer: self.__unsafe_private_named.13,
+            debug: self.__unsafe_private_named.3,
+            embed: self.__unsafe_private_named.4,
+            indexed_at: self.__unsafe_private_named.5.unwrap(),
+            labels: self.__unsafe_private_named.6,
+            like_count: self.__unsafe_private_named.7,
+            quote_count: self.__unsafe_private_named.8,
+            record: self.__unsafe_private_named.9.unwrap(),
+            reply_count: self.__unsafe_private_named.10,
+            repost_count: self.__unsafe_private_named.11,
+            threadgate: self.__unsafe_private_named.12,
+            uri: self.__unsafe_private_named.13.unwrap(),
+            viewer: self.__unsafe_private_named.14,
             extra_data: Default::default(),
         }
     }
@@ -3603,17 +3635,18 @@ where
             author: self.__unsafe_private_named.0.unwrap(),
             bookmark_count: self.__unsafe_private_named.1,
             cid: self.__unsafe_private_named.2.unwrap(),
-            embed: self.__unsafe_private_named.3,
-            indexed_at: self.__unsafe_private_named.4.unwrap(),
-            labels: self.__unsafe_private_named.5,
-            like_count: self.__unsafe_private_named.6,
-            quote_count: self.__unsafe_private_named.7,
-            record: self.__unsafe_private_named.8.unwrap(),
-            reply_count: self.__unsafe_private_named.9,
-            repost_count: self.__unsafe_private_named.10,
-            threadgate: self.__unsafe_private_named.11,
-            uri: self.__unsafe_private_named.12.unwrap(),
-            viewer: self.__unsafe_private_named.13,
+            debug: self.__unsafe_private_named.3,
+            embed: self.__unsafe_private_named.4,
+            indexed_at: self.__unsafe_private_named.5.unwrap(),
+            labels: self.__unsafe_private_named.6,
+            like_count: self.__unsafe_private_named.7,
+            quote_count: self.__unsafe_private_named.8,
+            record: self.__unsafe_private_named.9.unwrap(),
+            reply_count: self.__unsafe_private_named.10,
+            repost_count: self.__unsafe_private_named.11,
+            threadgate: self.__unsafe_private_named.12,
+            uri: self.__unsafe_private_named.13.unwrap(),
+            viewer: self.__unsafe_private_named.14,
             extra_data: Some(extra_data),
         }
     }

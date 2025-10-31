@@ -89,9 +89,9 @@ pub fn parse_from_index_or_lexicon_file(
                         let doc = doc.into_static();
                         Ok((nsid, doc))
                     }
-                    Err(_) => {
+                    Err(e) => {
                         // Not a lexicon, skip
-                        Err(miette::miette!("Invalid lexicon file"))
+                        Err(miette::miette!("Invalid lexicon file: {e}"))
                     }
                 }
             } else {
@@ -104,9 +104,9 @@ pub fn parse_from_index_or_lexicon_file(
                     let doc = doc.into_static();
                     Ok((nsid, doc))
                 }
-                Err(_) => {
+                Err(e) => {
                     // Not a lexicon, skip
-                    Err(miette::miette!("Invalid lexicon file"))
+                    Err(miette::miette!("Invalid lexicon file: {e}"))
                 }
             }
         } else {

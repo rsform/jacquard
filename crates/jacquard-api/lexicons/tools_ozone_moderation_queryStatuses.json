@@ -112,6 +112,11 @@
             "type": "integer",
             "description": "If specified, only subjects that belong to an account that has at least this many reported records will be returned."
           },
+          "minStrikeCount": {
+            "type": "integer",
+            "description": "If specified, only subjects that belong to an account that has at least this many active strikes will be returned.",
+            "minimum": 1
+          },
           "minTakendownRecordsCount": {
             "type": "integer",
             "description": "If specified, only subjects that belong to an account that has at least this many taken down records will be returned."

@@ -1,0 +1,26 @@
+{
+  "lexicon": 1,
+  "id": "org.farmapps.temp.ecrop.defs",
+  "description": "Generic eCrop definitions",
+  "defs": {
+    "codeType": {
+      "type": "object",
+      "description": "Generic class to represent the code list and code that is used",
+      "required": [
+        "listId",
+        "code"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "format": "record-key"
+        },
+        "listId": {
+          "type": "string",
+          "description": "Identifier of the standard code list that contains the allowed codes.",
+          "format": "nsid"
+        }
+      }
+    }
+  }
+}

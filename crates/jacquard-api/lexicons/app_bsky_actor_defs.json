@@ -432,6 +432,10 @@
           "type": "string",
           "format": "datetime"
         },
+        "debug": {
+          "type": "unknown",
+          "description": "Debug information for internal development"
+        },
         "description": {
           "type": "string",
           "maxLength": 2560,
@@ -497,6 +501,10 @@
           "type": "string",
           "format": "datetime"
         },
+        "debug": {
+          "type": "unknown",
+          "description": "Debug information for internal development"
+        },
         "did": {
           "type": "string",
           "format": "did"
@@ -556,6 +564,10 @@
         "createdAt": {
           "type": "string",
           "format": "datetime"
+        },
+        "debug": {
+          "type": "unknown",
+          "description": "Debug information for internal development"
         },
         "description": {
           "type": "string",

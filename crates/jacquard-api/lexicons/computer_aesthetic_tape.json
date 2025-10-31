@@ -1,0 +1,62 @@
+{
+  "lexicon": 1,
+  "id": "computer.aesthetic.tape",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "slug",
+          "code",
+          "when"
+        ],
+        "properties": {
+          "acUrl": {
+            "type": "string",
+            "description": "Permanent link to view on aesthetic.computer (e.g., https://aesthetic.computer/!a3x)"
+          },
+          "code": {
+            "type": "string",
+            "description": "Short alphanumeric code for easy lookup (e.g., 'a3x')"
+          },
+          "ref": {
+            "type": "string",
+            "description": "MongoDB ObjectId reference for bi-directional sync"
+          },
+          "slug": {
+            "type": "string",
+            "description": "The unique slug identifier for this tape (e.g., wand-1729177200000)"
+          },
+          "thumbnail": {
+            "type": "blob",
+            "description": "Thumbnail image from midpoint frame, 3x scaled with nearest neighbor (max 1MB)",
+            "accept": [
+              "image/jpeg",
+              "image/png"
+            ],
+            "maxSize": 1048576
+          },
+          "video": {
+            "type": "blob",
+            "description": "MP4 video with 3x pixel scaling and audio soundtrack (max 50MB)",
+            "accept": [
+              "video/mp4"
+            ],
+            "maxSize": 52428800
+          },
+          "when": {
+            "type": "string",
+            "description": "ISO 8601 timestamp when the tape was created",
+            "format": "datetime"
+          },
+          "zipUrl": {
+            "type": "string",
+            "description": "Direct URL to download the original ZIP file with frames and audio"
+          }
+        }
+      }
+    }
+  }
+}

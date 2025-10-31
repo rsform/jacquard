@@ -1,0 +1,64 @@
+{
+  "lexicon": 1,
+  "id": "computer.aesthetic.painting",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A digital painting created on aesthetic.computer",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "slug",
+          "code",
+          "imageUrl",
+          "when",
+          "ref"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Short alphanumeric code for easy lookup (e.g., 'a3b')",
+            "maxLength": 10
+          },
+          "imageUrl": {
+            "type": "string",
+            "description": "URL to full resolution PNG",
+            "format": "uri",
+            "maxLength": 512
+          },
+          "recordingUrl": {
+            "type": "string",
+            "description": "URL to .zip recording file (if available)",
+            "format": "uri",
+            "maxLength": 512
+          },
+          "ref": {
+            "type": "string",
+            "description": "MongoDB ObjectId reference for bidirectional sync",
+            "maxLength": 24
+          },
+          "slug": {
+            "type": "string",
+            "description": "Timestamp slug (may include recording: imageSlug:recordingSlug)",
+            "maxLength": 128
+          },
+          "thumbnail": {
+            "type": "blob",
+            "description": "Thumbnail preview (max 1MB)",
+            "accept": [
+              "image/png",
+              "image/jpeg"
+            ],
+            "maxSize": 1048576
+          },
+          "when": {
+            "type": "string",
+            "description": "Creation timestamp (ISO 8601)",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

@@ -56,7 +56,10 @@ impl LexiconSource for GitSource {
                     let doc = doc.into_static();
                     lexicons.insert(nsid, doc);
                 }
-                Err(_) => {
+                Err(e) => {
+                    if self.repo.contains("weaver") {
+                        println!("Failed to parse lexicon file: {}\n{}", content, e);
+                    }
                     // Not a lexicon, skip
                     continue;
                 }

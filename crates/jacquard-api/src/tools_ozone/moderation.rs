@@ -520,6 +520,95 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> ::jacquard_lexicon::lexicon::Lex
                 }),
             );
             map.insert(
+                ::jacquard_common::smol_str::SmolStr::new_static("accountStrike"),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Strike information for an account",
+                        ),
+                    ),
+                    required: None,
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::std::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "activeStrikeCount",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: None,
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "firstStrikeAt",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Timestamp of the first strike received",
+                                    ),
+                                ),
+                                format: Some(
+                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
+                                ),
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "lastStrikeAt",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Timestamp of the most recent strike received",
+                                    ),
+                                ),
+                                format: Some(
+                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
+                                ),
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "totalStrikeCount",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: None,
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map
+                    },
+                }),
+            );
+            map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("ageAssuranceEvent"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: Some(
@@ -1188,6 +1277,87 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> ::jacquard_lexicon::lexicon::Lex
                             }),
                         );
                         map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("policies"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Names/Keywords of the policies that necessitated the email.",
+                                    ),
+                                ),
+                                items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: None,
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                                min_length: None,
+                                max_length: Some(5usize),
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "severityLevel",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Severity level of the violation. Normally 'sev-1' that adds strike on repeat offense",
+                                    ),
+                                ),
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "strikeCount",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: None,
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "strikeExpiresAt",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "When the strike should expire. If not provided, the strike never expires.",
+                                    ),
+                                ),
+                                format: Some(
+                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
+                                ),
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
                                 "subjectLine",
                             ),
@@ -1602,6 +1772,64 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> ::jacquard_lexicon::lexicon::Lex
                                 known_values: None,
                             }),
                         );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("policies"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Names/Keywords of the policy infraction for which takedown is being reversed.",
+                                    ),
+                                ),
+                                items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: None,
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                                min_length: None,
+                                max_length: Some(5usize),
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "severityLevel",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Severity level of the violation. Usually set from the last policy infraction's severity.",
+                                    ),
+                                ),
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "strikeCount",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: None,
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
                         map
                     },
                 }),
@@ -1768,6 +1996,63 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> ::jacquard_lexicon::lexicon::Lex
                                 }),
                                 min_length: None,
                                 max_length: Some(5usize),
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "severityLevel",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Severity level of the violation (e.g., 'sev-0', 'sev-1', 'sev-2', etc.).",
+                                    ),
+                                ),
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "strikeCount",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: None,
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "strikeExpiresAt",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "When the strike should expire. If not provided, the strike never expires.",
+                                    ),
+                                ),
+                                format: Some(
+                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
+                                ),
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
                             }),
                         );
                         map
@@ -3935,6 +4220,17 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> ::jacquard_lexicon::lexicon::Lex
                         );
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
+                                "accountStrike",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "#accountStrike",
+                                ),
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
                                 "ageAssuranceState",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -4589,6 +4885,51 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AccountStats<'a> {
     }
     fn def_name() -> &'static str {
         "accountStats"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_tools_ozone_moderation_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Strike information for an account
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct AccountStrike<'a> {
+    /// Current number of active strikes (excluding expired strikes)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub active_strike_count: std::option::Option<i64>,
+    /// Timestamp of the first strike received
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub first_strike_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    /// Timestamp of the most recent strike received
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub last_strike_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    /// Total number of strikes ever received (including expired strikes)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub total_strike_count: std::option::Option<i64>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AccountStrike<'a> {
+    fn nsid() -> &'static str {
+        "tools.ozone.moderation.defs"
+    }
+    fn def_name() -> &'static str {
+        "accountStrike"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
@@ -5839,6 +6180,20 @@ pub struct ModEventEmail<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub content: std::option::Option<jacquard_common::CowStr<'a>>,
+    /// Names/Keywords of the policies that necessitated the email.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub policies: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    /// Severity level of the violation. Normally 'sev-1' that adds strike on repeat offense
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub severity_level: std::option::Option<jacquard_common::CowStr<'a>>,
+    /// Number of strikes to assign to the user for this violation. Normally 0 as an indicator of a warning and only added as a strike on a repeat offense.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub strike_count: std::option::Option<i64>,
+    /// When the strike should expire. If not provided, the strike never expires.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub strike_expires_at: std::option::Option<jacquard_common::types::string::Datetime>,
     /// The subject line of the email sent to the user.
     #[serde(borrow)]
     pub subject_line: jacquard_common::CowStr<'a>,
@@ -5857,6 +6212,18 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ModEventEmail<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.policies {
+            #[allow(unused_comparisons)]
+            if value.len() > 5usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "policies",
+                    ),
+                    max: 5usize,
+                    actual: value.len(),
+                });
+            }
+        }
         Ok(())
     }
 }
@@ -6735,6 +7102,17 @@ pub struct ModEventReverseTakedown<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    /// Names/Keywords of the policy infraction for which takedown is being reversed.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub policies: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    /// Severity level of the violation. Usually set from the last policy infraction's severity.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub severity_level: std::option::Option<jacquard_common::CowStr<'a>>,
+    /// Number of strikes to subtract from the user's strike count. Usually set from the last policy infraction's severity.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub strike_count: std::option::Option<i64>,
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ModEventReverseTakedown<'a> {
@@ -6750,6 +7128,18 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ModEventReverseTakedown<'
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.policies {
+            #[allow(unused_comparisons)]
+            if value.len() > 5usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "policies",
+                    ),
+                    max: 5usize,
+                    actual: value.len(),
+                });
+            }
+        }
         Ok(())
     }
 }
@@ -6982,6 +7372,16 @@ pub struct ModEventTakedown<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub policies: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    /// Severity level of the violation (e.g., 'sev-0', 'sev-1', 'sev-2', etc.).
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub severity_level: std::option::Option<jacquard_common::CowStr<'a>>,
+    /// Number of strikes to assign to the user for this violation.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub strike_count: std::option::Option<i64>,
+    /// When the strike should expire. If not provided, the strike never expires.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub strike_expires_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ModEventTakedown<'a> {
@@ -11898,6 +12298,10 @@ pub struct SubjectStatusView<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub account_stats: Option<crate::tools_ozone::moderation::AccountStats<'a>>,
+    /// Strike information for the account (account-level only)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub account_strike: Option<crate::tools_ozone::moderation::AccountStrike<'a>>,
     /// Current age assurance state of the subject.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -12058,6 +12462,7 @@ pub struct SubjectStatusViewBuilder<'a, S: subject_status_view_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<crate::tools_ozone::moderation::AccountStats<'a>>,
+        ::core::option::Option<crate::tools_ozone::moderation::AccountStrike<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<bool>,
@@ -12122,6 +12527,7 @@ impl<'a> SubjectStatusViewBuilder<'a, subject_status_view_state::Empty> {
                 None,
                 None,
                 None,
+                None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
@@ -12148,12 +12554,31 @@ impl<'a, S: subject_status_view_state::State> SubjectStatusViewBuilder<'a, S> {
 }
 
 impl<'a, S: subject_status_view_state::State> SubjectStatusViewBuilder<'a, S> {
+    /// Set the `accountStrike` field (optional)
+    pub fn account_strike(
+        mut self,
+        value: impl Into<Option<crate::tools_ozone::moderation::AccountStrike<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `accountStrike` field to an Option value (optional)
+    pub fn maybe_account_strike(
+        mut self,
+        value: Option<crate::tools_ozone::moderation::AccountStrike<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: subject_status_view_state::State> SubjectStatusViewBuilder<'a, S> {
     /// Set the `ageAssuranceState` field (optional)
     pub fn age_assurance_state(
         mut self,
         value: impl Into<Option<jacquard_common::CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `ageAssuranceState` field to an Option value (optional)
@@ -12161,7 +12586,7 @@ impl<'a, S: subject_status_view_state::State> SubjectStatusViewBuilder<'a, S> {
         mut self,
         value: Option<jacquard_common::CowStr<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self.__unsafe_private_named.2 = value;
         self
     }
 }
@@ -12172,7 +12597,7 @@ impl<'a, S: subject_status_view_state::State> SubjectStatusViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `ageAssuranceUpdatedBy` field to an Option value (optional)
@@ -12180,7 +12605,7 @@ impl<'a, S: subject_status_view_state::State> SubjectStatusViewBuilder<'a, S> {
         mut self,
         value: Option<jacquard_common::CowStr<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self.__unsafe_private_named.3 = value;
         self
     }
 }
@@ -12188,12 +12613,12 @@ impl<'a, S: subject_status_view_state::State> SubjectStatusViewBuilder<'a, S> {
 impl<'a, S: subject_status_view_state::State> SubjectStatusViewBuilder<'a, S> {
     /// Set the `appealed` field (optional)
     pub fn appealed(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `appealed` field to an Option value (optional)
     pub fn maybe_appealed(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self.__unsafe_private_named.4 = value;
         self
     }
 }
@@ -12204,12 +12629,12 @@ impl<'a, S: subject_status_view_state::State> SubjectStatusViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `comment` field to an Option value (optional)
     pub fn maybe_comment(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self.__unsafe_private_named.5 = value;
         self
     }
 }
@@ -12224,7 +12649,7 @@ where
         mut self,
         value: impl Into<jacquard_common::types::string::Datetime>,
     ) -> SubjectStatusViewBuilder<'a, subject_status_view_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
         SubjectStatusViewBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -12239,12 +12664,12 @@ impl<'a, S: subject_status_view_state::State> SubjectStatusViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<SubjectStatusViewHosting<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `hosting` field to an Option value (optional)
     pub fn maybe_hosting(mut self, value: Option<SubjectStatusViewHosting<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self.__unsafe_private_named.7 = value;
         self
     }
 }
@@ -12259,7 +12684,7 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> SubjectStatusViewBuilder<'a, subject_status_view_state::SetId<S>> {
-        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.8 = ::core::option::Option::Some(value.into());
         SubjectStatusViewBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -12274,7 +12699,7 @@ impl<'a, S: subject_status_view_state::State> SubjectStatusViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::types::string::Datetime>>,
     ) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self.__unsafe_private_named.9 = value.into();
         self
     }
     /// Set the `lastAppealedAt` field to an Option value (optional)
@@ -12282,7 +12707,7 @@ impl<'a, S: subject_status_view_state::State> SubjectStatusViewBuilder<'a, S> {
         mut self,
         value: Option<jacquard_common::types::string::Datetime>,
     ) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self.__unsafe_private_named.9 = value;
         self
     }
 }
@@ -12293,7 +12718,7 @@ impl<'a, S: subject_status_view_state::State> SubjectStatusViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::types::string::Datetime>>,
     ) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self.__unsafe_private_named.10 = value.into();
         self
     }
     /// Set the `lastReportedAt` field to an Option value (optional)
@@ -12301,7 +12726,7 @@ impl<'a, S: subject_status_view_state::State> SubjectStatusViewBuilder<'a, S> {
         mut self,
         value: Option<jacquard_common::types::string::Datetime>,
     ) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self.__unsafe_private_named.10 = value;
         self
     }
 }
@@ -12312,7 +12737,7 @@ impl<'a, S: subject_status_view_state::State> SubjectStatusViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::types::string::Datetime>>,
     ) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self.__unsafe_private_named.11 = value.into();
         self
     }
     /// Set the `lastReviewedAt` field to an Option value (optional)
@@ -12320,7 +12745,7 @@ impl<'a, S: subject_status_view_state::State> SubjectStatusViewBuilder<'a, S> {
         mut self,
         value: Option<jacquard_common::types::string::Datetime>,
     ) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self.__unsafe_private_named.11 = value;
         self
     }
 }
@@ -12331,7 +12756,7 @@ impl<'a, S: subject_status_view_state::State> SubjectStatusViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::types::string::Did<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self.__unsafe_private_named.12 = value.into();
         self
     }
     /// Set the `lastReviewedBy` field to an Option value (optional)
@@ -12339,7 +12764,7 @@ impl<'a, S: subject_status_view_state::State> SubjectStatusViewBuilder<'a, S> {
         mut self,
         value: Option<jacquard_common::types::string::Did<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self.__unsafe_private_named.12 = value;
         self
     }
 }
@@ -12350,7 +12775,7 @@ impl<'a, S: subject_status_view_state::State> SubjectStatusViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::types::string::Datetime>>,
     ) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self.__unsafe_private_named.13 = value.into();
         self
     }
     /// Set the `muteReportingUntil` field to an Option value (optional)
@@ -12358,7 +12783,7 @@ impl<'a, S: subject_status_view_state::State> SubjectStatusViewBuilder<'a, S> {
         mut self,
         value: Option<jacquard_common::types::string::Datetime>,
     ) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self.__unsafe_private_named.13 = value;
         self
     }
 }
@@ -12369,7 +12794,7 @@ impl<'a, S: subject_status_view_state::State> SubjectStatusViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::types::string::Datetime>>,
     ) -> Self {
-        self.__unsafe_private_named.13 = value.into();
+        self.__unsafe_private_named.14 = value.into();
         self
     }
     /// Set the `muteUntil` field to an Option value (optional)
@@ -12377,7 +12802,7 @@ impl<'a, S: subject_status_view_state::State> SubjectStatusViewBuilder<'a, S> {
         mut self,
         value: Option<jacquard_common::types::string::Datetime>,
     ) -> Self {
-        self.__unsafe_private_named.13 = value;
+        self.__unsafe_private_named.14 = value;
         self
     }
 }
@@ -12385,12 +12810,12 @@ impl<'a, S: subject_status_view_state::State> SubjectStatusViewBuilder<'a, S> {
 impl<'a, S: subject_status_view_state::State> SubjectStatusViewBuilder<'a, S> {
     /// Set the `priorityScore` field (optional)
     pub fn priority_score(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.14 = value.into();
+        self.__unsafe_private_named.15 = value.into();
         self
     }
     /// Set the `priorityScore` field to an Option value (optional)
     pub fn maybe_priority_score(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.14 = value;
+        self.__unsafe_private_named.15 = value;
         self
     }
 }
@@ -12401,7 +12826,7 @@ impl<'a, S: subject_status_view_state::State> SubjectStatusViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<crate::tools_ozone::moderation::RecordsStats<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.15 = value.into();
+        self.__unsafe_private_named.16 = value.into();
         self
     }
     /// Set the `recordsStats` field to an Option value (optional)
@@ -12409,7 +12834,7 @@ impl<'a, S: subject_status_view_state::State> SubjectStatusViewBuilder<'a, S> {
         mut self,
         value: Option<crate::tools_ozone::moderation::RecordsStats<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.15 = value;
+        self.__unsafe_private_named.16 = value;
         self
     }
 }
@@ -12424,7 +12849,7 @@ where
         mut self,
         value: impl Into<crate::tools_ozone::moderation::SubjectReviewState<'a>>,
     ) -> SubjectStatusViewBuilder<'a, subject_status_view_state::SetReviewState<S>> {
-        self.__unsafe_private_named.16 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.17 = ::core::option::Option::Some(value.into());
         SubjectStatusViewBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -12443,7 +12868,7 @@ where
         mut self,
         value: impl Into<SubjectStatusViewSubject<'a>>,
     ) -> SubjectStatusViewBuilder<'a, subject_status_view_state::SetSubject<S>> {
-        self.__unsafe_private_named.17 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.18 = ::core::option::Option::Some(value.into());
         SubjectStatusViewBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -12458,7 +12883,7 @@ impl<'a, S: subject_status_view_state::State> SubjectStatusViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<jacquard_common::types::string::Cid<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.18 = value.into();
+        self.__unsafe_private_named.19 = value.into();
         self
     }
     /// Set the `subjectBlobCids` field to an Option value (optional)
@@ -12466,7 +12891,7 @@ impl<'a, S: subject_status_view_state::State> SubjectStatusViewBuilder<'a, S> {
         mut self,
         value: Option<Vec<jacquard_common::types::string::Cid<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.18 = value;
+        self.__unsafe_private_named.19 = value;
         self
     }
 }
@@ -12477,7 +12902,7 @@ impl<'a, S: subject_status_view_state::State> SubjectStatusViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.19 = value.into();
+        self.__unsafe_private_named.20 = value.into();
         self
     }
     /// Set the `subjectRepoHandle` field to an Option value (optional)
@@ -12485,7 +12910,7 @@ impl<'a, S: subject_status_view_state::State> SubjectStatusViewBuilder<'a, S> {
         mut self,
         value: Option<jacquard_common::CowStr<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.19 = value;
+        self.__unsafe_private_named.20 = value;
         self
     }
 }
@@ -12496,7 +12921,7 @@ impl<'a, S: subject_status_view_state::State> SubjectStatusViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::types::string::Datetime>>,
     ) -> Self {
-        self.__unsafe_private_named.20 = value.into();
+        self.__unsafe_private_named.21 = value.into();
         self
     }
     /// Set the `suspendUntil` field to an Option value (optional)
@@ -12504,7 +12929,7 @@ impl<'a, S: subject_status_view_state::State> SubjectStatusViewBuilder<'a, S> {
         mut self,
         value: Option<jacquard_common::types::string::Datetime>,
     ) -> Self {
-        self.__unsafe_private_named.20 = value;
+        self.__unsafe_private_named.21 = value;
         self
     }
 }
@@ -12515,7 +12940,7 @@ impl<'a, S: subject_status_view_state::State> SubjectStatusViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.21 = value.into();
+        self.__unsafe_private_named.22 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
@@ -12523,7 +12948,7 @@ impl<'a, S: subject_status_view_state::State> SubjectStatusViewBuilder<'a, S> {
         mut self,
         value: Option<Vec<jacquard_common::CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.21 = value;
+        self.__unsafe_private_named.22 = value;
         self
     }
 }
@@ -12531,12 +12956,12 @@ impl<'a, S: subject_status_view_state::State> SubjectStatusViewBuilder<'a, S> {
 impl<'a, S: subject_status_view_state::State> SubjectStatusViewBuilder<'a, S> {
     /// Set the `takendown` field (optional)
     pub fn takendown(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.22 = value.into();
+        self.__unsafe_private_named.23 = value.into();
         self
     }
     /// Set the `takendown` field to an Option value (optional)
     pub fn maybe_takendown(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.22 = value;
+        self.__unsafe_private_named.23 = value;
         self
     }
 }
@@ -12551,7 +12976,7 @@ where
         mut self,
         value: impl Into<jacquard_common::types::string::Datetime>,
     ) -> SubjectStatusViewBuilder<'a, subject_status_view_state::SetUpdatedAt<S>> {
-        self.__unsafe_private_named.23 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.24 = ::core::option::Option::Some(value.into());
         SubjectStatusViewBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -12573,29 +12998,30 @@ where
     pub fn build(self) -> SubjectStatusView<'a> {
         SubjectStatusView {
             account_stats: self.__unsafe_private_named.0,
-            age_assurance_state: self.__unsafe_private_named.1,
-            age_assurance_updated_by: self.__unsafe_private_named.2,
-            appealed: self.__unsafe_private_named.3,
-            comment: self.__unsafe_private_named.4,
-            created_at: self.__unsafe_private_named.5.unwrap(),
-            hosting: self.__unsafe_private_named.6,
-            id: self.__unsafe_private_named.7.unwrap(),
-            last_appealed_at: self.__unsafe_private_named.8,
-            last_reported_at: self.__unsafe_private_named.9,
-            last_reviewed_at: self.__unsafe_private_named.10,
-            last_reviewed_by: self.__unsafe_private_named.11,
-            mute_reporting_until: self.__unsafe_private_named.12,
-            mute_until: self.__unsafe_private_named.13,
-            priority_score: self.__unsafe_private_named.14,
-            records_stats: self.__unsafe_private_named.15,
-            review_state: self.__unsafe_private_named.16.unwrap(),
-            subject: self.__unsafe_private_named.17.unwrap(),
-            subject_blob_cids: self.__unsafe_private_named.18,
-            subject_repo_handle: self.__unsafe_private_named.19,
-            suspend_until: self.__unsafe_private_named.20,
-            tags: self.__unsafe_private_named.21,
-            takendown: self.__unsafe_private_named.22,
-            updated_at: self.__unsafe_private_named.23.unwrap(),
+            account_strike: self.__unsafe_private_named.1,
+            age_assurance_state: self.__unsafe_private_named.2,
+            age_assurance_updated_by: self.__unsafe_private_named.3,
+            appealed: self.__unsafe_private_named.4,
+            comment: self.__unsafe_private_named.5,
+            created_at: self.__unsafe_private_named.6.unwrap(),
+            hosting: self.__unsafe_private_named.7,
+            id: self.__unsafe_private_named.8.unwrap(),
+            last_appealed_at: self.__unsafe_private_named.9,
+            last_reported_at: self.__unsafe_private_named.10,
+            last_reviewed_at: self.__unsafe_private_named.11,
+            last_reviewed_by: self.__unsafe_private_named.12,
+            mute_reporting_until: self.__unsafe_private_named.13,
+            mute_until: self.__unsafe_private_named.14,
+            priority_score: self.__unsafe_private_named.15,
+            records_stats: self.__unsafe_private_named.16,
+            review_state: self.__unsafe_private_named.17.unwrap(),
+            subject: self.__unsafe_private_named.18.unwrap(),
+            subject_blob_cids: self.__unsafe_private_named.19,
+            subject_repo_handle: self.__unsafe_private_named.20,
+            suspend_until: self.__unsafe_private_named.21,
+            tags: self.__unsafe_private_named.22,
+            takendown: self.__unsafe_private_named.23,
+            updated_at: self.__unsafe_private_named.24.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -12609,29 +13035,30 @@ where
     ) -> SubjectStatusView<'a> {
         SubjectStatusView {
             account_stats: self.__unsafe_private_named.0,
-            age_assurance_state: self.__unsafe_private_named.1,
-            age_assurance_updated_by: self.__unsafe_private_named.2,
-            appealed: self.__unsafe_private_named.3,
-            comment: self.__unsafe_private_named.4,
-            created_at: self.__unsafe_private_named.5.unwrap(),
-            hosting: self.__unsafe_private_named.6,
-            id: self.__unsafe_private_named.7.unwrap(),
-            last_appealed_at: self.__unsafe_private_named.8,
-            last_reported_at: self.__unsafe_private_named.9,
-            last_reviewed_at: self.__unsafe_private_named.10,
-            last_reviewed_by: self.__unsafe_private_named.11,
-            mute_reporting_until: self.__unsafe_private_named.12,
-            mute_until: self.__unsafe_private_named.13,
-            priority_score: self.__unsafe_private_named.14,
-            records_stats: self.__unsafe_private_named.15,
-            review_state: self.__unsafe_private_named.16.unwrap(),
-            subject: self.__unsafe_private_named.17.unwrap(),
-            subject_blob_cids: self.__unsafe_private_named.18,
-            subject_repo_handle: self.__unsafe_private_named.19,
-            suspend_until: self.__unsafe_private_named.20,
-            tags: self.__unsafe_private_named.21,
-            takendown: self.__unsafe_private_named.22,
-            updated_at: self.__unsafe_private_named.23.unwrap(),
+            account_strike: self.__unsafe_private_named.1,
+            age_assurance_state: self.__unsafe_private_named.2,
+            age_assurance_updated_by: self.__unsafe_private_named.3,
+            appealed: self.__unsafe_private_named.4,
+            comment: self.__unsafe_private_named.5,
+            created_at: self.__unsafe_private_named.6.unwrap(),
+            hosting: self.__unsafe_private_named.7,
+            id: self.__unsafe_private_named.8.unwrap(),
+            last_appealed_at: self.__unsafe_private_named.9,
+            last_reported_at: self.__unsafe_private_named.10,
+            last_reviewed_at: self.__unsafe_private_named.11,
+            last_reviewed_by: self.__unsafe_private_named.12,
+            mute_reporting_until: self.__unsafe_private_named.13,
+            mute_until: self.__unsafe_private_named.14,
+            priority_score: self.__unsafe_private_named.15,
+            records_stats: self.__unsafe_private_named.16,
+            review_state: self.__unsafe_private_named.17.unwrap(),
+            subject: self.__unsafe_private_named.18.unwrap(),
+            subject_blob_cids: self.__unsafe_private_named.19,
+            subject_repo_handle: self.__unsafe_private_named.20,
+            suspend_until: self.__unsafe_private_named.21,
+            tags: self.__unsafe_private_named.22,
+            takendown: self.__unsafe_private_named.23,
+            updated_at: self.__unsafe_private_named.24.unwrap(),
             extra_data: Some(extra_data),
         }
     }

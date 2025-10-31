@@ -259,7 +259,7 @@ fn lexicon_doc_sh_weaver_edit_cursor() -> ::jacquard_lexicon::lexicon::LexiconDo
                         required: Some(
                             vec![
                                 ::jacquard_common::smol_str::SmolStr::new_static("container"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("die")
+                                ::jacquard_common::smol_str::SmolStr::new_static("id")
                             ],
                         ),
                         nullable: None,
@@ -742,9 +742,8 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Id<'a> {
 pub struct Cursor<'a> {
     #[serde(borrow)]
     pub container: crate::sh_weaver::edit::cursor::ContainerId<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub id: Option<crate::sh_weaver::edit::cursor::Id<'a>>,
+    pub id: crate::sh_weaver::edit::cursor::Id<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub side: Option<crate::sh_weaver::edit::cursor::CursorSide<'a>>,
@@ -761,36 +760,36 @@ pub mod cursor_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Container;
-        type Die;
+        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Container = Unset;
-        type Die = Unset;
+        type Id = Unset;
     }
     ///State transition - sets the `container` field to Set
     pub struct SetContainer<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContainer<S> {}
     impl<S: State> State for SetContainer<S> {
         type Container = Set<members::container>;
-        type Die = S::Die;
+        type Id = S::Id;
     }
-    ///State transition - sets the `die` field to Set
-    pub struct SetDie<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDie<S> {}
-    impl<S: State> State for SetDie<S> {
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
         type Container = S::Container;
-        type Die = Set<members::die>;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `container` field
         pub struct container(());
-        ///Marker type for the `die` field
-        pub struct die(());
+        ///Marker type for the `id` field
+        pub struct id(());
     }
 }
 
@@ -842,22 +841,22 @@ where
     }
 }
 
-impl<'a, S: cursor_state::State> CursorBuilder<'a, S> {
-    /// Set the `id` field (optional)
+impl<'a, S> CursorBuilder<'a, S>
+where
+    S: cursor_state::State,
+    S::Id: cursor_state::IsUnset,
+{
+    /// Set the `id` field (required)
     pub fn id(
         mut self,
-        value: impl Into<Option<crate::sh_weaver::edit::cursor::Id<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
-        self
-    }
-    /// Set the `id` field to an Option value (optional)
-    pub fn maybe_id(
-        mut self,
-        value: Option<crate::sh_weaver::edit::cursor::Id<'a>>,
-    ) -> Self {
-        self.__unsafe_private_named.1 = value;
-        self
+        value: impl Into<crate::sh_weaver::edit::cursor::Id<'a>>,
+    ) -> CursorBuilder<'a, cursor_state::SetId<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        CursorBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
     }
 }
 
@@ -884,13 +883,13 @@ impl<'a, S> CursorBuilder<'a, S>
 where
     S: cursor_state::State,
     S::Container: cursor_state::IsSet,
-    S::Die: cursor_state::IsSet,
+    S::Id: cursor_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Cursor<'a> {
         Cursor {
             container: self.__unsafe_private_named.0.unwrap(),
-            id: self.__unsafe_private_named.1,
+            id: self.__unsafe_private_named.1.unwrap(),
             side: self.__unsafe_private_named.2,
             extra_data: Default::default(),
         }
@@ -905,7 +904,7 @@ where
     ) -> Cursor<'a> {
         Cursor {
             container: self.__unsafe_private_named.0.unwrap(),
-            id: self.__unsafe_private_named.1,
+            id: self.__unsafe_private_named.1.unwrap(),
             side: self.__unsafe_private_named.2,
             extra_data: Some(extra_data),
         }

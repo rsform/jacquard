@@ -143,6 +143,10 @@
             "items": {
               "type": "string"
             }
+          },
+          "withStrike": {
+            "type": "boolean",
+            "description": "If specified, only events where strikeCount value is set are returned."
           }
         }
       },

@@ -281,6 +281,10 @@
           "type": "string",
           "format": "cid"
         },
+        "debug": {
+          "type": "unknown",
+          "description": "Debug information for internal development"
+        },
         "embed": {
           "type": "union",
           "refs": [

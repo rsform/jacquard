@@ -21,6 +21,7 @@ pub struct Block<'a> {
     pub block: BlockBlock<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub height: Option<i64>,
+    /// The rotation of the block in degrees
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub rotation: Option<i64>,
     pub width: i64,
@@ -307,6 +308,10 @@ pub enum BlockBlock<'a> {
     BskyPost(Box<crate::pub_leaflet::blocks::bsky_post::BskyPost<'a>>),
     #[serde(rename = "pub.leaflet.blocks.page")]
     Page(Box<crate::pub_leaflet::blocks::page::Page<'a>>),
+    #[serde(rename = "pub.leaflet.blocks.poll")]
+    Poll(Box<crate::pub_leaflet::blocks::poll::Poll<'a>>),
+    #[serde(rename = "pub.leaflet.blocks.button")]
+    Button(Box<crate::pub_leaflet::blocks::button::Button<'a>>),
 }
 
 fn lexicon_doc_pub_leaflet_pages_canvas() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -351,7 +356,9 @@ fn lexicon_doc_pub_leaflet_pages_canvas() -> ::jacquard_lexicon::lexicon::Lexico
                                     ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.code"),
                                     ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.horizontalRule"),
                                     ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.bskyPost"),
-                                    ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.page")
+                                    ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.page"),
+                                    ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.poll"),
+                                    ::jacquard_common::CowStr::new_static("pub.leaflet.blocks.button")
                                 ],
                                 closed: None,
                             }),

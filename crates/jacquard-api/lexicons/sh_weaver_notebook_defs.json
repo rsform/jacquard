@@ -196,7 +196,7 @@
     "title": {
       "type": "string",
       "description": "The title of the notebook entry.",
-      "maxLength": 420
+      "maxLength": 300
     }
   }
 }

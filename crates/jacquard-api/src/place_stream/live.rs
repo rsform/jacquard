@@ -6,3 +6,6 @@
 pub mod get_live_users;
 pub mod get_profile_card;
 pub mod get_segments;
+
+#[cfg(feature = "streaming")]
+pub mod subscribe_segments;

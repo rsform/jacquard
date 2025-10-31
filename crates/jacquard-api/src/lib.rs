@@ -52,9 +52,6 @@ pub mod com_atproto;
 #[cfg(feature = "com_bad_example")]
 pub mod com_bad_example;
 
-#[cfg(feature = "com_crabdance")]
-pub mod com_crabdance;
-
 #[cfg(feature = "com_shinolabs")]
 pub mod com_shinolabs;
 
@@ -63,6 +60,9 @@ pub mod com_whtwnd;
 
 #[cfg(feature = "community_lexicon")]
 pub mod community_lexicon;
+
+#[cfg(feature = "computer_aesthetic")]
+pub mod computer_aesthetic;
 
 #[cfg(feature = "dev_baileytownsend")]
 pub mod dev_baileytownsend;
@@ -75,9 +75,6 @@ pub mod dev_ocbwoy3;
 
 #[cfg(feature = "dev_regnault")]
 pub mod dev_regnault;
-
-#[cfg(feature = "events_smokesignal")]
-pub mod events_smokesignal;
 
 #[cfg(feature = "fm_teal")]
 pub mod fm_teal;
@@ -117,6 +114,9 @@ pub mod network_slices;
 
 #[cfg(feature = "org_devcon")]
 pub mod org_devcon;
+
+#[cfg(feature = "org_farmapps")]
+pub mod org_farmapps;
 
 #[cfg(feature = "org_robocracy")]
 pub mod org_robocracy;

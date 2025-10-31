@@ -33,6 +33,10 @@
             "image/*"
           ],
           "maxSize": 3000000
+        },
+        "name": {
+          "type": "string",
+          "maxLength": 128
         }
       }
     },
@@ -49,6 +53,58 @@
             "ref": "#image"
           },
           "maxLength": 48
+        }
+      }
+    },
+    "view": {
+      "type": "object",
+      "required": [
+        "images"
+      ],
+      "properties": {
+        "images": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#viewImage"
+          },
+          "maxLength": 48
+        }
+      }
+    },
+    "viewImage": {
+      "type": "object",
+      "required": [
+        "thumb",
+        "fullsize",
+        "alt"
+      ],
+      "properties": {
+        "alt": {
+          "type": "string",
+          "description": "Alt text description of the image, for accessibility."
+        },
+        "dimensions": {
+          "type": "union",
+          "refs": [
+            "app.bsky.embed.defs#aspectRatio",
+            "sh.weaver.embed.defs#percentSize",
+            "sh.weaver.embed.defs#pixelSize"
+          ]
+        },
+        "fullsize": {
+          "type": "string",
+          "description": "Fully-qualified URL where a large version of the image can be fetched. May or may not be the exact original blob. For example, CDN location provided by the App View.",
+          "format": "uri"
+        },
+        "name": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "thumb": {
+          "type": "string",
+          "description": "Fully-qualified URL where a thumbnail of the image can be fetched. For example, CDN location provided by the App View.",
+          "format": "uri"
         }
       }
     }

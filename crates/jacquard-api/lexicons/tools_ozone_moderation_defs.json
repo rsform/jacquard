@@ -98,6 +98,30 @@
         }
       }
     },
+    "accountStrike": {
+      "type": "object",
+      "description": "Strike information for an account",
+      "properties": {
+        "activeStrikeCount": {
+          "type": "integer",
+          "description": "Current number of active strikes (excluding expired strikes)"
+        },
+        "firstStrikeAt": {
+          "type": "string",
+          "description": "Timestamp of the first strike received",
+          "format": "datetime"
+        },
+        "lastStrikeAt": {
+          "type": "string",
+          "description": "Timestamp of the most recent strike received",
+          "format": "datetime"
+        },
+        "totalStrikeCount": {
+          "type": "integer",
+          "description": "Total number of strikes ever received (including expired strikes)"
+        }
+      }
+    },
     "ageAssuranceEvent": {
       "type": "object",
       "description": "Age assurance info coming directly from users. Only works on DID subjects.",
@@ -302,6 +326,27 @@
           "type": "string",
           "description": "The content of the email sent to the user."
         },
+        "policies": {
+          "type": "array",
+          "description": "Names/Keywords of the policies that necessitated the email.",
+          "items": {
+            "type": "string"
+          },
+          "maxLength": 5
+        },
+        "severityLevel": {
+          "type": "string",
+          "description": "Severity level of the violation. Normally 'sev-1' that adds strike on repeat offense"
+        },
+        "strikeCount": {
+          "type": "integer",
+          "description": "Number of strikes to assign to the user for this violation. Normally 0 as an indicator of a warning and only added as a strike on a repeat offense."
+        },
+        "strikeExpiresAt": {
+          "type": "string",
+          "description": "When the strike should expire. If not provided, the strike never expires.",
+          "format": "datetime"
+        },
         "subjectLine": {
           "type": "string",
           "description": "The subject line of the email sent to the user."
@@ -428,6 +473,22 @@
         "comment": {
           "type": "string",
           "description": "Describe reasoning behind the reversal."
+        },
+        "policies": {
+          "type": "array",
+          "description": "Names/Keywords of the policy infraction for which takedown is being reversed.",
+          "items": {
+            "type": "string"
+          },
+          "maxLength": 5
+        },
+        "severityLevel": {
+          "type": "string",
+          "description": "Severity level of the violation. Usually set from the last policy infraction's severity."
+        },
+        "strikeCount": {
+          "type": "integer",
+          "description": "Number of strikes to subtract from the user's strike count. Usually set from the last policy infraction's severity."
         }
       }
     },
@@ -481,6 +542,19 @@
             "type": "string"
           },
           "maxLength": 5
+        },
+        "severityLevel": {
+          "type": "string",
+          "description": "Severity level of the violation (e.g., 'sev-0', 'sev-1', 'sev-2', etc.)."
+        },
+        "strikeCount": {
+          "type": "integer",
+          "description": "Number of strikes to assign to the user for this violation."
+        },
+        "strikeExpiresAt": {
+          "type": "string",
+          "description": "When the strike should expire. If not provided, the strike never expires.",
+          "format": "datetime"
         }
       }
     },
@@ -1252,6 +1326,11 @@
           "type": "ref",
           "description": "Statistics related to the account subject",
           "ref": "#accountStats"
+        },
+        "accountStrike": {
+          "type": "ref",
+          "description": "Strike information for the account (account-level only)",
+          "ref": "#accountStrike"
         },
         "ageAssuranceState": {
           "type": "string",
