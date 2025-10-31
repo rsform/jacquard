@@ -26,6 +26,7 @@
     };
     apps = {
       default.program = "${self'.packages.jacquard-lexgen}/bin/lex-fetch";
+      lexgen.program = "${self'.packages.jacquard-lexgen}/bin/lex-fetch";
     };
   };
 }
