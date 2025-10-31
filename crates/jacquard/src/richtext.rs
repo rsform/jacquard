@@ -67,7 +67,7 @@ static SANITIZE_NEWLINES_REGEX: LazyLock<Regex> =
 /// Default domains that support at-URI extraction from URLs
 /// (bsky.app URL patterns like /profile/{actor}/post/{rkey})
 #[cfg(feature = "api_bluesky")]
-static DEFAULT_EMBED_DOMAINS: &[&str] = &[
+pub static DEFAULT_EMBED_DOMAINS: &[&str] = &[
     "bsky.app",
     "deer.social",
     "blacksky.community",
@@ -656,7 +656,7 @@ fn classify_embed(url: &str, embed_domains: &[&str]) -> Option<EmbedCandidate<'s
 ///
 /// Only works for domains in the provided `embed_domains` list.
 #[cfg(feature = "api_bluesky")]
-fn extract_at_uri_from_url(url: &str, embed_domains: &[&str]) -> Option<AtUri<'static>> {
+pub fn extract_at_uri_from_url(url: &str, embed_domains: &[&str]) -> Option<AtUri<'static>> {
     // Parse URL
     let url_parsed = url::Url::parse(url).ok()?;
 
