@@ -100,7 +100,6 @@ use {
 use {
     crate::lexicon_resolver::ResolvedLexiconSchema,
     jacquard_common::{smol_str::SmolStr, types::string::Nsid},
-    moka::future::Cache,
     std::time::Duration,
 };
 
@@ -109,6 +108,93 @@ use {
     not(all(feature = "dns", not(target_family = "wasm")))
 ))]
 use std::sync::Arc;
+
+// Platform-specific cache implementations
+#[cfg(all(feature = "cache", not(target_arch = "wasm32")))]
+mod cache_impl {
+    /// Native: Use sync cache (thread-safe, no mutex needed)
+    pub type Cache<K, V> = mini_moka::sync::Cache<K, V>;
+
+    pub fn new_cache<K, V>(max_capacity: u64, ttl: std::time::Duration) -> Cache<K, V>
+    where
+        K: std::hash::Hash + Eq + Send + Sync + 'static,
+        V: Clone + Send + Sync + 'static,
+    {
+        mini_moka::sync::Cache::builder()
+            .max_capacity(max_capacity)
+            .time_to_live(ttl)
+            .build()
+    }
+
+    pub fn get<K, V>(cache: &Cache<K, V>, key: &K) -> Option<V>
+    where
+        K: std::hash::Hash + Eq + Send + Sync + 'static,
+        V: Clone + Send + Sync + 'static,
+    {
+        cache.get(key)
+    }
+
+    pub fn insert<K, V>(cache: &Cache<K, V>, key: K, value: V)
+    where
+        K: std::hash::Hash + Eq + Send + Sync + 'static,
+        V: Clone + Send + Sync + 'static,
+    {
+        cache.insert(key, value);
+    }
+
+    pub fn invalidate<K, V>(cache: &Cache<K, V>, key: &K)
+    where
+        K: std::hash::Hash + Eq + Send + Sync + 'static,
+        V: Clone + Send + Sync + 'static,
+    {
+        cache.invalidate(key);
+    }
+}
+
+#[cfg(all(feature = "cache", target_arch = "wasm32"))]
+mod cache_impl {
+    use std::sync::{Arc, Mutex};
+
+    /// WASM: Use unsync cache in Arc<Mutex<_>> (no threads, but need interior mutability)
+    pub type Cache<K, V> = Arc<Mutex<mini_moka::unsync::Cache<K, V>>>;
+
+    pub fn new_cache<K, V>(max_capacity: u64, ttl: std::time::Duration) -> Cache<K, V>
+    where
+        K: std::hash::Hash + Eq + 'static,
+        V: Clone + 'static,
+    {
+        Arc::new(Mutex::new(
+            mini_moka::unsync::Cache::builder()
+                .max_capacity(max_capacity)
+                .time_to_live(ttl)
+                .build(),
+        ))
+    }
+
+    pub fn get<K, V>(cache: &Cache<K, V>, key: &K) -> Option<V>
+    where
+        K: std::hash::Hash + Eq + 'static,
+        V: Clone + 'static,
+    {
+        cache.lock().unwrap().get(key).cloned()
+    }
+
+    pub fn insert<K, V>(cache: &Cache<K, V>, key: K, value: V)
+    where
+        K: std::hash::Hash + Eq + 'static,
+        V: Clone + 'static,
+    {
+        cache.lock().unwrap().insert(key, value);
+    }
+
+    pub fn invalidate<K, V>(cache: &Cache<K, V>, key: &K)
+    where
+        K: std::hash::Hash + Eq + 'static,
+        V: Clone + 'static,
+    {
+        cache.lock().unwrap().invalidate(key);
+    }
+}
 
 /// Configuration for resolver caching
 #[cfg(feature = "cache")]
@@ -194,32 +280,29 @@ impl CacheConfig {
 #[cfg(feature = "cache")]
 #[derive(Clone)]
 pub struct ResolverCaches {
-    pub handle_to_did: Cache<Handle<'static>, Did<'static>>,
-    pub did_to_doc: Cache<Did<'static>, Arc<DidDocResponse>>,
-    pub authority_to_did: Cache<SmolStr, Did<'static>>,
-    pub nsid_to_schema: Cache<Nsid<'static>, Arc<ResolvedLexiconSchema<'static>>>,
+    pub handle_to_did: cache_impl::Cache<Handle<'static>, Did<'static>>,
+    pub did_to_doc: cache_impl::Cache<Did<'static>, Arc<DidDocResponse>>,
+    pub authority_to_did: cache_impl::Cache<SmolStr, Did<'static>>,
+    pub nsid_to_schema: cache_impl::Cache<Nsid<'static>, Arc<ResolvedLexiconSchema<'static>>>,
 }
 
 #[cfg(feature = "cache")]
 impl ResolverCaches {
     pub fn new(config: &CacheConfig) -> Self {
         Self {
-            handle_to_did: Cache::builder()
-                .max_capacity(config.handle_to_did_capacity)
-                .time_to_live(config.handle_to_did_ttl)
-                .build(),
-            did_to_doc: Cache::builder()
-                .max_capacity(config.did_to_doc_capacity)
-                .time_to_live(config.did_to_doc_ttl)
-                .build(),
-            authority_to_did: Cache::builder()
-                .max_capacity(config.authority_to_did_capacity)
-                .time_to_live(config.authority_to_did_ttl)
-                .build(),
-            nsid_to_schema: Cache::builder()
-                .max_capacity(config.nsid_to_schema_capacity)
-                .time_to_live(config.nsid_to_schema_ttl)
-                .build(),
+            handle_to_did: cache_impl::new_cache(
+                config.handle_to_did_capacity,
+                config.handle_to_did_ttl,
+            ),
+            did_to_doc: cache_impl::new_cache(config.did_to_doc_capacity, config.did_to_doc_ttl),
+            authority_to_did: cache_impl::new_cache(
+                config.authority_to_did_capacity,
+                config.authority_to_did_ttl,
+            ),
+            nsid_to_schema: cache_impl::new_cache(
+                config.nsid_to_schema_capacity,
+                config.nsid_to_schema_ttl,
+            ),
         }
     }
 }
@@ -498,7 +581,7 @@ impl IdentityResolver for JacquardResolver {
         #[cfg(feature = "cache")]
         if let Some(caches) = &self.caches {
             let key = handle.clone().into_static();
-            if let Some(did) = caches.handle_to_did.get(&key).await {
+            if let Some(did) = cache_impl::get(&caches.handle_to_did, &key) {
                 return Ok(did);
             }
         }
@@ -600,10 +683,11 @@ impl IdentityResolver for JacquardResolver {
             // Cache successful resolution
             #[cfg(feature = "cache")]
             if let Some(caches) = &self.caches {
-                caches
-                    .handle_to_did
-                    .insert(handle.clone().into_static(), did.clone())
-                    .await;
+                cache_impl::insert(
+                    &caches.handle_to_did,
+                    handle.clone().into_static(),
+                    did.clone(),
+                );
             }
             Ok(did)
         } else {
@@ -620,7 +704,7 @@ impl IdentityResolver for JacquardResolver {
         #[cfg(feature = "cache")]
         if let Some(caches) = &self.caches {
             let key = did.clone().into_static();
-            if let Some(doc_resp) = caches.did_to_doc.get(&key).await {
+            if let Some(doc_resp) = cache_impl::get(&caches.did_to_doc, &key) {
                 return Ok((*doc_resp).clone());
             }
         }
@@ -690,10 +774,11 @@ impl IdentityResolver for JacquardResolver {
             // Cache successful resolution
             #[cfg(feature = "cache")]
             if let Some(caches) = &self.caches {
-                caches
-                    .did_to_doc
-                    .insert(did.clone().into_static(), Arc::new(doc_resp.clone()))
-                    .await;
+                cache_impl::insert(
+                    &caches.did_to_doc,
+                    did.clone().into_static(),
+                    Arc::new(doc_resp.clone()),
+                );
             }
             Ok(doc_resp)
         } else {
@@ -813,7 +898,7 @@ impl JacquardResolver {
     async fn invalidate_handle_chain(&self, handle: &Handle<'_>) {
         if let Some(caches) = &self.caches {
             let key = handle.clone().into_static();
-            caches.handle_to_did.invalidate(&key).await;
+            cache_impl::invalidate(&caches.handle_to_did, &key);
         }
     }
 
@@ -822,7 +907,7 @@ impl JacquardResolver {
         if let Some(caches) = &self.caches {
             let did_key = did.clone().into_static();
             // Get doc before evicting to extract handles
-            if let Some(doc_resp) = caches.did_to_doc.get(&did_key).await {
+            if let Some(doc_resp) = cache_impl::get(&caches.did_to_doc, &did_key) {
                 let doc_resp_clone = (*doc_resp).clone();
                 if let Ok(doc) = doc_resp_clone.parse() {
                     if let Some(aliases) = &doc.also_known_as {
@@ -830,14 +915,14 @@ impl JacquardResolver {
                             if let Some(handle_str) = alias.as_ref().strip_prefix("at://") {
                                 if let Ok(handle) = Handle::new(handle_str) {
                                     let handle_key = handle.into_static();
-                                    caches.handle_to_did.invalidate(&handle_key).await;
+                                    cache_impl::invalidate(&caches.handle_to_did, &handle_key);
                                 }
                             }
                         }
                     }
                 }
             }
-            caches.did_to_doc.invalidate(&did_key).await;
+            cache_impl::invalidate(&caches.did_to_doc, &did_key);
         }
     }
 
@@ -845,7 +930,7 @@ impl JacquardResolver {
     async fn invalidate_authority_chain(&self, authority: &str) {
         if let Some(caches) = &self.caches {
             let authority = SmolStr::from(authority);
-            caches.authority_to_did.invalidate(&authority).await;
+            cache_impl::invalidate(&caches.authority_to_did, &authority);
         }
     }
 
@@ -853,12 +938,12 @@ impl JacquardResolver {
     async fn invalidate_lexicon_chain(&self, nsid: &jacquard_common::types::string::Nsid<'_>) {
         if let Some(caches) = &self.caches {
             let nsid_key = nsid.clone().into_static();
-            if let Some(schema) = caches.nsid_to_schema.get(&nsid_key).await {
+            if let Some(schema) = cache_impl::get(&caches.nsid_to_schema, &nsid_key) {
                 let authority = SmolStr::from(nsid.domain_authority());
-                caches.authority_to_did.invalidate(&authority).await;
+                cache_impl::invalidate(&caches.authority_to_did, &authority);
                 self.invalidate_did_chain(&schema.repo).await;
             }
-            caches.nsid_to_schema.invalidate(&nsid_key).await;
+            cache_impl::invalidate(&caches.nsid_to_schema, &nsid_key);
         }
     }
 

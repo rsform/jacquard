@@ -246,7 +246,7 @@ impl LexiconAuthorityResolver for crate::JacquardResolver {
         #[cfg(feature = "cache")]
         if let Some(caches) = &self.caches {
             let authority = jacquard_common::smol_str::SmolStr::from(nsid.domain_authority());
-            if let Some(did) = caches.authority_to_did.get(&authority).await {
+            if let Some(did) = crate::cache_impl::get(&caches.authority_to_did, &authority) {
                 return Ok(did);
             }
         }
@@ -262,7 +262,7 @@ impl LexiconAuthorityResolver for crate::JacquardResolver {
                 if let Some(caches) = &self.caches {
                     let authority =
                         jacquard_common::smol_str::SmolStr::from(nsid.domain_authority());
-                    caches.authority_to_did.insert(authority, did.clone()).await;
+                    crate::cache_impl::insert(&caches.authority_to_did, authority, did.clone());
                 }
             }
             Err(_) => {
@@ -298,7 +298,7 @@ impl LexiconSchemaResolver for crate::JacquardResolver {
         #[cfg(feature = "cache")]
         if let Some(caches) = &self.caches {
             let key = nsid.clone().into_static();
-            if let Some(schema) = caches.nsid_to_schema.get(&key).await {
+            if let Some(schema) = crate::cache_impl::get(&caches.nsid_to_schema, &key) {
                 return Ok((*schema).clone());
             }
         }
@@ -375,10 +375,11 @@ impl LexiconSchemaResolver for crate::JacquardResolver {
                 // Cache successful resolution
                 #[cfg(feature = "cache")]
                 if let Some(caches) = &self.caches {
-                    caches
-                        .nsid_to_schema
-                        .insert(nsid.clone().into_static(), std::sync::Arc::new(schema.clone()))
-                        .await;
+                    crate::cache_impl::insert(
+                        &caches.nsid_to_schema,
+                        nsid.clone().into_static(),
+                        std::sync::Arc::new(schema.clone()),
+                    );
                 }
                 Ok(schema)
             }
