@@ -1080,7 +1080,7 @@ impl RichTextBuilder<Unresolved> {
 
 /// Fetch OpenGraph metadata from a URL using the webpage crate
 #[cfg(feature = "api_bluesky")]
-async fn fetch_opengraph_metadata<C>(
+pub async fn fetch_opengraph_metadata<C>(
     client: &C,
     url: &str,
 ) -> Result<Option<ExternalMetadata<'static>>, Box<dyn std::error::Error + Send + Sync>>
@@ -1091,15 +1091,11 @@ where
     let request = http::Request::builder()
         .method("GET")
         .uri(url)
-        .header("User-Agent", "jacquard/0.6")
-        .body(Vec::new())
-        .map_err(|e| Box::new(e) as Box<dyn std::error::Error + Send + Sync>)?;
+        .header("User-Agent", "jacquard/0.8")
+        .body(Vec::new())?;
 
     // Fetch the page
-    let response = client
-        .send_http(request)
-        .await
-        .map_err(|e| Box::new(e) as Box<dyn std::error::Error + Send + Sync>)?;
+    let response = client.send_http(request).await?;
 
     // Parse HTML body
     let html = String::from_utf8_lossy(response.body());
