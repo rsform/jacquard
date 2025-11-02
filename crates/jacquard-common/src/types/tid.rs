@@ -2,7 +2,6 @@ use serde::{Deserialize, Deserializer, Serialize, de::Error};
 use smol_str::{SmolStr, SmolStrBuilder};
 use std::fmt;
 use std::sync::LazyLock;
-use std::time::SystemTime;
 use std::{ops::Deref, str::FromStr};
 
 use crate::CowStr;
@@ -306,10 +305,7 @@ impl Ticker {
 
     /// Generate the next TID, optionally ensuring it's after the given TID
     pub fn next(&mut self, prev: Option<Tid>) -> Tid {
-        let now = SystemTime::now()
-            .duration_since(SystemTime::UNIX_EPOCH)
-            .expect("timestamp in micros since UNIX epoch")
-            .as_micros() as u64;
+        let now = chrono::Utc::now().timestamp_micros() as u64;
         // mask to 53 bits
         let now = now & 0x001FFFFFFFFFFFFF;
         if now > self.last_timestamp {

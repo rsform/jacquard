@@ -62,8 +62,7 @@ zstd = { version = "0.13", optional = true }
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 getrandom = { version = "0.3.4", features = ["wasm_js"] }
-
-[target.'cfg(target_arch = "wasm32")'.dependencies]
+chrono = { workspace = true, features = ["wasmbind"] }
 getrandom_02 = { package = "getrandom", version = "0.2", features = ["js"] }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]

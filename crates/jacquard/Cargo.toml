@@ -36,7 +36,7 @@ tracing = [
     "jacquard-oauth/tracing",
     "jacquard-identity/tracing",
 ]
-dns = ["jacquard-identity/dns", "jacquard-identity/cache"]
+dns = ["jacquard-identity/dns", ]
 streaming = [
     "jacquard-common/websocket",
     "jacquard-oauth/streaming",
@@ -46,6 +46,8 @@ streaming = [
 ]
 websocket = ["jacquard-common/websocket"]
 zstd = ["jacquard-common/zstd"]
+
+
 
 [[example]]
 name = "oauth_timeline"
@@ -133,6 +135,8 @@ jacquard-oauth = { version = "0.8", path = "../jacquard-oauth" }
 jacquard-derive = { version = "0.8", path = "../jacquard-derive", optional = true }
 jacquard-identity = { version = "0.8", path = "../jacquard-identity" }
 
+
+
 #bon.workspace = true
 trait-variant.workspace = true
 bytes.workspace = true
@@ -152,7 +156,9 @@ jose-jwk = { workspace = true, features = ["p256"] }
 tracing = { workspace = true, optional = true }
 n0-future = { workspace = true, optional = true }
 
-[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+
+[target.'cfg(not(target_family = "wasm"))'.dependencies]
+jacquard-identity = { version = "0.8", path = "../jacquard-identity", features = ["cache"] }
 reqwest = { workspace = true, features = [
     "http2",
     "system-proxy",
