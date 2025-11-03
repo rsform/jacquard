@@ -274,9 +274,21 @@ pub trait XrpcClient: HttpClient {
     /// Get the base URI for the client.
     fn base_uri(&self) -> impl Future<Output = Url>;
 
+    /// Set the base URI for the client.
+    fn set_base_uri(&self, url: Url) -> impl Future<Output = ()> {
+        let _ = url;
+        async {}
+    }
+
     /// Get the call options for the client.
     fn opts(&self) -> impl Future<Output = CallOptions<'_>> {
         async { CallOptions::default() }
+    }
+
+    /// Set the call options for the client.
+    fn set_opts(&self, opts: CallOptions) -> impl Future<Output = ()> {
+        let _ = opts;
+        async {}
     }
 
     /// Send an XRPC request and parse the response

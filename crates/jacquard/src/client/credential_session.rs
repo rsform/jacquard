@@ -408,6 +408,20 @@ where
         )
     }
 
+    async fn opts(&self) -> CallOptions<'_> {
+        self.options.read().await.clone()
+    }
+
+    async fn set_opts(&self, opts: CallOptions<'_>) {
+        let mut guard = self.options.write().await;
+        *guard = opts.into_static();
+    }
+
+    async fn set_base_uri(&self, url: Url) {
+        let mut guard = self.endpoint.write().await;
+        *guard = Some(url);
+    }
+
     async fn send<R>(&self, request: R) -> XrpcResult<XrpcResponse<R>>
     where
         R: XrpcRequest + Send + Sync,

@@ -26,7 +26,6 @@ path = "src/bin/extract_schemas.rs"
 [[example]]
 name = "extract_inventory"
 path = "../../examples/extract_inventory.rs"
-required-features = ["codegen"]
 
 
 [dependencies]

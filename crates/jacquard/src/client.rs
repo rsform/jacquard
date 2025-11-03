@@ -1020,6 +1020,14 @@ impl<A: AgentSession> XrpcClient for Agent<A> {
     fn opts(&self) -> impl Future<Output = CallOptions<'_>> {
         self.inner.opts()
     }
+
+    async fn set_opts(&self, opts: CallOptions<'_>) {
+        self.inner.set_opts(opts).await
+    }
+
+    async fn set_base_uri(&self, url: url::Url) {
+        self.inner.set_base_uri(url).await
+    }
     fn send<R>(
         &self,
         request: R,
