@@ -58,7 +58,7 @@ impl<K, T> Default for MemorySessionStore<K, T> {
 impl<K, T> SessionStore<K, T> for MemorySessionStore<K, T>
 where
     K: Eq + Hash + Send + Sync,
-    T: Clone + Send + Sync + 'static,
+    T: Clone + Send + Sync,
 {
     async fn get(&self, key: &K) -> Option<T> {
         self.0.read().await.get(key).cloned()
@@ -104,10 +104,8 @@ impl FileTokenStore {
     }
 }
 
-impl<
-    K: Eq + Hash + Display + Send + Sync + 'static,
-    T: Clone + Serialize + DeserializeOwned + Send + Sync + 'static,
-> SessionStore<K, T> for FileTokenStore
+impl<K: Eq + Hash + Display + Send + Sync, T: Clone + Serialize + DeserializeOwned + Send + Sync>
+    SessionStore<K, T> for FileTokenStore
 {
     /// Get the current session if present.
     async fn get(&self, key: &K) -> Option<T> {
