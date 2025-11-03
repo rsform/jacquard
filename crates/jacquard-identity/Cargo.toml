@@ -43,6 +43,11 @@ mini-moka = { git = "https://github.com/moka-rs/mini-moka", rev = "da864e849f5d0
 hickory-resolver = { optional = true, version = "0.24", default-features = false, features = ["system-config", "tokio-runtime"]}
 tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
 
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+mini-moka = { git = "https://github.com/moka-rs/mini-moka", rev = "da864e849f5d034f32e02197fee9bb5d5af36d3d", features = ["js"] }
+
+
 [[example]]
 name = "resolve_lexicon"
 path = "../../examples/resolve_lexicon.rs"

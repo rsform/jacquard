@@ -2911,6 +2911,7 @@ dependencies = [
  "smallvec",
  "tagptr",
  "triomphe",
+ "web-time",
 ]
 
 [[package]]
