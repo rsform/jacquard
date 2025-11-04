@@ -70,6 +70,11 @@ name = "public_atproto_feed"
 path = "../../examples/public_atproto_feed.rs"
 
 [[example]]
+name = "thomas_bug"
+path = "../../examples/thomas_bug.rs"
+
+
+[[example]]
 name = "create_whitewind_post"
 path = "../../examples/create_whitewind_post.rs"
 

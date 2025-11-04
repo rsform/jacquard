@@ -869,11 +869,15 @@ impl JacquardResolver {
         }
         let mut warnings = Vec::new();
         // Check handle alias presence (soft warning)
-        let expected_alias = format!("at://{}", handle.as_str());
         let has_alias = doc_borrowed
             .also_known_as
             .as_ref()
-            .map(|v| v.iter().any(|s| s.as_ref() == expected_alias))
+            .map(|v| {
+                v.iter().any(|s| {
+                    let s = s.strip_prefix("at://").unwrap_or(s);
+                    s == handle.as_str()
+                })
+            })
             .unwrap_or(false);
         if !has_alias {
             warnings.push(IdentityWarning::HandleAliasMismatch {
