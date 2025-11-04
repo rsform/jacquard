@@ -55,6 +55,7 @@ It is also designed around zero-copy/borrowed deserialization: types like [`Post
 - Basic LRU in-memory cache implementation using `mini-moka`
 - Reduces number of network requests for certain operations
 - Works on both native and WebAssembly
+- **NOTE** wasm target for `mini-moka` requires a git dependency, use the git version of the crate when compiling for wasm
 
 **XRPC client improvements**
 - `set_options()` and `set_endpoint()` methods on `XrpcClient` trait
