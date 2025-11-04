@@ -122,7 +122,7 @@ mod cache_impl {
     {
         mini_moka::sync::Cache::builder()
             .max_capacity(max_capacity)
-            .time_to_live(ttl)
+            .time_to_idle(ttl)
             .build()
     }
 
@@ -166,7 +166,7 @@ mod cache_impl {
         Arc::new(Mutex::new(
             mini_moka::unsync::Cache::builder()
                 .max_capacity(max_capacity)
-                .time_to_live(ttl)
+                .time_to_idle(ttl)
                 .build(),
         ))
     }

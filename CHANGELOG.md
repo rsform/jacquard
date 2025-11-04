@@ -1,5 +1,103 @@
 # Changelog
 
+## [0.9.0] - 2025-11-03
+
+### Added
+
+**Runtime schema validation** (`jacquard-lexicon`)
+- `SchemaValidator` for validating `Data` values against lexicon schemas
+- CID-based validation caching for efficient repeated validation
+- `ValidationResult` with structural and constraint error separation
+- Comprehensive error types: `StructuralError` (type mismatches, missing fields, union errors) and `ConstraintError` (length, grapheme, numeric bounds)
+- `ValidationPath` for precise error location reporting
+- Ref cycle detection with configurable max depth
+- Support for validating partial/malformed data without full deserialization
+
+**Value query DSL** (`jacquard-common`)
+- Pattern-based querying of nested `Data` structures
+- `data.query(pattern)` with expressive syntax:
+  - `field.nested` - exact path navigation
+  - `[..]` - wildcard over collections (array elements or object values)
+  - `field..nested` - scoped recursion (find nested within field, expect one)
+  - `...field` - global recursion (find all occurrences anywhere)
+- `QueryResult` enum with `Single`, `Multiple`, and `None` variants
+- `QueryMatch` with path tracking for multiple results
+- Iterator support via `.values()`, `.first()`, `.single()`, `.multiple()`
+
+**Data value enhancements** (`jacquard-common`)
+- `get_at_path()` for simple path-based field access on `Data` and `RawData`
+- Path syntax: `embed.images[0].alt` for navigating nested structures
+- `type_discriminator()` helper methods for AT Protocol union discrimination
+- Returns `$type` field value for objects with type discriminators
+- Added on `Data`, `Object`, and `RawData` types
+- Collection helper methods: `get()`, `contains_key()`, `len()`, `is_empty()`, `iter()`, `keys()`, `values()`
+- Index operator support: `obj["key"]` and `arr[0]`
+
+**Lexicon resolution** (`jacquard-identity`)
+- `LexiconResolver` for fetching lexicon schemas from AT Protocol services
+- Resolves lexicons from PDS instances and lexicon hosts
+- `resolve_lexicon()` fetches and parses lexicon schemas
+- `resolve_lexicon_raw()` fetches raw schema JSON
+- New example: `resolve_lexicon.rs`
+
+**Identity resolver caching** (`jacquard-identity`)
+- Optional `cache` feature with configurable in-memory caching
+- `JacquardResolver::with_cache()` constructor for cached resolver
+- Separate TTLs for handle→DID, DID→doc, and lexicon resolution
+
+**XRPC client improvements** (`jacquard-common`, `jacquard`, `jacquard-oauth`)
+- `set_options()` and `set_endpoint()` methods on `XrpcClient` trait
+- Default no-op implementations for stateless clients
+- Enables runtime reconfiguration of stateful clients
+- Better support for custom endpoint and option overrides
+
+**Lexicon schema generation from Rust types** (`jacquard-derive`, `jacquard-lexicon`)
+- New `#[derive(LexiconSchema)]` macro for generating lexicon schemas from Rust structs
+- New `#[lexicon_union]` attribute macro for lexicon union types (tagged enums)
+- Automatic schema generation for custom lexicons without writing JSON manually
+- Field-level attributes: `ref` for explicit type references, `union` for union fields
+- Fragment support for multi-def lexicons via `fragment = "..."` attribute
+- Generates `LexiconDoc` at compile time for runtime validation
+- Enables type-safe custom lexicon development
+
+**Lexicon codegen improvements** (`jacquard-lexicon`, `jacquard-api`)
+- Vendored in an implementation of the typed builder pattern from `bon` to **substantially** improve compile times
+- Feature-gated heavy code generation features so `jacquard-api` and other consumers of the validation capabilities don't pay the `syn` tax as badly.
+- LexiconSchema trait generated implementations for runtime validation
+
+**Session store improvements** (`jacquard`)
+- Improved trait bounds for `SessionStore` implementations
+- Better ergonomics for credential session types
+- Memory-based credential session helpers
+
+**New crate: `jacquard-lexgen`**
+- Lexicon code generation tooling extracted from `jacquard-lexicon`
+- Separates binary/CLI tools from library code
+- Contains lexicon fetching and code generation binaries
+- `jacquard-lexicon` remains as pure library for lexicon parsing, code generation, and validation
+
+**Examples**
+- `app_password_create_post.rs`: App password authentication example
+
+### Changed
+
+**Feature gating** (`jacquard-identity`)
+- Better conditional compilation for platform-specific features
+- Improved WASM target support
+
+**Dependency updates**
+- Updated to latest lexicons from atproto/bluesky
+- Added workspace dependencies: sha2, multihash, dashmap, cid
+- Various minor dependency version updates
+
+### Fixed
+
+**File auth store** (`jacquard`)
+- Fixed serialization/deserialization bugs in `FileAuthStore` implementation
+
+**Packaging** (`jacquard-lexgen`)
+- Added Nix flake apps for lexicon tools
+
 ## [0.8.0] - 2025-10-23
 
 ### Breaking Changes

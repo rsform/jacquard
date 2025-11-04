@@ -542,6 +542,7 @@ where
     path.push_str("/xrpc/");
     path.push_str(<R as XrpcRequest>::NSID);
     url.set_path(&path);
+    // Check if extra_headers already contains Content-Type
 
     if let XrpcMethod::Query = <R as XrpcRequest>::METHOD {
         let qs = serde_html_form::to_string(&req).map_err(|e| {
@@ -561,8 +562,16 @@ where
 
     let mut builder = Request::builder().method(method).uri(url.as_str());
 
+    let has_content_type = opts
+        .extra_headers
+        .iter()
+        .any(|(name, _)| name == CONTENT_TYPE);
+
     if let XrpcMethod::Procedure(encoding) = <R as XrpcRequest>::METHOD {
-        builder = builder.header(Header::ContentType, encoding);
+        // Only set default Content-Type if not provided in extra_headers
+        if !has_content_type {
+            builder = builder.header(Header::ContentType, encoding);
+        }
     }
     let output_encoding = <R::Response as XrpcResp>::ENCODING;
     builder = builder.header(http::header::ACCEPT, output_encoding);
@@ -1118,6 +1127,7 @@ impl<'a, C: HttpClient + HttpClientExt> XrpcCall<'a, C> {
                 builder = builder.header(Header::AtprotoAcceptLabelers, joined);
             }
         }
+
         for (name, value) in &self.opts.extra_headers {
             builder = builder.header(name, value);
         }

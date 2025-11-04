@@ -84,41 +84,67 @@
 //!
 //! **Type-level attributes** (`#[lexicon(...)]`):
 //! - `nsid = "..."`: The lexicon NSID (required)
-//! - `record`: Mark as a record type (requires `key`)
+//! - `record`: Mark as a record type
+//! - `key = "..."`: Record key type (`"tid"`, `"literal:self"`, or custom) - optional
 //! - `object`: Mark as an object type (default if neither record/procedure/query)
-//! - `key = "..."`: Record key type (`"tid"`, `"literal:self"`, or custom)
-//! - `fragment = "..."`: Fragment name for non-main defs
+//! - `fragment = "..."`: Fragment name for non-main defs (e.g., `fragment = "textSlice"`)
 //!
 //! **Field-level attributes** (`#[lexicon(...)]`):
 //! - `max_length = N`: Max byte length for strings
 //! - `max_graphemes = N`: Max grapheme count for strings
 //! - `min_length = N`, `min_graphemes = N`: Minimum constraints
 //! - `minimum = N`, `maximum = N`: Integer range constraints
+//! - `max_items = N`: Max array length
+//! - `item_max_length = N`, `item_max_graphemes = N`: Constraints on array items
+//! - `ref = "..."`: Explicit type ref (e.g., `ref = "com.atproto.repo.strongRef"` or `ref = "#textSlice"`)
+//! - `union`: Mark field as union type (use with `#[lexicon_union]` enum)
 //!
 //! **Serde integration**: Respects `#[serde(rename)]`, `#[serde(rename_all)]`, and
 //! `#[serde(skip)]`. Defaults to camelCase for field names (lexicon standard).
 //!
-//! **Enums**: Closed unions by default. Add `#[open_union]` for open unions. Variant
-//! refs resolved via `#[nsid = "..."]` > `#[serde(rename = "...")]` > fragment inference.
+//! **Unions**: Use `#[lexicon_union]` attribute macro, not `#[derive(LexiconSchema)]`.
+//! Mark union fields with `#[lexicon(union)]`.
 //!
 //! ```ignore
-//! // Record with constraints
+//! // Record with constraints and fragments
 //! #[derive(LexiconSchema)]
 //! #[lexicon(nsid = "app.bsky.feed.post", record, key = "tid")]
+//! #[serde(rename_all = "camelCase")]
 //! struct Post<'a> {
 //!     #[lexicon(max_graphemes = 300, max_length = 3000)]
 //!     pub text: CowStr<'a>,
+//!
 //!     pub created_at: Datetime,  // -> "createdAt" (camelCase)
+//!
+//!     #[lexicon(union)]
+//!     pub embed: Option<PostEmbed<'a>>,
+//!
+//!     #[lexicon(max_items = 8, item_max_length = 640, item_max_graphemes = 64)]
+//!     pub tags: Option<Vec<CowStr<'a>>>,
+//!
+//!     #[lexicon(ref = "app.bsky.richtext.facet")]
+//!     pub facets: Option<Vec<CowStr<'a>>>,
 //! }
 //!
-//! // Closed union
+//! // Fragment (non-main def)
 //! #[derive(LexiconSchema)]
-//! #[lexicon(nsid = "app.bsky.feed.defs")]
-//! enum FeedViewPref {
-//!     #[nsid = "app.bsky.feed.defs#feedViewPref"]
-//!     Feed,
-//!     #[nsid = "app.bsky.feed.defs#threadViewPref"]
-//!     Thread,
+//! #[lexicon(nsid = "app.bsky.feed.post", fragment = "textSlice")]
+//! #[serde(rename_all = "camelCase")]
+//! struct TextSlice {
+//!     #[lexicon(minimum = 0)]
+//!     pub start: i64,
+//!     #[lexicon(minimum = 0)]
+//!     pub end: i64,
+//! }
+//!
+//! // Union (uses lexicon_union, not LexiconSchema)
+//! #[lexicon_union]
+//! #[serde(tag = "$type")]
+//! enum PostEmbed<'a> {
+//!     #[serde(rename = "app.bsky.embed.images")]
+//!     Images(CowStr<'a>),
+//!     #[serde(rename = "app.bsky.embed.video")]
+//!     Video(CowStr<'a>),
 //! }
 //! ```
 

@@ -22,15 +22,54 @@ It is also designed around zero-copy/borrowed deserialization: types like [`Post
    - All the building blocks of the convenient abstractions are available
    - Use as much or as little from the crates as you need
 
-## 0.8.0 Release Highlights:
+## 0.9.0 Release Highlights:
 
-**`jacquard-repo` crate**
- - Complete implementation of the atproto repository spec
- - [Sync v1.1](https://github.com/bluesky-social/proposals/blob/main/0006-sync-iteration/README.md#commit-validation-mst-operation-inversion) commit event support (both proof production and verification), well-validated in testing
- - repository CAR file read/write support
- - CAR file write order compatible with streaming mode from the [sync iteration proposal](https://github.com/bluesky-social/proposals/blob/main/0006-sync-iteration/README.md#streaming-car-processing)
- - Big rewrite of all the errors in the crate, improvements to context and overall structure
- - Made handle parsing a bit more permissive for a common case ('handle.invalid' when someone has a messed up handle), added a method to confirm syntactic validity (the correct way to confirm validity is resolve_handle() from the  IdentityResolver trait, then fetching and comparing to the DID document).
+**`#[derive(LexiconSchema)]` + `#[lexicon_union]` macros**
+- Automatic schema generation for custom lexicons from Rust structs
+- Supports all lexicon constraints via attributes (max_length, max_graphemes, min/max, etc.)
+- Generates `LexiconDoc` at compile time for runtime validation
+
+**Runtime lexicon data validation**
+- Validation of structural and/or value contraints of data against a lexicon
+- caching for value validations
+- LexiconSchema trait generated implementations for runtime validation
+- detailed validation error results
+
+**Lexicon resolver**
+- Fetch lexicons at runtime for addition to schema registry
+
+**Query and path DSLs for `Data` and `RawData` value types**
+- Pattern-based querying of nested `Data` structures
+- `data.query(pattern)` with expressive syntax:
+  - `field.nested` - exact path navigation
+  - `[..]` - wildcard over collections (array elements or object values)
+  - `field..nested` - scoped recursion (find nested within field, expect one)
+  - `...field` - global recursion (find all occurrences anywhere)
+- `get_at_path()` for simple path-based field access on `Data` and `RawData`
+- Path syntax: `embed.images[0].alt` for navigating nested structures
+- `type_discriminator()` helper methods for AT Protocol union discrimination
+- Collection helper methods: `get()`, `contains_key()`, `len()`, `is_empty()`, `iter()`, `keys()`, `values()`
+- Index trait implemented: `obj["key"]` and `arr[0]`
+
+**Caching in identity/lexicon resolver**
+- Basic LRU in-memory cache implementation using `mini-moka`
+- Reduces number of network requests for certain operations
+- Works on both native and WebAssembly
+
+**XRPC client improvements**
+- `set_options()` and `set_endpoint()` methods on `XrpcClient` trait
+- Default no-op implementations for stateless clients
+- Enables runtime reconfiguration of stateful clients
+- Better support for custom endpoint and option overrides
+- Fixed bug where setting a custom 'Content-Type' header wouldn't be respected
+
+**Major generated API compilation time improvements**
+- Generated code output now includes a typestate builder implementation, similar to the `bon` crate
+- Moves the substantial `syn` tax of generating the builders to code generation time, not compile time.
+
+**New `jacquard-lexgen` crate**
+- Moves binaries out of jacquard-lexicon to reduce size further
+- Flake app for `lex-fetch`
 
 ## Example
 
