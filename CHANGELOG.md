@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.9.1] - 2025-11-04 (`jacquard-identity`)
+
+### Fixed
+
+- slingshot resolver no longer spuriously warns when cross-validating handles
+
 ## [0.9.0] - 2025-11-03
 
 ### Added
