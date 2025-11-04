@@ -2242,7 +2242,7 @@ dependencies = [
  "http",
  "image",
  "jacquard-api",
- "jacquard-common 0.9.0",
+ "jacquard-common",
  "jacquard-derive 0.9.0",
  "jacquard-identity",
  "jacquard-oauth",
@@ -2271,9 +2271,9 @@ version = "0.9.0"
 dependencies = [
  "bon",
  "bytes",
- "jacquard-common 0.9.0",
+ "jacquard-common",
  "jacquard-derive 0.9.0",
- "jacquard-lexicon 0.9.0",
+ "jacquard-lexicon",
  "miette",
  "rustversion",
  "serde",
@@ -2293,7 +2293,7 @@ dependencies = [
  "bytes",
  "chrono",
  "jacquard",
- "jacquard-common 0.9.0",
+ "jacquard-common",
  "jacquard-derive 0.9.0",
  "jacquard-identity",
  "k256",
@@ -2357,40 +2357,14 @@ dependencies = [
 ]
 
 [[package]]
-name = "jacquard-common"
-version = "0.9.0"
-source = "git+https://tangled.org/@nonbinary.computer/jacquard/#19d78f32fd8e51927afc11bbc2af1ac20cdb3d44"
+name = "jacquard-derive"
+version = "0.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "107f2ecd44086d7f5f89a328589f5535d02a35cf70c9e54362deeccdcdeac662"
 dependencies = [
- "base64 0.22.1",
- "bon",
- "bytes",
- "chrono",
- "cid",
- "getrandom 0.2.16",
- "getrandom 0.3.4",
- "http",
- "ipld-core",
- "k256",
- "langtag",
- "miette",
- "multibase",
- "multihash",
- "ouroboros",
- "p256",
- "rand 0.9.2",
- "regex",
- "reqwest",
- "serde",
- "serde_html_form",
- "serde_ipld_dagcbor",
- "serde_json",
- "signature",
- "smol_str",
- "thiserror 2.0.17",
- "tokio",
- "tokio-util",
- "trait-variant",
- "url",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.108",
 ]
 
 [[package]]
@@ -2399,26 +2373,14 @@ version = "0.9.0"
 dependencies = [
  "heck 0.5.0",
  "inventory",
- "jacquard-common 0.9.0",
- "jacquard-lexicon 0.9.0",
+ "jacquard-common",
+ "jacquard-lexicon",
  "proc-macro2",
  "quote",
  "serde",
  "serde_json",
  "syn 2.0.108",
  "unicode-segmentation",
-]
-
-[[package]]
-name = "jacquard-derive"
-version = "0.9.0"
-source = "git+https://tangled.org/@nonbinary.computer/jacquard/#19d78f32fd8e51927afc11bbc2af1ac20cdb3d44"
-dependencies = [
- "heck 0.5.0",
- "jacquard-lexicon 0.9.0 (git+https://tangled.org/@nonbinary.computer/jacquard/)",
- "proc-macro2",
- "quote",
- "syn 2.0.108",
 ]
 
 [[package]]
@@ -2430,8 +2392,8 @@ dependencies = [
  "hickory-resolver",
  "http",
  "jacquard-api",
- "jacquard-common 0.9.0",
- "jacquard-lexicon 0.9.0",
+ "jacquard-common",
+ "jacquard-lexicon",
  "miette",
  "mini-moka",
  "n0-future",
@@ -2458,10 +2420,10 @@ dependencies = [
  "glob",
  "inventory",
  "jacquard-api",
- "jacquard-common 0.9.0",
+ "jacquard-common",
  "jacquard-derive 0.9.0",
  "jacquard-identity",
- "jacquard-lexicon 0.9.0",
+ "jacquard-lexicon",
  "kdl",
  "miette",
  "reqwest",
@@ -2484,8 +2446,8 @@ dependencies = [
  "dashmap",
  "heck 0.5.0",
  "inventory",
- "jacquard-common 0.9.0",
- "jacquard-derive 0.9.0 (git+https://tangled.org/@nonbinary.computer/jacquard/)",
+ "jacquard-common",
+ "jacquard-derive 0.8.0",
  "miette",
  "multihash",
  "prettyplease",
@@ -2504,32 +2466,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "jacquard-lexicon"
-version = "0.9.0"
-source = "git+https://tangled.org/@nonbinary.computer/jacquard/#19d78f32fd8e51927afc11bbc2af1ac20cdb3d44"
-dependencies = [
- "cid",
- "dashmap",
- "heck 0.5.0",
- "inventory",
- "jacquard-common 0.9.0 (git+https://tangled.org/@nonbinary.computer/jacquard/)",
- "miette",
- "multihash",
- "prettyplease",
- "proc-macro2",
- "quote",
- "serde",
- "serde_ipld_dagcbor",
- "serde_json",
- "serde_repr",
- "serde_with",
- "sha2",
- "syn 2.0.108",
- "thiserror 2.0.17",
- "unicode-segmentation",
-]
-
-[[package]]
 name = "jacquard-oauth"
 version = "0.9.0"
 dependencies = [
@@ -2539,7 +2475,7 @@ dependencies = [
  "dashmap",
  "elliptic-curve",
  "http",
- "jacquard-common 0.9.0",
+ "jacquard-common",
  "jacquard-identity",
  "jose-jwa",
  "jose-jwk",
@@ -2572,7 +2508,7 @@ dependencies = [
  "ed25519-dalek",
  "hex",
  "iroh-car",
- "jacquard-common 0.9.0",
+ "jacquard-common",
  "jacquard-derive 0.9.0",
  "k256",
  "miette",
