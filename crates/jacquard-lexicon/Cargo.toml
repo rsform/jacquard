@@ -38,5 +38,5 @@ unicode-segmentation = "1.12"
 
 [dev-dependencies]
 bytes = { workspace = true }
-jacquard-derive = { version = "0.9", path = "../jacquard-derive" }
+jacquard-derive = { version = "0.9", git = "https://tangled.org/@nonbinary.computer/jacquard/" }
 tempfile = { version = "3.23.0" }
