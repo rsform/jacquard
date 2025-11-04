@@ -45,7 +45,7 @@ tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
 
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-mini-moka = { git = "https://github.com/moka-rs/mini-moka", rev = "da864e849f5d034f32e02197fee9bb5d5af36d3d", features = ["js"] }
+mini-moka = { version = "0.11.0", git = "https://github.com/moka-rs/mini-moka", rev = "da864e849f5d034f32e02197fee9bb5d5af36d3d", features = ["js"] }
 
 
 [[example]]
