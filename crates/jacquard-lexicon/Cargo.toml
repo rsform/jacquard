@@ -2,7 +2,7 @@
 name = "jacquard-lexicon"
 description = "Lexicon schema parsing and code generation for Jacquard"
 edition.workspace = true
-version.workspace = true
+version = "0.9.1"
 authors.workspace = true
 repository.workspace = true
 keywords.workspace = true
@@ -38,5 +38,5 @@ unicode-segmentation = "1.12"
 
 [dev-dependencies]
 bytes = { workspace = true }
-jacquard-derive = { version = "0.8"}
+jacquard-derive = { version = "0.9", path = "../jacquard-derive"}
 tempfile = { version = "3.23.0" }

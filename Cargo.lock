@@ -2243,7 +2243,7 @@ dependencies = [
  "image",
  "jacquard-api",
  "jacquard-common",
- "jacquard-derive 0.9.0",
+ "jacquard-derive",
  "jacquard-identity",
  "jacquard-oauth",
  "jose-jwk",
@@ -2272,7 +2272,7 @@ dependencies = [
  "bon",
  "bytes",
  "jacquard-common",
- "jacquard-derive 0.9.0",
+ "jacquard-derive",
  "jacquard-lexicon",
  "miette",
  "rustversion",
@@ -2294,7 +2294,7 @@ dependencies = [
  "chrono",
  "jacquard",
  "jacquard-common",
- "jacquard-derive 0.9.0",
+ "jacquard-derive",
  "jacquard-identity",
  "k256",
  "miette",
@@ -2358,17 +2358,6 @@ dependencies = [
 
 [[package]]
 name = "jacquard-derive"
-version = "0.8.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "107f2ecd44086d7f5f89a328589f5535d02a35cf70c9e54362deeccdcdeac662"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.108",
-]
-
-[[package]]
-name = "jacquard-derive"
 version = "0.9.0"
 dependencies = [
  "heck 0.5.0",
@@ -2421,7 +2410,7 @@ dependencies = [
  "inventory",
  "jacquard-api",
  "jacquard-common",
- "jacquard-derive 0.9.0",
+ "jacquard-derive",
  "jacquard-identity",
  "jacquard-lexicon",
  "kdl",
@@ -2439,7 +2428,7 @@ dependencies = [
 
 [[package]]
 name = "jacquard-lexicon"
-version = "0.9.0"
+version = "0.9.1"
 dependencies = [
  "bytes",
  "cid",
@@ -2447,7 +2436,7 @@ dependencies = [
  "heck 0.5.0",
  "inventory",
  "jacquard-common",
- "jacquard-derive 0.8.0",
+ "jacquard-derive",
  "miette",
  "multihash",
  "prettyplease",
@@ -2509,7 +2498,7 @@ dependencies = [
  "hex",
  "iroh-car",
  "jacquard-common",
- "jacquard-derive 0.9.0",
+ "jacquard-derive",
  "k256",
  "miette",
  "multihash",
