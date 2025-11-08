@@ -375,6 +375,17 @@ where
                     formatter.write_str("a CID link object with $link field")
                 }
 
+                fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
+                where
+                    E: serde::de::Error,
+                {
+                    if let Ok(cid) = IpldCid::try_from(v.as_bytes()) {
+                        Ok(CidLink(Cid::ipld(cid)))
+                    } else {
+                        Err(E::custom("invalid CID string"))
+                    }
+                }
+
                 fn visit_map<A>(self, mut map: A) -> Result<Self::Value, A::Error>
                 where
                     A: serde::de::MapAccess<'de>,
