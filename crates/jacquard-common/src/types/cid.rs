@@ -411,7 +411,7 @@ where
                 }
             }
 
-            deserializer.deserialize_map(LinkVisitor)
+            deserializer.deserialize_any(LinkVisitor)
         } else {
             // CBOR: raw CID
             Ok(CidLink(Cid::deserialize(deserializer)?))
