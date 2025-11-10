@@ -1,4 +1,4 @@
-use crate::{CowStr, IntoStatic};
+use crate::{CowStr, IntoStatic, cowstr::ToCowStr};
 pub use cid::Cid as IpldCid;
 use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Visitor};
 use smol_str::ToSmolStr;
@@ -379,11 +379,8 @@ where
                 where
                     E: serde::de::Error,
                 {
-                    if let Ok(cid) = IpldCid::try_from(v.as_bytes()) {
-                        Ok(CidLink(Cid::ipld(cid)))
-                    } else {
-                        Err(E::custom("invalid CID string"))
-                    }
+                    // TODO: currently overly permissive, should fix
+                    Ok(CidLink::cow_str(v.to_cowstr()).into_static())
                 }
 
                 fn visit_map<A>(self, mut map: A) -> Result<Self::Value, A::Error>

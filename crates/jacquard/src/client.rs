@@ -47,6 +47,8 @@ use jacquard_common::types::recordkey::{RecordKey, Rkey};
 use jacquard_common::types::string::AtUri;
 #[cfg(feature = "api")]
 use jacquard_common::types::uri::RecordUri;
+#[cfg(not(target_arch = "wasm32"))]
+use jacquard_common::xrpc::XrpcResponse;
 use jacquard_common::xrpc::{
     CallOptions, Response, XrpcClient, XrpcError, XrpcExt, XrpcRequest, XrpcResp,
 };
@@ -58,6 +60,7 @@ use jacquard_common::{
 use jacquard_identity::resolver::{
     DidDocResponse, IdentityError, IdentityResolver, ResolverOptions,
 };
+use jacquard_identity::{JacquardResolver, slingshot_resolver_default};
 use jacquard_oauth::authstore::ClientAuthStore;
 use jacquard_oauth::client::OAuthSession;
 use jacquard_oauth::dpop::DpopExt;
@@ -66,7 +69,10 @@ use serde::Serialize;
 #[cfg(feature = "api")]
 use std::marker::Send;
 use std::option::Option;
+use std::sync::Arc;
 pub use token::FileAuthStore;
+use tokio::sync::RwLock;
+use url::Url;
 
 /// Identifies the active authentication mode for an agent/session.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -142,6 +148,248 @@ impl BasicClient {
 impl Default for BasicClient {
     fn default() -> Self {
         Self::unauthenticated()
+    }
+}
+pub struct UnauthenticatedSession<T> {
+    resolver: Arc<T>,
+    endpoint: Arc<RwLock<Option<Url>>>,
+    options: Arc<RwLock<CallOptions<'static>>>,
+}
+
+impl Default for UnauthenticatedSession<JacquardResolver> {
+    fn default() -> Self {
+        Self::new_public()
+    }
+}
+
+impl UnauthenticatedSession<JacquardResolver> {
+    pub fn new_public() -> Self {
+        let resolver = Arc::new(JacquardResolver::default());
+        let endpoint = Arc::new(RwLock::new(None));
+        let options = Arc::new(RwLock::new(CallOptions::default()));
+        Self {
+            resolver,
+            endpoint,
+            options,
+        }
+    }
+
+    pub fn new_slingshot() -> Self {
+        let resolver = Arc::new(slingshot_resolver_default());
+        let endpoint = Arc::new(RwLock::new(None));
+        let options = Arc::new(RwLock::new(CallOptions::default()));
+        Self {
+            resolver,
+            endpoint,
+            options,
+        }
+    }
+}
+
+impl<T: HttpClient + Sync> HttpClient for UnauthenticatedSession<T> {
+    type Error = T::Error;
+
+    #[cfg(not(target_arch = "wasm32"))]
+    fn send_http(
+        &self,
+        request: http::Request<Vec<u8>>,
+    ) -> impl Future<Output = core::result::Result<http::Response<Vec<u8>>, T::Error>> + Send {
+        self.resolver.send_http(request)
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    fn send_http(
+        &self,
+        request: http::Request<Vec<u8>>,
+    ) -> impl Future<Output = core::result::Result<http::Response<Vec<u8>>, T::Error>> {
+        self.resolver.send_http(request)
+    }
+}
+
+impl<T: HttpClient> XrpcClient for UnauthenticatedSession<T>
+where
+    T: Sync + Send,
+{
+    #[doc = " Get the base URI for the client."]
+    fn base_uri(&self) -> impl Future<Output = Url> + Send {
+        async move {
+            self.endpoint.read().await.clone().unwrap_or(
+                Url::parse("https://public.bsky.app").expect("public appview should be valid url"),
+            )
+        }
+    }
+
+    #[doc = " Send an XRPC request and parse the response"]
+    #[cfg(not(target_arch = "wasm32"))]
+    fn send<R>(&self, request: R) -> impl Future<Output = XrpcResult<XrpcResponse<R>>> + Send
+    where
+        R: XrpcRequest + Send + Sync,
+        <R as XrpcRequest>::Response: Send + Sync,
+        Self: Sync,
+    {
+        async move {
+            let opts = self.options.read().await.clone();
+            self.send_with_opts(request, opts).await
+        }
+    }
+
+    #[doc = " Send an XRPC request and parse the response"]
+    #[cfg(not(target_arch = "wasm32"))]
+    fn send_with_opts<R>(
+        &self,
+        request: R,
+        opts: CallOptions<'_>,
+    ) -> impl Future<Output = XrpcResult<XrpcResponse<R>>> + Send
+    where
+        R: XrpcRequest + Send + Sync,
+        <R as XrpcRequest>::Response: Send + Sync,
+        Self: Sync,
+    {
+        async move {
+            let base_uri = self.base_uri().await;
+            self.resolver
+                .xrpc(base_uri.clone())
+                .with_options(opts.clone())
+                .send(&request)
+                .await
+        }
+    }
+
+    #[doc = " Send an XRPC request and parse the response"]
+    #[cfg(target_arch = "wasm32")]
+    fn send<R>(&self, request: R) -> impl Future<Output = XrpcResult<XrpcResponse<R>>>
+    where
+        R: XrpcRequest + Send + Sync,
+        <R as XrpcRequest>::Response: Send + Sync,
+    {
+        async move {
+            let opts = self.options.read().await.clone();
+            self.send_with_opts(request, opts).await
+        }
+    }
+
+    #[doc = " Send an XRPC request and parse the response"]
+    #[cfg(target_arch = "wasm32")]
+    fn send_with_opts<R>(
+        &self,
+        request: R,
+        opts: CallOptions<'_>,
+    ) -> impl Future<Output = XrpcResult<XrpcResponse<R>>>
+    where
+        R: XrpcRequest + Send + Sync,
+        <R as XrpcRequest>::Response: Send + Sync,
+    {
+        async move {
+            let base_uri = self.base_uri().await;
+            self.resolver
+                .xrpc(base_uri.clone())
+                .with_options(opts.clone())
+                .send(&request)
+                .await
+        }
+    }
+
+    #[doc = " Set the base URI for the client."]
+    fn set_base_uri(&self, url: Url) -> impl Future<Output = ()> + Send {
+        async move {
+            let mut guard = self.endpoint.write().await;
+            *guard = Some(url);
+        }
+    }
+
+    #[doc = " Get the call options for the client."]
+    fn opts(&self) -> impl Future<Output = CallOptions<'_>> + Send {
+        async move { self.options.read().await.clone() }
+    }
+
+    #[doc = " Set the call options for the client."]
+    fn set_opts(&self, opts: CallOptions<'_>) -> impl Future<Output = ()> + Send {
+        async move {
+            *self.options.write().await = opts.into_static();
+        }
+    }
+}
+
+impl<T: IdentityResolver + HttpClient> AgentSession for UnauthenticatedSession<T>
+where
+    T: Sync + Send,
+{
+    fn session_kind(&self) -> AgentKind {
+        AgentKind::AppPassword
+    }
+
+    fn session_info(
+        &self,
+    ) -> impl Future<Output = Option<(Did<'static>, Option<CowStr<'static>>)>> {
+        async { None } // no session
+    }
+
+    fn endpoint(&self) -> impl Future<Output = Url> {
+        async { self.base_uri().await }
+    }
+
+    #[doc = " Override per-session call options."]
+    fn set_options<'a>(&'a self, opts: CallOptions<'a>) -> impl Future<Output = ()> + Send {
+        async move {
+            *self.options.write().await = opts.into_static();
+        }
+    }
+
+    #[doc = " Refresh the session and return a fresh AuthorizationToken."]
+    fn refresh(&self) -> impl Future<Output = ClientResult<AuthorizationToken<'static>>> + Send {
+        async {
+            Err(ClientError::auth(
+                jacquard_common::error::AuthError::NotAuthenticated,
+            ))
+        }
+    }
+}
+
+impl<T: IdentityResolver + Sync> IdentityResolver for UnauthenticatedSession<T> {
+    #[doc = " Access options for validation decisions in default methods"]
+    fn options(&self) -> &ResolverOptions {
+        self.resolver.options()
+    }
+
+    #[doc = " Resolve handle"]
+    #[cfg(not(target_arch = "wasm32"))]
+    fn resolve_handle(
+        &self,
+        handle: &Handle<'_>,
+    ) -> impl Future<Output = std::result::Result<Did<'static>, IdentityError>> + Send
+    where
+        Self: Sync,
+    {
+        self.resolver.resolve_handle(handle)
+    }
+
+    #[doc = " Resolve DID document"]
+    #[cfg(not(target_arch = "wasm32"))]
+    fn resolve_did_doc(
+        &self,
+        did: &Did<'_>,
+    ) -> impl Future<Output = std::result::Result<DidDocResponse, IdentityError>> + Send
+    where
+        Self: Sync,
+    {
+        self.resolver.resolve_did_doc(did)
+    }
+    #[doc = " Resolve handle"]
+    #[cfg(target_arch = "wasm32")]
+    fn resolve_handle(
+        &self,
+        handle: &Handle<'_>,
+    ) -> impl Future<Output = std::result::Result<Did<'static>, IdentityError>> {
+        self.resolver.resolve_handle(handle)
+    }
+
+    #[doc = " Resolve DID document"]
+    #[cfg(target_arch = "wasm32")]
+    fn resolve_did_doc(
+        &self,
+        did: &Did<'_>,
+    ) -> impl Future<Output = std::result::Result<DidDocResponse, IdentityError>> {
+        self.resolver.resolve_did_doc(did)
     }
 }
 
