@@ -30,6 +30,8 @@ use crate::client::vec_update::VecUpdate;
 use core::future::Future;
 pub use error::*;
 #[cfg(feature = "api")]
+use jacquard_api::com_atproto::repo::get_record::GetRecordOutput;
+#[cfg(feature = "api")]
 use jacquard_api::com_atproto::{
     repo::{
         create_record::CreateRecordOutput, delete_record::DeleteRecordOutput,
@@ -47,7 +49,6 @@ use jacquard_common::types::recordkey::{RecordKey, Rkey};
 use jacquard_common::types::string::AtUri;
 #[cfg(feature = "api")]
 use jacquard_common::types::uri::RecordUri;
-#[cfg(not(target_arch = "wasm32"))]
 use jacquard_common::xrpc::XrpcResponse;
 use jacquard_common::xrpc::{
     CallOptions, Response, XrpcClient, XrpcError, XrpcExt, XrpcRequest, XrpcResp,
@@ -62,7 +63,7 @@ use jacquard_identity::resolver::{
 };
 use jacquard_identity::{JacquardResolver, slingshot_resolver_default};
 use jacquard_oauth::authstore::ClientAuthStore;
-use jacquard_oauth::client::OAuthSession;
+use jacquard_oauth::client::{OAuthClient, OAuthSession};
 use jacquard_oauth::dpop::DpopExt;
 use jacquard_oauth::resolver::OAuthResolver;
 use serde::Serialize;
@@ -506,6 +507,10 @@ impl<A: AgentSession> Agent<A> {
         Self { inner }
     }
 
+    pub fn inner(&self) -> &A {
+        &self.inner
+    }
+
     /// Return the underlying session kind.
     pub fn kind(&self) -> AgentKind {
         self.inner.session_kind()
@@ -757,6 +762,64 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
                 xrpc::process_response(http_response)
             }?;
             Ok(response.transmute())
+        }
+    }
+
+    /// Untyped, freeform record fetcher.
+    /// Hits [https://slingshot.microcosm.blue]
+    fn fetch_record_slingshot(
+        &self,
+        uri: &AtUri<'_>,
+    ) -> impl Future<Output = Result<GetRecordOutput<'static>>> {
+        async move {
+            #[cfg(feature = "tracing")]
+            let _span = tracing::debug_span!("fetch_record_slingshot", uri = %uri).entered();
+
+            // Make stateless XRPC call to that PDS (no auth required for public records)
+            use jacquard_api::com_atproto::repo::get_record::GetRecord;
+            let collection = uri.collection().clone().ok_or(AgentError::sub_operation(
+                "no collection",
+                ClientError::invalid_request("no collection"),
+            ))?;
+            let rkey = uri.rkey().ok_or(AgentError::sub_operation(
+                "no rkey",
+                ClientError::invalid_request("no rkey"),
+            ))?;
+            let request = GetRecord::new()
+                .repo(uri.authority().clone())
+                .collection(collection.clone())
+                .rkey(rkey.clone())
+                .build();
+
+            let response: Response<GetRecordResponse> = {
+                use url::Url;
+
+                let http_request = xrpc::build_http_request(
+                    &Url::parse("https://slingshot.microcosm.blue")
+                        .expect("slingshot url is valid"),
+                    &request,
+                    &self.opts().await,
+                )?;
+
+                let http_response = self
+                    .send_http(http_request)
+                    .await
+                    .map_err(|e| ClientError::transport(e))?;
+
+                xrpc::process_response(http_response)
+            }?;
+            let output = response.into_output().map_err(|e| match e {
+                XrpcError::Auth(auth) => AgentError::from(auth),
+                e @ (XrpcError::Generic(_) | XrpcError::Decode(_)) => AgentError::xrpc(e),
+                XrpcError::Xrpc(typed) => AgentError::new(
+                    AgentErrorKind::SubOperation {
+                        step: "fetch record",
+                    },
+                    None,
+                )
+                .with_details(typed.to_string()),
+            })?;
+            Ok(output)
         }
     }
 
@@ -1165,6 +1228,34 @@ where
                 .await
                 .map(|t| t.into_static())
                 .map_err(|e| ClientError::transport(e).with_context("OAuth token refresh failed"))
+        }
+    }
+}
+
+impl<T, S> AgentSession for OAuthClient<T, S>
+where
+    S: ClientAuthStore + Send + Sync + 'static,
+    T: OAuthResolver + DpopExt + Send + Sync + 'static,
+{
+    fn session_kind(&self) -> AgentKind {
+        AgentKind::OAuth
+    }
+    fn session_info(
+        &self,
+    ) -> impl Future<Output = Option<(Did<'static>, Option<CowStr<'static>>)>> {
+        async { None }
+    }
+    fn endpoint(&self) -> impl Future<Output = url::Url> {
+        async { self.base_uri().await }
+    }
+    fn set_options<'a>(&'a self, opts: CallOptions<'a>) -> impl Future<Output = ()> {
+        async { self.set_opts(opts).await }
+    }
+    fn refresh(&self) -> impl Future<Output = ClientResult<AuthorizationToken<'static>>> {
+        async {
+            Err(ClientError::auth(
+                jacquard_common::error::AuthError::NotAuthenticated,
+            ))
         }
     }
 }

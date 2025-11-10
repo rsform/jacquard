@@ -228,17 +228,24 @@ impl Default for ResolverOptions {
         let mut handle_order = vec![];
         #[cfg(not(target_family = "wasm"))]
         handle_order.push(HandleStep::DnsTxt);
+        #[cfg(not(target_family = "wasm"))]
         handle_order.push(HandleStep::HttpsWellKnown);
         handle_order.push(HandleStep::PdsResolveHandle);
+        #[cfg(target_family = "wasm")]
+        handle_order.push(HandleStep::HttpsWellKnown);
+
+        let mut did_order = vec![];
+        #[cfg(not(target_family = "wasm"))]
+        did_order.push(DidStep::DidWebHttps);
+        did_order.push(DidStep::PlcHttp);
+        did_order.push(DidStep::PdsResolveDid);
+        #[cfg(target_family = "wasm")]
+        did_order.push(DidStep::DidWebHttps);
 
         Self::new()
             .plc_source(PlcSource::default())
             .handle_order(handle_order)
-            .did_order(vec![
-                DidStep::DidWebHttps,
-                DidStep::PlcHttp,
-                DidStep::PdsResolveDid,
-            ])
+            .did_order(did_order)
             .validate_doc_id(true)
             .public_fallback_for_handle(true)
             .build()

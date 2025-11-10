@@ -1,6 +1,7 @@
 use jacquard_common::{CowStr, IntoStatic};
 use jose_jwk::JwkSet;
 use serde::{Deserialize, Serialize};
+use smol_str::SmolStr;
 use url::Url;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
@@ -27,6 +28,14 @@ pub struct OAuthClientMetadata<'c> {
     // https://openid.net/specs/openid-connect-registration-1_0.html#ClientMetadata
     #[serde(skip_serializing_if = "Option::is_none")]
     pub token_endpoint_auth_signing_alg: Option<CowStr<'c>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub client_name: Option<SmolStr>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub logo_uri: Option<Url>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tos_uri: Option<Url>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub privacy_policy_uri: Option<Url>,
 }
 
 impl OAuthClientMetadata<'_> {}
@@ -50,6 +59,10 @@ impl IntoStatic for OAuthClientMetadata<'_> {
             token_endpoint_auth_signing_alg: self
                 .token_endpoint_auth_signing_alg
                 .map(|alg| alg.into_static()),
+            client_name: self.client_name,
+            logo_uri: self.logo_uri,
+            tos_uri: self.tos_uri,
+            privacy_policy_uri: self.privacy_policy_uri,
         }
     }
 }

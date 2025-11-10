@@ -237,6 +237,19 @@ pub struct ClientData<'s> {
     pub config: AtprotoClientMetadata<'s>,
 }
 
+impl<'s> ClientData<'s> {
+    pub fn new(keyset: Option<Keyset>, config: AtprotoClientMetadata<'s>) -> Self {
+        Self { keyset, config }
+    }
+
+    pub fn new_public(config: AtprotoClientMetadata<'s>) -> Self {
+        Self {
+            keyset: None,
+            config,
+        }
+    }
+}
+
 pub struct ClientSession<'s> {
     pub keyset: Option<Keyset>,
     pub config: AtprotoClientMetadata<'s>,

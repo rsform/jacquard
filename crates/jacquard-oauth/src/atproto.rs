@@ -4,6 +4,7 @@ use crate::types::OAuthClientMetadata;
 use crate::{keyset::Keyset, scopes::Scope};
 use jacquard_common::CowStr;
 use serde::{Deserialize, Serialize};
+use smol_str::{SmolStr, ToSmolStr};
 use thiserror::Error;
 use url::Url;
 
@@ -85,6 +86,10 @@ pub struct AtprotoClientMetadata<'m> {
     #[serde(borrow)]
     pub scopes: Vec<Scope<'m>>,
     pub jwks_uri: Option<Url>,
+    pub client_name: Option<SmolStr>,
+    pub logo_uri: Option<Url>,
+    pub tos_uri: Option<Url>,
+    pub privacy_policy_uri: Option<Url>,
 }
 
 impl<'m> AtprotoClientMetadata<'m> {
@@ -103,7 +108,25 @@ impl<'m> AtprotoClientMetadata<'m> {
             grant_types,
             scopes,
             jwks_uri,
+            client_name: None,
+            logo_uri: None,
+            tos_uri: None,
+            privacy_policy_uri: None,
         }
+    }
+
+    pub fn with_prod_info(
+        mut self,
+        client_name: &str,
+        logo_uri: Option<Url>,
+        tos_uri: Option<Url>,
+        privacy_policy_uri: Option<Url>,
+    ) -> Self {
+        self.client_name = Some(client_name.to_smolstr());
+        self.logo_uri = logo_uri;
+        self.tos_uri = tos_uri;
+        self.privacy_policy_uri = privacy_policy_uri;
+        self
     }
 
     pub fn default_localhost() -> Self {
@@ -155,6 +178,10 @@ impl<'m> AtprotoClientMetadata<'m> {
             grant_types: vec![GrantType::AuthorizationCode, GrantType::RefreshToken],
             scopes: scopes.unwrap_or(vec![Scope::Atproto]),
             jwks_uri: None,
+            client_name: None,
+            logo_uri: None,
+            tos_uri: None,
+            privacy_policy_uri: None,
         }
     }
 }
@@ -208,6 +235,10 @@ pub fn atproto_client_metadata<'m>(
         } else {
             None
         },
+        client_name: metadata.client_name,
+        logo_uri: metadata.logo_uri,
+        tos_uri: metadata.tos_uri,
+        privacy_policy_uri: metadata.privacy_policy_uri,
     })
 }
 
@@ -247,6 +278,10 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
                 jwks_uri: None,
                 jwks: None,
                 token_endpoint_auth_signing_alg: None,
+                tos_uri: None,
+                privacy_policy_uri: None,
+                client_name: None,
+                logo_uri: None,
             }
         );
     }
@@ -285,6 +320,10 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
                 jwks_uri: None,
                 jwks: None,
                 token_endpoint_auth_signing_alg: None,
+                tos_uri: None,
+                privacy_policy_uri: None,
+                client_name: None,
+                logo_uri: None,
             }
         );
     }
@@ -317,6 +356,10 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
                     jwks_uri: None,
                     jwks: None,
                     token_endpoint_auth_signing_alg: None,
+                    tos_uri: None,
+                    privacy_policy_uri: None,
+                    client_name: None,
+                    logo_uri: None,
                 }
             );
         }
@@ -345,6 +388,10 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
                     jwks_uri: None,
                     jwks: None,
                     token_endpoint_auth_signing_alg: None,
+                    tos_uri: None,
+                    privacy_policy_uri: None,
+                    client_name: None,
+                    logo_uri: None,
                 }
             );
         }
@@ -373,6 +420,10 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
                     jwks_uri: None,
                     jwks: None,
                     token_endpoint_auth_signing_alg: None,
+                    tos_uri: None,
+                    privacy_policy_uri: None,
+                    client_name: None,
+                    logo_uri: None,
                 }
             );
         }
@@ -387,6 +438,10 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
             grant_types: vec![GrantType::AuthorizationCode],
             scopes: vec![Scope::Atproto],
             jwks_uri: None,
+            client_name: None,
+            logo_uri: None,
+            tos_uri: None,
+            privacy_policy_uri: None,
         };
         {
             // Non-loopback clients without a keyset should fail (must provide JWKS)
@@ -420,6 +475,10 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
                     jwks_uri: None,
                     jwks: Some(keyset.public_jwks()),
                     token_endpoint_auth_signing_alg: Some(CowStr::new_static("ES256")),
+                    client_name: None,
+                    logo_uri: None,
+                    tos_uri: None,
+                    privacy_policy_uri: None,
                 }
             );
         }

@@ -495,6 +495,12 @@ pub async fn par<'r, T: OAuthResolver + DpopExt + Send + Sync + 'static>(
         login_hint: login_hint,
         prompt: prompt.map(CowStr::from),
     };
+
+    #[cfg(feature = "tracing")]
+    tracing::debug!(
+        parameters = ?parameters,
+        "par:"
+    );
     if metadata
         .server_metadata
         .pushed_authorization_request_endpoint
@@ -937,6 +943,10 @@ mod tests {
                 jwks_uri: None,
                 jwks: None,
                 token_endpoint_auth_signing_alg: None,
+                client_name: None,
+                privacy_policy_uri: None,
+                tos_uri: None,
+                logo_uri: None,
             },
             keyset: None,
         }

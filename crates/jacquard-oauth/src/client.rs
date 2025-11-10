@@ -39,6 +39,8 @@ where
     S: ClientAuthStore,
 {
     pub registry: Arc<SessionRegistry<T, S>>,
+    pub options: RwLock<CallOptions<'static>>,
+    pub endpoint: RwLock<Option<Url>>,
     pub client: Arc<T>,
 }
 
@@ -106,12 +108,17 @@ where
             redirect_uris = ?client_data.config.redirect_uris,
             scopes = ?client_data.config.scopes,
             has_keyset = client_data.keyset.is_some(),
-            "oauth client created"
+            "oauth client created:"
         );
 
         let client = Arc::new(client);
         let registry = Arc::new(SessionRegistry::new(store, client.clone(), client_data));
-        Self { registry, client }
+        Self {
+            registry,
+            client,
+            options: RwLock::new(CallOptions::default()),
+            endpoint: RwLock::new(None),
+        }
     }
 
     pub fn new_with_shared(
@@ -124,7 +131,12 @@ where
             client.clone(),
             client_data,
         ));
-        Self { registry, client }
+        Self {
+            registry,
+            client,
+            options: RwLock::new(CallOptions::default()),
+            endpoint: RwLock::new(None),
+        }
     }
 }
 
@@ -151,7 +163,6 @@ where
             self.registry.client_data.config.clone(),
             &self.registry.client_data.keyset,
         )?;
-
         let (server_metadata, identity) = self.client.resolve_oauth(input.as_ref()).await?;
         let login_hint = if identity.is_some() {
             Some(input.as_ref().into())
@@ -163,8 +174,10 @@ where
             client_metadata,
             keyset: self.registry.client_data.keyset.clone(),
         };
+
         let auth_req_info =
             par(self.client.as_ref(), login_hint, options.prompt, &metadata).await?;
+
         // Persist state for callback handling
         self.registry
             .store
@@ -284,6 +297,97 @@ where
     }
 }
 
+impl<T, S> HttpClient for OAuthClient<T, S>
+where
+    S: ClientAuthStore + Send + Sync + 'static,
+    T: OAuthResolver + DpopExt + Send + Sync + 'static,
+{
+    type Error = T::Error;
+
+    async fn send_http(
+        &self,
+        request: http::Request<Vec<u8>>,
+    ) -> core::result::Result<http::Response<Vec<u8>>, Self::Error> {
+        self.client.send_http(request).await
+    }
+}
+
+impl<T, S> IdentityResolver for OAuthClient<T, S>
+where
+    S: ClientAuthStore + Send + Sync + 'static,
+    T: OAuthResolver + DpopExt + Send + Sync + 'static,
+{
+    fn options(&self) -> &ResolverOptions {
+        self.client.options()
+    }
+
+    async fn resolve_handle(
+        &self,
+        handle: &Handle<'_>,
+    ) -> jacquard_identity::resolver::Result<Did<'static>> {
+        self.client.resolve_handle(handle).await
+    }
+
+    async fn resolve_did_doc(
+        &self,
+        did: &Did<'_>,
+    ) -> jacquard_identity::resolver::Result<DidDocResponse> {
+        self.client.resolve_did_doc(did).await
+    }
+}
+
+impl<T, S> XrpcClient for OAuthClient<T, S>
+where
+    S: ClientAuthStore + Send + Sync + 'static,
+    T: OAuthResolver + DpopExt + Send + Sync + 'static,
+{
+    async fn base_uri(&self) -> Url {
+        self.endpoint.read().await.clone().unwrap_or(
+            Url::parse("https://public.api.bsky.app").expect("public appview should be valid url"),
+        )
+    }
+
+    async fn opts(&self) -> CallOptions<'_> {
+        self.options.read().await.clone()
+    }
+
+    async fn set_opts(&self, opts: CallOptions<'_>) {
+        let mut guard = self.options.write().await;
+        *guard = opts.into_static();
+    }
+
+    async fn set_base_uri(&self, url: Url) {
+        let mut guard = self.endpoint.write().await;
+        *guard = Some(url);
+    }
+
+    async fn send<R>(&self, request: R) -> XrpcResult<XrpcResponse<R>>
+    where
+        R: XrpcRequest + Send + Sync,
+        <R as XrpcRequest>::Response: Send + Sync,
+    {
+        let opts = self.options.read().await.clone();
+        self.send_with_opts(request, opts).await
+    }
+
+    async fn send_with_opts<R>(
+        &self,
+        request: R,
+        opts: CallOptions<'_>,
+    ) -> XrpcResult<XrpcResponse<R>>
+    where
+        R: XrpcRequest + Send + Sync,
+        <R as XrpcRequest>::Response: Send + Sync,
+    {
+        let base_uri = self.base_uri().await;
+        self.client
+            .xrpc(base_uri.clone())
+            .with_options(opts.clone())
+            .send(&request)
+            .await
+    }
+}
+
 pub struct OAuthSession<T, S, W = ()>
 where
     T: OAuthResolver,
@@ -377,6 +481,10 @@ where
             .as_ref()
             .map(|t| AuthorizationToken::Dpop(t.clone()))
     }
+
+    pub fn to_client(&self) -> OAuthClient<T, S> {
+        OAuthClient::from_session(self)
+    }
 }
 impl<T, S, W> OAuthSession<T, S, W>
 where
@@ -411,6 +519,8 @@ where
         Self {
             registry: session.registry.clone(),
             client: session.client.clone(),
+            options: RwLock::new(CallOptions::default()),
+            endpoint: RwLock::new(None),
         }
     }
 }
