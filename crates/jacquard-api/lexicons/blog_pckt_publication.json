@@ -1,7 +1,7 @@
 {
   "lexicon": 1,
   "id": "blog.pckt.publication",
-  "description": "A publication record with core metadata, plus slots for theme and extensions for additional features.",
+  "description": "A publication (blog) record representing a collection of documents. Contains metadata, branding, theme configuration, and optional extensions. Publications serve as the parent container for blog documents.",
   "defs": {
     "main": {
       "type": "record",
@@ -16,8 +16,9 @@
         "properties": {
           "basePath": {
             "type": "string",
-            "description": "Base URL path for the publication ex https://blog.pckt.blog",
-            "format": "uri"
+            "description": "Base URL path for the publication (e.g., https://blog.pckt.blog)",
+            "format": "uri",
+            "maxLength": 2000
           },
           "createdAt": {
             "type": "string",
@@ -26,8 +27,9 @@
           },
           "description": {
             "type": "string",
-            "description": "Publication description",
-            "maxLength": 2000
+            "description": "Publication description or tagline",
+            "maxLength": 2000,
+            "maxGraphemes": 500
           },
           "extensions": {
             "type": "array",
@@ -54,7 +56,8 @@
           "name": {
             "type": "string",
             "description": "Publication name/title",
-            "maxLength": 200
+            "maxLength": 200,
+            "maxGraphemes": 100
           },
           "theme": {
             "type": "union",

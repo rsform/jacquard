@@ -19,13 +19,9 @@
 #[serde(rename_all = "camelCase")]
 pub struct Root<'a> {
     #[serde(borrow)]
-    pub cid: jacquard_common::types::string::Cid<'a>,
-    #[serde(borrow)]
     pub doc: crate::sh_weaver::edit::DocRef<'a>,
     #[serde(borrow)]
     pub snapshot: jacquard_common::types::blob::BlobRef<'a>,
-    #[serde(borrow)]
-    pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
 pub mod root_state {
@@ -38,8 +34,6 @@ pub mod root_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
-        type Uri;
         type Doc;
         type Snapshot;
     }
@@ -47,35 +41,13 @@ pub mod root_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
-        type Uri = Unset;
         type Doc = Unset;
         type Snapshot = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Cid = Set<members::cid>;
-        type Uri = S::Uri;
-        type Doc = S::Doc;
-        type Snapshot = S::Snapshot;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Cid = S::Cid;
-        type Uri = Set<members::uri>;
-        type Doc = S::Doc;
-        type Snapshot = S::Snapshot;
     }
     ///State transition - sets the `doc` field to Set
     pub struct SetDoc<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDoc<S> {}
     impl<S: State> State for SetDoc<S> {
-        type Cid = S::Cid;
-        type Uri = S::Uri;
         type Doc = Set<members::doc>;
         type Snapshot = S::Snapshot;
     }
@@ -83,18 +55,12 @@ pub mod root_state {
     pub struct SetSnapshot<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSnapshot<S> {}
     impl<S: State> State for SetSnapshot<S> {
-        type Cid = S::Cid;
-        type Uri = S::Uri;
         type Doc = S::Doc;
         type Snapshot = Set<members::snapshot>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `doc` field
         pub struct doc(());
         ///Marker type for the `snapshot` field
@@ -106,10 +72,8 @@ pub mod root_state {
 pub struct RootBuilder<'a, S: root_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
         ::core::option::Option<crate::sh_weaver::edit::DocRef<'a>>,
         ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -126,26 +90,7 @@ impl<'a> RootBuilder<'a, root_state::Empty> {
     pub fn new() -> Self {
         RootBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> RootBuilder<'a, S>
-where
-    S: root_state::State,
-    S::Cid: root_state::IsUnset,
-{
-    /// Set the `cid` field (required)
-    pub fn cid(
-        mut self,
-        value: impl Into<jacquard_common::types::string::Cid<'a>>,
-    ) -> RootBuilder<'a, root_state::SetCid<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
-        RootBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
+            __unsafe_private_named: (None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -161,7 +106,7 @@ where
         mut self,
         value: impl Into<crate::sh_weaver::edit::DocRef<'a>>,
     ) -> RootBuilder<'a, root_state::SetDoc<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
         RootBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -180,7 +125,7 @@ where
         mut self,
         value: impl Into<jacquard_common::types::blob::BlobRef<'a>>,
     ) -> RootBuilder<'a, root_state::SetSnapshot<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
         RootBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -192,37 +137,14 @@ where
 impl<'a, S> RootBuilder<'a, S>
 where
     S: root_state::State,
-    S::Uri: root_state::IsUnset,
-{
-    /// Set the `uri` field (required)
-    pub fn uri(
-        mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
-    ) -> RootBuilder<'a, root_state::SetUri<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
-        RootBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> RootBuilder<'a, S>
-where
-    S: root_state::State,
-    S::Cid: root_state::IsSet,
-    S::Uri: root_state::IsSet,
     S::Doc: root_state::IsSet,
     S::Snapshot: root_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Root<'a> {
         Root {
-            cid: self.__unsafe_private_named.0.unwrap(),
-            doc: self.__unsafe_private_named.1.unwrap(),
-            snapshot: self.__unsafe_private_named.2.unwrap(),
-            uri: self.__unsafe_private_named.3.unwrap(),
+            doc: self.__unsafe_private_named.0.unwrap(),
+            snapshot: self.__unsafe_private_named.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -235,10 +157,8 @@ where
         >,
     ) -> Root<'a> {
         Root {
-            cid: self.__unsafe_private_named.0.unwrap(),
-            doc: self.__unsafe_private_named.1.unwrap(),
-            snapshot: self.__unsafe_private_named.2.unwrap(),
-            uri: self.__unsafe_private_named.3.unwrap(),
+            doc: self.__unsafe_private_named.0.unwrap(),
+            snapshot: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -345,8 +265,6 @@ fn lexicon_doc_sh_weaver_edit_root() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("cid"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("uri"),
                                 ::jacquard_common::smol_str::SmolStr::new_static("doc"),
                                 ::jacquard_common::smol_str::SmolStr::new_static("snapshot")
                             ],
@@ -355,23 +273,6 @@ fn lexicon_doc_sh_weaver_edit_root() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("cid"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Cid,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
-                            );
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static("doc"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -389,23 +290,6 @@ fn lexicon_doc_sh_weaver_edit_root() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                                     description: None,
                                     accept: None,
                                     max_size: None,
-                                }),
-                            );
-                            map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("uri"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
                                 }),
                             );
                             map

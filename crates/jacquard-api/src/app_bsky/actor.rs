@@ -2125,16 +2125,6 @@ fn lexicon_doc_app_bsky_actor_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
-                                "prioritizeFollowedUsers",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
-                            }),
-                        );
-                        map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("sort"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
@@ -7111,9 +7101,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StatusView<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ThreadViewPref<'a> {
-    /// Show followed users at the top of all replies.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub prioritize_followed_users: std::option::Option<bool>,
     /// Sorting mode for threads.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]

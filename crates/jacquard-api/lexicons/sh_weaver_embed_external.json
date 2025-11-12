@@ -3,7 +3,7 @@
   "id": "sh.weaver.embed.external",
   "description": "A set of records embedded in a blog post.",
   "defs": {
-    "external": {
+    "externalEmbed": {
       "type": "object",
       "required": [
         "uri",
@@ -40,7 +40,7 @@
           "type": "array",
           "items": {
             "type": "ref",
-            "ref": "#external"
+            "ref": "#externalEmbed"
           },
           "maxLength": 48
         }
@@ -53,8 +53,12 @@
       ],
       "properties": {
         "external": {
-          "type": "ref",
-          "ref": "#viewExternal"
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#viewExternal"
+          },
+          "maxLength": 48
         }
       }
     },

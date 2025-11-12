@@ -1,0 +1,24 @@
+{
+  "lexicon": 1,
+  "id": "blog.pckt.block.paragraph",
+  "description": "A paragraph block containing inline text content with optional formatting. Paragraphs are the basic unit of text content in documents.",
+  "defs": {
+    "main": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "array",
+          "description": "Array of inline content nodes (text and hard breaks)",
+          "items": {
+            "type": "union",
+            "refs": [
+              "blog.pckt.block.text",
+              "blog.pckt.block.hardBreak"
+            ],
+            "closed": false
+          }
+        }
+      }
+    }
+  }
+}

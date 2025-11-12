@@ -144,6 +144,50 @@ impl<'s> Data<'s> {
         }
     }
 
+    /// Get as object if this is an Object variant
+    pub fn as_object_mut<'a>(&'a mut self) -> Option<&'a mut Object<'s>> {
+        if let Data::Object(obj) = self {
+            Some(obj)
+        } else {
+            None
+        }
+    }
+
+    /// Get as array if this is an Array variant
+    pub fn as_array_mut<'a>(&'a mut self) -> Option<&'a mut Array<'s>> {
+        if let Data::Array(arr) = self {
+            Some(arr)
+        } else {
+            None
+        }
+    }
+
+    /// Get as string if this is a String variant
+    pub fn as_str_mut(&'s mut self) -> Option<&'s mut AtprotoStr> {
+        if let Data::String(s) = self {
+            Some(s)
+        } else {
+            None
+        }
+    }
+
+    /// Get as integer if this is an Integer variant
+    pub fn as_integer_mut(&mut self) -> Option<&mut i64> {
+        if let Data::Integer(i) = self {
+            Some(i)
+        } else {
+            None
+        }
+    }
+
+    pub fn as_boolean_mut(&mut self) -> Option<&mut bool> {
+        if let Data::Boolean(b) = self {
+            Some(b)
+        } else {
+            None
+        }
+    }
+
     /// Get as integer if this is an Integer variant
     pub fn as_integer(&self) -> Option<i64> {
         if let Data::Integer(i) = self {
@@ -200,6 +244,19 @@ impl<'s> Data<'s> {
     /// ```
     pub fn get_at_path(&'s self, path: &str) -> Option<&'s Data<'s>> {
         parse_and_traverse_path(self, path)
+    }
+
+    pub fn get_at_path_mut(&mut self, path: &str) -> Option<&mut Data<'s>> {
+        parse_and_traverse_path_mut(self, path)
+    }
+
+    pub fn set_at_path(&mut self, path: &str, new_data: Data<'_>) -> bool {
+        if let Some(data) = parse_and_traverse_path_mut(self, path) {
+            *data = new_data.into_static();
+            true
+        } else {
+            false
+        }
     }
 
     /// Query data with pattern matching
@@ -287,6 +344,10 @@ impl<'s> Array<'s> {
         self.0.get(index)
     }
 
+    pub fn get_mut(&mut self, index: usize) -> Option<&mut Data<'s>> {
+        self.0.get_mut(index)
+    }
+
     /// Get an iterator over the array elements
     pub fn iter(&self) -> std::slice::Iter<'_, Data<'s>> {
         self.0.iter()
@@ -333,6 +394,10 @@ impl<'s> Object<'s> {
     /// Get a value by key
     pub fn get(&self, key: &str) -> Option<&Data<'s>> {
         self.0.get(key)
+    }
+
+    pub fn get_mut(&mut self, key: &str) -> Option<&mut Data<'s>> {
+        self.0.get_mut(key)
     }
 
     /// Check if a key exists in the object
@@ -580,6 +645,42 @@ impl<'d> RawData<'d> {
         }
     }
 
+    /// get as object if this is an Object variant
+    pub fn as_object_mut(&mut self) -> Option<&mut BTreeMap<SmolStr, RawData<'d>>> {
+        if let RawData::Object(obj) = self {
+            Some(obj)
+        } else {
+            None
+        }
+    }
+
+    /// Get as array if this is an Array variant
+    pub fn as_array_mut(&mut self) -> Option<&mut Vec<RawData<'d>>> {
+        if let RawData::Array(arr) = self {
+            Some(arr)
+        } else {
+            None
+        }
+    }
+
+    /// Get as string if this is a String variant
+    pub fn as_str_mut(&mut self) -> Option<&mut CowStr<'d>> {
+        if let RawData::String(s) = self {
+            Some(s)
+        } else {
+            None
+        }
+    }
+
+    /// Get as boolean if this is a Boolean variant
+    pub fn as_boolean_mut(&mut self) -> Option<&mut bool> {
+        if let RawData::Boolean(b) = self {
+            Some(b)
+        } else {
+            None
+        }
+    }
+
     /// Check if this is a null value
     pub fn is_null(&self) -> bool {
         matches!(self, RawData::Null)
@@ -620,6 +721,10 @@ impl<'d> RawData<'d> {
     /// ```
     pub fn get_at_path(&'d self, path: &str) -> Option<&'d RawData<'d>> {
         parse_and_traverse_raw_path(self, path)
+    }
+
+    pub fn get_at_path_mut<'a>(&'a mut self, path: &str) -> Option<&'a mut RawData<'d>> {
+        parse_and_traverse_raw_path_mut(self, path)
     }
 
     /// Convert a CBOR-encoded byte slice into a `RawData` value.
@@ -902,6 +1007,74 @@ fn parse_and_traverse_raw_path<'d>(data: &'d RawData<'d>, path: &str) -> Option<
     Some(current)
 }
 
+/// Parse and traverse a path through nested Data structures
+fn parse_and_traverse_path_mut<'d, 's>(
+    data: &'s mut Data<'d>,
+    path: &str,
+) -> Option<&'s mut Data<'d>> {
+    let mut current = data;
+    let mut path = path.trim_start_matches('.');
+
+    while !path.is_empty() {
+        if path.starts_with('[') {
+            // Array index: [N]
+            let idx_end = path.find(']')?;
+            let idx_str = &path[1..idx_end];
+            let idx: usize = idx_str.parse().ok()?;
+
+            current = current.as_array_mut()?.get_mut(idx)?;
+            path = &path[idx_end + 1..].trim_start_matches('.');
+        } else {
+            // Field access: extract next segment (up to '.' or '[')
+            let next_sep = path.find(&['.', '['][..]).unwrap_or(path.len());
+            let field = &path[..next_sep];
+
+            if field.is_empty() {
+                break;
+            }
+
+            current = current.as_object_mut()?.get_mut(field)?;
+            path = &path[next_sep..].trim_start_matches('.');
+        }
+    }
+
+    Some(current)
+}
+
+/// Parse and traverse a path through nested RawData structures
+fn parse_and_traverse_raw_path_mut<'a, 'd>(
+    data: &'a mut RawData<'d>,
+    path: &str,
+) -> Option<&'a mut RawData<'d>> {
+    let mut current = data;
+    let mut path = path.trim_start_matches('.');
+
+    while !path.is_empty() {
+        if path.starts_with('[') {
+            // Array index: [N]
+            let idx_end = path.find(']')?;
+            let idx_str = &path[1..idx_end];
+            let idx: usize = idx_str.parse().ok()?;
+
+            current = current.as_array_mut()?.get_mut(idx)?;
+            path = &path[idx_end + 1..].trim_start_matches('.');
+        } else {
+            // Field access: extract next segment (up to '.' or '[')
+            let next_sep = path.find(&['.', '['][..]).unwrap_or(path.len());
+            let field = &path[..next_sep];
+
+            if field.is_empty() {
+                break;
+            }
+
+            current = current.as_object_mut()?.get_mut(field as &str)?;
+            path = &path[next_sep..].trim_start_matches('.');
+        }
+    }
+
+    Some(current)
+}
+
 /// Result of a data query operation
 #[derive(Debug, Clone, PartialEq)]
 pub enum QueryResult<'s> {
@@ -1055,7 +1228,9 @@ fn query_data<'s>(data: &'s Data<'s>, pattern: &str) -> QueryResult<'s> {
 
     // Determine result type based on segment types before consuming segments
     let has_wildcard = segments.iter().any(|s| matches!(s, QuerySegment::Wildcard));
-    let has_global = segments.iter().any(|s| matches!(s, QuerySegment::GlobalRecursion(_)));
+    let has_global = segments
+        .iter()
+        .any(|s| matches!(s, QuerySegment::GlobalRecursion(_)));
 
     for segment in segments {
         results = execute_segment(&results, &segment);

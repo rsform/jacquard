@@ -1,0 +1,23 @@
+{
+  "lexicon": 1,
+  "id": "blog.pckt.block.bulletList",
+  "description": "Unordered list with bullet points. Each item can contain rich content including nested lists.",
+  "defs": {
+    "main": {
+      "type": "object",
+      "required": [
+        "content"
+      ],
+      "properties": {
+        "content": {
+          "type": "array",
+          "description": "Array of list items",
+          "items": {
+            "type": "ref",
+            "ref": "blog.pckt.block.listItem"
+          }
+        }
+      }
+    }
+  }
+}

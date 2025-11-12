@@ -30,6 +30,9 @@ pub struct Book<'a> {
     pub tags: Option<crate::sh_weaver::notebook::Tags<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
+    pub theme: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
     pub title: Option<crate::sh_weaver::notebook::Title<'a>>,
 }
 
@@ -85,6 +88,7 @@ pub struct BookBuilder<'a, S: book_state::State> {
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
         ::core::option::Option<crate::sh_weaver::notebook::Tags<'a>>,
+        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
         ::core::option::Option<crate::sh_weaver::notebook::Title<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
@@ -102,7 +106,7 @@ impl<'a> BookBuilder<'a, book_state::Empty> {
     pub fn new() -> Self {
         BookBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
+            __unsafe_private_named: (None, None, None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -185,12 +189,31 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 }
 
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
+    /// Set the `theme` field (optional)
+    pub fn theme(
+        mut self,
+        value: impl Into<Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `theme` field to an Option value (optional)
+    pub fn maybe_theme(
+        mut self,
+        value: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `title` field (optional)
     pub fn title(
         mut self,
         value: impl Into<Option<crate::sh_weaver::notebook::Title<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
@@ -198,7 +221,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<crate::sh_weaver::notebook::Title<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self.__unsafe_private_named.5 = value;
         self
     }
 }
@@ -216,7 +239,8 @@ where
             created_at: self.__unsafe_private_named.1,
             entry_list: self.__unsafe_private_named.2.unwrap(),
             tags: self.__unsafe_private_named.3,
-            title: self.__unsafe_private_named.4,
+            theme: self.__unsafe_private_named.4,
+            title: self.__unsafe_private_named.5,
             extra_data: Default::default(),
         }
     }
@@ -233,7 +257,8 @@ where
             created_at: self.__unsafe_private_named.1,
             entry_list: self.__unsafe_private_named.2.unwrap(),
             tags: self.__unsafe_private_named.3,
-            title: self.__unsafe_private_named.4,
+            theme: self.__unsafe_private_named.4,
+            title: self.__unsafe_private_named.5,
             extra_data: Some(extra_data),
         }
     }
@@ -407,6 +432,15 @@ fn lexicon_doc_sh_weaver_notebook_book() -> ::jacquard_lexicon::lexicon::Lexicon
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static(
                                         "sh.weaver.notebook.defs#tags",
+                                    ),
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static("theme"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "com.atproto.repo.strongRef",
                                     ),
                                 }),
                             );

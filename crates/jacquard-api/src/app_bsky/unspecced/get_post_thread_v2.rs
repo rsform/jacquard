@@ -27,9 +27,6 @@ pub struct GetPostThreadV2<'a> {
     ///(default: 10, min: 0, max: 100)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub branching_factor: std::option::Option<i64>,
-    /// (default: false)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub prioritize_followed_users: std::option::Option<bool>,
     ///(default: "oldest")
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -76,7 +73,6 @@ pub struct GetPostThreadV2Builder<'a, S: get_post_thread_v2_state::State> {
         ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
         ::core::option::Option<i64>,
         ::core::option::Option<i64>,
-        ::core::option::Option<bool>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
@@ -94,7 +90,7 @@ impl<'a> GetPostThreadV2Builder<'a, get_post_thread_v2_state::Empty> {
     pub fn new() -> Self {
         GetPostThreadV2Builder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
+            __unsafe_private_named: (None, None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -159,30 +155,17 @@ impl<'a, S: get_post_thread_v2_state::State> GetPostThreadV2Builder<'a, S> {
 }
 
 impl<'a, S: get_post_thread_v2_state::State> GetPostThreadV2Builder<'a, S> {
-    /// Set the `prioritizeFollowedUsers` field (optional)
-    pub fn prioritize_followed_users(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
-        self
-    }
-    /// Set the `prioritizeFollowedUsers` field to an Option value (optional)
-    pub fn maybe_prioritize_followed_users(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.4 = value;
-        self
-    }
-}
-
-impl<'a, S: get_post_thread_v2_state::State> GetPostThreadV2Builder<'a, S> {
     /// Set the `sort` field (optional)
     pub fn sort(
         mut self,
         value: impl Into<Option<jacquard_common::CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `sort` field to an Option value (optional)
     pub fn maybe_sort(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self.__unsafe_private_named.4 = value;
         self
     }
 }
@@ -199,8 +182,7 @@ where
             anchor: self.__unsafe_private_named.1.unwrap(),
             below: self.__unsafe_private_named.2,
             branching_factor: self.__unsafe_private_named.3,
-            prioritize_followed_users: self.__unsafe_private_named.4,
-            sort: self.__unsafe_private_named.5,
+            sort: self.__unsafe_private_named.4,
         }
     }
 }
@@ -550,16 +532,6 @@ fn lexicon_doc_app_bsky_unspecced_getPostThreadV2() -> ::jacquard_lexicon::lexic
                                         minimum: None,
                                         maximum: None,
                                         r#enum: None,
-                                        r#const: None,
-                                    }),
-                                );
-                                map.insert(
-                                    ::jacquard_common::smol_str::SmolStr::new_static(
-                                        "prioritizeFollowedUsers",
-                                    ),
-                                    ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                        description: None,
-                                        default: None,
                                         r#const: None,
                                     }),
                                 );

@@ -1,0 +1,115 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.notebook.theme",
+  "defs": {
+    "codeThemeFile": {
+      "type": "object",
+      "required": [
+        "name",
+        "did",
+        "content"
+      ],
+      "properties": {
+        "content": {
+          "type": "blob",
+          "accept": [
+            "*/*"
+          ],
+          "maxSize": 20000
+        },
+        "did": {
+          "type": "string",
+          "format": "did"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "codeThemeName": {
+      "type": "string"
+    },
+    "main": {
+      "type": "record",
+      "description": "Theme for a notebook",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "darkScheme",
+          "lightScheme",
+          "fonts",
+          "spacing",
+          "darkCodeTheme",
+          "lightCodeTheme"
+        ],
+        "properties": {
+          "darkCodeTheme": {
+            "type": "union",
+            "description": "Syntax highlighting theme for dark mode",
+            "refs": [
+              "#codeThemeName",
+              "#codeThemeFile"
+            ]
+          },
+          "darkScheme": {
+            "type": "ref",
+            "description": "Reference to a dark colour scheme",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "fonts": {
+            "type": "object",
+            "required": [
+              "body",
+              "heading",
+              "monospace"
+            ],
+            "properties": {
+              "body": {
+                "type": "string"
+              },
+              "heading": {
+                "type": "string"
+              },
+              "monospace": {
+                "type": "string"
+              }
+            }
+          },
+          "lightCodeTheme": {
+            "type": "union",
+            "description": "Syntax highlighting theme for light mode",
+            "refs": [
+              "#codeThemeName",
+              "#codeThemeFile"
+            ]
+          },
+          "lightScheme": {
+            "type": "ref",
+            "description": "Reference to a light colour scheme",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "spacing": {
+            "type": "object",
+            "required": [
+              "baseSize",
+              "lineHeight",
+              "scale"
+            ],
+            "properties": {
+              "baseSize": {
+                "type": "string"
+              },
+              "lineHeight": {
+                "type": "string"
+              },
+              "scale": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

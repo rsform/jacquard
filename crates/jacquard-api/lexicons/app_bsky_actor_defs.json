@@ -743,10 +743,6 @@
     "threadViewPref": {
       "type": "object",
       "properties": {
-        "prioritizeFollowedUsers": {
-          "type": "boolean",
-          "description": "Show followed users at the top of all replies."
-        },
         "sort": {
           "type": "string",
           "description": "Sorting mode for threads.",

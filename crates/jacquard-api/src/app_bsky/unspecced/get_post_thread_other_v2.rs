@@ -18,9 +18,6 @@
 pub struct GetPostThreadOtherV2<'a> {
     #[serde(borrow)]
     pub anchor: jacquard_common::types::string::AtUri<'a>,
-    /// (default: false)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub prioritize_followed_users: std::option::Option<bool>,
 }
 
 pub mod get_post_thread_other_v2_state {
@@ -60,7 +57,6 @@ pub struct GetPostThreadOtherV2Builder<'a, S: get_post_thread_other_v2_state::St
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<bool>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -80,7 +76,7 @@ impl<'a> GetPostThreadOtherV2Builder<'a, get_post_thread_other_v2_state::Empty> 
     pub fn new() -> Self {
         GetPostThreadOtherV2Builder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None),
+            __unsafe_private_named: (None,),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -105,19 +101,6 @@ where
     }
 }
 
-impl<'a, S: get_post_thread_other_v2_state::State> GetPostThreadOtherV2Builder<'a, S> {
-    /// Set the `prioritizeFollowedUsers` field (optional)
-    pub fn prioritize_followed_users(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
-        self
-    }
-    /// Set the `prioritizeFollowedUsers` field to an Option value (optional)
-    pub fn maybe_prioritize_followed_users(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.1 = value;
-        self
-    }
-}
-
 impl<'a, S> GetPostThreadOtherV2Builder<'a, S>
 where
     S: get_post_thread_other_v2_state::State,
@@ -127,7 +110,6 @@ where
     pub fn build(self) -> GetPostThreadOtherV2<'a> {
         GetPostThreadOtherV2 {
             anchor: self.__unsafe_private_named.0.unwrap(),
-            prioritize_followed_users: self.__unsafe_private_named.1,
         }
     }
 }
@@ -420,16 +402,6 @@ fn lexicon_doc_app_bsky_unspecced_getPostThreadOtherV2() -> ::jacquard_lexicon::
                                         r#enum: None,
                                         r#const: None,
                                         known_values: None,
-                                    }),
-                                );
-                                map.insert(
-                                    ::jacquard_common::smol_str::SmolStr::new_static(
-                                        "prioritizeFollowedUsers",
-                                    ),
-                                    ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                        description: None,
-                                        default: None,
-                                        r#const: None,
                                     }),
                                 );
                                 map

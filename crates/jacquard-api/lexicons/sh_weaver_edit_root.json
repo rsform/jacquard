@@ -9,16 +9,10 @@
       "record": {
         "type": "object",
         "required": [
-          "cid",
-          "uri",
           "doc",
           "snapshot"
         ],
         "properties": {
-          "cid": {
-            "type": "string",
-            "format": "cid"
-          },
           "doc": {
             "type": "ref",
             "ref": "sh.weaver.edit.defs#docRef"
@@ -29,10 +23,6 @@
               "*/*"
             ],
             "maxSize": 30000000
-          },
-          "uri": {
-            "type": "string",
-            "format": "at-uri"
           }
         }
       }

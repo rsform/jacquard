@@ -3,7 +3,6 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use smol_str::{SmolStr, ToSmolStr};
 use std::{str::FromStr, sync::Arc};
 
-use crate::IntoStatic;
 pub use crate::{
     CowStr,
     types::{
@@ -19,6 +18,10 @@ pub use crate::{
         tid::Tid,
         uri::Uri,
     },
+};
+use crate::{
+    IntoStatic,
+    types::{LexiconStringType, UriType},
 };
 
 /// Polymorphic AT Protocol string value
@@ -111,6 +114,31 @@ impl<'s> AtprotoStr<'s> {
             Self::Did(did) => did.as_str(),
             Self::RecordKey(rkey) => rkey.as_ref(),
             Self::String(string) => string.as_ref(),
+        }
+    }
+
+    /// detailed string type
+    pub fn string_type(&self) -> LexiconStringType {
+        match self {
+            Self::Datetime(_) => LexiconStringType::Datetime,
+            Self::Language(_) => LexiconStringType::Language,
+            Self::Handle(_) => LexiconStringType::Handle,
+            Self::AtIdentifier(_) => LexiconStringType::AtIdentifier,
+            Self::Nsid(_) => LexiconStringType::Nsid,
+            Self::AtUri(_) => LexiconStringType::AtUri,
+            Self::Uri(uri) => LexiconStringType::Uri(match uri {
+                Uri::Did(_) => UriType::Did,
+                Uri::At(_) => UriType::At,
+                Uri::Https(_) => UriType::Https,
+                Uri::Wss(_) => UriType::Wss,
+                Uri::Cid(_) => UriType::Cid,
+                Uri::Any(_) => UriType::Any,
+            }),
+            Self::Cid(_) => LexiconStringType::Cid,
+            Self::Tid(_) => LexiconStringType::Tid,
+            Self::Did(_) => LexiconStringType::Did,
+            Self::RecordKey(_) => LexiconStringType::RecordKey,
+            Self::String(_) => LexiconStringType::String,
         }
     }
 }

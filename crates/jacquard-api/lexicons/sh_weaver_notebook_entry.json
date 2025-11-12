@@ -24,10 +24,34 @@
             "description": "Client-declared timestamp when this was originally created.",
             "format": "datetime"
           },
-          "images": {
-            "type": "ref",
-            "description": "The set of images, if any, embedded in the notebook entry.",
-            "ref": "sh.weaver.embed.images"
+          "embeds": {
+            "type": "object",
+            "description": "The set of images and records, if any, embedded in the notebook entry.",
+            "properties": {
+              "externals": {
+                "type": "ref",
+                "ref": "sh.weaver.embed.external"
+              },
+              "images": {
+                "type": "ref",
+                "ref": "sh.weaver.embed.images"
+              },
+              "records": {
+                "type": "ref",
+                "ref": "sh.weaver.embed.records"
+              },
+              "recordsWithMedia": {
+                "type": "array",
+                "items": {
+                  "type": "ref",
+                  "ref": "sh.weaver.embed.recordWithMedia"
+                }
+              },
+              "videos": {
+                "type": "ref",
+                "ref": "sh.weaver.embed.video"
+              }
+            }
           },
           "tags": {
             "type": "ref",

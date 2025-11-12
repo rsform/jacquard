@@ -6,7 +6,7 @@
     "main": {
       "type": "object",
       "required": [
-        "record",
+        "records",
         "media"
       ],
       "properties": {
@@ -15,17 +15,12 @@
           "refs": [
             "sh.weaver.embed.images",
             "sh.weaver.embed.external",
-            "app.bsky.embed.images",
-            "app.bsky.embed.video",
-            "app.bsky.embed.external"
+            "sh.weaver.embed.video"
           ]
         },
-        "record": {
-          "type": "union",
-          "refs": [
-            "app.bsky.embed.record",
-            "sh.weaver.embed.records"
-          ]
+        "records": {
+          "type": "ref",
+          "ref": "sh.weaver.embed.records"
         }
       }
     },
@@ -39,19 +34,14 @@
         "media": {
           "type": "union",
           "refs": [
-            "sh.weaver.embed.images",
+            "sh.weaver.embed.images#view",
             "sh.weaver.embed.external#view",
-            "app.bsky.embed.images#view",
-            "app.bsky.embed.video#view",
-            "app.bsky.embed.external#view"
+            "sh.weaver.embed.video#view"
           ]
         },
-        "record": {
-          "type": "union",
-          "refs": [
-            "sh.weaver.embed.records#view",
-            "app.bsky.embed.record#view"
-          ]
+        "records": {
+          "type": "ref",
+          "ref": "sh.weaver.embed.records#view"
         }
       }
     }

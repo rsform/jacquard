@@ -1,0 +1,50 @@
+{
+  "lexicon": 1,
+  "id": "blog.pckt.mark.link",
+  "description": "Hyperlink formatting. Creates a clickable link to an external or internal resource.",
+  "defs": {
+    "linkAttrs": {
+      "type": "object",
+      "description": "Link attributes",
+      "required": [
+        "href"
+      ],
+      "properties": {
+        "href": {
+          "type": "string",
+          "description": "The URL destination of the hyperlink",
+          "format": "uri",
+          "maxLength": 2000
+        },
+        "rel": {
+          "type": "string",
+          "description": "Defines the relationship between the current document and the linked resource (e.g., nofollow, noopener)",
+          "maxLength": 100
+        },
+        "target": {
+          "type": "string",
+          "description": "Specifies where to open the linked document (e.g., _blank, _self)",
+          "maxLength": 50
+        },
+        "title": {
+          "type": "string",
+          "description": "Additional information about the link, typically shown as a tooltip on hover",
+          "maxLength": 500
+        }
+      }
+    },
+    "main": {
+      "type": "object",
+      "required": [
+        "attrs"
+      ],
+      "properties": {
+        "attrs": {
+          "type": "ref",
+          "description": "Link attributes that define the hyperlink behavior and destination",
+          "ref": "#linkAttrs"
+        }
+      }
+    }
+  }
+}

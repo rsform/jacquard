@@ -220,6 +220,33 @@ fn lexicon_doc_sh_weaver_embed_video() -> ::jacquard_lexicon::lexicon::LexiconDo
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("videos")],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::std::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("videos"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                description: None,
+                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: ::jacquard_common::CowStr::new_static("#video"),
+                                }),
+                                min_length: None,
+                                max_length: None,
+                            }),
+                        );
+                        map
+                    },
+                }),
+            );
+            map.insert(
+                ::jacquard_common::smol_str::SmolStr::new_static("video"),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: Some(
                         vec![::jacquard_common::smol_str::SmolStr::new_static("video")],
                     ),
                     nullable: None,
@@ -246,17 +273,6 @@ fn lexicon_doc_sh_weaver_embed_video() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
-                                "aspectRatio",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "app.bsky.embed.defs#aspectRatio",
-                                ),
-                            }),
-                        );
-                        map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("captions"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
@@ -266,6 +282,35 @@ fn lexicon_doc_sh_weaver_embed_video() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 }),
                                 min_length: None,
                                 max_length: Some(20usize),
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "dimensions",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                description: None,
+                                refs: vec![
+                                    ::jacquard_common::CowStr::new_static("app.bsky.embed.defs#aspectRatio"),
+                                    ::jacquard_common::CowStr::new_static("sh.weaver.embed.defs#percentSize"),
+                                    ::jacquard_common::CowStr::new_static("sh.weaver.embed.defs#pixelSize")
+                                ],
+                                closed: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: Some(128usize),
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
                             }),
                         );
                         map.insert(
@@ -310,17 +355,6 @@ fn lexicon_doc_sh_weaver_embed_video() -> ::jacquard_lexicon::lexicon::LexiconDo
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
-                                "aspectRatio",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "app.bsky.embed.defs#aspectRatio",
-                                ),
-                            }),
-                        );
-                        map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("cid"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
@@ -330,6 +364,35 @@ fn lexicon_doc_sh_weaver_embed_video() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 default: None,
                                 min_length: None,
                                 max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "dimensions",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                description: None,
+                                refs: vec![
+                                    ::jacquard_common::CowStr::new_static("app.bsky.embed.defs#aspectRatio"),
+                                    ::jacquard_common::CowStr::new_static("sh.weaver.embed.defs#percentSize"),
+                                    ::jacquard_common::CowStr::new_static("sh.weaver.embed.defs#pixelSize")
+                                ],
+                                closed: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: Some(128usize),
                                 min_graphemes: None,
                                 max_graphemes: None,
                                 r#enum: None,
@@ -410,6 +473,144 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Caption<'a> {
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
+pub struct VideoRecord<'a> {
+    #[serde(borrow)]
+    pub videos: Vec<crate::sh_weaver::embed::video::Video<'a>>,
+}
+
+pub mod video_record_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Videos;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Videos = Unset;
+    }
+    ///State transition - sets the `videos` field to Set
+    pub struct SetVideos<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVideos<S> {}
+    impl<S: State> State for SetVideos<S> {
+        type Videos = Set<members::videos>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `videos` field
+        pub struct videos(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct VideoRecordBuilder<'a, S: video_record_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<Vec<crate::sh_weaver::embed::video::Video<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> VideoRecord<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> VideoRecordBuilder<'a, video_record_state::Empty> {
+        VideoRecordBuilder::new()
+    }
+}
+
+impl<'a> VideoRecordBuilder<'a, video_record_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        VideoRecordBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> VideoRecordBuilder<'a, S>
+where
+    S: video_record_state::State,
+    S::Videos: video_record_state::IsUnset,
+{
+    /// Set the `videos` field (required)
+    pub fn videos(
+        mut self,
+        value: impl Into<Vec<crate::sh_weaver::embed::video::Video<'a>>>,
+    ) -> VideoRecordBuilder<'a, video_record_state::SetVideos<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        VideoRecordBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> VideoRecordBuilder<'a, S>
+where
+    S: video_record_state::State,
+    S::Videos: video_record_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> VideoRecord<'a> {
+        VideoRecord {
+            videos: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> VideoRecord<'a> {
+        VideoRecord {
+            videos: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for VideoRecord<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.embed.video"
+    }
+    fn def_name() -> &'static str {
+        "main"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_embed_video()
+    }
+    fn validate(
+        &self,
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
 pub struct Video<'a> {
     /// Alt text description of the video, for accessibility.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -417,10 +618,13 @@ pub struct Video<'a> {
     pub alt: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub aspect_ratio: Option<crate::app_bsky::embed::AspectRatio<'a>>,
+    pub captions: Option<Vec<crate::sh_weaver::embed::video::Caption<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub captions: Option<Vec<crate::sh_weaver::embed::video::Caption<'a>>>,
+    pub dimensions: Option<VideoDimensions<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub name: Option<jacquard_common::CowStr<'a>>,
     /// The mp4 video file. May be up to 100mb, formerly limited to 50mb.
     #[serde(borrow)]
     pub video: jacquard_common::types::blob::BlobRef<'a>,
@@ -463,8 +667,9 @@ pub struct VideoBuilder<'a, S: video_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<crate::app_bsky::embed::AspectRatio<'a>>,
         ::core::option::Option<Vec<crate::sh_weaver::embed::video::Caption<'a>>>,
+        ::core::option::Option<VideoDimensions<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
@@ -482,7 +687,7 @@ impl<'a> VideoBuilder<'a, video_state::Empty> {
     pub fn new() -> Self {
         VideoBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None),
+            __unsafe_private_named: (None, None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -502,31 +707,12 @@ impl<'a, S: video_state::State> VideoBuilder<'a, S> {
 }
 
 impl<'a, S: video_state::State> VideoBuilder<'a, S> {
-    /// Set the `aspectRatio` field (optional)
-    pub fn aspect_ratio(
-        mut self,
-        value: impl Into<Option<crate::app_bsky::embed::AspectRatio<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
-        self
-    }
-    /// Set the `aspectRatio` field to an Option value (optional)
-    pub fn maybe_aspect_ratio(
-        mut self,
-        value: Option<crate::app_bsky::embed::AspectRatio<'a>>,
-    ) -> Self {
-        self.__unsafe_private_named.1 = value;
-        self
-    }
-}
-
-impl<'a, S: video_state::State> VideoBuilder<'a, S> {
     /// Set the `captions` field (optional)
     pub fn captions(
         mut self,
         value: impl Into<Option<Vec<crate::sh_weaver::embed::video::Caption<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `captions` field to an Option value (optional)
@@ -534,7 +720,36 @@ impl<'a, S: video_state::State> VideoBuilder<'a, S> {
         mut self,
         value: Option<Vec<crate::sh_weaver::embed::video::Caption<'a>>>,
     ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: video_state::State> VideoBuilder<'a, S> {
+    /// Set the `dimensions` field (optional)
+    pub fn dimensions(mut self, value: impl Into<Option<VideoDimensions<'a>>>) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `dimensions` field to an Option value (optional)
+    pub fn maybe_dimensions(mut self, value: Option<VideoDimensions<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: video_state::State> VideoBuilder<'a, S> {
+    /// Set the `name` field (optional)
+    pub fn name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `name` field to an Option value (optional)
+    pub fn maybe_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.3 = value;
         self
     }
 }
@@ -549,7 +764,7 @@ where
         mut self,
         value: impl Into<jacquard_common::types::blob::BlobRef<'a>>,
     ) -> VideoBuilder<'a, video_state::SetVideo<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
         VideoBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -567,9 +782,10 @@ where
     pub fn build(self) -> Video<'a> {
         Video {
             alt: self.__unsafe_private_named.0,
-            aspect_ratio: self.__unsafe_private_named.1,
-            captions: self.__unsafe_private_named.2,
-            video: self.__unsafe_private_named.3.unwrap(),
+            captions: self.__unsafe_private_named.1,
+            dimensions: self.__unsafe_private_named.2,
+            name: self.__unsafe_private_named.3,
+            video: self.__unsafe_private_named.4.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -583,12 +799,34 @@ where
     ) -> Video<'a> {
         Video {
             alt: self.__unsafe_private_named.0,
-            aspect_ratio: self.__unsafe_private_named.1,
-            captions: self.__unsafe_private_named.2,
-            video: self.__unsafe_private_named.3.unwrap(),
+            captions: self.__unsafe_private_named.1,
+            dimensions: self.__unsafe_private_named.2,
+            name: self.__unsafe_private_named.3,
+            video: self.__unsafe_private_named.4.unwrap(),
             extra_data: Some(extra_data),
         }
     }
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum VideoDimensions<'a> {
+    #[serde(rename = "app.bsky.embed.defs#aspectRatio")]
+    AspectRatio(Box<crate::app_bsky::embed::AspectRatio<'a>>),
+    #[serde(rename = "sh.weaver.embed.defs#percentSize")]
+    PercentSize(Box<crate::sh_weaver::embed::PercentSize<'a>>),
+    #[serde(rename = "sh.weaver.embed.defs#pixelSize")]
+    PixelSize(Box<crate::sh_weaver::embed::PixelSize<'a>>),
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Video<'a> {
@@ -596,7 +834,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Video<'a> {
         "sh.weaver.embed.video"
     }
     fn def_name() -> &'static str {
-        "main"
+        "video"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_embed_video()
@@ -646,6 +884,18 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Video<'a> {
                 });
             }
         }
+        if let Some(ref value) = self.name {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 128usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
+                    max: 128usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
         Ok(())
     }
 }
@@ -665,11 +915,14 @@ pub struct View<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub alt: Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub aspect_ratio: Option<crate::app_bsky::embed::AspectRatio<'a>>,
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub dimensions: Option<ViewDimensions<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub name: Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub playlist: jacquard_common::types::string::Uri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -726,8 +979,9 @@ pub struct ViewBuilder<'a, S: view_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<crate::app_bsky::embed::AspectRatio<'a>>,
         ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
+        ::core::option::Option<ViewDimensions<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
         ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
     ),
@@ -746,7 +1000,7 @@ impl<'a> ViewBuilder<'a, view_state::Empty> {
     pub fn new() -> Self {
         ViewBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
+            __unsafe_private_named: (None, None, None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -765,25 +1019,6 @@ impl<'a, S: view_state::State> ViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: view_state::State> ViewBuilder<'a, S> {
-    /// Set the `aspectRatio` field (optional)
-    pub fn aspect_ratio(
-        mut self,
-        value: impl Into<Option<crate::app_bsky::embed::AspectRatio<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
-        self
-    }
-    /// Set the `aspectRatio` field to an Option value (optional)
-    pub fn maybe_aspect_ratio(
-        mut self,
-        value: Option<crate::app_bsky::embed::AspectRatio<'a>>,
-    ) -> Self {
-        self.__unsafe_private_named.1 = value;
-        self
-    }
-}
-
 impl<'a, S> ViewBuilder<'a, S>
 where
     S: view_state::State,
@@ -794,12 +1029,41 @@ where
         mut self,
         value: impl Into<jacquard_common::types::string::Cid<'a>>,
     ) -> ViewBuilder<'a, view_state::SetCid<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
         ViewBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
             _phantom: ::core::marker::PhantomData,
         }
+    }
+}
+
+impl<'a, S: view_state::State> ViewBuilder<'a, S> {
+    /// Set the `dimensions` field (optional)
+    pub fn dimensions(mut self, value: impl Into<Option<ViewDimensions<'a>>>) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `dimensions` field to an Option value (optional)
+    pub fn maybe_dimensions(mut self, value: Option<ViewDimensions<'a>>) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: view_state::State> ViewBuilder<'a, S> {
+    /// Set the `name` field (optional)
+    pub fn name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `name` field to an Option value (optional)
+    pub fn maybe_name(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
     }
 }
 
@@ -813,7 +1077,7 @@ where
         mut self,
         value: impl Into<jacquard_common::types::string::Uri<'a>>,
     ) -> ViewBuilder<'a, view_state::SetPlaylist<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
         ViewBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -828,7 +1092,7 @@ impl<'a, S: view_state::State> ViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `thumbnail` field to an Option value (optional)
@@ -836,7 +1100,7 @@ impl<'a, S: view_state::State> ViewBuilder<'a, S> {
         mut self,
         value: Option<jacquard_common::types::string::Uri<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self.__unsafe_private_named.5 = value;
         self
     }
 }
@@ -851,10 +1115,11 @@ where
     pub fn build(self) -> View<'a> {
         View {
             alt: self.__unsafe_private_named.0,
-            aspect_ratio: self.__unsafe_private_named.1,
-            cid: self.__unsafe_private_named.2.unwrap(),
-            playlist: self.__unsafe_private_named.3.unwrap(),
-            thumbnail: self.__unsafe_private_named.4,
+            cid: self.__unsafe_private_named.1.unwrap(),
+            dimensions: self.__unsafe_private_named.2,
+            name: self.__unsafe_private_named.3,
+            playlist: self.__unsafe_private_named.4.unwrap(),
+            thumbnail: self.__unsafe_private_named.5,
             extra_data: Default::default(),
         }
     }
@@ -868,13 +1133,35 @@ where
     ) -> View<'a> {
         View {
             alt: self.__unsafe_private_named.0,
-            aspect_ratio: self.__unsafe_private_named.1,
-            cid: self.__unsafe_private_named.2.unwrap(),
-            playlist: self.__unsafe_private_named.3.unwrap(),
-            thumbnail: self.__unsafe_private_named.4,
+            cid: self.__unsafe_private_named.1.unwrap(),
+            dimensions: self.__unsafe_private_named.2,
+            name: self.__unsafe_private_named.3,
+            playlist: self.__unsafe_private_named.4.unwrap(),
+            thumbnail: self.__unsafe_private_named.5,
             extra_data: Some(extra_data),
         }
     }
+}
+
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "$type")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum ViewDimensions<'a> {
+    #[serde(rename = "app.bsky.embed.defs#aspectRatio")]
+    AspectRatio(Box<crate::app_bsky::embed::AspectRatio<'a>>),
+    #[serde(rename = "sh.weaver.embed.defs#percentSize")]
+    PercentSize(Box<crate::sh_weaver::embed::PercentSize<'a>>),
+    #[serde(rename = "sh.weaver.embed.defs#pixelSize")]
+    PixelSize(Box<crate::sh_weaver::embed::PixelSize<'a>>),
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for View<'a> {
@@ -918,6 +1205,18 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for View<'a> {
                         actual: count,
                     });
                 }
+            }
+        }
+        if let Some(ref value) = self.name {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 128usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "name",
+                    ),
+                    max: 128usize,
+                    actual: <str>::len(value.as_ref()),
+                });
             }
         }
         Ok(())

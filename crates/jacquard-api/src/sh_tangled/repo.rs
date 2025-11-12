@@ -67,6 +67,14 @@ pub struct Repo<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub spindle: Option<jacquard_common::CowStr<'a>>,
+    /// Topics related to the repo
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub topics: Option<Vec<jacquard_common::CowStr<'a>>>,
+    /// Any URI related to the repo
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub website: Option<jacquard_common::types::string::Uri<'a>>,
 }
 
 pub mod repo_state {
@@ -138,6 +146,8 @@ pub struct RepoBuilder<'a, S: repo_state::State> {
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -154,7 +164,17 @@ impl<'a> RepoBuilder<'a, repo_state::Empty> {
     pub fn new() -> Self {
         RepoBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -290,6 +310,44 @@ impl<'a, S: repo_state::State> RepoBuilder<'a, S> {
     }
 }
 
+impl<'a, S: repo_state::State> RepoBuilder<'a, S> {
+    /// Set the `topics` field (optional)
+    pub fn topics(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value.into();
+        self
+    }
+    /// Set the `topics` field to an Option value (optional)
+    pub fn maybe_topics(
+        mut self,
+        value: Option<Vec<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.7 = value;
+        self
+    }
+}
+
+impl<'a, S: repo_state::State> RepoBuilder<'a, S> {
+    /// Set the `website` field (optional)
+    pub fn website(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value.into();
+        self
+    }
+    /// Set the `website` field to an Option value (optional)
+    pub fn maybe_website(
+        mut self,
+        value: Option<jacquard_common::types::string::Uri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value;
+        self
+    }
+}
+
 impl<'a, S> RepoBuilder<'a, S>
 where
     S: repo_state::State,
@@ -307,6 +365,8 @@ where
             name: self.__unsafe_private_named.4.unwrap(),
             source: self.__unsafe_private_named.5,
             spindle: self.__unsafe_private_named.6,
+            topics: self.__unsafe_private_named.7,
+            website: self.__unsafe_private_named.8,
             extra_data: Default::default(),
         }
     }
@@ -326,6 +386,8 @@ where
             name: self.__unsafe_private_named.4.unwrap(),
             source: self.__unsafe_private_named.5,
             spindle: self.__unsafe_private_named.6,
+            topics: self.__unsafe_private_named.7,
+            website: self.__unsafe_private_named.8,
             extra_data: Some(extra_data),
         }
     }
@@ -439,6 +501,18 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Repo<'a> {
                         actual: count,
                     });
                 }
+            }
+        }
+        if let Some(ref value) = self.topics {
+            #[allow(unused_comparisons)]
+            if value.len() > 50usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "topics",
+                    ),
+                    max: 50usize,
+                    actual: value.len(),
+                });
             }
         }
         Ok(())
@@ -597,6 +671,51 @@ fn lexicon_doc_sh_tangled_repo() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                                         ),
                                     ),
                                     format: None,
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static("topics"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Topics related to the repo",
+                                        ),
+                                    ),
+                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: None,
+                                        default: None,
+                                        min_length: Some(1usize),
+                                        max_length: Some(50usize),
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                    min_length: None,
+                                    max_length: Some(50usize),
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static("website"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Any URI related to the repo",
+                                        ),
+                                    ),
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
+                                    ),
                                     default: None,
                                     min_length: None,
                                     max_length: None,

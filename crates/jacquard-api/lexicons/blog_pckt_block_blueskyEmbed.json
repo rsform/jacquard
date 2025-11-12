@@ -1,0 +1,39 @@
+{
+  "lexicon": 1,
+  "id": "blog.pckt.block.blueskyEmbed",
+  "description": "Embedded Bluesky social media post. Displays rich content from Bluesky including the post author, text, images, and engagement metrics.",
+  "defs": {
+    "embedAttrs": {
+      "type": "object",
+      "description": "Embed attributes",
+      "required": [
+        "url"
+      ],
+      "properties": {
+        "html": {
+          "type": "string",
+          "description": "Pre-rendered HTML content of the embedded post",
+          "maxLength": 50000
+        },
+        "url": {
+          "type": "string",
+          "description": "URL of the Bluesky post to embed",
+          "format": "uri"
+        }
+      }
+    },
+    "main": {
+      "type": "object",
+      "required": [
+        "attrs"
+      ],
+      "properties": {
+        "attrs": {
+          "type": "ref",
+          "description": "Embed attributes",
+          "ref": "#embedAttrs"
+        }
+      }
+    }
+  }
+}

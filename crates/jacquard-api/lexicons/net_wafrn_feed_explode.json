@@ -1,0 +1,24 @@
+{
+  "lexicon": 1,
+  "id": "net.wafrn.feed.explode",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Record declaring a 'explode' of a piece of subject content.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "subject": {
+            "type": "ref",
+            "ref": "com.atproto.repo.strongRef"
+          }
+        }
+      }
+    }
+  }
+}

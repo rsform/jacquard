@@ -35,6 +35,10 @@ pub struct Profile<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub pinned_repositories: Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
+    /// Preferred gender pronouns.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub pronouns: Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub stats: Option<Vec<jacquard_common::CowStr<'a>>>,
@@ -81,6 +85,7 @@ pub struct ProfileBuilder<'a, S: profile_state::State> {
         ::core::option::Option<Vec<jacquard_common::types::string::Uri<'a>>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
@@ -98,7 +103,7 @@ impl<'a> ProfileBuilder<'a, profile_state::Empty> {
     pub fn new() -> Self {
         ProfileBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
+            __unsafe_private_named: (None, None, None, None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -197,12 +202,28 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 }
 
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
+    /// Set the `pronouns` field (optional)
+    pub fn pronouns(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `pronouns` field to an Option value (optional)
+    pub fn maybe_pronouns(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `stats` field (optional)
     pub fn stats(
         mut self,
         value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `stats` field to an Option value (optional)
@@ -210,7 +231,7 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
         mut self,
         value: Option<Vec<jacquard_common::CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self.__unsafe_private_named.6 = value;
         self
     }
 }
@@ -228,7 +249,8 @@ where
             links: self.__unsafe_private_named.2,
             location: self.__unsafe_private_named.3,
             pinned_repositories: self.__unsafe_private_named.4,
-            stats: self.__unsafe_private_named.5,
+            pronouns: self.__unsafe_private_named.5,
+            stats: self.__unsafe_private_named.6,
             extra_data: Default::default(),
         }
     }
@@ -246,7 +268,8 @@ where
             links: self.__unsafe_private_named.2,
             location: self.__unsafe_private_named.3,
             pinned_repositories: self.__unsafe_private_named.4,
-            stats: self.__unsafe_private_named.5,
+            pronouns: self.__unsafe_private_named.5,
+            stats: self.__unsafe_private_named.6,
             extra_data: Some(extra_data),
         }
     }
@@ -434,6 +457,18 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
                 });
             }
         }
+        if let Some(ref value) = self.pronouns {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 40usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "pronouns",
+                    ),
+                    max: 40usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
         if let Some(ref value) = self.stats {
             #[allow(unused_comparisons)]
             if value.len() > 2usize {
@@ -594,6 +629,27 @@ fn lexicon_doc_sh_tangled_actor_profile() -> ::jacquard_lexicon::lexicon::Lexico
                                     }),
                                     min_length: Some(0usize),
                                     max_length: Some(6usize),
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "pronouns",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Preferred gender pronouns.",
+                                        ),
+                                    ),
+                                    format: None,
+                                    default: None,
+                                    min_length: None,
+                                    max_length: Some(40usize),
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
                                 }),
                             );
                             map.insert(

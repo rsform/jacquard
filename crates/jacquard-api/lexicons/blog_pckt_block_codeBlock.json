@@ -1,0 +1,36 @@
+{
+  "lexicon": 1,
+  "id": "blog.pckt.block.codeBlock",
+  "description": "Preformatted code block with optional syntax highlighting. Preserves whitespace and displays code in a monospace font.",
+  "defs": {
+    "codeBlockAttrs": {
+      "type": "object",
+      "description": "Code block attributes",
+      "properties": {
+        "language": {
+          "type": "string",
+          "description": "Programming language for syntax highlighting (e.g., 'javascript', 'python', 'php')",
+          "maxLength": 50
+        }
+      }
+    },
+    "main": {
+      "type": "object",
+      "properties": {
+        "attrs": {
+          "type": "ref",
+          "description": "Code block attributes",
+          "ref": "#codeBlockAttrs"
+        },
+        "content": {
+          "type": "array",
+          "description": "Array of text nodes containing the code",
+          "items": {
+            "type": "ref",
+            "ref": "blog.pckt.block.text"
+          }
+        }
+      }
+    }
+  }
+}

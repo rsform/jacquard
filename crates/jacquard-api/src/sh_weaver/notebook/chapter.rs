@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-/// A grouping of entries in a notebook, intended to be displayed as a single page.
+/// A grouping of entries in a notebook.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -18,12 +18,14 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Chapter<'a> {
+    #[serde(borrow)]
+    pub authors: Vec<crate::sh_weaver::actor::Author<'a>>,
     /// Client-declared timestamp when this was originally created.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub created_at: Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub entry_list: Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    /// The notebook this page belongs to.
+    /// The notebook this chapter belongs to.
     #[serde(borrow)]
     pub notebook: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -96,6 +98,7 @@ pub mod chapter_state {
 pub struct ChapterBuilder<'a, S: chapter_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
+        ::core::option::Option<Vec<crate::sh_weaver::actor::Author<'a>>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
         ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
@@ -117,7 +120,26 @@ impl<'a> ChapterBuilder<'a, chapter_state::Empty> {
     pub fn new() -> Self {
         ChapterBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
+            __unsafe_private_named: (None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> ChapterBuilder<'a, S>
+where
+    S: chapter_state::State,
+    S::Authors: chapter_state::IsUnset,
+{
+    /// Set the `authors` field (required)
+    pub fn authors(
+        mut self,
+        value: impl Into<Vec<crate::sh_weaver::actor::Author<'a>>>,
+    ) -> ChapterBuilder<'a, chapter_state::SetAuthors<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        ChapterBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -129,7 +151,7 @@ impl<'a, S: chapter_state::State> ChapterBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::types::string::Datetime>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `createdAt` field to an Option value (optional)
@@ -137,7 +159,7 @@ impl<'a, S: chapter_state::State> ChapterBuilder<'a, S> {
         mut self,
         value: Option<jacquard_common::types::string::Datetime>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self.__unsafe_private_named.1 = value;
         self
     }
 }
@@ -152,7 +174,7 @@ where
         mut self,
         value: impl Into<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
     ) -> ChapterBuilder<'a, chapter_state::SetEntryList<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
         ChapterBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -171,7 +193,7 @@ where
         mut self,
         value: impl Into<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     ) -> ChapterBuilder<'a, chapter_state::SetNotebook<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
         ChapterBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -186,7 +208,7 @@ impl<'a, S: chapter_state::State> ChapterBuilder<'a, S> {
         mut self,
         value: impl Into<Option<crate::sh_weaver::notebook::Tags<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
@@ -194,7 +216,7 @@ impl<'a, S: chapter_state::State> ChapterBuilder<'a, S> {
         mut self,
         value: Option<crate::sh_weaver::notebook::Tags<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self.__unsafe_private_named.4 = value;
         self
     }
 }
@@ -205,7 +227,7 @@ impl<'a, S: chapter_state::State> ChapterBuilder<'a, S> {
         mut self,
         value: impl Into<Option<crate::sh_weaver::notebook::Title<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
@@ -213,7 +235,7 @@ impl<'a, S: chapter_state::State> ChapterBuilder<'a, S> {
         mut self,
         value: Option<crate::sh_weaver::notebook::Title<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self.__unsafe_private_named.5 = value;
         self
     }
 }
@@ -228,11 +250,12 @@ where
     /// Build the final struct
     pub fn build(self) -> Chapter<'a> {
         Chapter {
-            created_at: self.__unsafe_private_named.0,
-            entry_list: self.__unsafe_private_named.1.unwrap(),
-            notebook: self.__unsafe_private_named.2.unwrap(),
-            tags: self.__unsafe_private_named.3,
-            title: self.__unsafe_private_named.4,
+            authors: self.__unsafe_private_named.0.unwrap(),
+            created_at: self.__unsafe_private_named.1,
+            entry_list: self.__unsafe_private_named.2.unwrap(),
+            notebook: self.__unsafe_private_named.3.unwrap(),
+            tags: self.__unsafe_private_named.4,
+            title: self.__unsafe_private_named.5,
             extra_data: Default::default(),
         }
     }
@@ -245,11 +268,12 @@ where
         >,
     ) -> Chapter<'a> {
         Chapter {
-            created_at: self.__unsafe_private_named.0,
-            entry_list: self.__unsafe_private_named.1.unwrap(),
-            notebook: self.__unsafe_private_named.2.unwrap(),
-            tags: self.__unsafe_private_named.3,
-            title: self.__unsafe_private_named.4,
+            authors: self.__unsafe_private_named.0.unwrap(),
+            created_at: self.__unsafe_private_named.1,
+            entry_list: self.__unsafe_private_named.2.unwrap(),
+            notebook: self.__unsafe_private_named.3.unwrap(),
+            tags: self.__unsafe_private_named.4,
+            title: self.__unsafe_private_named.5,
             extra_data: Some(extra_data),
         }
     }
@@ -348,7 +372,7 @@ fn lexicon_doc_sh_weaver_notebook_chapter() -> ::jacquard_lexicon::lexicon::Lexi
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
                     description: Some(
                         ::jacquard_common::CowStr::new_static(
-                            "A grouping of entries in a notebook, intended to be displayed as a single page.",
+                            "A grouping of entries in a notebook.",
                         ),
                     ),
                     key: Some(::jacquard_common::CowStr::new_static("tid")),
@@ -365,6 +389,20 @@ fn lexicon_doc_sh_weaver_notebook_chapter() -> ::jacquard_lexicon::lexicon::Lexi
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static("authors"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                    description: None,
+                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                        description: None,
+                                        r#ref: ::jacquard_common::CowStr::new_static(
+                                            "sh.weaver.actor.defs#author",
+                                        ),
+                                    }),
+                                    min_length: None,
+                                    max_length: None,
+                                }),
+                            );
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static(
                                     "createdAt",

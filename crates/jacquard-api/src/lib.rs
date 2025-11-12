@@ -52,6 +52,9 @@ pub mod com_atproto;
 #[cfg(feature = "com_bad_example")]
 pub mod com_bad_example;
 
+#[cfg(feature = "com_crabdance")]
+pub mod com_crabdance;
+
 #[cfg(feature = "com_shinolabs")]
 pub mod com_shinolabs;
 
@@ -88,6 +91,9 @@ pub mod fyi_unravel;
 #[cfg(feature = "garden_lexicon")]
 pub mod garden_lexicon;
 
+#[cfg(feature = "lol_jbc")]
+pub mod lol_jbc;
+
 #[cfg(feature = "moe_karashiiro")]
 pub mod moe_karashiiro;
 
@@ -108,6 +114,9 @@ pub mod net_bnewbold;
 
 #[cfg(feature = "net_mmatt")]
 pub mod net_mmatt;
+
+#[cfg(feature = "net_wafrn")]
+pub mod net_wafrn;
 
 #[cfg(feature = "network_slices")]
 pub mod network_slices;
@@ -142,9 +151,6 @@ pub mod sh_weaver;
 #[cfg(feature = "social_clippr")]
 pub mod social_clippr;
 
-#[cfg(feature = "social_flockfeeds")]
-pub mod social_flockfeeds;
-
 #[cfg(feature = "social_grain")]
 pub mod social_grain;
 
@@ -153,6 +159,9 @@ pub mod social_pmsky;
 
 #[cfg(feature = "social_psky")]
 pub mod social_psky;
+
+#[cfg(feature = "tech_manos")]
+pub mod tech_manos;
 
 #[cfg(feature = "tools_ozone")]
 pub mod tools_ozone;

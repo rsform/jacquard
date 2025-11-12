@@ -5,11 +5,14 @@
 //! 2. Fetch lexicon schema from `com.atproto.lexicon.schema` collection via XRPC
 
 use crate::resolver::{IdentityError, IdentityResolver};
+
 use jacquard_common::{
-    smol_str,
-    types::{cid::Cid, did::Did, string::Nsid},
+    IntoStatic, from_json_value, smol_str,
+    types::{aturi::AtUri, cid::Cid, did::Did, string::Nsid},
 };
+use jacquard_lexicon::lexicon::LexiconDoc;
 use smol_str::SmolStr;
+use url::Url;
 
 /// Resolve lexicon authority (NSID → authoritative DID)
 #[cfg_attr(not(target_arch = "wasm32"), trait_variant::make(Send))]
@@ -236,6 +239,57 @@ impl crate::JacquardResolver {
     }
 }
 
+#[allow(unused)]
+use jacquard_api::com_atproto::lexicon::resolve_lexicon::{ResolveLexicon, ResolveLexiconOutput};
+
+impl crate::JacquardResolver {
+    #[allow(dead_code)]
+    async fn resolve_lexicon_xrpc(
+        &self,
+        nsid: &Nsid<'_>,
+    ) -> std::result::Result<ResolvedLexiconSchema<'static>, LexiconResolutionError> {
+        if let Ok(mut url) = Url::parse("https://public.api.bsky.app") {
+            url.set_path("/xrpc/com.atproto.lexicon.resolveLexicon");
+            if let Ok(qs) =
+                serde_html_form::to_string(&ResolveLexicon::new().nsid(nsid.clone()).build())
+            {
+                url.set_query(Some(&qs));
+            } else {
+                return Err(LexiconResolutionError::invalid_collection());
+            }
+            if let Ok((buf, status)) = self.get_json_bytes(url).await {
+                if status.is_success() {
+                    if let Ok(val) = serde_json::from_slice::<serde_json::Value>(&buf) {
+                        if let Some(obj) = val.as_object() {
+                            if let Some(schema) = obj.get("schema") {
+                                if let Ok(schema) = from_json_value::<LexiconDoc>(schema.clone()) {
+                                    let uri =
+                                        obj.get("uri").expect("uri should be present").to_string();
+                                    let cid =
+                                        obj.get("cid").expect("cid should be present").to_string();
+                                    let uri = AtUri::new_owned(uri).map_err(|e| {
+                                        LexiconResolutionError::parse_failed("uri", e)
+                                    })?;
+                                    let cid = Cid::str(&cid).into_static();
+                                    let repo = Did::raw(uri.authority().as_str()).into_static();
+                                    return Ok(ResolvedLexiconSchema {
+                                        repo,
+                                        cid,
+                                        nsid: nsid.clone().into_static(),
+                                        doc: schema.into_static(),
+                                    });
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        Err(LexiconResolutionError::invalid_collection())
+    }
+}
+
 #[cfg(all(feature = "dns", not(target_family = "wasm")))]
 impl LexiconAuthorityResolver for crate::JacquardResolver {
     async fn resolve_lexicon_authority(
@@ -304,6 +358,7 @@ impl LexiconSchemaResolver for crate::JacquardResolver {
         }
 
         // Perform resolution
+        #[cfg(feature = "dns")]
         let result = async {
             // 1. Resolve authority DID via DNS
             let authority_did = self.resolve_lexicon_authority(nsid).await?;
@@ -368,6 +423,9 @@ impl LexiconSchemaResolver for crate::JacquardResolver {
             })
         }
         .await;
+
+        #[cfg(not(feature = "dns"))]
+        let result = self.resolve_lexicon_xrpc(nsid).await;
 
         // Handle result
         match result {

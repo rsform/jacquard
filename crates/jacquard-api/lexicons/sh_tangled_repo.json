@@ -46,6 +46,21 @@
           "spindle": {
             "type": "string",
             "description": "CI runner to send jobs to and receive results from"
+          },
+          "topics": {
+            "type": "array",
+            "description": "Topics related to the repo",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 50
+            },
+            "maxLength": 50
+          },
+          "website": {
+            "type": "string",
+            "description": "Any URI related to the repo",
+            "format": "uri"
           }
         }
       }

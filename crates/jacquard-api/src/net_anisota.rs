@@ -6,3 +6,4 @@
 pub mod beta;
 pub mod feed;
 pub mod graph;
+pub mod settings;

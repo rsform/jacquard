@@ -36,6 +36,10 @@
             "type": "ref",
             "ref": "sh.weaver.notebook.defs#tags"
           },
+          "theme": {
+            "type": "ref",
+            "ref": "com.atproto.repo.strongRef"
+          },
           "title": {
             "type": "ref",
             "ref": "sh.weaver.notebook.defs#title"

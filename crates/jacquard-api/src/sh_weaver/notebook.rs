@@ -8,7 +8,10 @@
 pub mod authors;
 pub mod book;
 pub mod chapter;
+pub mod colour_scheme;
 pub mod entry;
+pub mod page;
+pub mod theme;
 
 #[jacquard_derive::lexicon]
 #[derive(
@@ -22,13 +25,9 @@ pub mod entry;
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AuthorListView<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<jacquard_common::types::string::Cid<'a>>,
     pub index: i64,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub record: Option<jacquard_common::types::value::Data<'a>>,
+    pub record: jacquard_common::types::value::Data<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub uri: Option<jacquard_common::types::string::AtUri<'a>>,
@@ -44,35 +43,35 @@ pub mod author_list_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Profile;
+        type Record;
         type Index;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Profile = Unset;
+        type Record = Unset;
         type Index = Unset;
     }
-    ///State transition - sets the `profile` field to Set
-    pub struct SetProfile<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetProfile<S> {}
-    impl<S: State> State for SetProfile<S> {
-        type Profile = Set<members::profile>;
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecord<S> {}
+    impl<S: State> State for SetRecord<S> {
+        type Record = Set<members::record>;
         type Index = S::Index;
     }
     ///State transition - sets the `index` field to Set
     pub struct SetIndex<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIndex<S> {}
     impl<S: State> State for SetIndex<S> {
-        type Profile = S::Profile;
+        type Record = S::Record;
         type Index = Set<members::index>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `profile` field
-        pub struct profile(());
+        ///Marker type for the `record` field
+        pub struct record(());
         ///Marker type for the `index` field
         pub struct index(());
     }
@@ -82,7 +81,6 @@ pub mod author_list_view_state {
 pub struct AuthorListViewBuilder<'a, S: author_list_view_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
         ::core::option::Option<i64>,
         ::core::option::Option<jacquard_common::types::value::Data<'a>>,
         ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
@@ -102,28 +100,9 @@ impl<'a> AuthorListViewBuilder<'a, author_list_view_state::Empty> {
     pub fn new() -> Self {
         AuthorListViewBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None),
+            __unsafe_private_named: (None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
-    }
-}
-
-impl<'a, S: author_list_view_state::State> AuthorListViewBuilder<'a, S> {
-    /// Set the `cid` field (optional)
-    pub fn cid(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Cid<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
-        self
-    }
-    /// Set the `cid` field to an Option value (optional)
-    pub fn maybe_cid(
-        mut self,
-        value: Option<jacquard_common::types::string::Cid<'a>>,
-    ) -> Self {
-        self.__unsafe_private_named.0 = value;
-        self
     }
 }
 
@@ -137,6 +116,25 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> AuthorListViewBuilder<'a, author_list_view_state::SetIndex<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        AuthorListViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AuthorListViewBuilder<'a, S>
+where
+    S: author_list_view_state::State,
+    S::Record: author_list_view_state::IsUnset,
+{
+    /// Set the `record` field (required)
+    pub fn record(
+        mut self,
+        value: impl Into<jacquard_common::types::value::Data<'a>>,
+    ) -> AuthorListViewBuilder<'a, author_list_view_state::SetRecord<S>> {
         self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
         AuthorListViewBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -147,31 +145,12 @@ where
 }
 
 impl<'a, S: author_list_view_state::State> AuthorListViewBuilder<'a, S> {
-    /// Set the `record` field (optional)
-    pub fn record(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::value::Data<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
-        self
-    }
-    /// Set the `record` field to an Option value (optional)
-    pub fn maybe_record(
-        mut self,
-        value: Option<jacquard_common::types::value::Data<'a>>,
-    ) -> Self {
-        self.__unsafe_private_named.2 = value;
-        self
-    }
-}
-
-impl<'a, S: author_list_view_state::State> AuthorListViewBuilder<'a, S> {
     /// Set the `uri` field (optional)
     pub fn uri(
         mut self,
         value: impl Into<Option<jacquard_common::types::string::AtUri<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `uri` field to an Option value (optional)
@@ -179,7 +158,7 @@ impl<'a, S: author_list_view_state::State> AuthorListViewBuilder<'a, S> {
         mut self,
         value: Option<jacquard_common::types::string::AtUri<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self.__unsafe_private_named.2 = value;
         self
     }
 }
@@ -187,16 +166,15 @@ impl<'a, S: author_list_view_state::State> AuthorListViewBuilder<'a, S> {
 impl<'a, S> AuthorListViewBuilder<'a, S>
 where
     S: author_list_view_state::State,
-    S::Profile: author_list_view_state::IsSet,
+    S::Record: author_list_view_state::IsSet,
     S::Index: author_list_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> AuthorListView<'a> {
         AuthorListView {
-            cid: self.__unsafe_private_named.0,
-            index: self.__unsafe_private_named.1.unwrap(),
-            record: self.__unsafe_private_named.2,
-            uri: self.__unsafe_private_named.3,
+            index: self.__unsafe_private_named.0.unwrap(),
+            record: self.__unsafe_private_named.1.unwrap(),
+            uri: self.__unsafe_private_named.2,
             extra_data: Default::default(),
         }
     }
@@ -209,10 +187,9 @@ where
         >,
     ) -> AuthorListView<'a> {
         AuthorListView {
-            cid: self.__unsafe_private_named.0,
-            index: self.__unsafe_private_named.1.unwrap(),
-            record: self.__unsafe_private_named.2,
-            uri: self.__unsafe_private_named.3,
+            index: self.__unsafe_private_named.0.unwrap(),
+            record: self.__unsafe_private_named.1.unwrap(),
+            uri: self.__unsafe_private_named.2,
             extra_data: Some(extra_data),
         }
     }
@@ -234,7 +211,7 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                     description: None,
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("profile"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("record"),
                             ::jacquard_common::smol_str::SmolStr::new_static("index")
                         ],
                     ),
@@ -242,23 +219,6 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("cid"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Cid,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("index"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -421,7 +381,7 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                         vec![
                             ::jacquard_common::smol_str::SmolStr::new_static("uri"),
                             ::jacquard_common::smol_str::SmolStr::new_static("cid"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("author"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("authors"),
                             ::jacquard_common::smol_str::SmolStr::new_static("record"),
                             ::jacquard_common::smol_str::SmolStr::new_static("indexedAt")
                         ],
@@ -432,11 +392,16 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("authors"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "#authorListView",
-                                ),
+                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "#authorListView",
+                                    ),
+                                }),
+                                min_length: None,
+                                max_length: None,
                             }),
                         );
                         map.insert(
@@ -535,7 +500,7 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                         vec![
                             ::jacquard_common::smol_str::SmolStr::new_static("uri"),
                             ::jacquard_common::smol_str::SmolStr::new_static("cid"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("author"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("authors"),
                             ::jacquard_common::smol_str::SmolStr::new_static("record"),
                             ::jacquard_common::smol_str::SmolStr::new_static("indexedAt")
                         ],
@@ -546,11 +511,16 @@ fn lexicon_doc_sh_weaver_notebook_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("authors"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "#authorListView",
-                                ),
+                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "#authorListView",
+                                    ),
+                                }),
+                                min_length: None,
+                                max_length: None,
                             }),
                         );
                         map.insert(
@@ -1138,9 +1108,8 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContentFormat<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct EntryView<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub authors: Option<crate::sh_weaver::notebook::AuthorListView<'a>>,
+    pub authors: Vec<crate::sh_weaver::notebook::AuthorListView<'a>>,
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
     pub indexed_at: jacquard_common::types::string::Datetime,
@@ -1171,7 +1140,7 @@ pub mod entry_view_state {
     pub trait State: sealed::Sealed {
         type Uri;
         type Cid;
-        type Author;
+        type Authors;
         type Record;
         type IndexedAt;
     }
@@ -1181,7 +1150,7 @@ pub mod entry_view_state {
     impl State for Empty {
         type Uri = Unset;
         type Cid = Unset;
-        type Author = Unset;
+        type Authors = Unset;
         type Record = Unset;
         type IndexedAt = Unset;
     }
@@ -1191,7 +1160,7 @@ pub mod entry_view_state {
     impl<S: State> State for SetUri<S> {
         type Uri = Set<members::uri>;
         type Cid = S::Cid;
-        type Author = S::Author;
+        type Authors = S::Authors;
         type Record = S::Record;
         type IndexedAt = S::IndexedAt;
     }
@@ -1201,17 +1170,17 @@ pub mod entry_view_state {
     impl<S: State> State for SetCid<S> {
         type Uri = S::Uri;
         type Cid = Set<members::cid>;
-        type Author = S::Author;
+        type Authors = S::Authors;
         type Record = S::Record;
         type IndexedAt = S::IndexedAt;
     }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthor<S> {}
-    impl<S: State> State for SetAuthor<S> {
+    ///State transition - sets the `authors` field to Set
+    pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthors<S> {}
+    impl<S: State> State for SetAuthors<S> {
         type Uri = S::Uri;
         type Cid = S::Cid;
-        type Author = Set<members::author>;
+        type Authors = Set<members::authors>;
         type Record = S::Record;
         type IndexedAt = S::IndexedAt;
     }
@@ -1221,7 +1190,7 @@ pub mod entry_view_state {
     impl<S: State> State for SetRecord<S> {
         type Uri = S::Uri;
         type Cid = S::Cid;
-        type Author = S::Author;
+        type Authors = S::Authors;
         type Record = Set<members::record>;
         type IndexedAt = S::IndexedAt;
     }
@@ -1231,7 +1200,7 @@ pub mod entry_view_state {
     impl<S: State> State for SetIndexedAt<S> {
         type Uri = S::Uri;
         type Cid = S::Cid;
-        type Author = S::Author;
+        type Authors = S::Authors;
         type Record = S::Record;
         type IndexedAt = Set<members::indexed_at>;
     }
@@ -1242,8 +1211,8 @@ pub mod entry_view_state {
         pub struct uri(());
         ///Marker type for the `cid` field
         pub struct cid(());
-        ///Marker type for the `author` field
-        pub struct author(());
+        ///Marker type for the `authors` field
+        pub struct authors(());
         ///Marker type for the `record` field
         pub struct record(());
         ///Marker type for the `indexed_at` field
@@ -1255,7 +1224,7 @@ pub mod entry_view_state {
 pub struct EntryViewBuilder<'a, S: entry_view_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<crate::sh_weaver::notebook::AuthorListView<'a>>,
+        ::core::option::Option<Vec<crate::sh_weaver::notebook::AuthorListView<'a>>>,
         ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<jacquard_common::types::value::Data<'a>>,
@@ -1285,22 +1254,22 @@ impl<'a> EntryViewBuilder<'a, entry_view_state::Empty> {
     }
 }
 
-impl<'a, S: entry_view_state::State> EntryViewBuilder<'a, S> {
-    /// Set the `authors` field (optional)
+impl<'a, S> EntryViewBuilder<'a, S>
+where
+    S: entry_view_state::State,
+    S::Authors: entry_view_state::IsUnset,
+{
+    /// Set the `authors` field (required)
     pub fn authors(
         mut self,
-        value: impl Into<Option<crate::sh_weaver::notebook::AuthorListView<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
-        self
-    }
-    /// Set the `authors` field to an Option value (optional)
-    pub fn maybe_authors(
-        mut self,
-        value: Option<crate::sh_weaver::notebook::AuthorListView<'a>>,
-    ) -> Self {
-        self.__unsafe_private_named.0 = value;
-        self
+        value: impl Into<Vec<crate::sh_weaver::notebook::AuthorListView<'a>>>,
+    ) -> EntryViewBuilder<'a, entry_view_state::SetAuthors<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        EntryViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
     }
 }
 
@@ -1442,14 +1411,14 @@ where
     S: entry_view_state::State,
     S::Uri: entry_view_state::IsSet,
     S::Cid: entry_view_state::IsSet,
-    S::Author: entry_view_state::IsSet,
+    S::Authors: entry_view_state::IsSet,
     S::Record: entry_view_state::IsSet,
     S::IndexedAt: entry_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> EntryView<'a> {
         EntryView {
-            authors: self.__unsafe_private_named.0,
+            authors: self.__unsafe_private_named.0.unwrap(),
             cid: self.__unsafe_private_named.1.unwrap(),
             indexed_at: self.__unsafe_private_named.2.unwrap(),
             record: self.__unsafe_private_named.3.unwrap(),
@@ -1469,7 +1438,7 @@ where
         >,
     ) -> EntryView<'a> {
         EntryView {
-            authors: self.__unsafe_private_named.0,
+            authors: self.__unsafe_private_named.0.unwrap(),
             cid: self.__unsafe_private_named.1.unwrap(),
             indexed_at: self.__unsafe_private_named.2.unwrap(),
             record: self.__unsafe_private_named.3.unwrap(),
@@ -1511,9 +1480,8 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EntryView<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct NotebookView<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub authors: Option<crate::sh_weaver::notebook::AuthorListView<'a>>,
+    pub authors: Vec<crate::sh_weaver::notebook::AuthorListView<'a>>,
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
     pub indexed_at: jacquard_common::types::string::Datetime,
@@ -1541,7 +1509,7 @@ pub mod notebook_view_state {
     pub trait State: sealed::Sealed {
         type Uri;
         type Cid;
-        type Author;
+        type Authors;
         type Record;
         type IndexedAt;
     }
@@ -1551,7 +1519,7 @@ pub mod notebook_view_state {
     impl State for Empty {
         type Uri = Unset;
         type Cid = Unset;
-        type Author = Unset;
+        type Authors = Unset;
         type Record = Unset;
         type IndexedAt = Unset;
     }
@@ -1561,7 +1529,7 @@ pub mod notebook_view_state {
     impl<S: State> State for SetUri<S> {
         type Uri = Set<members::uri>;
         type Cid = S::Cid;
-        type Author = S::Author;
+        type Authors = S::Authors;
         type Record = S::Record;
         type IndexedAt = S::IndexedAt;
     }
@@ -1571,17 +1539,17 @@ pub mod notebook_view_state {
     impl<S: State> State for SetCid<S> {
         type Uri = S::Uri;
         type Cid = Set<members::cid>;
-        type Author = S::Author;
+        type Authors = S::Authors;
         type Record = S::Record;
         type IndexedAt = S::IndexedAt;
     }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthor<S> {}
-    impl<S: State> State for SetAuthor<S> {
+    ///State transition - sets the `authors` field to Set
+    pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthors<S> {}
+    impl<S: State> State for SetAuthors<S> {
         type Uri = S::Uri;
         type Cid = S::Cid;
-        type Author = Set<members::author>;
+        type Authors = Set<members::authors>;
         type Record = S::Record;
         type IndexedAt = S::IndexedAt;
     }
@@ -1591,7 +1559,7 @@ pub mod notebook_view_state {
     impl<S: State> State for SetRecord<S> {
         type Uri = S::Uri;
         type Cid = S::Cid;
-        type Author = S::Author;
+        type Authors = S::Authors;
         type Record = Set<members::record>;
         type IndexedAt = S::IndexedAt;
     }
@@ -1601,7 +1569,7 @@ pub mod notebook_view_state {
     impl<S: State> State for SetIndexedAt<S> {
         type Uri = S::Uri;
         type Cid = S::Cid;
-        type Author = S::Author;
+        type Authors = S::Authors;
         type Record = S::Record;
         type IndexedAt = Set<members::indexed_at>;
     }
@@ -1612,8 +1580,8 @@ pub mod notebook_view_state {
         pub struct uri(());
         ///Marker type for the `cid` field
         pub struct cid(());
-        ///Marker type for the `author` field
-        pub struct author(());
+        ///Marker type for the `authors` field
+        pub struct authors(());
         ///Marker type for the `record` field
         pub struct record(());
         ///Marker type for the `indexed_at` field
@@ -1625,7 +1593,7 @@ pub mod notebook_view_state {
 pub struct NotebookViewBuilder<'a, S: notebook_view_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<crate::sh_weaver::notebook::AuthorListView<'a>>,
+        ::core::option::Option<Vec<crate::sh_weaver::notebook::AuthorListView<'a>>>,
         ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<jacquard_common::types::value::Data<'a>>,
@@ -1654,22 +1622,22 @@ impl<'a> NotebookViewBuilder<'a, notebook_view_state::Empty> {
     }
 }
 
-impl<'a, S: notebook_view_state::State> NotebookViewBuilder<'a, S> {
-    /// Set the `authors` field (optional)
+impl<'a, S> NotebookViewBuilder<'a, S>
+where
+    S: notebook_view_state::State,
+    S::Authors: notebook_view_state::IsUnset,
+{
+    /// Set the `authors` field (required)
     pub fn authors(
         mut self,
-        value: impl Into<Option<crate::sh_weaver::notebook::AuthorListView<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
-        self
-    }
-    /// Set the `authors` field to an Option value (optional)
-    pub fn maybe_authors(
-        mut self,
-        value: Option<crate::sh_weaver::notebook::AuthorListView<'a>>,
-    ) -> Self {
-        self.__unsafe_private_named.0 = value;
-        self
+        value: impl Into<Vec<crate::sh_weaver::notebook::AuthorListView<'a>>>,
+    ) -> NotebookViewBuilder<'a, notebook_view_state::SetAuthors<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        NotebookViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
     }
 }
 
@@ -1792,14 +1760,14 @@ where
     S: notebook_view_state::State,
     S::Uri: notebook_view_state::IsSet,
     S::Cid: notebook_view_state::IsSet,
-    S::Author: notebook_view_state::IsSet,
+    S::Authors: notebook_view_state::IsSet,
     S::Record: notebook_view_state::IsSet,
     S::IndexedAt: notebook_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> NotebookView<'a> {
         NotebookView {
-            authors: self.__unsafe_private_named.0,
+            authors: self.__unsafe_private_named.0.unwrap(),
             cid: self.__unsafe_private_named.1.unwrap(),
             indexed_at: self.__unsafe_private_named.2.unwrap(),
             record: self.__unsafe_private_named.3.unwrap(),
@@ -1818,7 +1786,7 @@ where
         >,
     ) -> NotebookView<'a> {
         NotebookView {
-            authors: self.__unsafe_private_named.0,
+            authors: self.__unsafe_private_named.0.unwrap(),
             cid: self.__unsafe_private_named.1.unwrap(),
             indexed_at: self.__unsafe_private_named.2.unwrap(),
             record: self.__unsafe_private_named.3.unwrap(),

@@ -1,0 +1,120 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.notebook.colourScheme",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A colour palette for notebook theming",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "variant",
+          "colours"
+        ],
+        "properties": {
+          "colours": {
+            "type": "object",
+            "required": [
+              "base",
+              "surface",
+              "overlay",
+              "text",
+              "muted",
+              "subtle",
+              "emphasis",
+              "primary",
+              "secondary",
+              "tertiary",
+              "error",
+              "warning",
+              "success",
+              "border",
+              "link",
+              "highlight"
+            ],
+            "properties": {
+              "base": {
+                "type": "string",
+                "description": "Primary background for page/frame"
+              },
+              "border": {
+                "type": "string",
+                "description": "Border/divider colour"
+              },
+              "emphasis": {
+                "type": "string",
+                "description": "Emphasized text (bold, important)"
+              },
+              "error": {
+                "type": "string",
+                "description": "Error state colour"
+              },
+              "highlight": {
+                "type": "string",
+                "description": "Selection/highlight colour"
+              },
+              "link": {
+                "type": "string",
+                "description": "Hyperlink colour"
+              },
+              "muted": {
+                "type": "string",
+                "description": "De-emphasized text (disabled, metadata)"
+              },
+              "overlay": {
+                "type": "string",
+                "description": "Tertiary background for popovers/dialogs"
+              },
+              "primary": {
+                "type": "string",
+                "description": "Primary brand/accent colour"
+              },
+              "secondary": {
+                "type": "string",
+                "description": "Secondary accent colour"
+              },
+              "subtle": {
+                "type": "string",
+                "description": "Medium emphasis text (comments, labels)"
+              },
+              "success": {
+                "type": "string",
+                "description": "Success state colour"
+              },
+              "surface": {
+                "type": "string",
+                "description": "Secondary background for panels/cards"
+              },
+              "tertiary": {
+                "type": "string",
+                "description": "Tertiary accent colour"
+              },
+              "text": {
+                "type": "string",
+                "description": "Primary readable text colour"
+              },
+              "warning": {
+                "type": "string",
+                "description": "Warning state colour"
+              }
+            }
+          },
+          "name": {
+            "type": "string",
+            "description": "Human-readable name for the colour scheme"
+          },
+          "variant": {
+            "type": "string",
+            "description": "Whether this is a dark or light colour scheme",
+            "enum": [
+              "dark",
+              "light"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

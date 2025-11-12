@@ -11,7 +11,10 @@ use dashmap::DashMap;
 use jacquard_common::{smol_str, types::value::Data};
 use sha2::{Digest, Sha256};
 use smol_str::SmolStr;
-use std::{fmt, sync::{Arc, LazyLock}};
+use std::{
+    fmt,
+    sync::{Arc, LazyLock},
+};
 
 /// Path to a value within a data structure
 ///
@@ -290,9 +293,7 @@ impl<'a> IntoObjectProperty<'a> for LexArrayItem<'a> {
 #[derive(Debug, Clone)]
 pub enum ValidationResult {
     /// Only structural validation was performed (or data was structurally invalid)
-    StructuralOnly {
-        structural: Vec<StructuralError>,
-    },
+    StructuralOnly { structural: Vec<StructuralError> },
     /// Both structural and constraint validation were performed
     Complete {
         structural: Vec<StructuralError>,
@@ -378,6 +379,13 @@ impl SchemaValidator {
     pub fn new() -> Self {
         Self {
             registry: SchemaRegistry::new(),
+            cache: DashMap::new(),
+        }
+    }
+
+    pub fn from_registry(registry: SchemaRegistry) -> Self {
+        Self {
+            registry,
             cache: DashMap::new(),
         }
     }
@@ -490,6 +498,78 @@ impl SchemaValidator {
         }
     }
 
+    pub fn validate_by_nsid_structural(&self, nsid: &str, data: &Data) -> ValidationResult {
+        let mut split = nsid.split('#');
+        let nsid = split.next().unwrap();
+        let def_name = split.next().unwrap_or("main");
+        let def = match self.registry.get_def(nsid, def_name) {
+            Some(d) => d,
+            None => {
+                // Schema not found - this is a structural error
+                return ValidationResult::StructuralOnly {
+                    structural: vec![StructuralError::UnresolvedRef {
+                        path: ValidationPath::new(),
+                        ref_nsid: format!("{}#{}", nsid, def_name).into(),
+                    }],
+                };
+            }
+        };
+
+        let mut path = ValidationPath::new();
+        let mut ctx = ValidationContext::new(nsid, def_name);
+
+        let structural_errors = validate_def(&mut path, data, &def, &self.registry, &mut ctx);
+
+        ValidationResult::StructuralOnly {
+            structural: structural_errors,
+        }
+    }
+
+    pub fn validate_by_nsid(&self, nsid: &str, data: &Data) -> ValidationResult {
+        let mut split = nsid.split('#');
+        let nsid = split.next().unwrap();
+        let def_name = split.next().unwrap_or("main");
+        let def = match self.registry.get_def(nsid, def_name) {
+            Some(d) => d,
+            None => {
+                // Schema not found - this is a structural error
+                return ValidationResult::StructuralOnly {
+                    structural: vec![StructuralError::UnresolvedRef {
+                        path: ValidationPath::new(),
+                        ref_nsid: format!("{}#{}", nsid, def_name).into(),
+                    }],
+                };
+            }
+        };
+
+        let mut path = ValidationPath::new();
+        let mut ctx = ValidationContext::new(nsid, def_name);
+
+        let structural_errors = validate_def(&mut path, data, &def, &self.registry, &mut ctx);
+
+        // If structurally invalid, return structural errors only
+        if !structural_errors.is_empty() {
+            return ValidationResult::StructuralOnly {
+                structural: structural_errors,
+            };
+        }
+
+        // Structurally valid - compute constraints eagerly
+        let mut path = ValidationPath::new();
+        let constraint_errors = validate_constraints(
+            &mut path,
+            data,
+            nsid,
+            def_name,
+            Some(&Arc::new(self.registry.clone())),
+        );
+
+        ValidationResult::Complete {
+            structural: structural_errors,
+            constraints: constraint_errors,
+        }
+    }
+
     /// Get the schema registry
     pub fn registry(&self) -> &SchemaRegistry {
         &self.registry
@@ -520,7 +600,6 @@ impl ValidationContext {
         }
     }
 }
-
 
 /// Validate data against a lexicon def
 fn validate_def(
@@ -609,7 +688,9 @@ fn validate_def(
         // Token types are unit types, no validation needed beyond type checking
         LexUserType::Token(_) => Vec::new(),
         // XRPC types are endpoint definitions, not data types
-        LexUserType::XrpcQuery(_) | LexUserType::XrpcProcedure(_) | LexUserType::XrpcSubscription(_) => Vec::new(),
+        LexUserType::XrpcQuery(_)
+        | LexUserType::XrpcProcedure(_)
+        | LexUserType::XrpcSubscription(_) => Vec::new(),
         // Other types
         _ => Vec::new(),
     }
@@ -951,11 +1032,7 @@ fn validate_constraints_impl(
                 if let Some(field_data) = obj_data.get(name.as_ref()) {
                     path.push_field(name.as_ref());
                     errors.extend(check_property_constraints(
-                        path,
-                        field_data,
-                        prop,
-                        nsid,
-                        registry,
+                        path, field_data, prop, nsid, registry,
                     ));
                     path.pop();
                 }
@@ -978,11 +1055,7 @@ fn validate_constraints_impl(
                 if let Some(field_data) = obj_data.get(name.as_ref()) {
                     path.push_field(name.as_ref());
                     errors.extend(check_property_constraints(
-                        path,
-                        field_data,
-                        prop,
-                        nsid,
-                        registry,
+                        path, field_data, prop, nsid, registry,
                     ));
                     path.pop();
                 }

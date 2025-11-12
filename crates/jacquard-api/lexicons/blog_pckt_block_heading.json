@@ -1,0 +1,47 @@
+{
+  "lexicon": 1,
+  "id": "blog.pckt.block.heading",
+  "description": "A heading block with hierarchical levels (H1-H6). Headings provide document structure and semantic meaning for accessibility and navigation.",
+  "defs": {
+    "headingAttrs": {
+      "type": "object",
+      "description": "Heading attributes",
+      "required": [
+        "level"
+      ],
+      "properties": {
+        "level": {
+          "type": "integer",
+          "description": "Heading level from 1 (most important) to 6 (least important)",
+          "minimum": 1,
+          "maximum": 6
+        }
+      }
+    },
+    "main": {
+      "type": "object",
+      "required": [
+        "attrs"
+      ],
+      "properties": {
+        "attrs": {
+          "type": "ref",
+          "description": "Heading attributes",
+          "ref": "#headingAttrs"
+        },
+        "content": {
+          "type": "array",
+          "description": "Inline content of the heading (text with optional formatting)",
+          "items": {
+            "type": "union",
+            "refs": [
+              "blog.pckt.block.text",
+              "blog.pckt.block.hardBreak"
+            ],
+            "closed": false
+          }
+        }
+      }
+    }
+  }
+}

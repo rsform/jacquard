@@ -16,7 +16,7 @@
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-pub struct External<'a> {
+pub struct ExternalEmbed<'a> {
     #[serde(borrow)]
     pub description: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -28,7 +28,7 @@ pub struct External<'a> {
     pub uri: jacquard_common::types::string::Uri<'a>,
 }
 
-pub mod external_state {
+pub mod external_embed_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
@@ -87,7 +87,7 @@ pub mod external_state {
 }
 
 /// Builder for constructing an instance of this type
-pub struct ExternalBuilder<'a, S: external_state::State> {
+pub struct ExternalEmbedBuilder<'a, S: external_embed_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::CowStr<'a>>,
@@ -98,17 +98,17 @@ pub struct ExternalBuilder<'a, S: external_state::State> {
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
-impl<'a> External<'a> {
+impl<'a> ExternalEmbed<'a> {
     /// Create a new builder for this type
-    pub fn new() -> ExternalBuilder<'a, external_state::Empty> {
-        ExternalBuilder::new()
+    pub fn new() -> ExternalEmbedBuilder<'a, external_embed_state::Empty> {
+        ExternalEmbedBuilder::new()
     }
 }
 
-impl<'a> ExternalBuilder<'a, external_state::Empty> {
+impl<'a> ExternalEmbedBuilder<'a, external_embed_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
-        ExternalBuilder {
+        ExternalEmbedBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (None, None, None, None),
             _phantom: ::core::marker::PhantomData,
@@ -116,18 +116,18 @@ impl<'a> ExternalBuilder<'a, external_state::Empty> {
     }
 }
 
-impl<'a, S> ExternalBuilder<'a, S>
+impl<'a, S> ExternalEmbedBuilder<'a, S>
 where
-    S: external_state::State,
-    S::Description: external_state::IsUnset,
+    S: external_embed_state::State,
+    S::Description: external_embed_state::IsUnset,
 {
     /// Set the `description` field (required)
     pub fn description(
         mut self,
         value: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> ExternalBuilder<'a, external_state::SetDescription<S>> {
+    ) -> ExternalEmbedBuilder<'a, external_embed_state::SetDescription<S>> {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
-        ExternalBuilder {
+        ExternalEmbedBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
             _phantom: ::core::marker::PhantomData,
@@ -135,7 +135,7 @@ where
     }
 }
 
-impl<'a, S: external_state::State> ExternalBuilder<'a, S> {
+impl<'a, S: external_embed_state::State> ExternalEmbedBuilder<'a, S> {
     /// Set the `thumb` field (optional)
     pub fn thumb(
         mut self,
@@ -154,18 +154,18 @@ impl<'a, S: external_state::State> ExternalBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ExternalBuilder<'a, S>
+impl<'a, S> ExternalEmbedBuilder<'a, S>
 where
-    S: external_state::State,
-    S::Title: external_state::IsUnset,
+    S: external_embed_state::State,
+    S::Title: external_embed_state::IsUnset,
 {
     /// Set the `title` field (required)
     pub fn title(
         mut self,
         value: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> ExternalBuilder<'a, external_state::SetTitle<S>> {
+    ) -> ExternalEmbedBuilder<'a, external_embed_state::SetTitle<S>> {
         self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
-        ExternalBuilder {
+        ExternalEmbedBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
             _phantom: ::core::marker::PhantomData,
@@ -173,18 +173,18 @@ where
     }
 }
 
-impl<'a, S> ExternalBuilder<'a, S>
+impl<'a, S> ExternalEmbedBuilder<'a, S>
 where
-    S: external_state::State,
-    S::Uri: external_state::IsUnset,
+    S: external_embed_state::State,
+    S::Uri: external_embed_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<jacquard_common::types::string::Uri<'a>>,
-    ) -> ExternalBuilder<'a, external_state::SetUri<S>> {
+    ) -> ExternalEmbedBuilder<'a, external_embed_state::SetUri<S>> {
         self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
-        ExternalBuilder {
+        ExternalEmbedBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
             _phantom: ::core::marker::PhantomData,
@@ -192,16 +192,16 @@ where
     }
 }
 
-impl<'a, S> ExternalBuilder<'a, S>
+impl<'a, S> ExternalEmbedBuilder<'a, S>
 where
-    S: external_state::State,
-    S::Uri: external_state::IsSet,
-    S::Title: external_state::IsSet,
-    S::Description: external_state::IsSet,
+    S: external_embed_state::State,
+    S::Uri: external_embed_state::IsSet,
+    S::Title: external_embed_state::IsSet,
+    S::Description: external_embed_state::IsSet,
 {
     /// Build the final struct
-    pub fn build(self) -> External<'a> {
-        External {
+    pub fn build(self) -> ExternalEmbed<'a> {
+        ExternalEmbed {
             description: self.__unsafe_private_named.0.unwrap(),
             thumb: self.__unsafe_private_named.1,
             title: self.__unsafe_private_named.2.unwrap(),
@@ -216,8 +216,8 @@ where
             jacquard_common::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
-    ) -> External<'a> {
-        External {
+    ) -> ExternalEmbed<'a> {
+        ExternalEmbed {
             description: self.__unsafe_private_named.0.unwrap(),
             thumb: self.__unsafe_private_named.1,
             title: self.__unsafe_private_named.2.unwrap(),
@@ -238,7 +238,7 @@ fn lexicon_doc_sh_weaver_embed_external() -> ::jacquard_lexicon::lexicon::Lexico
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("external"),
+                ::jacquard_common::smol_str::SmolStr::new_static("externalEmbed"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
@@ -330,7 +330,9 @@ fn lexicon_doc_sh_weaver_embed_external() -> ::jacquard_lexicon::lexicon::Lexico
                                 description: None,
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static("#external"),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "#externalEmbed",
+                                    ),
                                 }),
                                 min_length: None,
                                 max_length: Some(48usize),
@@ -355,11 +357,16 @@ fn lexicon_doc_sh_weaver_embed_external() -> ::jacquard_lexicon::lexicon::Lexico
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("external"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "#viewExternal",
-                                ),
+                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "#viewExternal",
+                                    ),
+                                }),
+                                min_length: None,
+                                max_length: Some(48usize),
                             }),
                         );
                         map
@@ -456,12 +463,12 @@ fn lexicon_doc_sh_weaver_embed_external() -> ::jacquard_lexicon::lexicon::Lexico
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for External<'a> {
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ExternalEmbed<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.embed.external"
     }
     fn def_name() -> &'static str {
-        "external"
+        "externalEmbed"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_embed_external()
@@ -484,12 +491,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for External<'a> {
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-pub struct ExternalRecord<'a> {
+pub struct External<'a> {
     #[serde(borrow)]
-    pub embeds: Vec<crate::sh_weaver::embed::external::External<'a>>,
+    pub embeds: Vec<crate::sh_weaver::embed::external::ExternalEmbed<'a>>,
 }
 
-pub mod external_record_state {
+pub mod external_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
@@ -522,25 +529,27 @@ pub mod external_record_state {
 }
 
 /// Builder for constructing an instance of this type
-pub struct ExternalRecordBuilder<'a, S: external_record_state::State> {
+pub struct ExternalBuilder<'a, S: external_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<Vec<crate::sh_weaver::embed::external::External<'a>>>,
+        ::core::option::Option<
+            Vec<crate::sh_weaver::embed::external::ExternalEmbed<'a>>,
+        >,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
-impl<'a> ExternalRecord<'a> {
+impl<'a> External<'a> {
     /// Create a new builder for this type
-    pub fn new() -> ExternalRecordBuilder<'a, external_record_state::Empty> {
-        ExternalRecordBuilder::new()
+    pub fn new() -> ExternalBuilder<'a, external_state::Empty> {
+        ExternalBuilder::new()
     }
 }
 
-impl<'a> ExternalRecordBuilder<'a, external_record_state::Empty> {
+impl<'a> ExternalBuilder<'a, external_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
-        ExternalRecordBuilder {
+        ExternalBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (None,),
             _phantom: ::core::marker::PhantomData,
@@ -548,18 +557,18 @@ impl<'a> ExternalRecordBuilder<'a, external_record_state::Empty> {
     }
 }
 
-impl<'a, S> ExternalRecordBuilder<'a, S>
+impl<'a, S> ExternalBuilder<'a, S>
 where
-    S: external_record_state::State,
-    S::Embeds: external_record_state::IsUnset,
+    S: external_state::State,
+    S::Embeds: external_state::IsUnset,
 {
     /// Set the `embeds` field (required)
     pub fn embeds(
         mut self,
-        value: impl Into<Vec<crate::sh_weaver::embed::external::External<'a>>>,
-    ) -> ExternalRecordBuilder<'a, external_record_state::SetEmbeds<S>> {
+        value: impl Into<Vec<crate::sh_weaver::embed::external::ExternalEmbed<'a>>>,
+    ) -> ExternalBuilder<'a, external_state::SetEmbeds<S>> {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
-        ExternalRecordBuilder {
+        ExternalBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
             _phantom: ::core::marker::PhantomData,
@@ -567,14 +576,14 @@ where
     }
 }
 
-impl<'a, S> ExternalRecordBuilder<'a, S>
+impl<'a, S> ExternalBuilder<'a, S>
 where
-    S: external_record_state::State,
-    S::Embeds: external_record_state::IsSet,
+    S: external_state::State,
+    S::Embeds: external_state::IsSet,
 {
     /// Build the final struct
-    pub fn build(self) -> ExternalRecord<'a> {
-        ExternalRecord {
+    pub fn build(self) -> External<'a> {
+        External {
             embeds: self.__unsafe_private_named.0.unwrap(),
             extra_data: Default::default(),
         }
@@ -586,15 +595,15 @@ where
             jacquard_common::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
-    ) -> ExternalRecord<'a> {
-        ExternalRecord {
+    ) -> External<'a> {
+        External {
             embeds: self.__unsafe_private_named.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ExternalRecord<'a> {
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for External<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.embed.external"
     }
@@ -637,7 +646,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ExternalRecord<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct View<'a> {
     #[serde(borrow)]
-    pub external: crate::sh_weaver::embed::external::ViewExternal<'a>,
+    pub external: Vec<crate::sh_weaver::embed::external::ViewExternal<'a>>,
 }
 
 pub mod view_state {
@@ -676,7 +685,7 @@ pub mod view_state {
 pub struct ViewBuilder<'a, S: view_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<crate::sh_weaver::embed::external::ViewExternal<'a>>,
+        ::core::option::Option<Vec<crate::sh_weaver::embed::external::ViewExternal<'a>>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -707,7 +716,7 @@ where
     /// Set the `external` field (required)
     pub fn external(
         mut self,
-        value: impl Into<crate::sh_weaver::embed::external::ViewExternal<'a>>,
+        value: impl Into<Vec<crate::sh_weaver::embed::external::ViewExternal<'a>>>,
     ) -> ViewBuilder<'a, view_state::SetExternal<S>> {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
         ViewBuilder {
@@ -758,6 +767,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for View<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.external;
+            #[allow(unused_comparisons)]
+            if value.len() > 48usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "external",
+                    ),
+                    max: 48usize,
+                    actual: value.len(),
+                });
+            }
+        }
         Ok(())
     }
 }

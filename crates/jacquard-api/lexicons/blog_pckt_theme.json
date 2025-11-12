@@ -4,31 +4,27 @@
   "description": "Theme record for blog publications with light and dark mode color schemes.",
   "defs": {
     "main": {
-      "type": "record",
+      "type": "object",
       "description": "Theme configuration for a blog publication",
-      "key": "tid",
-      "record": {
-        "type": "object",
-        "required": [
-          "light",
-          "dark"
-        ],
-        "properties": {
-          "dark": {
-            "type": "ref",
-            "description": "Dark mode color palette",
-            "ref": "#palette"
-          },
-          "font": {
-            "type": "string",
-            "description": "Font family name (optional)",
-            "maxLength": 100
-          },
-          "light": {
-            "type": "ref",
-            "description": "Light mode color palette",
-            "ref": "#palette"
-          }
+      "required": [
+        "light",
+        "dark"
+      ],
+      "properties": {
+        "dark": {
+          "type": "ref",
+          "description": "Dark mode color palette",
+          "ref": "#palette"
+        },
+        "font": {
+          "type": "string",
+          "description": "Font family name (optional)",
+          "maxLength": 100
+        },
+        "light": {
+          "type": "ref",
+          "description": "Light mode color palette",
+          "ref": "#palette"
         }
       }
     },

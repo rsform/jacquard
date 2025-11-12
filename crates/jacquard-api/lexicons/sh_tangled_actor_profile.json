@@ -48,6 +48,11 @@
             "minLength": 0,
             "maxLength": 6
           },
+          "pronouns": {
+            "type": "string",
+            "description": "Preferred gender pronouns.",
+            "maxLength": 40
+          },
           "stats": {
             "type": "array",
             "items": {

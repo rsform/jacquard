@@ -23,10 +23,10 @@ pub struct Entry<'a> {
     pub content: jacquard_common::CowStr<'a>,
     /// Client-declared timestamp when this was originally created.
     pub created_at: jacquard_common::types::string::Datetime,
-    /// The set of images, if any, embedded in the notebook entry.
+    /// The set of images and records, if any, embedded in the notebook entry.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub images: Option<crate::sh_weaver::embed::images::Images<'a>>,
+    pub embeds: Option<EntryEmbeds<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub tags: Option<crate::sh_weaver::notebook::Tags<'a>>,
@@ -98,7 +98,7 @@ pub struct EntryBuilder<'a, S: entry_state::State> {
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<crate::sh_weaver::embed::images::Images<'a>>,
+        ::core::option::Option<EntryEmbeds<'a>>,
         ::core::option::Option<crate::sh_weaver::notebook::Tags<'a>>,
         ::core::option::Option<crate::sh_weaver::notebook::Title<'a>>,
     ),
@@ -162,19 +162,13 @@ where
 }
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
-    /// Set the `images` field (optional)
-    pub fn images(
-        mut self,
-        value: impl Into<Option<crate::sh_weaver::embed::images::Images<'a>>>,
-    ) -> Self {
+    /// Set the `embeds` field (optional)
+    pub fn embeds(mut self, value: impl Into<Option<EntryEmbeds<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
-    /// Set the `images` field to an Option value (optional)
-    pub fn maybe_images(
-        mut self,
-        value: Option<crate::sh_weaver::embed::images::Images<'a>>,
-    ) -> Self {
+    /// Set the `embeds` field to an Option value (optional)
+    pub fn maybe_embeds(mut self, value: Option<EntryEmbeds<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -230,7 +224,7 @@ where
         Entry {
             content: self.__unsafe_private_named.0.unwrap(),
             created_at: self.__unsafe_private_named.1.unwrap(),
-            images: self.__unsafe_private_named.2,
+            embeds: self.__unsafe_private_named.2,
             tags: self.__unsafe_private_named.3,
             title: self.__unsafe_private_named.4.unwrap(),
             extra_data: Default::default(),
@@ -247,7 +241,7 @@ where
         Entry {
             content: self.__unsafe_private_named.0.unwrap(),
             created_at: self.__unsafe_private_named.1.unwrap(),
-            images: self.__unsafe_private_named.2,
+            embeds: self.__unsafe_private_named.2,
             tags: self.__unsafe_private_named.3,
             title: self.__unsafe_private_named.4.unwrap(),
             extra_data: Some(extra_data),
@@ -265,6 +259,227 @@ impl<'a> Entry<'a> {
         jacquard_common::types::uri::RecordUri::try_from_uri(
             jacquard_common::types::string::AtUri::new_cow(uri.into())?,
         )
+    }
+}
+
+/// The set of images and records, if any, embedded in the notebook entry.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct EntryEmbeds<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub externals: std::option::Option<crate::sh_weaver::embed::external::External<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub images: std::option::Option<crate::sh_weaver::embed::images::Images<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub records: std::option::Option<crate::sh_weaver::embed::records::Records<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub records_with_media: std::option::Option<
+        Vec<crate::sh_weaver::embed::record_with_media::RecordWithMedia<'a>>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub videos: std::option::Option<crate::sh_weaver::embed::video::VideoRecord<'a>>,
+}
+
+fn lexicon_doc_sh_weaver_notebook_entry() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
+    ::jacquard_lexicon::lexicon::LexiconDoc {
+        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
+        id: ::jacquard_common::CowStr::new_static("sh.weaver.notebook.entry"),
+        revision: None,
+        description: None,
+        defs: {
+            let mut map = ::std::collections::BTreeMap::new();
+            map.insert(
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static("A notebook entry"),
+                    ),
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
+                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("content"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                            ],
+                        ),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::std::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static("content"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The content of the notebook entry. This should be some flavor of Markdown.",
+                                        ),
+                                    ),
+                                    format: None,
+                                    default: None,
+                                    min_length: None,
+                                    max_length: Some(200000usize),
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Client-declared timestamp when this was originally created.",
+                                        ),
+                                    ),
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static("embeds"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Object(::jacquard_lexicon::lexicon::LexObject {
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "The set of images and records, if any, embedded in the notebook entry.",
+                                        ),
+                                    ),
+                                    required: None,
+                                    nullable: None,
+                                    properties: {
+                                        #[allow(unused_mut)]
+                                        let mut map = ::std::collections::BTreeMap::new();
+                                        map.insert(
+                                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                                "externals",
+                                            ),
+                                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                                description: None,
+                                                r#ref: ::jacquard_common::CowStr::new_static(
+                                                    "sh.weaver.embed.external",
+                                                ),
+                                            }),
+                                        );
+                                        map.insert(
+                                            ::jacquard_common::smol_str::SmolStr::new_static("images"),
+                                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                                description: None,
+                                                r#ref: ::jacquard_common::CowStr::new_static(
+                                                    "sh.weaver.embed.images",
+                                                ),
+                                            }),
+                                        );
+                                        map.insert(
+                                            ::jacquard_common::smol_str::SmolStr::new_static("records"),
+                                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                                description: None,
+                                                r#ref: ::jacquard_common::CowStr::new_static(
+                                                    "sh.weaver.embed.records",
+                                                ),
+                                            }),
+                                        );
+                                        map.insert(
+                                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                                "recordsWithMedia",
+                                            ),
+                                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                                description: None,
+                                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                                    description: None,
+                                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                                        "sh.weaver.embed.recordWithMedia",
+                                                    ),
+                                                }),
+                                                min_length: None,
+                                                max_length: None,
+                                            }),
+                                        );
+                                        map.insert(
+                                            ::jacquard_common::smol_str::SmolStr::new_static("videos"),
+                                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                                description: None,
+                                                r#ref: ::jacquard_common::CowStr::new_static(
+                                                    "sh.weaver.embed.video",
+                                                ),
+                                            }),
+                                        );
+                                        map
+                                    },
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static("tags"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "sh.weaver.notebook.defs#tags",
+                                    ),
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "sh.weaver.notebook.defs#title",
+                                    ),
+                                }),
+                            );
+                            map
+                        },
+                    }),
+                }),
+            );
+            map
+        },
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EntryEmbeds<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.notebook.entry"
+    }
+    fn def_name() -> &'static str {
+        "EntryEmbeds"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_notebook_entry()
+    }
+    fn validate(
+        &self,
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
     }
 }
 
@@ -343,114 +558,5 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
             }
         }
         Ok(())
-    }
-}
-
-fn lexicon_doc_sh_weaver_notebook_entry() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("sh.weaver.notebook.entry"),
-        revision: None,
-        description: None,
-        defs: {
-            let mut map = ::std::collections::BTreeMap::new();
-            map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static("A notebook entry"),
-                    ),
-                    key: Some(::jacquard_common::CowStr::new_static("tid")),
-                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
-                        description: None,
-                        required: Some(
-                            vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("content"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
-                            ],
-                        ),
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("content"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "The content of the notebook entry. This should be some flavor of Markdown.",
-                                        ),
-                                    ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: Some(200000usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
-                            );
-                            map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Client-declared timestamp when this was originally created.",
-                                        ),
-                                    ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
-                            );
-                            map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("images"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "sh.weaver.embed.images",
-                                    ),
-                                }),
-                            );
-                            map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("tags"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "sh.weaver.notebook.defs#tags",
-                                    ),
-                                }),
-                            );
-                            map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "sh.weaver.notebook.defs#title",
-                                    ),
-                                }),
-                            );
-                            map
-                        },
-                    }),
-                }),
-            );
-            map
-        },
     }
 }

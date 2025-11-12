@@ -1,0 +1,88 @@
+{
+  "lexicon": 1,
+  "id": "blog.pckt.block.image",
+  "description": "An image block for displaying visual content. Supports both external URLs and AT Protocol blob storage with automatic aspect ratio preservation.",
+  "defs": {
+    "aspectRatio": {
+      "type": "object",
+      "description": "Image aspect ratio represented as width and height dimensions",
+      "required": [
+        "width",
+        "height"
+      ],
+      "properties": {
+        "height": {
+          "type": "integer",
+          "description": "Height component of aspect ratio",
+          "minimum": 1
+        },
+        "width": {
+          "type": "integer",
+          "description": "Width component of aspect ratio",
+          "minimum": 1
+        }
+      }
+    },
+    "imageAttrs": {
+      "type": "object",
+      "description": "Image attributes",
+      "required": [
+        "src"
+      ],
+      "properties": {
+        "align": {
+          "type": "string",
+          "description": "Horizontal alignment of the image within its container",
+          "enum": [
+            "left",
+            "center",
+            "right"
+          ]
+        },
+        "alt": {
+          "type": "string",
+          "description": "Alternative text description for accessibility and screen readers",
+          "maxLength": 1000,
+          "maxGraphemes": 300
+        },
+        "aspectRatio": {
+          "type": "ref",
+          "description": "Image aspect ratio for proper layout before loading",
+          "ref": "#aspectRatio"
+        },
+        "blob": {
+          "type": "blob",
+          "description": "AT Protocol blob reference (10MB max). Used when image is uploaded to PDS.",
+          "accept": [
+            "image/*"
+          ],
+          "maxSize": 10000000
+        },
+        "src": {
+          "type": "string",
+          "description": "Image source URL or blob reference (blob:CID format for AT Protocol blobs)",
+          "maxLength": 2000
+        },
+        "title": {
+          "type": "string",
+          "description": "Optional image title displayed on hover",
+          "maxLength": 500,
+          "maxGraphemes": 200
+        }
+      }
+    },
+    "main": {
+      "type": "object",
+      "required": [
+        "attrs"
+      ],
+      "properties": {
+        "attrs": {
+          "type": "ref",
+          "description": "Image attributes",
+          "ref": "#imageAttrs"
+        }
+      }
+    }
+  }
+}

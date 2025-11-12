@@ -4,7 +4,7 @@
   "defs": {
     "main": {
       "type": "record",
-      "description": "A grouping of entries in a notebook, intended to be displayed as a single page.",
+      "description": "A grouping of entries in a notebook.",
       "key": "tid",
       "record": {
         "type": "object",
@@ -14,6 +14,13 @@
           "entryList"
         ],
         "properties": {
+          "authors": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "sh.weaver.actor.defs#author"
+            }
+          },
           "createdAt": {
             "type": "string",
             "description": "Client-declared timestamp when this was originally created.",
@@ -28,7 +35,7 @@
           },
           "notebook": {
             "type": "ref",
-            "description": "The notebook this page belongs to.",
+            "description": "The notebook this chapter belongs to.",
             "ref": "com.atproto.repo.strongRef"
           },
           "tags": {

@@ -5,14 +5,10 @@
     "authorListView": {
       "type": "object",
       "required": [
-        "profile",
+        "record",
         "index"
       ],
       "properties": {
-        "cid": {
-          "type": "string",
-          "format": "cid"
-        },
         "index": {
           "type": "integer"
         },
@@ -84,14 +80,17 @@
       "required": [
         "uri",
         "cid",
-        "author",
+        "authors",
         "record",
         "indexedAt"
       ],
       "properties": {
         "authors": {
-          "type": "ref",
-          "ref": "#authorListView"
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#authorListView"
+          }
         },
         "cid": {
           "type": "string",
@@ -127,14 +126,17 @@
       "required": [
         "uri",
         "cid",
-        "author",
+        "authors",
         "record",
         "indexedAt"
       ],
       "properties": {
         "authors": {
-          "type": "ref",
-          "ref": "#authorListView"
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#authorListView"
+          }
         },
         "cid": {
           "type": "string",

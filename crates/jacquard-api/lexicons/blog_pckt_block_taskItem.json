@@ -1,0 +1,45 @@
+{
+  "lexicon": 1,
+  "id": "blog.pckt.block.taskItem",
+  "description": "Individual task item with checkbox state. Contains rich text content that describes the task.",
+  "defs": {
+    "main": {
+      "type": "object",
+      "required": [
+        "attrs",
+        "content"
+      ],
+      "properties": {
+        "attrs": {
+          "type": "ref",
+          "description": "Task item attributes",
+          "ref": "#taskItemAttrs"
+        },
+        "content": {
+          "type": "array",
+          "description": "Array of paragraph content",
+          "items": {
+            "type": "union",
+            "refs": [
+              "blog.pckt.block.paragraph"
+            ],
+            "closed": false
+          }
+        }
+      }
+    },
+    "taskItemAttrs": {
+      "type": "object",
+      "description": "Task item attributes",
+      "required": [
+        "checked"
+      ],
+      "properties": {
+        "checked": {
+          "type": "boolean",
+          "description": "Whether the task is checked or unchecked"
+        }
+      }
+    }
+  }
+}

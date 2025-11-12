@@ -1,0 +1,23 @@
+{
+  "lexicon": 1,
+  "id": "blog.pckt.block.taskList",
+  "description": "Interactive task list with checkable items. Each item displays a checkbox that can be toggled between checked and unchecked states.",
+  "defs": {
+    "main": {
+      "type": "object",
+      "required": [
+        "content"
+      ],
+      "properties": {
+        "content": {
+          "type": "array",
+          "description": "Array of task items",
+          "items": {
+            "type": "ref",
+            "ref": "blog.pckt.block.taskItem"
+          }
+        }
+      }
+    }
+  }
+}

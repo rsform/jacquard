@@ -18,6 +18,9 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Blob<'a> {
+    /// relative path to the blob
+    #[serde(borrow)]
+    pub path: jacquard_common::CowStr<'a>,
     /// Reference to the uploaded file
     #[serde(borrow)]
     pub upload: jacquard_common::types::blob::BlobRef<'a>,
@@ -34,24 +37,36 @@ pub mod blob_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Upload;
+        type Path;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Upload = Unset;
+        type Path = Unset;
     }
     ///State transition - sets the `upload` field to Set
     pub struct SetUpload<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUpload<S> {}
     impl<S: State> State for SetUpload<S> {
         type Upload = Set<members::upload>;
+        type Path = S::Path;
+    }
+    ///State transition - sets the `path` field to Set
+    pub struct SetPath<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPath<S> {}
+    impl<S: State> State for SetPath<S> {
+        type Upload = S::Upload;
+        type Path = Set<members::path>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `upload` field
         pub struct upload(());
+        ///Marker type for the `path` field
+        pub struct path(());
     }
 }
 
@@ -59,6 +74,7 @@ pub mod blob_state {
 pub struct BlobBuilder<'a, S: blob_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
@@ -76,7 +92,26 @@ impl<'a> BlobBuilder<'a, blob_state::Empty> {
     pub fn new() -> Self {
         BlobBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None,),
+            __unsafe_private_named: (None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> BlobBuilder<'a, S>
+where
+    S: blob_state::State,
+    S::Path: blob_state::IsUnset,
+{
+    /// Set the `path` field (required)
+    pub fn path(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> BlobBuilder<'a, blob_state::SetPath<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        BlobBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -92,7 +127,7 @@ where
         mut self,
         value: impl Into<jacquard_common::types::blob::BlobRef<'a>>,
     ) -> BlobBuilder<'a, blob_state::SetUpload<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
         BlobBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -105,11 +140,13 @@ impl<'a, S> BlobBuilder<'a, S>
 where
     S: blob_state::State,
     S::Upload: blob_state::IsSet,
+    S::Path: blob_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Blob<'a> {
         Blob {
-            upload: self.__unsafe_private_named.0.unwrap(),
+            path: self.__unsafe_private_named.0.unwrap(),
+            upload: self.__unsafe_private_named.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -122,7 +159,8 @@ where
         >,
     ) -> Blob<'a> {
         Blob {
-            upload: self.__unsafe_private_named.0.unwrap(),
+            path: self.__unsafe_private_named.0.unwrap(),
+            upload: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -202,6 +240,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Blob<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.path;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 1usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MinLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "path",
+                    ),
+                    min: 1usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
         Ok(())
     }
 }
@@ -229,13 +280,33 @@ fn lexicon_doc_sh_weaver_publish_blob() -> ::jacquard_lexicon::lexicon::LexiconD
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("upload")
+                                ::jacquard_common::smol_str::SmolStr::new_static("upload"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("path")
                             ],
                         ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static("path"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "relative path to the blob",
+                                        ),
+                                    ),
+                                    format: None,
+                                    default: None,
+                                    min_length: Some(1usize),
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static("upload"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {

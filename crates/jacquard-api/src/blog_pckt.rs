@@ -3,7 +3,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+pub mod block;
 pub mod blog;
+pub mod document;
+pub mod mark;
 pub mod post;
 pub mod publication;
 pub mod theme;

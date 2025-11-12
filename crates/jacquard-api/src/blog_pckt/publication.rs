@@ -18,13 +18,13 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Publication<'a> {
-    /// Base URL path for the publication ex https://blog.pckt.blog
+    /// Base URL path for the publication (e.g., https://blog.pckt.blog)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub base_path: Option<jacquard_common::types::string::Uri<'a>>,
     /// Timestamp when the publication was first created
     pub created_at: jacquard_common::types::string::Datetime,
-    /// Publication description
+    /// Publication description or tagline
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub description: Option<jacquard_common::CowStr<'a>>,
@@ -394,6 +394,18 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Publication<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.base_path {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 2000usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "base_path",
+                    ),
+                    max: 2000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
@@ -404,6 +416,24 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Publication<'a> {
                     max: 2000usize,
                     actual: <str>::len(value.as_ref()),
                 });
+            }
+        }
+        if let Some(ref value) = self.description {
+            {
+                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 500usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "description",
+                        ),
+                        max: 500usize,
+                        actual: count,
+                    });
+                }
             }
         }
         if let Some(ref value) = self.extensions {
@@ -429,6 +459,25 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Publication<'a> {
                     max: 200usize,
                     actual: <str>::len(value.as_ref()),
                 });
+            }
+        }
+        {
+            let value = &self.name;
+            {
+                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
+                        value.as_ref(),
+                        true,
+                    )
+                    .count();
+                if count > 100usize {
+                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
+                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                            "name",
+                        ),
+                        max: 100usize,
+                        actual: count,
+                    });
+                }
             }
         }
         Ok(())
@@ -473,7 +522,7 @@ fn lexicon_doc_blog_pckt_publication() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
-                                            "Base URL path for the publication ex https://blog.pckt.blog",
+                                            "Base URL path for the publication (e.g., https://blog.pckt.blog)",
                                         ),
                                     ),
                                     format: Some(
@@ -481,7 +530,7 @@ fn lexicon_doc_blog_pckt_publication() -> ::jacquard_lexicon::lexicon::LexiconDo
                                     ),
                                     default: None,
                                     min_length: None,
-                                    max_length: None,
+                                    max_length: Some(2000usize),
                                     min_graphemes: None,
                                     max_graphemes: None,
                                     r#enum: None,
@@ -519,7 +568,7 @@ fn lexicon_doc_blog_pckt_publication() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static(
-                                            "Publication description",
+                                            "Publication description or tagline",
                                         ),
                                     ),
                                     format: None,
@@ -527,7 +576,7 @@ fn lexicon_doc_blog_pckt_publication() -> ::jacquard_lexicon::lexicon::LexiconDo
                                     min_length: None,
                                     max_length: Some(2000usize),
                                     min_graphemes: None,
-                                    max_graphemes: None,
+                                    max_graphemes: Some(500usize),
                                     r#enum: None,
                                     r#const: None,
                                     known_values: None,
@@ -573,7 +622,7 @@ fn lexicon_doc_blog_pckt_publication() -> ::jacquard_lexicon::lexicon::LexiconDo
                                     min_length: None,
                                     max_length: Some(200usize),
                                     min_graphemes: None,
-                                    max_graphemes: None,
+                                    max_graphemes: Some(100usize),
                                     r#enum: None,
                                     r#const: None,
                                     known_values: None,

@@ -1,0 +1,59 @@
+{
+  "lexicon": 1,
+  "id": "com.crabdance.nandi.post",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "title",
+          "content",
+          "createdAt"
+        ],
+        "properties": {
+          "content": {
+            "type": "string",
+            "description": "The main content of the blog post in markdown",
+            "minLength": 1,
+            "maxLength": 10000
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "published": {
+            "type": "boolean",
+            "description": "Whether the post is published or draft",
+            "default": false
+          },
+          "summary": {
+            "type": "string",
+            "description": "Optional summary/excerpt of the post",
+            "maxLength": 500
+          },
+          "tags": {
+            "type": "array",
+            "description": "Tags for categorizing the post",
+            "items": {
+              "type": "string",
+              "maxLength": 50
+            },
+            "maxLength": 10
+          },
+          "title": {
+            "type": "string",
+            "description": "The title of the blog post",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}
