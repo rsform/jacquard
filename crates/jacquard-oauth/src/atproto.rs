@@ -191,11 +191,11 @@ pub fn atproto_client_metadata<'m>(
     keyset: &Option<Keyset>,
 ) -> Result<OAuthClientMetadata<'m>> {
     // For non-loopback clients, require a keyset/JWKs.
-    let is_loopback =
-        metadata.client_id.scheme() == "http" && metadata.client_id.host_str() == Some("localhost");
-    if !is_loopback && keyset.is_none() {
-        return Err(Error::EmptyJwks);
-    }
+    // let is_loopback =
+    //     metadata.client_id.scheme() == "http" && metadata.client_id.host_str() == Some("localhost");
+    // if !is_loopback && keyset.is_none() {
+    //     return Err(Error::EmptyJwks);
+    // }
     if metadata.redirect_uris.is_empty() {
         return Err(Error::EmptyRedirectUris);
     }
