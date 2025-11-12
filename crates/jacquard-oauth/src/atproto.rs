@@ -227,7 +227,7 @@ pub fn atproto_client_metadata<'m>(
             None
         },
         scope: Some(Scope::serialize_multiple(metadata.scopes.as_slice())),
-        dpop_bound_access_tokens: if keyset.is_some() { Some(true) } else { None },
+        dpop_bound_access_tokens: Some(true),
         jwks_uri,
         jwks,
         token_endpoint_auth_signing_alg: if keyset.is_some() {
