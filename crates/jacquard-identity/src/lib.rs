@@ -328,13 +328,13 @@ pub struct JacquardResolver {
 impl JacquardResolver {
     /// Create a new instance of the default resolver with all options (except DNS) up front
     pub fn new(http: reqwest::Client, opts: ResolverOptions) -> Self {
-        #[cfg(feature = "tracing")]
-        tracing::info!(
-            public_fallback = opts.public_fallback_for_handle,
-            validate_doc_id = opts.validate_doc_id,
-            plc_source = ?opts.plc_source,
-            "jacquard resolver created"
-        );
+        // #[cfg(feature = "tracing")]
+        // tracing::info!(
+        //     public_fallback = opts.public_fallback_for_handle,
+        //     validate_doc_id = opts.validate_doc_id,
+        //     plc_source = ?opts.plc_source,
+        //     "jacquard resolver created"
+        // );
 
         Self {
             http,

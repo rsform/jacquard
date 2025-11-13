@@ -103,13 +103,13 @@ where
     S: ClientAuthStore,
 {
     pub fn new_from_resolver(store: S, client: T, client_data: ClientData<'static>) -> Self {
-        #[cfg(feature = "tracing")]
-        tracing::info!(
-            redirect_uris = ?client_data.config.redirect_uris,
-            scopes = ?client_data.config.scopes,
-            has_keyset = client_data.keyset.is_some(),
-            "oauth client created:"
-        );
+        // #[cfg(feature = "tracing")]
+        // tracing::info!(
+        //     redirect_uris = ?client_data.config.redirect_uris,
+        //     scopes = ?client_data.config.scopes,
+        //     has_keyset = client_data.keyset.is_some(),
+        //     "oauth client created:"
+        // );
 
         let client = Arc::new(client);
         let registry = Arc::new(SessionRegistry::new(store, client.clone(), client_data));
