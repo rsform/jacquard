@@ -477,6 +477,66 @@ impl JacquardResolver {
         Ok(out)
     }
 
+    /// Query DNS via DNS-over-HTTPS using Cloudflare
+    pub async fn query_dns_doh(
+        &self,
+        name: &str,
+        record_type: &str,
+    ) -> resolver::Result<serde_json::Value> {
+        #[cfg(feature = "tracing")]
+        tracing::trace!("querying DNS via DoH: {} ({})", name, record_type);
+
+        let mut url = Url::parse("https://cloudflare-dns.com/dns-query")
+            .expect("hardcoded URL should be valid");
+
+        url.query_pairs_mut()
+            .append_pair("name", name)
+            .append_pair("type", record_type);
+
+        let response = self
+            .http
+            .get(url)
+            .header("Accept", "application/dns-json")
+            .send()
+            .await?;
+
+        let status = response.status();
+        if !status.is_success() {
+            return Err(IdentityError::http_status(status));
+        }
+
+        let json: serde_json::Value = response.json().await?;
+        Ok(json)
+    }
+
+    #[cfg(not(feature = "dns"))]
+    async fn dns_txt(&self, name: &str) -> resolver::Result<Vec<String>> {
+        let fqdn = format!("_atproto.{name}.");
+        let response = self
+            .query_dns_doh(&fqdn, "TXT")
+            .await
+            .map_err(|e| IdentityError::dns(e))?;
+
+        // Parse DoH JSON response
+        let answers = response
+            .get("Answer")
+            .and_then(|a| a.as_array())
+            .ok_or_else(|| {
+                IdentityError::invalid_well_known().with_context(format!(
+                    "couldn't parse cloudflare DoH answers looking for {name}"
+                ))
+            })?;
+
+        let mut results: Vec<String> = Vec::new();
+        for answer in answers {
+            if let Some(data) = answer.get("data").and_then(|d| d.as_str()) {
+                // TXT records are quoted in DNS responses, strip quotes
+                results.push(data.trim_matches('"').to_string())
+            }
+        }
+        Ok(results)
+    }
+
     fn parse_atproto_did_body(body: &str) -> resolver::Result<Did<'static>> {
         let line = body
             .lines()
@@ -592,15 +652,12 @@ impl IdentityResolver for JacquardResolver {
         'outer: for step in &self.opts.handle_order {
             match step {
                 HandleStep::DnsTxt => {
-                    #[cfg(feature = "dns")]
-                    {
-                        if let Ok(txts) = self.dns_txt(host).await {
-                            for txt in txts {
-                                if let Some(did_str) = txt.strip_prefix("did=") {
-                                    if let Ok(did) = Did::new(did_str) {
-                                        resolved_did = Some(did.into_static());
-                                        break 'outer;
-                                    }
+                    if let Ok(txts) = self.dns_txt(host).await {
+                        for txt in txts {
+                            if let Some(did_str) = txt.strip_prefix("did=") {
+                                if let Ok(did) = Did::new(did_str) {
+                                    resolved_did = Some(did.into_static());
+                                    break 'outer;
                                 }
                             }
                         }

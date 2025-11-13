@@ -233,6 +233,8 @@ impl Default for ResolverOptions {
         handle_order.push(HandleStep::PdsResolveHandle);
         #[cfg(target_family = "wasm")]
         handle_order.push(HandleStep::HttpsWellKnown);
+        #[cfg(target_family = "wasm")]
+        handle_order.push(HandleStep::DnsTxt);
 
         let mut did_order = vec![];
         #[cfg(not(target_family = "wasm"))]
@@ -558,7 +560,7 @@ pub enum IdentityErrorKind {
     Url,
 
     /// DNS resolution error
-    #[cfg(all(feature = "dns", not(target_family = "wasm")))]
+    //#[cfg(all(feature = "dns", not(target_family = "wasm")))]
     #[error("DNS resolution error")]
     #[diagnostic(
         code(jacquard::identity::dns),
@@ -667,7 +669,7 @@ impl IdentityError {
     }
 
     /// Create a DNS error
-    #[cfg(all(feature = "dns", not(target_family = "wasm")))]
+    //#[cfg(all(feature = "dns", not(target_family = "wasm")))]
     pub fn dns(source: impl std::error::Error + Send + Sync + 'static) -> Self {
         Self::new(IdentityErrorKind::Dns, Some(Box::new(source)))
     }

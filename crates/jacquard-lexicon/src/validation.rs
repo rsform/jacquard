@@ -365,13 +365,14 @@ pub struct SchemaValidator {
     cache: DashMap<ValidationCacheKey, Arc<ValidationResult>>,
 }
 
+static VALIDATOR: LazyLock<SchemaValidator> = LazyLock::new(|| SchemaValidator {
+    registry: SchemaRegistry::from_inventory(),
+    cache: DashMap::new(),
+});
+
 impl SchemaValidator {
     /// Get the global validator instance
     pub fn global() -> &'static Self {
-        static VALIDATOR: LazyLock<SchemaValidator> = LazyLock::new(|| SchemaValidator {
-            registry: SchemaRegistry::from_inventory(),
-            cache: DashMap::new(),
-        });
         &VALIDATOR
     }
 
