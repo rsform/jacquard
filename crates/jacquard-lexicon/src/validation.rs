@@ -80,6 +80,10 @@ impl ValidationPath {
     pub fn is_empty(&self) -> bool {
         self.segments.is_empty()
     }
+
+    pub fn segments(&self) -> &[PathSegment] {
+        &self.segments
+    }
 }
 
 impl Default for ValidationPath {
@@ -820,6 +824,11 @@ fn validate_property(
             let Some(type_str) = obj.type_discriminator() else {
                 return vec![StructuralError::MissingUnionDiscriminator { path: path.clone() }];
             };
+
+            // Reject empty $type
+            if type_str.is_empty() {
+                return vec![StructuralError::MissingUnionDiscriminator { path: path.clone() }];
+            }
 
             // Try to match against refs
             for variant_ref in &u.refs {

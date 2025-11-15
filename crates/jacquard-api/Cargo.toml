@@ -42,6 +42,9 @@ ufos = [ "moe_karashiiro", "dev_regnault", "buzz_bookhive", "uk_ewancroft",  "wi
 
 streaming = ["jacquard-common/websocket"]
 
+# --- generated ---
+# Generated namespace features
+
 app_blebbit = []
 app_bsky = []
 app_ocho = []
@@ -98,6 +101,3 @@ uk_ewancroft = []
 uk_skyblur = []
 us_polhem = []
 win_tomo_x = []
-
-# --- generated ---
-# Generated namespace features

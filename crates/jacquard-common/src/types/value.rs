@@ -163,7 +163,7 @@ impl<'s> Data<'s> {
     }
 
     /// Get as string if this is a String variant
-    pub fn as_str_mut(&'s mut self) -> Option<&'s mut AtprotoStr> {
+    pub fn as_str_mut(&'s mut self) -> Option<&'s mut AtprotoStr<'s>> {
         if let Data::String(s) = self {
             Some(s)
         } else {

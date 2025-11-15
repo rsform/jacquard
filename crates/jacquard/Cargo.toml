@@ -69,9 +69,6 @@ path = "../../examples/update_profile.rs"
 name = "public_atproto_feed"
 path = "../../examples/public_atproto_feed.rs"
 
-[[example]]
-name = "thomas_bug"
-path = "../../examples/thomas_bug.rs"
 
 
 [[example]]

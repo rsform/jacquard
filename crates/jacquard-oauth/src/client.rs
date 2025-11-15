@@ -175,8 +175,14 @@ where
             keyset: self.registry.client_data.keyset.clone(),
         };
 
-        let auth_req_info =
-            par(self.client.as_ref(), login_hint, options.prompt, &metadata).await?;
+        let auth_req_info = par(
+            self.client.as_ref(),
+            login_hint,
+            options.prompt,
+            &metadata,
+            options.state,
+        )
+        .await?;
 
         // Persist state for callback handling
         self.registry

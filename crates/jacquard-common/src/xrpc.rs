@@ -28,6 +28,7 @@ use crate::error::DecodeError;
 use crate::http_client::HttpClient;
 #[cfg(feature = "streaming")]
 use crate::http_client::HttpClientExt;
+use crate::types::nsid::Nsid;
 use crate::types::value::Data;
 use crate::{AuthorizationToken, error::AuthError};
 use crate::{CowStr, error::XrpcResult};
@@ -162,9 +163,7 @@ pub trait XrpcResp {
     where
         Self::Output<'de>: Deserialize<'de>,
     {
-        #[allow(deprecated)]
         let body = serde_json::from_slice(body).map_err(|e| DecodeError::Json(e))?;
-
         Ok(body)
     }
 }

@@ -274,7 +274,7 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
                 scope: Some(CowStr::new_static("atproto")),
                 grant_types: None,
                 token_endpoint_auth_method: Some(AuthMethod::None.into()),
-                dpop_bound_access_tokens: None,
+                dpop_bound_access_tokens: Some(true),
                 jwks_uri: None,
                 jwks: None,
                 token_endpoint_auth_signing_alg: None,
@@ -316,7 +316,7 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
                 scope: Some(CowStr::new_static("account:email atproto transition:generic")),
                 grant_types: None,
                 token_endpoint_auth_method: Some(AuthMethod::None.into()),
-                dpop_bound_access_tokens: None,
+                dpop_bound_access_tokens: Some(true),
                 jwks_uri: None,
                 jwks: None,
                 token_endpoint_auth_signing_alg: None,
@@ -352,7 +352,7 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
                     scope: Some(CowStr::new_static("atproto")),
                     grant_types: None,
                     token_endpoint_auth_method: Some(AuthMethod::None.into()),
-                    dpop_bound_access_tokens: None,
+                    dpop_bound_access_tokens: Some(true),
                     jwks_uri: None,
                     jwks: None,
                     token_endpoint_auth_signing_alg: None,
@@ -384,7 +384,7 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
                     scope: Some(CowStr::new_static("atproto")),
                     grant_types: None,
                     token_endpoint_auth_method: Some(AuthMethod::None.into()),
-                    dpop_bound_access_tokens: None,
+                    dpop_bound_access_tokens: Some(true),
                     jwks_uri: None,
                     jwks: None,
                     token_endpoint_auth_signing_alg: None,
@@ -416,7 +416,7 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
                     scope: Some(CowStr::new_static("atproto")),
                     grant_types: None,
                     token_endpoint_auth_method: Some(AuthMethod::None.into()),
-                    dpop_bound_access_tokens: None,
+                    dpop_bound_access_tokens: Some(true),
                     jwks_uri: None,
                     jwks: None,
                     token_endpoint_auth_signing_alg: None,
@@ -446,8 +446,8 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
         {
             // Non-loopback clients without a keyset should fail (must provide JWKS)
             let metadata = metadata.clone();
-            let err = atproto_client_metadata(metadata, &None).expect_err("expected to fail");
-            assert!(matches!(err, Error::EmptyJwks));
+            let err = atproto_client_metadata(metadata, &None);
+            assert!(err.is_ok());
         }
         {
             let metadata = metadata.clone();

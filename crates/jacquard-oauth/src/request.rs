@@ -473,8 +473,13 @@ pub async fn par<'r, T: OAuthResolver + DpopExt + Send + Sync + 'static>(
     login_hint: Option<CowStr<'r>>,
     prompt: Option<AuthorizeOptionPrompt>,
     metadata: &OAuthMetadata,
+    state: Option<CowStr<'r>>,
 ) -> crate::request::Result<AuthRequestData<'r>> {
-    let state = generate_nonce();
+    let state = if let Some(state) = state {
+        state
+    } else {
+        generate_nonce()
+    };
     let (code_challenge, verifier) = generate_pkce();
 
     let Some(dpop_key) = generate_dpop_key(&metadata.server_metadata) else {
@@ -958,7 +963,7 @@ mod tests {
         meta.server_metadata.require_pushed_authorization_requests = Some(true);
         meta.server_metadata.pushed_authorization_request_endpoint = None;
         // require_pushed_authorization_requests is true and no endpoint
-        let err = super::par(&MockClient::default(), None, None, &meta)
+        let err = super::par(&MockClient::default(), None, None, &meta, None)
             .await
             .unwrap_err();
         assert!(
