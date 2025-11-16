@@ -13,6 +13,7 @@ use std::future::Future;
 use std::marker::PhantomData;
 use url::Url;
 
+use crate::cowstr::ToCowStr;
 use crate::error::DecodeError;
 use crate::stream::StreamError;
 use crate::websocket::{WebSocketClient, WebSocketConnection, WsSink, WsStream};
@@ -792,7 +793,7 @@ impl<'a, C: WebSocketClient> SubscriptionCall<'a, C> {
 #[cfg_attr(not(target_arch = "wasm32"), trait_variant::make(Send))]
 pub trait SubscriptionClient: WebSocketClient {
     /// Get the base URI for the client.
-    fn base_uri(&self) -> impl Future<Output = Url>;
+    fn base_uri(&self) -> impl Future<Output = CowStr<'static>>;
 
     /// Get the subscription options for the client.
     fn subscription_opts(&self) -> impl Future<Output = SubscriptionOptions<'_>> {
@@ -847,16 +848,17 @@ pub trait SubscriptionClient: WebSocketClient {
 /// or when you want to handle auth manually via headers.
 pub struct BasicSubscriptionClient<W: WebSocketClient> {
     client: W,
-    base_uri: Url,
+    base_uri: CowStr<'static>,
     opts: SubscriptionOptions<'static>,
 }
 
 impl<W: WebSocketClient> BasicSubscriptionClient<W> {
     /// Create a new basic subscription client with the given WebSocket client and base URI.
     pub fn new(client: W, base_uri: Url) -> Self {
+        let base_uri = base_uri.as_str().trim_end_matches("/");
         Self {
             client,
-            base_uri,
+            base_uri: base_uri.to_cowstr().into_static(),
             opts: SubscriptionOptions::default(),
         }
     }
@@ -890,7 +892,7 @@ impl<W: WebSocketClient> WebSocketClient for BasicSubscriptionClient<W> {
 }
 
 impl<W: WebSocketClient> SubscriptionClient for BasicSubscriptionClient<W> {
-    async fn base_uri(&self) -> Url {
+    async fn base_uri(&self) -> CowStr<'static> {
         self.base_uri.clone()
     }
 
@@ -934,6 +936,7 @@ impl<W: WebSocketClient> SubscriptionClient for BasicSubscriptionClient<W> {
         Self: Sync,
     {
         let base = self.base_uri().await;
+        let base = Url::parse(&base).expect("Failed to parse base URL");
         self.subscription(base)
             .with_options(opts)
             .subscribe(params)
@@ -950,6 +953,7 @@ impl<W: WebSocketClient> SubscriptionClient for BasicSubscriptionClient<W> {
         Sub: XrpcSubscription + Send + Sync,
     {
         let base = self.base_uri().await;
+        let base = Url::parse(&base).expect("Failed to parse base URL");
         self.subscription(base)
             .with_options(opts)
             .subscribe(params)

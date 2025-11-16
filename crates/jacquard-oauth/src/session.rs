@@ -43,10 +43,10 @@ pub struct ClientSessionData<'s> {
     pub session_id: CowStr<'s>,
 
     // Base URL of the "resource server" (eg, PDS). Should include scheme, hostname, port; no path or auth info.
-    pub host_url: Url,
+    pub host_url: CowStr<'s>,
 
     // Base URL of the "auth server" (eg, PDS or entryway). Should include scheme, hostname, port; no path or auth info.
-    pub authserver_url: Url,
+    pub authserver_url: CowStr<'s>,
 
     // Full token endpoint
     pub authserver_token_endpoint: CowStr<'s>,
@@ -70,7 +70,7 @@ impl IntoStatic for ClientSessionData<'_> {
 
     fn into_static(self) -> Self::Output {
         ClientSessionData {
-            authserver_url: self.authserver_url,
+            authserver_url: self.authserver_url.into_static(),
             authserver_token_endpoint: self.authserver_token_endpoint.into_static(),
             authserver_revocation_endpoint: self
                 .authserver_revocation_endpoint
@@ -80,7 +80,7 @@ impl IntoStatic for ClientSessionData<'_> {
             token_set: self.token_set.into_static(),
             account_did: self.account_did.into_static(),
             session_id: self.session_id.into_static(),
-            host_url: self.host_url,
+            host_url: self.host_url.into_static(),
         }
     }
 }

@@ -3,9 +3,9 @@ use std::sync::Arc;
 
 use bytes::Bytes;
 use http::{Response as HttpResponse, StatusCode};
-use jacquard::IntoStatic;
 use jacquard::client::Agent;
 use jacquard::xrpc::XrpcClient;
+use jacquard::{CowStr, IntoStatic};
 use jacquard_common::http_client::HttpClient;
 use jacquard_oauth::atproto::AtprotoClientMetadata;
 use jacquard_oauth::authstore::ClientAuthStore;
@@ -115,7 +115,7 @@ impl OAuthResolver for MockClient {
     }
     async fn get_authorization_server_metadata(
         &self,
-        issuer: &url::Url,
+        issuer: &CowStr<'_>,
     ) -> Result<
         jacquard_oauth::types::OAuthAuthorizationServerMetadata<'static>,
         jacquard_oauth::resolver::ResolverError,
@@ -134,7 +134,7 @@ impl OAuthResolver for MockClient {
 
     async fn get_resource_server_metadata(
         &self,
-        _pds: &url::Url,
+        _pds: &CowStr<'_>,
     ) -> Result<
         jacquard_oauth::types::OAuthAuthorizationServerMetadata<'static>,
         jacquard_oauth::resolver::ResolverError,
@@ -243,7 +243,7 @@ async fn oauth_end_to_end_mock_flow() {
     // Construct authorization URL as OAuthClient::start_auth would do
     #[derive(serde::Serialize)]
     struct Parameters<'s> {
-        client_id: url::Url,
+        client_id: CowStr<'s>,
         request_uri: jacquard::CowStr<'s>,
     }
     let auth_url = format!(

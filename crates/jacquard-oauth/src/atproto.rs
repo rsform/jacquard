@@ -2,7 +2,8 @@ use std::str::FromStr;
 
 use crate::types::OAuthClientMetadata;
 use crate::{keyset::Keyset, scopes::Scope};
-use jacquard_common::CowStr;
+use jacquard_common::cowstr::ToCowStr;
+use jacquard_common::{CowStr, IntoStatic};
 use serde::{Deserialize, Serialize};
 use smol_str::{SmolStr, ToSmolStr};
 use thiserror::Error;
@@ -217,9 +218,13 @@ pub fn atproto_client_metadata<'m>(
     };
 
     Ok(OAuthClientMetadata {
-        client_id: metadata.client_id,
-        client_uri: metadata.client_uri,
-        redirect_uris: metadata.redirect_uris,
+        client_id: metadata.client_id.to_cowstr().into_static(),
+        client_uri: metadata.client_uri.map(|u| u.to_cowstr().into_static()),
+        redirect_uris: metadata
+            .redirect_uris
+            .iter()
+            .map(|u| u.to_cowstr().into_static())
+            .collect(),
         token_endpoint_auth_method: Some(auth_method.into()),
         grant_types: if keyset.is_some() {
             Some(metadata.grant_types.into_iter().map(|v| v.into()).collect())
@@ -228,7 +233,7 @@ pub fn atproto_client_metadata<'m>(
         },
         scope: Some(Scope::serialize_multiple(metadata.scopes.as_slice())),
         dpop_bound_access_tokens: Some(true),
-        jwks_uri,
+        jwks_uri: jwks_uri.map(|u| u.to_cowstr().into_static()),
         jwks,
         token_endpoint_auth_signing_alg: if keyset.is_some() {
             Some(CowStr::new_static("ES256"))
@@ -236,9 +241,11 @@ pub fn atproto_client_metadata<'m>(
             None
         },
         client_name: metadata.client_name,
-        logo_uri: metadata.logo_uri,
-        tos_uri: metadata.tos_uri,
-        privacy_policy_uri: metadata.privacy_policy_uri,
+        logo_uri: metadata.logo_uri.map(|u| u.to_cowstr().into_static()),
+        tos_uri: metadata.tos_uri.map(|u| u.to_cowstr().into_static()),
+        privacy_policy_uri: metadata
+            .privacy_policy_uri
+            .map(|u| u.to_cowstr().into_static()),
     })
 }
 
@@ -265,11 +272,11 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
             atproto_client_metadata(AtprotoClientMetadata::new_localhost(None, None), &None)
                 .unwrap(),
             OAuthClientMetadata {
-                client_id: Url::from_str("http://localhost").unwrap(),
+                client_id: CowStr::new_static("http://localhost"),
                 client_uri: None,
                 redirect_uris: vec![
-                    Url::from_str("http://127.0.0.1/").unwrap(),
-                    Url::from_str("http://[::1]/").unwrap(),
+                    CowStr::new_static("http://127.0.0.1/"),
+                    CowStr::new_static("http://[::1]/"),
                 ],
                 scope: Some(CowStr::new_static("atproto")),
                 grant_types: None,
@@ -289,31 +296,34 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
     #[test]
     fn test_localhost_client_metadata_custom() {
         assert_eq!(
-            atproto_client_metadata(AtprotoClientMetadata::new_localhost(
-                Some(vec![
-                     Url::from_str("http://127.0.0.1/callback").unwrap(),
-                     Url::from_str("http://[::1]/callback").unwrap(),
-                ]),
-                Some(
-                    vec![
+            atproto_client_metadata(
+                AtprotoClientMetadata::new_localhost(
+                    Some(vec![
+                        Url::parse("http://127.0.0.1/callback").unwrap(),
+                        Url::parse("http://[::1]/callback").unwrap(),
+                    ]),
+                    Some(vec![
                         Scope::Atproto,
                         Scope::Transition(TransitionScope::Generic),
                         Scope::parse("account:email").unwrap()
-                    ]
-                )
-            ), &None)
+                    ])
+                ),
+                &None
+            )
             .expect("failed to convert metadata"),
             OAuthClientMetadata {
-                client_id: Url::from_str(
+                client_id: CowStr::new_static(
                     "http://localhost?redirect_uri=http%3A%2F%2F127.0.0.1%2Fcallback&redirect_uri=http%3A%2F%2F127.0.0.1%2Fcallback&scope=account%3Aemail+atproto+transition%3Ageneric"
-                ).unwrap(),
+                ),
                 client_uri: None,
                 redirect_uris: vec![
-                    Url::from_str("http://127.0.0.1/callback").unwrap(),
+                    CowStr::new_static("http://127.0.0.1/callback"),
                     // TODO: fix this so that it respects IPv6
-                    Url::from_str("http://127.0.0.1/callback").unwrap(),
+                    CowStr::new_static("http://127.0.0.1/callback"),
                 ],
-                scope: Some(CowStr::new_static("account:email atproto transition:generic")),
+                scope: Some(CowStr::new_static(
+                    "account:email atproto transition:generic"
+                )),
                 grant_types: None,
                 token_endpoint_auth_method: Some(AuthMethod::None.into()),
                 dpop_bound_access_tokens: Some(true),
@@ -334,7 +344,7 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
         {
             let out = atproto_client_metadata(
                 AtprotoClientMetadata::new_localhost(
-                    Some(vec![Url::from_str("https://127.0.0.1/").unwrap()]),
+                    Some(vec![Url::from_str("https://127.0.0.1").unwrap()]),
                     None,
                 ),
                 &None,
@@ -343,12 +353,11 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
             assert_eq!(
                 out,
                 OAuthClientMetadata {
-                    client_id: Url::from_str(
+                    client_id: CowStr::new_static(
                         "http://localhost?redirect_uri=http%3A%2F%2F127.0.0.1%2F"
-                    )
-                    .unwrap(),
+                    ),
                     client_uri: None,
-                    redirect_uris: vec![Url::from_str("http://127.0.0.1/").unwrap()],
+                    redirect_uris: vec![CowStr::new_static("http://127.0.0.1")],
                     scope: Some(CowStr::new_static("atproto")),
                     grant_types: None,
                     token_endpoint_auth_method: Some(AuthMethod::None.into()),
@@ -366,7 +375,7 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
         {
             let out = atproto_client_metadata(
                 AtprotoClientMetadata::new_localhost(
-                    Some(vec![Url::from_str("http://localhost:8000/").unwrap()]),
+                    Some(vec![Url::from_str("http://localhost:8000").unwrap()]),
                     None,
                 ),
                 &None,
@@ -375,12 +384,11 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
             assert_eq!(
                 out,
                 OAuthClientMetadata {
-                    client_id: Url::from_str(
+                    client_id: CowStr::new_static(
                         "http://localhost?redirect_uri=http%3A%2F%2F127.0.0.1%3A8000%2F"
-                    )
-                    .unwrap(),
+                    ),
                     client_uri: None,
-                    redirect_uris: vec![Url::from_str("http://127.0.0.1:8000/").unwrap()],
+                    redirect_uris: vec![CowStr::new_static("http://127.0.0.1:8000")],
                     scope: Some(CowStr::new_static("atproto")),
                     grant_types: None,
                     token_endpoint_auth_method: Some(AuthMethod::None.into()),
@@ -407,12 +415,11 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
             assert_eq!(
                 out,
                 OAuthClientMetadata {
-                    client_id: Url::from_str(
+                    client_id: CowStr::new_static(
                         "http://localhost?redirect_uri=http%3A%2F%2F127.0.0.1%2F"
-                    )
-                    .unwrap(),
+                    ),
                     client_uri: None,
-                    redirect_uris: vec![Url::from_str("http://127.0.0.1/").unwrap()],
+                    redirect_uris: vec![CowStr::new_static("http://127.0.0.1/")],
                     scope: Some(CowStr::new_static("atproto")),
                     grant_types: None,
                     token_endpoint_auth_method: Some(AuthMethod::None.into()),
@@ -465,9 +472,9 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
                 atproto_client_metadata(metadata, &Some(keyset.clone()))
                     .expect("failed to convert metadata"),
                 OAuthClientMetadata {
-                    client_id: Url::from_str("https://example.com/client_metadata.json").unwrap(),
-                    client_uri: Some(Url::from_str("https://example.com").unwrap()),
-                    redirect_uris: vec![Url::from_str("https://example.com/callback").unwrap()],
+                    client_id: CowStr::new_static("https://example.com/client_metadata.json"),
+                    client_uri: Some(CowStr::new_static("https://example.com")),
+                    redirect_uris: vec![CowStr::new_static("https://example.com/callback")],
                     scope: Some(CowStr::new_static("atproto")),
                     grant_types: Some(vec![CowStr::new_static("authorization_code")]),
                     token_endpoint_auth_method: Some(AuthMethod::PrivateKeyJwt.into()),

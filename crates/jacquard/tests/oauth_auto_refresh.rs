@@ -3,10 +3,10 @@ use std::sync::Arc;
 
 use bytes::Bytes;
 use http::{HeaderValue, Method, Response as HttpResponse, StatusCode};
-use jacquard::IntoStatic;
 use jacquard::client::Agent;
 use jacquard::types::did::Did;
 use jacquard::xrpc::XrpcClient;
+use jacquard::{CowStr, IntoStatic};
 use jacquard_common::http_client::HttpClient;
 use jacquard_oauth::atproto::AtprotoClientMetadata;
 use jacquard_oauth::client::OAuthSession;
@@ -84,7 +84,7 @@ impl jacquard::identity::resolver::IdentityResolver for MockClient {
 impl OAuthResolver for MockClient {
     async fn get_authorization_server_metadata(
         &self,
-        issuer: &url::Url,
+        issuer: &CowStr<'_>,
     ) -> Result<OAuthAuthorizationServerMetadata<'static>, jacquard_oauth::resolver::ResolverError>
     {
         // Return minimal metadata with supported auth method "none" and DPoP support
@@ -103,7 +103,7 @@ impl OAuthResolver for MockClient {
 
     async fn get_resource_server_metadata(
         &self,
-        _pds: &url::Url,
+        _pds: &CowStr<'_>,
     ) -> Result<OAuthAuthorizationServerMetadata<'static>, jacquard_oauth::resolver::ResolverError>
     {
         // Return metadata pointing to the same issuer as above
@@ -217,8 +217,8 @@ async fn oauth_xrpc_invalid_token_triggers_refresh_and_retries() {
     let session_data = ClientSessionData {
         account_did: Did::new_static("did:plc:alice").unwrap(),
         session_id: jacquard::CowStr::from("state"),
-        host_url: url::Url::parse("https://pds").unwrap(),
-        authserver_url: url::Url::parse("https://issuer").unwrap(),
+        host_url: CowStr::new_static("https://pds"),
+        authserver_url: CowStr::new_static("https://issuer"),
         authserver_token_endpoint: jacquard::CowStr::from("https://issuer/token"),
         authserver_revocation_endpoint: None,
         scopes: vec![Scope::Atproto],
@@ -246,8 +246,8 @@ async fn oauth_xrpc_invalid_token_triggers_refresh_and_retries() {
     let data_store = ClientSessionData {
         account_did: Did::new_static("did:plc:alice").unwrap(),
         session_id: jacquard::CowStr::from("state"),
-        host_url: url::Url::parse("https://pds").unwrap(),
-        authserver_url: url::Url::parse("https://issuer").unwrap(),
+        host_url: CowStr::new_static("https://pds"),
+        authserver_url: CowStr::new_static("https://issuer"),
         authserver_token_endpoint: jacquard::CowStr::from("https://issuer/token"),
         authserver_revocation_endpoint: None,
         scopes: vec![Scope::Atproto],
@@ -348,8 +348,8 @@ async fn oauth_xrpc_invalid_token_body_triggers_refresh_and_retries() {
     let session_data = ClientSessionData {
         account_did: Did::new_static("did:plc:alice").unwrap(),
         session_id: jacquard::CowStr::from("state"),
-        host_url: url::Url::parse("https://pds").unwrap(),
-        authserver_url: url::Url::parse("https://issuer").unwrap(),
+        host_url: CowStr::new_static("https://pds"),
+        authserver_url: CowStr::new_static("https://issuer"),
         authserver_token_endpoint: jacquard::CowStr::from("https://issuer/token"),
         authserver_revocation_endpoint: None,
         scopes: vec![Scope::Atproto],

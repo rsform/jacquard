@@ -11,6 +11,7 @@ use crate::{
 };
 use jacquard_common::{
     AuthorizationToken, CowStr, IntoStatic,
+    cowstr::ToCowStr,
     error::{AuthError, ClientError, XrpcResult},
     http_client::HttpClient,
     types::{did::Did, string::Handle},
@@ -29,6 +30,7 @@ use jacquard_identity::{
     resolver::{DidDocResponse, IdentityError, IdentityResolver, ResolverOptions},
 };
 use jose_jwk::JwkSet;
+use smol_str::ToSmolStr;
 use std::{future::Future, sync::Arc};
 use tokio::sync::RwLock;
 use url::Url;
@@ -40,7 +42,7 @@ where
 {
     pub registry: Arc<SessionRegistry<T, S>>,
     pub options: RwLock<CallOptions<'static>>,
-    pub endpoint: RwLock<Option<Url>>,
+    pub endpoint: RwLock<Option<CowStr<'static>>>,
     pub client: Arc<T>,
 }
 
@@ -192,13 +194,13 @@ where
 
         #[derive(serde::Serialize)]
         struct Parameters<'s> {
-            client_id: Url,
+            client_id: CowStr<'s>,
             request_uri: CowStr<'s>,
         }
         Ok(metadata.server_metadata.authorization_endpoint.to_string()
             + "?"
             + &serde_html_form::to_string(Parameters {
-                client_id: metadata.client_metadata.client_id.clone(),
+                client_id: metadata.client_metadata.client_id,
                 request_uri: auth_req_info.request_uri,
             })
             .unwrap())
@@ -218,7 +220,7 @@ where
 
         let metadata = self
             .client
-            .get_authorization_server_metadata(&auth_req_info.authserver_url)
+            .get_authorization_server_metadata(&auth_req_info.authserver_url.to_cowstr())
             .await?;
 
         if let Some(iss) = params.iss {
@@ -262,8 +264,8 @@ where
                 let client_data = ClientSessionData {
                     account_did: token_set.sub.clone(),
                     session_id: auth_req_info.state,
-                    host_url: Url::parse(&token_set.iss).expect("Failed to parse host URL"),
-                    authserver_url: auth_req_info.authserver_url,
+                    host_url: token_set.iss.clone(),
+                    authserver_url: auth_req_info.authserver_url.to_cowstr(),
                     authserver_token_endpoint: auth_req_info.authserver_token_endpoint,
                     authserver_revocation_endpoint: auth_req_info.authserver_revocation_endpoint,
                     scopes,
@@ -347,10 +349,12 @@ where
     S: ClientAuthStore + Send + Sync + 'static,
     T: OAuthResolver + DpopExt + Send + Sync + 'static,
 {
-    async fn base_uri(&self) -> Url {
-        self.endpoint.read().await.clone().unwrap_or(
-            Url::parse("https://public.api.bsky.app").expect("public appview should be valid url"),
-        )
+    async fn base_uri(&self) -> CowStr<'static> {
+        self.endpoint
+            .read()
+            .await
+            .clone()
+            .unwrap_or(CowStr::new_static("https://public.api.bsky.app"))
     }
 
     async fn opts(&self) -> CallOptions<'_> {
@@ -364,7 +368,7 @@ where
 
     async fn set_base_uri(&self, url: Url) {
         let mut guard = self.endpoint.write().await;
-        *guard = Some(url);
+        *guard = Some(url.to_cowstr().into_static());
     }
 
     async fn send<R>(&self, request: R) -> XrpcResult<XrpcResponse<R>>
@@ -387,7 +391,7 @@ where
     {
         let base_uri = self.base_uri().await;
         self.client
-            .xrpc(base_uri.clone())
+            .xrpc(Url::parse(&base_uri).map_err(|e| ClientError::encode(e.to_smolstr()))?)
             .with_options(opts.clone())
             .send(&request)
             .await
@@ -470,7 +474,7 @@ where
         (data.account_did.clone(), data.session_id.clone())
     }
 
-    pub async fn endpoint(&self) -> Url {
+    pub async fn endpoint(&self) -> CowStr<'static> {
         self.data.read().await.host_url.clone()
     }
 
@@ -574,7 +578,7 @@ where
     T: OAuthResolver + DpopExt + XrpcExt + Send + Sync + 'static,
     W: Send + Sync,
 {
-    async fn base_uri(&self) -> Url {
+    async fn base_uri(&self) -> CowStr<'static> {
         self.data.read().await.host_url.clone()
     }
 
@@ -589,7 +593,7 @@ where
 
     async fn set_base_uri(&self, url: Url) {
         let mut guard = self.data.write().await;
-        guard.host_url = url;
+        guard.host_url = url.to_cowstr().into_static();
     }
 
     async fn send<R>(&self, request: R) -> XrpcResult<XrpcResponse<R>>
@@ -614,6 +618,7 @@ where
         opts.auth = Some(self.access_token().await);
         let guard = self.data.read().await;
         let mut dpop = guard.dpop_data.clone();
+        let base_uri = Url::parse(&base_uri).map_err(|e| ClientError::transport(e))?;
         let http_response = self
             .client
             .dpop_call(&mut dpop)
@@ -718,6 +723,7 @@ where
         use jacquard_common::StreamError;
 
         let base_uri = <Self as XrpcClient>::base_uri(self).await;
+        let base_uri = Url::parse(&base_uri).map_err(|e| StreamError::protocol(e.to_string()))?;
         let mut opts = self.options.read().await.clone();
         opts.auth = Some(self.access_token().await);
         let http_request = build_http_request(&base_uri, &request, &opts)
@@ -773,7 +779,7 @@ where
         let mut opts = self.options.read().await.clone();
         opts.auth = Some(self.access_token().await);
 
-        let mut url = base_uri;
+        let mut url = Url::parse(&base_uri).map_err(|e| StreamError::encode(e))?;
         let mut path = url.path().trim_end_matches('/').to_owned();
         path.push_str("/xrpc/");
         path.push_str(<Str::Request as jacquard_common::xrpc::XrpcRequest>::NSID);
@@ -919,13 +925,8 @@ where
     T: OAuthResolver + Send + Sync + 'static,
     W: WebSocketClient + Send + Sync,
 {
-    async fn base_uri(&self) -> Url {
-        #[cfg(not(target_arch = "wasm32"))]
-        if tokio::runtime::Handle::try_current().is_ok() {
-            return tokio::task::block_in_place(|| self.data.blocking_read().host_url.clone());
-        }
-
-        self.data.blocking_read().host_url.clone()
+    async fn base_uri(&self) -> CowStr<'static> {
+        self.data.read().await.host_url.clone()
     }
 
     async fn subscription_opts(&self) -> jacquard_common::xrpc::SubscriptionOptions<'_> {
@@ -961,6 +962,7 @@ where
     {
         use jacquard_common::xrpc::SubscriptionExt;
         let base = self.base_uri().await;
+        let base = Url::parse(&base).expect("Failed to parse base URL");
         self.subscription(base)
             .with_options(opts)
             .subscribe(params)

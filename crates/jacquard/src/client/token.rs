@@ -48,10 +48,10 @@ pub struct OAuthSession {
     session_id: String,
 
     /// Base URL of the resource server (PDS)
-    host_url: Url,
+    host_url: String,
 
     /// Base URL of the authorization server (PDS or entryway)
-    authserver_url: Url,
+    authserver_url: String,
 
     /// Full token endpoint URL
     authserver_token_endpoint: String,
@@ -95,8 +95,8 @@ impl From<ClientSessionData<'_>> for OAuthSession {
         OAuthSession {
             account_did: data.account_did.to_string(),
             session_id: data.session_id.to_string(),
-            host_url: data.host_url,
-            authserver_url: data.authserver_url,
+            host_url: data.host_url.to_string(),
+            authserver_url: data.authserver_url.to_string(),
             authserver_token_endpoint: data.authserver_token_endpoint.to_string(),
             authserver_revocation_endpoint: data
                 .authserver_revocation_endpoint
@@ -122,8 +122,8 @@ impl From<OAuthSession> for ClientSessionData<'_> {
         ClientSessionData {
             account_did: session.account_did.into(),
             session_id: session.session_id.to_cowstr(),
-            host_url: session.host_url,
-            authserver_url: session.authserver_url,
+            host_url: session.host_url.to_cowstr(),
+            authserver_url: session.authserver_url.to_cowstr(),
             authserver_token_endpoint: session.authserver_token_endpoint.to_cowstr(),
             authserver_revocation_endpoint: session
                 .authserver_revocation_endpoint

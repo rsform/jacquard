@@ -861,7 +861,7 @@ mod tests {
     use crate::types::{OAuthAuthorizationServerMetadata, OAuthClientMetadata};
     use bytes::Bytes;
     use http::{Response as HttpResponse, StatusCode};
-    use jacquard_common::http_client::HttpClient;
+    use jacquard_common::{http_client::HttpClient, types::string::Did};
     use jacquard_identity::resolver::IdentityResolver;
     use std::sync::Arc;
     use tokio::sync::Mutex;
@@ -895,15 +895,12 @@ mod tests {
         async fn resolve_handle(
             &self,
             _handle: &jacquard_common::types::string::Handle<'_>,
-        ) -> std::result::Result<
-            jacquard_common::types::string::Did<'static>,
-            jacquard_identity::resolver::IdentityError,
-        > {
-            Ok(jacquard_common::types::string::Did::new_static("did:plc:alice").unwrap())
+        ) -> std::result::Result<Did<'static>, jacquard_identity::resolver::IdentityError> {
+            Ok(Did::new_static("did:plc:alice").unwrap())
         }
         async fn resolve_did_doc(
             &self,
-            _did: &jacquard_common::types::string::Did<'_>,
+            _did: &Did<'_>,
         ) -> std::result::Result<
             jacquard_identity::resolver::DidDocResponse,
             jacquard_identity::resolver::IdentityError,
@@ -938,9 +935,9 @@ mod tests {
         OAuthMetadata {
             server_metadata: server,
             client_metadata: OAuthClientMetadata {
-                client_id: url::Url::parse("https://client").unwrap(),
+                client_id: CowStr::new_static("https://client"),
                 client_uri: None,
-                redirect_uris: vec![url::Url::parse("https://client/cb").unwrap()],
+                redirect_uris: vec![CowStr::new_static("https://client/cb")],
                 scope: Some(CowStr::from("atproto")),
                 grant_types: None,
                 token_endpoint_auth_method: Some(CowStr::from("none")),
@@ -976,10 +973,10 @@ mod tests {
         let client = MockClient::default();
         let meta = base_metadata();
         let session = ClientSessionData {
-            account_did: jacquard_common::types::string::Did::new_static("did:plc:alice").unwrap(),
+            account_did: Did::new_static("did:plc:alice").unwrap(),
             session_id: CowStr::from("state"),
-            host_url: url::Url::parse("https://pds").unwrap(),
-            authserver_url: url::Url::parse("https://issuer").unwrap(),
+            host_url: CowStr::new_static("https://pds"),
+            authserver_url: CowStr::new_static("https://issuer"),
             authserver_token_endpoint: CowStr::from("https://issuer/token"),
             authserver_revocation_endpoint: None,
             scopes: vec![],
@@ -990,7 +987,7 @@ mod tests {
             },
             token_set: crate::types::TokenSet {
                 iss: CowStr::from("https://issuer"),
-                sub: jacquard_common::types::string::Did::new_static("did:plc:alice").unwrap(),
+                sub: Did::new_static("did:plc:alice").unwrap(),
                 aud: CowStr::from("https://pds"),
                 scope: None,
                 refresh_token: None,

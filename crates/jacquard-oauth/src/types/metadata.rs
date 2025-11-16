@@ -56,7 +56,7 @@ pub struct OAuthAuthorizationServerMetadata<'s> {
 pub struct OAuthProtectedResourceMetadata<'s> {
     #[serde(borrow)]
     pub resource: CowStr<'s>,
-    pub authorization_servers: Option<Vec<Url>>,
+    pub authorization_servers: Option<Vec<CowStr<'s>>>,
     pub jwks_uri: Option<CowStr<'s>>,
     pub scopes_supported: Vec<CowStr<'s>>,
     pub bearer_methods_supported: Option<Vec<CowStr<'s>>>,
@@ -71,7 +71,7 @@ impl IntoStatic for OAuthProtectedResourceMetadata<'_> {
     fn into_static(self) -> Self::Output {
         OAuthProtectedResourceMetadata {
             resource: self.resource.into_static(),
-            authorization_servers: self.authorization_servers,
+            authorization_servers: self.authorization_servers.into_static(),
             jwks_uri: self.jwks_uri.map(|v| v.into_static()),
             scopes_supported: self.scopes_supported.into_static(),
             bearer_methods_supported: self.bearer_methods_supported.map(|v| v.into_static()),

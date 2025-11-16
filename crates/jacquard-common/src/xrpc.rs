@@ -271,7 +271,7 @@ pub type XrpcResponse<R> = Response<<R as XrpcRequest>::Response>;
 #[cfg_attr(not(target_arch = "wasm32"), trait_variant::make(Send))]
 pub trait XrpcClient: HttpClient {
     /// Get the base URI for the client.
-    fn base_uri(&self) -> impl Future<Output = Url>;
+    fn base_uri(&self) -> impl Future<Output = CowStr<'static>>;
 
     /// Set the base URI for the client.
     fn set_base_uri(&self, url: Url) -> impl Future<Output = ()> {

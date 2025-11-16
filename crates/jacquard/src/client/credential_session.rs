@@ -5,6 +5,7 @@ use jacquard_api::com_atproto::server::{
 };
 use jacquard_common::{
     AuthorizationToken, CowStr, IntoStatic,
+    cowstr::ToCowStr,
     error::{AuthError, ClientError, XrpcResult},
     http_client::HttpClient,
     session::SessionStore,
@@ -13,6 +14,7 @@ use jacquard_common::{
         CallOptions, Response, XrpcClient, XrpcError, XrpcExt, XrpcRequest, XrpcResp, XrpcResponse,
     },
 };
+use smol_str::ToSmolStr;
 use tokio::sync::RwLock;
 use url::Url;
 
@@ -48,7 +50,7 @@ where
     /// Active session key, if any.
     pub key: RwLock<Option<SessionKey>>,
     /// Current base endpoint (PDS); defaults to public appview when unset.
-    pub endpoint: RwLock<Option<Url>>,
+    pub endpoint: RwLock<Option<CowStr<'static>>>,
 }
 
 impl<S, T> CredentialSession<S, T, ()>
@@ -112,15 +114,17 @@ where
     }
 
     /// Current base endpoint. Defaults to the public appview when unset.
-    pub async fn endpoint(&self) -> Url {
-        self.endpoint.read().await.clone().unwrap_or(
-            Url::parse("https://public.bsky.app").expect("public appview should be valid url"),
-        )
+    pub async fn endpoint(&self) -> CowStr<'static> {
+        self.endpoint
+            .read()
+            .await
+            .clone()
+            .unwrap_or(CowStr::new_static("https://public.bsky.app"))
     }
 
     /// Override the current base endpoint.
     pub async fn set_endpoint(&self, endpoint: Url) {
-        *self.endpoint.write().await = Some(endpoint);
+        *self.endpoint.write().await = Some(endpoint.to_cowstr().into_static());
     }
 
     /// Current access token (Bearer), if logged in.
@@ -153,6 +157,11 @@ where
             .ok_or_else(|| ClientError::auth(AuthError::NotAuthenticated))?;
         let session = self.store.get(&key).await;
         let endpoint = self.endpoint().await;
+        let endpoint = Url::parse(endpoint.as_str()).map_err(|_| {
+            ClientError::auth(AuthError::NotAuthenticated)
+                .with_help("ensure endpoint is valid")
+                .with_url("com.atproto.server.refreshSession")
+        })?;
         let mut opts = self.options.read().await.clone();
         opts.auth = session.map(|s| AuthorizationToken::Bearer(s.refresh_jwt));
         let response = self
@@ -277,7 +286,7 @@ where
         }
         // Activate
         *self.key.write().await = Some(key);
-        *self.endpoint.write().await = Some(pds);
+        *self.endpoint.write().await = Some(pds.to_cowstr().into_static());
 
         Ok(session)
     }
@@ -318,7 +327,7 @@ where
 
         // Activate
         *self.key.write().await = Some(key.clone());
-        *self.endpoint.write().await = Some(pds);
+        *self.endpoint.write().await = Some(pds.to_cowstr().into_static());
         // ensure store has the session (no-op if it existed)
         self.store
             .set((sess.did.clone(), session_id.into_static()), sess)
@@ -326,7 +335,13 @@ where
         if let Some(file_store) =
             (&*self.store as &dyn Any).downcast_ref::<crate::client::token::FileAuthStore>()
         {
-            let _ = file_store.set_atp_pds(&key, &self.endpoint().await);
+            let _ = file_store.set_atp_pds(
+                &key,
+                &Url::parse(&self.endpoint().await).map_err(|e| {
+                    ClientError::invalid_request("invalid PDS endpoint")
+                        .with_help(format!("Failed to parse PDS endpoint: {}", e))
+                })?,
+            );
         }
         Ok(())
     }
@@ -360,11 +375,17 @@ where
             })?
         });
         *self.key.write().await = Some(key.clone());
-        *self.endpoint.write().await = Some(pds);
+        *self.endpoint.write().await = Some(pds.to_cowstr().into_static());
         if let Some(file_store) =
             (&*self.store as &dyn Any).downcast_ref::<crate::client::token::FileAuthStore>()
         {
-            let _ = file_store.set_atp_pds(&key, &self.endpoint().await);
+            let _ = file_store.set_atp_pds(
+                &key,
+                &Url::parse(&self.endpoint().await).map_err(|e| {
+                    ClientError::invalid_request("invalid PDS endpoint")
+                        .with_help(format!("Failed to parse PDS endpoint: {}", e))
+                })?,
+            );
         }
         Ok(())
     }
@@ -402,10 +423,12 @@ where
     T: HttpClient + XrpcExt + Send + Sync + 'static,
     W: Send + Sync,
 {
-    async fn base_uri(&self) -> Url {
-        self.endpoint.read().await.clone().unwrap_or(
-            Url::parse("https://public.bsky.app").expect("public appview should be valid url"),
-        )
+    async fn base_uri(&self) -> CowStr<'static> {
+        self.endpoint
+            .read()
+            .await
+            .clone()
+            .unwrap_or(CowStr::new_static("https://public.bsky.app"))
     }
 
     async fn opts(&self) -> CallOptions<'_> {
@@ -419,7 +442,7 @@ where
 
     async fn set_base_uri(&self, url: Url) {
         let mut guard = self.endpoint.write().await;
-        *guard = Some(url);
+        *guard = Some(url.to_cowstr().into_static());
     }
 
     async fn send<R>(&self, request: R) -> XrpcResult<XrpcResponse<R>>
@@ -441,6 +464,8 @@ where
         <R as XrpcRequest>::Response: Send + Sync,
     {
         let base_uri = self.base_uri().await;
+        let base_uri =
+            Url::parse(&base_uri).map_err(|e| ClientError::invalid_request(e.to_smolstr()))?;
         let auth = self.access_token().await;
         opts.auth = auth;
         let resp = self
@@ -546,6 +571,7 @@ where
         use jacquard_common::{StreamError, xrpc::build_http_request};
 
         let base_uri = <Self as XrpcClient>::base_uri(self).await;
+        let base_uri = Url::parse(&base_uri).map_err(|e| StreamError::encode(e))?;
         let mut opts = self.options.read().await.clone();
         opts.auth = self.access_token().await;
 
@@ -599,6 +625,7 @@ where
         use n0_future::TryStreamExt;
 
         let base_uri = self.base_uri().await;
+        let base_uri = Url::parse(&base_uri).map_err(|e| StreamError::encode(e))?;
         let mut opts = self.options.read().await.clone();
         opts.auth = self.access_token().await;
 
@@ -782,10 +809,12 @@ where
     T: Send + Sync + 'static,
     W: WebSocketClient + Send + Sync,
 {
-    async fn base_uri(&self) -> Url {
-        self.endpoint.read().await.clone().unwrap_or(
-            Url::parse("https://public.bsky.app").expect("public appview should be valid url"),
-        )
+    async fn base_uri(&self) -> CowStr<'static> {
+        self.endpoint
+            .read()
+            .await
+            .clone()
+            .unwrap_or(CowStr::new_static("https://public.bsky.app"))
     }
 
     async fn subscription_opts(&self) -> jacquard_common::xrpc::SubscriptionOptions<'_> {
@@ -822,6 +851,7 @@ where
     {
         use jacquard_common::xrpc::SubscriptionExt;
         let base = self.base_uri().await;
+        let base = Url::parse(&base).expect("base uri should be valid url");
         self.subscription(base)
             .with_options(opts)
             .subscribe(params)
