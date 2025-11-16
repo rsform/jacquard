@@ -593,7 +593,7 @@ where
 
     async fn set_base_uri(&self, url: Url) {
         let mut guard = self.data.write().await;
-        guard.host_url = url.to_cowstr().into_static();
+        guard.host_url = url.as_str().trim_end_matches("/").to_cowstr().into_static();
     }
 
     async fn send<R>(&self, request: R) -> XrpcResult<XrpcResponse<R>>

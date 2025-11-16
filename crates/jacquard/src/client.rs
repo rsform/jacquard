@@ -254,7 +254,7 @@ where
             let base_uri = self.base_uri().await;
             let base_uri = Url::parse(&base_uri).expect("base_uri should be valid url");
             self.resolver
-                .xrpc(base_uri.clone())
+                .xrpc(base_uri)
                 .with_options(opts.clone())
                 .send(&request)
                 .await
@@ -287,8 +287,9 @@ where
     {
         async move {
             let base_uri = self.base_uri().await;
+            let base_uri = Url::parse(&base_uri).expect("base_uri should be valid url");
             self.resolver
-                .xrpc(base_uri.clone())
+                .xrpc(base_uri)
                 .with_options(opts.clone())
                 .send(&request)
                 .await

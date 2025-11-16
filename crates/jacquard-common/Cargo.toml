@@ -93,4 +93,4 @@ tokio = { version = "1", features = ["macros", "rt", "rt-multi-thread"] }
 futures-lite = "2.6"
 
 [package.metadata.docs.rs]
-features = [ "crypto-k256", "crypto-k256", "crypto-p256",  "websocket", "zstd", "service-auth", "reqwest-client", "crypto"]
+features = [ "crypto-k256", "crypto-ed22519", "crypto-p256",  "websocket", "zstd", "service-auth", "reqwest-client", "crypto"]

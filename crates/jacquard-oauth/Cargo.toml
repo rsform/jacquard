@@ -33,7 +33,6 @@ thiserror = { workspace = true }
 serde_html_form = { workspace = true }
 miette = { workspace = true }
 p256 = { workspace = true, features = ["ecdsa"] }
-signature = "2"
 jose-jwa = "0.1"
 jose-jwk = { workspace = true, features = ["p256"] }
 chrono.workspace = true

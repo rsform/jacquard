@@ -286,7 +286,8 @@ where
         }
         // Activate
         *self.key.write().await = Some(key);
-        *self.endpoint.write().await = Some(pds.to_cowstr().into_static());
+        *self.endpoint.write().await =
+            Some(pds.as_str().trim_end_matches("/").to_cowstr().into_static());
 
         Ok(session)
     }
@@ -442,7 +443,7 @@ where
 
     async fn set_base_uri(&self, url: Url) {
         let mut guard = self.endpoint.write().await;
-        *guard = Some(url.to_cowstr().into_static());
+        *guard = Some(url.as_str().trim_end_matches("/").to_cowstr().into_static());
     }
 
     async fn send<R>(&self, request: R) -> XrpcResult<XrpcResponse<R>>

@@ -2506,7 +2506,6 @@ dependencies = [
  "serde_html_form",
  "serde_json",
  "sha2",
- "signature",
  "smol_str",
  "thiserror 2.0.17",
  "tokio",

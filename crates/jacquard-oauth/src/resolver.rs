@@ -5,6 +5,7 @@ use crate::types::{OAuthAuthorizationServerMetadata, OAuthProtectedResourceMetad
 use http::{Request, StatusCode};
 use jacquard_common::CowStr;
 use jacquard_common::IntoStatic;
+use jacquard_common::cowstr::ToCowStr;
 use jacquard_common::types::did_doc::DidDocument;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::{http_client::HttpClient, types::did::Did};
@@ -423,7 +424,7 @@ async fn resolve_oauth_impl<T: OAuthResolver + ?Sized>(
     // resolve to a DID)
     Ok(if input.starts_with("https://") {
         let url = Url::parse(input).map_err(|_| ResolverError::not_found())?;
-        (resolver.resolve_from_service(&url).await?, None)
+        (resolver.resolve_from_service(&url.to_cowstr()).await?, None)
     } else {
         let (metadata, identity) = resolver.resolve_from_identity(input).await?;
         (metadata, Some(identity))
@@ -491,7 +492,9 @@ async fn resolve_from_identity_impl<T: OAuthResolver + ?Sized>(
         .map_err(|e| ResolverError::at_identifier(smol_str::format_smolstr!("{:?}", e)))?;
     let identity = resolver.resolve_ident_owned(&actor).await?;
     if let Some(pds) = &identity.pds_endpoint() {
-        let metadata = resolver.get_resource_server_metadata(pds).await?;
+        let metadata = resolver
+            .get_resource_server_metadata(&pds.to_cowstr())
+            .await?;
         Ok((metadata, identity))
     } else {
         Err(ResolverError::did_document("Did doc lacking pds"))
@@ -514,7 +517,7 @@ async fn get_authorization_server_metadata_impl<T: HttpClient + ?Sized>(
     issuer: &CowStr<'_>,
 ) -> Result<OAuthAuthorizationServerMetadata<'static>> {
     let mut md = resolve_authorization_server(client, issuer).await?;
-    md.issuer = issuer.into_static();
+    md.issuer = issuer.clone().into_static();
     Ok(md)
 }
 
