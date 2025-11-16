@@ -1,13 +1,11 @@
 #![cfg(feature = "loopback")]
 
 use crate::{
-    atproto::AtprotoClientMetadata,
     authstore::ClientAuthStore,
     client::OAuthClient,
     dpop::DpopExt,
     error::{CallbackError, OAuthError},
     resolver::OAuthResolver,
-    scopes::Scope,
     types::{AuthorizeOptions, CallbackParams},
 };
 use jacquard_common::{IntoStatic, cowstr::ToCowStr};
@@ -122,22 +120,15 @@ where
             local_addr.port(),
         ))
         .unwrap();
-        let client_data = crate::session::ClientData {
-            keyset: self.registry.client_data.keyset.clone(),
-            config: AtprotoClientMetadata::new_localhost(
-                Some(vec![redirect.clone()]),
-                Some(vec![
-                    Scope::Atproto,
-                    Scope::Transition(crate::scopes::TransitionScope::Generic),
-                ]),
-            ),
-        };
 
+        let mut client_data = self.registry.client_data.clone();
+        // Ensure the redirect URI is set correctly for the loopback server
+        client_data.config.redirect_uris = vec![redirect];
         // Build client using store and resolver
         let flow_client = OAuthClient::new_with_shared(
             self.registry.store.clone(),
             self.client.clone(),
-            client_data.clone(),
+            client_data,
         );
 
         // Start auth and get authorization URL

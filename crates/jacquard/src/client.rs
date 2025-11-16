@@ -16,6 +16,7 @@
 //! - [`token`] - Token storage and persistence
 //! - [`vec_update`] - Trait for fetch-modify-put patterns on array endpoints
 
+//pub mod bff_session;
 /// App-password session implementation with auto-refresh
 pub mod credential_session;
 /// Agent error type
@@ -460,9 +461,10 @@ impl Default for MemoryCredentialSession {
 /// App password session information from `com.atproto.server.createSession`
 ///
 /// Contains the access and refresh tokens along with user identity information.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct AtpSession {
     /// Access token (JWT) used for authenticated requests
+    #[serde(borrow)]
     pub access_jwt: CowStr<'static>,
     /// Refresh token (JWT) used to obtain new access tokens
     pub refresh_jwt: CowStr<'static>,
@@ -470,6 +472,19 @@ pub struct AtpSession {
     pub did: Did<'static>,
     /// User's handle (e.g., "alice.bsky.social")
     pub handle: Handle<'static>,
+}
+
+impl IntoStatic for AtpSession {
+    type Output = Self;
+
+    fn into_static(self) -> Self {
+        Self {
+            access_jwt: self.access_jwt.into_static(),
+            refresh_jwt: self.refresh_jwt.into_static(),
+            did: self.did.into_static(),
+            handle: self.handle.into_static(),
+        }
+    }
 }
 
 #[cfg(feature = "api")]
