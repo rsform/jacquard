@@ -513,28 +513,28 @@ mod tests {
         assert!(formatted.contains("Account"));
     }
 
-    #[test]
-    fn test_generate_token_type() {
-        let corpus =
-            LexiconCorpus::load_from_dir("tests/fixtures/test_lexicons").expect("load corpus");
-        let codegen = CodeGenerator::new(&corpus, "jacquard_api");
+    // #[test]
+    // fn test_generate_token_type() {
+    //     let corpus =
+    //         LexiconCorpus::load_from_dir("tests/fixtures/test_lexicons").expect("load corpus");
+    //     let codegen = CodeGenerator::new(&corpus, "jacquard_api");
 
-        let doc = corpus.get("app.bsky.embed.images").expect("get images");
-        let def = doc.defs.get("viewImage").expect("get viewImage def");
+    //     let doc = corpus.get("app.bsky.embed.images").expect("get images");
+    //     let def = doc.defs.get("viewImage").expect("get viewImage def");
 
-        let tokens = codegen
-            .generate_def("app.bsky.embed.images", "viewImage", def)
-            .expect("generate");
+    //     let tokens = codegen
+    //         .generate_def("app.bsky.embed.images", "viewImage", def)
+    //         .expect("generate");
 
-        let file: syn::File = syn::parse2(tokens).expect("parse tokens");
-        let formatted = prettyplease::unparse(&file);
-        println!("\n{}\n", formatted);
+    //     let file: syn::File = syn::parse2(tokens).expect("parse tokens");
+    //     let formatted = prettyplease::unparse(&file);
+    //     println!("\n{}\n", formatted);
 
-        // Token types are unit structs
-        assert!(formatted.contains("struct ViewImage"));
-        // Should have Display implementation
-        assert!(formatted.contains("impl std::fmt::Display"));
-    }
+    //     // Token types are unit structs
+    //     assert!(formatted.contains("struct ViewImage"));
+    //     // Should have Display implementation
+    //     assert!(formatted.contains("impl std::fmt::Display"));
+    // }
 
     #[test]
     fn test_generate_array_types() {

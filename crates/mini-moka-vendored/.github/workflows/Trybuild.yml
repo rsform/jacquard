@@ -1,0 +1,35 @@
+name: Trybuild
+
+on:
+  push:
+    paths-ignore:
+    - '.devcontainer/**'
+    - '.gitpod.yml'
+    - '.vscode/**'
+  schedule:
+    # Run against the last commit on the default branch on Friday at 9pm (UTC?)
+    - cron:  '0 21 * * 5'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        rust:
+          - stable
+          - beta
+
+    steps:
+      - name: Checkout Mini Moka
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.rust }}
+
+      - name: Run compile error tests (sync feature, trybuild)
+        if: ${{ matrix.rust == 'stable' }}
+        run: cargo test ui_trybuild --release --features sync
+        env:
+          RUSTFLAGS: '--cfg trybuild'

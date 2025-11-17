@@ -1,0 +1,42 @@
+name: Clippy lints and Rustfmt
+
+on:
+  push:
+    paths-ignore:
+    - '.devcontainer/**'
+    - '.gitpod.yml'
+    - '.vscode/**'
+  schedule:
+    # Run against the last commit on the default branch on Friday at 7pm (UTC?)
+    - cron:  '0 19 * * 5'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        rust:
+          - toolchain: stable
+          - toolchain: beta
+            rustflags: '--cfg beta_clippy'
+
+    steps:
+      - name: Checkout Mini Moka
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.rust.toolchain }}
+          components: rustfmt, clippy
+
+      - run: cargo clean
+
+      - name: Run Clippy
+        run: cargo clippy --lib --tests --all-features --all-targets -- -D warnings
+        env:
+          RUSTFLAGS: ${{ matrix.rust.rustflags }}
+
+      - name: Run Rustfmt
+        if: ${{ matrix.rust.toolchain == 'stable' }}
+        run: cargo fmt --all -- --check

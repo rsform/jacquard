@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    paths-ignore:
+    - '.devcontainer/**'
+    - '.gitpod.yml'
+    - '.vscode/**'
+  pull_request:
+    paths-ignore:
+    - '.devcontainer/**'
+    - '.gitpod.yml'
+    - '.vscode/**'
+  schedule:
+    # Run against the last commit on the default branch on Friday at 8pm (UTC?)
+    - cron: '0 20 * * 5'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        rust:
+          - stable
+          - beta
+          - 1.76.0  # MSRV
+          - nightly # For checking minimum version dependencies.
+
+    steps:
+      - name: Checkout Mini Moka
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.rust }}
+
+      - run: cargo clean
+
+      - name: Downgrade dependencies to minimal versions (Nightly only)
+        if: ${{ matrix.rust == 'nightly' }}
+        run: cargo update -Z minimal-versions
+
+      - name: Show cargo tree
+        run: cargo tree
+
+      - name: Run tests (debug, sync feature)
+        run: cargo test --features sync
+
+      - name: Run tests (release, sync feature)
+        run: cargo test --release --features sync
