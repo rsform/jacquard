@@ -204,6 +204,7 @@ where
         session_id: Option<CowStr<'_>>,
         allow_takendown: Option<bool>,
         auth_factor_token: Option<CowStr<'_>>,
+        pds: Option<Url>,
     ) -> std::result::Result<AtpSession, ClientError>
     where
         S: Any + 'static,
@@ -213,7 +214,9 @@ where
             tracing::info_span!("credential_session_login", identifier = %identifier).entered();
 
         // Resolve PDS base
-        let pds = if identifier.as_ref().starts_with("http://")
+        let pds = if let Some(pds) = pds {
+            pds
+        } else if identifier.as_ref().starts_with("http://")
             || identifier.as_ref().starts_with("https://")
         {
             Url::parse(identifier.as_ref()).map_err(|e: url::ParseError| {
@@ -231,6 +234,12 @@ where
             resp.into_owned()?.pds_endpoint().ok_or_else(|| {
                 ClientError::invalid_request("missing PDS endpoint")
                     .with_help("DID document must include a PDS service endpoint")
+            })?
+        } else if identifier.as_ref().contains("@") && !identifier.as_ref().starts_with("@") {
+            // we're going to assume its an email
+            pds.ok_or_else(|| {
+                ClientError::invalid_request("missing PDS endpoint")
+                    .with_help("When logging in with email, we need your PDS")
             })?
         } else {
             // treat as handle

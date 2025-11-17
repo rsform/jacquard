@@ -452,10 +452,11 @@ impl MemoryCredentialSession {
         identifier: CowStr<'_>,
         password: CowStr<'_>,
         session_id: Option<CowStr<'_>>,
+        pds: Option<Url>,
     ) -> ClientResult<(Self, AtpSession)> {
         let session = MemoryCredentialSession::unauthenticated();
         let auth = session
-            .login(identifier, password, session_id, None, None)
+            .login(identifier, password, session_id, None, None, pds)
             .await?;
         Ok((session, auth))
     }

@@ -179,6 +179,7 @@ async fn credential_login_and_auto_refresh() {
             Some(jacquard::CowStr::from("session")),
             None,
             None,
+            None,
         )
         .await
         .expect("login ok");

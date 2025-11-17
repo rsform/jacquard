@@ -1,3 +1,4 @@
+use langtag::InvalidLangTag;
 use serde::{Deserialize, Deserializer, Serialize, de::Error};
 use smol_str::{SmolStr, ToSmolStr};
 use std::fmt;
@@ -34,6 +35,11 @@ impl Language {
     pub fn new_static(lang: &'static str) -> Result<Self, langtag::InvalidLangTag<&'static str>> {
         let tag = langtag::LangTag::new(lang)?;
         Ok(Language(SmolStr::new_static(tag.as_str())))
+    }
+
+    fn new_owned(lang: SmolStr) -> Result<Self, SmolStr> {
+        let tag = langtag::LangTag::new(&lang).map_err(|e| e.to_smolstr())?;
+        Ok(Language(SmolStr::new(tag.as_str())))
     }
 
     /// Infallible constructor for when you *know* the string is a valid IETF language tag.
@@ -75,8 +81,8 @@ impl<'de> Deserialize<'de> for Language {
     where
         D: Deserializer<'de>,
     {
-        let value: &str = Deserialize::deserialize(deserializer)?;
-        Self::new(value).map_err(D::Error::custom)
+        let value = Deserialize::deserialize(deserializer)?;
+        Self::new_owned(value).map_err(D::Error::custom)
     }
 }
 
