@@ -7,7 +7,10 @@ use std::sync::LazyLock;
 use std::{cmp, str::FromStr};
 
 use crate::{CowStr, IntoStatic};
+#[cfg(not(target_arch = "wasm32"))]
 use regex::Regex;
+#[cfg(target_arch = "wasm32")]
+use regex_lite::Regex;
 
 /// Regex for ISO 8601 datetime validation per AT Protocol spec
 pub static ISO8601_REGEX: LazyLock<Regex> = LazyLock::new(|| {

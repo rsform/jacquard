@@ -1,6 +1,9 @@
 use crate::types::string::AtStrError;
 use crate::{CowStr, IntoStatic};
+#[cfg(not(target_arch = "wasm32"))]
 use regex::Regex;
+#[cfg(target_arch = "wasm32")]
+use regex_lite::Regex;
 use serde::{Deserialize, Deserializer, Serialize, de::Error};
 use smol_str::{SmolStr, ToSmolStr};
 use std::fmt;

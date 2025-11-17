@@ -20,7 +20,10 @@ use jacquard_common::types::uri::UriParseError;
 use jacquard_identity::resolver::IdentityError;
 #[cfg(feature = "api_bluesky")]
 use jacquard_identity::resolver::IdentityResolver;
-use regex::Regex;
+#[cfg(not(target_family = "wasm"))]
+use regex::{Regex, Captures};
+#[cfg(target_family = "wasm")]
+use regex_lite::{Regex, Captures};
 use std::marker::PhantomData;
 use std::ops::Range;
 use std::sync::LazyLock;
@@ -197,7 +200,7 @@ enum FacetCandidate {
 /// runs of newlines and invisible chars to at most two newlines.
 fn sanitize_text(text: &str) -> String {
     SANITIZE_NEWLINES_REGEX
-        .replace_all(text, |caps: &regex::Captures| {
+        .replace_all(text, |caps: &Captures| {
             let matched = caps.get(0).unwrap().as_str();
 
             // Count newline sequences, treating \r\n as one unit

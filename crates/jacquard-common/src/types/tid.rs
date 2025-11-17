@@ -7,7 +7,10 @@ use std::{ops::Deref, str::FromStr};
 use crate::CowStr;
 use crate::types::integer::LimitedU32;
 use crate::types::string::{AtStrError, StrParseKind};
+#[cfg(not(target_arch = "wasm32"))]
 use regex::Regex;
+#[cfg(target_arch = "wasm32")]
+use regex_lite::Regex;
 
 const S32_CHAR: &str = "234567abcdefghijklmnopqrstuvwxyz";
 

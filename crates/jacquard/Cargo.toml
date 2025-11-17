@@ -152,7 +152,6 @@ thiserror.workspace = true
 tokio = { workspace = true, default-features = false, features = ["sync"] }
 url.workspace = true
 smol_str.workspace = true
-regex.workspace = true
 webpage.workspace = true
 jose-jwk = { workspace = true, features = ["p256"] }
 tracing = { workspace = true, optional = true }
@@ -167,9 +166,11 @@ reqwest = { workspace = true, features = [
     "rustls-tls",
 ] }
 tokio = { workspace = true, features = ["macros", "rt-multi-thread", "fs"] }
+regex = { workspace = true, default-features = false, features = ["std", "perf-literal", "unicode"] }
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 getrandom = { version = "0.2", features = ["js"] }
+regex-lite = "0.1"
 
 [target.'cfg(all(target_family = "wasm", target_os = "unknown"))'.dependencies]
 gloo-storage = "0.3"
