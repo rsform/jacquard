@@ -1,9 +1,9 @@
 [package]
 name = "mini-moka"
-version = "0.11.0"
+version = "0.10.99"
 edition = "2018"
 rust-version = "1.76"
-
+publish = false
 description = "A lighter edition of Moka, a fast and concurrent cache library"
 license = "MIT OR Apache-2.0"
 # homepage = "https://"
