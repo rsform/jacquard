@@ -180,6 +180,7 @@ impl<'s> Data<'s> {
         }
     }
 
+    /// Get a mutable reference to the boolean if this is a Boolean variant
     pub fn as_boolean_mut(&mut self) -> Option<&mut bool> {
         if let Data::Boolean(b) = self {
             Some(b)
@@ -246,10 +247,16 @@ impl<'s> Data<'s> {
         parse_and_traverse_path(self, path)
     }
 
+    /// Get a mutable reference to a field at the given path
+    ///
+    /// Uses the same path syntax as [`get_at_path`](Self::get_at_path).
     pub fn get_at_path_mut(&mut self, path: &str) -> Option<&mut Data<'s>> {
         parse_and_traverse_path_mut(self, path)
     }
 
+    /// Set the value at the given path, returning true if successful
+    ///
+    /// Uses the same path syntax as [`get_at_path`](Self::get_at_path).
     pub fn set_at_path(&mut self, path: &str, new_data: Data<'_>) -> bool {
         if let Some(data) = parse_and_traverse_path_mut(self, path) {
             *data = new_data.into_static();
@@ -344,6 +351,7 @@ impl<'s> Array<'s> {
         self.0.get(index)
     }
 
+    /// Get a mutable reference to an element by index
     pub fn get_mut(&mut self, index: usize) -> Option<&mut Data<'s>> {
         self.0.get_mut(index)
     }
@@ -396,6 +404,7 @@ impl<'s> Object<'s> {
         self.0.get(key)
     }
 
+    /// Get a mutable reference to a value by key
     pub fn get_mut(&mut self, key: &str) -> Option<&mut Data<'s>> {
         self.0.get_mut(key)
     }
@@ -723,6 +732,9 @@ impl<'d> RawData<'d> {
         parse_and_traverse_raw_path(self, path)
     }
 
+    /// Get a mutable reference to a field at the given path
+    ///
+    /// Uses the same path syntax as [`get_at_path`](Self::get_at_path).
     pub fn get_at_path_mut<'a>(&'a mut self, path: &str) -> Option<&'a mut RawData<'d>> {
         parse_and_traverse_raw_path_mut(self, path)
     }

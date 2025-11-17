@@ -1,6 +1,42 @@
 # Changelog
 
-## [0.9.1] - 2025-11-04 (`jacquard-identity`)
+## [0.9.2] - 2025-11-17
+
+### Added
+
+**WASM compatibility improvements** (`jacquard-common`, `jacquard-identity`)
+- Vendored mini-moka implementation with WASM support for caching
+- regex-lite usage on WASM targets for reduced binary size
+- Schema resolver now works on WASM targets
+
+**Data query improvements** (`jacquard-common`)
+- Mutable path query access and setting for `Data` values
+
+### Changed
+
+**URL handling** (`jacquard-common`)
+- Rework of some internal URL handling for better compatibility
+- Includes a minor change to the return type of the endpoint() method of XrpcClient and equivalents.
+
+**OAuth improvements** (`jacquard-oauth`)
+- Fixed OAuth scope handling in loopback flow
+- OAuth metadata resolution improvements
+- Various OAuth flow enhancements and bug fixes
+
+**Identity resolution** (`jacquard-identity`)
+- Fixed non-DNS lexicon and did:web resolution using Cloudflare DoH
+- Reduced noisy logging in identity resolution
+
+**Lexicons** (`jacquard-api`)
+- Updated to latest AT Protocol lexicons
+
+### Fixed
+
+**Data deserialization** (`jacquard-common`)
+- Fixed CID deserialization edge cases for better spec compliance
+- More permissive JSON shape handling for better interoperability with varied implementations
+
+## [0.9.1] - 2025-11-04 (`jacquard-identity`, `jacquard-lexicon`)
 
 ### Fixed
 

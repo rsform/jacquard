@@ -1,6 +1,5 @@
 use jacquard_common::{CowStr, IntoStatic, types::string::Language};
 use serde::{Deserialize, Serialize};
-use url::Url;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
 pub struct OAuthAuthorizationServerMetadata<'s> {

@@ -2,7 +2,6 @@ use jacquard_common::{CowStr, IntoStatic};
 use jose_jwk::JwkSet;
 use serde::{Deserialize, Serialize};
 use smol_str::SmolStr;
-use url::Url;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct OAuthClientMetadata<'c> {

@@ -5,7 +5,6 @@ use crate::types::{OAuthAuthorizationServerMetadata, OAuthProtectedResourceMetad
 use http::{Request, StatusCode};
 use jacquard_common::CowStr;
 use jacquard_common::IntoStatic;
-use jacquard_common::cowstr::ToCowStr;
 use jacquard_common::types::did_doc::DidDocument;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::{http_client::HttpClient, types::did::Did};

@@ -28,7 +28,6 @@ use crate::error::DecodeError;
 use crate::http_client::HttpClient;
 #[cfg(feature = "streaming")]
 use crate::http_client::HttpClientExt;
-use crate::types::nsid::Nsid;
 use crate::types::value::Data;
 use crate::{AuthorizationToken, error::AuthError};
 use crate::{CowStr, error::XrpcResult};

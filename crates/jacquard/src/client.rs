@@ -153,6 +153,8 @@ impl Default for BasicClient {
         Self::unauthenticated()
     }
 }
+
+/// Unauthenticated XRPC client session with identity resolution
 pub struct UnauthenticatedSession<T> {
     resolver: Arc<T>,
     endpoint: Arc<RwLock<Option<CowStr<'static>>>>,
@@ -166,6 +168,7 @@ impl Default for UnauthenticatedSession<JacquardResolver> {
 }
 
 impl UnauthenticatedSession<JacquardResolver> {
+    /// Create a new unauthenticated session using public resolvers
     pub fn new_public() -> Self {
         let resolver = Arc::new(JacquardResolver::default());
         let endpoint = Arc::new(RwLock::new(None));
@@ -177,6 +180,7 @@ impl UnauthenticatedSession<JacquardResolver> {
         }
     }
 
+    /// Create a new unauthenticated session using the Slingshot relay resolver
     pub fn new_slingshot() -> Self {
         let resolver = Arc::new(slingshot_resolver_default());
         let endpoint = Arc::new(RwLock::new(None));
@@ -527,6 +531,7 @@ impl<A: AgentSession> Agent<A> {
         Self { inner }
     }
 
+    /// Get a reference to the underlying session
     pub fn inner(&self) -> &A {
         &self.inner
     }
