@@ -168,7 +168,7 @@ impl Default for UnauthenticatedSession<JacquardResolver> {
 }
 
 impl UnauthenticatedSession<JacquardResolver> {
-    /// Create a new unauthenticated session using public resolvers
+    /// Create a new unauthenticated session using the public bluesky appview api as a fallback resolver
     pub fn new_public() -> Self {
         let resolver = Arc::new(JacquardResolver::default());
         let endpoint = Arc::new(RwLock::new(None));
@@ -180,7 +180,7 @@ impl UnauthenticatedSession<JacquardResolver> {
         }
     }
 
-    /// Create a new unauthenticated session using the Slingshot relay resolver
+    /// Create a new unauthenticated session using the Slingshot service for handle resolution
     pub fn new_slingshot() -> Self {
         let resolver = Arc::new(slingshot_resolver_default());
         let endpoint = Arc::new(RwLock::new(None));
