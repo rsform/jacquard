@@ -247,7 +247,7 @@ async fn credential_login_and_auto_refresh() {
     );
 
     // Verify store updated with refreshed tokens
-    let key: SessionKey = (
+    let key = SessionKey(
         Did::new_static("did:plc:alice").unwrap(),
         jacquard::CowStr::from("session"),
     );

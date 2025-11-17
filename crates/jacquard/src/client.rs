@@ -1206,7 +1206,7 @@ where
         async move {
             CredentialSession::<S, T, W>::session_info(self)
                 .await
-                .map(|(did, sid)| (did, Some(sid)))
+                .map(|key| (key.0, Some(key.1)))
         }
     }
     fn endpoint(&self) -> impl Future<Output = CowStr<'static>> {

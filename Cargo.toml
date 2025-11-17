@@ -33,6 +33,9 @@ serde_with = "3.14"
 serde_html_form = "0.2"
 serde_ipld_dagcbor = "0.6"
 serde_repr = "0.1"
+facet = "0.6"
+facet-json = "0.6"
+cfg-if = "1.0"
 
 # Error handling
 miette = "7.6"
@@ -88,5 +91,5 @@ p256 = "0.13"
 jose-jwk = "0.1"
 
 # Text processing
-regex = { version = "1.11", default-features = false }
+regex = { version = "1.12", default-features = false }
 webpage = { version = "2.0", default-features = false }

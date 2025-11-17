@@ -30,7 +30,8 @@ use jacquard_common::websocket::{WebSocketClient, WebSocketConnection};
 use jacquard_common::xrpc::XrpcSubscription;
 
 /// Storage key for app‑password sessions: `(account DID, session id)`.
-pub type SessionKey = (Did<'static>, CowStr<'static>);
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct SessionKey(pub Did<'static>, pub CowStr<'static>);
 
 /// Stateful client for app‑password based sessions.
 ///
@@ -273,7 +274,7 @@ where
         let session = AtpSession::from(out);
 
         let sid = session_id.unwrap_or_else(|| CowStr::new_static("session"));
-        let key = (session.did.clone(), sid.into_static());
+        let key = SessionKey(session.did.clone(), sid.into_static());
         self.store
             .set(key.clone(), session.clone())
             .await
@@ -306,7 +307,7 @@ where
             tracing::info_span!("credential_session_restore", did = %did, session_id = %session_id)
                 .entered();
 
-        let key = (did.clone().into_static(), session_id.clone().into_static());
+        let key = SessionKey(did.clone().into_static(), session_id.clone().into_static());
         let Some(sess) = self.store.get(&key).await else {
             return Err(ClientError::auth(AuthError::NotAuthenticated));
         };
@@ -331,7 +332,7 @@ where
         *self.endpoint.write().await = Some(pds.to_cowstr().into_static());
         // ensure store has the session (no-op if it existed)
         self.store
-            .set((sess.did.clone(), session_id.into_static()), sess)
+            .set(SessionKey(sess.did.clone(), session_id.into_static()), sess)
             .await?;
         if let Some(file_store) =
             (&*self.store as &dyn Any).downcast_ref::<crate::client::token::FileAuthStore>()
@@ -356,7 +357,7 @@ where
     where
         S: Any + 'static,
     {
-        let key = (did.clone().into_static(), session_id.into_static());
+        let key = SessionKey(did.clone().into_static(), session_id.into_static());
         if self.store.get(&key).await.is_none() {
             return Err(ClientError::auth(AuthError::NotAuthenticated));
         }

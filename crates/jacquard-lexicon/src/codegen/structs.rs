@@ -340,12 +340,7 @@ impl<'c> CodeGenerator<'c> {
         let rust_type = if is_required {
             rust_type
         } else {
-            // Use std::option::Option for non-builder structs to avoid name collision
-            if is_builder {
-                quote! { Option<#rust_type> }
-            } else {
-                quote! { std::option::Option<#rust_type> }
-            }
+            quote! { std::option::Option<#rust_type> }
         };
 
         // Extract description from field type

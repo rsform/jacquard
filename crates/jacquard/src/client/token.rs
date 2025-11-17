@@ -475,7 +475,7 @@ mod tests {
             did: Did::new_static("did:plc:alice").unwrap(),
             handle: Handle::new_static("alice.bsky.social").unwrap(),
         };
-        let key: SessionKey = (session.did.clone(), "session".into());
+        let key = SessionKey(session.did.clone(), "session".into());
         jacquard_common::session::SessionStore::set(&store, key.clone(), session.clone())
             .await
             .unwrap();

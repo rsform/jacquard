@@ -91,7 +91,7 @@ async fn restore_uses_cached_pds_when_present() {
         did: Did::new_static("did:plc:alice").unwrap(),
         handle: Handle::new_static("alice.bsky.social").unwrap(),
     };
-    let key: SessionKey = (session.did.clone(), "session".into());
+    let key = SessionKey(session.did.clone(), "session".into());
     jacquard_common::session::SessionStore::set(store.as_ref(), key.clone(), session)
         .await
         .unwrap();
