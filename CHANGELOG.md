@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.9.3] - 2025-11-17 (`jacquard`)
+
+### Fixed
+
+- SessionKey is now a proper tuple struct and not a type alias, which should help rustc not freak out when you do things like put MemoryCredentialSession in an Arc
+
 ## [0.9.2] - 2025-11-17
 
 ### Added
