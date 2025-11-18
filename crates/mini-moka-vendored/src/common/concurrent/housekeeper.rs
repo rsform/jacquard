@@ -6,12 +6,9 @@ use super::{
     },
 };
 
-use crate::common::time::{CheckedTimeOps, Instant};
+use crate::common::time::{CheckedTimeOps, Duration, Instant};
 
-use std::{
-    sync::atomic::{AtomicBool, Ordering},
-    time::Duration,
-};
+use std::sync::atomic::{AtomicBool, Ordering};
 
 pub(crate) trait InnerSync {
     fn sync(&self, max_sync_repeats: usize);

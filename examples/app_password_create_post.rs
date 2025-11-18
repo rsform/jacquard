@@ -23,7 +23,7 @@ async fn main() -> miette::Result<()> {
     let args = Args::parse();
 
     let (session, auth) =
-        MemoryCredentialSession::authenticated(args.input, args.password, None).await?;
+        MemoryCredentialSession::authenticated(args.input, args.password, None, None).await?;
     println!("Signed in as {}", auth.handle);
 
     let agent: Agent<_> = Agent::from(session);

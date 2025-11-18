@@ -1,4 +1,8 @@
-use std::time::Duration;
+#[cfg(not(feature = "js"))]
+pub type Duration = std::time::Duration;
+
+#[cfg(feature = "js")]
+pub type Duration = web_time::Duration;
 
 pub(crate) mod clock;
 

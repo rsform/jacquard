@@ -6,6 +6,7 @@ use crate::{
             housekeeper::{Housekeeper, InnerSync},
             Weigher, WriteOp,
         },
+        time::Duration,
         time::Instant,
     },
     Policy,
@@ -18,7 +19,6 @@ use std::{
     fmt,
     hash::{BuildHasher, Hash},
     sync::Arc,
-    time::Duration,
 };
 
 /// A thread-safe concurrent in-memory cache built upon [`dashmap::DashMap`][dashmap].

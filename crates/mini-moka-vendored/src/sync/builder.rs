@@ -1,12 +1,11 @@
 use super::Cache;
-use crate::{common::builder_utils, common::concurrent::Weigher};
+use crate::{common::builder_utils, common::concurrent::Weigher, common::time::Duration};
 
 use std::{
     collections::hash_map::RandomState,
     hash::{BuildHasher, Hash},
     marker::PhantomData,
     sync::Arc,
-    time::Duration,
 };
 
 /// Builds a [`Cache`][cache-struct] or with various configuration knobs.

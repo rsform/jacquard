@@ -66,6 +66,8 @@ pub mod unsync;
 #[cfg_attr(docsrs, doc(cfg(feature = "sync")))]
 pub mod sync;
 
+pub use common::time;
+
 pub use policy::Policy;
 
 #[cfg(test)]

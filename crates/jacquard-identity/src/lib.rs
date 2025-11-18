@@ -100,7 +100,7 @@ use {
 use {
     crate::lexicon_resolver::ResolvedLexiconSchema,
     jacquard_common::{smol_str::SmolStr, types::string::Nsid},
-    std::time::Duration,
+    mini_moka::time::Duration,
 };
 
 #[cfg(all(
@@ -110,7 +110,8 @@ use {
 use std::sync::Arc;
 
 // Platform-specific cache implementations
-#[cfg(all(feature = "cache", not(target_arch = "wasm32")))]
+//#[cfg(all(feature = "cache", not(target_arch = "wasm32")))]
+#[cfg(feature = "cache")]
 mod cache_impl {
     /// Native: Use sync cache (thread-safe, no mutex needed)
     pub type Cache<K, V> = mini_moka::sync::Cache<K, V>;
@@ -151,50 +152,50 @@ mod cache_impl {
     }
 }
 
-#[cfg(all(feature = "cache", target_arch = "wasm32"))]
-mod cache_impl {
-    use std::sync::{Arc, Mutex};
+// #[cfg(all(feature = "cache", target_arch = "wasm32"))]
+// mod cache_impl {
+//     use std::sync::{Arc, Mutex};
 
-    /// WASM: Use unsync cache in Arc<Mutex<_>> (no threads, but need interior mutability)
-    pub type Cache<K, V> = Arc<Mutex<mini_moka::unsync::Cache<K, V>>>;
+//     /// WASM: Use unsync cache in Arc<Mutex<_>> (no threads, but need interior mutability)
+//     pub type Cache<K, V> = Arc<Mutex<mini_moka::unsync::Cache<K, V>>>;
 
-    pub fn new_cache<K, V>(max_capacity: u64, ttl: std::time::Duration) -> Cache<K, V>
-    where
-        K: std::hash::Hash + Eq + 'static,
-        V: Clone + 'static,
-    {
-        Arc::new(Mutex::new(
-            mini_moka::unsync::Cache::builder()
-                .max_capacity(max_capacity)
-                .time_to_idle(ttl)
-                .build(),
-        ))
-    }
+//     pub fn new_cache<K, V>(max_capacity: u64, ttl: std::time::Duration) -> Cache<K, V>
+//     where
+//         K: std::hash::Hash + Eq + 'static,
+//         V: Clone + 'static,
+//     {
+//         Arc::new(Mutex::new(
+//             mini_moka::unsync::Cache::builder()
+//                 .max_capacity(max_capacity)
+//                 .time_to_idle(ttl)
+//                 .build(),
+//         ))
+//     }
 
-    pub fn get<K, V>(cache: &Cache<K, V>, key: &K) -> Option<V>
-    where
-        K: std::hash::Hash + Eq + 'static,
-        V: Clone + 'static,
-    {
-        cache.lock().unwrap().get(key).cloned()
-    }
+//     pub fn get<K, V>(cache: &Cache<K, V>, key: &K) -> Option<V>
+//     where
+//         K: std::hash::Hash + Eq + 'static,
+//         V: Clone + 'static,
+//     {
+//         cache.lock().unwrap().get(key).cloned()
+//     }
 
-    pub fn insert<K, V>(cache: &Cache<K, V>, key: K, value: V)
-    where
-        K: std::hash::Hash + Eq + 'static,
-        V: Clone + 'static,
-    {
-        cache.lock().unwrap().insert(key, value);
-    }
+//     pub fn insert<K, V>(cache: &Cache<K, V>, key: K, value: V)
+//     where
+//         K: std::hash::Hash + Eq + 'static,
+//         V: Clone + 'static,
+//     {
+//         cache.lock().unwrap().insert(key, value);
+//     }
 
-    pub fn invalidate<K, V>(cache: &Cache<K, V>, key: &K)
-    where
-        K: std::hash::Hash + Eq + 'static,
-        V: Clone + 'static,
-    {
-        cache.lock().unwrap().invalidate(key);
-    }
-}
+//     pub fn invalidate<K, V>(cache: &Cache<K, V>, key: &K)
+//     where
+//         K: std::hash::Hash + Eq + 'static,
+//         V: Clone + 'static,
+//     {
+//         cache.lock().unwrap().invalidate(key);
+//     }
+// }
 
 /// Configuration for resolver caching
 #[cfg(feature = "cache")]

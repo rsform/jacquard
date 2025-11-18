@@ -15,7 +15,7 @@ use crate::{
         },
         deque::{DeqNode, Deque},
         frequency_sketch::FrequencySketch,
-        time::{CheckedTimeOps, Clock, Instant},
+        time::{CheckedTimeOps, Clock, Duration, Instant},
         CacheRegion,
     },
     Policy,
@@ -34,7 +34,6 @@ use std::{
         atomic::{AtomicBool, Ordering},
         Arc, Mutex, RwLock,
     },
-    time::Duration,
 };
 use triomphe::Arc as TrioArc;
 
