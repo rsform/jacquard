@@ -793,11 +793,11 @@ pub async fn resolve_authorization_server<T: HttpClient + ?Sized>(
         .await
         .map_err(|e| ResolverError::transport(e))?;
     if res.status() == StatusCode::OK {
-        let mut metadata = serde_json::from_slice::<OAuthAuthorizationServerMetadata>(res.body())?;
+        let metadata = serde_json::from_slice::<OAuthAuthorizationServerMetadata>(res.body())?;
         // https://datatracker.ietf.org/doc/html/rfc8414#section-3.3
         // Accept semantically equivalent issuer (normalize to the requested URL form)
         if issuer_equivalent(&metadata.issuer, server.as_str()) {
-            metadata.issuer = server.as_str().into();
+            // if equivalent, keep the canonical form
             Ok(metadata.into_static())
         } else {
             Err(ResolverError::authorization_server_metadata(
@@ -827,11 +827,11 @@ pub async fn resolve_protected_resource_info<T: HttpClient + ?Sized>(
         .await
         .map_err(|e| ResolverError::transport(e))?;
     if res.status() == StatusCode::OK {
-        let mut metadata = serde_json::from_slice::<OAuthProtectedResourceMetadata>(res.body())?;
+        let metadata = serde_json::from_slice::<OAuthProtectedResourceMetadata>(res.body())?;
         // https://datatracker.ietf.org/doc/html/rfc8414#section-3.3
         // Accept semantically equivalent resource URL (normalize to the requested URL form)
         if issuer_equivalent(&metadata.resource, server.as_str()) {
-            metadata.resource = server.as_str().into();
+            // if equivalent, keep the canonical form
             Ok(metadata.into_static())
         } else {
             Err(ResolverError::authorization_server_metadata(

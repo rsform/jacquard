@@ -189,10 +189,12 @@ pub struct OAuthState {
     pub dpop_authserver_nonce: Option<String>,
 }
 
-impl From<AuthRequestData<'_>> for OAuthState {
-    fn from(value: AuthRequestData) -> Self {
-        OAuthState {
-            authserver_url: value.authserver_url,
+impl TryFrom<AuthRequestData<'_>> for OAuthState {
+    type Error = url::ParseError;
+
+    fn try_from(value: AuthRequestData) -> Result<Self, Self::Error> {
+        Ok(OAuthState {
+            authserver_url: Url::parse(&value.authserver_url)?,
             account_did: value.account_did.map(|s| s.to_string()),
             scopes: value.scopes.into_iter().map(|s| s.to_string()).collect(),
             request_uri: value.request_uri.to_string(),
@@ -204,14 +206,14 @@ impl From<AuthRequestData<'_>> for OAuthState {
             dpop_key: value.dpop_data.dpop_key,
             dpop_authserver_nonce: value.dpop_data.dpop_authserver_nonce.map(|s| s.to_string()),
             state: value.state.to_string(),
-        }
+        })
     }
 }
 
 impl From<OAuthState> for AuthRequestData<'_> {
     fn from(value: OAuthState) -> Self {
         AuthRequestData {
-            authserver_url: value.authserver_url,
+            authserver_url: value.authserver_url.to_cowstr(),
             state: value.state.to_cowstr(),
             account_did: value.account_did.map(|s| Did::from(s).into_static()),
             authserver_revocation_endpoint: value
@@ -317,9 +319,11 @@ impl jacquard_oauth::authstore::ClientAuthStore for FileAuthStore {
         auth_req_info: &AuthRequestData<'_>,
     ) -> Result<(), SessionStoreError> {
         let key = format!("authreq_{}", auth_req_info.state);
-        self.0
-            .set(key, StoredSession::OAuthState(auth_req_info.clone().into()))
-            .await?;
+        let state = auth_req_info
+            .clone()
+            .try_into()
+            .map_err(|e: url::ParseError| SessionStoreError::Other(Box::new(e)))?;
+        self.0.set(key, StoredSession::OAuthState(state)).await?;
         Ok(())
     }
 

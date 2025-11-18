@@ -22,7 +22,6 @@ use jose_jwk::Key;
 use serde::{Deserialize, Serialize};
 use smol_str::{SmolStr, format_smolstr};
 use tokio::sync::Mutex;
-use url::Url;
 
 pub trait DpopDataSource {
     fn key(&self) -> &Key;
@@ -148,7 +147,7 @@ pub struct AuthRequestData<'s> {
     pub state: CowStr<'s>,
 
     // URL of the auth server (eg, PDS or entryway)
-    pub authserver_url: Url,
+    pub authserver_url: CowStr<'s>,
 
     // If the flow started with an account identifier (DID or handle), it should be persisted, to verify against the initial token response.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -186,7 +185,7 @@ impl IntoStatic for AuthRequestData<'_> {
             pkce_verifier: self.pkce_verifier.into_static(),
             dpop_data: self.dpop_data.into_static(),
             state: self.state.into_static(),
-            authserver_url: self.authserver_url,
+            authserver_url: self.authserver_url.into_static(),
             account_did: self.account_did.into_static(),
             scopes: self.scopes.into_static(),
         }

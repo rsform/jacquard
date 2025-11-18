@@ -528,8 +528,7 @@ pub async fn par<'r, T: OAuthResolver + DpopExt + Send + Sync + 'static>(
         };
         let auth_req_data = AuthRequestData {
             state,
-            authserver_url: url::Url::parse(&metadata.server_metadata.issuer)
-                .expect("Failed to parse issuer URL"),
+            authserver_url: metadata.server_metadata.issuer.clone(),
             account_did: None,
             scopes,
             request_uri: par_response.request_uri.to_cowstr().into_static(),

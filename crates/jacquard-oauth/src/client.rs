@@ -264,7 +264,7 @@ where
                 let client_data = ClientSessionData {
                     account_did: token_set.sub.clone(),
                     session_id: auth_req_info.state,
-                    host_url: token_set.iss.clone(),
+                    host_url: token_set.aud.clone(),
                     authserver_url: auth_req_info.authserver_url.to_cowstr(),
                     authserver_token_endpoint: auth_req_info.authserver_token_endpoint,
                     authserver_revocation_endpoint: auth_req_info.authserver_revocation_endpoint,
@@ -279,6 +279,8 @@ where
                     },
                     token_set,
                 };
+
+                dbg!(&client_data);
 
                 self.create_session(client_data).await
             }
