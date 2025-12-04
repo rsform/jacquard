@@ -1,4 +1,4 @@
-use jacquard_common::error::{AuthError, ClientError};
+use jacquard_common::error::{AuthError, ClientError, ClientErrorKind};
 use jacquard_common::types::did::Did;
 use jacquard_common::types::nsid::Nsid;
 use jacquard_common::types::string::{RecordKey, Rkey};
@@ -11,7 +11,6 @@ pub type BoxError = Box<dyn std::error::Error + Send + Sync + 'static>;
 
 /// Error type for Agent convenience methods
 #[derive(Debug, thiserror::Error, miette::Diagnostic)]
-#[error("{kind}")]
 pub struct AgentError {
     #[diagnostic_source]
     kind: AgentErrorKind,
@@ -26,12 +25,38 @@ pub struct AgentError {
     xrpc: Option<Data<'static>>,
 }
 
+impl std::fmt::Display for AgentError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.kind)?;
+
+        // Add context if available
+        if let Some(context) = &self.context {
+            write!(f, ": {}", context)?;
+        }
+
+        // Add URL if available
+        if let Some(url) = &self.url {
+            write!(f, " (url: {})", url)?;
+        }
+
+        // Add details if available
+        if let Some(details) = &self.details {
+            write!(f, " [{}]", details)?;
+        }
+
+        Ok(())
+    }
+}
+
 /// Error categories for Agent operations
 #[derive(Debug, thiserror::Error, miette::Diagnostic)]
 pub enum AgentErrorKind {
     /// Transport/network layer failure
-    #[error("client error")]
-    #[diagnostic(code(jacquard::agent::client))]
+    #[error("client error (see context for details)")]
+    #[diagnostic(
+        code(jacquard::agent::client),
+        help("check source error and context for specific failure details")
+    )]
     Client,
 
     /// No session available for operations requiring authentication
@@ -226,7 +251,66 @@ impl AgentError {
 
 impl From<ClientError> for AgentError {
     fn from(e: ClientError) -> Self {
-        Self::new(AgentErrorKind::Client, Some(Box::new(e)))
+        use smol_str::ToSmolStr;
+
+        let context_msg: SmolStr;
+        let help_msg: SmolStr;
+        let url = e.url().map(|s| s.to_smolstr());
+        let details = e.details().map(|s| s.to_smolstr());
+
+        // Build context and help based on the error kind
+        match e.kind() {
+            ClientErrorKind::Transport => {
+                help_msg = "check network connectivity and server availability".to_smolstr();
+                context_msg = "network/transport error during request".to_smolstr();
+            }
+            ClientErrorKind::InvalidRequest(msg) => {
+                help_msg = "verify request parameters are valid".to_smolstr();
+                context_msg = smol_str::format_smolstr!("invalid request: {}", msg);
+            }
+            ClientErrorKind::Encode(msg) => {
+                help_msg = "check request body format".to_smolstr();
+                context_msg = smol_str::format_smolstr!("failed to encode request: {}", msg);
+            }
+            ClientErrorKind::Decode(msg) => {
+                help_msg = "server returned unexpected response format".to_smolstr();
+                context_msg = smol_str::format_smolstr!("failed to decode response: {}", msg);
+            }
+            ClientErrorKind::Http { status } => {
+                help_msg = match status.as_u16() {
+                    400..=499 => "check request parameters and authentication",
+                    500..=599 => "server error - try again later or check server logs",
+                    _ => "unexpected HTTP status code",
+                }
+                .to_smolstr();
+                context_msg = smol_str::format_smolstr!("HTTP error {}", status);
+            }
+            ClientErrorKind::Auth(auth_err) => {
+                help_msg = "verify authentication credentials and session".to_smolstr();
+                context_msg = smol_str::format_smolstr!("authentication error: {}", auth_err);
+            }
+            ClientErrorKind::IdentityResolution => {
+                help_msg = "check handle/DID is valid and resolvable".to_smolstr();
+                context_msg = "identity resolution failed".to_smolstr();
+            }
+            ClientErrorKind::Storage => {
+                help_msg = "verify storage backend is accessible".to_smolstr();
+                context_msg = "storage operation failed".to_smolstr();
+            }
+        }
+
+        let mut error = Self::new(AgentErrorKind::Client, Some(Box::new(e)));
+        error = error.with_context(context_msg);
+        error = error.with_help(help_msg);
+
+        if let Some(url) = url {
+            error = error.with_url(url);
+        }
+        if let Some(details) = details {
+            error = error.with_details(details);
+        }
+
+        error
     }
 }
 
