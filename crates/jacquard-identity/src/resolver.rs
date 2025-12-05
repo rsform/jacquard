@@ -38,12 +38,12 @@ pub enum PlcSource {
     /// Use the public PLC directory
     PlcDirectory {
         /// Base URL for the PLC directory
-        base: Url,
+        pub base: Url,
     },
     /// Use the slingshot mini-docs service
     Slingshot {
         /// Base URL for the Slingshot service
-        base: Url,
+        pub base: Url,
     },
 }
 
