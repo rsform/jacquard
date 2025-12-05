@@ -760,49 +760,49 @@ pub mod view_image_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Alt;
         type Thumb;
+        type Alt;
         type Fullsize;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Alt = Unset;
         type Thumb = Unset;
+        type Alt = Unset;
         type Fullsize = Unset;
-    }
-    ///State transition - sets the `alt` field to Set
-    pub struct SetAlt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAlt<S> {}
-    impl<S: State> State for SetAlt<S> {
-        type Alt = Set<members::alt>;
-        type Thumb = S::Thumb;
-        type Fullsize = S::Fullsize;
     }
     ///State transition - sets the `thumb` field to Set
     pub struct SetThumb<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetThumb<S> {}
     impl<S: State> State for SetThumb<S> {
-        type Alt = S::Alt;
         type Thumb = Set<members::thumb>;
+        type Alt = S::Alt;
+        type Fullsize = S::Fullsize;
+    }
+    ///State transition - sets the `alt` field to Set
+    pub struct SetAlt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAlt<S> {}
+    impl<S: State> State for SetAlt<S> {
+        type Thumb = S::Thumb;
+        type Alt = Set<members::alt>;
         type Fullsize = S::Fullsize;
     }
     ///State transition - sets the `fullsize` field to Set
     pub struct SetFullsize<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFullsize<S> {}
     impl<S: State> State for SetFullsize<S> {
-        type Alt = S::Alt;
         type Thumb = S::Thumb;
+        type Alt = S::Alt;
         type Fullsize = Set<members::fullsize>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `alt` field
-        pub struct alt(());
         ///Marker type for the `thumb` field
         pub struct thumb(());
+        ///Marker type for the `alt` field
+        pub struct alt(());
         ///Marker type for the `fullsize` field
         pub struct fullsize(());
     }
@@ -917,8 +917,8 @@ where
 impl<'a, S> ViewImageBuilder<'a, S>
 where
     S: view_image_state::State,
-    S::Alt: view_image_state::IsSet,
     S::Thumb: view_image_state::IsSet,
+    S::Alt: view_image_state::IsSet,
     S::Fullsize: view_image_state::IsSet,
 {
     /// Build the final struct

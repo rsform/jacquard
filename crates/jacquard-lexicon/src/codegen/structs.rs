@@ -376,7 +376,9 @@ impl<'c> CodeGenerator<'c> {
             if is_required {
                 attrs.push(quote! { #[serde(with = "jacquard_common::serde_bytes_helper")] });
             } else {
-                attrs.push(quote! {#[serde(with = "jacquard_common::opt_serde_bytes_helper")] });
+                attrs.push(
+                    quote! {#[serde(default, with = "jacquard_common::opt_serde_bytes_helper")] },
+                );
             }
         }
 

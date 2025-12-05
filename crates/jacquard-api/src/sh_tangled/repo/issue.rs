@@ -40,51 +40,51 @@ pub mod issue_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type Repo;
         type CreatedAt;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type Repo = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Repo = S::Repo;
-        type CreatedAt = S::CreatedAt;
+        type Title = Unset;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepo<S> {}
     impl<S: State> State for SetRepo<S> {
-        type Title = S::Title;
         type Repo = Set<members::repo>;
         type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Title = S::Title;
         type Repo = S::Repo;
         type CreatedAt = Set<members::created_at>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Repo = S::Repo;
+        type CreatedAt = S::CreatedAt;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `repo` field
         pub struct repo(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
@@ -194,9 +194,9 @@ where
 impl<'a, S> IssueBuilder<'a, S>
 where
     S: issue_state::State,
-    S::Title: issue_state::IsSet,
     S::Repo: issue_state::IsSet,
     S::CreatedAt: issue_state::IsSet,
+    S::Title: issue_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Issue<'a> {

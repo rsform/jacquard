@@ -454,37 +454,37 @@ pub mod comment_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Content;
         type EntryUri;
+        type Content;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Content = Unset;
         type EntryUri = Unset;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Content = Set<members::content>;
-        type EntryUri = S::EntryUri;
+        type Content = Unset;
     }
     ///State transition - sets the `entry_uri` field to Set
     pub struct SetEntryUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEntryUri<S> {}
     impl<S: State> State for SetEntryUri<S> {
-        type Content = S::Content;
         type EntryUri = Set<members::entry_uri>;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type EntryUri = S::EntryUri;
+        type Content = Set<members::content>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `content` field
-        pub struct content(());
         ///Marker type for the `entry_uri` field
         pub struct entry_uri(());
+        ///Marker type for the `content` field
+        pub struct content(());
     }
 }
 
@@ -557,8 +557,8 @@ where
 impl<'a, S> CommentBuilder<'a, S>
 where
     S: comment_state::State,
-    S::Content: comment_state::IsSet,
     S::EntryUri: comment_state::IsSet,
+    S::Content: comment_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Comment<'a> {

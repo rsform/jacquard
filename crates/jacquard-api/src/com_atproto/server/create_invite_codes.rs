@@ -33,37 +33,37 @@ pub mod account_codes_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Account;
         type Codes;
+        type Account;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Account = Unset;
         type Codes = Unset;
-    }
-    ///State transition - sets the `account` field to Set
-    pub struct SetAccount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAccount<S> {}
-    impl<S: State> State for SetAccount<S> {
-        type Account = Set<members::account>;
-        type Codes = S::Codes;
+        type Account = Unset;
     }
     ///State transition - sets the `codes` field to Set
     pub struct SetCodes<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCodes<S> {}
     impl<S: State> State for SetCodes<S> {
-        type Account = S::Account;
         type Codes = Set<members::codes>;
+        type Account = S::Account;
+    }
+    ///State transition - sets the `account` field to Set
+    pub struct SetAccount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAccount<S> {}
+    impl<S: State> State for SetAccount<S> {
+        type Codes = S::Codes;
+        type Account = Set<members::account>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `account` field
-        pub struct account(());
         ///Marker type for the `codes` field
         pub struct codes(());
+        ///Marker type for the `account` field
+        pub struct account(());
     }
 }
 
@@ -136,8 +136,8 @@ where
 impl<'a, S> AccountCodesBuilder<'a, S>
 where
     S: account_codes_state::State,
-    S::Account: account_codes_state::IsSet,
     S::Codes: account_codes_state::IsSet,
+    S::Account: account_codes_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> AccountCodes<'a> {

@@ -51,50 +51,50 @@ pub mod test_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Start;
-        type End;
         type Title;
+        type End;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Start = Unset;
-        type End = Unset;
         type Title = Unset;
+        type End = Unset;
     }
     ///State transition - sets the `start` field to Set
     pub struct SetStart<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStart<S> {}
     impl<S: State> State for SetStart<S> {
         type Start = Set<members::start>;
+        type Title = S::Title;
         type End = S::End;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `end` field to Set
-    pub struct SetEnd<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEnd<S> {}
-    impl<S: State> State for SetEnd<S> {
-        type Start = S::Start;
-        type End = Set<members::end>;
-        type Title = S::Title;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
         type Start = S::Start;
-        type End = S::End;
         type Title = Set<members::title>;
+        type End = S::End;
+    }
+    ///State transition - sets the `end` field to Set
+    pub struct SetEnd<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEnd<S> {}
+    impl<S: State> State for SetEnd<S> {
+        type Start = S::Start;
+        type Title = S::Title;
+        type End = Set<members::end>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `start` field
         pub struct start(());
-        ///Marker type for the `end` field
-        pub struct end(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `end` field
+        pub struct end(());
     }
 }
 
@@ -259,8 +259,8 @@ impl<'a, S> TestBuilder<'a, S>
 where
     S: test_state::State,
     S::Start: test_state::IsSet,
-    S::End: test_state::IsSet,
     S::Title: test_state::IsSet,
+    S::End: test_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Test<'a> {

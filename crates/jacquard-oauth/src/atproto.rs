@@ -152,12 +152,17 @@ impl<'m> AtprotoClientMetadata<'m> {
         #[derive(serde::Serialize)]
         struct Parameters<'a> {
             #[serde(skip_serializing_if = "Option::is_none")]
-            redirect_uri: Option<Vec<Url>>,
+            redirect_uri: Option<Vec<CowStr<'a>>>,
             #[serde(skip_serializing_if = "Option::is_none")]
             scope: Option<CowStr<'a>>,
         }
+        let redir_str = redirect_uris.as_ref().map(|uris| {
+            uris.iter()
+                .map(|u| u.as_str().trim_end_matches("/").to_cowstr().into_static())
+                .collect()
+        });
         let query = serde_html_form::to_string(Parameters {
-            redirect_uri: redirect_uris.clone(),
+            redirect_uri: redir_str,
             scope: scopes
                 .as_ref()
                 .map(|s| Scope::serialize_multiple(s.as_slice())),

@@ -32,37 +32,37 @@ pub mod branch_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repo;
         type Name;
+        type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repo = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Repo = Set<members::repo>;
-        type Name = S::Name;
+        type Repo = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Repo = S::Repo;
         type Name = Set<members::name>;
+        type Repo = S::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Name = S::Name;
+        type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
     }
 }
 
@@ -135,8 +135,8 @@ where
 impl<'a, S> BranchBuilder<'a, S>
 where
     S: branch_state::State,
-    S::Repo: branch_state::IsSet,
     S::Name: branch_state::IsSet,
+    S::Repo: branch_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Branch<'a> {
@@ -297,50 +297,50 @@ pub mod signature_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type When;
-        type Email;
         type Name;
+        type Email;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type When = Unset;
-        type Email = Unset;
         type Name = Unset;
+        type Email = Unset;
     }
     ///State transition - sets the `when` field to Set
     pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWhen<S> {}
     impl<S: State> State for SetWhen<S> {
         type When = Set<members::when>;
+        type Name = S::Name;
         type Email = S::Email;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `email` field to Set
-    pub struct SetEmail<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEmail<S> {}
-    impl<S: State> State for SetEmail<S> {
-        type When = S::When;
-        type Email = Set<members::email>;
-        type Name = S::Name;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
         type When = S::When;
-        type Email = S::Email;
         type Name = Set<members::name>;
+        type Email = S::Email;
+    }
+    ///State transition - sets the `email` field to Set
+    pub struct SetEmail<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEmail<S> {}
+    impl<S: State> State for SetEmail<S> {
+        type When = S::When;
+        type Name = S::Name;
+        type Email = Set<members::email>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `when` field
         pub struct when(());
-        ///Marker type for the `email` field
-        pub struct email(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `email` field
+        pub struct email(());
     }
 }
 
@@ -434,8 +434,8 @@ impl<'a, S> SignatureBuilder<'a, S>
 where
     S: signature_state::State,
     S::When: signature_state::IsSet,
-    S::Email: signature_state::IsSet,
     S::Name: signature_state::IsSet,
+    S::Email: signature_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Signature<'a> {

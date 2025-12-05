@@ -35,37 +35,37 @@ pub mod task_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Content;
         type Attrs;
+        type Content;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Content = Unset;
         type Attrs = Unset;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Content = Set<members::content>;
-        type Attrs = S::Attrs;
+        type Content = Unset;
     }
     ///State transition - sets the `attrs` field to Set
     pub struct SetAttrs<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAttrs<S> {}
     impl<S: State> State for SetAttrs<S> {
-        type Content = S::Content;
         type Attrs = Set<members::attrs>;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type Attrs = S::Attrs;
+        type Content = Set<members::content>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `content` field
-        pub struct content(());
         ///Marker type for the `attrs` field
         pub struct attrs(());
+        ///Marker type for the `content` field
+        pub struct content(());
     }
 }
 
@@ -138,8 +138,8 @@ where
 impl<'a, S> TaskItemBuilder<'a, S>
 where
     S: task_item_state::State,
-    S::Content: task_item_state::IsSet,
     S::Attrs: task_item_state::IsSet,
+    S::Content: task_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TaskItem<'a> {

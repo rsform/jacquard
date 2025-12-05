@@ -44,85 +44,85 @@ pub mod livestream_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
-        type Record;
-        type Author;
-        type Uri;
         type IndexedAt;
+        type Uri;
+        type Record;
+        type Cid;
+        type Author;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
-        type Record = Unset;
-        type Author = Unset;
-        type Uri = Unset;
         type IndexedAt = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Cid = Set<members::cid>;
-        type Record = S::Record;
-        type Author = S::Author;
-        type Uri = S::Uri;
-        type IndexedAt = S::IndexedAt;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecord<S> {}
-    impl<S: State> State for SetRecord<S> {
-        type Cid = S::Cid;
-        type Record = Set<members::record>;
-        type Author = S::Author;
-        type Uri = S::Uri;
-        type IndexedAt = S::IndexedAt;
-    }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthor<S> {}
-    impl<S: State> State for SetAuthor<S> {
-        type Cid = S::Cid;
-        type Record = S::Record;
-        type Author = Set<members::author>;
-        type Uri = S::Uri;
-        type IndexedAt = S::IndexedAt;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Cid = S::Cid;
-        type Record = S::Record;
-        type Author = S::Author;
-        type Uri = Set<members::uri>;
-        type IndexedAt = S::IndexedAt;
+        type Uri = Unset;
+        type Record = Unset;
+        type Cid = Unset;
+        type Author = Unset;
     }
     ///State transition - sets the `indexed_at` field to Set
     pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
     impl<S: State> State for SetIndexedAt<S> {
-        type Cid = S::Cid;
-        type Record = S::Record;
-        type Author = S::Author;
-        type Uri = S::Uri;
         type IndexedAt = Set<members::indexed_at>;
+        type Uri = S::Uri;
+        type Record = S::Record;
+        type Cid = S::Cid;
+        type Author = S::Author;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type IndexedAt = S::IndexedAt;
+        type Uri = Set<members::uri>;
+        type Record = S::Record;
+        type Cid = S::Cid;
+        type Author = S::Author;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecord<S> {}
+    impl<S: State> State for SetRecord<S> {
+        type IndexedAt = S::IndexedAt;
+        type Uri = S::Uri;
+        type Record = Set<members::record>;
+        type Cid = S::Cid;
+        type Author = S::Author;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type IndexedAt = S::IndexedAt;
+        type Uri = S::Uri;
+        type Record = S::Record;
+        type Cid = Set<members::cid>;
+        type Author = S::Author;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthor<S> {}
+    impl<S: State> State for SetAuthor<S> {
+        type IndexedAt = S::IndexedAt;
+        type Uri = S::Uri;
+        type Record = S::Record;
+        type Cid = S::Cid;
+        type Author = Set<members::author>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
-        ///Marker type for the `record` field
-        pub struct record(());
-        ///Marker type for the `author` field
-        pub struct author(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `record` field
+        pub struct record(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `author` field
+        pub struct author(());
     }
 }
 
@@ -275,11 +275,11 @@ impl<'a, S: livestream_view_state::State> LivestreamViewBuilder<'a, S> {
 impl<'a, S> LivestreamViewBuilder<'a, S>
 where
     S: livestream_view_state::State,
-    S::Cid: livestream_view_state::IsSet,
-    S::Record: livestream_view_state::IsSet,
-    S::Author: livestream_view_state::IsSet,
-    S::Uri: livestream_view_state::IsSet,
     S::IndexedAt: livestream_view_state::IsSet,
+    S::Uri: livestream_view_state::IsSet,
+    S::Record: livestream_view_state::IsSet,
+    S::Cid: livestream_view_state::IsSet,
+    S::Author: livestream_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LivestreamView<'a> {
@@ -739,37 +739,37 @@ pub mod livestream_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type CreatedAt;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type CreatedAt = S::CreatedAt;
+        type Title = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Title = S::Title;
         type CreatedAt = Set<members::created_at>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type CreatedAt = S::CreatedAt;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
@@ -963,8 +963,8 @@ impl<'a, S: livestream_state::State> LivestreamBuilder<'a, S> {
 impl<'a, S> LivestreamBuilder<'a, S>
 where
     S: livestream_state::State,
-    S::Title: livestream_state::IsSet,
     S::CreatedAt: livestream_state::IsSet,
+    S::Title: livestream_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Livestream<'a> {

@@ -35,51 +35,51 @@ pub mod code_theme_file_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Content;
         type Did;
         type Name;
-        type Content;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Content = Unset;
         type Did = Unset;
         type Name = Unset;
-        type Content = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Name = S::Name;
-        type Content = S::Content;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Did = S::Did;
-        type Name = Set<members::name>;
-        type Content = S::Content;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContent<S> {}
     impl<S: State> State for SetContent<S> {
+        type Content = Set<members::content>;
         type Did = S::Did;
         type Name = S::Name;
-        type Content = Set<members::content>;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Content = S::Content;
+        type Did = Set<members::did>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Content = S::Content;
+        type Did = S::Did;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `content` field
+        pub struct content(());
         ///Marker type for the `did` field
         pub struct did(());
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `content` field
-        pub struct content(());
     }
 }
 
@@ -172,9 +172,9 @@ where
 impl<'a, S> CodeThemeFileBuilder<'a, S>
 where
     S: code_theme_file_state::State,
+    S::Content: code_theme_file_state::IsSet,
     S::Did: code_theme_file_state::IsSet,
     S::Name: code_theme_file_state::IsSet,
-    S::Content: code_theme_file_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CodeThemeFile<'a> {
@@ -568,105 +568,105 @@ pub mod theme_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type LightScheme;
         type DarkCodeTheme;
-        type LightCodeTheme;
+        type Fonts;
         type DarkScheme;
         type Spacing;
-        type Fonts;
+        type LightCodeTheme;
+        type LightScheme;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type LightScheme = Unset;
         type DarkCodeTheme = Unset;
-        type LightCodeTheme = Unset;
+        type Fonts = Unset;
         type DarkScheme = Unset;
         type Spacing = Unset;
-        type Fonts = Unset;
-    }
-    ///State transition - sets the `light_scheme` field to Set
-    pub struct SetLightScheme<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLightScheme<S> {}
-    impl<S: State> State for SetLightScheme<S> {
-        type LightScheme = Set<members::light_scheme>;
-        type DarkCodeTheme = S::DarkCodeTheme;
-        type LightCodeTheme = S::LightCodeTheme;
-        type DarkScheme = S::DarkScheme;
-        type Spacing = S::Spacing;
-        type Fonts = S::Fonts;
+        type LightCodeTheme = Unset;
+        type LightScheme = Unset;
     }
     ///State transition - sets the `dark_code_theme` field to Set
     pub struct SetDarkCodeTheme<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDarkCodeTheme<S> {}
     impl<S: State> State for SetDarkCodeTheme<S> {
-        type LightScheme = S::LightScheme;
         type DarkCodeTheme = Set<members::dark_code_theme>;
-        type LightCodeTheme = S::LightCodeTheme;
+        type Fonts = S::Fonts;
         type DarkScheme = S::DarkScheme;
         type Spacing = S::Spacing;
-        type Fonts = S::Fonts;
-    }
-    ///State transition - sets the `light_code_theme` field to Set
-    pub struct SetLightCodeTheme<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLightCodeTheme<S> {}
-    impl<S: State> State for SetLightCodeTheme<S> {
-        type LightScheme = S::LightScheme;
-        type DarkCodeTheme = S::DarkCodeTheme;
-        type LightCodeTheme = Set<members::light_code_theme>;
-        type DarkScheme = S::DarkScheme;
-        type Spacing = S::Spacing;
-        type Fonts = S::Fonts;
-    }
-    ///State transition - sets the `dark_scheme` field to Set
-    pub struct SetDarkScheme<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDarkScheme<S> {}
-    impl<S: State> State for SetDarkScheme<S> {
-        type LightScheme = S::LightScheme;
-        type DarkCodeTheme = S::DarkCodeTheme;
         type LightCodeTheme = S::LightCodeTheme;
-        type DarkScheme = Set<members::dark_scheme>;
-        type Spacing = S::Spacing;
-        type Fonts = S::Fonts;
-    }
-    ///State transition - sets the `spacing` field to Set
-    pub struct SetSpacing<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSpacing<S> {}
-    impl<S: State> State for SetSpacing<S> {
         type LightScheme = S::LightScheme;
-        type DarkCodeTheme = S::DarkCodeTheme;
-        type LightCodeTheme = S::LightCodeTheme;
-        type DarkScheme = S::DarkScheme;
-        type Spacing = Set<members::spacing>;
-        type Fonts = S::Fonts;
     }
     ///State transition - sets the `fonts` field to Set
     pub struct SetFonts<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFonts<S> {}
     impl<S: State> State for SetFonts<S> {
-        type LightScheme = S::LightScheme;
         type DarkCodeTheme = S::DarkCodeTheme;
-        type LightCodeTheme = S::LightCodeTheme;
+        type Fonts = Set<members::fonts>;
         type DarkScheme = S::DarkScheme;
         type Spacing = S::Spacing;
-        type Fonts = Set<members::fonts>;
+        type LightCodeTheme = S::LightCodeTheme;
+        type LightScheme = S::LightScheme;
+    }
+    ///State transition - sets the `dark_scheme` field to Set
+    pub struct SetDarkScheme<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDarkScheme<S> {}
+    impl<S: State> State for SetDarkScheme<S> {
+        type DarkCodeTheme = S::DarkCodeTheme;
+        type Fonts = S::Fonts;
+        type DarkScheme = Set<members::dark_scheme>;
+        type Spacing = S::Spacing;
+        type LightCodeTheme = S::LightCodeTheme;
+        type LightScheme = S::LightScheme;
+    }
+    ///State transition - sets the `spacing` field to Set
+    pub struct SetSpacing<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSpacing<S> {}
+    impl<S: State> State for SetSpacing<S> {
+        type DarkCodeTheme = S::DarkCodeTheme;
+        type Fonts = S::Fonts;
+        type DarkScheme = S::DarkScheme;
+        type Spacing = Set<members::spacing>;
+        type LightCodeTheme = S::LightCodeTheme;
+        type LightScheme = S::LightScheme;
+    }
+    ///State transition - sets the `light_code_theme` field to Set
+    pub struct SetLightCodeTheme<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLightCodeTheme<S> {}
+    impl<S: State> State for SetLightCodeTheme<S> {
+        type DarkCodeTheme = S::DarkCodeTheme;
+        type Fonts = S::Fonts;
+        type DarkScheme = S::DarkScheme;
+        type Spacing = S::Spacing;
+        type LightCodeTheme = Set<members::light_code_theme>;
+        type LightScheme = S::LightScheme;
+    }
+    ///State transition - sets the `light_scheme` field to Set
+    pub struct SetLightScheme<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLightScheme<S> {}
+    impl<S: State> State for SetLightScheme<S> {
+        type DarkCodeTheme = S::DarkCodeTheme;
+        type Fonts = S::Fonts;
+        type DarkScheme = S::DarkScheme;
+        type Spacing = S::Spacing;
+        type LightCodeTheme = S::LightCodeTheme;
+        type LightScheme = Set<members::light_scheme>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `light_scheme` field
-        pub struct light_scheme(());
         ///Marker type for the `dark_code_theme` field
         pub struct dark_code_theme(());
-        ///Marker type for the `light_code_theme` field
-        pub struct light_code_theme(());
+        ///Marker type for the `fonts` field
+        pub struct fonts(());
         ///Marker type for the `dark_scheme` field
         pub struct dark_scheme(());
         ///Marker type for the `spacing` field
         pub struct spacing(());
-        ///Marker type for the `fonts` field
-        pub struct fonts(());
+        ///Marker type for the `light_code_theme` field
+        pub struct light_code_theme(());
+        ///Marker type for the `light_scheme` field
+        pub struct light_scheme(());
     }
 }
 
@@ -819,12 +819,12 @@ where
 impl<'a, S> ThemeBuilder<'a, S>
 where
     S: theme_state::State,
-    S::LightScheme: theme_state::IsSet,
     S::DarkCodeTheme: theme_state::IsSet,
-    S::LightCodeTheme: theme_state::IsSet,
+    S::Fonts: theme_state::IsSet,
     S::DarkScheme: theme_state::IsSet,
     S::Spacing: theme_state::IsSet,
-    S::Fonts: theme_state::IsSet,
+    S::LightCodeTheme: theme_state::IsSet,
+    S::LightScheme: theme_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Theme<'a> {

@@ -32,51 +32,51 @@ pub mod rgb_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type B;
         type R;
         type G;
-        type B;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type B = Unset;
         type R = Unset;
         type G = Unset;
-        type B = Unset;
-    }
-    ///State transition - sets the `r` field to Set
-    pub struct SetR<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetR<S> {}
-    impl<S: State> State for SetR<S> {
-        type R = Set<members::r>;
-        type G = S::G;
-        type B = S::B;
-    }
-    ///State transition - sets the `g` field to Set
-    pub struct SetG<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetG<S> {}
-    impl<S: State> State for SetG<S> {
-        type R = S::R;
-        type G = Set<members::g>;
-        type B = S::B;
     }
     ///State transition - sets the `b` field to Set
     pub struct SetB<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetB<S> {}
     impl<S: State> State for SetB<S> {
+        type B = Set<members::b>;
         type R = S::R;
         type G = S::G;
-        type B = Set<members::b>;
+    }
+    ///State transition - sets the `r` field to Set
+    pub struct SetR<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetR<S> {}
+    impl<S: State> State for SetR<S> {
+        type B = S::B;
+        type R = Set<members::r>;
+        type G = S::G;
+    }
+    ///State transition - sets the `g` field to Set
+    pub struct SetG<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetG<S> {}
+    impl<S: State> State for SetG<S> {
+        type B = S::B;
+        type R = S::R;
+        type G = Set<members::g>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `b` field
+        pub struct b(());
         ///Marker type for the `r` field
         pub struct r(());
         ///Marker type for the `g` field
         pub struct g(());
-        ///Marker type for the `b` field
-        pub struct b(());
     }
 }
 
@@ -160,9 +160,9 @@ where
 impl<'a, S> RgbBuilder<'a, S>
 where
     S: rgb_state::State,
+    S::B: rgb_state::IsSet,
     S::R: rgb_state::IsSet,
     S::G: rgb_state::IsSet,
-    S::B: rgb_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Rgb<'a> {

@@ -33,7 +33,7 @@ pub struct Vote<'a> {
     pub reasons: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     /// Signature of dag-cbor encoded vote.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(with = "jacquard_common::opt_serde_bytes_helper")]
+    #[serde(default, with = "jacquard_common::opt_serde_bytes_helper")]
     pub sig: std::option::Option<bytes::Bytes>,
     /// the account creating the vote, not necessarily the same as the user who voted
     #[serde(borrow)]
@@ -55,67 +55,67 @@ pub mod vote_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Val;
         type Src;
         type Cts;
         type Uri;
-        type Val;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Val = Unset;
         type Src = Unset;
         type Cts = Unset;
         type Uri = Unset;
-        type Val = Unset;
-    }
-    ///State transition - sets the `src` field to Set
-    pub struct SetSrc<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSrc<S> {}
-    impl<S: State> State for SetSrc<S> {
-        type Src = Set<members::src>;
-        type Cts = S::Cts;
-        type Uri = S::Uri;
-        type Val = S::Val;
-    }
-    ///State transition - sets the `cts` field to Set
-    pub struct SetCts<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCts<S> {}
-    impl<S: State> State for SetCts<S> {
-        type Src = S::Src;
-        type Cts = Set<members::cts>;
-        type Uri = S::Uri;
-        type Val = S::Val;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Src = S::Src;
-        type Cts = S::Cts;
-        type Uri = Set<members::uri>;
-        type Val = S::Val;
     }
     ///State transition - sets the `val` field to Set
     pub struct SetVal<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVal<S> {}
     impl<S: State> State for SetVal<S> {
+        type Val = Set<members::val>;
         type Src = S::Src;
         type Cts = S::Cts;
         type Uri = S::Uri;
-        type Val = Set<members::val>;
+    }
+    ///State transition - sets the `src` field to Set
+    pub struct SetSrc<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSrc<S> {}
+    impl<S: State> State for SetSrc<S> {
+        type Val = S::Val;
+        type Src = Set<members::src>;
+        type Cts = S::Cts;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `cts` field to Set
+    pub struct SetCts<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCts<S> {}
+    impl<S: State> State for SetCts<S> {
+        type Val = S::Val;
+        type Src = S::Src;
+        type Cts = Set<members::cts>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Val = S::Val;
+        type Src = S::Src;
+        type Cts = S::Cts;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `val` field
+        pub struct val(());
         ///Marker type for the `src` field
         pub struct src(());
         ///Marker type for the `cts` field
         pub struct cts(());
         ///Marker type for the `uri` field
         pub struct uri(());
-        ///Marker type for the `val` field
-        pub struct val(());
     }
 }
 
@@ -296,10 +296,10 @@ where
 impl<'a, S> VoteBuilder<'a, S>
 where
     S: vote_state::State,
+    S::Val: vote_state::IsSet,
     S::Src: vote_state::IsSet,
     S::Cts: vote_state::IsSet,
     S::Uri: vote_state::IsSet,
-    S::Val: vote_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Vote<'a> {

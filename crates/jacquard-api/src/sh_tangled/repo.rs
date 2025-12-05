@@ -87,49 +87,49 @@ pub mod repo_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Knot;
+        type Name;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Knot = Unset;
+        type Name = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Knot = S::Knot;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `knot` field to Set
     pub struct SetKnot<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetKnot<S> {}
     impl<S: State> State for SetKnot<S> {
-        type Name = S::Name;
         type Knot = Set<members::knot>;
+        type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Knot = S::Knot;
+        type Name = Set<members::name>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
         type Knot = S::Knot;
+        type Name = S::Name;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `knot` field
         pub struct knot(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -351,8 +351,8 @@ impl<'a, S: repo_state::State> RepoBuilder<'a, S> {
 impl<'a, S> RepoBuilder<'a, S>
 where
     S: repo_state::State,
-    S::Name: repo_state::IsSet,
     S::Knot: repo_state::IsSet,
+    S::Name: repo_state::IsSet,
     S::CreatedAt: repo_state::IsSet,
 {
     /// Build the final struct

@@ -37,8 +37,8 @@ pub mod op_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type PerformedAt;
         type Add;
+        type PerformedAt;
         type Delete;
         type Subject;
     }
@@ -46,26 +46,26 @@ pub mod op_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type PerformedAt = Unset;
         type Add = Unset;
+        type PerformedAt = Unset;
         type Delete = Unset;
         type Subject = Unset;
-    }
-    ///State transition - sets the `performed_at` field to Set
-    pub struct SetPerformedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPerformedAt<S> {}
-    impl<S: State> State for SetPerformedAt<S> {
-        type PerformedAt = Set<members::performed_at>;
-        type Add = S::Add;
-        type Delete = S::Delete;
-        type Subject = S::Subject;
     }
     ///State transition - sets the `add` field to Set
     pub struct SetAdd<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAdd<S> {}
     impl<S: State> State for SetAdd<S> {
-        type PerformedAt = S::PerformedAt;
         type Add = Set<members::add>;
+        type PerformedAt = S::PerformedAt;
+        type Delete = S::Delete;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `performed_at` field to Set
+    pub struct SetPerformedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPerformedAt<S> {}
+    impl<S: State> State for SetPerformedAt<S> {
+        type Add = S::Add;
+        type PerformedAt = Set<members::performed_at>;
         type Delete = S::Delete;
         type Subject = S::Subject;
     }
@@ -73,8 +73,8 @@ pub mod op_state {
     pub struct SetDelete<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDelete<S> {}
     impl<S: State> State for SetDelete<S> {
-        type PerformedAt = S::PerformedAt;
         type Add = S::Add;
+        type PerformedAt = S::PerformedAt;
         type Delete = Set<members::delete>;
         type Subject = S::Subject;
     }
@@ -82,18 +82,18 @@ pub mod op_state {
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type PerformedAt = S::PerformedAt;
         type Add = S::Add;
+        type PerformedAt = S::PerformedAt;
         type Delete = S::Delete;
         type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `performed_at` field
-        pub struct performed_at(());
         ///Marker type for the `add` field
         pub struct add(());
+        ///Marker type for the `performed_at` field
+        pub struct performed_at(());
         ///Marker type for the `delete` field
         pub struct delete(());
         ///Marker type for the `subject` field
@@ -210,8 +210,8 @@ where
 impl<'a, S> OpBuilder<'a, S>
 where
     S: op_state::State,
-    S::PerformedAt: op_state::IsSet,
     S::Add: op_state::IsSet,
+    S::PerformedAt: op_state::IsSet,
     S::Delete: op_state::IsSet,
     S::Subject: op_state::IsSet,
 {
@@ -512,37 +512,37 @@ pub mod operand_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Key;
         type Value;
+        type Key;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Key = Unset;
         type Value = Unset;
-    }
-    ///State transition - sets the `key` field to Set
-    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetKey<S> {}
-    impl<S: State> State for SetKey<S> {
-        type Key = Set<members::key>;
-        type Value = S::Value;
+        type Key = Unset;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValue<S> {}
     impl<S: State> State for SetValue<S> {
-        type Key = S::Key;
         type Value = Set<members::value>;
+        type Key = S::Key;
+    }
+    ///State transition - sets the `key` field to Set
+    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetKey<S> {}
+    impl<S: State> State for SetKey<S> {
+        type Value = S::Value;
+        type Key = Set<members::key>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `key` field
-        pub struct key(());
         ///Marker type for the `value` field
         pub struct value(());
+        ///Marker type for the `key` field
+        pub struct key(());
     }
 }
 
@@ -615,8 +615,8 @@ where
 impl<'a, S> OperandBuilder<'a, S>
 where
     S: operand_state::State,
-    S::Key: operand_state::IsSet,
     S::Value: operand_state::IsSet,
+    S::Key: operand_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Operand<'a> {

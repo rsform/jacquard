@@ -32,37 +32,37 @@ pub mod get_entry_metadata_by_name_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type EntryTitle;
         type Author;
+        type EntryTitle;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type EntryTitle = Unset;
         type Author = Unset;
-    }
-    ///State transition - sets the `entry_title` field to Set
-    pub struct SetEntryTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEntryTitle<S> {}
-    impl<S: State> State for SetEntryTitle<S> {
-        type EntryTitle = Set<members::entry_title>;
-        type Author = S::Author;
+        type EntryTitle = Unset;
     }
     ///State transition - sets the `author` field to Set
     pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthor<S> {}
     impl<S: State> State for SetAuthor<S> {
-        type EntryTitle = S::EntryTitle;
         type Author = Set<members::author>;
+        type EntryTitle = S::EntryTitle;
+    }
+    ///State transition - sets the `entry_title` field to Set
+    pub struct SetEntryTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEntryTitle<S> {}
+    impl<S: State> State for SetEntryTitle<S> {
+        type Author = S::Author;
+        type EntryTitle = Set<members::entry_title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `entry_title` field
-        pub struct entry_title(());
         ///Marker type for the `author` field
         pub struct author(());
+        ///Marker type for the `entry_title` field
+        pub struct entry_title(());
     }
 }
 
@@ -147,8 +147,8 @@ where
 impl<'a, S> GetEntryMetadataByNameBuilder<'a, S>
 where
     S: get_entry_metadata_by_name_state::State,
-    S::EntryTitle: get_entry_metadata_by_name_state::IsSet,
     S::Author: get_entry_metadata_by_name_state::IsSet,
+    S::EntryTitle: get_entry_metadata_by_name_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GetEntryMetadataByName<'a> {

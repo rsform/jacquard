@@ -43,8 +43,8 @@ pub mod post_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type TwUserId;
-        type BskyPost;
         type TweetId;
+        type BskyPost;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
@@ -52,8 +52,8 @@ pub mod post_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type TwUserId = Unset;
-        type BskyPost = Unset;
         type TweetId = Unset;
+        type BskyPost = Unset;
         type CreatedAt = Unset;
     }
     ///State transition - sets the `tw_user_id` field to Set
@@ -61,17 +61,8 @@ pub mod post_state {
     impl<S: State> sealed::Sealed for SetTwUserId<S> {}
     impl<S: State> State for SetTwUserId<S> {
         type TwUserId = Set<members::tw_user_id>;
+        type TweetId = S::TweetId;
         type BskyPost = S::BskyPost;
-        type TweetId = S::TweetId;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `bsky_post` field to Set
-    pub struct SetBskyPost<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBskyPost<S> {}
-    impl<S: State> State for SetBskyPost<S> {
-        type TwUserId = S::TwUserId;
-        type BskyPost = Set<members::bsky_post>;
-        type TweetId = S::TweetId;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `tweet_id` field to Set
@@ -79,8 +70,17 @@ pub mod post_state {
     impl<S: State> sealed::Sealed for SetTweetId<S> {}
     impl<S: State> State for SetTweetId<S> {
         type TwUserId = S::TwUserId;
-        type BskyPost = S::BskyPost;
         type TweetId = Set<members::tweet_id>;
+        type BskyPost = S::BskyPost;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `bsky_post` field to Set
+    pub struct SetBskyPost<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBskyPost<S> {}
+    impl<S: State> State for SetBskyPost<S> {
+        type TwUserId = S::TwUserId;
+        type TweetId = S::TweetId;
+        type BskyPost = Set<members::bsky_post>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
@@ -88,8 +88,8 @@ pub mod post_state {
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type TwUserId = S::TwUserId;
-        type BskyPost = S::BskyPost;
         type TweetId = S::TweetId;
+        type BskyPost = S::BskyPost;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -97,10 +97,10 @@ pub mod post_state {
     pub mod members {
         ///Marker type for the `tw_user_id` field
         pub struct tw_user_id(());
-        ///Marker type for the `bsky_post` field
-        pub struct bsky_post(());
         ///Marker type for the `tweet_id` field
         pub struct tweet_id(());
+        ///Marker type for the `bsky_post` field
+        pub struct bsky_post(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -216,8 +216,8 @@ impl<'a, S> PostBuilder<'a, S>
 where
     S: post_state::State,
     S::TwUserId: post_state::IsSet,
-    S::BskyPost: post_state::IsSet,
     S::TweetId: post_state::IsSet,
+    S::BskyPost: post_state::IsSet,
     S::CreatedAt: post_state::IsSet,
 {
     /// Build the final struct

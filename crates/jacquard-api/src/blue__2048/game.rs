@@ -45,8 +45,8 @@ pub mod game_state {
     pub trait State: sealed::Sealed {
         type SeededRecording;
         type CurrentScore;
-        type CreatedAt;
         type Completed;
+        type CreatedAt;
         type SyncStatus;
         type Won;
     }
@@ -56,8 +56,8 @@ pub mod game_state {
     impl State for Empty {
         type SeededRecording = Unset;
         type CurrentScore = Unset;
-        type CreatedAt = Unset;
         type Completed = Unset;
+        type CreatedAt = Unset;
         type SyncStatus = Unset;
         type Won = Unset;
     }
@@ -67,8 +67,8 @@ pub mod game_state {
     impl<S: State> State for SetSeededRecording<S> {
         type SeededRecording = Set<members::seeded_recording>;
         type CurrentScore = S::CurrentScore;
-        type CreatedAt = S::CreatedAt;
         type Completed = S::Completed;
+        type CreatedAt = S::CreatedAt;
         type SyncStatus = S::SyncStatus;
         type Won = S::Won;
     }
@@ -78,19 +78,8 @@ pub mod game_state {
     impl<S: State> State for SetCurrentScore<S> {
         type SeededRecording = S::SeededRecording;
         type CurrentScore = Set<members::current_score>;
+        type Completed = S::Completed;
         type CreatedAt = S::CreatedAt;
-        type Completed = S::Completed;
-        type SyncStatus = S::SyncStatus;
-        type Won = S::Won;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type SeededRecording = S::SeededRecording;
-        type CurrentScore = S::CurrentScore;
-        type CreatedAt = Set<members::created_at>;
-        type Completed = S::Completed;
         type SyncStatus = S::SyncStatus;
         type Won = S::Won;
     }
@@ -100,8 +89,19 @@ pub mod game_state {
     impl<S: State> State for SetCompleted<S> {
         type SeededRecording = S::SeededRecording;
         type CurrentScore = S::CurrentScore;
-        type CreatedAt = S::CreatedAt;
         type Completed = Set<members::completed>;
+        type CreatedAt = S::CreatedAt;
+        type SyncStatus = S::SyncStatus;
+        type Won = S::Won;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type SeededRecording = S::SeededRecording;
+        type CurrentScore = S::CurrentScore;
+        type Completed = S::Completed;
+        type CreatedAt = Set<members::created_at>;
         type SyncStatus = S::SyncStatus;
         type Won = S::Won;
     }
@@ -111,8 +111,8 @@ pub mod game_state {
     impl<S: State> State for SetSyncStatus<S> {
         type SeededRecording = S::SeededRecording;
         type CurrentScore = S::CurrentScore;
-        type CreatedAt = S::CreatedAt;
         type Completed = S::Completed;
+        type CreatedAt = S::CreatedAt;
         type SyncStatus = Set<members::sync_status>;
         type Won = S::Won;
     }
@@ -122,8 +122,8 @@ pub mod game_state {
     impl<S: State> State for SetWon<S> {
         type SeededRecording = S::SeededRecording;
         type CurrentScore = S::CurrentScore;
-        type CreatedAt = S::CreatedAt;
         type Completed = S::Completed;
+        type CreatedAt = S::CreatedAt;
         type SyncStatus = S::SyncStatus;
         type Won = Set<members::won>;
     }
@@ -134,10 +134,10 @@ pub mod game_state {
         pub struct seeded_recording(());
         ///Marker type for the `current_score` field
         pub struct current_score(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `completed` field
         pub struct completed(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `sync_status` field
         pub struct sync_status(());
         ///Marker type for the `won` field
@@ -296,8 +296,8 @@ where
     S: game_state::State,
     S::SeededRecording: game_state::IsSet,
     S::CurrentScore: game_state::IsSet,
-    S::CreatedAt: game_state::IsSet,
     S::Completed: game_state::IsSet,
+    S::CreatedAt: game_state::IsSet,
     S::SyncStatus: game_state::IsSet,
     S::Won: game_state::IsSet,
 {

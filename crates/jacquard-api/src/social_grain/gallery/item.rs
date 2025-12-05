@@ -36,51 +36,51 @@ pub mod item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Gallery;
         type Item;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Gallery = Unset;
         type Item = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `gallery` field to Set
-    pub struct SetGallery<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGallery<S> {}
-    impl<S: State> State for SetGallery<S> {
-        type Gallery = Set<members::gallery>;
-        type Item = S::Item;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `item` field to Set
-    pub struct SetItem<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetItem<S> {}
-    impl<S: State> State for SetItem<S> {
-        type Gallery = S::Gallery;
-        type Item = Set<members::item>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
         type Gallery = S::Gallery;
         type Item = S::Item;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `gallery` field to Set
+    pub struct SetGallery<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGallery<S> {}
+    impl<S: State> State for SetGallery<S> {
+        type CreatedAt = S::CreatedAt;
+        type Gallery = Set<members::gallery>;
+        type Item = S::Item;
+    }
+    ///State transition - sets the `item` field to Set
+    pub struct SetItem<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetItem<S> {}
+    impl<S: State> State for SetItem<S> {
+        type CreatedAt = S::CreatedAt;
+        type Gallery = S::Gallery;
+        type Item = Set<members::item>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `gallery` field
         pub struct gallery(());
         ///Marker type for the `item` field
         pub struct item(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -187,9 +187,9 @@ impl<'a, S: item_state::State> ItemBuilder<'a, S> {
 impl<'a, S> ItemBuilder<'a, S>
 where
     S: item_state::State,
+    S::CreatedAt: item_state::IsSet,
     S::Gallery: item_state::IsSet,
     S::Item: item_state::IsSet,
-    S::CreatedAt: item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Item<'a> {
