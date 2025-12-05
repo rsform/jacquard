@@ -294,20 +294,22 @@ impl<'c> CodeGenerator<'c> {
         nsid: &str,
         parent_type_name: &str,
         obj: &LexObject<'static>,
-        is_builder: bool,
+        _is_builder: bool,
     ) -> Result<TokenStream> {
         let required = obj.required.as_ref().map(|r| r.as_slice()).unwrap_or(&[]);
+        let nullable = obj.nullable.as_ref().map(|n| n.as_slice()).unwrap_or(&[]);
 
         let mut fields = Vec::new();
         for (field_name, field_type) in &obj.properties {
             let is_required = required.contains(field_name);
+            let is_nullable = nullable.contains(field_name);
             let field_tokens = self.generate_field(
                 nsid,
                 parent_type_name,
                 field_name,
                 field_type,
                 is_required,
-                is_builder,
+                is_nullable,
             )?;
             fields.push(field_tokens);
         }
@@ -323,7 +325,7 @@ impl<'c> CodeGenerator<'c> {
         field_name: &str,
         field_type: &LexObjectProperty<'static>,
         is_required: bool,
-        _is_builder: bool,
+        is_nullable: bool,
     ) -> Result<TokenStream> {
         if field_name.is_empty() {
             eprintln!(
@@ -337,7 +339,7 @@ impl<'c> CodeGenerator<'c> {
             self.property_to_rust_type(nsid, parent_type_name, field_name, field_type)?;
         let needs_lifetime = self.property_needs_lifetime(field_type);
 
-        let rust_type = if is_required {
+        let rust_type = if is_required && !is_nullable {
             rust_type
         } else {
             quote! { std::option::Option<#rust_type> }

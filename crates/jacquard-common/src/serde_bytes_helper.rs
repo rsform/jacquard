@@ -1,14 +1,32 @@
 //! Custom serde helpers for bytes::Bytes using serde_bytes
 
+use core::fmt;
+
+use base64::{
+    Engine,
+    prelude::{BASE64_STANDARD, BASE64_STANDARD_NO_PAD, BASE64_URL_SAFE, BASE64_URL_SAFE_NO_PAD},
+};
 use bytes::Bytes;
-use serde::{Deserializer, Serializer};
+use serde::{
+    Deserializer, Serializer,
+    de::{self, MapAccess, Visitor},
+};
 
 /// Serialize Bytes as a CBOR byte string
 pub fn serialize<S>(bytes: &Bytes, serializer: S) -> Result<S::Ok, S::Error>
 where
     S: Serializer,
 {
-    serde_bytes::serialize(bytes.as_ref(), serializer)
+    if serializer.is_human_readable() {
+        // JSON: {"$bytes": "base64 string"}
+        use serde::ser::SerializeMap;
+        let mut map = serializer.serialize_map(Some(1))?;
+        map.serialize_entry("$bytes", &BASE64_STANDARD.encode(bytes))?;
+        map.end()
+    } else {
+        // CBOR: raw bytes
+        serde_bytes::serialize(bytes.as_ref(), serializer)
+    }
 }
 
 /// Deserialize Bytes from a CBOR byte string
@@ -16,6 +34,55 @@ pub fn deserialize<'de, D>(deserializer: D) -> Result<Bytes, D::Error>
 where
     D: Deserializer<'de>,
 {
-    let vec: Vec<u8> = serde_bytes::deserialize(deserializer)?;
-    Ok(Bytes::from(vec))
+    if deserializer.is_human_readable() {
+        Ok(deserializer.deserialize_map(BytesVisitor)?)
+    } else {
+        let vec: Vec<u8> = serde_bytes::deserialize(deserializer)?;
+        Ok(Bytes::from(vec))
+    }
+}
+
+struct BytesVisitor;
+
+impl<'de> Visitor<'de> for BytesVisitor {
+    type Value = Bytes;
+
+    fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        formatter.write_str("a base64-encoded string")
+    }
+
+    fn visit_map<A>(self, mut map: A) -> Result<Self::Value, A::Error>
+    where
+        A: MapAccess<'de>,
+    {
+        let mut bytes = None;
+
+        while let Some(key) = map.next_key()? {
+            match key {
+                "$bytes" => {
+                    if bytes.is_some() {
+                        return Err(de::Error::duplicate_field("$bytes"));
+                    }
+                    let bytes_str: String = map.next_value()?;
+                    // First one should just work. rest are insurance.
+                    bytes = if let Ok(bytes) = BASE64_STANDARD.decode(&bytes_str) {
+                        Some(Bytes::from_owner(bytes))
+                    } else if let Ok(bytes) = BASE64_STANDARD_NO_PAD.decode(&bytes_str) {
+                        Some(Bytes::from_owner(bytes))
+                    } else if let Ok(bytes) = BASE64_URL_SAFE.decode(&bytes_str) {
+                        Some(Bytes::from_owner(bytes))
+                    } else if let Ok(bytes) = BASE64_URL_SAFE_NO_PAD.decode(&bytes_str) {
+                        Some(Bytes::from_owner(bytes))
+                    } else {
+                        return Err(de::Error::custom("invalid base64 string"));
+                    }
+                }
+                _ => {
+                    return Err(de::Error::unknown_field(key, &["$bytes"]));
+                }
+            }
+        }
+
+        bytes.ok_or_else(|| de::Error::missing_field("$bytes"))
+    }
 }
