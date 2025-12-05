@@ -1,5 +1,7 @@
 use std::sync::Arc;
 
+use chrono::TimeDelta;
+
 use crate::{
     atproto::{AtprotoClientMetadata, atproto_client_metadata},
     authstore::ClientAuthStore,
@@ -295,6 +297,25 @@ pub enum Error {
     #[error("session does not exist")]
     #[diagnostic(code(jacquard_oauth::session::not_found))]
     SessionNotFound,
+    #[error("session refresh failed permanently")]
+    #[diagnostic(
+        code(jacquard_oauth::session::refresh_failed),
+        help("the session has been cleared - user must re-authenticate")
+    )]
+    RefreshFailed(#[source] crate::request::RequestError),
+}
+
+impl Error {
+    /// Returns true if this error indicates a permanent auth failure
+    /// where the user needs to re-authenticate.
+    pub fn is_permanent(&self) -> bool {
+        match self {
+            Error::RefreshFailed(_) => true,
+            Error::SessionNotFound => true,
+            Error::ServerAgent(e) => e.is_permanent(),
+            Error::Store(_) => false,
+        }
+    }
 }
 
 pub struct SessionRegistry<T, S>
@@ -351,22 +372,40 @@ where
             .clone();
         let _guard = lock.lock().await;
 
-        let mut session = self
+        let session = self
             .store
             .get_session(did, session_id)
             .await?
             .ok_or(Error::SessionNotFound)?;
+
+        // Check if token is still valid with a 60-second buffer before expiry.
+        // This triggers proactive refresh before the token actually expires,
+        // avoiding the race condition where a token expires mid-request.
+        const EXPIRY_BUFFER_SECS: i64 = 60;
         if let Some(expires_at) = &session.token_set.expires_at {
-            if expires_at > &Datetime::now() {
+            let now_with_buffer = Datetime::now()
+                .as_ref()
+                .checked_add_signed(TimeDelta::seconds(EXPIRY_BUFFER_SECS))
+                .map(Datetime::new)
+                .unwrap_or_else(Datetime::now);
+            if expires_at > &now_with_buffer {
                 return Ok(session);
             }
         }
         let metadata =
             OAuthMetadata::new(self.client.as_ref(), &self.client_data, &session).await?;
-        session = refresh(self.client.as_ref(), session, &metadata).await?;
-        self.store.upsert_session(session.clone()).await?;
-
-        Ok(session)
+        match refresh(self.client.as_ref(), session, &metadata).await {
+            Ok(refreshed) => {
+                self.store.upsert_session(refreshed.clone()).await?;
+                Ok(refreshed)
+            }
+            Err(e) if e.is_permanent() => {
+                // Session is permanently dead - clean it up
+                let _ = self.store.delete_session(did, session_id).await;
+                Err(Error::RefreshFailed(e))
+            }
+            Err(e) => Err(Error::ServerAgent(e)),
+        }
     }
     pub async fn get(
         &self,

@@ -20,6 +20,7 @@ use jacquard_common::types::string::{AtprotoStr, Handle};
 use jacquard_common::types::uri::Uri;
 use jacquard_common::types::value::{AtDataError, Data};
 use jacquard_common::{CowStr, IntoStatic, smol_str};
+use n0_future::time::Duration;
 use smol_str::SmolStr;
 use std::collections::BTreeMap;
 use std::marker::Sync;
@@ -219,6 +220,8 @@ pub struct ResolverOptions {
     pub validate_doc_id: bool,
     /// Allow public unauthenticated fallback for resolveHandle via public.api.bsky.app
     pub public_fallback_for_handle: bool,
+    /// HTTP request timeout. Default: 10 seconds. Set to None to disable.
+    pub request_timeout: Option<Duration>,
 }
 
 impl Default for ResolverOptions {
@@ -250,6 +253,7 @@ impl Default for ResolverOptions {
             .did_order(did_order)
             .validate_doc_id(true)
             .public_fallback_for_handle(true)
+            .request_timeout(Duration::from_secs(20))
             .build()
     }
 }
@@ -538,6 +542,14 @@ pub enum IdentityErrorKind {
     )]
     Transport,
 
+    /// Request timeout
+    #[error("request timed out")]
+    #[diagnostic(
+        code(jacquard::identity::timeout),
+        help("the server took too long to respond")
+    )]
+    Timeout,
+
     /// HTTP status error
     #[error("HTTP {0}")]
     #[diagnostic(
@@ -651,6 +663,11 @@ impl IdentityError {
     /// Create a transport error
     pub fn transport(source: impl std::error::Error + Send + Sync + 'static) -> Self {
         Self::new(IdentityErrorKind::Transport, Some(Box::new(source)))
+    }
+
+    /// Create a timeout error
+    pub fn timeout() -> Self {
+        Self::new(IdentityErrorKind::Timeout, None)
     }
 
     /// Create an HTTP status error

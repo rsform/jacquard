@@ -13,9 +13,12 @@ pub struct OAuthClientMetadata<'c> {
     #[serde(borrow)]
     pub scope: Option<CowStr<'c>>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub application_type: Option<CowStr<'c>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub grant_types: Option<Vec<CowStr<'c>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub token_endpoint_auth_method: Option<CowStr<'c>>,
+    pub response_types: Vec<CowStr<'c>>,
     // https://datatracker.ietf.org/doc/html/rfc9449#section-5.2
     #[serde(skip_serializing_if = "Option::is_none")]
     pub dpop_bound_access_tokens: Option<bool>,
@@ -48,7 +51,9 @@ impl IntoStatic for OAuthClientMetadata<'_> {
             client_uri: self.client_uri.into_static(),
             redirect_uris: self.redirect_uris.into_static(),
             scope: self.scope.map(|scope| scope.into_static()),
+            application_type: self.application_type.map(|app_type| app_type.into_static()),
             grant_types: self.grant_types.map(|types| types.into_static()),
+            response_types: self.response_types.into_static(),
             token_endpoint_auth_method: self
                 .token_endpoint_auth_method
                 .map(|method| method.into_static()),

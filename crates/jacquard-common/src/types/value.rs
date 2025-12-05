@@ -5,7 +5,7 @@ use crate::{
 use bytes::Bytes;
 use ipld_core::ipld::Ipld;
 use smol_str::{SmolStr, ToSmolStr};
-use std::collections::BTreeMap;
+use std::{collections::BTreeMap, convert::Infallible};
 
 /// Conversion utilities for Data types
 pub mod convert;
@@ -854,6 +854,28 @@ where
     T: serde::Deserialize<'de> + IntoStatic,
 {
     T::deserialize(json).map(IntoStatic::into_static)
+}
+
+/// Deserialize a typed value from cbor bytes
+///
+/// Returns an owned version, will allocate
+pub fn from_cbor<'de, T>(
+    cbor: &'de [u8],
+) -> Result<<T as IntoStatic>::Output, serde_ipld_dagcbor::DecodeError<Infallible>>
+where
+    T: serde::Deserialize<'de> + IntoStatic,
+{
+    serde_ipld_dagcbor::from_slice::<T>(cbor).map(|d| d.into_static())
+}
+
+/// Deserialize a typed value from postcard bytes
+///
+/// Returns an owned version, will allocate
+pub fn from_postcard<'de, T>(bytes: &'de [u8]) -> Result<<T as IntoStatic>::Output, postcard::Error>
+where
+    T: serde::Deserialize<'de> + IntoStatic,
+{
+    postcard::from_bytes::<T>(bytes).map(|d| d.into_static())
 }
 
 /// Deserialize a typed value from a `RawData` value

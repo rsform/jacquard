@@ -1,6 +1,7 @@
 #![cfg(feature = "loopback")]
 
 use crate::{
+    atproto::AtprotoClientMetadata,
     authstore::ClientAuthStore,
     client::OAuthClient,
     dpop::DpopExt,
@@ -121,9 +122,16 @@ where
         ))
         .unwrap();
 
-        let mut client_data = self.registry.client_data.clone();
-        // Ensure the redirect URI is set correctly for the loopback server
-        client_data.config.redirect_uris = vec![redirect];
+        let scopes = if opts.scopes.is_empty() {
+            Some(self.registry.client_data.config.scopes.clone())
+        } else {
+            Some(opts.scopes.clone().into_static())
+        };
+
+        let client_data = crate::session::ClientData {
+            keyset: self.registry.client_data.keyset.clone(),
+            config: AtprotoClientMetadata::new_localhost(Some(vec![redirect.clone()]), scopes),
+        };
         // Build client using store and resolver
         let flow_client = OAuthClient::new_with_shared(
             self.registry.store.clone(),

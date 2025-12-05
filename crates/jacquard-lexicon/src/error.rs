@@ -76,10 +76,13 @@ pub enum CodegenError {
     )]
     Unsupported {
         /// Description of the unsupported feature
+        #[allow(unused)]
         feature: String,
         /// NSID of lexicon containing the feature
+        #[allow(unused)]
         lexicon_nsid: String,
         /// Optional suggestion for workaround
+        #[allow(unused)]
         suggestion: Option<String>,
     },
 
@@ -87,7 +90,9 @@ pub enum CodegenError {
     #[error("Name collision: {name}")]
     #[diagnostic(
         code(lexicon::name_collision),
-        help("Multiple types would generate the same Rust identifier. Module paths will disambiguate.")
+        help(
+            "Multiple types would generate the same Rust identifier. Module paths will disambiguate."
+        )
     )]
     NameCollision {
         /// The colliding name

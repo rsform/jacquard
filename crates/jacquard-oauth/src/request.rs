@@ -302,6 +302,23 @@ impl RequestError {
     pub fn atproto(source: impl std::error::Error + Send + Sync + 'static) -> Self {
         Self::new(RequestErrorKind::Atproto, Some(Box::new(source)))
     }
+
+    /// Returns true if this error indicates permanent auth failure
+    /// (token revoked, refresh_token expired, etc.)
+    ///
+    /// When this returns true, the session should be cleared from storage
+    /// rather than retried.
+    pub fn is_permanent(&self) -> bool {
+        match &self.kind {
+            RequestErrorKind::NoRefreshToken => true,
+            RequestErrorKind::HttpStatusWithBody { body, .. } => {
+                body.get("error")
+                    .and_then(|e| e.as_str())
+                    .is_some_and(|e| matches!(e, "invalid_grant" | "access_denied"))
+            }
+            _ => false,
+        }
+    }
 }
 
 // From impls for common error types
@@ -939,6 +956,8 @@ mod tests {
                 redirect_uris: vec![CowStr::new_static("https://client/cb")],
                 scope: Some(CowStr::from("atproto")),
                 grant_types: None,
+                response_types: vec![CowStr::new_static("code")],
+                application_type: Some(CowStr::new_static("web")),
                 token_endpoint_auth_method: Some(CowStr::from("none")),
                 dpop_bound_access_tokens: None,
                 jwks_uri: None,

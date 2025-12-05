@@ -390,6 +390,12 @@ impl JacquardResolver {
         self
     }
 
+    /// Set the HTTP request timeout. Pass `None` to disable timeout.
+    pub fn with_request_timeout(mut self, timeout: Option<n0_future::time::Duration>) -> Self {
+        self.opts.request_timeout = timeout;
+        self
+    }
+
     #[cfg(feature = "cache")]
     /// Enable caching with default configuration
     pub fn with_cache(mut self) -> Self {
@@ -849,52 +855,98 @@ impl IdentityResolver for JacquardResolver {
 }
 
 impl HttpClient for JacquardResolver {
+    type Error = IdentityError;
+
     async fn send_http(
         &self,
         request: http::Request<Vec<u8>>,
     ) -> core::result::Result<http::Response<Vec<u8>>, Self::Error> {
-        self.http.send_http(request).await
+        match self.opts.request_timeout {
+            Some(duration) => n0_future::time::timeout(duration, self.http.send_http(request))
+                .await
+                .map_err(|_| IdentityError::timeout())?
+                .map_err(IdentityError::transport),
+            None => self
+                .http
+                .send_http(request)
+                .await
+                .map_err(IdentityError::transport),
+        }
     }
-
-    type Error = reqwest::Error;
 }
 
 #[cfg(feature = "streaming")]
 impl jacquard_common::http_client::HttpClientExt for JacquardResolver {
     /// Send HTTP request and return streaming response
-    fn send_http_streaming(
+    async fn send_http_streaming(
         &self,
         request: http::Request<Vec<u8>>,
-    ) -> impl Future<Output = Result<http::Response<ByteStream>, Self::Error>> {
-        self.http.send_http_streaming(request)
+    ) -> Result<http::Response<ByteStream>, Self::Error> {
+        match self.opts.request_timeout {
+            Some(duration) => {
+                n0_future::time::timeout(duration, self.http.send_http_streaming(request))
+                    .await
+                    .map_err(|_| IdentityError::timeout())?
+                    .map_err(IdentityError::transport)
+            }
+            None => self
+                .http
+                .send_http_streaming(request)
+                .await
+                .map_err(IdentityError::transport),
+        }
     }
 
     /// Send HTTP request with streaming body and receive streaming response
     #[cfg(not(target_arch = "wasm32"))]
-    fn send_http_bidirectional<S>(
+    async fn send_http_bidirectional<S>(
         &self,
         parts: http::request::Parts,
         body: S,
-    ) -> impl Future<Output = Result<http::Response<ByteStream>, Self::Error>>
+    ) -> Result<http::Response<ByteStream>, Self::Error>
     where
         S: n0_future::Stream<Item = Result<bytes::Bytes, jacquard_common::StreamError>>
             + Send
             + 'static,
     {
-        self.http.send_http_bidirectional(parts, body)
+        match self.opts.request_timeout {
+            Some(duration) => {
+                n0_future::time::timeout(duration, self.http.send_http_bidirectional(parts, body))
+                    .await
+                    .map_err(|_| IdentityError::timeout())?
+                    .map_err(IdentityError::transport)
+            }
+            None => self
+                .http
+                .send_http_bidirectional(parts, body)
+                .await
+                .map_err(IdentityError::transport),
+        }
     }
 
     /// Send HTTP request with streaming body and receive streaming response (WASM)
     #[cfg(target_arch = "wasm32")]
-    fn send_http_bidirectional<S>(
+    async fn send_http_bidirectional<S>(
         &self,
         parts: http::request::Parts,
         body: S,
-    ) -> impl Future<Output = Result<http::Response<ByteStream>, Self::Error>>
+    ) -> Result<http::Response<ByteStream>, Self::Error>
     where
         S: n0_future::Stream<Item = Result<bytes::Bytes, jacquard_common::StreamError>> + 'static,
     {
-        self.http.send_http_bidirectional(parts, body)
+        match self.opts.request_timeout {
+            Some(duration) => {
+                n0_future::time::timeout(duration, self.http.send_http_bidirectional(parts, body))
+                    .await
+                    .map_err(|_| IdentityError::timeout())?
+                    .map_err(IdentityError::transport)
+            }
+            None => self
+                .http
+                .send_http_bidirectional(parts, body)
+                .await
+                .map_err(IdentityError::transport),
+        }
     }
 }
 

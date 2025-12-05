@@ -1,3 +1,4 @@
+#[allow(unused)]
 use langtag::InvalidLangTag;
 use serde::{Deserialize, Deserializer, Serialize, de::Error};
 use smol_str::{SmolStr, ToSmolStr};

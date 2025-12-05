@@ -152,16 +152,12 @@ impl<'m> AtprotoClientMetadata<'m> {
         #[derive(serde::Serialize)]
         struct Parameters<'a> {
             #[serde(skip_serializing_if = "Option::is_none")]
-            redirect_uri: Option<Vec<CowStr<'a>>>,
+            redirect_uri: Option<Vec<Url>>,
             #[serde(skip_serializing_if = "Option::is_none")]
             scope: Option<CowStr<'a>>,
         }
         let query = serde_html_form::to_string(Parameters {
-            redirect_uri: redirect_uris.as_ref().map(|u| {
-                u.iter()
-                    .map(|u| u.as_str().trim_end_matches("/").to_cowstr().into_static())
-                    .collect()
-            }),
+            redirect_uri: redirect_uris.clone(),
             scope: scopes
                 .as_ref()
                 .map(|s| Scope::serialize_multiple(s.as_slice())),
@@ -196,8 +192,13 @@ pub fn atproto_client_metadata<'m>(
     keyset: &Option<Keyset>,
 ) -> Result<OAuthClientMetadata<'m>> {
     // For non-loopback clients, require a keyset/JWKs.
-    // let is_loopback =
-    //     metadata.client_id.scheme() == "http" && metadata.client_id.host_str() == Some("localhost");
+    let is_loopback =
+        metadata.client_id.scheme() == "http" && metadata.client_id.host_str() == Some("localhost");
+    let application_type = if is_loopback {
+        Some(CowStr::new_static("native"))
+    } else {
+        Some(CowStr::new_static("web"))
+    };
     // if !is_loopback && keyset.is_none() {
     //     return Err(Error::EmptyJwks);
     // }
@@ -234,12 +235,14 @@ pub fn atproto_client_metadata<'m>(
         client_id: client_id.to_cowstr().into_static(),
         client_uri,
         redirect_uris,
+        application_type,
         token_endpoint_auth_method: Some(auth_method.into()),
         grant_types: if keyset.is_some() {
             Some(metadata.grant_types.into_iter().map(|v| v.into()).collect())
         } else {
             None
         },
+        response_types: vec!["code".to_cowstr()],
         scope: Some(Scope::serialize_multiple(metadata.scopes.as_slice())),
         dpop_bound_access_tokens: Some(true),
         jwks_uri,
@@ -287,8 +290,10 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
                     CowStr::new_static("http://127.0.0.1"),
                     CowStr::new_static("http://[::1]"),
                 ],
+                application_type: Some(CowStr::new_static("native")),
                 scope: Some(CowStr::new_static("atproto")),
                 grant_types: None,
+                response_types: vec!["code".to_cowstr()],
                 token_endpoint_auth_method: Some(AuthMethod::None.into()),
                 dpop_bound_access_tokens: Some(true),
                 jwks_uri: None,
@@ -333,7 +338,9 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
                 scope: Some(CowStr::new_static(
                     "account:email atproto transition:generic"
                 )),
+                application_type: Some(CowStr::new_static("native")),
                 grant_types: None,
+                response_types: vec!["code".to_cowstr()],
                 token_endpoint_auth_method: Some(AuthMethod::None.into()),
                 dpop_bound_access_tokens: Some(true),
                 jwks_uri: None,
@@ -365,10 +372,12 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
                     client_id: CowStr::new_static(
                         "http://localhost/?redirect_uri=http%3A%2F%2F127.0.0.1"
                     ),
+                    application_type: Some(CowStr::new_static("native")),
                     client_uri: None,
                     redirect_uris: vec![CowStr::new_static("http://127.0.0.1")],
                     scope: Some(CowStr::new_static("atproto")),
                     grant_types: None,
+                    response_types: vec!["code".to_cowstr()],
                     token_endpoint_auth_method: Some(AuthMethod::None.into()),
                     dpop_bound_access_tokens: Some(true),
                     jwks_uri: None,
@@ -400,6 +409,8 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
                     redirect_uris: vec![CowStr::new_static("http://127.0.0.1:8000")],
                     scope: Some(CowStr::new_static("atproto")),
                     grant_types: None,
+                    application_type: Some(CowStr::new_static("native")),
+                    response_types: vec!["code".to_cowstr()],
                     token_endpoint_auth_method: Some(AuthMethod::None.into()),
                     dpop_bound_access_tokens: Some(true),
                     jwks_uri: None,
@@ -431,6 +442,8 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
                     redirect_uris: vec![CowStr::new_static("http://127.0.0.1")],
                     scope: Some(CowStr::new_static("atproto")),
                     grant_types: None,
+                    application_type: Some(CowStr::new_static("native")),
+                    response_types: vec!["code".to_cowstr()],
                     token_endpoint_auth_method: Some(AuthMethod::None.into()),
                     dpop_bound_access_tokens: Some(true),
                     jwks_uri: None,
@@ -484,10 +497,12 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
                     client_id: CowStr::new_static("https://example.com/client_metadata.json"),
                     client_uri: Some(CowStr::new_static("https://example.com")),
                     redirect_uris: vec![CowStr::new_static("https://example.com/callback")],
+                    application_type: Some(CowStr::new_static("web")),
                     scope: Some(CowStr::new_static("atproto")),
                     grant_types: Some(vec![CowStr::new_static("authorization_code")]),
                     token_endpoint_auth_method: Some(AuthMethod::PrivateKeyJwt.into()),
                     dpop_bound_access_tokens: Some(true),
+                    response_types: vec!["code".to_cowstr()],
                     jwks_uri: None,
                     jwks: Some(keyset.public_jwks()),
                     token_endpoint_auth_signing_alg: Some(CowStr::new_static("ES256")),

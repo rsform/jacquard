@@ -323,7 +323,7 @@ impl<'c> CodeGenerator<'c> {
         field_name: &str,
         field_type: &LexObjectProperty<'static>,
         is_required: bool,
-        is_builder: bool,
+        _is_builder: bool,
     ) -> Result<TokenStream> {
         if field_name.is_empty() {
             eprintln!(
@@ -368,6 +368,14 @@ impl<'c> CodeGenerator<'c> {
         // Add serde(borrow) to all fields with lifetimes
         if needs_lifetime {
             attrs.push(quote! { #[serde(borrow)] });
+        }
+
+        if matches!(field_type, LexObjectProperty::Bytes(_)) {
+            if is_required {
+                attrs.push(quote! { #[serde(with = "jacquard_common::serde_bytes_helper")] });
+            } else {
+                attrs.push(quote! {#[serde(with = "jacquard_common::opt_serde_bytes_helper")] });
+            }
         }
 
         Ok(quote! {

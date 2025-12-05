@@ -219,13 +219,15 @@ pub mod session;
 /// Baseline fundamental AT Protocol data types.
 pub mod types;
 // XRPC protocol types and traits
-pub mod xrpc;
+pub mod opt_serde_bytes_helper;
+pub mod serde_bytes_helper;
 /// Stream abstractions for HTTP request/response bodies.
 #[cfg(feature = "streaming")]
 pub mod stream;
+pub mod xrpc;
 
 #[cfg(feature = "streaming")]
-pub use stream::{ByteStream, ByteSink, StreamError, StreamErrorKind};
+pub use stream::{ByteSink, ByteStream, StreamError, StreamErrorKind};
 
 #[cfg(feature = "streaming")]
 pub use xrpc::StreamingResponse;
@@ -238,8 +240,8 @@ pub mod jetstream;
 
 #[cfg(feature = "websocket")]
 pub use websocket::{
-    tungstenite_client::TungsteniteClient, CloseCode, CloseFrame, WebSocketClient,
-    WebSocketConnection, WsMessage, WsSink, WsStream, WsText,
+    CloseCode, CloseFrame, WebSocketClient, WebSocketConnection, WsMessage, WsSink, WsStream,
+    WsText, tungstenite_client::TungsteniteClient,
 };
 
 pub use types::value::*;
