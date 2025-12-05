@@ -52,51 +52,51 @@ pub mod invite_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Slice;
         type CreatedAt;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Slice = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Slice = S::Slice;
-        type CreatedAt = S::CreatedAt;
+        type Did = Unset;
     }
     ///State transition - sets the `slice` field to Set
     pub struct SetSlice<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSlice<S> {}
     impl<S: State> State for SetSlice<S> {
-        type Did = S::Did;
         type Slice = Set<members::slice>;
         type CreatedAt = S::CreatedAt;
+        type Did = S::Did;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Did = S::Did;
         type Slice = S::Slice;
         type CreatedAt = Set<members::created_at>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Slice = S::Slice;
+        type CreatedAt = S::CreatedAt;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `slice` field
         pub struct slice(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
@@ -249,9 +249,9 @@ impl<'a, S: invite_view_state::State> InviteViewBuilder<'a, S> {
 impl<'a, S> InviteViewBuilder<'a, S>
 where
     S: invite_view_state::State,
-    S::Did: invite_view_state::IsSet,
     S::Slice: invite_view_state::IsSet,
     S::CreatedAt: invite_view_state::IsSet,
+    S::Did: invite_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> InviteView<'a> {

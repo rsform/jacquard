@@ -586,37 +586,37 @@ pub mod id_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Peer;
         type Counter;
+        type Peer;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Peer = Unset;
         type Counter = Unset;
-    }
-    ///State transition - sets the `peer` field to Set
-    pub struct SetPeer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPeer<S> {}
-    impl<S: State> State for SetPeer<S> {
-        type Peer = Set<members::peer>;
-        type Counter = S::Counter;
+        type Peer = Unset;
     }
     ///State transition - sets the `counter` field to Set
     pub struct SetCounter<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCounter<S> {}
     impl<S: State> State for SetCounter<S> {
-        type Peer = S::Peer;
         type Counter = Set<members::counter>;
+        type Peer = S::Peer;
+    }
+    ///State transition - sets the `peer` field to Set
+    pub struct SetPeer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPeer<S> {}
+    impl<S: State> State for SetPeer<S> {
+        type Counter = S::Counter;
+        type Peer = Set<members::peer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `peer` field
-        pub struct peer(());
         ///Marker type for the `counter` field
         pub struct counter(());
+        ///Marker type for the `peer` field
+        pub struct peer(());
     }
 }
 
@@ -683,8 +683,8 @@ where
 impl<'a, S> IdBuilder<'a, S>
 where
     S: id_state::State,
-    S::Peer: id_state::IsSet,
     S::Counter: id_state::IsSet,
+    S::Peer: id_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Id<'a> {

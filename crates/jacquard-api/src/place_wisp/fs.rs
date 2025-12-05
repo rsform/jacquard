@@ -946,51 +946,51 @@ pub mod fs_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Site;
         type Root;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Site = Unset;
         type Root = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `site` field to Set
-    pub struct SetSite<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSite<S> {}
-    impl<S: State> State for SetSite<S> {
-        type Site = Set<members::site>;
-        type Root = S::Root;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `root` field to Set
-    pub struct SetRoot<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRoot<S> {}
-    impl<S: State> State for SetRoot<S> {
-        type Site = S::Site;
-        type Root = Set<members::root>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
         type Site = S::Site;
         type Root = S::Root;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `site` field to Set
+    pub struct SetSite<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSite<S> {}
+    impl<S: State> State for SetSite<S> {
+        type CreatedAt = S::CreatedAt;
+        type Site = Set<members::site>;
+        type Root = S::Root;
+    }
+    ///State transition - sets the `root` field to Set
+    pub struct SetRoot<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRoot<S> {}
+    impl<S: State> State for SetRoot<S> {
+        type CreatedAt = S::CreatedAt;
+        type Site = S::Site;
+        type Root = Set<members::root>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `site` field
         pub struct site(());
         ///Marker type for the `root` field
         pub struct root(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -1097,9 +1097,9 @@ where
 impl<'a, S> FsBuilder<'a, S>
 where
     S: fs_state::State,
+    S::CreatedAt: fs_state::IsSet,
     S::Site: fs_state::IsSet,
     S::Root: fs_state::IsSet,
-    S::CreatedAt: fs_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Fs<'a> {

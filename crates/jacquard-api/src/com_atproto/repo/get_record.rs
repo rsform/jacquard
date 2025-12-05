@@ -39,49 +39,49 @@ pub mod get_record_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repo;
         type Collection;
+        type Repo;
         type Rkey;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repo = Unset;
         type Collection = Unset;
+        type Repo = Unset;
         type Rkey = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Repo = Set<members::repo>;
-        type Collection = S::Collection;
-        type Rkey = S::Rkey;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCollection<S> {}
     impl<S: State> State for SetCollection<S> {
-        type Repo = S::Repo;
         type Collection = Set<members::collection>;
+        type Repo = S::Repo;
+        type Rkey = S::Rkey;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Collection = S::Collection;
+        type Repo = Set<members::repo>;
         type Rkey = S::Rkey;
     }
     ///State transition - sets the `rkey` field to Set
     pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRkey<S> {}
     impl<S: State> State for SetRkey<S> {
-        type Repo = S::Repo;
         type Collection = S::Collection;
+        type Repo = S::Repo;
         type Rkey = Set<members::rkey>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `collection` field
         pub struct collection(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
         ///Marker type for the `rkey` field
         pub struct rkey(());
     }
@@ -204,8 +204,8 @@ where
 impl<'a, S> GetRecordBuilder<'a, S>
 where
     S: get_record_state::State,
-    S::Repo: get_record_state::IsSet,
     S::Collection: get_record_state::IsSet,
+    S::Repo: get_record_state::IsSet,
     S::Rkey: get_record_state::IsSet,
 {
     /// Build the final struct

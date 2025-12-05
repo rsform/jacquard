@@ -43,8 +43,8 @@ pub mod question_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Title;
-        type Content;
         type CreatedAt;
+        type Content;
         type Forum;
         type Tags;
         type IsOpen;
@@ -54,8 +54,8 @@ pub mod question_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Title = Unset;
-        type Content = Unset;
         type CreatedAt = Unset;
+        type Content = Unset;
         type Forum = Unset;
         type Tags = Unset;
         type IsOpen = Unset;
@@ -65,19 +65,8 @@ pub mod question_state {
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
         type Title = Set<members::title>;
+        type CreatedAt = S::CreatedAt;
         type Content = S::Content;
-        type CreatedAt = S::CreatedAt;
-        type Forum = S::Forum;
-        type Tags = S::Tags;
-        type IsOpen = S::IsOpen;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Title = S::Title;
-        type Content = Set<members::content>;
-        type CreatedAt = S::CreatedAt;
         type Forum = S::Forum;
         type Tags = S::Tags;
         type IsOpen = S::IsOpen;
@@ -87,8 +76,19 @@ pub mod question_state {
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type Title = S::Title;
-        type Content = S::Content;
         type CreatedAt = Set<members::created_at>;
+        type Content = S::Content;
+        type Forum = S::Forum;
+        type Tags = S::Tags;
+        type IsOpen = S::IsOpen;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+        type Content = Set<members::content>;
         type Forum = S::Forum;
         type Tags = S::Tags;
         type IsOpen = S::IsOpen;
@@ -98,8 +98,8 @@ pub mod question_state {
     impl<S: State> sealed::Sealed for SetForum<S> {}
     impl<S: State> State for SetForum<S> {
         type Title = S::Title;
-        type Content = S::Content;
         type CreatedAt = S::CreatedAt;
+        type Content = S::Content;
         type Forum = Set<members::forum>;
         type Tags = S::Tags;
         type IsOpen = S::IsOpen;
@@ -109,8 +109,8 @@ pub mod question_state {
     impl<S: State> sealed::Sealed for SetTags<S> {}
     impl<S: State> State for SetTags<S> {
         type Title = S::Title;
-        type Content = S::Content;
         type CreatedAt = S::CreatedAt;
+        type Content = S::Content;
         type Forum = S::Forum;
         type Tags = Set<members::tags>;
         type IsOpen = S::IsOpen;
@@ -120,8 +120,8 @@ pub mod question_state {
     impl<S: State> sealed::Sealed for SetIsOpen<S> {}
     impl<S: State> State for SetIsOpen<S> {
         type Title = S::Title;
-        type Content = S::Content;
         type CreatedAt = S::CreatedAt;
+        type Content = S::Content;
         type Forum = S::Forum;
         type Tags = S::Tags;
         type IsOpen = Set<members::is_open>;
@@ -131,10 +131,10 @@ pub mod question_state {
     pub mod members {
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `content` field
-        pub struct content(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `content` field
+        pub struct content(());
         ///Marker type for the `forum` field
         pub struct forum(());
         ///Marker type for the `tags` field
@@ -314,8 +314,8 @@ impl<'a, S> QuestionBuilder<'a, S>
 where
     S: question_state::State,
     S::Title: question_state::IsSet,
-    S::Content: question_state::IsSet,
     S::CreatedAt: question_state::IsSet,
+    S::Content: question_state::IsSet,
     S::Forum: question_state::IsSet,
     S::Tags: question_state::IsSet,
     S::IsOpen: question_state::IsSet,

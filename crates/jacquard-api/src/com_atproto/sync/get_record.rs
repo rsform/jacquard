@@ -36,49 +36,49 @@ pub mod get_record_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Collection;
+        type Did;
         type Rkey;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Collection = Unset;
+        type Did = Unset;
         type Rkey = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Collection = S::Collection;
-        type Rkey = S::Rkey;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCollection<S> {}
     impl<S: State> State for SetCollection<S> {
-        type Did = S::Did;
         type Collection = Set<members::collection>;
+        type Did = S::Did;
+        type Rkey = S::Rkey;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Collection = S::Collection;
+        type Did = Set<members::did>;
         type Rkey = S::Rkey;
     }
     ///State transition - sets the `rkey` field to Set
     pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRkey<S> {}
     impl<S: State> State for SetRkey<S> {
-        type Did = S::Did;
         type Collection = S::Collection;
+        type Did = S::Did;
         type Rkey = Set<members::rkey>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `collection` field
         pub struct collection(());
+        ///Marker type for the `did` field
+        pub struct did(());
         ///Marker type for the `rkey` field
         pub struct rkey(());
     }
@@ -181,8 +181,8 @@ where
 impl<'a, S> GetRecordBuilder<'a, S>
 where
     S: get_record_state::State,
-    S::Did: get_record_state::IsSet,
     S::Collection: get_record_state::IsSet,
+    S::Did: get_record_state::IsSet,
     S::Rkey: get_record_state::IsSet,
 {
     /// Build the final struct

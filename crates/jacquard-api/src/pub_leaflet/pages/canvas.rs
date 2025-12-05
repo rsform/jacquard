@@ -764,37 +764,37 @@ pub mod position_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Block;
         type Offset;
+        type Block;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Block = Unset;
         type Offset = Unset;
-    }
-    ///State transition - sets the `block` field to Set
-    pub struct SetBlock<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlock<S> {}
-    impl<S: State> State for SetBlock<S> {
-        type Block = Set<members::block>;
-        type Offset = S::Offset;
+        type Block = Unset;
     }
     ///State transition - sets the `offset` field to Set
     pub struct SetOffset<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetOffset<S> {}
     impl<S: State> State for SetOffset<S> {
-        type Block = S::Block;
         type Offset = Set<members::offset>;
+        type Block = S::Block;
+    }
+    ///State transition - sets the `block` field to Set
+    pub struct SetBlock<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlock<S> {}
+    impl<S: State> State for SetBlock<S> {
+        type Offset = S::Offset;
+        type Block = Set<members::block>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `block` field
-        pub struct block(());
         ///Marker type for the `offset` field
         pub struct offset(());
+        ///Marker type for the `block` field
+        pub struct block(());
     }
 }
 
@@ -867,8 +867,8 @@ where
 impl<'a, S> PositionBuilder<'a, S>
 where
     S: position_state::State,
-    S::Block: position_state::IsSet,
     S::Offset: position_state::IsSet,
+    S::Block: position_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Position<'a> {

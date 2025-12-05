@@ -40,51 +40,51 @@ pub mod comment_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Post;
         type Content;
         type CreatedAt;
-        type Post;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Post = Unset;
         type Content = Unset;
         type CreatedAt = Unset;
-        type Post = Unset;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Content = Set<members::content>;
-        type CreatedAt = S::CreatedAt;
-        type Post = S::Post;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Content = S::Content;
-        type CreatedAt = Set<members::created_at>;
-        type Post = S::Post;
     }
     ///State transition - sets the `post` field to Set
     pub struct SetPost<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPost<S> {}
     impl<S: State> State for SetPost<S> {
+        type Post = Set<members::post>;
         type Content = S::Content;
         type CreatedAt = S::CreatedAt;
-        type Post = Set<members::post>;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type Post = S::Post;
+        type Content = Set<members::content>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Post = S::Post;
+        type Content = S::Content;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `post` field
+        pub struct post(());
         ///Marker type for the `content` field
         pub struct content(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `post` field
-        pub struct post(());
     }
 }
 
@@ -197,9 +197,9 @@ where
 impl<'a, S> CommentBuilder<'a, S>
 where
     S: comment_state::State,
+    S::Post: comment_state::IsSet,
     S::Content: comment_state::IsSet,
     S::CreatedAt: comment_state::IsSet,
-    S::Post: comment_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Comment<'a> {

@@ -48,67 +48,67 @@ pub mod document_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Publication;
         type Pages;
         type Author;
         type Title;
-        type Publication;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Publication = Unset;
         type Pages = Unset;
         type Author = Unset;
         type Title = Unset;
-        type Publication = Unset;
-    }
-    ///State transition - sets the `pages` field to Set
-    pub struct SetPages<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPages<S> {}
-    impl<S: State> State for SetPages<S> {
-        type Pages = Set<members::pages>;
-        type Author = S::Author;
-        type Title = S::Title;
-        type Publication = S::Publication;
-    }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthor<S> {}
-    impl<S: State> State for SetAuthor<S> {
-        type Pages = S::Pages;
-        type Author = Set<members::author>;
-        type Title = S::Title;
-        type Publication = S::Publication;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Pages = S::Pages;
-        type Author = S::Author;
-        type Title = Set<members::title>;
-        type Publication = S::Publication;
     }
     ///State transition - sets the `publication` field to Set
     pub struct SetPublication<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPublication<S> {}
     impl<S: State> State for SetPublication<S> {
+        type Publication = Set<members::publication>;
         type Pages = S::Pages;
         type Author = S::Author;
         type Title = S::Title;
-        type Publication = Set<members::publication>;
+    }
+    ///State transition - sets the `pages` field to Set
+    pub struct SetPages<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPages<S> {}
+    impl<S: State> State for SetPages<S> {
+        type Publication = S::Publication;
+        type Pages = Set<members::pages>;
+        type Author = S::Author;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthor<S> {}
+    impl<S: State> State for SetAuthor<S> {
+        type Publication = S::Publication;
+        type Pages = S::Pages;
+        type Author = Set<members::author>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Publication = S::Publication;
+        type Pages = S::Pages;
+        type Author = S::Author;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `publication` field
+        pub struct publication(());
         ///Marker type for the `pages` field
         pub struct pages(());
         ///Marker type for the `author` field
         pub struct author(());
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `publication` field
-        pub struct publication(());
     }
 }
 
@@ -281,10 +281,10 @@ where
 impl<'a, S> DocumentBuilder<'a, S>
 where
     S: document_state::State,
+    S::Publication: document_state::IsSet,
     S::Pages: document_state::IsSet,
     S::Author: document_state::IsSet,
     S::Title: document_state::IsSet,
-    S::Publication: document_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Document<'a> {

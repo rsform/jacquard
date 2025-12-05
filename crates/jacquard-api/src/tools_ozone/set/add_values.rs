@@ -35,37 +35,37 @@ pub mod add_values_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Values;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Values = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Values = S::Values;
+        type Name = Unset;
     }
     ///State transition - sets the `values` field to Set
     pub struct SetValues<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValues<S> {}
     impl<S: State> State for SetValues<S> {
-        type Name = S::Name;
         type Values = Set<members::values>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Values = S::Values;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `values` field
         pub struct values(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -138,8 +138,8 @@ where
 impl<'a, S> AddValuesBuilder<'a, S>
 where
     S: add_values_state::State,
-    S::Name: add_values_state::IsSet,
     S::Values: add_values_state::IsSet,
+    S::Name: add_values_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> AddValues<'a> {

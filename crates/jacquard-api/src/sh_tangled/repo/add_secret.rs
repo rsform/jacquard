@@ -35,49 +35,49 @@ pub mod add_secret_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repo;
         type Key;
+        type Repo;
         type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repo = Unset;
         type Key = Unset;
+        type Repo = Unset;
         type Value = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Repo = Set<members::repo>;
-        type Key = S::Key;
-        type Value = S::Value;
     }
     ///State transition - sets the `key` field to Set
     pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetKey<S> {}
     impl<S: State> State for SetKey<S> {
-        type Repo = S::Repo;
         type Key = Set<members::key>;
+        type Repo = S::Repo;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Key = S::Key;
+        type Repo = Set<members::repo>;
         type Value = S::Value;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValue<S> {}
     impl<S: State> State for SetValue<S> {
-        type Repo = S::Repo;
         type Key = S::Key;
+        type Repo = S::Repo;
         type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `key` field
         pub struct key(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
         ///Marker type for the `value` field
         pub struct value(());
     }
@@ -172,8 +172,8 @@ where
 impl<'a, S> AddSecretBuilder<'a, S>
 where
     S: add_secret_state::State,
-    S::Repo: add_secret_state::IsSet,
     S::Key: add_secret_state::IsSet,
+    S::Repo: add_secret_state::IsSet,
     S::Value: add_secret_state::IsSet,
 {
     /// Build the final struct

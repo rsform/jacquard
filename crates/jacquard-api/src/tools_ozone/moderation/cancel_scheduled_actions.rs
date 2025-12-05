@@ -37,37 +37,37 @@ pub mod cancellation_results_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Succeeded;
         type Failed;
+        type Succeeded;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Succeeded = Unset;
         type Failed = Unset;
-    }
-    ///State transition - sets the `succeeded` field to Set
-    pub struct SetSucceeded<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSucceeded<S> {}
-    impl<S: State> State for SetSucceeded<S> {
-        type Succeeded = Set<members::succeeded>;
-        type Failed = S::Failed;
+        type Succeeded = Unset;
     }
     ///State transition - sets the `failed` field to Set
     pub struct SetFailed<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFailed<S> {}
     impl<S: State> State for SetFailed<S> {
-        type Succeeded = S::Succeeded;
         type Failed = Set<members::failed>;
+        type Succeeded = S::Succeeded;
+    }
+    ///State transition - sets the `succeeded` field to Set
+    pub struct SetSucceeded<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSucceeded<S> {}
+    impl<S: State> State for SetSucceeded<S> {
+        type Failed = S::Failed;
+        type Succeeded = Set<members::succeeded>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `succeeded` field
-        pub struct succeeded(());
         ///Marker type for the `failed` field
         pub struct failed(());
+        ///Marker type for the `succeeded` field
+        pub struct succeeded(());
     }
 }
 
@@ -152,8 +152,8 @@ where
 impl<'a, S> CancellationResultsBuilder<'a, S>
 where
     S: cancellation_results_state::State,
-    S::Succeeded: cancellation_results_state::IsSet,
     S::Failed: cancellation_results_state::IsSet,
+    S::Succeeded: cancellation_results_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CancellationResults<'a> {

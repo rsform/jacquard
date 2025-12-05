@@ -36,37 +36,37 @@ pub mod definition_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Options;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Options = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Options = S::Options;
+        type Name = Unset;
     }
     ///State transition - sets the `options` field to Set
     pub struct SetOptions<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetOptions<S> {}
     impl<S: State> State for SetOptions<S> {
-        type Name = S::Name;
         type Options = Set<members::options>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Options = S::Options;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `options` field
         pub struct options(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -161,8 +161,8 @@ where
 impl<'a, S> DefinitionBuilder<'a, S>
 where
     S: definition_state::State,
-    S::Name: definition_state::IsSet,
     S::Options: definition_state::IsSet,
+    S::Name: definition_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Definition<'a> {

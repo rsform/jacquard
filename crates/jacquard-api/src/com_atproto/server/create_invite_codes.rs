@@ -361,37 +361,37 @@ pub mod create_invite_codes_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CodeCount;
         type UseCount;
+        type CodeCount;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CodeCount = Unset;
         type UseCount = Unset;
-    }
-    ///State transition - sets the `code_count` field to Set
-    pub struct SetCodeCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCodeCount<S> {}
-    impl<S: State> State for SetCodeCount<S> {
-        type CodeCount = Set<members::code_count>;
-        type UseCount = S::UseCount;
+        type CodeCount = Unset;
     }
     ///State transition - sets the `use_count` field to Set
     pub struct SetUseCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUseCount<S> {}
     impl<S: State> State for SetUseCount<S> {
-        type CodeCount = S::CodeCount;
         type UseCount = Set<members::use_count>;
+        type CodeCount = S::CodeCount;
+    }
+    ///State transition - sets the `code_count` field to Set
+    pub struct SetCodeCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCodeCount<S> {}
+    impl<S: State> State for SetCodeCount<S> {
+        type UseCount = S::UseCount;
+        type CodeCount = Set<members::code_count>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `code_count` field
-        pub struct code_count(());
         ///Marker type for the `use_count` field
         pub struct use_count(());
+        ///Marker type for the `code_count` field
+        pub struct code_count(());
     }
 }
 
@@ -484,8 +484,8 @@ where
 impl<'a, S> CreateInviteCodesBuilder<'a, S>
 where
     S: create_invite_codes_state::State,
-    S::CodeCount: create_invite_codes_state::IsSet,
     S::UseCount: create_invite_codes_state::IsSet,
+    S::CodeCount: create_invite_codes_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CreateInviteCodes<'a> {

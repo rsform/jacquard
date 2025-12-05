@@ -26,6 +26,13 @@ impl<'a> BuilderSchema<'a> {
         }
     }
 
+    pub fn nullable(&self) -> Option<&[jacquard_common::smol_str::SmolStr]> {
+        match self {
+            BuilderSchema::Object(obj) => obj.nullable.as_deref(),
+            BuilderSchema::Parameters(_) => None,
+        }
+    }
+
     /// Get the property names (field names)
     pub fn property_names(&self) -> Vec<&jacquard_common::smol_str::SmolStr> {
         match self {

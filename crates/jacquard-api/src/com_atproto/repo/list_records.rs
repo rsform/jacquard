@@ -40,37 +40,37 @@ pub mod list_records_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repo;
         type Collection;
+        type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repo = Unset;
         type Collection = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Repo = Set<members::repo>;
-        type Collection = S::Collection;
+        type Repo = Unset;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCollection<S> {}
     impl<S: State> State for SetCollection<S> {
-        type Repo = S::Repo;
         type Collection = Set<members::collection>;
+        type Repo = S::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Collection = S::Collection;
+        type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `collection` field
         pub struct collection(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
     }
 }
 
@@ -188,8 +188,8 @@ impl<'a, S: list_records_state::State> ListRecordsBuilder<'a, S> {
 impl<'a, S> ListRecordsBuilder<'a, S>
 where
     S: list_records_state::State,
-    S::Repo: list_records_state::IsSet,
     S::Collection: list_records_state::IsSet,
+    S::Repo: list_records_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ListRecords<'a> {
@@ -278,49 +278,49 @@ pub mod record_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Cid;
+        type Uri;
         type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Cid = Unset;
+        type Uri = Unset;
         type Value = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type Cid = S::Cid;
-        type Value = S::Value;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
-        type Uri = S::Uri;
         type Cid = Set<members::cid>;
+        type Uri = S::Uri;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Cid = S::Cid;
+        type Uri = Set<members::uri>;
         type Value = S::Value;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValue<S> {}
     impl<S: State> State for SetValue<S> {
-        type Uri = S::Uri;
         type Cid = S::Cid;
+        type Uri = S::Uri;
         type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `cid` field
         pub struct cid(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
         ///Marker type for the `value` field
         pub struct value(());
     }
@@ -415,8 +415,8 @@ where
 impl<'a, S> RecordBuilder<'a, S>
 where
     S: record_state::State,
-    S::Uri: record_state::IsSet,
     S::Cid: record_state::IsSet,
+    S::Uri: record_state::IsSet,
     S::Value: record_state::IsSet,
 {
     /// Build the final struct

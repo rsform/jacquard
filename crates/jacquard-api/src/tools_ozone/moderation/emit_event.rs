@@ -47,51 +47,51 @@ pub mod emit_event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Event;
         type Subject;
         type CreatedBy;
+        type Event;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Event = Unset;
         type Subject = Unset;
         type CreatedBy = Unset;
-    }
-    ///State transition - sets the `event` field to Set
-    pub struct SetEvent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEvent<S> {}
-    impl<S: State> State for SetEvent<S> {
-        type Event = Set<members::event>;
-        type Subject = S::Subject;
-        type CreatedBy = S::CreatedBy;
+        type Event = Unset;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type Event = S::Event;
         type Subject = Set<members::subject>;
         type CreatedBy = S::CreatedBy;
+        type Event = S::Event;
     }
     ///State transition - sets the `created_by` field to Set
     pub struct SetCreatedBy<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedBy<S> {}
     impl<S: State> State for SetCreatedBy<S> {
-        type Event = S::Event;
         type Subject = S::Subject;
         type CreatedBy = Set<members::created_by>;
+        type Event = S::Event;
+    }
+    ///State transition - sets the `event` field to Set
+    pub struct SetEvent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEvent<S> {}
+    impl<S: State> State for SetEvent<S> {
+        type Subject = S::Subject;
+        type CreatedBy = S::CreatedBy;
+        type Event = Set<members::event>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `event` field
-        pub struct event(());
         ///Marker type for the `subject` field
         pub struct subject(());
         ///Marker type for the `created_by` field
         pub struct created_by(());
+        ///Marker type for the `event` field
+        pub struct event(());
     }
 }
 
@@ -244,9 +244,9 @@ impl<'a, S: emit_event_state::State> EmitEventBuilder<'a, S> {
 impl<'a, S> EmitEventBuilder<'a, S>
 where
     S: emit_event_state::State,
-    S::Event: emit_event_state::IsSet,
     S::Subject: emit_event_state::IsSet,
     S::CreatedBy: emit_event_state::IsSet,
+    S::Event: emit_event_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> EmitEvent<'a> {

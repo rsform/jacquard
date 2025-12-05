@@ -3,6 +3,8 @@
 //! Generates the state trait, Empty state, and SetX<S> transition types
 //! that enable type-safe builder patterns.
 
+use std::collections::HashSet;
+
 use heck::{ToPascalCase, ToSnakeCase};
 use jacquard_common::smol_str::SmolStr;
 use proc_macro2::TokenStream;
@@ -11,7 +13,7 @@ use quote::{format_ident, quote};
 use crate::codegen::utils::make_ident;
 
 /// Information about a required field for builder state generation
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub struct RequiredField {
     /// Field name (snake_case)
     pub name_snake: SmolStr,
@@ -31,14 +33,21 @@ impl RequiredField {
 /// Collect required fields from a builder schema
 pub fn collect_required_fields(schema: &super::BuilderSchema<'_>) -> Vec<RequiredField> {
     let required = schema.required().unwrap_or(&[]);
+    let nullable = schema.nullable().unwrap_or(&[]);
 
-    required
+    let set: HashSet<_> = required
         .iter()
-        .map(|field_name| {
-            let field_name_str: &str = field_name.as_ref();
-            RequiredField::new(field_name_str)
+        .filter_map(|field_name| {
+            if nullable.contains(&field_name) {
+                None
+            } else {
+                let field_name_str: &str = field_name.as_ref();
+                Some(RequiredField::new(field_name_str))
+            }
         })
-        .collect()
+        .collect();
+
+    set.into_iter().collect()
 }
 
 /// Generate the complete state module for a builder

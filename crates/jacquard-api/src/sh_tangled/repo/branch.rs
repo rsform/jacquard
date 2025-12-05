@@ -296,51 +296,51 @@ pub mod signature_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
-        type Email;
         type When;
+        type Email;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
-        type Email = Unset;
         type When = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Email = S::Email;
-        type When = S::When;
-    }
-    ///State transition - sets the `email` field to Set
-    pub struct SetEmail<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEmail<S> {}
-    impl<S: State> State for SetEmail<S> {
-        type Name = S::Name;
-        type Email = Set<members::email>;
-        type When = S::When;
+        type Email = Unset;
+        type Name = Unset;
     }
     ///State transition - sets the `when` field to Set
     pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWhen<S> {}
     impl<S: State> State for SetWhen<S> {
-        type Name = S::Name;
-        type Email = S::Email;
         type When = Set<members::when>;
+        type Email = S::Email;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `email` field to Set
+    pub struct SetEmail<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEmail<S> {}
+    impl<S: State> State for SetEmail<S> {
+        type When = S::When;
+        type Email = Set<members::email>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type When = S::When;
+        type Email = S::Email;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
-        ///Marker type for the `email` field
-        pub struct email(());
         ///Marker type for the `when` field
         pub struct when(());
+        ///Marker type for the `email` field
+        pub struct email(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -433,9 +433,9 @@ where
 impl<'a, S> SignatureBuilder<'a, S>
 where
     S: signature_state::State,
-    S::Name: signature_state::IsSet,
-    S::Email: signature_state::IsSet,
     S::When: signature_state::IsSet,
+    S::Email: signature_state::IsSet,
+    S::Name: signature_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Signature<'a> {
