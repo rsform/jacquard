@@ -19,7 +19,7 @@
 #[serde(rename_all = "camelCase")]
 pub struct Lock<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub lock: Option<bool>,
+    pub lock: std::option::Option<bool>,
 }
 
 pub mod lock_state {

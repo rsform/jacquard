@@ -22,16 +22,16 @@ pub struct Pack<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     /// When the record was last modified
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_modified: Option<jacquard_common::types::string::Datetime>,
+    pub last_modified: std::option::Option<jacquard_common::types::string::Datetime>,
     /// When daily pack was last opened
     pub last_open_time: jacquard_common::types::string::Datetime,
     /// Longest daily pack opening streak achieved
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub longest_streak: Option<i64>,
+    pub longest_streak: std::option::Option<i64>,
     /// History of the last few pack openings
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub pack_history: Option<
+    pub pack_history: std::option::Option<
         Vec<crate::net_anisota::beta::game::pack::PackHistoryEntry<'a>>,
     >,
     /// Current daily pack opening streak count

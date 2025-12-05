@@ -23,21 +23,21 @@ pub struct Warrant<'a> {
     /// Optional description explaining the basis for this warrant
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: Option<jacquard_common::CowStr<'a>>,
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Optional expiration date for this warrant
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub expires_at: Option<jacquard_common::types::string::Datetime>,
+    pub expires_at: std::option::Option<jacquard_common::types::string::Datetime>,
     /// DID of the identity being warranted for
     #[serde(borrow)]
     pub subject: jacquard_common::CowStr<'a>,
     /// Level of trust being warranted
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub trust_level: Option<jacquard_common::CowStr<'a>>,
+    pub trust_level: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Type of warrant being provided
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub warrant_type: Option<jacquard_common::CowStr<'a>>,
+    pub warrant_type: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 pub mod warrant_state {

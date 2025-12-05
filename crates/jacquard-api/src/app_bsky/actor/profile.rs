@@ -21,39 +21,41 @@ pub struct Profile<'a> {
     /// Small image to be displayed next to posts from account. AKA, 'profile picture'
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub avatar: Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub avatar: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     /// Larger horizontal image to display behind profile view.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub banner: Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub banner: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: Option<jacquard_common::types::string::Datetime>,
+    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
     /// Free-form profile description text.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: Option<jacquard_common::CowStr<'a>>,
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub display_name: Option<jacquard_common::CowStr<'a>>,
+    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub joined_via_starter_pack: Option<
+    pub joined_via_starter_pack: std::option::Option<
         crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     >,
     /// Self-label values, specific to the Bluesky application, on the overall account.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub labels: Option<crate::com_atproto::label::SelfLabels<'a>>,
+    pub labels: std::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub pinned_post: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    pub pinned_post: std::option::Option<
+        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    >,
     /// Free-form pronouns text.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub pronouns: Option<jacquard_common::CowStr<'a>>,
+    pub pronouns: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub website: Option<jacquard_common::types::string::Uri<'a>>,
+    pub website: std::option::Option<jacquard_common::types::string::Uri<'a>>,
 }
 
 pub mod profile_state {

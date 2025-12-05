@@ -23,7 +23,7 @@ pub struct Content<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub images: Option<Vec<jacquard_common::types::value::Data<'a>>>,
+    pub images: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
     #[serde(borrow)]
     pub slug: jacquard_common::CowStr<'a>,
 }

@@ -20,7 +20,9 @@ pub struct OrderedList<'a> {
     /// Optional attributes for the ordered list
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub attrs: Option<crate::blog_pckt::block::ordered_list::OrderedListAttrs<'a>>,
+    pub attrs: std::option::Option<
+        crate::blog_pckt::block::ordered_list::OrderedListAttrs<'a>,
+    >,
     /// Array of list items
     #[serde(borrow)]
     pub content: Vec<crate::blog_pckt::block::list_item::ListItem<'a>>,

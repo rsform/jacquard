@@ -29,6 +29,7 @@ pub struct Artifact<'a> {
     #[serde(borrow)]
     pub repo: jacquard_common::types::string::AtUri<'a>,
     /// hash of the tag object that this artifact is attached to (only annotated tags are supported)
+    #[serde(with = "jacquard_common::serde_bytes_helper")]
     pub tag: bytes::Bytes,
 }
 

@@ -484,7 +484,7 @@ pub struct HydratedOekaki<'a> {
     /// Alt text description of the image, for accessibility.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub alt: Option<jacquard_common::CowStr<'a>>,
+    pub alt: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The AT protocol link.
     #[serde(borrow)]
     pub at: jacquard_common::types::string::Uri<'a>,
@@ -503,7 +503,7 @@ pub struct HydratedOekaki<'a> {
     /// An array of tags this image had.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub tags: Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
 pub mod hydrated_oekaki_state {

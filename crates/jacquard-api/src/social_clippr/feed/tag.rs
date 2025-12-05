@@ -21,13 +21,13 @@ pub struct Tag<'a> {
     /// A hexadecimal color code
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub color: Option<jacquard_common::CowStr<'a>>,
+    pub color: std::option::Option<jacquard_common::CowStr<'a>>,
     /// A client-defined timestamp for the creation of the tag
     pub created_at: jacquard_common::types::string::Datetime,
     /// A description of the tag for additional context
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: Option<jacquard_common::CowStr<'a>>,
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
     /// A de-duplicated string containing the name of the tag
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,

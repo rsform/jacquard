@@ -20,7 +20,7 @@ pub struct RevokeVerifications<'a> {
     /// Reason for revoking the verification. This is optional and can be omitted if not needed.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub revoke_reason: Option<jacquard_common::CowStr<'a>>,
+    pub revoke_reason: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Array of verification record uris to revoke
     #[serde(borrow)]
     pub uris: Vec<jacquard_common::types::string::AtUri<'a>>,

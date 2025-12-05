@@ -39,10 +39,12 @@ pub struct ConvoView<'a> {
     pub id: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub last_message: Option<ConvoViewLastMessage<'a>>,
+    pub last_message: std::option::Option<ConvoViewLastMessage<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub last_reaction: Option<crate::chat_bsky::convo::MessageAndReactionView<'a>>,
+    pub last_reaction: std::option::Option<
+        crate::chat_bsky::convo::MessageAndReactionView<'a>,
+    >,
     #[serde(borrow)]
     pub members: Vec<crate::chat_bsky::actor::ProfileViewBasic<'a>>,
     pub muted: bool,
@@ -50,7 +52,7 @@ pub struct ConvoView<'a> {
     pub rev: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub status: Option<jacquard_common::CowStr<'a>>,
+    pub status: std::option::Option<jacquard_common::CowStr<'a>>,
     pub unread_count: i64,
 }
 
@@ -3781,17 +3783,17 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MessageRef<'a> {
 pub struct MessageView<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub embed: Option<crate::app_bsky::embed::record::View<'a>>,
+    pub embed: std::option::Option<crate::app_bsky::embed::record::View<'a>>,
     /// Annotations of text (mentions, URLs, hashtags, etc)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub facets: Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
+    pub facets: std::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
     #[serde(borrow)]
     pub id: jacquard_common::CowStr<'a>,
     /// Reactions to this message, in ascending order of creation time.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub reactions: Option<Vec<crate::chat_bsky::convo::ReactionView<'a>>>,
+    pub reactions: std::option::Option<Vec<crate::chat_bsky::convo::ReactionView<'a>>>,
     #[serde(borrow)]
     pub rev: jacquard_common::CowStr<'a>,
     #[serde(borrow)]

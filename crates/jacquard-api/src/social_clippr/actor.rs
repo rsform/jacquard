@@ -48,14 +48,14 @@ pub struct ProfileView<'a> {
     /// A link to the profile's avatar
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub avatar: Option<jacquard_common::types::string::Uri<'a>>,
+    pub avatar: std::option::Option<jacquard_common::types::string::Uri<'a>>,
     /// When the profile record was first created
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: Option<jacquard_common::types::string::Datetime>,
+    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
     /// The biography associated to the profile
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: Option<jacquard_common::CowStr<'a>>,
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The DID of the profile
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,

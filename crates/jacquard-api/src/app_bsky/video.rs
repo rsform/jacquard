@@ -23,20 +23,20 @@ pub mod upload_video;
 pub struct JobStatus<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub blob: Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub blob: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub error: Option<jacquard_common::CowStr<'a>>,
+    pub error: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub job_id: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub message: Option<jacquard_common::CowStr<'a>>,
+    pub message: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Progress within the current processing state.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub progress: Option<i64>,
+    pub progress: std::option::Option<i64>,
     /// The state of the video processing job. All values not listed as a known value indicate that the job is in process.
     #[serde(borrow)]
     pub state: jacquard_common::CowStr<'a>,

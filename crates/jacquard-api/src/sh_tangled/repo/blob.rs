@@ -19,7 +19,7 @@
 pub struct LastCommit<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub author: Option<crate::sh_tangled::repo::blob::Signature<'a>>,
+    pub author: std::option::Option<crate::sh_tangled::repo::blob::Signature<'a>>,
     /// Commit hash
     #[serde(borrow)]
     pub hash: jacquard_common::CowStr<'a>,
@@ -29,7 +29,7 @@ pub struct LastCommit<'a> {
     /// Short commit hash
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub short_hash: Option<jacquard_common::CowStr<'a>>,
+    pub short_hash: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Commit timestamp
     pub when: jacquard_common::types::string::Datetime,
 }

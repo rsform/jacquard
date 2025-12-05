@@ -414,19 +414,21 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LinearDocumentQuote<'a> {
 pub struct Comment<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub attachment: Option<crate::pub_leaflet::comment::LinearDocumentQuote<'a>>,
+    pub attachment: std::option::Option<
+        crate::pub_leaflet::comment::LinearDocumentQuote<'a>,
+    >,
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub facets: Option<Vec<crate::pub_leaflet::richtext::facet::Facet<'a>>>,
+    pub facets: std::option::Option<Vec<crate::pub_leaflet::richtext::facet::Facet<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub on_page: Option<jacquard_common::CowStr<'a>>,
+    pub on_page: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub plaintext: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub reply: Option<crate::pub_leaflet::comment::ReplyRef<'a>>,
+    pub reply: std::option::Option<crate::pub_leaflet::comment::ReplyRef<'a>>,
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::AtUri<'a>,
 }

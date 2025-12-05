@@ -20,30 +20,32 @@
 pub struct Exif<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub date_time_original: Option<jacquard_common::types::string::Datetime>,
+    pub date_time_original: std::option::Option<
+        jacquard_common::types::string::Datetime,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub exposure_time: Option<i64>,
+    pub exposure_time: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub f_number: Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub flash: Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub focal_length_in35mm_format: Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub i_so: Option<i64>,
+    pub f_number: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub lens_make: Option<jacquard_common::CowStr<'a>>,
+    pub flash: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub focal_length_in35mm_format: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub i_so: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub lens_model: Option<jacquard_common::CowStr<'a>>,
+    pub lens_make: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub make: Option<jacquard_common::CowStr<'a>>,
+    pub lens_model: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub model: Option<jacquard_common::CowStr<'a>>,
+    pub make: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub model: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub photo: jacquard_common::types::string::AtUri<'a>,
 }

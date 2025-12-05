@@ -20,7 +20,7 @@
 pub struct Group<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: Option<jacquard_common::CowStr<'a>>,
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
 }

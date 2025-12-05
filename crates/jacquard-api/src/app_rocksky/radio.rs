@@ -23,15 +23,15 @@ pub struct Radio<'a> {
     /// A description of the radio station.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: Option<jacquard_common::CowStr<'a>>,
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The genre of the radio station.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub genre: Option<jacquard_common::CowStr<'a>>,
+    pub genre: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The logo of the radio station.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub logo: Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub logo: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     /// The name of the radio station.
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
@@ -41,7 +41,7 @@ pub struct Radio<'a> {
     /// The website of the radio station.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub website: Option<jacquard_common::types::string::Uri<'a>>,
+    pub website: std::option::Option<jacquard_common::types::string::Uri<'a>>,
 }
 
 pub mod radio_state {

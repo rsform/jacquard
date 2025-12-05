@@ -21,19 +21,21 @@ pub struct Profile<'a> {
     /// The oekaki image that's the avatar of this profile.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub avatar: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    pub avatar: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     /// The bio of the user.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub bio: Option<jacquard_common::CowStr<'a>>,
+    pub bio: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The links to outside platforms for this user
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub links: Option<Vec<crate::com_shinolabs::pinksea::profile::ProfileLink<'a>>>,
+    pub links: std::option::Option<
+        Vec<crate::com_shinolabs::pinksea::profile::ProfileLink<'a>>,
+    >,
     /// The display name of the user.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub nickname: Option<jacquard_common::CowStr<'a>>,
+    pub nickname: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 pub mod profile_state {

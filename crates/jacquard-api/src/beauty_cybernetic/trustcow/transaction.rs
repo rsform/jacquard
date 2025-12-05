@@ -21,17 +21,17 @@ pub struct Transaction<'a> {
     /// Transaction amount (optional, in whatever currency applies)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub amount: Option<jacquard_common::CowStr<'a>>,
+    pub amount: std::option::Option<jacquard_common::CowStr<'a>>,
     /// When the transaction occurred
     pub created_at: jacquard_common::types::string::Datetime,
     /// Currency code (optional, e.g. USD, EUR, BTC)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub currency: Option<jacquard_common::CowStr<'a>>,
+    pub currency: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Description of the service or product transacted
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: Option<jacquard_common::CowStr<'a>>,
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
     /// DID of the service consumer identity
     #[serde(borrow)]
     pub service_consumer: jacquard_common::CowStr<'a>,

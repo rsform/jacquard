@@ -19,7 +19,9 @@
 pub struct ListItem<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub children: Option<Vec<crate::pub_leaflet::blocks::unordered_list::ListItem<'a>>>,
+    pub children: std::option::Option<
+        Vec<crate::pub_leaflet::blocks::unordered_list::ListItem<'a>>,
+    >,
     #[serde(borrow)]
     pub content: ListItemContent<'a>,
 }

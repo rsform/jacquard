@@ -29,7 +29,7 @@ pub struct CreateRecord<'a> {
     /// The Record Key.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub rkey: Option<
+    pub rkey: std::option::Option<
         jacquard_common::types::string::RecordKey<
             jacquard_common::types::string::Rkey<'a>,
         >,
@@ -37,10 +37,10 @@ pub struct CreateRecord<'a> {
     /// Compare and swap with the previous commit by CID.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub swap_commit: Option<jacquard_common::types::string::Cid<'a>>,
+    pub swap_commit: std::option::Option<jacquard_common::types::string::Cid<'a>>,
     /// Can be set to 'false' to skip Lexicon schema validation of record data, 'true' to require it, or leave unset to validate only for known Lexicons.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub validate: Option<bool>,
+    pub validate: std::option::Option<bool>,
 }
 
 pub mod create_record_state {

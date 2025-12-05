@@ -21,22 +21,24 @@ pub struct Listing<'a> {
     /// URL where applicants can apply for the job.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub apply_link: Option<jacquard_common::types::string::Uri<'a>>,
+    pub apply_link: std::option::Option<jacquard_common::types::string::Uri<'a>>,
     /// Larger horizontal image to display behind job listing view.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub banner: Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub banner: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     /// The description of the job listing.
     #[serde(borrow)]
     pub description: jacquard_common::CowStr<'a>,
     /// Annotations of text (mentions, URLs, hashtags, etc).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub facets: Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
+    pub facets: std::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
     /// Locations that are relevant to the job listing.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub locations: Option<Vec<crate::community_lexicon::location::hthree::Hthree<'a>>>,
+    pub locations: std::option::Option<
+        Vec<crate::community_lexicon::location::hthree::Hthree<'a>>,
+    >,
     /// Client-declared timestamp when the job listing expires.
     pub not_after: jacquard_common::types::string::Datetime,
     /// Client-declared timestamp when the job listing becomes visible.

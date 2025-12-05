@@ -23,37 +23,37 @@ pub struct CreateOAuthClient<'a> {
     /// URI of the client application
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub client_uri: Option<jacquard_common::types::string::Uri<'a>>,
+    pub client_uri: std::option::Option<jacquard_common::types::string::Uri<'a>>,
     /// OAuth grant types
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub grant_types: Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub grant_types: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     /// URI of the client logo
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub logo_uri: Option<jacquard_common::types::string::Uri<'a>>,
+    pub logo_uri: std::option::Option<jacquard_common::types::string::Uri<'a>>,
     /// URI of the privacy policy
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub policy_uri: Option<jacquard_common::types::string::Uri<'a>>,
+    pub policy_uri: std::option::Option<jacquard_common::types::string::Uri<'a>>,
     /// Allowed redirect URIs for OAuth flow (must use HTTP or HTTPS)
     #[serde(borrow)]
     pub redirect_uris: Vec<jacquard_common::types::string::Uri<'a>>,
     /// OAuth response types
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub response_types: Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub response_types: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     /// OAuth scope
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub scope: Option<jacquard_common::CowStr<'a>>,
+    pub scope: std::option::Option<jacquard_common::CowStr<'a>>,
     /// AT-URI of the slice to register the OAuth client for
     #[serde(borrow)]
     pub slice_uri: jacquard_common::CowStr<'a>,
     /// URI of the terms of service
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub tos_uri: Option<jacquard_common::types::string::Uri<'a>>,
+    pub tos_uri: std::option::Option<jacquard_common::types::string::Uri<'a>>,
 }
 
 pub mod create_o_auth_client_state {

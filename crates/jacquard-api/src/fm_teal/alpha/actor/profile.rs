@@ -255,28 +255,32 @@ pub struct Profile<'a> {
     /// Small image to be displayed next to posts from account. AKA, 'profile picture'
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub avatar: Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub avatar: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     /// Larger horizontal image to display behind profile view.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub banner: Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub banner: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: Option<jacquard_common::types::string::Datetime>,
+    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
     /// Free-form profile description text.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: Option<jacquard_common::CowStr<'a>>,
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Annotations of text in the profile description (mentions, URLs, hashtags, etc).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description_facets: Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
+    pub description_facets: std::option::Option<
+        Vec<crate::app_bsky::richtext::facet::Facet<'a>>,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub display_name: Option<jacquard_common::CowStr<'a>>,
+    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The user's most recent item featured on their profile.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub featured_item: Option<crate::fm_teal::alpha::actor::profile::FeaturedItem<'a>>,
+    pub featured_item: std::option::Option<
+        crate::fm_teal::alpha::actor::profile::FeaturedItem<'a>,
+    >,
 }
 
 pub mod profile_state {

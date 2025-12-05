@@ -34,34 +34,40 @@ pub mod update_subject_status;
 #[serde(rename_all = "camelCase")]
 pub struct AccountView<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub deactivated_at: Option<jacquard_common::types::string::Datetime>,
+    pub deactivated_at: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub email: Option<jacquard_common::CowStr<'a>>,
+    pub email: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub email_confirmed_at: Option<jacquard_common::types::string::Datetime>,
+    pub email_confirmed_at: std::option::Option<
+        jacquard_common::types::string::Datetime,
+    >,
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
     pub indexed_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub invite_note: Option<jacquard_common::CowStr<'a>>,
+    pub invite_note: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub invited_by: Option<crate::com_atproto::server::InviteCode<'a>>,
+    pub invited_by: std::option::Option<crate::com_atproto::server::InviteCode<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub invites: Option<Vec<crate::com_atproto::server::InviteCode<'a>>>,
+    pub invites: std::option::Option<Vec<crate::com_atproto::server::InviteCode<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub invites_disabled: Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub related_records: Option<Vec<jacquard_common::types::value::Data<'a>>>,
+    pub invites_disabled: std::option::Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub threat_signatures: Option<Vec<crate::com_atproto::admin::ThreatSignature<'a>>>,
+    pub related_records: std::option::Option<
+        Vec<jacquard_common::types::value::Data<'a>>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub threat_signatures: std::option::Option<
+        Vec<crate::com_atproto::admin::ThreatSignature<'a>>,
+    >,
 }
 
 pub mod account_view_state {
@@ -888,7 +894,7 @@ pub struct RepoBlobRef<'a> {
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub record_uri: Option<jacquard_common::types::string::AtUri<'a>>,
+    pub record_uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
 }
 
 pub mod repo_blob_ref_state {
@@ -1223,7 +1229,7 @@ pub struct StatusAttr<'a> {
     pub applied: bool,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub r#ref: Option<jacquard_common::CowStr<'a>>,
+    pub r#ref: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 pub mod status_attr_state {

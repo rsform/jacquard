@@ -1257,13 +1257,15 @@ pub struct TriggerMetadata<'a> {
     pub kind: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub manual: Option<crate::sh_tangled::pipeline::ManualTriggerData<'a>>,
+    pub manual: std::option::Option<crate::sh_tangled::pipeline::ManualTriggerData<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub pull_request: Option<crate::sh_tangled::pipeline::PullRequestTriggerData<'a>>,
+    pub pull_request: std::option::Option<
+        crate::sh_tangled::pipeline::PullRequestTriggerData<'a>,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub push: Option<crate::sh_tangled::pipeline::PushTriggerData<'a>>,
+    pub push: std::option::Option<crate::sh_tangled::pipeline::PushTriggerData<'a>>,
     #[serde(borrow)]
     pub repo: crate::sh_tangled::pipeline::TriggerRepo<'a>,
 }

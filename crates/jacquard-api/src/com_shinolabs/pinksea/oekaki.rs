@@ -421,14 +421,16 @@ pub struct Oekaki<'a> {
     /// What this oekaki post is a response to.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub in_response_to: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    pub in_response_to: std::option::Option<
+        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    >,
     /// Is this oekaki NSFW?
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub nsfw: Option<bool>,
+    pub nsfw: std::option::Option<bool>,
     /// An array of tags this image had.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub tags: Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
 pub mod oekaki_state {

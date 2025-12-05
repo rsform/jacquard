@@ -18,15 +18,15 @@
 #[serde(rename_all = "camelCase")]
 pub struct Rel<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub finished_at: Option<Vec<jacquard_common::types::string::Datetime>>,
+    pub finished_at: std::option::Option<Vec<jacquard_common::types::string::Datetime>>,
     #[serde(borrow)]
     pub item: crate::my_skylights::Item<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub note: Option<crate::my_skylights::rel::Note<'a>>,
+    pub note: std::option::Option<crate::my_skylights::rel::Note<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub rating: Option<crate::my_skylights::rel::Rating<'a>>,
+    pub rating: std::option::Option<crate::my_skylights::rel::Rating<'a>>,
 }
 
 pub mod rel_state {

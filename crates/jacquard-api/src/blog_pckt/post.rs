@@ -23,22 +23,22 @@ pub struct Post<'a> {
     pub blog: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub body_plain: Option<jacquard_common::CowStr<'a>>,
+    pub body_plain: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub cover: Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub cover: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub images: Option<Vec<jacquard_common::types::blob::BlobRef<'a>>>,
+    pub images: std::option::Option<Vec<jacquard_common::types::blob::BlobRef<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub published_at: Option<jacquard_common::types::string::Datetime>,
+    pub published_at: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub tags: Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: Option<jacquard_common::types::string::Datetime>,
+    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub url: jacquard_common::types::string::Uri<'a>,
 }

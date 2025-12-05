@@ -28,80 +28,80 @@ pub struct Song<'a> {
     /// The album art of the song.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub album_art: Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub album_art: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     /// The album artist of the song.
     #[serde(borrow)]
     pub album_artist: jacquard_common::CowStr<'a>,
     /// The Apple Music link of the song.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub apple_music_link: Option<jacquard_common::types::string::Uri<'a>>,
+    pub apple_music_link: std::option::Option<jacquard_common::types::string::Uri<'a>>,
     /// The artist of the song.
     #[serde(borrow)]
     pub artist: jacquard_common::CowStr<'a>,
     /// The composer of the song.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub composer: Option<jacquard_common::CowStr<'a>>,
+    pub composer: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The copyright message of the song.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub copyright_message: Option<jacquard_common::CowStr<'a>>,
+    pub copyright_message: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The date when the song was created.
     pub created_at: jacquard_common::types::string::Datetime,
     /// The disc number of the song in the album.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub disc_number: Option<i64>,
+    pub disc_number: std::option::Option<i64>,
     /// The duration of the song in seconds.
     pub duration: i64,
     /// The genre of the song.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub genre: Option<jacquard_common::CowStr<'a>>,
+    pub genre: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The label of the song.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub label: Option<jacquard_common::CowStr<'a>>,
+    pub label: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The lyrics of the song.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub lyrics: Option<jacquard_common::CowStr<'a>>,
+    pub lyrics: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The MusicBrainz ID of the song.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub mbid: Option<jacquard_common::CowStr<'a>>,
+    pub mbid: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The release date of the song.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub release_date: Option<jacquard_common::types::string::Datetime>,
+    pub release_date: std::option::Option<jacquard_common::types::string::Datetime>,
     /// The Spotify link of the song.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub spotify_link: Option<jacquard_common::types::string::Uri<'a>>,
+    pub spotify_link: std::option::Option<jacquard_common::types::string::Uri<'a>>,
     /// The tags of the song.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub tags: Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     /// The Tidal link of the song.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub tidal_link: Option<jacquard_common::types::string::Uri<'a>>,
+    pub tidal_link: std::option::Option<jacquard_common::types::string::Uri<'a>>,
     /// The title of the song.
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
     /// The track number of the song in the album.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub track_number: Option<i64>,
+    pub track_number: std::option::Option<i64>,
     /// Informations about the song
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub wiki: Option<jacquard_common::CowStr<'a>>,
+    pub wiki: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The year the song was released.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub year: Option<i64>,
+    pub year: std::option::Option<i64>,
     /// The YouTube link of the song.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub youtube_link: Option<jacquard_common::types::string::Uri<'a>>,
+    pub youtube_link: std::option::Option<jacquard_common::types::string::Uri<'a>>,
 }
 
 pub mod song_state {

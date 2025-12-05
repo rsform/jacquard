@@ -20,23 +20,23 @@ pub struct ListScheduledActions<'a> {
     /// Cursor for pagination
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: Option<jacquard_common::CowStr<'a>>,
+    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Filter actions scheduled to execute before this time
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub ends_before: Option<jacquard_common::types::string::Datetime>,
+    pub ends_before: std::option::Option<jacquard_common::types::string::Datetime>,
     /// Maximum number of results to return
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: Option<i64>,
+    pub limit: std::option::Option<i64>,
     /// Filter actions scheduled to execute after this time
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub starts_after: Option<jacquard_common::types::string::Datetime>,
+    pub starts_after: std::option::Option<jacquard_common::types::string::Datetime>,
     /// Filter actions by status
     #[serde(borrow)]
     pub statuses: Vec<jacquard_common::CowStr<'a>>,
     /// Filter actions for specific DID subjects
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub subjects: Option<Vec<jacquard_common::types::string::Did<'a>>>,
+    pub subjects: std::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
 }
 
 pub mod list_scheduled_actions_state {

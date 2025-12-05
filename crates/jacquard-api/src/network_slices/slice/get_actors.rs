@@ -23,7 +23,7 @@ pub struct Actor<'a> {
     /// Human-readable handle of the actor
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub handle: Option<jacquard_common::types::string::Handle<'a>>,
+    pub handle: std::option::Option<jacquard_common::types::string::Handle<'a>>,
     /// When this actor was indexed
     pub indexed_at: jacquard_common::types::string::Datetime,
     /// AT-URI of the slice this actor is indexed in

@@ -77,32 +77,36 @@ pub struct Event<'a> {
     /// The description of the event.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: Option<jacquard_common::CowStr<'a>>,
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Client-declared timestamp when the event ends.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub ends_at: Option<jacquard_common::types::string::Datetime>,
+    pub ends_at: std::option::Option<jacquard_common::types::string::Datetime>,
     /// The locations where the event takes place.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub locations: Option<Vec<EventLocationsItem<'a>>>,
+    pub locations: std::option::Option<Vec<EventLocationsItem<'a>>>,
     /// The attendance mode of the event.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub mode: Option<crate::community_lexicon::calendar::event::Mode<'a>>,
+    pub mode: std::option::Option<crate::community_lexicon::calendar::event::Mode<'a>>,
     /// The name of the event.
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     /// Client-declared timestamp when the event starts.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub starts_at: Option<jacquard_common::types::string::Datetime>,
+    pub starts_at: std::option::Option<jacquard_common::types::string::Datetime>,
     /// The status of the event.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub status: Option<crate::community_lexicon::calendar::event::Status<'a>>,
+    pub status: std::option::Option<
+        crate::community_lexicon::calendar::event::Status<'a>,
+    >,
     /// URIs associated with the event.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub uris: Option<Vec<crate::community_lexicon::calendar::event::Uri<'a>>>,
+    pub uris: std::option::Option<
+        Vec<crate::community_lexicon::calendar::event::Uri<'a>>,
+    >,
 }
 
 pub mod event_state {
@@ -1182,7 +1186,7 @@ pub struct Uri<'a> {
     /// The display name of the URI.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub name: Option<jacquard_common::CowStr<'a>>,
+    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::Uri<'a>,
 }

@@ -31,7 +31,7 @@ pub struct TemplateView<'a> {
     pub id: jacquard_common::CowStr<'a>,
     /// Message language.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub lang: Option<jacquard_common::types::string::Language>,
+    pub lang: std::option::Option<jacquard_common::types::string::Language>,
     /// DID of the user who last updated the template.
     #[serde(borrow)]
     pub last_updated_by: jacquard_common::types::string::Did<'a>,
@@ -41,7 +41,7 @@ pub struct TemplateView<'a> {
     /// Content of the template, can contain markdown and variable placeholders.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub subject: Option<jacquard_common::CowStr<'a>>,
+    pub subject: std::option::Option<jacquard_common::CowStr<'a>>,
     pub updated_at: jacquard_common::types::string::Datetime,
 }
 

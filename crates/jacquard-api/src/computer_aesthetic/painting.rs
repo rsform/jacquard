@@ -27,7 +27,7 @@ pub struct Painting<'a> {
     /// URL to .zip recording file (if available)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub recording_url: Option<jacquard_common::types::string::Uri<'a>>,
+    pub recording_url: std::option::Option<jacquard_common::types::string::Uri<'a>>,
     /// MongoDB ObjectId reference for bidirectional sync
     #[serde(borrow)]
     pub r#ref: jacquard_common::CowStr<'a>,
@@ -37,7 +37,7 @@ pub struct Painting<'a> {
     /// Thumbnail preview (max 1MB)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub thumbnail: Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub thumbnail: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     /// Creation timestamp (ISO 8601)
     pub when: jacquard_common::types::string::Datetime,
 }

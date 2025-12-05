@@ -20,31 +20,31 @@ pub struct Tape<'a> {
     /// Permanent link to view on aesthetic.computer (e.g., https://aesthetic.computer/!a3x)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub ac_url: Option<jacquard_common::CowStr<'a>>,
+    pub ac_url: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Short alphanumeric code for easy lookup (e.g., 'a3x')
     #[serde(borrow)]
     pub code: jacquard_common::CowStr<'a>,
     /// MongoDB ObjectId reference for bi-directional sync
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub r#ref: Option<jacquard_common::CowStr<'a>>,
+    pub r#ref: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The unique slug identifier for this tape (e.g., wand-1729177200000)
     #[serde(borrow)]
     pub slug: jacquard_common::CowStr<'a>,
     /// Thumbnail image from midpoint frame, 3x scaled with nearest neighbor (max 1MB)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub thumbnail: Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub thumbnail: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     /// MP4 video with 3x pixel scaling and audio soundtrack (max 50MB)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub video: Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub video: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     /// ISO 8601 timestamp when the tape was created
     pub when: jacquard_common::types::string::Datetime,
     /// Direct URL to download the original ZIP file with frames and audio
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub zip_url: Option<jacquard_common::CowStr<'a>>,
+    pub zip_url: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 pub mod tape_state {

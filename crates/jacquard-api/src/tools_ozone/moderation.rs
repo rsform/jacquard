@@ -38,10 +38,10 @@ pub struct AccountEvent<'a> {
     pub active: bool,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: Option<jacquard_common::CowStr<'a>>,
+    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub status: Option<jacquard_common::CowStr<'a>>,
+    pub status: std::option::Option<jacquard_common::CowStr<'a>>,
     pub timestamp: jacquard_common::types::string::Datetime,
 }
 
@@ -4960,21 +4960,21 @@ pub struct AgeAssuranceEvent<'a> {
     /// The IP address used when completing the AA flow.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub complete_ip: Option<jacquard_common::CowStr<'a>>,
+    pub complete_ip: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The user agent used when completing the AA flow.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub complete_ua: Option<jacquard_common::CowStr<'a>>,
+    pub complete_ua: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The date and time of this write operation.
     pub created_at: jacquard_common::types::string::Datetime,
     /// The IP address used when initiating the AA flow.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub init_ip: Option<jacquard_common::CowStr<'a>>,
+    pub init_ip: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The user agent used when initiating the AA flow.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub init_ua: Option<jacquard_common::CowStr<'a>>,
+    pub init_ua: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The status of the age assurance process.
     #[serde(borrow)]
     pub status: jacquard_common::CowStr<'a>,
@@ -5312,12 +5312,12 @@ pub struct BlobView<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub details: Option<BlobViewDetails<'a>>,
+    pub details: std::option::Option<BlobViewDetails<'a>>,
     #[serde(borrow)]
     pub mime_type: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub moderation: Option<crate::tools_ozone::moderation::Moderation<'a>>,
+    pub moderation: std::option::Option<crate::tools_ozone::moderation::Moderation<'a>>,
     pub size: i64,
 }
 
@@ -5662,16 +5662,16 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CancelScheduledTakedownEv
 pub struct IdentityEvent<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: Option<jacquard_common::CowStr<'a>>,
+    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub handle: Option<jacquard_common::types::string::Handle<'a>>,
+    pub handle: std::option::Option<jacquard_common::types::string::Handle<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub pds_host: Option<jacquard_common::types::string::Uri<'a>>,
+    pub pds_host: std::option::Option<jacquard_common::types::string::Uri<'a>>,
     pub timestamp: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub tombstone: Option<bool>,
+    pub tombstone: std::option::Option<bool>,
 }
 
 pub mod identity_event_state {
@@ -6278,12 +6278,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ModEventEscalate<'a> {
 pub struct ModEventLabel<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: Option<jacquard_common::CowStr<'a>>,
+    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub create_label_vals: Vec<jacquard_common::CowStr<'a>>,
     /// Indicates how long the label will remain on the subject. Only applies on labels that are being added.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub duration_in_hours: Option<i64>,
+    pub duration_in_hours: std::option::Option<i64>,
     #[serde(borrow)]
     pub negate_label_vals: Vec<jacquard_common::CowStr<'a>>,
 }
@@ -6495,7 +6495,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ModEventLabel<'a> {
 pub struct ModEventMute<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: Option<jacquard_common::CowStr<'a>>,
+    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Indicates how long the subject should remain muted.
     pub duration_in_hours: i64,
 }
@@ -6695,7 +6695,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ModEventMuteReporter<'a> 
 pub struct ModEventPriorityScore<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: Option<jacquard_common::CowStr<'a>>,
+    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
     pub score: i64,
 }
 
@@ -6882,10 +6882,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ModEventPriorityScore<'a>
 pub struct ModEventReport<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: Option<jacquard_common::CowStr<'a>>,
+    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Set to true if the reporter was muted from reporting at the time of the event. These reports won't impact the reviewState of the subject.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub is_reporter_muted: Option<bool>,
+    pub is_reporter_muted: std::option::Option<bool>,
     #[serde(borrow)]
     pub report_type: crate::com_atproto::moderation::ReasonType<'a>,
 }
@@ -7163,7 +7163,7 @@ pub struct ModEventTag<'a> {
     /// Additional comment about added/removed tags.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: Option<jacquard_common::CowStr<'a>>,
+    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Tags to be removed to the subject. Ignores a tag If it doesn't exist, won't be duplicated.
     #[serde(borrow)]
     pub remove: Vec<jacquard_common::CowStr<'a>>,
@@ -7504,20 +7504,20 @@ pub struct ModEventView<'a> {
     pub created_by: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub creator_handle: Option<jacquard_common::CowStr<'a>>,
+    pub creator_handle: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub event: ModEventViewEvent<'a>,
     pub id: i64,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub mod_tool: Option<crate::tools_ozone::moderation::ModTool<'a>>,
+    pub mod_tool: std::option::Option<crate::tools_ozone::moderation::ModTool<'a>>,
     #[serde(borrow)]
     pub subject: ModEventViewSubject<'a>,
     #[serde(borrow)]
     pub subject_blob_cids: Vec<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub subject_handle: Option<jacquard_common::CowStr<'a>>,
+    pub subject_handle: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 pub mod mod_event_view_state {
@@ -8033,7 +8033,7 @@ pub struct ModEventViewDetail<'a> {
     pub id: i64,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub mod_tool: Option<crate::tools_ozone::moderation::ModTool<'a>>,
+    pub mod_tool: std::option::Option<crate::tools_ozone::moderation::ModTool<'a>>,
     #[serde(borrow)]
     pub subject: ModEventViewDetailSubject<'a>,
     #[serde(borrow)]
@@ -8610,10 +8610,10 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ModerationDetail<'a> {
 pub struct RecordEvent<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: Option<jacquard_common::CowStr<'a>>,
+    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub op: jacquard_common::CowStr<'a>,
     pub timestamp: jacquard_common::types::string::Datetime,
@@ -9265,7 +9265,7 @@ pub struct RecordViewDetail<'a> {
     pub indexed_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub labels: Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
     #[serde(borrow)]
     pub moderation: crate::tools_ozone::moderation::ModerationDetail<'a>,
     #[serde(borrow)]
@@ -9868,30 +9868,32 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RecordsStats<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct RepoView<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub deactivated_at: Option<jacquard_common::types::string::Datetime>,
+    pub deactivated_at: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub email: Option<jacquard_common::CowStr<'a>>,
+    pub email: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
     pub indexed_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub invite_note: Option<jacquard_common::CowStr<'a>>,
+    pub invite_note: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub invited_by: Option<crate::com_atproto::server::InviteCode<'a>>,
+    pub invited_by: std::option::Option<crate::com_atproto::server::InviteCode<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub invites_disabled: Option<bool>,
+    pub invites_disabled: std::option::Option<bool>,
     #[serde(borrow)]
     pub moderation: crate::tools_ozone::moderation::Moderation<'a>,
     #[serde(borrow)]
     pub related_records: Vec<jacquard_common::types::value::Data<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub threat_signatures: Option<Vec<crate::com_atproto::admin::ThreatSignature<'a>>>,
+    pub threat_signatures: std::option::Option<
+        Vec<crate::com_atproto::admin::ThreatSignature<'a>>,
+    >,
 }
 
 pub mod repo_view_state {
@@ -10316,38 +10318,42 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RepoView<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct RepoViewDetail<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub deactivated_at: Option<jacquard_common::types::string::Datetime>,
+    pub deactivated_at: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub email: Option<jacquard_common::CowStr<'a>>,
+    pub email: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub email_confirmed_at: Option<jacquard_common::types::string::Datetime>,
+    pub email_confirmed_at: std::option::Option<
+        jacquard_common::types::string::Datetime,
+    >,
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
     pub indexed_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub invite_note: Option<jacquard_common::CowStr<'a>>,
+    pub invite_note: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub invited_by: Option<crate::com_atproto::server::InviteCode<'a>>,
+    pub invited_by: std::option::Option<crate::com_atproto::server::InviteCode<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub invites: Option<Vec<crate::com_atproto::server::InviteCode<'a>>>,
+    pub invites: std::option::Option<Vec<crate::com_atproto::server::InviteCode<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub invites_disabled: Option<bool>,
+    pub invites_disabled: std::option::Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub labels: Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
     #[serde(borrow)]
     pub moderation: crate::tools_ozone::moderation::ModerationDetail<'a>,
     #[serde(borrow)]
     pub related_records: Vec<jacquard_common::types::value::Data<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub threat_signatures: Option<Vec<crate::com_atproto::admin::ThreatSignature<'a>>>,
+    pub threat_signatures: std::option::Option<
+        Vec<crate::com_atproto::admin::ThreatSignature<'a>>,
+    >,
 }
 
 pub mod repo_view_detail_state {
@@ -11644,37 +11650,37 @@ pub struct ScheduledActionView<'a> {
     /// Serialized event object that will be propagated to the event when performed
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub event_data: Option<jacquard_common::types::value::Data<'a>>,
+    pub event_data: std::option::Option<jacquard_common::types::value::Data<'a>>,
     /// Earliest time to execute the action (for randomized scheduling)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub execute_after: Option<jacquard_common::types::string::Datetime>,
+    pub execute_after: std::option::Option<jacquard_common::types::string::Datetime>,
     /// Exact time to execute the action
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub execute_at: Option<jacquard_common::types::string::Datetime>,
+    pub execute_at: std::option::Option<jacquard_common::types::string::Datetime>,
     /// Latest time to execute the action (for randomized scheduling)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub execute_until: Option<jacquard_common::types::string::Datetime>,
+    pub execute_until: std::option::Option<jacquard_common::types::string::Datetime>,
     /// ID of the moderation event created when action was successfully executed
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub execution_event_id: Option<i64>,
+    pub execution_event_id: std::option::Option<i64>,
     /// Auto-incrementing row ID
     pub id: i64,
     /// When the action was last attempted to be executed
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_executed_at: Option<jacquard_common::types::string::Datetime>,
+    pub last_executed_at: std::option::Option<jacquard_common::types::string::Datetime>,
     /// Reason for the last execution failure
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub last_failure_reason: Option<jacquard_common::CowStr<'a>>,
+    pub last_failure_reason: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Whether execution time should be randomized within the specified range
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub randomize_execution: Option<bool>,
+    pub randomize_execution: std::option::Option<bool>,
     /// Current status of the scheduled action
     #[serde(borrow)]
     pub status: jacquard_common::CowStr<'a>,
     /// When the scheduled action was last updated
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: Option<jacquard_common::types::string::Datetime>,
+    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 pub mod scheduled_action_view_state {
@@ -12297,70 +12303,80 @@ pub struct SubjectStatusView<'a> {
     /// Statistics related to the account subject
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub account_stats: Option<crate::tools_ozone::moderation::AccountStats<'a>>,
+    pub account_stats: std::option::Option<
+        crate::tools_ozone::moderation::AccountStats<'a>,
+    >,
     /// Strike information for the account (account-level only)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub account_strike: Option<crate::tools_ozone::moderation::AccountStrike<'a>>,
+    pub account_strike: std::option::Option<
+        crate::tools_ozone::moderation::AccountStrike<'a>,
+    >,
     /// Current age assurance state of the subject.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub age_assurance_state: Option<jacquard_common::CowStr<'a>>,
+    pub age_assurance_state: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Whether or not the last successful update to age assurance was made by the user or admin.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub age_assurance_updated_by: Option<jacquard_common::CowStr<'a>>,
+    pub age_assurance_updated_by: std::option::Option<jacquard_common::CowStr<'a>>,
     /// True indicates that the a previously taken moderator action was appealed against, by the author of the content. False indicates last appeal was resolved by moderators.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub appealed: Option<bool>,
+    pub appealed: std::option::Option<bool>,
     /// Sticky comment on the subject.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: Option<jacquard_common::CowStr<'a>>,
+    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Timestamp referencing the first moderation status impacting event was emitted on the subject
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub hosting: Option<SubjectStatusViewHosting<'a>>,
+    pub hosting: std::option::Option<SubjectStatusViewHosting<'a>>,
     pub id: i64,
     /// Timestamp referencing when the author of the subject appealed a moderation action
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_appealed_at: Option<jacquard_common::types::string::Datetime>,
+    pub last_appealed_at: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_reported_at: Option<jacquard_common::types::string::Datetime>,
+    pub last_reported_at: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_reviewed_at: Option<jacquard_common::types::string::Datetime>,
+    pub last_reviewed_at: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub last_reviewed_by: Option<jacquard_common::types::string::Did<'a>>,
+    pub last_reviewed_by: std::option::Option<jacquard_common::types::string::Did<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub mute_reporting_until: Option<jacquard_common::types::string::Datetime>,
+    pub mute_reporting_until: std::option::Option<
+        jacquard_common::types::string::Datetime,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub mute_until: Option<jacquard_common::types::string::Datetime>,
+    pub mute_until: std::option::Option<jacquard_common::types::string::Datetime>,
     /// Numeric value representing the level of priority. Higher score means higher priority.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub priority_score: Option<i64>,
+    pub priority_score: std::option::Option<i64>,
     /// Statistics related to the record subjects authored by the subject's account
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub records_stats: Option<crate::tools_ozone::moderation::RecordsStats<'a>>,
+    pub records_stats: std::option::Option<
+        crate::tools_ozone::moderation::RecordsStats<'a>,
+    >,
     #[serde(borrow)]
     pub review_state: crate::tools_ozone::moderation::SubjectReviewState<'a>,
     #[serde(borrow)]
     pub subject: SubjectStatusViewSubject<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub subject_blob_cids: Option<Vec<jacquard_common::types::string::Cid<'a>>>,
+    pub subject_blob_cids: std::option::Option<
+        Vec<jacquard_common::types::string::Cid<'a>>,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub subject_repo_handle: Option<jacquard_common::CowStr<'a>>,
+    pub subject_repo_handle: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub suspend_until: Option<jacquard_common::types::string::Datetime>,
+    pub suspend_until: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub tags: Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub takendown: Option<bool>,
+    pub takendown: std::option::Option<bool>,
     /// Timestamp referencing when the last update was made to the moderation status of the subject
     pub updated_at: jacquard_common::types::string::Datetime,
 }
@@ -13158,16 +13174,20 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SubjectStatusView<'a> {
 pub struct SubjectView<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub profile: Option<jacquard_common::types::value::Data<'a>>,
+    pub profile: std::option::Option<jacquard_common::types::value::Data<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub record: Option<crate::tools_ozone::moderation::RecordViewDetail<'a>>,
+    pub record: std::option::Option<
+        crate::tools_ozone::moderation::RecordViewDetail<'a>,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub repo: Option<crate::tools_ozone::moderation::RepoViewDetail<'a>>,
+    pub repo: std::option::Option<crate::tools_ozone::moderation::RepoViewDetail<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub status: Option<crate::tools_ozone::moderation::SubjectStatusView<'a>>,
+    pub status: std::option::Option<
+        crate::tools_ozone::moderation::SubjectStatusView<'a>,
+    >,
     #[serde(borrow)]
     pub subject: jacquard_common::CowStr<'a>,
     #[serde(borrow)]

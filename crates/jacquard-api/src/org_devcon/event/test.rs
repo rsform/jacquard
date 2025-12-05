@@ -18,17 +18,17 @@
 #[serde(rename_all = "camelCase")]
 pub struct Test<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: Option<jacquard_common::types::string::Datetime>,
+    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
     /// Description of the event
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: Option<jacquard_common::CowStr<'a>>,
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
     /// End time of the event
     pub end: jacquard_common::types::string::Datetime,
     /// Location of the event
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub location: Option<jacquard_common::CowStr<'a>>,
+    pub location: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Start time of the event
     pub start: jacquard_common::types::string::Datetime,
     /// Title of the event
@@ -37,7 +37,7 @@ pub struct Test<'a> {
     /// URL of the event
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub url: Option<jacquard_common::CowStr<'a>>,
+    pub url: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 pub mod test_state {

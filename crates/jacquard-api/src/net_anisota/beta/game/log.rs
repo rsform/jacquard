@@ -1337,13 +1337,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ItemUsageData<'a> {
 pub struct Log<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub collection_data: Option<crate::net_anisota::beta::game::log::CollectionData<'a>>,
+    pub collection_data: std::option::Option<
+        crate::net_anisota::beta::game::log::CollectionData<'a>,
+    >,
     /// When the log record was created
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: Option<jacquard_common::types::string::Datetime>,
+    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub daily_rewards_data: Option<
+    pub daily_rewards_data: std::option::Option<
         crate::net_anisota::beta::game::log::DailyRewardsData<'a>,
     >,
     /// Type of event being logged
@@ -1351,35 +1353,41 @@ pub struct Log<'a> {
     pub event_type: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub feed_context: Option<crate::net_anisota::beta::game::log::FeedContext<'a>>,
+    pub feed_context: std::option::Option<
+        crate::net_anisota::beta::game::log::FeedContext<'a>,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub game_card_data: Option<crate::net_anisota::beta::game::log::GameCardData<'a>>,
+    pub game_card_data: std::option::Option<
+        crate::net_anisota::beta::game::log::GameCardData<'a>,
+    >,
     /// Unique ID of the game card this event relates to
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub game_card_id: Option<jacquard_common::CowStr<'a>>,
+    pub game_card_id: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub item_usage_data: Option<crate::net_anisota::beta::game::log::ItemUsageData<'a>>,
+    pub item_usage_data: std::option::Option<
+        crate::net_anisota::beta::game::log::ItemUsageData<'a>,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub metadata: Option<crate::net_anisota::beta::game::log::Metadata<'a>>,
+    pub metadata: std::option::Option<crate::net_anisota::beta::game::log::Metadata<'a>>,
     /// URI of the parent log record that triggered this event
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub parent_log_uri: Option<jacquard_common::CowStr<'a>>,
+    pub parent_log_uri: std::option::Option<jacquard_common::CowStr<'a>>,
     /// URI of the root log record in this event chain
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub root_log_uri: Option<jacquard_common::CowStr<'a>>,
+    pub root_log_uri: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Unique session identifier to group related events
     #[serde(borrow)]
     pub session_id: jacquard_common::CowStr<'a>,
     /// URI of the session record this event belongs to (at://did/collection/rkey)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub session_uri: Option<jacquard_common::CowStr<'a>>,
+    pub session_uri: std::option::Option<jacquard_common::CowStr<'a>>,
     /// When the event occurred (ISO 8601)
     pub timestamp: jacquard_common::types::string::Datetime,
 }

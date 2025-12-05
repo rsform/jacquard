@@ -274,12 +274,12 @@ pub struct ListItem<'a> {
     pub added_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub item: Option<crate::my_skylights::Item<'a>>,
+    pub item: std::option::Option<crate::my_skylights::Item<'a>>,
     #[serde(borrow)]
     pub list: ListItemList<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub note: Option<jacquard_common::CowStr<'a>>,
+    pub note: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub position: jacquard_common::CowStr<'a>,
 }

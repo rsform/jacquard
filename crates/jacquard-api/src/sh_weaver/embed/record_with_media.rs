@@ -310,7 +310,7 @@ pub struct View<'a> {
     pub media: ViewMedia<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub records: Option<crate::sh_weaver::embed::records::View<'a>>,
+    pub records: std::option::Option<crate::sh_weaver::embed::records::View<'a>>,
 }
 
 pub mod view_state {

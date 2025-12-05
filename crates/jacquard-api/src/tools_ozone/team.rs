@@ -23,21 +23,21 @@ pub mod update_member;
 #[serde(rename_all = "camelCase")]
 pub struct Member<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: Option<jacquard_common::types::string::Datetime>,
+    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub disabled: Option<bool>,
+    pub disabled: std::option::Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub last_updated_by: Option<jacquard_common::CowStr<'a>>,
+    pub last_updated_by: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub profile: Option<crate::app_bsky::actor::ProfileViewDetailed<'a>>,
+    pub profile: std::option::Option<crate::app_bsky::actor::ProfileViewDetailed<'a>>,
     #[serde(borrow)]
     pub role: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: Option<jacquard_common::types::string::Datetime>,
+    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 pub mod member_state {

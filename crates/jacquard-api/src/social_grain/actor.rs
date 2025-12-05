@@ -21,22 +21,22 @@ pub mod profile;
 pub struct ProfileView<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub avatar: Option<jacquard_common::types::string::Uri<'a>>,
+    pub avatar: std::option::Option<jacquard_common::types::string::Uri<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: Option<jacquard_common::types::string::Datetime>,
+    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: Option<jacquard_common::CowStr<'a>>,
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub display_name: Option<jacquard_common::CowStr<'a>>,
+    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub labels: Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
 }
 
 pub mod profile_view_state {

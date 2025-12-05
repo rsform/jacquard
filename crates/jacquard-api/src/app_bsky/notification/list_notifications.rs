@@ -248,13 +248,13 @@ pub struct Notification<'a> {
     pub is_read: bool,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub labels: Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
     /// The reason why this notification was delivered - e.g. your post was liked, or you received a new follower.
     #[serde(borrow)]
     pub reason: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub reason_subject: Option<jacquard_common::types::string::AtUri<'a>>,
+    pub reason_subject: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
     #[serde(borrow)]
     pub record: jacquard_common::types::value::Data<'a>,
     #[serde(borrow)]

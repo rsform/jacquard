@@ -299,7 +299,7 @@ pub struct Image<'a> {
     /// Alt text description of the image, for accessibility.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub alt: Option<jacquard_common::CowStr<'a>>,
+    pub alt: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub aspect_ratio: crate::pub_leaflet::blocks::image::AspectRatio<'a>,
     #[serde(borrow)]

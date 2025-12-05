@@ -28,18 +28,18 @@ pub struct InviteView<'a> {
     pub did: jacquard_common::types::string::Did<'a>,
     /// Optional expiration date for this invitation
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub expires_at: Option<jacquard_common::types::string::Datetime>,
+    pub expires_at: std::option::Option<jacquard_common::types::string::Datetime>,
     /// Profile of the invitee
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub profile: Option<crate::app_bsky::actor::ProfileViewBasic<'a>>,
+    pub profile: std::option::Option<crate::app_bsky::actor::ProfileViewBasic<'a>>,
     /// The AT URI of the slice this invite is for
     #[serde(borrow)]
     pub slice: jacquard_common::types::string::AtUri<'a>,
     /// The AT URI of this invite record
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub uri: Option<jacquard_common::types::string::AtUri<'a>>,
+    pub uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
 }
 
 pub mod invite_view_state {
@@ -551,7 +551,7 @@ pub struct RequestView<'a> {
     /// Profile of the requester
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub profile: Option<crate::app_bsky::actor::ProfileViewBasic<'a>>,
+    pub profile: std::option::Option<crate::app_bsky::actor::ProfileViewBasic<'a>>,
     /// The AT URI of the slice being requested access to
     #[serde(borrow)]
     pub slice: jacquard_common::types::string::AtUri<'a>,

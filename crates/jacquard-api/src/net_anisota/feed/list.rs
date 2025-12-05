@@ -21,20 +21,20 @@ pub struct List<'a> {
     /// Optional avatar image for the list
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub avatar: Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub avatar: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     /// When the list was created
     pub created_at: jacquard_common::types::string::Datetime,
     /// Optional description of the list
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: Option<jacquard_common::CowStr<'a>>,
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Display name for the list
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     /// Tags for categorizing the list
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub tags: Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
 pub mod list_state {

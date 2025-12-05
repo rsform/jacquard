@@ -22,31 +22,31 @@ pub struct Draft<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub embed: Option<DraftEmbed<'a>>,
+    pub embed: std::option::Option<DraftEmbed<'a>>,
     /// Annotations of text (mentions, URLs, hashtags, etc)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub facets: Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
+    pub facets: std::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
     /// Self-label values for this post. Effectively content warnings.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub labels: Option<crate::com_atproto::label::SelfLabels<'a>>,
+    pub labels: std::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
     /// Indicates human language of post primary text content.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub langs: Option<Vec<jacquard_common::types::string::Language>>,
+    pub langs: std::option::Option<Vec<jacquard_common::types::string::Language>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub reply: Option<crate::net_anisota::feed::draft::ReplyRef<'a>>,
+    pub reply: std::option::Option<crate::net_anisota::feed::draft::ReplyRef<'a>>,
     /// Additional hashtags, in addition to any included in post text and facets.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub tags: Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     /// The primary post content. May be an empty string, if there are embeds.
     #[serde(borrow)]
     pub text: jacquard_common::CowStr<'a>,
     /// Client-declared timestamp when this draft was last updated.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: Option<jacquard_common::types::string::Datetime>,
+    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 pub mod draft_state {

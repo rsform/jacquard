@@ -21,16 +21,16 @@ pub struct Profile<'a> {
     /// Small image to be displayed next to posts from account. AKA, 'profile picture'
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub avatar: Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub avatar: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: Option<jacquard_common::types::string::Datetime>,
+    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
     /// Free-form profile description text.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: Option<jacquard_common::CowStr<'a>>,
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub display_name: Option<jacquard_common::CowStr<'a>>,
+    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 pub mod profile_state {

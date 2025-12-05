@@ -19,7 +19,7 @@
 pub struct Langs<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: Option<jacquard_common::CowStr<'a>>,
+    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub lang: jacquard_common::CowStr<'a>,
     #[serde(borrow)]

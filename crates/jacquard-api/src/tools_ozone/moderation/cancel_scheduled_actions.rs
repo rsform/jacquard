@@ -440,7 +440,7 @@ pub struct FailedCancellation<'a> {
     pub error: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub error_code: Option<jacquard_common::CowStr<'a>>,
+    pub error_code: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 pub mod failed_cancellation_state {
@@ -637,7 +637,7 @@ pub struct CancelScheduledActions<'a> {
     /// Optional comment describing the reason for cancellation
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: Option<jacquard_common::CowStr<'a>>,
+    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Array of DID subjects to cancel scheduled actions for
     #[serde(borrow)]
     pub subjects: Vec<jacquard_common::types::string::Did<'a>>,

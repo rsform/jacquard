@@ -3502,13 +3502,13 @@ pub struct MutedWord<'a> {
     /// Groups of users to apply the muted word to. If undefined, applies to all users.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub actor_target: Option<jacquard_common::CowStr<'a>>,
+    pub actor_target: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The date and time at which the muted word will expire and no longer be applied.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub expires_at: Option<jacquard_common::types::string::Datetime>,
+    pub expires_at: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub id: Option<jacquard_common::CowStr<'a>>,
+    pub id: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The intended targets of the muted word.
     #[serde(borrow)]
     pub targets: Vec<crate::app_bsky::actor::MutedWordTarget<'a>>,
@@ -3998,10 +3998,10 @@ pub struct Nux<'a> {
     /// Arbitrary data for the NUX. The structure is defined by the NUX itself. Limited to 300 characters.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub data: Option<jacquard_common::CowStr<'a>>,
+    pub data: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The date and time at which the NUX will expire and should be considered completed.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub expires_at: Option<jacquard_common::types::string::Datetime>,
+    pub expires_at: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub id: jacquard_common::CowStr<'a>,
 }
@@ -4551,43 +4551,43 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileAssociatedChat<'a>
 pub struct ProfileView<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub associated: Option<crate::app_bsky::actor::ProfileAssociated<'a>>,
+    pub associated: std::option::Option<crate::app_bsky::actor::ProfileAssociated<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub avatar: Option<jacquard_common::types::string::Uri<'a>>,
+    pub avatar: std::option::Option<jacquard_common::types::string::Uri<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: Option<jacquard_common::types::string::Datetime>,
+    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
     /// Debug information for internal development
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub debug: Option<jacquard_common::types::value::Data<'a>>,
+    pub debug: std::option::Option<jacquard_common::types::value::Data<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: Option<jacquard_common::CowStr<'a>>,
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub display_name: Option<jacquard_common::CowStr<'a>>,
+    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub indexed_at: Option<jacquard_common::types::string::Datetime>,
+    pub indexed_at: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub labels: Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub pronouns: Option<jacquard_common::CowStr<'a>>,
+    pub pronouns: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub status: Option<crate::app_bsky::actor::StatusView<'a>>,
+    pub status: std::option::Option<crate::app_bsky::actor::StatusView<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub verification: Option<crate::app_bsky::actor::VerificationState<'a>>,
+    pub verification: std::option::Option<crate::app_bsky::actor::VerificationState<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub viewer: Option<crate::app_bsky::actor::ViewerState<'a>>,
+    pub viewer: std::option::Option<crate::app_bsky::actor::ViewerState<'a>>,
 }
 
 pub mod profile_view_state {
@@ -5097,38 +5097,38 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileView<'a> {
 pub struct ProfileViewBasic<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub associated: Option<crate::app_bsky::actor::ProfileAssociated<'a>>,
+    pub associated: std::option::Option<crate::app_bsky::actor::ProfileAssociated<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub avatar: Option<jacquard_common::types::string::Uri<'a>>,
+    pub avatar: std::option::Option<jacquard_common::types::string::Uri<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: Option<jacquard_common::types::string::Datetime>,
+    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
     /// Debug information for internal development
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub debug: Option<jacquard_common::types::value::Data<'a>>,
+    pub debug: std::option::Option<jacquard_common::types::value::Data<'a>>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub display_name: Option<jacquard_common::CowStr<'a>>,
+    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub labels: Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub pronouns: Option<jacquard_common::CowStr<'a>>,
+    pub pronouns: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub status: Option<crate::app_bsky::actor::StatusView<'a>>,
+    pub status: std::option::Option<crate::app_bsky::actor::StatusView<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub verification: Option<crate::app_bsky::actor::VerificationState<'a>>,
+    pub verification: std::option::Option<crate::app_bsky::actor::VerificationState<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub viewer: Option<crate::app_bsky::actor::ViewerState<'a>>,
+    pub viewer: std::option::Option<crate::app_bsky::actor::ViewerState<'a>>,
 }
 
 pub mod profile_view_basic_state {
@@ -5562,63 +5562,65 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileViewBasic<'a> {
 pub struct ProfileViewDetailed<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub associated: Option<crate::app_bsky::actor::ProfileAssociated<'a>>,
+    pub associated: std::option::Option<crate::app_bsky::actor::ProfileAssociated<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub avatar: Option<jacquard_common::types::string::Uri<'a>>,
+    pub avatar: std::option::Option<jacquard_common::types::string::Uri<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub banner: Option<jacquard_common::types::string::Uri<'a>>,
+    pub banner: std::option::Option<jacquard_common::types::string::Uri<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: Option<jacquard_common::types::string::Datetime>,
+    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
     /// Debug information for internal development
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub debug: Option<jacquard_common::types::value::Data<'a>>,
+    pub debug: std::option::Option<jacquard_common::types::value::Data<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: Option<jacquard_common::CowStr<'a>>,
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub display_name: Option<jacquard_common::CowStr<'a>>,
+    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub followers_count: Option<i64>,
+    pub followers_count: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub follows_count: Option<i64>,
+    pub follows_count: std::option::Option<i64>,
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub indexed_at: Option<jacquard_common::types::string::Datetime>,
+    pub indexed_at: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub joined_via_starter_pack: Option<
+    pub joined_via_starter_pack: std::option::Option<
         crate::app_bsky::graph::StarterPackViewBasic<'a>,
     >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub labels: Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub pinned_post: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    pub pinned_post: std::option::Option<
+        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub posts_count: Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub pronouns: Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub status: Option<crate::app_bsky::actor::StatusView<'a>>,
+    pub posts_count: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub verification: Option<crate::app_bsky::actor::VerificationState<'a>>,
+    pub pronouns: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub viewer: Option<crate::app_bsky::actor::ViewerState<'a>>,
+    pub status: std::option::Option<crate::app_bsky::actor::StatusView<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub website: Option<jacquard_common::types::string::Uri<'a>>,
+    pub verification: std::option::Option<crate::app_bsky::actor::VerificationState<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub viewer: std::option::Option<crate::app_bsky::actor::ViewerState<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub website: std::option::Option<jacquard_common::types::string::Uri<'a>>,
 }
 
 pub mod profile_view_detailed_state {
@@ -6528,7 +6530,7 @@ pub struct SavedFeedsPref<'a> {
     #[serde(borrow)]
     pub saved: Vec<jacquard_common::types::string::AtUri<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub timeline_index: Option<i64>,
+    pub timeline_index: std::option::Option<i64>,
 }
 
 pub mod saved_feeds_pref_state {
@@ -6857,13 +6859,13 @@ pub struct StatusView<'a> {
     /// An optional embed associated with the status.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub embed: Option<crate::app_bsky::embed::external::View<'a>>,
+    pub embed: std::option::Option<crate::app_bsky::embed::external::View<'a>>,
     /// The date when this status will expire. The application might choose to no longer return the status after expiration.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub expires_at: Option<jacquard_common::types::string::Datetime>,
+    pub expires_at: std::option::Option<jacquard_common::types::string::Datetime>,
     /// True if the status is not expired, false if it is expired. Only present if expiration was set.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub is_active: Option<bool>,
+    pub is_active: std::option::Option<bool>,
     #[serde(borrow)]
     pub record: jacquard_common::types::value::Data<'a>,
     /// The status for the account.

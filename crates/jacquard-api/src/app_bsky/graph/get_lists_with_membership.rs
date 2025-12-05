@@ -22,7 +22,7 @@ pub struct ListWithMembership<'a> {
     pub list: crate::app_bsky::graph::ListView<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub list_item: Option<crate::app_bsky::graph::ListItemView<'a>>,
+    pub list_item: std::option::Option<crate::app_bsky::graph::ListItemView<'a>>,
 }
 
 pub mod list_with_membership_state {

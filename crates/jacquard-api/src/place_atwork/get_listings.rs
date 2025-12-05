@@ -27,7 +27,7 @@ pub struct ListingRecord<'a> {
     /// The full job listing record
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub value: Option<crate::place_atwork::listing::Listing<'a>>,
+    pub value: std::option::Option<crate::place_atwork::listing::Listing<'a>>,
 }
 
 pub mod listing_record_state {

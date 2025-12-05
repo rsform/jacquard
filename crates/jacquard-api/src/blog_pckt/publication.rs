@@ -21,31 +21,31 @@ pub struct Publication<'a> {
     /// Base URL path for the publication (e.g., https://blog.pckt.blog)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub base_path: Option<jacquard_common::types::string::Uri<'a>>,
+    pub base_path: std::option::Option<jacquard_common::types::string::Uri<'a>>,
     /// Timestamp when the publication was first created
     pub created_at: jacquard_common::types::string::Datetime,
     /// Publication description or tagline
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: Option<jacquard_common::CowStr<'a>>,
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Extension objects (open union) for additional features
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub extensions: Option<Vec<jacquard_common::types::value::Data<'a>>>,
+    pub extensions: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
     /// Publication icon/avatar image
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub icon: Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub icon: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     /// Publication name/title
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     /// Theme configuration as an open union; accepts blog.pckt.theme and future types.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub theme: Option<crate::blog_pckt::theme::Theme<'a>>,
+    pub theme: std::option::Option<crate::blog_pckt::theme::Theme<'a>>,
     /// Timestamp when the publication was last updated (optional)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: Option<jacquard_common::types::string::Datetime>,
+    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 pub mod publication_state {

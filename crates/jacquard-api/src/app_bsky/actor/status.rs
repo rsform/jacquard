@@ -39,11 +39,11 @@ pub struct Status<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     /// The duration of the status in minutes. Applications can choose to impose minimum and maximum limits.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub duration_minutes: Option<i64>,
+    pub duration_minutes: std::option::Option<i64>,
     /// An optional embed associated with the status.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub embed: Option<crate::app_bsky::embed::external::ExternalRecord<'a>>,
+    pub embed: std::option::Option<crate::app_bsky::embed::external::ExternalRecord<'a>>,
     /// The status for the account.
     #[serde(borrow)]
     pub status: jacquard_common::CowStr<'a>,

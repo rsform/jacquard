@@ -23,10 +23,12 @@ pub struct Message<'a> {
     /// Annotations of text (mentions, URLs, etc)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub facets: Option<Vec<crate::place_stream::richtext::facet::Facet<'a>>>,
+    pub facets: std::option::Option<
+        Vec<crate::place_stream::richtext::facet::Facet<'a>>,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub reply: Option<crate::place_stream::chat::message::ReplyRef<'a>>,
+    pub reply: std::option::Option<crate::place_stream::chat::message::ReplyRef<'a>>,
     /// The DID of the streamer whose chat this is.
     #[serde(borrow)]
     pub streamer: jacquard_common::types::string::Did<'a>,

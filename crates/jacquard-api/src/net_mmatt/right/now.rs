@@ -23,7 +23,7 @@ pub struct Now<'a> {
     /// The emoji of the status update
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub emoji: Option<jacquard_common::CowStr<'a>>,
+    pub emoji: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The text of the status update
     #[serde(borrow)]
     pub text: jacquard_common::CowStr<'a>,

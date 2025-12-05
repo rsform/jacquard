@@ -26,7 +26,7 @@ pub struct Workout<'a> {
     /// Distance covered during the workout (optional).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub distance: Option<jacquard_common::CowStr<'a>>,
+    pub distance: std::option::Option<jacquard_common::CowStr<'a>>,
     /// How long the workout lasted in minutes.
     #[serde(borrow)]
     pub duration: jacquard_common::CowStr<'a>,

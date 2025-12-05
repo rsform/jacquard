@@ -20,10 +20,10 @@ pub struct UpdateMember<'a> {
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub disabled: Option<bool>,
+    pub disabled: std::option::Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub role: Option<jacquard_common::CowStr<'a>>,
+    pub role: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 pub mod update_member_state {

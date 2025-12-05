@@ -23,24 +23,24 @@ pub struct Post<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub excerpt: Option<jacquard_common::CowStr<'a>>,
+    pub excerpt: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub featured_image: Option<crate::app_bsky::embed::images::Image<'a>>,
+    pub featured_image: std::option::Option<crate::app_bsky::embed::images::Image<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub images: Option<Vec<crate::app_bsky::embed::images::Image<'a>>>,
+    pub images: std::option::Option<Vec<crate::app_bsky::embed::images::Image<'a>>>,
     #[serde(borrow)]
     pub slug: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub tags: Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
+    pub tags: std::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
     /// Tells the visibility of the article to AppView.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub visibility: Option<jacquard_common::CowStr<'a>>,
+    pub visibility: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 pub mod post_state {

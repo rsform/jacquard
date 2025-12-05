@@ -21,21 +21,27 @@ pub struct Service<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub labels: Option<crate::com_atproto::label::SelfLabels<'a>>,
+    pub labels: std::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
     #[serde(borrow)]
     pub policies: crate::app_bsky::labeler::LabelerPolicies<'a>,
     /// The set of report reason 'codes' which are in-scope for this service to review and action. These usually align to policy categories. If not defined (distinct from empty array), all reason types are allowed.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub reason_types: Option<Vec<crate::com_atproto::moderation::ReasonType<'a>>>,
+    pub reason_types: std::option::Option<
+        Vec<crate::com_atproto::moderation::ReasonType<'a>>,
+    >,
     /// Set of record types (collection NSIDs) which can be reported to this service. If not defined (distinct from empty array), default is any record type.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub subject_collections: Option<Vec<jacquard_common::types::string::Nsid<'a>>>,
+    pub subject_collections: std::option::Option<
+        Vec<jacquard_common::types::string::Nsid<'a>>,
+    >,
     /// The set of subject types (account, record, etc) this service accepts reports on.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub subject_types: Option<Vec<crate::com_atproto::moderation::SubjectType<'a>>>,
+    pub subject_types: std::option::Option<
+        Vec<crate::com_atproto::moderation::SubjectType<'a>>,
+    >,
 }
 
 pub mod service_state {

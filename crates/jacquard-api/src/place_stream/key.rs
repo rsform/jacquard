@@ -23,7 +23,7 @@ pub struct Key<'a> {
     /// The name of the client that created this key.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub created_by: Option<jacquard_common::CowStr<'a>>,
+    pub created_by: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The did:key signing key for the stream.
     #[serde(borrow)]
     pub signing_key: jacquard_common::CowStr<'a>,

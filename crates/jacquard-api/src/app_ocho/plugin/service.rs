@@ -20,7 +20,7 @@
 pub struct Service<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub db: Option<crate::app_ocho::plugin::Db<'a>>,
+    pub db: std::option::Option<crate::app_ocho::plugin::Db<'a>>,
     /// Additional metadata for the plugin, including Expo client and Go configurations.
     #[serde(borrow)]
     pub permissions: Vec<jacquard_common::CowStr<'a>>,

@@ -3793,23 +3793,27 @@ for KeyboardShortcutsPostInteractions<'a> {
 pub struct Settings<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub behavior_settings: Option<crate::net_anisota::settings::BehaviorSettings<'a>>,
+    pub behavior_settings: std::option::Option<
+        crate::net_anisota::settings::BehaviorSettings<'a>,
+    >,
     /// Order of control buttons
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub control_order: Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub control_order: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub control_settings: Option<crate::net_anisota::settings::ControlSettings<'a>>,
+    pub control_settings: std::option::Option<
+        crate::net_anisota::settings::ControlSettings<'a>,
+    >,
     /// When the settings record was first created
     pub created_at: jacquard_common::types::string::Datetime,
     /// Selected color theme
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub theme: Option<jacquard_common::CowStr<'a>>,
+    pub theme: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub ui_settings: Option<crate::net_anisota::settings::UiSettings<'a>>,
+    pub ui_settings: std::option::Option<crate::net_anisota::settings::UiSettings<'a>>,
     /// When the settings were last updated
     pub updated_at: jacquard_common::types::string::Datetime,
     /// Settings schema version for backward compatibility

@@ -281,23 +281,27 @@ pub struct ListMute<'a> {
     /// Types of content to mute from accounts on this list
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub content_types: Option<crate::net_anisota::graph::list_mute::ContentTypes<'a>>,
+    pub content_types: std::option::Option<
+        crate::net_anisota::graph::list_mute::ContentTypes<'a>,
+    >,
     /// When the mute was created
     pub created_at: jacquard_common::types::string::Datetime,
     /// When this mute expires. If not set, mute is permanent
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub expires_at: Option<jacquard_common::types::string::Datetime>,
+    pub expires_at: std::option::Option<jacquard_common::types::string::Datetime>,
     /// Optional reason for muting this list
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub reason: Option<jacquard_common::CowStr<'a>>,
+    pub reason: std::option::Option<jacquard_common::CowStr<'a>>,
     /// AT-URI of the list to mute (app.bsky.graph.list record)
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::AtUri<'a>,
     /// Specific feeds where this mute should apply. If empty, applies to all feeds
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub target_feeds: Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
+    pub target_feeds: std::option::Option<
+        Vec<jacquard_common::types::string::AtUri<'a>>,
+    >,
 }
 
 pub mod list_mute_state {

@@ -25,11 +25,11 @@ pub struct Car<'a> {
     /// The car make value
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub car_make: Option<jacquard_common::CowStr<'a>>,
+    pub car_make: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The car model value
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub car_model: Option<jacquard_common::CowStr<'a>>,
+    pub car_model: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The car fuel level value in percentage (floating point string)
     #[serde(borrow)]
     pub car_percent_fuel_remaining: jacquard_common::CowStr<'a>,
@@ -37,7 +37,7 @@ pub struct Car<'a> {
     pub car_traveled_distance: i64,
     /// The car year value
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub car_year: Option<i64>,
+    pub car_year: std::option::Option<i64>,
     /// The unix timestamp of when the vital was recorded
     pub created_at: jacquard_common::types::string::Datetime,
 }

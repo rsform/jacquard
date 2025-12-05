@@ -213,7 +213,9 @@ pub struct RelatedAccount<'a> {
     pub account: crate::com_atproto::admin::AccountView<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub similarities: Option<Vec<crate::tools_ozone::signature::SigDetail<'a>>>,
+    pub similarities: std::option::Option<
+        Vec<crate::tools_ozone::signature::SigDetail<'a>>,
+    >,
 }
 
 pub mod related_account_state {

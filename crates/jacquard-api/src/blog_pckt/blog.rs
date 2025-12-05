@@ -19,23 +19,23 @@
 pub struct Blog<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: Option<jacquard_common::CowStr<'a>>,
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub icon: Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub icon: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub rss: Option<jacquard_common::types::string::Uri<'a>>,
+    pub rss: std::option::Option<jacquard_common::types::string::Uri<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub theme: Option<crate::blog_pckt::blog::Theme<'a>>,
+    pub theme: std::option::Option<crate::blog_pckt::blog::Theme<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: Option<jacquard_common::types::string::Datetime>,
+    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub url: Option<jacquard_common::types::string::Uri<'a>>,
+    pub url: std::option::Option<jacquard_common::types::string::Uri<'a>>,
 }
 
 pub mod blog_state {

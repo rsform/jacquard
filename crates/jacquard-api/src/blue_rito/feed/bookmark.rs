@@ -392,21 +392,21 @@ pub struct Bookmark<'a> {
     /// OGP Description
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub ogp_description: Option<jacquard_common::CowStr<'a>>,
+    pub ogp_description: std::option::Option<jacquard_common::CowStr<'a>>,
     /// OGP Image Uri
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub ogp_image: Option<jacquard_common::types::string::Uri<'a>>,
+    pub ogp_image: std::option::Option<jacquard_common::types::string::Uri<'a>>,
     /// OGP Title
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub ogp_title: Option<jacquard_common::CowStr<'a>>,
+    pub ogp_title: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::Uri<'a>,
     /// Tags describing the uri's description (max 10 tags, 25 charactors)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub tags: Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
 pub mod bookmark_state {

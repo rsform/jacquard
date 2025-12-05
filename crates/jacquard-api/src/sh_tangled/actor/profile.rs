@@ -23,25 +23,27 @@ pub struct Profile<'a> {
     /// Free-form profile description text.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: Option<jacquard_common::CowStr<'a>>,
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub links: Option<Vec<jacquard_common::types::string::Uri<'a>>>,
+    pub links: std::option::Option<Vec<jacquard_common::types::string::Uri<'a>>>,
     /// Free-form location text.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub location: Option<jacquard_common::CowStr<'a>>,
+    pub location: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Any ATURI, it is up to appviews to validate these fields.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub pinned_repositories: Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
+    pub pinned_repositories: std::option::Option<
+        Vec<jacquard_common::types::string::AtUri<'a>>,
+    >,
     /// Preferred gender pronouns.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub pronouns: Option<jacquard_common::CowStr<'a>>,
+    pub pronouns: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub stats: Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub stats: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
 pub mod profile_state {

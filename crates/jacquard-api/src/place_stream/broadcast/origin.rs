@@ -21,11 +21,11 @@ pub struct Origin<'a> {
     /// did of the broadcaster that operates the server syndicating the livestream
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub broadcaster: Option<jacquard_common::types::string::Did<'a>>,
+    pub broadcaster: std::option::Option<jacquard_common::types::string::Did<'a>>,
     /// Iroh ticket that can be used to access the livestream from the server
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub iroh_ticket: Option<jacquard_common::CowStr<'a>>,
+    pub iroh_ticket: std::option::Option<jacquard_common::CowStr<'a>>,
     /// did of the server that's currently rebroadcasting the livestream
     #[serde(borrow)]
     pub server: jacquard_common::types::string::Did<'a>,
@@ -37,7 +37,7 @@ pub struct Origin<'a> {
     /// URL of the websocket endpoint for the livestream
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub websocket_url: Option<jacquard_common::types::string::Uri<'a>>,
+    pub websocket_url: std::option::Option<jacquard_common::types::string::Uri<'a>>,
 }
 
 pub mod origin_state {

@@ -24,7 +24,7 @@ pub struct Bookmark<'a> {
     /// Tags for content the bookmark may be related to, for example 'news' or 'funny videos'
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub tags: Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
 pub mod bookmark_state {

@@ -25,13 +25,13 @@ pub struct Post<'a> {
     /// The post additional contents.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub additional: Option<jacquard_common::CowStr<'a>>,
+    pub additional: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Created date assigned by client
     pub created_at: jacquard_common::types::string::Datetime,
     /// Encrypted post body. It shoud be decrypted by the client with AES-256.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub encrypt_body: Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub encrypt_body: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     /// The post main contents. Blurred text must be enclosed in brackets [].
     #[serde(borrow)]
     pub text: jacquard_common::CowStr<'a>,

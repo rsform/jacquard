@@ -24,7 +24,7 @@ pub struct LogEntry<'a> {
     /// UUID of related job if applicable
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub job_id: Option<jacquard_common::CowStr<'a>>,
+    pub job_id: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Log level
     #[serde(borrow)]
     pub level: jacquard_common::CowStr<'a>,
@@ -37,15 +37,15 @@ pub struct LogEntry<'a> {
     /// Additional metadata associated with the log entry
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub metadata: Option<jacquard_common::types::value::Data<'a>>,
+    pub metadata: std::option::Option<jacquard_common::types::value::Data<'a>>,
     /// AT-URI of related slice if applicable
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub slice_uri: Option<jacquard_common::CowStr<'a>>,
+    pub slice_uri: std::option::Option<jacquard_common::CowStr<'a>>,
     /// DID of related user if applicable
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub user_did: Option<jacquard_common::types::string::Did<'a>>,
+    pub user_did: std::option::Option<jacquard_common::types::string::Did<'a>>,
 }
 
 pub mod log_entry_state {

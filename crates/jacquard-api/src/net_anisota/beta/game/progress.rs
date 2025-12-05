@@ -21,48 +21,50 @@ pub struct Progress<'a> {
     /// URI of the card that was advanced when triggerSource is card_advance
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub card_uri: Option<jacquard_common::CowStr<'a>>,
+    pub card_uri: std::option::Option<jacquard_common::CowStr<'a>>,
     /// When the progress record was created
     pub created_at: jacquard_common::types::string::Datetime,
     /// Current stamina level when this progress was recorded (decimal string, e.g. '85.5')
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub current_stamina: Option<jacquard_common::CowStr<'a>>,
+    pub current_stamina: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Current player level
     pub level: i64,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub metadata: Option<crate::net_anisota::beta::game::progress::Metadata<'a>>,
+    pub metadata: std::option::Option<
+        crate::net_anisota::beta::game::progress::Metadata<'a>,
+    >,
     /// Previous level before this update (for tracking level progression)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub previous_level: Option<i64>,
+    pub previous_level: std::option::Option<i64>,
     /// Progress percentage to the next level (decimal string, e.g. '75.5')
     #[serde(borrow)]
     pub progress_percentage: jacquard_common::CowStr<'a>,
     /// URIs of related game log records that contributed to this progress
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub related_log_uris: Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub related_log_uris: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     /// Session ID when this progress was recorded (for linking with log records)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub session_id: Option<jacquard_common::CowStr<'a>>,
+    pub session_id: std::option::Option<jacquard_common::CowStr<'a>>,
     /// URI of the session record when this progress was recorded
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub session_uri: Option<jacquard_common::CowStr<'a>>,
+    pub session_uri: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub stats: Option<crate::net_anisota::beta::game::progress::Stats<'a>>,
+    pub stats: std::option::Option<crate::net_anisota::beta::game::progress::Stats<'a>>,
     /// Total experience points accumulated
     pub total_xp: i64,
     /// What action triggered this progress save
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub trigger_source: Option<jacquard_common::CowStr<'a>>,
+    pub trigger_source: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Experience points gained since the last progress save
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub xp_gained_since_last_save: Option<i64>,
+    pub xp_gained_since_last_save: std::option::Option<i64>,
     /// Experience points needed to reach the next level
     pub xp_to_next_level: i64,
 }

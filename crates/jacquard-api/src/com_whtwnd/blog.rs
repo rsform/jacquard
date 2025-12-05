@@ -27,7 +27,7 @@ pub struct BlobMetadata<'a> {
     pub blobref: jacquard_common::types::blob::BlobRef<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub name: Option<jacquard_common::CowStr<'a>>,
+    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 pub mod blob_metadata_state {
@@ -627,11 +627,11 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Comment<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Ogp<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub height: Option<i64>,
+    pub height: std::option::Option<i64>,
     #[serde(borrow)]
     pub url: jacquard_common::types::string::Uri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub width: Option<i64>,
+    pub width: std::option::Option<i64>,
 }
 
 pub mod ogp_state {

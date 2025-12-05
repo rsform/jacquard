@@ -23,10 +23,10 @@ pub struct ProfileStatus<'a> {
     pub completed_onboarding: jacquard_common::CowStr<'a>,
     /// The timestamp when this status was created
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: Option<jacquard_common::types::string::Datetime>,
+    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
     /// The timestamp when this status was last updated
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: Option<jacquard_common::types::string::Datetime>,
+    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 pub mod profile_status_state {

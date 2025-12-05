@@ -20,21 +20,23 @@
 pub struct Publication<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub base_path: Option<jacquard_common::CowStr<'a>>,
+    pub base_path: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: Option<jacquard_common::CowStr<'a>>,
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub icon: Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub icon: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub preferences: Option<crate::pub_leaflet::publication::Preferences<'a>>,
+    pub preferences: std::option::Option<
+        crate::pub_leaflet::publication::Preferences<'a>,
+    >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub theme: Option<crate::pub_leaflet::publication::Theme<'a>>,
+    pub theme: std::option::Option<crate::pub_leaflet::publication::Theme<'a>>,
 }
 
 pub mod publication_state {

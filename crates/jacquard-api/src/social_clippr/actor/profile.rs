@@ -21,13 +21,13 @@ pub struct Profile<'a> {
     /// Image to show on user's profiles
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub avatar: Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub avatar: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     /// The creation date of the profile
     pub created_at: jacquard_common::types::string::Datetime,
     /// Text for user to describe themselves
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: Option<jacquard_common::CowStr<'a>>,
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
     /// A display name to be shown on a profile
     #[serde(borrow)]
     pub display_name: jacquard_common::CowStr<'a>,

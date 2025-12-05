@@ -24,7 +24,7 @@ pub struct Reply<'a> {
     #[serde(borrow)]
     pub root: jacquard_common::types::string::AtUri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: Option<jacquard_common::types::string::Datetime>,
+    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 pub mod reply_state {

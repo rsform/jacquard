@@ -20,7 +20,7 @@ pub struct GetPost<'a> {
     /// If the specified uri is password-protected, please provide the password. If no password is specified, the non-protected content will be returned.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub password: Option<jacquard_common::CowStr<'a>>,
+    pub password: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Skyblur post at-uri. It shoud be uk.skyblur.post collection.
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,

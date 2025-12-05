@@ -1009,7 +1009,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GameActions<'a> {
 pub struct Session<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub activity_summary: Option<
+    pub activity_summary: std::option::Option<
         crate::net_anisota::beta::game::session::ActivitySummary<'a>,
     >,
     /// Version of the client application
@@ -1017,45 +1017,47 @@ pub struct Session<'a> {
     pub client_version: jacquard_common::CowStr<'a>,
     /// When the session record was created
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: Option<jacquard_common::types::string::Datetime>,
+    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
     /// Total session duration in milliseconds (calculated when session ends)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub duration: Option<i64>,
+    pub duration: std::option::Option<i64>,
     /// Why the session ended
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub end_reason: Option<jacquard_common::CowStr<'a>>,
+    pub end_reason: std::option::Option<jacquard_common::CowStr<'a>>,
     /// When the session ended (ISO 8601)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub ended_at: Option<jacquard_common::types::string::Datetime>,
+    pub ended_at: std::option::Option<jacquard_common::types::string::Datetime>,
     /// Timestamp of the last recorded activity in this session
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_activity_at: Option<jacquard_common::types::string::Datetime>,
+    pub last_activity_at: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub metadata: Option<crate::net_anisota::beta::game::session::Metadata<'a>>,
+    pub metadata: std::option::Option<
+        crate::net_anisota::beta::game::session::Metadata<'a>,
+    >,
     /// URI of the previous session if this is a continuation (e.g., after brief inactivity)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub parent_session_uri: Option<jacquard_common::CowStr<'a>>,
+    pub parent_session_uri: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Platform where the session occurred
     #[serde(borrow)]
     pub platform: jacquard_common::CowStr<'a>,
     /// URIs of log records that occurred during this session
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub related_log_uris: Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub related_log_uris: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     /// URIs of progress records created during this session
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub related_progress_uris: Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub related_progress_uris: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     /// URIs of related sessions (e.g., same day, same device)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub related_session_uris: Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub related_session_uris: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub session_context: Option<
+    pub session_context: std::option::Option<
         crate::net_anisota::beta::game::session::SessionContext<'a>,
     >,
     /// When the session began (ISO 8601)
@@ -1065,7 +1067,7 @@ pub struct Session<'a> {
     pub status: jacquard_common::CowStr<'a>,
     /// When the session record was last updated
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: Option<jacquard_common::types::string::Datetime>,
+    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 pub mod session_state {

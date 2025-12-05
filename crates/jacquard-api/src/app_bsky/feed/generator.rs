@@ -20,20 +20,22 @@
 pub struct Generator<'a> {
     /// Declaration that a feed accepts feedback interactions from a client through app.bsky.feed.sendInteractions
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub accepts_interactions: Option<bool>,
+    pub accepts_interactions: std::option::Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub avatar: Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub avatar: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub content_mode: Option<jacquard_common::CowStr<'a>>,
+    pub content_mode: std::option::Option<jacquard_common::CowStr<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: Option<jacquard_common::CowStr<'a>>,
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description_facets: Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
+    pub description_facets: std::option::Option<
+        Vec<crate::app_bsky::richtext::facet::Facet<'a>>,
+    >,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(borrow)]
@@ -41,7 +43,7 @@ pub struct Generator<'a> {
     /// Self-label values
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub labels: Option<crate::com_atproto::label::SelfLabels<'a>>,
+    pub labels: std::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
 }
 
 pub mod generator_state {

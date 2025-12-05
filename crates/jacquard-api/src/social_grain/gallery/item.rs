@@ -23,7 +23,7 @@ pub struct Item<'a> {
     #[serde(borrow)]
     pub item: jacquard_common::types::string::AtUri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub position: Option<i64>,
+    pub position: std::option::Option<i64>,
 }
 
 pub mod item_state {

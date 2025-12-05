@@ -19,10 +19,10 @@
 #[serde(rename_all = "camelCase")]
 pub struct AuthorListItem<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub index: Option<i64>,
+    pub index: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub profile: Option<AuthorListItemProfile<'a>>,
+    pub profile: std::option::Option<AuthorListItemProfile<'a>>,
 }
 
 pub mod author_list_item_state {
@@ -313,7 +313,7 @@ pub struct Authors<'a> {
     #[serde(borrow)]
     pub author_list: Vec<crate::sh_weaver::notebook::authors::AuthorListItem<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: Option<jacquard_common::types::string::Datetime>,
+    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 pub mod authors_state {

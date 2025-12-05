@@ -21,22 +21,22 @@ pub struct Room<'a> {
     /// List of users allowed to send messages in the room.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub allowlist: Option<crate::social_psky::chat::room::ModlistRef<'a>>,
+    pub allowlist: std::option::Option<crate::social_psky::chat::room::ModlistRef<'a>>,
     /// List of users disallowed to send messages in the room.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub denylist: Option<crate::social_psky::chat::room::ModlistRef<'a>>,
+    pub denylist: std::option::Option<crate::social_psky::chat::room::ModlistRef<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub languages: Option<Vec<jacquard_common::types::string::Language>>,
+    pub languages: std::option::Option<Vec<jacquard_common::types::string::Language>>,
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub tags: Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     /// Topic title of the room.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub topic: Option<jacquard_common::CowStr<'a>>,
+    pub topic: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 pub mod room_state {

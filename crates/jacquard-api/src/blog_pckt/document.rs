@@ -26,28 +26,28 @@ pub struct Document<'a> {
     /// Plain text representation of the document content for search and preview
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub body_plain: Option<jacquard_common::CowStr<'a>>,
+    pub body_plain: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Optional cover/featured image (10MB max)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub cover: Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub cover: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     /// Blob references for images used within the document content
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub images: Option<Vec<jacquard_common::types::blob::BlobRef<'a>>>,
+    pub images: std::option::Option<Vec<jacquard_common::types::blob::BlobRef<'a>>>,
     /// Timestamp when the document was first published
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub published_at: Option<jacquard_common::types::string::Datetime>,
+    pub published_at: std::option::Option<jacquard_common::types::string::Datetime>,
     /// Optional tags for categorization and discovery
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub tags: Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     /// Document title/headline
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
     /// Timestamp when the document was last modified
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: Option<jacquard_common::types::string::Datetime>,
+    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
     /// Canonical URL where this document is published
     #[serde(borrow)]
     pub url: jacquard_common::types::string::Uri<'a>,

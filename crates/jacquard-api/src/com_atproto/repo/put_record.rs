@@ -34,14 +34,14 @@ pub struct PutRecord<'a> {
     /// Compare and swap with the previous commit by CID.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub swap_commit: Option<jacquard_common::types::string::Cid<'a>>,
+    pub swap_commit: std::option::Option<jacquard_common::types::string::Cid<'a>>,
     /// Compare and swap with the previous record by CID. WARNING: nullable and optional field; may cause problems with golang implementation
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub swap_record: Option<jacquard_common::types::string::Cid<'a>>,
+    pub swap_record: std::option::Option<jacquard_common::types::string::Cid<'a>>,
     /// Can be set to 'false' to skip Lexicon schema validation of record data, 'true' to require it, or leave unset to validate only for known Lexicons.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub validate: Option<bool>,
+    pub validate: std::option::Option<bool>,
 }
 
 pub mod put_record_state {

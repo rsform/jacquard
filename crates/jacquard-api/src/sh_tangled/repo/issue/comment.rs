@@ -24,7 +24,7 @@ pub struct Comment<'a> {
     pub issue: jacquard_common::types::string::AtUri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub reply_to: Option<jacquard_common::types::string::AtUri<'a>>,
+    pub reply_to: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
 }
 
 pub mod comment_state {

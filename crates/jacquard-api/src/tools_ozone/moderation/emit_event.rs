@@ -24,15 +24,17 @@ pub struct EmitEvent<'a> {
     /// An optional external ID for the event, used to deduplicate events from external systems. Fails when an event of same type with the same external ID exists for the same subject.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub external_id: Option<jacquard_common::CowStr<'a>>,
+    pub external_id: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub mod_tool: Option<crate::tools_ozone::moderation::ModTool<'a>>,
+    pub mod_tool: std::option::Option<crate::tools_ozone::moderation::ModTool<'a>>,
     #[serde(borrow)]
     pub subject: EmitEventSubject<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub subject_blob_cids: Option<Vec<jacquard_common::types::string::Cid<'a>>>,
+    pub subject_blob_cids: std::option::Option<
+        Vec<jacquard_common::types::string::Cid<'a>>,
+    >,
 }
 
 pub mod emit_event_state {

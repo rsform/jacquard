@@ -18,7 +18,7 @@
 #[serde(rename_all = "camelCase")]
 pub struct Iframe<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub height: Option<i64>,
+    pub height: std::option::Option<i64>,
     #[serde(borrow)]
     pub url: jacquard_common::types::string::Uri<'a>,
 }

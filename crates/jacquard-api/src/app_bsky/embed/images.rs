@@ -22,7 +22,7 @@ pub struct Image<'a> {
     pub alt: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub aspect_ratio: Option<crate::app_bsky::embed::AspectRatio<'a>>,
+    pub aspect_ratio: std::option::Option<crate::app_bsky::embed::AspectRatio<'a>>,
     #[serde(borrow)]
     pub image: jacquard_common::types::blob::BlobRef<'a>,
 }
@@ -741,7 +741,7 @@ pub struct ViewImage<'a> {
     pub alt: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub aspect_ratio: Option<crate::app_bsky::embed::AspectRatio<'a>>,
+    pub aspect_ratio: std::option::Option<crate::app_bsky::embed::AspectRatio<'a>>,
     /// Fully-qualified URL where a large version of the image can be fetched. May or may not be the exact original blob. For example, CDN location provided by the App View.
     #[serde(borrow)]
     pub fullsize: jacquard_common::types::string::Uri<'a>,

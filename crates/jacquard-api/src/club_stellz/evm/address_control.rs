@@ -18,11 +18,13 @@
 #[serde(rename_all = "camelCase")]
 pub struct AddressControl<'a> {
     /// Ethereum address as bytes (20 bytes)
+    #[serde(with = "jacquard_common::serde_bytes_helper")]
     pub address: bytes::Bytes,
     /// List of all Chain IDs (besides the one in the sign-in message, though you can include it) that the holder of this address is also active on & accepts tokens thru.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub also_on: Option<Vec<i64>>,
+    pub also_on: std::option::Option<Vec<i64>>,
     /// Sign in With Ethereum message signature as bytes
+    #[serde(with = "jacquard_common::serde_bytes_helper")]
     pub signature: bytes::Bytes,
     #[serde(borrow)]
     pub siwe: crate::club_stellz::evm::address_control::SiweMessage<'a>,

@@ -23,29 +23,29 @@ pub mod export_account_data;
 pub struct ProfileViewBasic<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub associated: Option<crate::app_bsky::actor::ProfileAssociated<'a>>,
+    pub associated: std::option::Option<crate::app_bsky::actor::ProfileAssociated<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub avatar: Option<jacquard_common::types::string::Uri<'a>>,
+    pub avatar: std::option::Option<jacquard_common::types::string::Uri<'a>>,
     /// Set to true when the actor cannot actively participate in conversations
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub chat_disabled: Option<bool>,
+    pub chat_disabled: std::option::Option<bool>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub display_name: Option<jacquard_common::CowStr<'a>>,
+    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub labels: Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub verification: Option<crate::app_bsky::actor::VerificationState<'a>>,
+    pub verification: std::option::Option<crate::app_bsky::actor::VerificationState<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub viewer: Option<crate::app_bsky::actor::ViewerState<'a>>,
+    pub viewer: std::option::Option<crate::app_bsky::actor::ViewerState<'a>>,
 }
 
 pub mod profile_view_basic_state {

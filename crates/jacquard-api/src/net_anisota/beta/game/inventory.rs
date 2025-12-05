@@ -28,46 +28,46 @@ pub struct Inventory<'a> {
     /// Display name of the item
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub item_name: Option<jacquard_common::CowStr<'a>>,
+    pub item_name: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Type category of the item (consumable, tool, equipment, etc.)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub item_type: Option<jacquard_common::CowStr<'a>>,
+    pub item_type: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Base value of the item in game currency
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub item_value: Option<i64>,
+    pub item_value: std::option::Option<i64>,
     /// When the record was last modified
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_modified: Option<jacquard_common::types::string::Datetime>,
+    pub last_modified: std::option::Option<jacquard_common::types::string::Datetime>,
     /// URI of the game.log record that documents the acquisition of this item
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub log_record_uri: Option<jacquard_common::CowStr<'a>>,
+    pub log_record_uri: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Maximum stack size for this item
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub max_stack: Option<i64>,
+    pub max_stack: std::option::Option<i64>,
     /// Additional item-specific data (stats, attributes, enchantments, etc.)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub metadata: Option<jacquard_common::types::value::Data<'a>>,
+    pub metadata: std::option::Option<jacquard_common::types::value::Data<'a>>,
     /// Number of items in the stack
     pub quantity: i64,
     /// Rarity level of the item
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub rarity: Option<jacquard_common::CowStr<'a>>,
+    pub rarity: std::option::Option<jacquard_common::CowStr<'a>>,
     /// How the item was acquired
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub source: Option<jacquard_common::CowStr<'a>>,
+    pub source: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub source_details: Option<
+    pub source_details: std::option::Option<
         crate::net_anisota::beta::game::inventory::SourceDetails<'a>,
     >,
     /// Whether this item can be stacked with others of the same type
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub stackable: Option<bool>,
+    pub stackable: std::option::Option<bool>,
 }
 
 pub mod inventory_state {

@@ -19,7 +19,7 @@
 #[serde(rename_all = "camelCase")]
 pub struct Definition<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub end_date: Option<jacquard_common::types::string::Datetime>,
+    pub end_date: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     #[serde(borrow)]

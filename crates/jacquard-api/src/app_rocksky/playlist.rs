@@ -24,36 +24,36 @@ pub struct Playlist<'a> {
     /// The Apple Music link of the playlist.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub apple_music_link: Option<jacquard_common::CowStr<'a>>,
+    pub apple_music_link: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The date the playlist was created.
     pub created_at: jacquard_common::types::string::Datetime,
     /// The playlist description.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: Option<jacquard_common::CowStr<'a>>,
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The name of the playlist.
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     /// The picture of the playlist.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub picture: Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub picture: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     /// The Spotify link of the playlist.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub spotify_link: Option<jacquard_common::CowStr<'a>>,
+    pub spotify_link: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The Tidal link of the playlist.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub tidal_link: Option<jacquard_common::CowStr<'a>>,
+    pub tidal_link: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The tracks in the playlist.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub tracks: Option<Vec<jacquard_common::types::value::Data<'a>>>,
+    pub tracks: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
     /// The YouTube link of the playlist.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub youtube_link: Option<jacquard_common::CowStr<'a>>,
+    pub youtube_link: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 pub mod playlist_state {

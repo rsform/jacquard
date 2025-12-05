@@ -19,25 +19,27 @@
 pub struct JobStatus<'a> {
     /// When the job completed
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub completed_at: Option<jacquard_common::types::string::Datetime>,
+    pub completed_at: std::option::Option<jacquard_common::types::string::Datetime>,
     /// When the job was created
     pub created_at: jacquard_common::types::string::Datetime,
     /// Error message if job failed
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub error: Option<jacquard_common::CowStr<'a>>,
+    pub error: std::option::Option<jacquard_common::CowStr<'a>>,
     /// UUID of the job
     #[serde(borrow)]
     pub job_id: jacquard_common::CowStr<'a>,
     /// Job result if completed successfully
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub result: Option<crate::network_slices::slice::get_job_status::SyncJobResult<'a>>,
+    pub result: std::option::Option<
+        crate::network_slices::slice::get_job_status::SyncJobResult<'a>,
+    >,
     /// Number of times the job has been retried
     pub retry_count: i64,
     /// When the job started executing
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub started_at: Option<jacquard_common::types::string::Datetime>,
+    pub started_at: std::option::Option<jacquard_common::types::string::Datetime>,
     /// Current status of the job
     #[serde(borrow)]
     pub status: jacquard_common::CowStr<'a>,

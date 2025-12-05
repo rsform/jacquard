@@ -20,7 +20,7 @@
 pub struct Page<'a> {
     /// Client-declared timestamp when this was originally created.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: Option<jacquard_common::types::string::Datetime>,
+    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub entry_list: Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     /// The notebook this page belongs to.
@@ -28,10 +28,10 @@ pub struct Page<'a> {
     pub notebook: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub tags: Option<crate::sh_weaver::notebook::Tags<'a>>,
+    pub tags: std::option::Option<crate::sh_weaver::notebook::Tags<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub title: Option<crate::sh_weaver::notebook::Title<'a>>,
+    pub title: std::option::Option<crate::sh_weaver::notebook::Title<'a>>,
 }
 
 pub mod page_state {

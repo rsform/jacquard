@@ -25,15 +25,17 @@ pub struct Clip<'a> {
     pub description: jacquard_common::CowStr<'a>,
     /// Indicates human language of the given URL
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub languages: Option<Vec<jacquard_common::types::string::Language>>,
+    pub languages: std::option::Option<Vec<jacquard_common::types::string::Language>>,
     /// User-written notes for the bookmark. Public and personal.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub notes: Option<jacquard_common::CowStr<'a>>,
+    pub notes: std::option::Option<jacquard_common::CowStr<'a>>,
     /// An array of tags. A format of solely alphanumeric characters and dashes should be used.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub tags: Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
+    pub tags: std::option::Option<
+        Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    >,
     /// The title of the bookmark. If left empty, reuse the URL.
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
@@ -41,7 +43,7 @@ pub struct Clip<'a> {
     pub unlisted: bool,
     /// Whether the bookmark has been read by the user
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub unread: Option<bool>,
+    pub unread: std::option::Option<bool>,
     /// The URL of the bookmark. Cannot be left empty or be modified after creation.
     #[serde(borrow)]
     pub url: jacquard_common::types::string::Uri<'a>,

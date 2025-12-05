@@ -24,7 +24,7 @@ pub struct WebMonetization<'a> {
     /// Short, human-readable description of how this wallet is related to this account.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub note: Option<jacquard_common::CowStr<'a>>,
+    pub note: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 pub mod web_monetization_state {

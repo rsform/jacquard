@@ -882,7 +882,7 @@ pub struct TreeEntry<'a> {
     pub is_subtree: bool,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub last_commit: Option<crate::sh_tangled::repo::tree::LastCommit<'a>>,
+    pub last_commit: std::option::Option<crate::sh_tangled::repo::tree::LastCommit<'a>>,
     /// File mode
     #[serde(borrow)]
     pub mode: jacquard_common::CowStr<'a>,

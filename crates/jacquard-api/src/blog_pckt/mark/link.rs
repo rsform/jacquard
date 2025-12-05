@@ -24,15 +24,15 @@ pub struct LinkAttrs<'a> {
     /// Defines the relationship between the current document and the linked resource (e.g., nofollow, noopener)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub rel: Option<jacquard_common::CowStr<'a>>,
+    pub rel: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Specifies where to open the linked document (e.g., _blank, _self)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub target: Option<jacquard_common::CowStr<'a>>,
+    pub target: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Additional information about the link, typically shown as a tooltip on hover
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub title: Option<jacquard_common::CowStr<'a>>,
+    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 pub mod link_attrs_state {

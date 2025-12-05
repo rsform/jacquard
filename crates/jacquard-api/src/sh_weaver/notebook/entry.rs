@@ -26,10 +26,10 @@ pub struct Entry<'a> {
     /// The set of images and records, if any, embedded in the notebook entry.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub embeds: Option<EntryEmbeds<'a>>,
+    pub embeds: std::option::Option<EntryEmbeds<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub tags: Option<crate::sh_weaver::notebook::Tags<'a>>,
+    pub tags: std::option::Option<crate::sh_weaver::notebook::Tags<'a>>,
     #[serde(borrow)]
     pub title: crate::sh_weaver::notebook::Title<'a>,
 }

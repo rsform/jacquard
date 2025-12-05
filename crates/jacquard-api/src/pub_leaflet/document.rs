@@ -22,16 +22,18 @@ pub struct Document<'a> {
     pub author: jacquard_common::types::ident::AtIdentifier<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: Option<jacquard_common::CowStr<'a>>,
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub pages: Vec<DocumentPagesItem<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub post_ref: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    pub post_ref: std::option::Option<
+        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    >,
     #[serde(borrow)]
     pub publication: jacquard_common::types::string::AtUri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub published_at: Option<jacquard_common::types::string::Datetime>,
+    pub published_at: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
 }

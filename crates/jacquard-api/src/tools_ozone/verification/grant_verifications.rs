@@ -618,7 +618,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GrantVerificationsRequest {
 pub struct VerificationInput<'a> {
     /// Timestamp for verification record. Defaults to current time when not specified.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: Option<jacquard_common::types::string::Datetime>,
+    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
     /// Display name of the subject the verification applies to at the moment of verifying.
     #[serde(borrow)]
     pub display_name: jacquard_common::CowStr<'a>,

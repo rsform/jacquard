@@ -20,61 +20,61 @@ pub struct Play<'a> {
     /// Array of Musicbrainz artist IDs. Prefer using 'artists'.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub artist_mb_ids: Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub artist_mb_ids: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     /// Array of artist names in order of original appearance. Prefer using 'artists'.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub artist_names: Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub artist_names: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     /// Array of artists in order of original appearance.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub artists: Option<Vec<crate::fm_teal::alpha::feed::Artist<'a>>>,
+    pub artists: std::option::Option<Vec<crate::fm_teal::alpha::feed::Artist<'a>>>,
     /// The length of the track in seconds
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub duration: Option<i64>,
+    pub duration: std::option::Option<i64>,
     /// The ISRC code associated with the recording
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub isrc: Option<jacquard_common::CowStr<'a>>,
+    pub isrc: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The base domain of the music service. e.g. music.apple.com, tidal.com, spotify.com. Defaults to 'local' if unavailable or not provided.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub music_service_base_domain: Option<jacquard_common::CowStr<'a>>,
+    pub music_service_base_domain: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The URL associated with this track
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub origin_url: Option<jacquard_common::CowStr<'a>>,
+    pub origin_url: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The unix timestamp of when the track was played
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub played_time: Option<jacquard_common::types::string::Datetime>,
+    pub played_time: std::option::Option<jacquard_common::types::string::Datetime>,
     /// The Musicbrainz recording ID of the track
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub recording_mb_id: Option<jacquard_common::CowStr<'a>>,
+    pub recording_mb_id: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Distinguishing information for release variants (e.g. 'Deluxe Edition', 'Remastered', '2023 Remaster', 'Special Edition'). Used to differentiate between different versions of the same base release while maintaining grouping capabilities.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub release_discriminant: Option<jacquard_common::CowStr<'a>>,
+    pub release_discriminant: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The Musicbrainz release ID
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub release_mb_id: Option<jacquard_common::CowStr<'a>>,
+    pub release_mb_id: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The name of the release/album
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub release_name: Option<jacquard_common::CowStr<'a>>,
+    pub release_name: std::option::Option<jacquard_common::CowStr<'a>>,
     /// A metadata string specifying the user agent where the format is `<app-identifier>/<version> (<kernel/OS-base>; <platform/OS-version>; <device-model>)`. If string is provided, only `app-identifier` and `version` are required. `app-identifier` is recommended to be in reverse dns format. Defaults to 'manual/unknown' if unavailable or not provided.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub submission_client_agent: Option<jacquard_common::CowStr<'a>>,
+    pub submission_client_agent: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Distinguishing information for track variants (e.g. 'Acoustic Version', 'Live at Wembley', 'Radio Edit', 'Demo'). Used to differentiate between different versions of the same base track while maintaining grouping capabilities.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub track_discriminant: Option<jacquard_common::CowStr<'a>>,
+    pub track_discriminant: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The Musicbrainz ID of the track
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub track_mb_id: Option<jacquard_common::CowStr<'a>>,
+    pub track_mb_id: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The name of the track
     #[serde(borrow)]
     pub track_name: jacquard_common::CowStr<'a>,

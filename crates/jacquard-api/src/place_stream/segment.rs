@@ -816,27 +816,27 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Framerate<'a> {
 pub struct Segment<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub audio: Option<Vec<crate::place_stream::segment::Audio<'a>>>,
+    pub audio: std::option::Option<Vec<crate::place_stream::segment::Audio<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub content_rights: Option<
+    pub content_rights: std::option::Option<
         crate::place_stream::metadata::content_rights::ContentRights<'a>,
     >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub content_warnings: Option<
+    pub content_warnings: std::option::Option<
         crate::place_stream::metadata::content_warnings::ContentWarnings<'a>,
     >,
     #[serde(borrow)]
     pub creator: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub distribution_policy: Option<
+    pub distribution_policy: std::option::Option<
         crate::place_stream::metadata::distribution_policy::DistributionPolicy<'a>,
     >,
     /// The duration of the segment in nanoseconds
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub duration: Option<i64>,
+    pub duration: std::option::Option<i64>,
     /// Unique identifier for the segment
     #[serde(borrow)]
     pub id: jacquard_common::CowStr<'a>,
@@ -845,12 +845,12 @@ pub struct Segment<'a> {
     pub signing_key: jacquard_common::CowStr<'a>,
     /// The size of the segment in bytes
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub size: Option<i64>,
+    pub size: std::option::Option<i64>,
     /// When this segment started
     pub start_time: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub video: Option<Vec<crate::place_stream::segment::Video<'a>>>,
+    pub video: std::option::Option<Vec<crate::place_stream::segment::Video<'a>>>,
 }
 
 pub mod segment_state {
@@ -1509,12 +1509,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SegmentView<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Video<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub bframes: Option<bool>,
+    pub bframes: std::option::Option<bool>,
     #[serde(borrow)]
     pub codec: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub framerate: Option<crate::place_stream::segment::Framerate<'a>>,
+    pub framerate: std::option::Option<crate::place_stream::segment::Framerate<'a>>,
     pub height: i64,
     pub width: i64,
 }

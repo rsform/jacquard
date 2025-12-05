@@ -263,7 +263,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Bookmark<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct BookmarkView<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: Option<jacquard_common::types::string::Datetime>,
+    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub item: BookmarkViewItem<'a>,
     /// A strong ref to the bookmarked record.

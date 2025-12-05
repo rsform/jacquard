@@ -31,11 +31,11 @@ pub struct DeleteRecord<'a> {
     /// Compare and swap with the previous commit by CID.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub swap_commit: Option<jacquard_common::types::string::Cid<'a>>,
+    pub swap_commit: std::option::Option<jacquard_common::types::string::Cid<'a>>,
     /// Compare and swap with the previous record by CID.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub swap_record: Option<jacquard_common::types::string::Cid<'a>>,
+    pub swap_record: std::option::Option<jacquard_common::types::string::Cid<'a>>,
 }
 
 pub mod delete_record_state {

@@ -22,7 +22,7 @@ pub mod state;
 pub struct Issue<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub body: Option<jacquard_common::CowStr<'a>>,
+    pub body: std::option::Option<jacquard_common::CowStr<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(borrow)]
     pub repo: jacquard_common::types::string::AtUri<'a>,

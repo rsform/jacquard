@@ -23,7 +23,7 @@ pub struct Post<'a> {
     /// The piece of content that this Frontpage post is about.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub subject: Option<crate::fyi_frontpage::feed::post::UrlSubject<'a>>,
+    pub subject: std::option::Option<crate::fyi_frontpage::feed::post::UrlSubject<'a>>,
     /// The title of the post.
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,

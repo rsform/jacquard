@@ -20,7 +20,7 @@
 pub struct Allow<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub config: Option<jacquard_common::types::value::Data<'a>>,
+    pub config: std::option::Option<jacquard_common::types::value::Data<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
 }
 

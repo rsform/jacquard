@@ -479,10 +479,10 @@ pub struct Webhook<'a> {
     /// A description of what this webhook is used for.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: Option<jacquard_common::CowStr<'a>>,
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Number of consecutive errors for this webhook.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub error_count: Option<i64>,
+    pub error_count: std::option::Option<i64>,
     /// The types of events this webhook should receive.
     #[serde(borrow)]
     pub events: Vec<jacquard_common::CowStr<'a>>,
@@ -491,30 +491,30 @@ pub struct Webhook<'a> {
     pub id: jacquard_common::CowStr<'a>,
     /// When this webhook was last triggered.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_triggered: Option<jacquard_common::types::string::Datetime>,
+    pub last_triggered: std::option::Option<jacquard_common::types::string::Datetime>,
     /// Words to filter out from chat messages. Messages containing any of these words will not be forwarded.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub mute_words: Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub mute_words: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     /// A user-friendly name for this webhook.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub name: Option<jacquard_common::CowStr<'a>>,
+    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Text to prepend to webhook messages.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub prefix: Option<jacquard_common::CowStr<'a>>,
+    pub prefix: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Text replacement rules for webhook messages.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub rewrite: Option<Vec<crate::place_stream::server::RewriteRule<'a>>>,
+    pub rewrite: std::option::Option<Vec<crate::place_stream::server::RewriteRule<'a>>>,
     /// Text to append to webhook messages.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub suffix: Option<jacquard_common::CowStr<'a>>,
+    pub suffix: std::option::Option<jacquard_common::CowStr<'a>>,
     /// When this webhook was last updated.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: Option<jacquard_common::types::string::Datetime>,
+    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
     /// The webhook URL where events will be sent.
     #[serde(borrow)]
     pub url: jacquard_common::types::string::Uri<'a>,

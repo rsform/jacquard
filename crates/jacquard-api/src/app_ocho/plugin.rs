@@ -1127,7 +1127,7 @@ pub struct Asset<'a> {
     pub r#type: jacquard_common::CowStr<'a>,
     /// The date and time when this asset was last updated. Used to reset the jetstream cache, among other things.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: Option<jacquard_common::types::string::Datetime>,
+    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 pub mod asset_state {

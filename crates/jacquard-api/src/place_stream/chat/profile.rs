@@ -403,7 +403,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Color<'a> {
 pub struct Profile<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub color: Option<crate::place_stream::chat::profile::Color<'a>>,
+    pub color: std::option::Option<crate::place_stream::chat::profile::Color<'a>>,
 }
 
 pub mod profile_state {

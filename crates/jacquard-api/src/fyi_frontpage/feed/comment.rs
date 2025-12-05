@@ -25,7 +25,7 @@ pub struct Comment<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub parent: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    pub parent: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     #[serde(borrow)]
     pub post: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }

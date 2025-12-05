@@ -638,7 +638,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Records<'a> {
 pub struct RecordEmbed<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub name: Option<jacquard_common::CowStr<'a>>,
+    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub record: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }
@@ -810,7 +810,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RecordEmbed<'a> {
 pub struct RecordEmbedView<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub name: Option<jacquard_common::CowStr<'a>>,
+    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub record_view: RecordEmbedViewRecordView<'a>,
 }
@@ -1737,19 +1737,21 @@ pub struct ViewRecord<'a> {
     pub cid: jacquard_common::types::string::Cid<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub embeds: Option<Vec<crate::sh_weaver::embed::records::RecordEmbedView<'a>>>,
+    pub embeds: std::option::Option<
+        Vec<crate::sh_weaver::embed::records::RecordEmbedView<'a>>,
+    >,
     pub indexed_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub labels: Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub like_count: Option<i64>,
+    pub like_count: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub quote_count: Option<i64>,
+    pub quote_count: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub reply_count: Option<i64>,
+    pub reply_count: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub repost_count: Option<i64>,
+    pub repost_count: std::option::Option<i64>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     /// The record data itself.

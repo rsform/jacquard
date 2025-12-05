@@ -48,33 +48,33 @@ pub struct Repo<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: Option<jacquard_common::CowStr<'a>>,
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
     /// knot where the repo was created
     #[serde(borrow)]
     pub knot: jacquard_common::CowStr<'a>,
     /// List of labels that this repo subscribes to
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub labels: Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
+    pub labels: std::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
     /// name of the repo
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     /// source of the repo
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub source: Option<jacquard_common::types::string::Uri<'a>>,
+    pub source: std::option::Option<jacquard_common::types::string::Uri<'a>>,
     /// CI runner to send jobs to and receive results from
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub spindle: Option<jacquard_common::CowStr<'a>>,
+    pub spindle: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Topics related to the repo
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub topics: Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub topics: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     /// Any URI related to the repo
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub website: Option<jacquard_common::types::string::Uri<'a>>,
+    pub website: std::option::Option<jacquard_common::types::string::Uri<'a>>,
 }
 
 pub mod repo_state {

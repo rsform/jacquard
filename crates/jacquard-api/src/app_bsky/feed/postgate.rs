@@ -200,11 +200,15 @@ pub struct Postgate<'a> {
     /// List of AT-URIs embedding this post that the author has detached from.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub detached_embedding_uris: Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
+    pub detached_embedding_uris: std::option::Option<
+        Vec<jacquard_common::types::string::AtUri<'a>>,
+    >,
     /// List of rules defining who can embed this post. If value is an empty array or is undefined, no particular rules apply and anyone can embed.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub embedding_rules: Option<Vec<crate::app_bsky::feed::postgate::DisableRule<'a>>>,
+    pub embedding_rules: std::option::Option<
+        Vec<crate::app_bsky::feed::postgate::DisableRule<'a>>,
+    >,
     /// Reference (AT-URI) to the post record.
     #[serde(borrow)]
     pub post: jacquard_common::types::string::AtUri<'a>,

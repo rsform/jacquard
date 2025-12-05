@@ -23,20 +23,20 @@ pub struct Post<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     /// Whether the post is published or draft
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub published: Option<bool>,
+    pub published: std::option::Option<bool>,
     /// Optional summary/excerpt of the post
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub summary: Option<jacquard_common::CowStr<'a>>,
+    pub summary: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Tags for categorizing the post
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub tags: Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     /// The title of the blog post
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: Option<jacquard_common::types::string::Datetime>,
+    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 pub mod post_state {

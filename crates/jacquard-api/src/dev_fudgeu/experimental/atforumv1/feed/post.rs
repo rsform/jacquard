@@ -27,13 +27,13 @@ pub struct Post<'a> {
     pub forum: jacquard_common::types::ident::AtIdentifier<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub solution: Option<jacquard_common::types::string::AtUri<'a>>,
+    pub solution: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
     #[serde(borrow)]
     pub tags: Vec<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: Option<jacquard_common::types::string::Datetime>,
+    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 pub mod post_state {

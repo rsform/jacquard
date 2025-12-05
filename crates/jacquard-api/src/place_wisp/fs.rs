@@ -684,18 +684,18 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
 pub struct File<'a> {
     /// True if blob content is base64-encoded (used to bypass PDS content sniffing)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub base64: Option<bool>,
+    pub base64: std::option::Option<bool>,
     /// Content blob ref
     #[serde(borrow)]
     pub blob: jacquard_common::types::blob::BlobRef<'a>,
     /// Content encoding (e.g., gzip for compressed files)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub encoding: Option<jacquard_common::CowStr<'a>>,
+    pub encoding: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Original MIME type before compression
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub mime_type: Option<jacquard_common::CowStr<'a>>,
+    pub mime_type: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub r#type: jacquard_common::CowStr<'a>,
 }
@@ -929,7 +929,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for File<'a> {
 pub struct Fs<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub file_count: Option<i64>,
+    pub file_count: std::option::Option<i64>,
     #[serde(borrow)]
     pub root: crate::place_wisp::fs::Directory<'a>,
     #[serde(borrow)]

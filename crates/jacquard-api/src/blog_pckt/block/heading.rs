@@ -271,7 +271,7 @@ pub struct Heading<'a> {
     /// Inline content of the heading (text with optional formatting)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub content: Option<Vec<HeadingContentItem<'a>>>,
+    pub content: std::option::Option<Vec<HeadingContentItem<'a>>>,
 }
 
 pub mod heading_state {

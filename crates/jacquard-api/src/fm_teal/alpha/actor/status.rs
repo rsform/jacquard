@@ -20,7 +20,7 @@
 pub struct Status<'a> {
     /// The unix timestamp of the expiry time of the item. If unavailable, default to 10 minutes past the start time.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub expiry: Option<jacquard_common::types::string::Datetime>,
+    pub expiry: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub item: crate::fm_teal::alpha::feed::PlayView<'a>,
     /// The unix timestamp of when the item was recorded

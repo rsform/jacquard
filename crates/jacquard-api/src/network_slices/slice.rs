@@ -445,28 +445,30 @@ pub struct SliceView<'a> {
     pub domain: jacquard_common::CowStr<'a>,
     /// Total number of unique indexed actors in this slice
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub indexed_actor_count: Option<i64>,
+    pub indexed_actor_count: std::option::Option<i64>,
     /// Number of collections with indexed records
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub indexed_collection_count: Option<i64>,
+    pub indexed_collection_count: std::option::Option<i64>,
     /// Total number of indexed records in this slice
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub indexed_record_count: Option<i64>,
+    pub indexed_record_count: std::option::Option<i64>,
     /// Display name of the slice
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     /// Recent activity sparkline data points for the last 24 hours
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub sparkline: Option<Vec<crate::network_slices::slice::SparklinePoint<'a>>>,
+    pub sparkline: std::option::Option<
+        Vec<crate::network_slices::slice::SparklinePoint<'a>>,
+    >,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     /// Total number of waitlist invites for this slice
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub waitlist_invite_count: Option<i64>,
+    pub waitlist_invite_count: std::option::Option<i64>,
     /// Total number of waitlist requests for this slice
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub waitlist_request_count: Option<i64>,
+    pub waitlist_request_count: std::option::Option<i64>,
 }
 
 pub mod slice_view_state {

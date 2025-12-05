@@ -20,11 +20,11 @@ pub struct GetSparklines<'a> {
     /// Time range to fetch data for
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub duration: Option<jacquard_common::CowStr<'a>>,
+    pub duration: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Time interval for data points
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub interval: Option<jacquard_common::CowStr<'a>>,
+    pub interval: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Array of slice AT-URIs to get sparkline data for
     #[serde(borrow)]
     pub slices: Vec<jacquard_common::CowStr<'a>>,

@@ -171,7 +171,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for ListReposRequest {
 #[serde(rename_all = "camelCase")]
 pub struct Repo<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub active: Option<bool>,
+    pub active: std::option::Option<bool>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     /// Current repo commit CID
@@ -181,7 +181,7 @@ pub struct Repo<'a> {
     /// If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub status: Option<jacquard_common::CowStr<'a>>,
+    pub status: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 pub mod repo_state {

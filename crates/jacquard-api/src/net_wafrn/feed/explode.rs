@@ -19,10 +19,12 @@
 #[serde(rename_all = "camelCase")]
 pub struct Explode<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: Option<jacquard_common::types::string::Datetime>,
+    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub subject: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    pub subject: std::option::Option<
+        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    >,
 }
 
 pub mod explode_state {

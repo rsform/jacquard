@@ -19,7 +19,7 @@
 pub struct RegisterPush<'a> {
     /// Set to true when the actor is age restricted
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub age_restricted: Option<bool>,
+    pub age_restricted: std::option::Option<bool>,
     #[serde(borrow)]
     pub app_id: jacquard_common::CowStr<'a>,
     #[serde(borrow)]

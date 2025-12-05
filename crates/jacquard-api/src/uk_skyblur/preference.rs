@@ -318,7 +318,7 @@ pub struct MyPage<'a> {
     /// Define the description displayed on MyPage.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: Option<jacquard_common::CowStr<'a>>,
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
     /// If this item is true, MyPage will be displayed.
     pub is_use_my_page: bool,
 }

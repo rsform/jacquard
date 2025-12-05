@@ -20,7 +20,7 @@ pub struct Post<'a> {
     /// The post's attachment blob. Must be present if parent is dev.ocbwoy3.blueboard.board, otherwise AppView will ignore it.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub attachment: Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub attachment: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     /// The date and time when the post was created
     pub created_at: jacquard_common::types::string::Datetime,
     /// Determines the parent of the post. Must either be a `dev.ocbwoy3.blueboard.board` or a `dev.ocbwoy3.blueboard.post`.

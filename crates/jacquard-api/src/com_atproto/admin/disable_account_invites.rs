@@ -22,7 +22,7 @@ pub struct DisableAccountInvites<'a> {
     /// Optional reason for disabled invites.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub note: Option<jacquard_common::CowStr<'a>>,
+    pub note: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 pub mod disable_account_invites_state {

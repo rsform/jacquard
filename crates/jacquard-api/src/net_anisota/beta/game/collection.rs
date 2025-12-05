@@ -23,53 +23,53 @@ pub struct Collection<'a> {
     /// Common name of the specimen
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub common_name: Option<jacquard_common::CowStr<'a>>,
+    pub common_name: std::option::Option<jacquard_common::CowStr<'a>>,
     /// When the record was created
     pub created_at: jacquard_common::types::string::Datetime,
     /// Taxonomic family
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub family: Option<jacquard_common::CowStr<'a>>,
+    pub family: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Taxonomic genus
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub genus: Option<jacquard_common::CowStr<'a>>,
+    pub genus: std::option::Option<jacquard_common::CowStr<'a>>,
     /// When the record was last modified
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_modified: Option<jacquard_common::types::string::Datetime>,
+    pub last_modified: std::option::Option<jacquard_common::types::string::Datetime>,
     /// When the specimen was last encountered
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_seen: Option<jacquard_common::types::string::Datetime>,
+    pub last_seen: std::option::Option<jacquard_common::types::string::Datetime>,
     /// URI of the game.log record that documents the acquisition of this specimen
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub log_record_uri: Option<jacquard_common::CowStr<'a>>,
+    pub log_record_uri: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Number of specimens collected
     pub quantity: i64,
     /// Rarity level of the specimen
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub rarity: Option<jacquard_common::CowStr<'a>>,
+    pub rarity: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Scientific name of the specimen
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub scientific_name: Option<jacquard_common::CowStr<'a>>,
+    pub scientific_name: std::option::Option<jacquard_common::CowStr<'a>>,
     /// How the specimen was acquired
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub source: Option<jacquard_common::CowStr<'a>>,
+    pub source: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub source_details: Option<
+    pub source_details: std::option::Option<
         crate::net_anisota::beta::game::collection::SourceDetails<'a>,
     >,
     /// Taxonomic species
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub species: Option<jacquard_common::CowStr<'a>>,
+    pub species: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub specimen_data: Option<
+    pub specimen_data: std::option::Option<
         crate::net_anisota::beta::game::collection::SpecimenData<'a>,
     >,
     /// Unique identifier for the specimen
@@ -78,7 +78,7 @@ pub struct Collection<'a> {
     /// Collection status of this specimen
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub status: Option<jacquard_common::CowStr<'a>>,
+    pub status: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 pub mod collection_state {

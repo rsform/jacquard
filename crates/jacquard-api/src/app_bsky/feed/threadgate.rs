@@ -440,12 +440,14 @@ pub struct Threadgate<'a> {
     /// List of rules defining who can reply to this post. If value is an empty array, no one can reply. If value is undefined, anyone can reply.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub allow: Option<Vec<ThreadgateAllowItem<'a>>>,
+    pub allow: std::option::Option<Vec<ThreadgateAllowItem<'a>>>,
     pub created_at: jacquard_common::types::string::Datetime,
     /// List of hidden reply URIs.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub hidden_replies: Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
+    pub hidden_replies: std::option::Option<
+        Vec<jacquard_common::types::string::AtUri<'a>>,
+    >,
     /// Reference (AT-URI) to the post record.
     #[serde(borrow)]
     pub post: jacquard_common::types::string::AtUri<'a>,

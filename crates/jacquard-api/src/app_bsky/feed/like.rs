@@ -23,7 +23,7 @@ pub struct Like<'a> {
     pub subject: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub via: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    pub via: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
 }
 
 pub mod like_state {

@@ -23,7 +23,7 @@ pub struct Create<'a> {
     /// NOTE: maxLength is redundant with record-key format. Keeping it temporarily to ensure backwards compatibility.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub rkey: Option<
+    pub rkey: std::option::Option<
         jacquard_common::types::string::RecordKey<
             jacquard_common::types::string::Rkey<'a>,
         >,
@@ -715,7 +715,7 @@ pub struct CreateResult<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub validation_status: Option<jacquard_common::CowStr<'a>>,
+    pub validation_status: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 pub mod create_result_state {
@@ -1131,10 +1131,10 @@ pub struct ApplyWrites<'a> {
     /// If provided, the entire operation will fail if the current repo commit CID does not match this value. Used to prevent conflicting repo mutations.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub swap_commit: Option<jacquard_common::types::string::Cid<'a>>,
+    pub swap_commit: std::option::Option<jacquard_common::types::string::Cid<'a>>,
     /// Can be set to 'false' to skip Lexicon schema validation of record data across all operations, 'true' to require it, or leave unset to validate only for known Lexicons.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub validate: Option<bool>,
+    pub validate: std::option::Option<bool>,
     #[serde(borrow)]
     pub writes: Vec<ApplyWritesWritesItem<'a>>,
 }
@@ -1686,7 +1686,7 @@ pub struct UpdateResult<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub validation_status: Option<jacquard_common::CowStr<'a>>,
+    pub validation_status: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 pub mod update_result_state {

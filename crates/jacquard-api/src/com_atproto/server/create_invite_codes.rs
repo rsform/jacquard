@@ -347,7 +347,7 @@ pub struct CreateInviteCodes<'a> {
     pub code_count: i64,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub for_accounts: Option<Vec<jacquard_common::types::string::Did<'a>>>,
+    pub for_accounts: std::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
     pub use_count: i64,
 }
 

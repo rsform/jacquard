@@ -25,7 +25,7 @@ pub struct Invite<'a> {
     pub did: jacquard_common::types::string::Did<'a>,
     /// Optional expiration date for this invitation
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub expires_at: Option<jacquard_common::types::string::Datetime>,
+    pub expires_at: std::option::Option<jacquard_common::types::string::Datetime>,
     /// The AT URI of the slice this invite is for
     #[serde(borrow)]
     pub slice: jacquard_common::types::string::AtUri<'a>,

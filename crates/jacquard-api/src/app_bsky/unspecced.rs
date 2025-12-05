@@ -47,25 +47,25 @@ pub struct AgeAssuranceEvent<'a> {
     /// The IP address used when completing the AA flow.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub complete_ip: Option<jacquard_common::CowStr<'a>>,
+    pub complete_ip: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The user agent used when completing the AA flow.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub complete_ua: Option<jacquard_common::CowStr<'a>>,
+    pub complete_ua: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The date and time of this write operation.
     pub created_at: jacquard_common::types::string::Datetime,
     /// The email used for AA.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub email: Option<jacquard_common::CowStr<'a>>,
+    pub email: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The IP address used when initiating the AA flow.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub init_ip: Option<jacquard_common::CowStr<'a>>,
+    pub init_ip: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The user agent used when initiating the AA flow.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub init_ua: Option<jacquard_common::CowStr<'a>>,
+    pub init_ua: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The status of the age assurance process.
     #[serde(borrow)]
     pub status: jacquard_common::CowStr<'a>,
@@ -1717,7 +1717,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SkeletonSearchStarterPack
 pub struct SkeletonTrend<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub category: Option<jacquard_common::CowStr<'a>>,
+    pub category: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub dids: Vec<jacquard_common::types::string::Did<'a>>,
     #[serde(borrow)]
@@ -1728,7 +1728,7 @@ pub struct SkeletonTrend<'a> {
     pub started_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub status: Option<jacquard_common::CowStr<'a>>,
+    pub status: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub topic: jacquard_common::CowStr<'a>,
 }
@@ -2645,7 +2645,7 @@ pub struct TrendView<'a> {
     pub actors: Vec<crate::app_bsky::actor::ProfileViewBasic<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub category: Option<jacquard_common::CowStr<'a>>,
+    pub category: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub display_name: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
@@ -2654,7 +2654,7 @@ pub struct TrendView<'a> {
     pub started_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub status: Option<jacquard_common::CowStr<'a>>,
+    pub status: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub topic: jacquard_common::CowStr<'a>,
 }

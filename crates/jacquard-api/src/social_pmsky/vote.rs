@@ -20,20 +20,21 @@ pub struct Vote<'a> {
     /// The persistent, anonymous identifier for the user casting the vote.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub aid: Option<jacquard_common::CowStr<'a>>,
+    pub aid: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Optionally, CID specifying the specific version of 'uri' resource this vote applies to.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
     /// Timestamp when this vote was created.
     pub cts: jacquard_common::types::string::Datetime,
     /// An optional array of predefined reasons justifying the vote.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub reasons: Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub reasons: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     /// Signature of dag-cbor encoded vote.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub sig: Option<bytes::Bytes>,
+    #[serde(with = "jacquard_common::opt_serde_bytes_helper")]
+    pub sig: std::option::Option<bytes::Bytes>,
     /// the account creating the vote, not necessarily the same as the user who voted
     #[serde(borrow)]
     pub src: jacquard_common::types::string::Did<'a>,

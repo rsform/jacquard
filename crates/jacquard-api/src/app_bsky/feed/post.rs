@@ -584,29 +584,29 @@ pub struct Post<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub embed: Option<PostEmbed<'a>>,
+    pub embed: std::option::Option<PostEmbed<'a>>,
     /// DEPRECATED: replaced by app.bsky.richtext.facet.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub entities: Option<Vec<crate::app_bsky::feed::post::Entity<'a>>>,
+    pub entities: std::option::Option<Vec<crate::app_bsky::feed::post::Entity<'a>>>,
     /// Annotations of text (mentions, URLs, hashtags, etc)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub facets: Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
+    pub facets: std::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
     /// Self-label values for this post. Effectively content warnings.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub labels: Option<crate::com_atproto::label::SelfLabels<'a>>,
+    pub labels: std::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
     /// Indicates human language of post primary text content.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub langs: Option<Vec<jacquard_common::types::string::Language>>,
+    pub langs: std::option::Option<Vec<jacquard_common::types::string::Language>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub reply: Option<crate::app_bsky::feed::post::ReplyRef<'a>>,
+    pub reply: std::option::Option<crate::app_bsky::feed::post::ReplyRef<'a>>,
     /// Additional hashtags, in addition to any included in post text and facets.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub tags: Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     /// The primary post content. May be an empty string, if there are embeds.
     #[serde(borrow)]
     pub text: jacquard_common::CowStr<'a>,

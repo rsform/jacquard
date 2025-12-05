@@ -234,7 +234,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetStarterPacksWithMembershipReques
 pub struct StarterPackWithMembership<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub list_item: Option<crate::app_bsky::graph::ListItemView<'a>>,
+    pub list_item: std::option::Option<crate::app_bsky::graph::ListItemView<'a>>,
     #[serde(borrow)]
     pub starter_pack: crate::app_bsky::graph::StarterPackView<'a>,
 }

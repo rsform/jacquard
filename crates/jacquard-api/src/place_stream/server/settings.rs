@@ -20,7 +20,7 @@
 pub struct Settings<'a> {
     /// Whether this node may archive your livestream for improving the service
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub debug_recording: Option<bool>,
+    pub debug_recording: std::option::Option<bool>,
 }
 
 pub mod settings_state {

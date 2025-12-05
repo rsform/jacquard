@@ -25,14 +25,14 @@ pub struct Paste<'a> {
     /// Programming language for syntax highlighting
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub language: Option<jacquard_common::CowStr<'a>>,
+    pub language: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Optional title for the paste
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub title: Option<jacquard_common::CowStr<'a>>,
+    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
     /// When the paste was last modified (optional, defaults to createdAt)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: Option<jacquard_common::types::string::Datetime>,
+    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 pub mod paste_state {

@@ -24,33 +24,33 @@ pub struct HiveBook<'a> {
     /// URL to full-size cover image
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub cover: Option<jacquard_common::CowStr<'a>>,
+    pub cover: std::option::Option<jacquard_common::CowStr<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
     /// Book description/summary
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: Option<jacquard_common::CowStr<'a>>,
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The book's hive id, used to correlate user's books with the hive
     #[serde(borrow)]
     pub id: jacquard_common::CowStr<'a>,
     /// Average rating (0-1000)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub rating: Option<i64>,
+    pub rating: std::option::Option<i64>,
     /// Number of ratings
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub ratings_count: Option<i64>,
+    pub ratings_count: std::option::Option<i64>,
     /// The source service name (e.g. Goodreads)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub source: Option<jacquard_common::CowStr<'a>>,
+    pub source: std::option::Option<jacquard_common::CowStr<'a>>,
     /// ID of the book in the source service
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub source_id: Option<jacquard_common::CowStr<'a>>,
+    pub source_id: std::option::Option<jacquard_common::CowStr<'a>>,
     /// URL to the book on the source service
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub source_url: Option<jacquard_common::CowStr<'a>>,
+    pub source_url: std::option::Option<jacquard_common::CowStr<'a>>,
     /// URL to thumbnail image
     #[serde(borrow)]
     pub thumbnail: jacquard_common::CowStr<'a>,

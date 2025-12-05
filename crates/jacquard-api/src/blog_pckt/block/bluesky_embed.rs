@@ -21,7 +21,7 @@ pub struct EmbedAttrs<'a> {
     /// Pre-rendered HTML content of the embedded post
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub html: Option<jacquard_common::CowStr<'a>>,
+    pub html: std::option::Option<jacquard_common::CowStr<'a>>,
     /// URL of the Bluesky post to embed
     #[serde(borrow)]
     pub url: jacquard_common::types::string::Uri<'a>,

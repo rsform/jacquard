@@ -21,10 +21,10 @@ pub struct M<'a> {
     #[serde(borrow)]
     pub common_name: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub edible: Option<bool>,
+    pub edible: std::option::Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub species: Option<jacquard_common::CowStr<'a>>,
+    pub species: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 pub mod m_state {

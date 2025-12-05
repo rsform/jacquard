@@ -26,18 +26,19 @@ pub struct Label<'a> {
     /// Optionally, CID specifying the specific version of 'uri' resource this label applies to.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
     /// Timestamp when this label was created.
     pub cts: jacquard_common::types::string::Datetime,
     /// Timestamp at which this label expires (no longer applies).
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub exp: Option<jacquard_common::types::string::Datetime>,
+    pub exp: std::option::Option<jacquard_common::types::string::Datetime>,
     /// If true, this is a negation label, overwriting a previous label.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub neg: Option<bool>,
+    pub neg: std::option::Option<bool>,
     /// Signature of dag-cbor encoded label.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub sig: Option<bytes::Bytes>,
+    #[serde(with = "jacquard_common::opt_serde_bytes_helper")]
+    pub sig: std::option::Option<bytes::Bytes>,
     /// DID of the actor who created this label.
     #[serde(borrow)]
     pub src: jacquard_common::types::string::Did<'a>,
@@ -49,7 +50,7 @@ pub struct Label<'a> {
     pub val: jacquard_common::CowStr<'a>,
     /// The AT Protocol version of the label object.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub ver: Option<i64>,
+    pub ver: std::option::Option<i64>,
 }
 
 pub mod label_state {
@@ -1024,14 +1025,14 @@ impl jacquard_common::IntoStatic for LabelValue<'_> {
 pub struct LabelValueDefinition<'a> {
     /// Does the user need to have adult content enabled in order to configure this label?
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub adult_only: Option<bool>,
+    pub adult_only: std::option::Option<bool>,
     /// What should this label hide in the UI, if applied? 'content' hides all of the target; 'media' hides the images/video/audio; 'none' hides nothing.
     #[serde(borrow)]
     pub blurs: jacquard_common::CowStr<'a>,
     /// The default setting for this label.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub default_setting: Option<jacquard_common::CowStr<'a>>,
+    pub default_setting: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The value of the label being defined. Must only include lowercase ascii and the '-' character ([a-z-]+).
     #[serde(borrow)]
     pub identifier: jacquard_common::CowStr<'a>,

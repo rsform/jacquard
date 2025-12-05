@@ -25,10 +25,10 @@ pub struct Lexicon<'a> {
     /// Human-readable description of the lexicon
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: Option<jacquard_common::CowStr<'a>>,
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Whether this lexicon should be excluded from sync operations
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub excluded_from_sync: Option<bool>,
+    pub excluded_from_sync: std::option::Option<bool>,
     /// Namespaced identifier for the lexicon
     #[serde(borrow)]
     pub nsid: jacquard_common::CowStr<'a>,
@@ -37,7 +37,7 @@ pub struct Lexicon<'a> {
     pub slice: jacquard_common::types::string::AtUri<'a>,
     /// When the lexicon was last updated
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: Option<jacquard_common::types::string::Datetime>,
+    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 pub mod lexicon_state {

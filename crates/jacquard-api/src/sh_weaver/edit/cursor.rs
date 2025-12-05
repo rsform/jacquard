@@ -746,7 +746,7 @@ pub struct Cursor<'a> {
     pub id: crate::sh_weaver::edit::cursor::Id<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub side: Option<crate::sh_weaver::edit::cursor::CursorSide<'a>>,
+    pub side: std::option::Option<crate::sh_weaver::edit::cursor::CursorSide<'a>>,
 }
 
 pub mod cursor_state {

@@ -19,12 +19,12 @@
 pub struct Record<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub cuid: Option<jacquard_common::CowStr<'a>>,
+    pub cuid: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub name: Option<jacquard_common::CowStr<'a>>,
+    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub public: Option<bool>,
+    pub public: std::option::Option<bool>,
 }
 
 pub mod record_state {

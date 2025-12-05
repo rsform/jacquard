@@ -20,9 +20,9 @@ pub struct BackgroundImage<'a> {
     #[serde(borrow)]
     pub image: jacquard_common::types::blob::BlobRef<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub repeat: Option<bool>,
+    pub repeat: std::option::Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub width: Option<i64>,
+    pub width: std::option::Option<i64>,
 }
 
 pub mod background_image_state {

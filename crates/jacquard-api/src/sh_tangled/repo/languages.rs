@@ -20,14 +20,14 @@ pub struct Language<'a> {
     /// Hex color code for this language
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub color: Option<jacquard_common::CowStr<'a>>,
+    pub color: std::option::Option<jacquard_common::CowStr<'a>>,
     /// File extensions associated with this language
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub extensions: Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub extensions: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     /// Number of files in this language
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub file_count: Option<i64>,
+    pub file_count: std::option::Option<i64>,
     /// Programming language name
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,

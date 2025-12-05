@@ -20,17 +20,17 @@
 pub struct Configuration<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub content_rights: Option<
+    pub content_rights: std::option::Option<
         crate::place_stream::metadata::content_rights::ContentRights<'a>,
     >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub content_warnings: Option<
+    pub content_warnings: std::option::Option<
         crate::place_stream::metadata::content_warnings::ContentWarnings<'a>,
     >,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub distribution_policy: Option<
+    pub distribution_policy: std::option::Option<
         crate::place_stream::metadata::distribution_policy::DistributionPolicy<'a>,
     >,
 }

@@ -23,17 +23,17 @@ pub struct Review<'a> {
     /// The detailed review text
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: Option<jacquard_common::CowStr<'a>>,
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Rating score from 1 to 5
     pub rating: i64,
     /// Whether this review is from the service provider or consumer
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub reviewer_role: Option<jacquard_common::CowStr<'a>>,
+    pub reviewer_role: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The title of the review
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub title: Option<jacquard_common::CowStr<'a>>,
+    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
     /// AT URI reference to the transaction record (at://did/beauty.cybernetic.trustcow.transaction/rkey)
     #[serde(borrow)]
     pub transaction: jacquard_common::CowStr<'a>,

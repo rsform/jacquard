@@ -20,7 +20,7 @@
 pub struct Profile<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub nickname: Option<jacquard_common::CowStr<'a>>,
+    pub nickname: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 pub mod profile_state {

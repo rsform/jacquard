@@ -24,10 +24,10 @@ pub struct Message<'a> {
     /// Annotations of text (mentions, URLs, hashtags, etc)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub facets: Option<Vec<crate::social_psky::richtext::facet::Facet<'a>>>,
+    pub facets: std::option::Option<Vec<crate::social_psky::richtext::facet::Facet<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub reply: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    pub reply: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     #[serde(borrow)]
     pub room: jacquard_common::types::string::AtUri<'a>,
 }

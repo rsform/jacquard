@@ -20,10 +20,10 @@ pub struct Block<'a> {
     #[serde(borrow)]
     pub block: BlockBlock<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub height: Option<i64>,
+    pub height: std::option::Option<i64>,
     /// The rotation of the block in degrees
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub rotation: Option<i64>,
+    pub rotation: std::option::Option<i64>,
     pub width: i64,
     pub x: i64,
     pub y: i64,
@@ -597,7 +597,7 @@ pub struct Canvas<'a> {
     pub blocks: Vec<crate::pub_leaflet::pages::canvas::Block<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub id: Option<jacquard_common::CowStr<'a>>,
+    pub id: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 pub mod canvas_state {

@@ -19,15 +19,15 @@
 pub struct Website<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: Option<jacquard_common::CowStr<'a>>,
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub preview_image: Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub preview_image: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     #[serde(borrow)]
     pub src: jacquard_common::types::string::Uri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub title: Option<jacquard_common::CowStr<'a>>,
+    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 pub mod website_state {

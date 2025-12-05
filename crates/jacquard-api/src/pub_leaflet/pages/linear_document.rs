@@ -19,7 +19,7 @@
 pub struct Block<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub alignment: Option<jacquard_common::CowStr<'a>>,
+    pub alignment: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub block: BlockBlock<'a>,
 }
@@ -440,7 +440,7 @@ pub struct LinearDocument<'a> {
     pub blocks: Vec<crate::pub_leaflet::pages::linear_document::Block<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub id: Option<jacquard_common::CowStr<'a>>,
+    pub id: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 pub mod linear_document_state {

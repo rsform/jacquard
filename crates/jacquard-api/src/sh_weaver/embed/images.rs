@@ -23,15 +23,15 @@ pub struct Image<'a> {
     /// Blurhash string for the image, used for low-resolution placeholders. This must be a valid Blurhash string.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub blurhash: Option<jacquard_common::CowStr<'a>>,
+    pub blurhash: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub dimensions: Option<ImageDimensions<'a>>,
+    pub dimensions: std::option::Option<ImageDimensions<'a>>,
     #[serde(borrow)]
     pub image: jacquard_common::types::blob::BlobRef<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub name: Option<jacquard_common::CowStr<'a>>,
+    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 pub mod image_state {
@@ -880,13 +880,13 @@ pub struct ViewImage<'a> {
     pub alt: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub dimensions: Option<ViewImageDimensions<'a>>,
+    pub dimensions: std::option::Option<ViewImageDimensions<'a>>,
     /// Fully-qualified URL where a large version of the image can be fetched. May or may not be the exact original blob. For example, CDN location provided by the App View.
     #[serde(borrow)]
     pub fullsize: jacquard_common::types::string::Uri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub name: Option<jacquard_common::CowStr<'a>>,
+    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Fully-qualified URL where a thumbnail of the image can be fetched. For example, CDN location provided by the App View.
     #[serde(borrow)]
     pub thumb: jacquard_common::types::string::Uri<'a>,

@@ -22,11 +22,11 @@ pub struct AddRule<'a> {
     /// Optional comment about the decision
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: Option<jacquard_common::CowStr<'a>>,
+    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Author DID. Only respected when using admin auth
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub created_by: Option<jacquard_common::types::string::Did<'a>>,
+    pub created_by: std::option::Option<jacquard_common::types::string::Did<'a>>,
     #[serde(borrow)]
     pub pattern: crate::tools_ozone::safelink::PatternType<'a>,
     #[serde(borrow)]

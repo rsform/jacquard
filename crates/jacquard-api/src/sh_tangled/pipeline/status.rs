@@ -22,10 +22,10 @@ pub struct Status<'a> {
     /// error message if failed
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub error: Option<jacquard_common::CowStr<'a>>,
+    pub error: std::option::Option<jacquard_common::CowStr<'a>>,
     /// exit code if failed
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub exit_code: Option<i64>,
+    pub exit_code: std::option::Option<i64>,
     /// ATURI of the pipeline
     #[serde(borrow)]
     pub pipeline: jacquard_common::types::string::AtUri<'a>,

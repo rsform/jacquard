@@ -19,11 +19,13 @@
 pub struct CreateReport<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub mod_tool: Option<crate::com_atproto::moderation::create_report::ModTool<'a>>,
+    pub mod_tool: std::option::Option<
+        crate::com_atproto::moderation::create_report::ModTool<'a>,
+    >,
     /// Additional context about the content and violation.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub reason: Option<jacquard_common::CowStr<'a>>,
+    pub reason: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Indicates the broad category of violation the report is for.
     #[serde(borrow)]
     pub reason_type: crate::com_atproto::moderation::ReasonType<'a>,

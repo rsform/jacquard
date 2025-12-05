@@ -22,13 +22,13 @@ pub mod status;
 pub struct Pull<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub body: Option<jacquard_common::CowStr<'a>>,
+    pub body: std::option::Option<jacquard_common::CowStr<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(borrow)]
     pub patch: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub source: Option<crate::sh_tangled::repo::pull::Source<'a>>,
+    pub source: std::option::Option<crate::sh_tangled::repo::pull::Source<'a>>,
     #[serde(borrow)]
     pub target: crate::sh_tangled::repo::pull::Target<'a>,
     #[serde(borrow)]

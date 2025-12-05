@@ -1237,23 +1237,25 @@ impl jacquard_common::IntoStatic for ListPurpose<'_> {
 pub struct ListView<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub avatar: Option<jacquard_common::types::string::Uri<'a>>,
+    pub avatar: std::option::Option<jacquard_common::types::string::Uri<'a>>,
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
     #[serde(borrow)]
     pub creator: crate::app_bsky::actor::ProfileView<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: Option<jacquard_common::CowStr<'a>>,
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description_facets: Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
+    pub description_facets: std::option::Option<
+        Vec<crate::app_bsky::richtext::facet::Facet<'a>>,
+    >,
     pub indexed_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub labels: Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub list_item_count: Option<i64>,
+    pub list_item_count: std::option::Option<i64>,
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
@@ -1262,7 +1264,7 @@ pub struct ListView<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub viewer: Option<crate::app_bsky::graph::ListViewerState<'a>>,
+    pub viewer: std::option::Option<crate::app_bsky::graph::ListViewerState<'a>>,
 }
 
 pub mod list_view_state {
@@ -1802,16 +1804,16 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListView<'a> {
 pub struct ListViewBasic<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub avatar: Option<jacquard_common::types::string::Uri<'a>>,
+    pub avatar: std::option::Option<jacquard_common::types::string::Uri<'a>>,
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub indexed_at: Option<jacquard_common::types::string::Datetime>,
+    pub indexed_at: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub labels: Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub list_item_count: Option<i64>,
+    pub list_item_count: std::option::Option<i64>,
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
@@ -1820,7 +1822,7 @@ pub struct ListViewBasic<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub viewer: Option<crate::app_bsky::graph::ListViewerState<'a>>,
+    pub viewer: std::option::Option<crate::app_bsky::graph::ListViewerState<'a>>,
 }
 
 pub mod list_view_basic_state {
@@ -2473,11 +2475,11 @@ pub struct Relationship<'a> {
     /// if the actor is followed by this DID, contains the AT-URI of the follow record
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub followed_by: Option<jacquard_common::types::string::AtUri<'a>>,
+    pub followed_by: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
     /// if the actor follows this DID, this is the AT-URI of the follow record
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub following: Option<jacquard_common::types::string::AtUri<'a>>,
+    pub following: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
 }
 
 pub mod relationship_state {
@@ -2664,21 +2666,23 @@ pub struct StarterPackView<'a> {
     pub creator: crate::app_bsky::actor::ProfileViewBasic<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub feeds: Option<Vec<crate::app_bsky::feed::GeneratorView<'a>>>,
+    pub feeds: std::option::Option<Vec<crate::app_bsky::feed::GeneratorView<'a>>>,
     pub indexed_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub joined_all_time_count: Option<i64>,
+    pub joined_all_time_count: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub joined_week_count: Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub labels: Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    pub joined_week_count: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub list: Option<crate::app_bsky::graph::ListViewBasic<'a>>,
+    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub list_items_sample: Option<Vec<crate::app_bsky::graph::ListItemView<'a>>>,
+    pub list: std::option::Option<crate::app_bsky::graph::ListViewBasic<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub list_items_sample: std::option::Option<
+        Vec<crate::app_bsky::graph::ListItemView<'a>>,
+    >,
     #[serde(borrow)]
     pub record: jacquard_common::types::value::Data<'a>,
     #[serde(borrow)]
@@ -3155,14 +3159,14 @@ pub struct StarterPackViewBasic<'a> {
     pub creator: crate::app_bsky::actor::ProfileViewBasic<'a>,
     pub indexed_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub joined_all_time_count: Option<i64>,
+    pub joined_all_time_count: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub joined_week_count: Option<i64>,
+    pub joined_week_count: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub labels: Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub list_item_count: Option<i64>,
+    pub list_item_count: std::option::Option<i64>,
     #[serde(borrow)]
     pub record: jacquard_common::types::value::Data<'a>,
     #[serde(borrow)]

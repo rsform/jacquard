@@ -23,7 +23,7 @@ pub struct Follow<'a> {
     pub subject: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub via: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    pub via: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
 }
 
 pub mod follow_state {

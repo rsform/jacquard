@@ -35,30 +35,30 @@ pub struct VerificationView<'a> {
     pub issuer: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub issuer_profile: Option<jacquard_common::types::value::Data<'a>>,
+    pub issuer_profile: std::option::Option<jacquard_common::types::value::Data<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub issuer_repo: Option<VerificationViewIssuerRepo<'a>>,
+    pub issuer_repo: std::option::Option<VerificationViewIssuerRepo<'a>>,
     /// Describes the reason for revocation, also indicating that the verification is no longer valid.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub revoke_reason: Option<jacquard_common::CowStr<'a>>,
+    pub revoke_reason: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Timestamp when the verification was revoked.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub revoked_at: Option<jacquard_common::types::string::Datetime>,
+    pub revoked_at: std::option::Option<jacquard_common::types::string::Datetime>,
     /// The user who revoked this verification.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub revoked_by: Option<jacquard_common::types::string::Did<'a>>,
+    pub revoked_by: std::option::Option<jacquard_common::types::string::Did<'a>>,
     /// The subject of the verification.
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub subject_profile: Option<jacquard_common::types::value::Data<'a>>,
+    pub subject_profile: std::option::Option<jacquard_common::types::value::Data<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub subject_repo: Option<VerificationViewSubjectRepo<'a>>,
+    pub subject_repo: std::option::Option<VerificationViewSubjectRepo<'a>>,
     /// The AT-URI of the verification record.
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,

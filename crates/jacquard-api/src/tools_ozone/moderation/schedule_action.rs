@@ -21,7 +21,7 @@ pub struct FailedScheduling<'a> {
     pub error: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub error_code: Option<jacquard_common::CowStr<'a>>,
+    pub error_code: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::Did<'a>,
 }
@@ -642,7 +642,7 @@ pub struct ScheduleAction<'a> {
     /// This will be propagated to the moderation event when it is applied
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub mod_tool: Option<crate::tools_ozone::moderation::ModTool<'a>>,
+    pub mod_tool: std::option::Option<crate::tools_ozone::moderation::ModTool<'a>>,
     #[serde(borrow)]
     pub scheduling: crate::tools_ozone::moderation::schedule_action::SchedulingConfig<
         'a,

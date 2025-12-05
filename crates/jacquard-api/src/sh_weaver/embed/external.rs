@@ -21,7 +21,7 @@ pub struct ExternalEmbed<'a> {
     pub description: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub thumb: Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub thumb: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
@@ -800,7 +800,7 @@ pub struct ViewExternal<'a> {
     pub description: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub thumb: Option<jacquard_common::types::string::Uri<'a>>,
+    pub thumb: std::option::Option<jacquard_common::types::string::Uri<'a>>,
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
     #[serde(borrow)]

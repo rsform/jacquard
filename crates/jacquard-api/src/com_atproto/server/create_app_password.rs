@@ -23,7 +23,7 @@ pub struct AppPassword<'a> {
     #[serde(borrow)]
     pub password: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub privileged: Option<bool>,
+    pub privileged: std::option::Option<bool>,
 }
 
 pub mod app_password_state {

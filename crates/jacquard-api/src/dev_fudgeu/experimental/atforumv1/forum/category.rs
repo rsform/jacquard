@@ -22,7 +22,7 @@ pub struct Category<'a> {
     pub category_type: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: Option<jacquard_common::CowStr<'a>>,
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub group: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]

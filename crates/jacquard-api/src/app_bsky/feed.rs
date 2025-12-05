@@ -46,7 +46,7 @@ pub struct BlockedAuthor<'a> {
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub viewer: Option<crate::app_bsky::actor::ViewerState<'a>>,
+    pub viewer: std::option::Option<crate::app_bsky::actor::ViewerState<'a>>,
 }
 
 pub mod blocked_author_state {
@@ -1916,19 +1916,19 @@ pub struct FeedViewPost<'a> {
     /// Context provided by feed generator that may be passed back alongside interactions.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub feed_context: Option<jacquard_common::CowStr<'a>>,
+    pub feed_context: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub post: crate::app_bsky::feed::PostView<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub reason: Option<FeedViewPostReason<'a>>,
+    pub reason: std::option::Option<FeedViewPostReason<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub reply: Option<crate::app_bsky::feed::ReplyRef<'a>>,
+    pub reply: std::option::Option<crate::app_bsky::feed::ReplyRef<'a>>,
     /// Unique identifier per request that may be passed back alongside interactions.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub req_id: Option<jacquard_common::CowStr<'a>>,
+    pub req_id: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 pub mod feed_view_post_state {
@@ -2188,23 +2188,25 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FeedViewPost<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct GeneratorView<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub accepts_interactions: Option<bool>,
+    pub accepts_interactions: std::option::Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub avatar: Option<jacquard_common::types::string::Uri<'a>>,
+    pub avatar: std::option::Option<jacquard_common::types::string::Uri<'a>>,
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub content_mode: Option<jacquard_common::CowStr<'a>>,
+    pub content_mode: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub creator: crate::app_bsky::actor::ProfileView<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: Option<jacquard_common::CowStr<'a>>,
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description_facets: Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
+    pub description_facets: std::option::Option<
+        Vec<crate::app_bsky::richtext::facet::Facet<'a>>,
+    >,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(borrow)]
@@ -2212,14 +2214,14 @@ pub struct GeneratorView<'a> {
     pub indexed_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub labels: Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub like_count: Option<i64>,
+    pub like_count: std::option::Option<i64>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub viewer: Option<crate::app_bsky::feed::GeneratorViewerState<'a>>,
+    pub viewer: std::option::Option<crate::app_bsky::feed::GeneratorViewerState<'a>>,
 }
 
 pub mod generator_view_state {
@@ -3161,38 +3163,38 @@ pub struct PostView<'a> {
     #[serde(borrow)]
     pub author: crate::app_bsky::actor::ProfileViewBasic<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub bookmark_count: Option<i64>,
+    pub bookmark_count: std::option::Option<i64>,
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
     /// Debug information for internal development
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub debug: Option<jacquard_common::types::value::Data<'a>>,
+    pub debug: std::option::Option<jacquard_common::types::value::Data<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub embed: Option<PostViewEmbed<'a>>,
+    pub embed: std::option::Option<PostViewEmbed<'a>>,
     pub indexed_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub labels: Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub like_count: Option<i64>,
+    pub like_count: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub quote_count: Option<i64>,
+    pub quote_count: std::option::Option<i64>,
     #[serde(borrow)]
     pub record: jacquard_common::types::value::Data<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub reply_count: Option<i64>,
+    pub reply_count: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub repost_count: Option<i64>,
+    pub repost_count: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub threadgate: Option<crate::app_bsky::feed::ThreadgateView<'a>>,
+    pub threadgate: std::option::Option<crate::app_bsky::feed::ThreadgateView<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub viewer: Option<crate::app_bsky::feed::ViewerState<'a>>,
+    pub viewer: std::option::Option<crate::app_bsky::feed::ViewerState<'a>>,
 }
 
 pub mod post_view_state {
@@ -3740,11 +3742,11 @@ pub struct ReasonRepost<'a> {
     pub by: crate::app_bsky::actor::ProfileViewBasic<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
     pub indexed_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub uri: Option<jacquard_common::types::string::AtUri<'a>>,
+    pub uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
 }
 
 pub mod reason_repost_state {
@@ -3963,7 +3965,9 @@ pub struct ReplyRef<'a> {
     /// When parent is a reply to another post, this is the author of that post.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub grandparent_author: Option<crate::app_bsky::actor::ProfileViewBasic<'a>>,
+    pub grandparent_author: std::option::Option<
+        crate::app_bsky::actor::ProfileViewBasic<'a>,
+    >,
     #[serde(borrow)]
     pub parent: ReplyRefParent<'a>,
     #[serde(borrow)]
@@ -4242,12 +4246,12 @@ pub struct SkeletonFeedPost<'a> {
     /// Context that will be passed through to client and may be passed to feed generator back alongside interactions.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub feed_context: Option<jacquard_common::CowStr<'a>>,
+    pub feed_context: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub post: jacquard_common::types::string::AtUri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub reason: Option<SkeletonFeedPostReason<'a>>,
+    pub reason: std::option::Option<SkeletonFeedPostReason<'a>>,
 }
 
 pub mod skeleton_feed_post_state {
@@ -4665,15 +4669,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThreadContext<'a> {
 pub struct ThreadViewPost<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub parent: Option<ThreadViewPostParent<'a>>,
+    pub parent: std::option::Option<ThreadViewPostParent<'a>>,
     #[serde(borrow)]
     pub post: crate::app_bsky::feed::PostView<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub replies: Option<Vec<ThreadViewPostRepliesItem<'a>>>,
+    pub replies: std::option::Option<Vec<ThreadViewPostRepliesItem<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub thread_context: Option<crate::app_bsky::feed::ThreadContext<'a>>,
+    pub thread_context: std::option::Option<crate::app_bsky::feed::ThreadContext<'a>>,
 }
 
 pub mod thread_view_post_state {

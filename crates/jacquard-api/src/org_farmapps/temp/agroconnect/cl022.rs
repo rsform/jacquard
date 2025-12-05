@@ -20,14 +20,14 @@
 pub struct Cl022<'a> {
     /// Date when added to the list
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub added: Option<jacquard_common::types::string::Datetime>,
+    pub added: std::option::Option<jacquard_common::types::string::Datetime>,
     /// Comment
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: Option<jacquard_common::CowStr<'a>>,
+    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Denominator used for all fertilizer content properties
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub denominator: Option<i64>,
+    pub denominator: std::option::Option<i64>,
     /// Description / name of the fertilizer
     #[serde(borrow)]
     pub description: jacquard_common::CowStr<'a>,
@@ -36,24 +36,24 @@ pub struct Cl022<'a> {
     pub id: crate::org_farmapps::temp::ecrop::CodeType<'a>,
     /// <unit> Potassium oxide content of this fertilizer
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub k2o: Option<i64>,
+    pub k2o: std::option::Option<i64>,
     /// <unit> Nitrogen content of this fertilizer
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub n: Option<i64>,
+    pub n: std::option::Option<i64>,
     /// <unit> Phosphate content of this fertilizer
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub p2o5: Option<i64>,
+    pub p2o5: std::option::Option<i64>,
     /// Fertlizer type
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub r#type: Option<jacquard_common::CowStr<'a>>,
+    pub r#type: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Unit
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub unit: Option<jacquard_common::CowStr<'a>>,
+    pub unit: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Date when updated
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated: Option<jacquard_common::types::string::Datetime>,
+    pub updated: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 pub mod cl022_state {

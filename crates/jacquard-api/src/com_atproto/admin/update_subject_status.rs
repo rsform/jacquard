@@ -19,12 +19,12 @@
 pub struct UpdateSubjectStatus<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub deactivated: Option<crate::com_atproto::admin::StatusAttr<'a>>,
+    pub deactivated: std::option::Option<crate::com_atproto::admin::StatusAttr<'a>>,
     #[serde(borrow)]
     pub subject: UpdateSubjectStatusSubject<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub takedown: Option<crate::com_atproto::admin::StatusAttr<'a>>,
+    pub takedown: std::option::Option<crate::com_atproto::admin::StatusAttr<'a>>,
 }
 
 pub mod update_subject_status_state {

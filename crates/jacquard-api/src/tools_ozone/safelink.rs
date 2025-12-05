@@ -110,7 +110,7 @@ pub struct Event<'a> {
     /// Optional comment about the decision
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: Option<jacquard_common::CowStr<'a>>,
+    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
     /// DID of the user who created this rule
     #[serde(borrow)]
@@ -1206,7 +1206,7 @@ pub struct UrlRule<'a> {
     /// Optional comment about the decision
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: Option<jacquard_common::CowStr<'a>>,
+    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Timestamp when the rule was created
     pub created_at: jacquard_common::types::string::Datetime,
     /// DID of the user added the rule.

@@ -19,11 +19,13 @@
 #[serde(rename_all = "camelCase")]
 pub struct Game<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: Option<jacquard_common::types::string::Datetime>,
+    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
     /// This is the record that holds the publicly verifiable signature of a game record
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub verified_ref: Option<crate::blue__2048::verification::VerificationRef<'a>>,
+    pub verified_ref: std::option::Option<
+        crate::blue__2048::verification::VerificationRef<'a>,
+    >,
 }
 
 pub mod game_state {

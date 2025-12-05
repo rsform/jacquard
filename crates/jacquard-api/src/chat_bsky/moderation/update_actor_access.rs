@@ -22,7 +22,7 @@ pub struct UpdateActorAccess<'a> {
     pub allow_access: bool,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub r#ref: Option<jacquard_common::CowStr<'a>>,
+    pub r#ref: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 pub mod update_actor_access_state {

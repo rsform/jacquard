@@ -350,10 +350,10 @@ pub struct File<'a> {
     /// MIME type, e.g. 'video/mp4'.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub mime_type: Option<jacquard_common::CowStr<'a>>,
+    pub mime_type: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Client-side last-modified timestamp.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub modified_at: Option<jacquard_common::types::string::Datetime>,
+    pub modified_at: std::option::Option<jacquard_common::types::string::Datetime>,
     /// User-visible filename.
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
@@ -627,14 +627,16 @@ pub struct Aqfile<'a> {
     /// Handle or DID of the account to attribute this upload to.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub attribution: Option<jacquard_common::types::ident::AtIdentifier<'a>>,
+    pub attribution: std::option::Option<
+        jacquard_common::types::ident::AtIdentifier<'a>,
+    >,
     /// The uploaded blob reference. Note: Individual PDS instances may enforce lower size limits.
     #[serde(borrow)]
     pub blob: jacquard_common::types::blob::BlobRef<'a>,
     /// Optional cryptographic checksum for integrity verification.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub checksum: Option<crate::net_altq::aqfile::Checksum<'a>>,
+    pub checksum: std::option::Option<crate::net_altq::aqfile::Checksum<'a>>,
     /// Timestamp when this record was created.
     pub created_at: jacquard_common::types::string::Datetime,
     /// Metadata about the file.

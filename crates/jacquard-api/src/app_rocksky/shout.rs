@@ -35,7 +35,7 @@ pub struct Shout<'a> {
     pub message: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub parent: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    pub parent: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     #[serde(borrow)]
     pub subject: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }

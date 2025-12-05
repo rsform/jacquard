@@ -26,30 +26,30 @@ pub struct Artist<'a> {
     /// The biography of the artist.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub bio: Option<jacquard_common::CowStr<'a>>,
+    pub bio: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The birth date of the artist.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub born: Option<jacquard_common::types::string::Datetime>,
+    pub born: std::option::Option<jacquard_common::types::string::Datetime>,
     /// The birth place of the artist.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub born_in: Option<jacquard_common::CowStr<'a>>,
+    pub born_in: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The date when the artist was created.
     pub created_at: jacquard_common::types::string::Datetime,
     /// The death date of the artist.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub died: Option<jacquard_common::types::string::Datetime>,
+    pub died: std::option::Option<jacquard_common::types::string::Datetime>,
     /// The name of the artist.
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     /// The picture of the artist.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub picture: Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub picture: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     /// The tags of the artist.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub tags: Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
 pub mod artist_state {

@@ -57,35 +57,35 @@ pub struct Profile<'a> {
     /// Small image to be displayed next to job listings from account. AKA, 'profile picture'
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub avatar: Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub avatar: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     /// Larger horizontal image to display behind profile view.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub banner: Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub banner: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     /// A free text description of the identity.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: Option<jacquard_common::CowStr<'a>>,
+    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The display name of the identity.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub display_name: Option<jacquard_common::CowStr<'a>>,
+    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Annotations of text (mentions, URLs, hashtags, etc) in the description.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub facets: Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
+    pub facets: std::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
     /// The service used for profile links
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub profile_host: Option<jacquard_common::CowStr<'a>>,
+    pub profile_host: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The identity's resume.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub resume: Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub resume: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     /// The current status of the identity.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub status: Option<jacquard_common::CowStr<'a>>,
+    pub status: std::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 pub mod profile_state {

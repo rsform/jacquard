@@ -1366,7 +1366,9 @@ pub struct Meta<'a> {
     pub is_default_ref: bool,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub lang_breakdown: Option<crate::sh_tangled::git::ref_update::LangBreakdown<'a>>,
+    pub lang_breakdown: std::option::Option<
+        crate::sh_tangled::git::ref_update::LangBreakdown<'a>,
+    >,
 }
 
 pub mod meta_state {

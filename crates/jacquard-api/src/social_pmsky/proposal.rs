@@ -20,24 +20,25 @@ pub struct Proposal<'a> {
     /// The persistent, anonymous identifier for the user creating the proposal.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub aid: Option<jacquard_common::CowStr<'a>>,
+    pub aid: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Optionally, CID specifying the specific version of 'uri' resource this proposal applies to.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
     /// Timestamp when this proposal was created.
     pub cts: jacquard_common::types::string::Datetime,
     /// For 'label' proposals where 'val' is 'needs-context', the full text of any proposed annotation (e.g. community note) to be shown below the post.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub note: Option<jacquard_common::CowStr<'a>>,
+    pub note: std::option::Option<jacquard_common::CowStr<'a>>,
     /// An optional array of predefined reasons justifying the moderation action.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub reasons: Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub reasons: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     /// Signature of dag-cbor encoded proposal.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub sig: Option<bytes::Bytes>,
+    #[serde(with = "jacquard_common::opt_serde_bytes_helper")]
+    pub sig: std::option::Option<bytes::Bytes>,
     /// DID of the actor who created this proposal.
     #[serde(borrow)]
     pub src: jacquard_common::types::string::Did<'a>,
@@ -52,7 +53,7 @@ pub struct Proposal<'a> {
     pub val: jacquard_common::CowStr<'a>,
     /// The AT Protocol version of the proposal object.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub ver: Option<i64>,
+    pub ver: std::option::Option<i64>,
 }
 
 pub mod proposal_state {

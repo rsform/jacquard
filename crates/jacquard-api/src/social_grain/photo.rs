@@ -24,9 +24,9 @@ pub struct Photo<'a> {
     pub alt: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub aspect_ratio: Option<crate::social_grain::AspectRatio<'a>>,
+    pub aspect_ratio: std::option::Option<crate::social_grain::AspectRatio<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: Option<jacquard_common::types::string::Datetime>,
+    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub photo: jacquard_common::types::blob::BlobRef<'a>,
 }
@@ -399,42 +399,42 @@ fn lexicon_doc_social_grain_photo() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
 pub struct ExifView<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub date_time_original: Option<jacquard_common::CowStr<'a>>,
+    pub date_time_original: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub exposure_time: Option<jacquard_common::CowStr<'a>>,
+    pub exposure_time: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub f_number: Option<jacquard_common::CowStr<'a>>,
+    pub f_number: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub flash: Option<jacquard_common::CowStr<'a>>,
+    pub flash: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub focal_length_in35mm_format: Option<jacquard_common::CowStr<'a>>,
+    pub focal_length_in35mm_format: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub i_so: Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub lens_make: Option<jacquard_common::CowStr<'a>>,
+    pub i_so: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub lens_model: Option<jacquard_common::CowStr<'a>>,
+    pub lens_make: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub make: Option<jacquard_common::CowStr<'a>>,
+    pub lens_model: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub model: Option<jacquard_common::CowStr<'a>>,
+    pub make: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub model: std::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub photo: jacquard_common::types::string::AtUri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub uri: Option<jacquard_common::types::string::AtUri<'a>>,
+    pub uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
 }
 
 pub mod exif_view_state {
@@ -1265,13 +1265,13 @@ pub struct PhotoView<'a> {
     pub alt: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub aspect_ratio: Option<crate::social_grain::AspectRatio<'a>>,
+    pub aspect_ratio: std::option::Option<crate::social_grain::AspectRatio<'a>>,
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
     /// EXIF metadata for the photo, if available.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub exif: Option<crate::social_grain::photo::ExifView<'a>>,
+    pub exif: std::option::Option<crate::social_grain::photo::ExifView<'a>>,
     /// Fully-qualified URL where a large version of the image can be fetched. May or may not be the exact original blob. For example, CDN location provided by the App View.
     #[serde(borrow)]
     pub fullsize: jacquard_common::types::string::Uri<'a>,

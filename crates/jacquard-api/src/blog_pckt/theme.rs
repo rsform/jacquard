@@ -24,7 +24,7 @@ pub struct Theme<'a> {
     /// Font family name (optional)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub font: Option<jacquard_common::CowStr<'a>>,
+    pub font: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Light mode color palette
     #[serde(borrow)]
     pub light: crate::blog_pckt::theme::Palette<'a>,
