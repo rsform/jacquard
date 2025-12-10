@@ -38,7 +38,7 @@ where
     D: Deserializer<'de>,
 {
     if deserializer.is_human_readable() {
-        Ok(deserializer.deserialize_map(OptBytesVisitor)?)
+        Ok(deserializer.deserialize_any(OptBytesVisitor)?)
     } else {
         let vec: Option<Vec<u8>> = serde_bytes::deserialize(deserializer)?;
         Ok(vec.map(Bytes::from))

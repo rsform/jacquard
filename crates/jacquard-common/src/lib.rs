@@ -247,7 +247,7 @@ pub use websocket::{
 pub use types::value::*;
 
 /// Authorization token types for XRPC requests.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum AuthorizationToken<'s> {
     /// Bearer token (access JWT, refresh JWT to refresh the session)
     Bearer(CowStr<'s>),

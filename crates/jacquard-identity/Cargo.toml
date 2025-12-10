@@ -47,7 +47,7 @@ tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 mini-moka = { version = "0.10",path = "../mini-moka-vendored", features = ["js"],  optional = true }
-
+ring = { version = "0.17", default-features = false, features = ["wasm32_unknown_unknown_js"]}
 
 [[example]]
 name = "resolve_lexicon"

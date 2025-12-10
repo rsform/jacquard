@@ -20,7 +20,7 @@ crypto-p256 = ["crypto", "dep:p256", "p256/ecdsa"]
 service-auth = ["crypto-k256", "crypto-p256", "dep:signature"]
 reqwest-client = ["dep:reqwest"]
 tracing = ["dep:tracing"]
-streaming = ["n0-future", "futures"]
+streaming = ["n0-future", "futures", "reqwest/stream"]
 websocket = ["streaming", "tokio-tungstenite-wasm", "dep:ciborium"]
 zstd = ["dep:zstd"]
 
@@ -48,7 +48,7 @@ http.workspace = true
 serde_bytes = "0.11"
 
 
-reqwest = { workspace = true, optional = true, features = ["json", "charset", "gzip", "stream"] }
+reqwest = { workspace = true, optional = true, features = ["json", "gzip", "charset"] }
 serde_ipld_dagcbor.workspace = true
 signature = { version = "2", optional = true }
 tracing = { workspace = true, optional = true }
@@ -57,7 +57,7 @@ tokio = { workspace = true, default-features = false, features = ["sync"] }
 # Streaming support (optional)
 n0-future = { workspace = true, optional = true }
 futures = { version = "0.3", optional = true }
-tokio-tungstenite-wasm = { version = "0.4", features = ["rustls-tls-native-roots"], optional = true }
+tokio-tungstenite-wasm = { version = "0.4", default-features = false, optional = true }
 ciborium = {version = "0.2.0", optional = true }
 zstd = { version = "0.13", optional = true }
 postcard = { version = "1.1.3", features = ["use-std"] }
@@ -67,12 +67,15 @@ getrandom = { version = "0.3.4", features = ["wasm_js"] }
 chrono = { workspace = true, features = ["wasmbind"] }
 getrandom_02 = { package = "getrandom", version = "0.2", features = ["js"] }
 regex-lite = "0.1"
+ring = { version = "0.17", features = ["wasm32_unknown_unknown_js"]}
+reqwest = { workspace = true, optional = true, features = [ "json", "gzip", "rustls-tls-manual-roots"] }
+tokio-tungstenite-wasm = { version = "0.4", features = [], optional = true }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-reqwest = { workspace = true, optional = true, features = [ "http2", "system-proxy", "rustls-tls"] }
+reqwest = { workspace = true, optional = true, features = [ "http2", "gzip", "system-proxy", "rustls-tls"] }
 tokio-util = { version = "0.7.16", features = ["io"] }
 regex = { version = "1.11.3", default-features = false, features = ["std", "perf-literal"] }
-
+tokio-tungstenite-wasm = { version = "0.4", features = ["rustls-tls-native-roots"], optional = true }
 
 
 [dependencies.ed25519-dalek]

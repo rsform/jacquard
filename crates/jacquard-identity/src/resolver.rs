@@ -540,7 +540,7 @@ pub enum IdentityErrorKind {
         code(jacquard::identity::transport),
         help("check network connectivity and TLS configuration")
     )]
-    Transport,
+    Transport(SmolStr),
 
     /// Request timeout
     #[error("request timed out")]
@@ -661,8 +661,8 @@ impl IdentityError {
     }
 
     /// Create a transport error
-    pub fn transport(source: impl std::error::Error + Send + Sync + 'static) -> Self {
-        Self::new(IdentityErrorKind::Transport, Some(Box::new(source)))
+    pub fn transport(msg: SmolStr, source: impl std::error::Error + Send + Sync + 'static) -> Self {
+        Self::new(IdentityErrorKind::Transport(msg), Some(Box::new(source)))
     }
 
     /// Create a timeout error
@@ -765,7 +765,7 @@ impl From<AtDataError> for IdentityError {
 
 impl From<reqwest::Error> for IdentityError {
     fn from(e: reqwest::Error) -> Self {
-        Self::transport(e).with_context("HTTP request failed during identity resolution")
+        Self::transport("".into(), e).with_context("HTTP request failed during identity resolution")
     }
 }
 

@@ -155,6 +155,7 @@ impl Default for BasicClient {
 }
 
 /// Unauthenticated XRPC client session with identity resolution
+#[derive(Debug, Clone)]
 pub struct UnauthenticatedSession<T> {
     resolver: Arc<T>,
     endpoint: Arc<RwLock<Option<CowStr<'static>>>>,
@@ -224,7 +225,7 @@ where
                 .read()
                 .await
                 .clone()
-                .unwrap_or(CowStr::new_static("https://public.bsky.app"))
+                .unwrap_or(CowStr::new_static("https://public.api.bsky.app"))
         }
     }
 

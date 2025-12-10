@@ -617,9 +617,10 @@ where
         <R as XrpcRequest>::Response: Send + Sync,
     {
         let base_uri = self.base_uri().await;
-        opts.auth = Some(self.access_token().await);
-        let guard = self.data.read().await;
-        let mut dpop = guard.dpop_data.clone();
+        let original_token = self.access_token().await;
+        opts.auth = Some(original_token.clone());
+        // Clone dpop_data and release read lock before the await point
+        let mut dpop = self.data.read().await.dpop_data.clone();
         let base_uri = Url::parse(&base_uri).map_err(|e| ClientError::transport(e))?;
         let http_response = self
             .client
@@ -628,22 +629,44 @@ where
             .await
             .map_err(|e| ClientError::transport(e))?;
         let resp = process_response(http_response);
-        drop(guard);
+
+        // Write back updated nonce to session data (dpop_call may have updated it)
+        {
+            let mut guard = self.data.write().await;
+            guard.dpop_data.dpop_host_nonce = dpop.dpop_host_nonce.clone();
+        }
+
         if is_invalid_token_response(&resp) {
-            opts.auth = Some(
-                self.refresh()
-                    .await
-                    .map_err(|e| ClientError::transport(e))?,
-            );
-            let guard = self.data.read().await;
-            let mut dpop = guard.dpop_data.clone();
+            // Optimistic refresh: check if another request already refreshed the token
+            let current_token = self.access_token().await;
+            if current_token != original_token {
+                // Token was already refreshed by another concurrent request, use it
+                opts.auth = Some(current_token);
+            } else {
+                // We need to refresh - this will be serialized by the registry's Mutex
+                opts.auth = Some(
+                    self.refresh()
+                        .await
+                        .map_err(|e| ClientError::transport(e))?,
+                );
+            }
+            // Re-read dpop_data after refresh (refresh may have updated it)
+            let mut dpop = self.data.read().await.dpop_data.clone();
             let http_response = self
                 .client
                 .dpop_call(&mut dpop)
                 .send(build_http_request(&base_uri, &request, &opts)?)
                 .await
                 .map_err(|e| ClientError::transport(e))?;
-            process_response(http_response)
+            let resp = process_response(http_response);
+
+            // Write back updated nonce after retry
+            {
+                let mut guard = self.data.write().await;
+                guard.dpop_data.dpop_host_nonce = dpop.dpop_host_nonce.clone();
+            }
+
+            resp
         } else {
             resp
         }

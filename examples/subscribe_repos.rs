@@ -11,10 +11,15 @@ use jacquard::api::com_atproto::sync::subscribe_repos::{SubscribeRepos, Subscrib
 use jacquard_common::xrpc::{SubscriptionClient, TungsteniteSubscriptionClient};
 use miette::IntoDiagnostic;
 use n0_future::StreamExt;
+use smol_str::ToSmolStr;
 use url::Url;
 
 #[derive(Parser, Debug)]
-#[command(author, version, about = "Subscribe to a PDS's subscribeRepos endpoint")]
+#[command(
+    author,
+    version,
+    about = "Subscribe to a PDS's subscribeRepos endpoint"
+)]
 struct Args {
     /// PDS URL (e.g., atproto.systems or https://atproto.systems)
     pds_url: String,
@@ -47,7 +52,11 @@ fn print_message(msg: &SubscribeReposMessage) {
                 commit.rev,
                 commit.commit,
                 commit.ops.len(),
-                commit.since,
+                commit
+                    .since
+                    .as_ref()
+                    .map(|ts| ts.to_smolstr())
+                    .unwrap_or_default(),
             );
         }
         SubscribeReposMessage::Identity(identity) => {

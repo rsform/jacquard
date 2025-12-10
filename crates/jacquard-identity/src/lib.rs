@@ -81,6 +81,7 @@ use jacquard_api::com_atproto::identity::resolve_handle::ResolveHandle;
 #[cfg(feature = "streaming")]
 use jacquard_common::ByteStream;
 use jacquard_common::http_client::HttpClient;
+use jacquard_common::smol_str::ToSmolStr;
 use jacquard_common::types::did::Did;
 use jacquard_common::types::did_doc::DidDocument;
 use jacquard_common::types::ident::AtIdentifier;
@@ -458,11 +459,13 @@ impl JacquardResolver {
     }
 
     async fn get_text(&self, url: Url) -> resolver::Result<String> {
+        let u = url.to_smolstr();
         let resp = self.http.get(url).send().await?;
         if resp.status() == StatusCode::OK {
             Ok(resp.text().await?)
         } else {
             Err(IdentityError::transport(
+                u,
                 resp.error_for_status().unwrap_err(),
             ))
         }
@@ -861,16 +864,17 @@ impl HttpClient for JacquardResolver {
         &self,
         request: http::Request<Vec<u8>>,
     ) -> core::result::Result<http::Response<Vec<u8>>, Self::Error> {
+        let u = request.uri().clone();
         match self.opts.request_timeout {
             Some(duration) => n0_future::time::timeout(duration, self.http.send_http(request))
                 .await
                 .map_err(|_| IdentityError::timeout())?
-                .map_err(IdentityError::transport),
+                .map_err(|e| IdentityError::transport(u.to_smolstr(), e)),
             None => self
                 .http
                 .send_http(request)
                 .await
-                .map_err(IdentityError::transport),
+                .map_err(|e| IdentityError::transport(u.to_smolstr(), e)),
         }
     }
 }
@@ -882,18 +886,19 @@ impl jacquard_common::http_client::HttpClientExt for JacquardResolver {
         &self,
         request: http::Request<Vec<u8>>,
     ) -> Result<http::Response<ByteStream>, Self::Error> {
+        let u = request.uri().clone();
         match self.opts.request_timeout {
             Some(duration) => {
                 n0_future::time::timeout(duration, self.http.send_http_streaming(request))
                     .await
                     .map_err(|_| IdentityError::timeout())?
-                    .map_err(IdentityError::transport)
+                    .map_err(|e| IdentityError::transport(u.to_smolstr(), e))
             }
             None => self
                 .http
                 .send_http_streaming(request)
                 .await
-                .map_err(IdentityError::transport),
+                .map_err(|e| IdentityError::transport(u.to_smolstr(), e)),
         }
     }
 
@@ -909,18 +914,19 @@ impl jacquard_common::http_client::HttpClientExt for JacquardResolver {
             + Send
             + 'static,
     {
+        let u = parts.uri.clone();
         match self.opts.request_timeout {
             Some(duration) => {
                 n0_future::time::timeout(duration, self.http.send_http_bidirectional(parts, body))
                     .await
                     .map_err(|_| IdentityError::timeout())?
-                    .map_err(IdentityError::transport)
+                    .map_err(|e| IdentityError::transport(u.to_smolstr(), e))
             }
             None => self
                 .http
                 .send_http_bidirectional(parts, body)
                 .await
-                .map_err(IdentityError::transport),
+                .map_err(|e| IdentityError::transport(u.to_smolstr(), e)),
         }
     }
 
@@ -934,18 +940,19 @@ impl jacquard_common::http_client::HttpClientExt for JacquardResolver {
     where
         S: n0_future::Stream<Item = Result<bytes::Bytes, jacquard_common::StreamError>> + 'static,
     {
+        let u = parts.uri.clone();
         match self.opts.request_timeout {
             Some(duration) => {
                 n0_future::time::timeout(duration, self.http.send_http_bidirectional(parts, body))
                     .await
                     .map_err(|_| IdentityError::timeout())?
-                    .map_err(IdentityError::transport)
+                    .map_err(|e| IdentityError::transport(u.to_smolstr(), e))
             }
             None => self
                 .http
                 .send_http_bidirectional(parts, body)
                 .await
-                .map_err(IdentityError::transport),
+                .map_err(|e| IdentityError::transport(u.to_smolstr(), e)),
         }
     }
 }

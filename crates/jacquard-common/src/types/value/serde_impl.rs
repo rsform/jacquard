@@ -1,10 +1,10 @@
-use core::fmt;
-use std::{collections::BTreeMap, str::FromStr};
-
+use crate::types::cid::IpldCid;
 use base64::{Engine, prelude::BASE64_STANDARD};
 use bytes::Bytes;
+use core::fmt;
 use serde::{Deserialize, Deserializer, Serialize, Serializer, de::VariantAccess};
 use smol_str::{SmolStr, ToSmolStr};
+use std::{collections::BTreeMap, str::FromStr};
 
 use crate::{
     IntoStatic,
@@ -218,7 +218,7 @@ impl<'de: 'v, 'v> serde::de::Visitor<'v> for DataVisitor {
     where
         D: Deserializer<'v>,
     {
-        deserializer.deserialize_map(self)
+        deserializer.deserialize_any(CidAwareVisitor)
     }
 
     fn visit_map<A>(self, mut map: A) -> Result<Self::Value, A::Error>
@@ -643,7 +643,7 @@ impl<'de: 'v, 'v> serde::de::Visitor<'v> for RawDataVisitor {
     where
         D: Deserializer<'v>,
     {
-        deserializer.deserialize_map(self)
+        deserializer.deserialize_any(RawCidAwareVisitor)
     }
 
     fn visit_map<A>(self, mut map: A) -> Result<Self::Value, A::Error>
@@ -693,6 +693,64 @@ impl<'de: 'v, 'v> serde::de::Visitor<'v> for RawDataVisitor {
 
         // Second pass: apply type inference and check for special patterns
         apply_raw_type_inference(temp_map).map_err(A::Error::custom)
+    }
+}
+
+// In DAG-CBOR, newtype_struct wraps tag 42 (CID)
+// The CidDeserializer will call visit_bytes with the CID bytes
+struct CidAwareVisitor;
+
+impl<'de: 'v, 'v> serde::de::Visitor<'v> for CidAwareVisitor {
+    type Value = Data<'v>;
+
+    fn expecting(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        f.write_str("CID bytes or other newtype content")
+    }
+
+    fn visit_bytes<E>(self, v: &[u8]) -> Result<Self::Value, E>
+    where
+        E: serde::de::Error,
+    {
+        // Try to parse as CID first (tag 42 case)
+        match IpldCid::try_from(v) {
+            Ok(cid) => Ok(Data::CidLink(Cid::ipld(cid))),
+            Err(_) => Ok(Data::Bytes(Bytes::copy_from_slice(v))),
+        }
+    }
+
+    fn visit_borrowed_bytes<E>(self, v: &'v [u8]) -> Result<Self::Value, E>
+    where
+        E: serde::de::Error,
+    {
+        self.visit_bytes(v)
+    }
+}
+
+struct RawCidAwareVisitor;
+
+impl<'de: 'v, 'v> serde::de::Visitor<'v> for RawCidAwareVisitor {
+    type Value = RawData<'v>;
+
+    fn expecting(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        f.write_str("CID bytes or other newtype content")
+    }
+
+    fn visit_bytes<E>(self, v: &[u8]) -> Result<Self::Value, E>
+    where
+        E: serde::de::Error,
+    {
+        // Try to parse as CID first (tag 42 case)
+        match IpldCid::try_from(v) {
+            Ok(cid) => Ok(RawData::CidLink(Cid::ipld(cid))),
+            Err(_) => Ok(RawData::Bytes(Bytes::copy_from_slice(v))),
+        }
+    }
+
+    fn visit_borrowed_bytes<E>(self, v: &'v [u8]) -> Result<Self::Value, E>
+    where
+        E: serde::de::Error,
+    {
+        self.visit_bytes(v)
     }
 }
 
