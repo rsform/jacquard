@@ -1,3 +1,4 @@
+use crate::cowstr::ToCowStr;
 use crate::types::ident::AtIdentifier;
 use crate::types::nsid::Nsid;
 use crate::types::recordkey::{RecordKey, Rkey};
@@ -104,6 +105,16 @@ pub struct RepoPath<'u> {
     pub collection: Nsid<'u>,
     /// Optional record key identifying a specific record
     pub rkey: Option<RecordKey<Rkey<'u>>>,
+}
+
+impl fmt::Display for RepoPath<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "/{}", self.collection)?;
+        if let Some(rkey) = &self.rkey {
+            write!(f, "/{}", rkey.as_ref())?;
+        }
+        Ok(())
+    }
 }
 
 impl IntoStatic for RepoPath<'_> {
@@ -341,6 +352,31 @@ impl<'u> AtUri<'u> {
 }
 
 impl AtUri<'static> {
+    /// Fallible owned constructor from typical parts
+    pub fn from_parts_owned(
+        authority: impl AsRef<str>,
+        collection: impl AsRef<str>,
+        rkey: impl AsRef<str>,
+    ) -> Result<Self, AtStrError> {
+        let (authority, collection, rkey) =
+            (authority.as_ref(), collection.as_ref(), rkey.as_ref());
+        if authority.is_empty() || (collection.is_empty() && !rkey.is_empty()) {
+            Err(AtStrError::missing(
+                "at-uri-scheme",
+                &format!("at://{}/{}/{}", authority, collection, rkey),
+                "correct uri path",
+            ))
+        } else if !authority.is_empty() && collection.is_empty() && rkey.is_empty() {
+            let uri = format!("at://{}", authority);
+            Self::new_owned(uri)
+        } else if !collection.is_empty() && rkey.is_empty() {
+            let uri = format!("at://{}/{}", authority, collection);
+            Self::new_owned(uri)
+        } else {
+            let uri = format!("at://{}/{}/{}", authority, collection, rkey);
+            Self::new_owned(uri)
+        }
+    }
     /// Owned constructor
     ///
     /// Uses ouroboros self-referential tricks internally to make sure everything

@@ -667,9 +667,6 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
         R: Collection + serde::Serialize,
     {
         async move {
-            #[cfg(feature = "tracing")]
-            let _span = tracing::debug_span!("create_record", collection = %R::nsid()).entered();
-
             use jacquard_api::com_atproto::repo::create_record::CreateRecord;
             use jacquard_common::types::ident::AtIdentifier;
             use jacquard_common::types::value::to_data;
@@ -678,6 +675,9 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
                 .session_info()
                 .await
                 .ok_or_else(AgentError::no_session)?;
+
+            #[cfg(feature = "tracing")]
+            let _span = tracing::debug_span!("create_record", collection = %R::nsid()).entered();
 
             let data =
                 to_data(&record).map_err(|e| AgentError::sub_operation("serialize record", e))?;
@@ -688,6 +688,9 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
                 .record(data)
                 .maybe_rkey(rkey)
                 .build();
+
+            #[cfg(feature = "tracing")]
+            _span.exit();
 
             let response = self.send(request).await?;
             response.into_output().map_err(|e| match e {
@@ -753,6 +756,9 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
                     .with_help("ensure the URI includes a record key after the collection")
             })?;
 
+            #[cfg(feature = "tracing")]
+            _span.exit();
+
             // Resolve authority (DID or handle) to get DID and PDS
             use jacquard_common::types::ident::AtIdentifier;
             let (repo_did, pds_url) = match uri.authority() {
@@ -817,6 +823,9 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
                 .collection(collection.clone())
                 .rkey(rkey.clone())
                 .build();
+
+            #[cfg(feature = "tracing")]
+            _span.exit();
 
             let response: Response<GetRecordResponse> = {
                 use url::Url;
@@ -918,12 +927,12 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
         for<'a> CollectionError<'a, R>: Send + Sync + std::error::Error + IntoStatic,
     {
         async move {
+            // Fetch the record - Response<R::Record> where R::Record::Output<'de> = R<'de>
+            let response = self.get_record::<R>(uri).await?;
+
             #[cfg(feature = "tracing")]
             let _span = tracing::debug_span!("update_record", collection = %R::nsid(), uri = %uri)
                 .entered();
-
-            // Fetch the record - Response<R::Record> where R::Record::Output<'de> = R<'de>
-            let response = self.get_record::<R>(uri).await?;
 
             // Parse to get R<'_> borrowing from response buffer
             let record = response.parse().map_err(|e| match e {
@@ -952,6 +961,9 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
                 })?
                 .clone()
                 .into_static();
+
+            #[cfg(feature = "tracing")]
+            _span.exit();
             self.put_record::<R>(rkey, owned).await
         }
     }
@@ -968,22 +980,24 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
         R: Collection,
     {
         async {
+            let (did, _) = self
+                .session_info()
+                .await
+                .ok_or_else(AgentError::no_session)?;
             #[cfg(feature = "tracing")]
             let _span = tracing::debug_span!("delete_record", collection = %R::nsid()).entered();
 
             use jacquard_api::com_atproto::repo::delete_record::DeleteRecord;
             use jacquard_common::types::ident::AtIdentifier;
 
-            let (did, _) = self
-                .session_info()
-                .await
-                .ok_or_else(AgentError::no_session)?;
-
             let request = DeleteRecord::new()
                 .repo(AtIdentifier::Did(did))
                 .collection(R::nsid())
                 .rkey(rkey)
                 .build();
+
+            #[cfg(feature = "tracing")]
+            _span.exit();
 
             let response = self.send(request).await?;
             response.into_output().map_err(|e| match e {
@@ -1028,6 +1042,9 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
                 .rkey(rkey)
                 .record(data)
                 .build();
+
+            #[cfg(feature = "tracing")]
+            _span.exit();
 
             let response = self.send(request).await?;
             response.into_output().map_err(|e| match e {
@@ -1081,9 +1098,11 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
                 http::HeaderValue::from_str(mime_type.as_str())
                     .map_err(|e| AgentError::sub_operation("set Content-Type header", e))?,
             ));
+
+            #[cfg(feature = "tracing")]
+            _span.exit();
+
             let response = self.send_with_opts(request, opts).await?;
-            let debug: serde_json::Value = serde_json::from_slice(response.buffer()).unwrap();
-            println!("json: {}", serde_json::to_string_pretty(&debug).unwrap());
             let output = response.into_output().map_err(|e| match e {
                 XrpcError::Auth(auth) => AgentError::from(auth),
                 e @ (XrpcError::Generic(_) | XrpcError::Decode(_)) => AgentError::xrpc(e),
