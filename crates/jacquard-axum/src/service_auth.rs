@@ -242,6 +242,55 @@ impl<'a> VerifiedServiceAuth<'a> {
 /// ```
 pub struct ExtractServiceAuth(pub VerifiedServiceAuth<'static>);
 
+/// Axum extractor for optional service authentication.
+///
+/// Like `ExtractServiceAuth`, but returns `None` if no Authorization header
+/// is present. If a header IS present but invalid, returns an error.
+///
+/// Use this for endpoints that work for both authenticated and anonymous users,
+/// but show different content based on auth status.
+///
+/// # Example
+///
+/// ```no_run
+/// use axum::{Router, routing::get};
+/// use jacquard_axum::service_auth::{ServiceAuthConfig, ExtractOptionalServiceAuth};
+/// use jacquard_identity::JacquardResolver;
+/// use jacquard_identity::resolver::ResolverOptions;
+/// use jacquard_common::types::string::Did;
+///
+/// async fn handler(
+///     ExtractOptionalServiceAuth(auth): ExtractOptionalServiceAuth,
+/// ) -> String {
+///     match auth {
+///         Some(a) => format!("Authenticated as {}", a.did()),
+///         None => "Anonymous request".to_string(),
+///     }
+/// }
+///
+/// #[tokio::main]
+/// async fn main() {
+///     let resolver = JacquardResolver::new(
+///         reqwest::Client::new(),
+///         ResolverOptions::default(),
+///     );
+///     let config = ServiceAuthConfig::new(
+///         Did::new_static("did:web:example.com").unwrap(),
+///         resolver,
+///     );
+///
+///     let app = Router::new()
+///         .route("/xrpc/com.example.getData", get(handler))
+///         .with_state(config);
+///
+///     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000")
+///         .await
+///         .unwrap();
+///     axum::serve(listener, app).await.unwrap();
+/// }
+/// ```
+pub struct ExtractOptionalServiceAuth(pub Option<VerifiedServiceAuth<'static>>);
+
 /// Errors that can occur during service auth verification.
 #[derive(Debug, Error, miette::Diagnostic)]
 pub enum ServiceAuthError {
@@ -409,6 +458,88 @@ where
                 lxm: claims.lxm.as_ref().map(|l| l.clone().into_static()),
                 jti: claims.jti.as_ref().map(|j| j.clone().into_static()),
             }))
+        }
+    }
+}
+
+impl<S> FromRequestParts<S> for ExtractOptionalServiceAuth
+where
+    S: ServiceAuth + Send + Sync,
+    S::Resolver: Send + Sync,
+{
+    type Rejection = ServiceAuthError;
+
+    fn from_request_parts(
+        parts: &mut Parts,
+        state: &S,
+    ) -> impl std::future::Future<Output = Result<Self, Self::Rejection>> + Send {
+        async move {
+            // Check for Authorization header - if missing, return None (not an error)
+            let auth_header = match parts.headers.get(header::AUTHORIZATION) {
+                Some(h) => h,
+                None => return Ok(ExtractOptionalServiceAuth(None)),
+            };
+
+            // Header is present - now we MUST validate it (bad auth = error)
+            let auth_str = auth_header
+                .to_str()
+                .map_err(|_| ServiceAuthError::InvalidAuthHeader)?;
+
+            let token = auth_str
+                .strip_prefix("Bearer ")
+                .ok_or(ServiceAuthError::InvalidAuthHeader)?;
+
+            // Parse JWT
+            let parsed = service_auth::parse_jwt(token)?;
+
+            // Get claims for DID resolution
+            let claims = parsed.claims();
+
+            // Resolve DID to get signing key
+            let did_doc = state
+                .resolver()
+                .resolve_did_doc(&claims.iss)
+                .await
+                .map_err(|e| ServiceAuthError::DidResolutionFailed {
+                    did: claims.iss.clone().into_static(),
+                    source: Box::new(e),
+                })?;
+
+            // Parse the DID document response to get verification methods
+            let doc = did_doc
+                .parse()
+                .map_err(|e| ServiceAuthError::DidResolutionFailed {
+                    did: claims.iss.clone().into_static(),
+                    source: Box::new(e),
+                })?;
+
+            // Extract signing key from DID document
+            let verification_methods = doc
+                .verification_method
+                .as_deref()
+                .ok_or_else(|| ServiceAuthError::NoSigningKey(claims.iss.clone().into_static()))?;
+
+            let signing_key = extract_signing_key(verification_methods)
+                .ok_or_else(|| ServiceAuthError::NoSigningKey(claims.iss.clone().into_static()))?;
+
+            // Verify signature FIRST - if this fails, nothing else matters
+            service_auth::verify_signature(&parsed, &signing_key)?;
+
+            // Now validate claims (audience, expiration, etc.)
+            claims.validate(state.service_did())?;
+
+            // Check method binding if required
+            if state.require_lxm() && claims.lxm.is_none() {
+                return Err(ServiceAuthError::MethodBindingRequired);
+            }
+
+            // All checks passed - return verified auth
+            Ok(ExtractOptionalServiceAuth(Some(VerifiedServiceAuth {
+                did: claims.iss.clone().into_static(),
+                aud: claims.aud.clone().into_static(),
+                lxm: claims.lxm.as_ref().map(|l| l.clone().into_static()),
+                jti: claims.jti.as_ref().map(|j| j.clone().into_static()),
+            })))
         }
     }
 }
