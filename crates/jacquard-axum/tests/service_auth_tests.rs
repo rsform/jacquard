@@ -17,7 +17,7 @@ use jacquard_common::{
     service_auth::JwtHeader,
     types::{
         did::Did,
-        did_doc::{DidDocument, VerificationMethod},
+        did_doc::{DidDocument, VerificationMethod, default_context},
     },
 };
 use jacquard_identity::resolver::{
@@ -81,6 +81,7 @@ fn create_test_did_doc(did: &str, public_key: &k256::ecdsa::VerifyingKey) -> Did
     let multibase_key = multibase::encode(multibase::Base::Base58Btc, &multicodec_bytes);
 
     DidDocument {
+        context: default_context(),
         id: Did::new_owned(did).unwrap().into_static(),
         also_known_as: None,
         verification_method: Some(vec![VerificationMethod {

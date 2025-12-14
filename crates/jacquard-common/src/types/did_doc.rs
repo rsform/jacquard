@@ -43,20 +43,28 @@ use url::Url;
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
 pub struct DidDocument<'a> {
+    /// required prelude
+    #[serde(rename = "@context")]
+    #[serde(default = "default_context")]
+    pub context: Vec<CowStr<'a>>,
+
     /// Document identifier (e.g., `did:plc:...` or `did:web:...`)
     #[serde(borrow)]
     pub id: Did<'a>,
 
     /// Alternate identifiers for the subject, such as at://\<handle\>
     #[serde(borrow)]
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub also_known_as: Option<Vec<CowStr<'a>>>,
 
     /// Verification methods (keys) for this DID
     #[serde(borrow)]
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub verification_method: Option<Vec<VerificationMethod<'a>>>,
 
     /// Services associated with this DID (e.g., AtprotoPersonalDataServer)
     #[serde(borrow)]
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub service: Option<Vec<Service<'a>>>,
 
     /// Forward‑compatible capture of unmodeled fields
@@ -64,10 +72,20 @@ pub struct DidDocument<'a> {
     pub extra_data: BTreeMap<SmolStr, Data<'a>>,
 }
 
+/// Default context fields for DID documents
+pub fn default_context() -> Vec<CowStr<'static>> {
+    vec![
+        CowStr::new_static("https://www.w3.org/ns/did/v1"),
+        CowStr::new_static("https://w3id.org/security/multikey/v1"),
+        CowStr::new_static("https://w3id.org/security/suites/secp256k1-2019/v1"),
+    ]
+}
+
 impl crate::IntoStatic for DidDocument<'_> {
     type Output = DidDocument<'static>;
     fn into_static(self) -> Self::Output {
         DidDocument {
+            context: default_context(),
             id: self.id.into_static(),
             also_known_as: self.also_known_as.into_static(),
             verification_method: self.verification_method.into_static(),
@@ -156,9 +174,11 @@ pub struct VerificationMethod<'a> {
     pub r#type: CowStr<'a>,
     /// Optional controller DID
     #[serde(borrow)]
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub controller: Option<CowStr<'a>>,
     /// Multikey `publicKeyMultibase` (base58btc)
     #[serde(borrow)]
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub public_key_multibase: Option<CowStr<'a>>,
 
     /// Forward‑compatible capture of unmodeled fields
@@ -192,6 +212,7 @@ pub struct Service<'a> {
     pub r#type: CowStr<'a>,
     /// String or object; we preserve as Data
     #[serde(borrow)]
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub service_endpoint: Option<Data<'a>>,
 
     /// Forward‑compatible capture of unmodeled fields

@@ -14,7 +14,7 @@ use bytes::Bytes;
 use http::StatusCode;
 use jacquard_common::error::BoxError;
 use jacquard_common::types::did::Did;
-use jacquard_common::types::did_doc::{DidDocument, Service};
+use jacquard_common::types::did_doc::{DidDocument, Service, default_context};
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::{AtprotoStr, Handle};
 use jacquard_common::types::uri::Uri;
@@ -89,6 +89,7 @@ impl DidDocResponse {
                 Ok(doc)
             } else if let Ok(mini_doc) = serde_json::from_slice::<MiniDoc<'b>>(&self.buffer) {
                 Ok(DidDocument {
+                    context: default_context(),
                     id: mini_doc.did,
                     also_known_as: Some(vec![CowStr::from(mini_doc.handle)]),
                     verification_method: None,
@@ -133,6 +134,7 @@ impl DidDocResponse {
                 Ok(doc.into_static())
             } else if let Ok(mini_doc) = serde_json::from_slice::<MiniDoc<'_>>(&self.buffer) {
                 Ok(DidDocument {
+                    context: default_context(),
                     id: mini_doc.did,
                     also_known_as: Some(vec![CowStr::from(mini_doc.handle)]),
                     verification_method: None,
