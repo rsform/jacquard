@@ -513,8 +513,6 @@ where
                     source: Box::new(e),
                 })?;
 
-            tracing::warn!("Parsed DID document {did_doc}");
-
             // Extract signing key from DID document
             let verification_methods = doc
                 .verification_method
