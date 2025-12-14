@@ -572,10 +572,17 @@ fn extract_signing_key(methods: &[VerificationMethod]) -> Option<PublicKey> {
 
     match codec {
         // p256-pub (0x1200)
-        [0x80, 0x24] => PublicKey::from_p256_bytes(key_material).ok(),
+        [0x80, 0x24] => PublicKey::from_p256_bytes(key_material).inspect_err(|e| {
+            error!("Failed to parse p256 public key: {}", e);
+        }).ok(),
         // secp256k1-pub (0xe7)
-        [0xe7, 0x01] => PublicKey::from_k256_bytes(key_material).ok(),
-        _ => None,
+        [0xe7, 0x01] => PublicKey::from_k256_bytes(key_material).inspect_err(|e| {
+            error!("Failed to parse secp256k1 public key: {}", e);
+        }).ok(),
+        _ => {
+            error!("Unsupported public key multicodec: {:?}", codec);
+            None
+        },
     }
 }
 
