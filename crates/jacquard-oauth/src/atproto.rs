@@ -242,11 +242,7 @@ pub fn atproto_client_metadata<'m>(
         redirect_uris,
         application_type,
         token_endpoint_auth_method: Some(auth_method.into()),
-        grant_types: if keyset.is_some() {
-            Some(metadata.grant_types.into_iter().map(|v| v.into()).collect())
-        } else {
-            None
-        },
+        grant_types: Some(metadata.grant_types.into_iter().map(|v| v.into()).collect()),
         response_types: vec!["code".to_cowstr()],
         scope: Some(Scope::serialize_multiple(metadata.scopes.as_slice())),
         dpop_bound_access_tokens: Some(true),

@@ -311,11 +311,10 @@ impl RequestError {
     pub fn is_permanent(&self) -> bool {
         match &self.kind {
             RequestErrorKind::NoRefreshToken => true,
-            RequestErrorKind::HttpStatusWithBody { body, .. } => {
-                body.get("error")
-                    .and_then(|e| e.as_str())
-                    .is_some_and(|e| matches!(e, "invalid_grant" | "access_denied"))
-            }
+            RequestErrorKind::HttpStatusWithBody { body, .. } => body
+                .get("error")
+                .and_then(|e| e.as_str())
+                .is_some_and(|e| matches!(e, "invalid_grant" | "access_denied")),
             _ => false,
         }
     }

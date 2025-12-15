@@ -150,7 +150,7 @@ impl<'r, C: HttpClient, N: DpopDataSource> DpopCall<'r, C, N> {
 /// Extract authorization hash from request headers
 fn extract_ath(headers: &http::HeaderMap) -> Option<CowStr<'static>> {
     headers
-        .get("Authorization")
+        .get("authorization")
         .filter(|v| v.to_str().is_ok_and(|s| s.starts_with("DPoP ")))
         .map(|auth| {
             URL_SAFE_NO_PAD
@@ -212,9 +212,9 @@ where
 
     let next_nonce = response
         .headers()
-        .get("DPoP-Nonce")
+        .get("dpop-nonce")
         .and_then(|v| v.to_str().ok())
-        .map(|c| CowStr::from(c.to_string()));
+        .map(|c| CowStr::copy_from_str(c));
     match &next_nonce {
         Some(s) if next_nonce != init_nonce => {
             store_nonce(data_source, is_to_auth_server, s.clone());
@@ -380,7 +380,7 @@ fn is_use_dpop_nonce_error_streaming(
     }
     if !is_to_auth_server && status == 401 {
         if let Some(www_auth) = headers
-            .get("WWW-Authenticate")
+            .get("www-authenticate")
             .and_then(|v| v.to_str().ok())
         {
             return www_auth.starts_with("DPoP") && www_auth.contains(r#"error="use_dpop_nonce""#);
@@ -404,7 +404,7 @@ fn is_use_dpop_nonce_error(is_to_auth_server: bool, response: &Response<Vec<u8>>
     else if response.status() == 401 {
         if let Some(www_auth) = response
             .headers()
-            .get("WWW-Authenticate")
+            .get("www-authenticate")
             .and_then(|v| v.to_str().ok())
         {
             return www_auth.starts_with("DPoP") && www_auth.contains(r#"error="use_dpop_nonce""#);

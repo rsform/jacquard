@@ -298,7 +298,7 @@ where
     }
 
     pub async fn restore(&self, did: &Did<'_>, session_id: &str) -> Result<OAuthSession<T, S>> {
-        self.create_session(self.registry.get(did, session_id, false).await?)
+        self.create_session(self.registry.get(did, session_id, true).await?)
             .await
     }
 
