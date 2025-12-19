@@ -107,10 +107,7 @@ impl ClientAuthStore for BrowserAuthStore {
                         })?;
                     Ok(Some(data))
                 }
-                Err(gloo_storage::errors::StorageError::KeyNotFound(err)) => {
-                    tracing::debug!("gloo error: {}", err);
-                    Ok(None)
-                }
+                Err(gloo_storage::errors::StorageError::KeyNotFound(_)) => Ok(None),
                 Err(e) => Err(SessionStoreError::Other(
                     format!("SessionStorage error: {}", e).into(),
                 )),

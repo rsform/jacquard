@@ -517,11 +517,6 @@ pub async fn par<'r, T: OAuthResolver + DpopExt + Send + Sync + 'static>(
         prompt: prompt.map(CowStr::from),
     };
 
-    #[cfg(feature = "tracing")]
-    tracing::debug!(
-        parameters = ?parameters,
-        "par:"
-    );
     if metadata
         .server_metadata
         .pushed_authorization_request_endpoint

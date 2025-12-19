@@ -280,8 +280,6 @@ where
                     token_set,
                 };
 
-                dbg!(&client_data);
-
                 self.create_session(client_data).await
             }
             Err(e) => Err(e.into()),
