@@ -39,6 +39,7 @@ tracing = "0.1.41"
 [features]
 default = ["service-auth"]
 service-auth = ["jacquard-common/service-auth", "dep:jacquard-identity", "dep:multibase"]
+tracing = []
 
 [dev-dependencies]
 axum-macros = "0.5.0"
