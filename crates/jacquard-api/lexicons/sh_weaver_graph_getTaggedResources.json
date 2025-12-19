@@ -1,0 +1,87 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.graph.getTaggedResources",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get notebooks and entries tagged with a specific tag.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "tag"
+        ],
+        "properties": {
+          "cursor": {
+            "type": "string"
+          },
+          "includeAuthorTags": {
+            "type": "boolean",
+            "description": "Include resources where author applied this tag.",
+            "default": true
+          },
+          "includeCommunityTags": {
+            "type": "boolean",
+            "description": "Include resources where community applied this tag.",
+            "default": true
+          },
+          "limit": {
+            "type": "integer",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 100
+          },
+          "resourceType": {
+            "type": "string",
+            "default": "all",
+            "knownValues": [
+              "notebook",
+              "entry",
+              "all"
+            ]
+          },
+          "sort": {
+            "type": "string",
+            "default": "recent",
+            "knownValues": [
+              "recent",
+              "popular"
+            ]
+          },
+          "tag": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "resources"
+          ],
+          "properties": {
+            "cursor": {
+              "type": "string"
+            },
+            "resources": {
+              "type": "array",
+              "items": {
+                "type": "union",
+                "refs": [
+                  "sh.weaver.notebook.defs#notebookView",
+                  "sh.weaver.notebook.defs#entryView"
+                ]
+              }
+            },
+            "tag": {
+              "type": "ref",
+              "ref": "sh.weaver.graph.defs#tagView"
+            }
+          }
+        }
+      }
+    }
+  }
+}

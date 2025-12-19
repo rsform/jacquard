@@ -3,6 +3,25 @@ use jacquard_common::CowStr;
 use proc_macro2::TokenStream;
 use quote::quote;
 
+
+/// Rust keywords that need escaping with r# prefix in module paths
+const RUST_KEYWORDS: &[&str] = &[
+    "as", "break", "const", "continue", "crate", "else", "enum", "extern",
+    "false", "fn", "for", "if", "impl", "in", "let", "loop", "match", "mod",
+    "move", "mut", "pub", "ref", "return", "self", "static", "struct",
+    "super", "trait", "true", "type", "unsafe", "use", "where", "while",
+    // Reserved keywords
+    "abstract", "become", "box", "do", "final", "macro", "override", "priv",
+    "try", "typeof", "unsized", "virtual", "yield",
+    // 2018+ edition keywords
+    "async", "await", "dyn",
+];
+
+/// Check if a string is a Rust keyword
+#[inline]
+fn is_rust_keyword(s: &str) -> bool {
+    RUST_KEYWORDS.contains(&s)
+}
 /// Convert a value string to a valid Rust variant name
 pub(super) fn value_to_variant_name(value: &str) -> String {
     // Remove leading special chars and convert to pascal case
@@ -84,12 +103,24 @@ pub(super) fn namespace_prefix(first: &str, second: &str) -> String {
     format!("{}_{}", sanitize_name_cow(first), sanitize_name_cow(second))
 }
 
+/// Escape a Rust keyword with r# prefix for use in paths
+fn escape_keyword_for_path(s: &str) -> std::borrow::Cow<'_, str> {
+    // crate, self, super, and Self are valid in path contexts
+    if is_rust_keyword(s) && !matches!(s, "crate" | "self" | "super" | "Self") {
+        std::borrow::Cow::Owned(format!("r#{}", s))
+    } else {
+        std::borrow::Cow::Borrowed(s)
+    }
+}
+
 /// Join NSID segments into a module path (e.g., ["repo", "admin"] → "repo::admin")
 pub(super) fn join_module_path(segments: &[&str]) -> String {
-    let sanitized: Vec<_> = segments.iter().map(|s| sanitize_name_cow(s)).collect();
-    sanitized
+    segments
         .iter()
-        .map(|s| s.as_ref())
+        .map(|s| {
+            let sanitized = sanitize_name_cow(s);
+            escape_keyword_for_path(&sanitized).into_owned()
+        })
         .collect::<Vec<_>>()
         .join("::")
 }
@@ -98,7 +129,7 @@ pub(super) fn join_module_path(segments: &[&str]) -> String {
 pub(super) fn join_path_parts(parts: &[impl AsRef<str>]) -> String {
     parts
         .iter()
-        .map(|p| p.as_ref())
+        .map(|p| escape_keyword_for_path(p.as_ref()).into_owned())
         .collect::<Vec<_>>()
         .join("::")
 }

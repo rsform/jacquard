@@ -185,67 +185,67 @@ pub mod metadata_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ConvosStarted;
-        type MessagesSent;
         type MessagesReceived;
+        type ConvosStarted;
         type Convos;
+        type MessagesSent;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ConvosStarted = Unset;
-        type MessagesSent = Unset;
         type MessagesReceived = Unset;
+        type ConvosStarted = Unset;
         type Convos = Unset;
-    }
-    ///State transition - sets the `convos_started` field to Set
-    pub struct SetConvosStarted<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetConvosStarted<S> {}
-    impl<S: State> State for SetConvosStarted<S> {
-        type ConvosStarted = Set<members::convos_started>;
-        type MessagesSent = S::MessagesSent;
-        type MessagesReceived = S::MessagesReceived;
-        type Convos = S::Convos;
-    }
-    ///State transition - sets the `messages_sent` field to Set
-    pub struct SetMessagesSent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMessagesSent<S> {}
-    impl<S: State> State for SetMessagesSent<S> {
-        type ConvosStarted = S::ConvosStarted;
-        type MessagesSent = Set<members::messages_sent>;
-        type MessagesReceived = S::MessagesReceived;
-        type Convos = S::Convos;
+        type MessagesSent = Unset;
     }
     ///State transition - sets the `messages_received` field to Set
     pub struct SetMessagesReceived<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMessagesReceived<S> {}
     impl<S: State> State for SetMessagesReceived<S> {
-        type ConvosStarted = S::ConvosStarted;
-        type MessagesSent = S::MessagesSent;
         type MessagesReceived = Set<members::messages_received>;
+        type ConvosStarted = S::ConvosStarted;
         type Convos = S::Convos;
+        type MessagesSent = S::MessagesSent;
+    }
+    ///State transition - sets the `convos_started` field to Set
+    pub struct SetConvosStarted<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetConvosStarted<S> {}
+    impl<S: State> State for SetConvosStarted<S> {
+        type MessagesReceived = S::MessagesReceived;
+        type ConvosStarted = Set<members::convos_started>;
+        type Convos = S::Convos;
+        type MessagesSent = S::MessagesSent;
     }
     ///State transition - sets the `convos` field to Set
     pub struct SetConvos<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetConvos<S> {}
     impl<S: State> State for SetConvos<S> {
-        type ConvosStarted = S::ConvosStarted;
-        type MessagesSent = S::MessagesSent;
         type MessagesReceived = S::MessagesReceived;
+        type ConvosStarted = S::ConvosStarted;
         type Convos = Set<members::convos>;
+        type MessagesSent = S::MessagesSent;
+    }
+    ///State transition - sets the `messages_sent` field to Set
+    pub struct SetMessagesSent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMessagesSent<S> {}
+    impl<S: State> State for SetMessagesSent<S> {
+        type MessagesReceived = S::MessagesReceived;
+        type ConvosStarted = S::ConvosStarted;
+        type Convos = S::Convos;
+        type MessagesSent = Set<members::messages_sent>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `convos_started` field
-        pub struct convos_started(());
-        ///Marker type for the `messages_sent` field
-        pub struct messages_sent(());
         ///Marker type for the `messages_received` field
         pub struct messages_received(());
+        ///Marker type for the `convos_started` field
+        pub struct convos_started(());
         ///Marker type for the `convos` field
         pub struct convos(());
+        ///Marker type for the `messages_sent` field
+        pub struct messages_sent(());
     }
 }
 
@@ -358,10 +358,10 @@ where
 impl<'a, S> MetadataBuilder<'a, S>
 where
     S: metadata_state::State,
-    S::ConvosStarted: metadata_state::IsSet,
-    S::MessagesSent: metadata_state::IsSet,
     S::MessagesReceived: metadata_state::IsSet,
+    S::ConvosStarted: metadata_state::IsSet,
     S::Convos: metadata_state::IsSet,
+    S::MessagesSent: metadata_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Metadata<'a> {

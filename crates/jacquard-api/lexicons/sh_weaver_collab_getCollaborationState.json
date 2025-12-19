@@ -1,0 +1,29 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.collab.getCollaborationState",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get full collaboration state for a resource, including all participants and published versions.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "resource"
+        ],
+        "properties": {
+          "resource": {
+            "type": "string",
+            "format": "at-uri"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "ref",
+          "ref": "sh.weaver.collab.defs#collaborationStateView"
+        }
+      }
+    }
+  }
+}

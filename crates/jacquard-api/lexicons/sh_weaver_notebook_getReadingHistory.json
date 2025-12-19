@@ -1,0 +1,79 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.notebook.getReadingHistory",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get the authenticated user's reading history.",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "cursor": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 100
+          },
+          "status": {
+            "type": "string",
+            "description": "Filter by reading status.",
+            "default": "all",
+            "knownValues": [
+              "reading",
+              "finished",
+              "abandoned",
+              "want-to-read",
+              "all"
+            ]
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "history"
+          ],
+          "properties": {
+            "cursor": {
+              "type": "string"
+            },
+            "history": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "#readingHistoryItem"
+              }
+            }
+          }
+        }
+      }
+    },
+    "readingHistoryItem": {
+      "type": "object",
+      "required": [
+        "notebook",
+        "progress"
+      ],
+      "properties": {
+        "currentEntry": {
+          "type": "ref",
+          "description": "The entry the user was last reading.",
+          "ref": "sh.weaver.notebook.defs#entryView"
+        },
+        "notebook": {
+          "type": "ref",
+          "ref": "sh.weaver.notebook.defs#notebookView"
+        },
+        "progress": {
+          "type": "ref",
+          "ref": "sh.weaver.notebook.defs#readingProgress"
+        }
+      }
+    }
+  }
+}

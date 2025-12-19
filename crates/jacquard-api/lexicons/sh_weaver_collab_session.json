@@ -1,0 +1,44 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.collab.session",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Active real-time collaboration session. Published when joining a collaborative editing session, deleted on disconnect.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "resource",
+          "nodeId",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "expiresAt": {
+            "type": "string",
+            "description": "Session TTL. Should be refreshed periodically while active.",
+            "format": "datetime"
+          },
+          "nodeId": {
+            "type": "string",
+            "description": "iroh NodeId in z-base32 encoding for P2P connection."
+          },
+          "relayUrl": {
+            "type": "string",
+            "description": "DERP relay URL if using relay-only mode (browser clients).",
+            "format": "uri"
+          },
+          "resource": {
+            "type": "ref",
+            "description": "The resource being collaboratively edited.",
+            "ref": "com.atproto.repo.strongRef"
+          }
+        }
+      }
+    }
+  }
+}

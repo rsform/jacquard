@@ -151,7 +151,7 @@ pub struct ResolveLexiconOutput<'a> {
 pub enum ResolveLexiconError<'a> {
     /// No lexicon was resolved for the NSID.
     #[serde(rename = "LexiconNotFound")]
-    LexiconNotFound(std::option::Option<String>),
+    LexiconNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl std::fmt::Display for ResolveLexiconError<'_> {

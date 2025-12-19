@@ -59,10 +59,10 @@ pub struct RemoveReactionOutput<'a> {
 pub enum RemoveReactionError<'a> {
     /// Indicates that the message has been deleted and reactions can no longer be added/removed.
     #[serde(rename = "ReactionMessageDeleted")]
-    ReactionMessageDeleted(std::option::Option<String>),
+    ReactionMessageDeleted(std::option::Option<jacquard_common::CowStr<'a>>),
     /// Indicates the value for the reaction is not acceptable. In general, this means it is not an emoji.
     #[serde(rename = "ReactionInvalidValue")]
-    ReactionInvalidValue(std::option::Option<String>),
+    ReactionInvalidValue(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl std::fmt::Display for RemoveReactionError<'_> {

@@ -1,76 +1,19 @@
 {
   "lexicon": 1,
   "id": "blog.pckt.publication",
-  "description": "A publication (blog) record representing a collection of documents. Contains metadata, branding, theme configuration, and optional extensions. Publications serve as the parent container for blog documents.",
   "defs": {
     "main": {
       "type": "record",
-      "description": "Record declaring a publication",
       "key": "tid",
       "record": {
         "type": "object",
         "required": [
-          "name",
-          "createdAt"
+          "publication"
         ],
         "properties": {
-          "basePath": {
-            "type": "string",
-            "description": "Base URL path for the publication (e.g., https://blog.pckt.blog)",
-            "format": "uri",
-            "maxLength": 2000
-          },
-          "createdAt": {
-            "type": "string",
-            "description": "Timestamp when the publication was first created",
-            "format": "datetime"
-          },
-          "description": {
-            "type": "string",
-            "description": "Publication description or tagline",
-            "maxLength": 2000,
-            "maxGraphemes": 500
-          },
-          "extensions": {
-            "type": "array",
-            "description": "Extension objects (open union) for additional features",
-            "items": {
-              "type": "union",
-              "description": "Open union of extension objects identified by $type (NSID).",
-              "refs": [],
-              "closed": false
-            },
-            "maxLength": 10
-          },
-          "icon": {
-            "type": "blob",
-            "description": "Publication icon/avatar image",
-            "accept": [
-              "image/png",
-              "image/jpeg",
-              "image/webp",
-              "image/gif"
-            ],
-            "maxSize": 500000
-          },
-          "name": {
-            "type": "string",
-            "description": "Publication name/title",
-            "maxLength": 200,
-            "maxGraphemes": 100
-          },
-          "theme": {
-            "type": "union",
-            "description": "Theme configuration as an open union; accepts blog.pckt.theme and future types.",
-            "refs": [
-              "blog.pckt.theme"
-            ],
-            "closed": false
-          },
-          "updatedAt": {
-            "type": "string",
-            "description": "Timestamp when the publication was last updated (optional)",
-            "format": "datetime"
+          "publication": {
+            "type": "ref",
+            "ref": "site.standard.publication"
           }
         }
       }

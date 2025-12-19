@@ -144,7 +144,7 @@ pub struct DereferenceScopeOutput<'a> {
 pub enum DereferenceScopeError<'a> {
     /// An invalid scope reference was provided.
     #[serde(rename = "InvalidScopeReference")]
-    InvalidScopeReference(std::option::Option<String>),
+    InvalidScopeReference(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl std::fmt::Display for DereferenceScopeError<'_> {

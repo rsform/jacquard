@@ -168,7 +168,7 @@ pub struct GetRecordOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetRecordError<'a> {
     #[serde(rename = "RecordNotFound")]
-    RecordNotFound(std::option::Option<String>),
+    RecordNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl std::fmt::Display for GetRecordError<'_> {

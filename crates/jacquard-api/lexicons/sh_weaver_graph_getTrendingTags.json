@@ -1,0 +1,39 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.graph.getTrendingTags",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get trending tags based on recent usage.",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 100
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "tags"
+          ],
+          "properties": {
+            "tags": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "sh.weaver.graph.defs#tagView"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

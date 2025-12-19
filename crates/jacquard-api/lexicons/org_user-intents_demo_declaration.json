@@ -1,0 +1,58 @@
+{
+  "lexicon": 1,
+  "id": "org.user-intents.demo.declaration",
+  "defs": {
+    "intent": {
+      "type": "object",
+      "required": [
+        "updatedAt"
+      ],
+      "properties": {
+        "allow": {
+          "type": "boolean",
+          "description": "indicates user intent for reuse. Note that this field is optional, and thus tri-state (true, false, undefined)"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "",
+          "format": "datetime"
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "TODO",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "properties": {
+          "bulkDataset": {
+            "type": "ref",
+            "description": "Inclusion of account data in bulk 'snapshot' datasets which are publicly redistributed, even if only for a fixed time period",
+            "ref": "#intent"
+          },
+          "protocolBridging": {
+            "type": "ref",
+            "description": "Bridging account data or interactions into distinct social web protocol ecosystems",
+            "ref": "#intent"
+          },
+          "publicAccessArchive": {
+            "type": "ref",
+            "description": "Public access to or replay of account data as part of archiving and preservation efforts",
+            "ref": "#intent"
+          },
+          "syntheticContentGeneration": {
+            "type": "ref",
+            "description": "Use of account data as input to machine learning models which could be used to generate synthetic content or interactions",
+            "ref": "#intent"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

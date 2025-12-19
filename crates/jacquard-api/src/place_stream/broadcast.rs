@@ -41,65 +41,65 @@ pub mod broadcast_origin_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Cid;
         type Record;
         type Author;
-        type Cid;
         type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Cid = Unset;
         type Record = Unset;
         type Author = Unset;
-        type Cid = Unset;
         type Uri = Unset;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Cid = Set<members::cid>;
+        type Record = S::Record;
+        type Author = S::Author;
+        type Uri = S::Uri;
     }
     ///State transition - sets the `record` field to Set
     pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRecord<S> {}
     impl<S: State> State for SetRecord<S> {
+        type Cid = S::Cid;
         type Record = Set<members::record>;
         type Author = S::Author;
-        type Cid = S::Cid;
         type Uri = S::Uri;
     }
     ///State transition - sets the `author` field to Set
     pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthor<S> {}
     impl<S: State> State for SetAuthor<S> {
+        type Cid = S::Cid;
         type Record = S::Record;
         type Author = Set<members::author>;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Record = S::Record;
-        type Author = S::Author;
-        type Cid = Set<members::cid>;
         type Uri = S::Uri;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
+        type Cid = S::Cid;
         type Record = S::Record;
         type Author = S::Author;
-        type Cid = S::Cid;
         type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `cid` field
+        pub struct cid(());
         ///Marker type for the `record` field
         pub struct record(());
         ///Marker type for the `author` field
         pub struct author(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `uri` field
         pub struct uri(());
     }
@@ -214,9 +214,9 @@ where
 impl<'a, S> BroadcastOriginViewBuilder<'a, S>
 where
     S: broadcast_origin_view_state::State,
+    S::Cid: broadcast_origin_view_state::IsSet,
     S::Record: broadcast_origin_view_state::IsSet,
     S::Author: broadcast_origin_view_state::IsSet,
-    S::Cid: broadcast_origin_view_state::IsSet,
     S::Uri: broadcast_origin_view_state::IsSet,
 {
     /// Build the final struct

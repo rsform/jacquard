@@ -20,9 +20,23 @@
             "type": "string",
             "format": "datetime"
           },
+          "mentions": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "did"
+            }
+          },
           "pull": {
             "type": "string",
             "format": "at-uri"
+          },
+          "references": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "at-uri"
+            }
           }
         }
       }

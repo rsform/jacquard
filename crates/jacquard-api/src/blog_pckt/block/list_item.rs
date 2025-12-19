@@ -17,7 +17,7 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListItem<'a> {
-    /// Array of block content (paragraphs or nested lists)
+    /// Array of block content (text or nested lists)
     #[serde(borrow)]
     pub content: Vec<ListItemContentItem<'a>>,
 }
@@ -138,8 +138,8 @@ where
 #[serde(tag = "$type")]
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ListItemContentItem<'a> {
-    #[serde(rename = "blog.pckt.block.paragraph")]
-    Paragraph(Box<crate::blog_pckt::block::paragraph::Paragraph<'a>>),
+    #[serde(rename = "blog.pckt.block.text")]
+    Text(Box<crate::blog_pckt::block::text::Text<'a>>),
     #[serde(rename = "blog.pckt.block.bulletList")]
     BulletList(Box<crate::blog_pckt::block::bullet_list::BulletList<'a>>),
     #[serde(rename = "blog.pckt.block.orderedList")]
@@ -172,13 +172,13 @@ fn lexicon_doc_blog_pckt_block_listItem() -> ::jacquard_lexicon::lexicon::Lexico
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
-                                        "Array of block content (paragraphs or nested lists)",
+                                        "Array of block content (text or nested lists)",
                                     ),
                                 ),
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("blog.pckt.block.paragraph"),
+                                        ::jacquard_common::CowStr::new_static("blog.pckt.block.text"),
                                         ::jacquard_common::CowStr::new_static("blog.pckt.block.bulletList"),
                                         ::jacquard_common::CowStr::new_static("blog.pckt.block.orderedList")
                                     ],

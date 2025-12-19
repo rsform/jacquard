@@ -32,37 +32,37 @@ pub mod get_blob_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
         type Did;
+        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Cid = Set<members::cid>;
-        type Did = S::Did;
+        type Cid = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Cid = S::Cid;
         type Did = Set<members::did>;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Did = S::Did;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
     }
 }
 
@@ -135,8 +135,8 @@ where
 impl<'a, S> GetBlobBuilder<'a, S>
 where
     S: get_blob_state::State,
-    S::Cid: get_blob_state::IsSet,
     S::Did: get_blob_state::IsSet,
+    S::Cid: get_blob_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GetBlob<'a> {
@@ -177,15 +177,15 @@ pub struct GetBlobOutput {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetBlobError<'a> {
     #[serde(rename = "BlobNotFound")]
-    BlobNotFound(std::option::Option<String>),
+    BlobNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(std::option::Option<String>),
+    RepoNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "RepoTakendown")]
-    RepoTakendown(std::option::Option<String>),
+    RepoTakendown(std::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "RepoSuspended")]
-    RepoSuspended(std::option::Option<String>),
+    RepoSuspended(std::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "RepoDeactivated")]
-    RepoDeactivated(std::option::Option<String>),
+    RepoDeactivated(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl std::fmt::Display for GetBlobError<'_> {

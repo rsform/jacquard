@@ -17,12 +17,11 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TaskItem<'a> {
-    /// Task item attributes
+    /// Whether the task is completed
+    pub checked: bool,
+    /// Array of text blocks
     #[serde(borrow)]
-    pub attrs: crate::blog_pckt::block::task_item::TaskItemAttrs<'a>,
-    /// Array of paragraph content
-    #[serde(borrow)]
-    pub content: Vec<crate::blog_pckt::block::paragraph::Paragraph<'a>>,
+    pub content: Vec<crate::blog_pckt::block::text::Text<'a>>,
 }
 
 pub mod task_item_state {
@@ -35,37 +34,37 @@ pub mod task_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Attrs;
         type Content;
+        type Checked;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Attrs = Unset;
         type Content = Unset;
-    }
-    ///State transition - sets the `attrs` field to Set
-    pub struct SetAttrs<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAttrs<S> {}
-    impl<S: State> State for SetAttrs<S> {
-        type Attrs = Set<members::attrs>;
-        type Content = S::Content;
+        type Checked = Unset;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContent<S> {}
     impl<S: State> State for SetContent<S> {
-        type Attrs = S::Attrs;
         type Content = Set<members::content>;
+        type Checked = S::Checked;
+    }
+    ///State transition - sets the `checked` field to Set
+    pub struct SetChecked<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetChecked<S> {}
+    impl<S: State> State for SetChecked<S> {
+        type Content = S::Content;
+        type Checked = Set<members::checked>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `attrs` field
-        pub struct attrs(());
         ///Marker type for the `content` field
         pub struct content(());
+        ///Marker type for the `checked` field
+        pub struct checked(());
     }
 }
 
@@ -73,8 +72,8 @@ pub mod task_item_state {
 pub struct TaskItemBuilder<'a, S: task_item_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<crate::blog_pckt::block::task_item::TaskItemAttrs<'a>>,
-        ::core::option::Option<Vec<crate::blog_pckt::block::paragraph::Paragraph<'a>>>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<Vec<crate::blog_pckt::block::text::Text<'a>>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -100,13 +99,13 @@ impl<'a> TaskItemBuilder<'a, task_item_state::Empty> {
 impl<'a, S> TaskItemBuilder<'a, S>
 where
     S: task_item_state::State,
-    S::Attrs: task_item_state::IsUnset,
+    S::Checked: task_item_state::IsUnset,
 {
-    /// Set the `attrs` field (required)
-    pub fn attrs(
+    /// Set the `checked` field (required)
+    pub fn checked(
         mut self,
-        value: impl Into<crate::blog_pckt::block::task_item::TaskItemAttrs<'a>>,
-    ) -> TaskItemBuilder<'a, task_item_state::SetAttrs<S>> {
+        value: impl Into<bool>,
+    ) -> TaskItemBuilder<'a, task_item_state::SetChecked<S>> {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
         TaskItemBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -124,7 +123,7 @@ where
     /// Set the `content` field (required)
     pub fn content(
         mut self,
-        value: impl Into<Vec<crate::blog_pckt::block::paragraph::Paragraph<'a>>>,
+        value: impl Into<Vec<crate::blog_pckt::block::text::Text<'a>>>,
     ) -> TaskItemBuilder<'a, task_item_state::SetContent<S>> {
         self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
         TaskItemBuilder {
@@ -138,13 +137,13 @@ where
 impl<'a, S> TaskItemBuilder<'a, S>
 where
     S: task_item_state::State,
-    S::Attrs: task_item_state::IsSet,
     S::Content: task_item_state::IsSet,
+    S::Checked: task_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TaskItem<'a> {
         TaskItem {
-            attrs: self.__unsafe_private_named.0.unwrap(),
+            checked: self.__unsafe_private_named.0.unwrap(),
             content: self.__unsafe_private_named.1.unwrap(),
             extra_data: Default::default(),
         }
@@ -158,7 +157,7 @@ where
         >,
     ) -> TaskItem<'a> {
         TaskItem {
-            attrs: self.__unsafe_private_named.0.unwrap(),
+            checked: self.__unsafe_private_named.0.unwrap(),
             content: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
@@ -181,54 +180,9 @@ fn lexicon_doc_blog_pckt_block_taskItem() -> ::jacquard_lexicon::lexicon::Lexico
                     description: None,
                     required: Some(
                         vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("attrs"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("checked"),
                             ::jacquard_common::smol_str::SmolStr::new_static("content")
                         ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("attrs"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "#taskItemAttrs",
-                                ),
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("content"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Array of paragraph content",
-                                    ),
-                                ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
-                                    refs: vec![
-                                        ::jacquard_common::CowStr::new_static("blog.pckt.block.paragraph")
-                                    ],
-                                    closed: Some(false),
-                                }),
-                                min_length: None,
-                                max_length: None,
-                            }),
-                        );
-                        map
-                    },
-                }),
-            );
-            map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("taskItemAttrs"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static("Task item attributes"),
-                    ),
-                    required: Some(
-                        vec![::jacquard_common::smol_str::SmolStr::new_static("checked")],
                     ),
                     nullable: None,
                     properties: {
@@ -240,6 +194,25 @@ fn lexicon_doc_blog_pckt_block_taskItem() -> ::jacquard_lexicon::lexicon::Lexico
                                 description: None,
                                 default: None,
                                 r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("content"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Array of text blocks",
+                                    ),
+                                ),
+                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                    description: None,
+                                    refs: vec![
+                                        ::jacquard_common::CowStr::new_static("blog.pckt.block.text")
+                                    ],
+                                    closed: Some(false),
+                                }),
+                                min_length: None,
+                                max_length: None,
                             }),
                         );
                         map
@@ -257,143 +230,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TaskItem<'a> {
     }
     fn def_name() -> &'static str {
         "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_blog_pckt_block_taskItem()
-    }
-    fn validate(
-        &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Task item attributes
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct TaskItemAttrs<'a> {
-    /// Whether the task is checked or unchecked
-    pub checked: bool,
-}
-
-pub mod task_item_attrs_state {
-
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
-    #[allow(unused)]
-    use ::core::marker::PhantomData;
-    mod sealed {
-        pub trait Sealed {}
-    }
-    /// State trait tracking which required fields have been set
-    pub trait State: sealed::Sealed {
-        type Checked;
-    }
-    /// Empty state - all required fields are unset
-    pub struct Empty(());
-    impl sealed::Sealed for Empty {}
-    impl State for Empty {
-        type Checked = Unset;
-    }
-    ///State transition - sets the `checked` field to Set
-    pub struct SetChecked<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetChecked<S> {}
-    impl<S: State> State for SetChecked<S> {
-        type Checked = Set<members::checked>;
-    }
-    /// Marker types for field names
-    #[allow(non_camel_case_types)]
-    pub mod members {
-        ///Marker type for the `checked` field
-        pub struct checked(());
-    }
-}
-
-/// Builder for constructing an instance of this type
-pub struct TaskItemAttrsBuilder<'a, S: task_item_attrs_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<bool>,),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
-}
-
-impl<'a> TaskItemAttrs<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> TaskItemAttrsBuilder<'a, task_item_attrs_state::Empty> {
-        TaskItemAttrsBuilder::new()
-    }
-}
-
-impl<'a> TaskItemAttrsBuilder<'a, task_item_attrs_state::Empty> {
-    /// Create a new builder with all fields unset
-    pub fn new() -> Self {
-        TaskItemAttrsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> TaskItemAttrsBuilder<'a, S>
-where
-    S: task_item_attrs_state::State,
-    S::Checked: task_item_attrs_state::IsUnset,
-{
-    /// Set the `checked` field (required)
-    pub fn checked(
-        mut self,
-        value: impl Into<bool>,
-    ) -> TaskItemAttrsBuilder<'a, task_item_attrs_state::SetChecked<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
-        TaskItemAttrsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> TaskItemAttrsBuilder<'a, S>
-where
-    S: task_item_attrs_state::State,
-    S::Checked: task_item_attrs_state::IsSet,
-{
-    /// Build the final struct
-    pub fn build(self) -> TaskItemAttrs<'a> {
-        TaskItemAttrs {
-            checked: self.__unsafe_private_named.0.unwrap(),
-            extra_data: Default::default(),
-        }
-    }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> TaskItemAttrs<'a> {
-        TaskItemAttrs {
-            checked: self.__unsafe_private_named.0.unwrap(),
-            extra_data: Some(extra_data),
-        }
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TaskItemAttrs<'a> {
-    fn nsid() -> &'static str {
-        "blog.pckt.block.taskItem"
-    }
-    fn def_name() -> &'static str {
-        "taskItemAttrs"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blog_pckt_block_taskItem()

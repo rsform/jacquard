@@ -5,7 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-/// Heading attributes
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,115 +13,21 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
-pub struct HeadingAttrs<'a> {
+pub struct Heading<'a> {
+    /// Facets for text formatting and features
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub facets: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
     /// Heading level from 1 (most important) to 6 (least important)
-    pub level: i64,
-}
-
-pub mod heading_attrs_state {
-
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
-    #[allow(unused)]
-    use ::core::marker::PhantomData;
-    mod sealed {
-        pub trait Sealed {}
-    }
-    /// State trait tracking which required fields have been set
-    pub trait State: sealed::Sealed {
-        type Level;
-    }
-    /// Empty state - all required fields are unset
-    pub struct Empty(());
-    impl sealed::Sealed for Empty {}
-    impl State for Empty {
-        type Level = Unset;
-    }
-    ///State transition - sets the `level` field to Set
-    pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLevel<S> {}
-    impl<S: State> State for SetLevel<S> {
-        type Level = Set<members::level>;
-    }
-    /// Marker types for field names
-    #[allow(non_camel_case_types)]
-    pub mod members {
-        ///Marker type for the `level` field
-        pub struct level(());
-    }
-}
-
-/// Builder for constructing an instance of this type
-pub struct HeadingAttrsBuilder<'a, S: heading_attrs_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<i64>,),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
-}
-
-impl<'a> HeadingAttrs<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> HeadingAttrsBuilder<'a, heading_attrs_state::Empty> {
-        HeadingAttrsBuilder::new()
-    }
-}
-
-impl<'a> HeadingAttrsBuilder<'a, heading_attrs_state::Empty> {
-    /// Create a new builder with all fields unset
-    pub fn new() -> Self {
-        HeadingAttrsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> HeadingAttrsBuilder<'a, S>
-where
-    S: heading_attrs_state::State,
-    S::Level: heading_attrs_state::IsUnset,
-{
-    /// Set the `level` field (required)
-    pub fn level(
-        mut self,
-        value: impl Into<i64>,
-    ) -> HeadingAttrsBuilder<'a, heading_attrs_state::SetLevel<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
-        HeadingAttrsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> HeadingAttrsBuilder<'a, S>
-where
-    S: heading_attrs_state::State,
-    S::Level: heading_attrs_state::IsSet,
-{
-    /// Build the final struct
-    pub fn build(self) -> HeadingAttrs<'a> {
-        HeadingAttrs {
-            level: self.__unsafe_private_named.0.unwrap(),
-            extra_data: Default::default(),
-        }
-    }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> HeadingAttrs<'a> {
-        HeadingAttrs {
-            level: self.__unsafe_private_named.0.unwrap(),
-            extra_data: Some(extra_data),
-        }
-    }
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub level: std::option::Option<i64>,
+    /// The plain text content of the heading
+    #[serde(borrow)]
+    pub plaintext: jacquard_common::CowStr<'a>,
 }
 
 fn lexicon_doc_blog_pckt_block_heading() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -136,18 +41,36 @@ fn lexicon_doc_blog_pckt_block_heading() -> ::jacquard_lexicon::lexicon::Lexicon
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("headingAttrs"),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static("Heading attributes"),
-                    ),
+                    description: None,
                     required: Some(
-                        vec![::jacquard_common::smol_str::SmolStr::new_static("level")],
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("plaintext")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("facets"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Facets for text formatting and features",
+                                    ),
+                                ),
+                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "blog.pckt.richtext.facet",
+                                    ),
+                                }),
+                                min_length: None,
+                                max_length: None,
+                            }),
+                        );
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("level"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -159,48 +82,25 @@ fn lexicon_doc_blog_pckt_block_heading() -> ::jacquard_lexicon::lexicon::Lexicon
                                 r#const: None,
                             }),
                         );
-                        map
-                    },
-                }),
-            );
-            map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![::jacquard_common::smol_str::SmolStr::new_static("attrs")],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("attrs"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "#headingAttrs",
-                                ),
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("content"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "plaintext",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
-                                        "Inline content of the heading (text with optional formatting)",
+                                        "The plain text content of the heading",
                                     ),
                                 ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
-                                    refs: vec![
-                                        ::jacquard_common::CowStr::new_static("blog.pckt.block.text"),
-                                        ::jacquard_common::CowStr::new_static("blog.pckt.block.hardBreak")
-                                    ],
-                                    closed: Some(false),
-                                }),
+                                format: None,
+                                default: None,
                                 min_length: None,
                                 max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
                             }),
                         );
                         map
@@ -210,209 +110,6 @@ fn lexicon_doc_blog_pckt_block_heading() -> ::jacquard_lexicon::lexicon::Lexicon
             map
         },
     }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HeadingAttrs<'a> {
-    fn nsid() -> &'static str {
-        "blog.pckt.block.heading"
-    }
-    fn def_name() -> &'static str {
-        "headingAttrs"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_blog_pckt_block_heading()
-    }
-    fn validate(
-        &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.level;
-            if *value > 6i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "level",
-                    ),
-                    max: 6i64,
-                    actual: *value,
-                });
-            }
-        }
-        {
-            let value = &self.level;
-            if *value < 1i64 {
-                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "level",
-                    ),
-                    min: 1i64,
-                    actual: *value,
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct Heading<'a> {
-    /// Heading attributes
-    #[serde(borrow)]
-    pub attrs: crate::blog_pckt::block::heading::HeadingAttrs<'a>,
-    /// Inline content of the heading (text with optional formatting)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub content: std::option::Option<Vec<HeadingContentItem<'a>>>,
-}
-
-pub mod heading_state {
-
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
-    #[allow(unused)]
-    use ::core::marker::PhantomData;
-    mod sealed {
-        pub trait Sealed {}
-    }
-    /// State trait tracking which required fields have been set
-    pub trait State: sealed::Sealed {
-        type Attrs;
-    }
-    /// Empty state - all required fields are unset
-    pub struct Empty(());
-    impl sealed::Sealed for Empty {}
-    impl State for Empty {
-        type Attrs = Unset;
-    }
-    ///State transition - sets the `attrs` field to Set
-    pub struct SetAttrs<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAttrs<S> {}
-    impl<S: State> State for SetAttrs<S> {
-        type Attrs = Set<members::attrs>;
-    }
-    /// Marker types for field names
-    #[allow(non_camel_case_types)]
-    pub mod members {
-        ///Marker type for the `attrs` field
-        pub struct attrs(());
-    }
-}
-
-/// Builder for constructing an instance of this type
-pub struct HeadingBuilder<'a, S: heading_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<crate::blog_pckt::block::heading::HeadingAttrs<'a>>,
-        ::core::option::Option<Vec<HeadingContentItem<'a>>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
-}
-
-impl<'a> Heading<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> HeadingBuilder<'a, heading_state::Empty> {
-        HeadingBuilder::new()
-    }
-}
-
-impl<'a> HeadingBuilder<'a, heading_state::Empty> {
-    /// Create a new builder with all fields unset
-    pub fn new() -> Self {
-        HeadingBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> HeadingBuilder<'a, S>
-where
-    S: heading_state::State,
-    S::Attrs: heading_state::IsUnset,
-{
-    /// Set the `attrs` field (required)
-    pub fn attrs(
-        mut self,
-        value: impl Into<crate::blog_pckt::block::heading::HeadingAttrs<'a>>,
-    ) -> HeadingBuilder<'a, heading_state::SetAttrs<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
-        HeadingBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S: heading_state::State> HeadingBuilder<'a, S> {
-    /// Set the `content` field (optional)
-    pub fn content(
-        mut self,
-        value: impl Into<Option<Vec<HeadingContentItem<'a>>>>,
-    ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
-        self
-    }
-    /// Set the `content` field to an Option value (optional)
-    pub fn maybe_content(mut self, value: Option<Vec<HeadingContentItem<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value;
-        self
-    }
-}
-
-impl<'a, S> HeadingBuilder<'a, S>
-where
-    S: heading_state::State,
-    S::Attrs: heading_state::IsSet,
-{
-    /// Build the final struct
-    pub fn build(self) -> Heading<'a> {
-        Heading {
-            attrs: self.__unsafe_private_named.0.unwrap(),
-            content: self.__unsafe_private_named.1,
-            extra_data: Default::default(),
-        }
-    }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Heading<'a> {
-        Heading {
-            attrs: self.__unsafe_private_named.0.unwrap(),
-            content: self.__unsafe_private_named.1,
-            extra_data: Some(extra_data),
-        }
-    }
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum HeadingContentItem<'a> {
-    #[serde(rename = "blog.pckt.block.text")]
-    Text(Box<crate::blog_pckt::block::text::Text<'a>>),
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Heading<'a> {
@@ -428,6 +125,28 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Heading<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.level {
+            if *value > 6i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "level",
+                    ),
+                    max: 6i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.level {
+            if *value < 1i64 {
+                return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "level",
+                    ),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
         Ok(())
     }
 }

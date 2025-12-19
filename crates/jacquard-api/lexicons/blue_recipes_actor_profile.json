@@ -1,0 +1,59 @@
+{
+  "lexicon": 1,
+  "id": "blue.recipes.actor.profile",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": [
+          "displayName"
+        ],
+        "properties": {
+          "avatar": {
+            "type": "blob",
+            "description": "Small image to be displayed on the profile.",
+            "accept": [
+              "image/png",
+              "image/jpeg"
+            ],
+            "maxSize": 1000000
+          },
+          "banner": {
+            "type": "blob",
+            "description": "Larger header image to be displayed on the profile.",
+            "accept": [
+              "image/png",
+              "image/jpeg"
+            ],
+            "maxSize": 1000000
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "description": "Free-form profile description text.",
+            "maxLength": 2500,
+            "maxGraphemes": 256
+          },
+          "displayName": {
+            "type": "string",
+            "maxLength": 640,
+            "maxGraphemes": 64
+          },
+          "pronouns": {
+            "type": "string",
+            "description": "Free-form text to describe pronouns.",
+            "maxLength": 200,
+            "maxGraphemes": 20
+          },
+          "website": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

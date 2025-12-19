@@ -143,7 +143,7 @@ pub struct GetHeadOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetHeadError<'a> {
     #[serde(rename = "HeadNotFound")]
-    HeadNotFound(std::option::Option<String>),
+    HeadNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl std::fmt::Display for GetHeadError<'_> {

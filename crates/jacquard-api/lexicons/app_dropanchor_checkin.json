@@ -1,0 +1,202 @@
+{
+  "lexicon": 1,
+  "id": "app.dropanchor.checkin",
+  "description": "A location check-in record for the Anchor app",
+  "defs": {
+    "address": {
+      "type": "object",
+      "description": "Street address (based on community.lexicon.location.address)",
+      "required": [
+        "country"
+      ],
+      "properties": {
+        "country": {
+          "type": "string",
+          "description": "The ISO 3166 country code (preferably 2-letter)",
+          "minLength": 2,
+          "maxLength": 10
+        },
+        "locality": {
+          "type": "string",
+          "description": "The locality (city, town, etc.)",
+          "maxLength": 200
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the location",
+          "maxLength": 500
+        },
+        "postalCode": {
+          "type": "string",
+          "description": "The postal code",
+          "maxLength": 20
+        },
+        "region": {
+          "type": "string",
+          "description": "The administrative region (state, province, etc.)",
+          "maxLength": 200
+        },
+        "street": {
+          "type": "string",
+          "description": "The street address",
+          "maxLength": 500
+        }
+      }
+    },
+    "checkinImage": {
+      "type": "object",
+      "description": "Image attachment with thumbnail and full-size versions",
+      "required": [
+        "thumb",
+        "fullsize"
+      ],
+      "properties": {
+        "alt": {
+          "type": "string",
+          "description": "Alt text for accessibility",
+          "maxLength": 1000
+        },
+        "fullsize": {
+          "type": "blob",
+          "description": "Full-size version (max 2000px width, ~2MB)",
+          "accept": [
+            "image/jpeg",
+            "image/png",
+            "image/webp"
+          ],
+          "maxSize": 2000000
+        },
+        "thumb": {
+          "type": "blob",
+          "description": "Thumbnail version (max 800px width, ~300KB)",
+          "accept": [
+            "image/jpeg",
+            "image/png",
+            "image/webp"
+          ],
+          "maxSize": 300000
+        }
+      }
+    },
+    "fsqPlace": {
+      "type": "object",
+      "description": "Foursquare venue data (based on community.lexicon.location.fsq)",
+      "required": [
+        "fsqPlaceId"
+      ],
+      "properties": {
+        "fsqPlaceId": {
+          "type": "string",
+          "description": "The unique identifier of a Foursquare POI",
+          "maxLength": 100
+        },
+        "latitude": {
+          "type": "string",
+          "description": "Latitude in decimal degrees",
+          "maxLength": 32
+        },
+        "longitude": {
+          "type": "string",
+          "description": "Longitude in decimal degrees",
+          "maxLength": 32
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the location",
+          "maxLength": 500
+        }
+      }
+    },
+    "geo": {
+      "type": "object",
+      "description": "Geographic coordinates in WGS84 (based on community.lexicon.location.geo)",
+      "required": [
+        "latitude",
+        "longitude"
+      ],
+      "properties": {
+        "altitude": {
+          "type": "string",
+          "description": "Altitude in meters",
+          "maxLength": 32
+        },
+        "latitude": {
+          "type": "string",
+          "description": "Latitude in decimal degrees (range: -90 to 90)",
+          "maxLength": 32
+        },
+        "longitude": {
+          "type": "string",
+          "description": "Longitude in decimal degrees (range: -180 to 180)",
+          "maxLength": 32
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the location",
+          "maxLength": 500
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "A location check-in record for the Anchor app",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "text",
+          "createdAt",
+          "address",
+          "geo"
+        ],
+        "properties": {
+          "address": {
+            "type": "ref",
+            "description": "Address of the check-in location (based on community.lexicon.location.address)",
+            "ref": "#address"
+          },
+          "category": {
+            "type": "string",
+            "description": "Place category (e.g., cafe, restaurant)",
+            "maxLength": 100
+          },
+          "categoryGroup": {
+            "type": "string",
+            "description": "Category group for organization",
+            "maxLength": 100
+          },
+          "categoryIcon": {
+            "type": "string",
+            "description": "Emoji icon for the category",
+            "maxLength": 10
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "When the check-in was created",
+            "format": "datetime"
+          },
+          "fsq": {
+            "type": "ref",
+            "description": "Optional Foursquare venue data (based on community.lexicon.location.fsq)",
+            "ref": "#fsqPlace"
+          },
+          "geo": {
+            "type": "ref",
+            "description": "Geographic coordinates of the check-in (based on community.lexicon.location.geo)",
+            "ref": "#geo"
+          },
+          "image": {
+            "type": "ref",
+            "description": "Optional image attachment for the check-in",
+            "ref": "#checkinImage"
+          },
+          "text": {
+            "type": "string",
+            "description": "The check-in message or note",
+            "maxLength": 3000
+          }
+        }
+      }
+    }
+  }
+}

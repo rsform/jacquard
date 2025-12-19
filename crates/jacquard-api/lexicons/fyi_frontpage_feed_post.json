@@ -10,7 +10,8 @@
         "type": "object",
         "required": [
           "title",
-          "createdAt"
+          "createdAt",
+          "subject"
         ],
         "properties": {
           "createdAt": {

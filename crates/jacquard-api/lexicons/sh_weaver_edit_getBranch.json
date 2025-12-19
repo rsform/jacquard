@@ -1,0 +1,62 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.edit.getBranch",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get edit history for a specific branch, identified by its head.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "head"
+        ],
+        "properties": {
+          "afterRkey": {
+            "type": "string",
+            "description": "Only diffs after this rkey"
+          },
+          "cursor": {
+            "type": "string"
+          },
+          "head": {
+            "type": "string",
+            "description": "AT-URI of the branch head (latest diff)",
+            "format": "at-uri"
+          },
+          "limit": {
+            "type": "integer",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 100
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "branch",
+            "diffs"
+          ],
+          "properties": {
+            "branch": {
+              "type": "ref",
+              "ref": "sh.weaver.edit.defs#editBranchView"
+            },
+            "cursor": {
+              "type": "string"
+            },
+            "diffs": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "sh.weaver.edit.defs#editHistoryEntry"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

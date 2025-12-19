@@ -185,9 +185,9 @@ pub struct GetActorLikesOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetActorLikesError<'a> {
     #[serde(rename = "BlockedActor")]
-    BlockedActor(std::option::Option<String>),
+    BlockedActor(std::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "BlockedByActor")]
-    BlockedByActor(std::option::Option<String>),
+    BlockedByActor(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl std::fmt::Display for GetActorLikesError<'_> {

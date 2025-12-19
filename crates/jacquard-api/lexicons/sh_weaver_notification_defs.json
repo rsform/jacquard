@@ -1,0 +1,148 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.notification.defs",
+  "defs": {
+    "notification": {
+      "type": "object",
+      "description": "A notification for a user.",
+      "required": [
+        "uri",
+        "cid",
+        "author",
+        "reason",
+        "isRead",
+        "indexedAt"
+      ],
+      "properties": {
+        "author": {
+          "type": "ref",
+          "ref": "sh.weaver.actor.defs#profileViewBasic"
+        },
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "indexedAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "isRead": {
+          "type": "boolean"
+        },
+        "reason": {
+          "type": "ref",
+          "ref": "#notificationReason"
+        },
+        "reasonSubject": {
+          "type": "string",
+          "description": "The subject of the notification (entry, notebook, etc).",
+          "format": "at-uri"
+        },
+        "record": {
+          "type": "unknown"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
+    "notificationGroup": {
+      "type": "object",
+      "description": "Grouped notifications (e.g., '5 people liked your entry').",
+      "required": [
+        "reason",
+        "subject",
+        "count",
+        "actors",
+        "mostRecentAt"
+      ],
+      "properties": {
+        "actors": {
+          "type": "array",
+          "description": "Most recent actors (up to 5).",
+          "items": {
+            "type": "ref",
+            "ref": "sh.weaver.actor.defs#profileViewBasic"
+          },
+          "maxLength": 5
+        },
+        "count": {
+          "type": "integer"
+        },
+        "isRead": {
+          "type": "boolean"
+        },
+        "mostRecentAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "reason": {
+          "type": "ref",
+          "ref": "#notificationReason"
+        },
+        "subject": {
+          "type": "union",
+          "refs": [
+            "sh.weaver.notebook.defs#notebookView",
+            "sh.weaver.notebook.defs#entryView"
+          ]
+        }
+      }
+    },
+    "notificationReason": {
+      "type": "string",
+      "description": "Why this notification was generated.",
+      "knownValues": [
+        "like",
+        "bookmark",
+        "follow",
+        "followAccept",
+        "subscribe",
+        "subscribeAccept",
+        "collaborationInvite",
+        "collaborationAccept",
+        "newEntry",
+        "entryUpdate",
+        "mention",
+        "tag",
+        "comment"
+      ]
+    },
+    "subscriptionUpdateView": {
+      "type": "object",
+      "description": "New content from a notebook subscription.",
+      "required": [
+        "notebook",
+        "newEntries",
+        "updatedAt"
+      ],
+      "properties": {
+        "newEntries": {
+          "type": "array",
+          "description": "New entries since last check.",
+          "items": {
+            "type": "ref",
+            "ref": "sh.weaver.notebook.defs#entryView"
+          }
+        },
+        "notebook": {
+          "type": "ref",
+          "ref": "sh.weaver.notebook.defs#notebookView"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "updatedEntries": {
+          "type": "array",
+          "description": "Entries that were updated.",
+          "items": {
+            "type": "ref",
+            "ref": "sh.weaver.notebook.defs#entryView"
+          }
+        }
+      }
+    }
+  }
+}

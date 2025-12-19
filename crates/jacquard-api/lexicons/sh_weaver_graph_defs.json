@@ -1,0 +1,214 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.graph.defs",
+  "defs": {
+    "communityTagCount": {
+      "type": "object",
+      "description": "A community tag with how many people applied it.",
+      "required": [
+        "tag",
+        "count"
+      ],
+      "properties": {
+        "count": {
+          "type": "integer"
+        },
+        "tag": {
+          "type": "string"
+        }
+      }
+    },
+    "curatelist": {
+      "type": "token",
+      "description": "A curated collection of notebooks/entries for sharing."
+    },
+    "listItemView": {
+      "type": "object",
+      "description": "An item in a list with hydrated subject.",
+      "required": [
+        "uri",
+        "subject"
+      ],
+      "properties": {
+        "addedAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "subject": {
+          "type": "union",
+          "refs": [
+            "sh.weaver.notebook.defs#notebookView",
+            "sh.weaver.notebook.defs#entryView"
+          ]
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
+    "listPurpose": {
+      "type": "string",
+      "knownValues": [
+        "sh.weaver.graph.defs#curatelist",
+        "sh.weaver.graph.defs#readinglist",
+        "sh.weaver.graph.defs#serieslist"
+      ]
+    },
+    "listView": {
+      "type": "object",
+      "description": "Hydrated view of a list.",
+      "required": [
+        "uri",
+        "cid",
+        "creator",
+        "name",
+        "purpose",
+        "itemCount",
+        "indexedAt"
+      ],
+      "properties": {
+        "avatar": {
+          "type": "string",
+          "format": "uri"
+        },
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "creator": {
+          "type": "ref",
+          "ref": "sh.weaver.actor.defs#profileViewBasic"
+        },
+        "description": {
+          "type": "string"
+        },
+        "indexedAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "itemCount": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "purpose": {
+          "type": "ref",
+          "ref": "#listPurpose"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "viewerSubscribed": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
+    "readinglist": {
+      "type": "token",
+      "description": "A personal reading list."
+    },
+    "resourceTagsView": {
+      "type": "object",
+      "description": "All tags for a resource, grouped by source.",
+      "required": [
+        "resource",
+        "authorTags",
+        "communityTags"
+      ],
+      "properties": {
+        "authorTags": {
+          "type": "array",
+          "description": "Tags from the record itself (author-applied).",
+          "items": {
+            "type": "string"
+          }
+        },
+        "communityTags": {
+          "type": "array",
+          "description": "Aggregated community-applied tags with counts.",
+          "items": {
+            "type": "ref",
+            "ref": "#communityTagCount"
+          }
+        },
+        "resource": {
+          "type": "ref",
+          "ref": "com.atproto.repo.strongRef"
+        },
+        "viewerAppliedTags": {
+          "type": "array",
+          "description": "Tags the current viewer has applied.",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "serieslist": {
+      "type": "token",
+      "description": "An ordered series of related works (sequels, spin-offs)."
+    },
+    "tagApplicationView": {
+      "type": "object",
+      "description": "A single tag application with who applied it.",
+      "required": [
+        "uri",
+        "tag",
+        "appliedBy",
+        "createdAt"
+      ],
+      "properties": {
+        "appliedBy": {
+          "type": "ref",
+          "ref": "sh.weaver.actor.defs#profileViewBasic"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "tag": {
+          "type": "string"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
+    "tagView": {
+      "type": "object",
+      "description": "Aggregated view of a tag with usage statistics.",
+      "required": [
+        "tag",
+        "useCount"
+      ],
+      "properties": {
+        "entryCount": {
+          "type": "integer"
+        },
+        "notebookCount": {
+          "type": "integer"
+        },
+        "recentUseCount": {
+          "type": "integer",
+          "description": "Uses in the last 30 days."
+        },
+        "tag": {
+          "type": "string"
+        },
+        "trendingScore": {
+          "type": "integer",
+          "description": "Appview-computed trending score."
+        },
+        "useCount": {
+          "type": "integer",
+          "description": "Total number of resources tagged with this tag."
+        }
+      }
+    }
+  }
+}

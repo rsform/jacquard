@@ -17,15 +17,12 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct OrderedList<'a> {
-    /// Optional attributes for the ordered list
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub attrs: std::option::Option<
-        crate::blog_pckt::block::ordered_list::OrderedListAttrs<'a>,
-    >,
     /// Array of list items
     #[serde(borrow)]
     pub content: Vec<crate::blog_pckt::block::list_item::ListItem<'a>>,
+    /// Starting number for the ordered list (default: 1)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub start: std::option::Option<i64>,
 }
 
 pub mod ordered_list_state {
@@ -64,10 +61,8 @@ pub mod ordered_list_state {
 pub struct OrderedListBuilder<'a, S: ordered_list_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<
-            crate::blog_pckt::block::ordered_list::OrderedListAttrs<'a>,
-        >,
         ::core::option::Option<Vec<crate::blog_pckt::block::list_item::ListItem<'a>>>,
+        ::core::option::Option<i64>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -90,27 +85,6 @@ impl<'a> OrderedListBuilder<'a, ordered_list_state::Empty> {
     }
 }
 
-impl<'a, S: ordered_list_state::State> OrderedListBuilder<'a, S> {
-    /// Set the `attrs` field (optional)
-    pub fn attrs(
-        mut self,
-        value: impl Into<
-            Option<crate::blog_pckt::block::ordered_list::OrderedListAttrs<'a>>,
-        >,
-    ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
-        self
-    }
-    /// Set the `attrs` field to an Option value (optional)
-    pub fn maybe_attrs(
-        mut self,
-        value: Option<crate::blog_pckt::block::ordered_list::OrderedListAttrs<'a>>,
-    ) -> Self {
-        self.__unsafe_private_named.0 = value;
-        self
-    }
-}
-
 impl<'a, S> OrderedListBuilder<'a, S>
 where
     S: ordered_list_state::State,
@@ -121,12 +95,25 @@ where
         mut self,
         value: impl Into<Vec<crate::blog_pckt::block::list_item::ListItem<'a>>>,
     ) -> OrderedListBuilder<'a, ordered_list_state::SetContent<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
         OrderedListBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
             _phantom: ::core::marker::PhantomData,
         }
+    }
+}
+
+impl<'a, S: ordered_list_state::State> OrderedListBuilder<'a, S> {
+    /// Set the `start` field (optional)
+    pub fn start(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `start` field to an Option value (optional)
+    pub fn maybe_start(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
     }
 }
 
@@ -138,8 +125,8 @@ where
     /// Build the final struct
     pub fn build(self) -> OrderedList<'a> {
         OrderedList {
-            attrs: self.__unsafe_private_named.0,
-            content: self.__unsafe_private_named.1.unwrap(),
+            content: self.__unsafe_private_named.0.unwrap(),
+            start: self.__unsafe_private_named.1,
             extra_data: Default::default(),
         }
     }
@@ -152,8 +139,8 @@ where
         >,
     ) -> OrderedList<'a> {
         OrderedList {
-            attrs: self.__unsafe_private_named.0,
-            content: self.__unsafe_private_named.1.unwrap(),
+            content: self.__unsafe_private_named.0.unwrap(),
+            start: self.__unsafe_private_named.1,
             extra_data: Some(extra_data),
         }
     }
@@ -181,15 +168,6 @@ fn lexicon_doc_blog_pckt_block_orderedList() -> ::jacquard_lexicon::lexicon::Lex
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("attrs"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "#orderedListAttrs",
-                                ),
-                            }),
-                        );
-                        map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("content"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: Some(
@@ -205,21 +183,6 @@ fn lexicon_doc_blog_pckt_block_orderedList() -> ::jacquard_lexicon::lexicon::Lex
                                 max_length: None,
                             }),
                         );
-                        map
-                    },
-                }),
-            );
-            map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("orderedListAttrs"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static("Ordered list attributes"),
-                    ),
-                    required: None,
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("start"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -246,42 +209,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for OrderedList<'a> {
     }
     fn def_name() -> &'static str {
         "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_blog_pckt_block_orderedList()
-    }
-    fn validate(
-        &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        Ok(())
-    }
-}
-
-/// Ordered list attributes
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct OrderedListAttrs<'a> {
-    /// Starting number for the ordered list
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub start: std::option::Option<i64>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for OrderedListAttrs<'a> {
-    fn nsid() -> &'static str {
-        "blog.pckt.block.orderedList"
-    }
-    fn def_name() -> &'static str {
-        "orderedListAttrs"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blog_pckt_block_orderedList()

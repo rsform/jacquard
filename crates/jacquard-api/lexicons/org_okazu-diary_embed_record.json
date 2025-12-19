@@ -1,0 +1,19 @@
+{
+  "lexicon": 1,
+  "id": "org.okazu-diary.embed.record",
+  "description": "A representation of a record embedded in a diary entry record (eg. a Bluesky post).",
+  "defs": {
+    "main": {
+      "type": "object",
+      "required": [
+        "record"
+      ],
+      "properties": {
+        "record": {
+          "type": "ref",
+          "ref": "com.atproto.repo.strongRef"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.graph.follow",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Request to follow an author. Requires acceptance to be active.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "subject": {
+            "type": "string",
+            "description": "DID of the author to follow.",
+            "format": "did"
+          }
+        }
+      }
+    }
+  }
+}

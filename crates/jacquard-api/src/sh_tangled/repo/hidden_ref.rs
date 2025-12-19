@@ -38,49 +38,49 @@ pub mod hidden_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repo;
         type RemoteRef;
+        type Repo;
         type ForkRef;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repo = Unset;
         type RemoteRef = Unset;
+        type Repo = Unset;
         type ForkRef = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Repo = Set<members::repo>;
-        type RemoteRef = S::RemoteRef;
-        type ForkRef = S::ForkRef;
     }
     ///State transition - sets the `remote_ref` field to Set
     pub struct SetRemoteRef<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRemoteRef<S> {}
     impl<S: State> State for SetRemoteRef<S> {
-        type Repo = S::Repo;
         type RemoteRef = Set<members::remote_ref>;
+        type Repo = S::Repo;
+        type ForkRef = S::ForkRef;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type RemoteRef = S::RemoteRef;
+        type Repo = Set<members::repo>;
         type ForkRef = S::ForkRef;
     }
     ///State transition - sets the `fork_ref` field to Set
     pub struct SetForkRef<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetForkRef<S> {}
     impl<S: State> State for SetForkRef<S> {
-        type Repo = S::Repo;
         type RemoteRef = S::RemoteRef;
+        type Repo = S::Repo;
         type ForkRef = Set<members::fork_ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `remote_ref` field
         pub struct remote_ref(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
         ///Marker type for the `fork_ref` field
         pub struct fork_ref(());
     }
@@ -175,8 +175,8 @@ where
 impl<'a, S> HiddenRefBuilder<'a, S>
 where
     S: hidden_ref_state::State,
-    S::Repo: hidden_ref_state::IsSet,
     S::RemoteRef: hidden_ref_state::IsSet,
+    S::Repo: hidden_ref_state::IsSet,
     S::ForkRef: hidden_ref_state::IsSet,
 {
     /// Build the final struct

@@ -1,0 +1,814 @@
+{
+  "lexicon": 1,
+  "id": "social.flockfeeds.lexical.type.Event",
+  "defs": {
+    "embedded": {
+      "type": "object",
+      "description": "An event happening at a certain time and location, such as a concert, lecture, or festival. Ticketing information may be added via the [[offers]] property. Repeated events may be structured as separate Event objects.",
+      "properties": {
+        "about": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Thing#embedded",
+            "social.flockfeeds.lexical.prop.event#aboutList"
+          ]
+        },
+        "actor": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.PerformingGroup#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.event#actorList"
+          ]
+        },
+        "additionalType": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.event#additionalTypeScalar",
+            "social.flockfeeds.lexical.prop.event#additionalTypeList"
+          ]
+        },
+        "aggregateRating": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.AggregateRating#embedded",
+            "social.flockfeeds.lexical.prop.event#aggregateRatingList"
+          ]
+        },
+        "alternateName": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.event#alternateNameScalar",
+            "social.flockfeeds.lexical.prop.event#alternateNameList"
+          ]
+        },
+        "attendee": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.event#attendeeList"
+          ]
+        },
+        "attendees": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.event#attendeesList"
+          ]
+        },
+        "audience": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Audience#embedded",
+            "social.flockfeeds.lexical.prop.event#audienceList"
+          ]
+        },
+        "composer": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.event#composerList"
+          ]
+        },
+        "contributor": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.event#contributorList"
+          ]
+        },
+        "description": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.TextObject#embedded",
+            "social.flockfeeds.lexical.prop.event#descriptionScalar",
+            "social.flockfeeds.lexical.prop.event#descriptionList"
+          ]
+        },
+        "director": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.event#directorList"
+          ]
+        },
+        "disambiguatingDescription": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.event#disambiguatingDescriptionScalar",
+            "social.flockfeeds.lexical.prop.event#disambiguatingDescriptionList"
+          ]
+        },
+        "doorTime": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.event#doorTimeScalar",
+            "social.flockfeeds.lexical.prop.event#doorTimeList"
+          ]
+        },
+        "duration": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.QuantitativeValue#embedded",
+            "social.flockfeeds.lexical.prop.event#durationScalar",
+            "social.flockfeeds.lexical.prop.event#durationList"
+          ]
+        },
+        "endDate": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.event#endDateScalar",
+            "social.flockfeeds.lexical.prop.event#endDateList"
+          ]
+        },
+        "eventAttendanceMode": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.EventAttendanceModeEnumeration#embedded",
+            "social.flockfeeds.lexical.prop.event#eventAttendanceModeScalar",
+            "social.flockfeeds.lexical.prop.event#eventAttendanceModeList"
+          ]
+        },
+        "eventSchedule": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Schedule#embedded",
+            "social.flockfeeds.lexical.prop.event#eventScheduleList"
+          ]
+        },
+        "eventStatus": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.EventStatusType#embedded",
+            "social.flockfeeds.lexical.prop.event#eventStatusScalar",
+            "social.flockfeeds.lexical.prop.event#eventStatusList"
+          ]
+        },
+        "funder": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.event#funderList"
+          ]
+        },
+        "funding": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Grant#embedded",
+            "social.flockfeeds.lexical.prop.event#fundingList"
+          ]
+        },
+        "identifier": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.PropertyValue#embedded",
+            "social.flockfeeds.lexical.prop.event#identifierScalar",
+            "social.flockfeeds.lexical.prop.event#identifierList"
+          ]
+        },
+        "image": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.ImageObject#embedded",
+            "social.flockfeeds.lexical.prop.event#imageScalar",
+            "social.flockfeeds.lexical.prop.event#imageList"
+          ]
+        },
+        "inLanguage": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Language#embedded",
+            "social.flockfeeds.lexical.prop.event#inLanguageScalar",
+            "social.flockfeeds.lexical.prop.event#inLanguageList"
+          ]
+        },
+        "isAccessibleForFree": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.event#isAccessibleForFreeScalar",
+            "social.flockfeeds.lexical.prop.event#isAccessibleForFreeList"
+          ]
+        },
+        "keywords": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+            "social.flockfeeds.lexical.prop.event#keywordsScalar",
+            "social.flockfeeds.lexical.prop.event#keywordsList"
+          ]
+        },
+        "location": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Place#embedded",
+            "social.flockfeeds.lexical.type.PostalAddress#embedded",
+            "social.flockfeeds.lexical.type.VirtualLocation#embedded",
+            "social.flockfeeds.lexical.prop.event#locationScalar",
+            "social.flockfeeds.lexical.prop.event#locationList"
+          ]
+        },
+        "mainEntityOfPage": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.event#mainEntityOfPageScalar",
+            "social.flockfeeds.lexical.prop.event#mainEntityOfPageList"
+          ]
+        },
+        "maximumAttendeeCapacity": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.event#maximumAttendeeCapacityScalar",
+            "social.flockfeeds.lexical.prop.event#maximumAttendeeCapacityList"
+          ]
+        },
+        "maximumPhysicalAttendeeCapacity": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.event#maximumPhysicalAttendeeCapacityScalar",
+            "social.flockfeeds.lexical.prop.event#maximumPhysicalAttendeeCapacityList"
+          ]
+        },
+        "maximumVirtualAttendeeCapacity": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.event#maximumVirtualAttendeeCapacityScalar",
+            "social.flockfeeds.lexical.prop.event#maximumVirtualAttendeeCapacityList"
+          ]
+        },
+        "name": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.event#nameScalar",
+            "social.flockfeeds.lexical.prop.event#nameList"
+          ]
+        },
+        "offers": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Demand#embedded",
+            "social.flockfeeds.lexical.type.Offer#embedded",
+            "social.flockfeeds.lexical.prop.event#offersList"
+          ]
+        },
+        "organizer": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.event#organizerList"
+          ]
+        },
+        "performer": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.event#performerList"
+          ]
+        },
+        "performers": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.event#performersList"
+          ]
+        },
+        "potentialAction": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Action#embedded",
+            "social.flockfeeds.lexical.prop.event#potentialActionList"
+          ]
+        },
+        "previousStartDate": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.event#previousStartDateScalar",
+            "social.flockfeeds.lexical.prop.event#previousStartDateList"
+          ]
+        },
+        "recordedIn": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.event#recordedInList"
+          ]
+        },
+        "remainingAttendeeCapacity": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.event#remainingAttendeeCapacityScalar",
+            "social.flockfeeds.lexical.prop.event#remainingAttendeeCapacityList"
+          ]
+        },
+        "review": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Review#embedded",
+            "social.flockfeeds.lexical.prop.event#reviewList"
+          ]
+        },
+        "sameAs": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.event#sameAsScalar",
+            "social.flockfeeds.lexical.prop.event#sameAsList"
+          ]
+        },
+        "sponsor": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.event#sponsorList"
+          ]
+        },
+        "startDate": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.event#startDateScalar",
+            "social.flockfeeds.lexical.prop.event#startDateList"
+          ]
+        },
+        "subEvent": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Event#embedded",
+            "social.flockfeeds.lexical.prop.event#subEventList"
+          ]
+        },
+        "subEvents": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Event#embedded",
+            "social.flockfeeds.lexical.prop.event#subEventsList"
+          ]
+        },
+        "subjectOf": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.type.Event#embedded",
+            "social.flockfeeds.lexical.prop.event#subjectOfList"
+          ]
+        },
+        "superEvent": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Event#embedded",
+            "social.flockfeeds.lexical.prop.event#superEventList"
+          ]
+        },
+        "translator": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.event#translatorList"
+          ]
+        },
+        "typicalAgeRange": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.event#typicalAgeRangeScalar",
+            "social.flockfeeds.lexical.prop.event#typicalAgeRangeList"
+          ]
+        },
+        "url": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.event#urlScalar",
+            "social.flockfeeds.lexical.prop.event#urlList"
+          ]
+        },
+        "workFeatured": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.event#workFeaturedList"
+          ]
+        },
+        "workPerformed": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.event#workPerformedList"
+          ]
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "description": "An event happening at a certain time and location, such as a concert, lecture, or festival. Ticketing information may be added via the [[offers]] property. Repeated events may be structured as separate Event objects.",
+        "properties": {
+          "about": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Thing#embedded",
+              "social.flockfeeds.lexical.prop.event#aboutList"
+            ]
+          },
+          "actor": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.PerformingGroup#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.event#actorList"
+            ]
+          },
+          "additionalType": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.event#additionalTypeScalar",
+              "social.flockfeeds.lexical.prop.event#additionalTypeList"
+            ]
+          },
+          "aggregateRating": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.AggregateRating#embedded",
+              "social.flockfeeds.lexical.prop.event#aggregateRatingList"
+            ]
+          },
+          "alternateName": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.event#alternateNameScalar",
+              "social.flockfeeds.lexical.prop.event#alternateNameList"
+            ]
+          },
+          "attendee": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.event#attendeeList"
+            ]
+          },
+          "attendees": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.event#attendeesList"
+            ]
+          },
+          "audience": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Audience#embedded",
+              "social.flockfeeds.lexical.prop.event#audienceList"
+            ]
+          },
+          "composer": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.event#composerList"
+            ]
+          },
+          "contributor": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.event#contributorList"
+            ]
+          },
+          "description": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.TextObject#embedded",
+              "social.flockfeeds.lexical.prop.event#descriptionScalar",
+              "social.flockfeeds.lexical.prop.event#descriptionList"
+            ]
+          },
+          "director": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.event#directorList"
+            ]
+          },
+          "disambiguatingDescription": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.event#disambiguatingDescriptionScalar",
+              "social.flockfeeds.lexical.prop.event#disambiguatingDescriptionList"
+            ]
+          },
+          "doorTime": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.event#doorTimeScalar",
+              "social.flockfeeds.lexical.prop.event#doorTimeList"
+            ]
+          },
+          "duration": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.QuantitativeValue#embedded",
+              "social.flockfeeds.lexical.prop.event#durationScalar",
+              "social.flockfeeds.lexical.prop.event#durationList"
+            ]
+          },
+          "endDate": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.event#endDateScalar",
+              "social.flockfeeds.lexical.prop.event#endDateList"
+            ]
+          },
+          "eventAttendanceMode": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.EventAttendanceModeEnumeration#embedded",
+              "social.flockfeeds.lexical.prop.event#eventAttendanceModeScalar",
+              "social.flockfeeds.lexical.prop.event#eventAttendanceModeList"
+            ]
+          },
+          "eventSchedule": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Schedule#embedded",
+              "social.flockfeeds.lexical.prop.event#eventScheduleList"
+            ]
+          },
+          "eventStatus": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.EventStatusType#embedded",
+              "social.flockfeeds.lexical.prop.event#eventStatusScalar",
+              "social.flockfeeds.lexical.prop.event#eventStatusList"
+            ]
+          },
+          "funder": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.event#funderList"
+            ]
+          },
+          "funding": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Grant#embedded",
+              "social.flockfeeds.lexical.prop.event#fundingList"
+            ]
+          },
+          "identifier": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.PropertyValue#embedded",
+              "social.flockfeeds.lexical.prop.event#identifierScalar",
+              "social.flockfeeds.lexical.prop.event#identifierList"
+            ]
+          },
+          "image": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.ImageObject#embedded",
+              "social.flockfeeds.lexical.prop.event#imageScalar",
+              "social.flockfeeds.lexical.prop.event#imageList"
+            ]
+          },
+          "inLanguage": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Language#embedded",
+              "social.flockfeeds.lexical.prop.event#inLanguageScalar",
+              "social.flockfeeds.lexical.prop.event#inLanguageList"
+            ]
+          },
+          "isAccessibleForFree": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.event#isAccessibleForFreeScalar",
+              "social.flockfeeds.lexical.prop.event#isAccessibleForFreeList"
+            ]
+          },
+          "keywords": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+              "social.flockfeeds.lexical.prop.event#keywordsScalar",
+              "social.flockfeeds.lexical.prop.event#keywordsList"
+            ]
+          },
+          "location": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Place#embedded",
+              "social.flockfeeds.lexical.type.PostalAddress#embedded",
+              "social.flockfeeds.lexical.type.VirtualLocation#embedded",
+              "social.flockfeeds.lexical.prop.event#locationScalar",
+              "social.flockfeeds.lexical.prop.event#locationList"
+            ]
+          },
+          "mainEntityOfPage": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.prop.event#mainEntityOfPageScalar",
+              "social.flockfeeds.lexical.prop.event#mainEntityOfPageList"
+            ]
+          },
+          "maximumAttendeeCapacity": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.event#maximumAttendeeCapacityScalar",
+              "social.flockfeeds.lexical.prop.event#maximumAttendeeCapacityList"
+            ]
+          },
+          "maximumPhysicalAttendeeCapacity": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.event#maximumPhysicalAttendeeCapacityScalar",
+              "social.flockfeeds.lexical.prop.event#maximumPhysicalAttendeeCapacityList"
+            ]
+          },
+          "maximumVirtualAttendeeCapacity": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.event#maximumVirtualAttendeeCapacityScalar",
+              "social.flockfeeds.lexical.prop.event#maximumVirtualAttendeeCapacityList"
+            ]
+          },
+          "name": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.event#nameScalar",
+              "social.flockfeeds.lexical.prop.event#nameList"
+            ]
+          },
+          "offers": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Demand#embedded",
+              "social.flockfeeds.lexical.type.Offer#embedded",
+              "social.flockfeeds.lexical.prop.event#offersList"
+            ]
+          },
+          "organizer": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.event#organizerList"
+            ]
+          },
+          "performer": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.event#performerList"
+            ]
+          },
+          "performers": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.event#performersList"
+            ]
+          },
+          "potentialAction": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Action#embedded",
+              "social.flockfeeds.lexical.prop.event#potentialActionList"
+            ]
+          },
+          "previousStartDate": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.event#previousStartDateScalar",
+              "social.flockfeeds.lexical.prop.event#previousStartDateList"
+            ]
+          },
+          "recordedIn": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.prop.event#recordedInList"
+            ]
+          },
+          "remainingAttendeeCapacity": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.event#remainingAttendeeCapacityScalar",
+              "social.flockfeeds.lexical.prop.event#remainingAttendeeCapacityList"
+            ]
+          },
+          "review": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Review#embedded",
+              "social.flockfeeds.lexical.prop.event#reviewList"
+            ]
+          },
+          "sameAs": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.event#sameAsScalar",
+              "social.flockfeeds.lexical.prop.event#sameAsList"
+            ]
+          },
+          "sponsor": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.event#sponsorList"
+            ]
+          },
+          "startDate": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.event#startDateScalar",
+              "social.flockfeeds.lexical.prop.event#startDateList"
+            ]
+          },
+          "subEvent": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Event#embedded",
+              "social.flockfeeds.lexical.prop.event#subEventList"
+            ]
+          },
+          "subEvents": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Event#embedded",
+              "social.flockfeeds.lexical.prop.event#subEventsList"
+            ]
+          },
+          "subjectOf": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.type.Event#embedded",
+              "social.flockfeeds.lexical.prop.event#subjectOfList"
+            ]
+          },
+          "superEvent": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Event#embedded",
+              "social.flockfeeds.lexical.prop.event#superEventList"
+            ]
+          },
+          "translator": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.event#translatorList"
+            ]
+          },
+          "typicalAgeRange": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.event#typicalAgeRangeScalar",
+              "social.flockfeeds.lexical.prop.event#typicalAgeRangeList"
+            ]
+          },
+          "url": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.event#urlScalar",
+              "social.flockfeeds.lexical.prop.event#urlList"
+            ]
+          },
+          "workFeatured": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.prop.event#workFeaturedList"
+            ]
+          },
+          "workPerformed": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.prop.event#workPerformedList"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

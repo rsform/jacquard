@@ -69,7 +69,7 @@ pub struct CreateTemplateOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum CreateTemplateError<'a> {
     #[serde(rename = "DuplicateTemplateName")]
-    DuplicateTemplateName(std::option::Option<String>),
+    DuplicateTemplateName(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl std::fmt::Display for CreateTemplateError<'_> {

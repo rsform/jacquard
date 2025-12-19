@@ -4,6 +4,7 @@
   "defs": {
     "codeThemeFile": {
       "type": "object",
+      "description": "Custom syntax highlighting theme file (sublime text/textmate theme format)",
       "required": [
         "name",
         "did",
@@ -27,6 +28,50 @@
       }
     },
     "codeThemeName": {
+      "type": "string"
+    },
+    "font": {
+      "type": "object",
+      "required": [
+        "value"
+      ],
+      "properties": {
+        "value": {
+          "type": "union",
+          "description": "Font for a notebook",
+          "refs": [
+            "#fontName",
+            "#fontFile"
+          ]
+        }
+      }
+    },
+    "fontFile": {
+      "type": "object",
+      "description": "Custom woff(2) or ttf font file",
+      "required": [
+        "name",
+        "did",
+        "content"
+      ],
+      "properties": {
+        "content": {
+          "type": "blob",
+          "accept": [
+            "*/*"
+          ],
+          "maxSize": 20000
+        },
+        "did": {
+          "type": "string",
+          "format": "did"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "fontName": {
       "type": "string"
     },
     "main": {
@@ -57,8 +102,18 @@
             "description": "Reference to a dark colour scheme",
             "ref": "com.atproto.repo.strongRef"
           },
+          "defaultTheme": {
+            "type": "string",
+            "default": "auto",
+            "enum": [
+              "light",
+              "dark",
+              "auto"
+            ]
+          },
           "fonts": {
             "type": "object",
+            "description": "Fonts to be used in the notebook. Can specify a name or list of names (will load if available) or a file or list of files for each. Empty lists will use site defaults.",
             "required": [
               "body",
               "heading",
@@ -66,13 +121,25 @@
             ],
             "properties": {
               "body": {
-                "type": "string"
+                "type": "array",
+                "items": {
+                  "type": "ref",
+                  "ref": "#font"
+                }
               },
               "heading": {
-                "type": "string"
+                "type": "array",
+                "items": {
+                  "type": "ref",
+                  "ref": "#font"
+                }
               },
               "monospace": {
-                "type": "string"
+                "type": "array",
+                "items": {
+                  "type": "ref",
+                  "ref": "#font"
+                }
               }
             }
           },

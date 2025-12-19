@@ -1,0 +1,46 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.edit.getContributors",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get evidence-based contributors for a resource (entry or notebook). Returns users who have edit history or are explicit collaborators.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "resource"
+        ],
+        "properties": {
+          "includeCascaded": {
+            "type": "boolean",
+            "description": "For entries, also include notebook-level collaborators",
+            "default": true
+          },
+          "resource": {
+            "type": "string",
+            "description": "AT URI of the entry or notebook",
+            "format": "at-uri"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "contributors"
+          ],
+          "properties": {
+            "contributors": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "sh.weaver.actor.defs#profileViewBasic"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

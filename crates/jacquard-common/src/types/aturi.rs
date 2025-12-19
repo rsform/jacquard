@@ -1,4 +1,3 @@
-use crate::cowstr::ToCowStr;
 use crate::types::ident::AtIdentifier;
 use crate::types::nsid::Nsid;
 use crate::types::recordkey::{RecordKey, Rkey};

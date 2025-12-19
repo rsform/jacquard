@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-/// Facet feature for bold text
+/// Facet feature for mentioning an AT URI.
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -14,11 +14,119 @@
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
-    Default
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
-pub struct Bold<'a> {}
+pub struct AtMention<'a> {
+    #[serde(borrow)]
+    pub at_uri: jacquard_common::types::string::Uri<'a>,
+}
+
+pub mod at_mention_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type AtUri;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type AtUri = Unset;
+    }
+    ///State transition - sets the `at_uri` field to Set
+    pub struct SetAtUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAtUri<S> {}
+    impl<S: State> State for SetAtUri<S> {
+        type AtUri = Set<members::at_uri>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `at_uri` field
+        pub struct at_uri(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct AtMentionBuilder<'a, S: at_mention_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> AtMention<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> AtMentionBuilder<'a, at_mention_state::Empty> {
+        AtMentionBuilder::new()
+    }
+}
+
+impl<'a> AtMentionBuilder<'a, at_mention_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        AtMentionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AtMentionBuilder<'a, S>
+where
+    S: at_mention_state::State,
+    S::AtUri: at_mention_state::IsUnset,
+{
+    /// Set the `atURI` field (required)
+    pub fn at_uri(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+    ) -> AtMentionBuilder<'a, at_mention_state::SetAtUri<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        AtMentionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> AtMentionBuilder<'a, S>
+where
+    S: at_mention_state::State,
+    S::AtUri: at_mention_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> AtMention<'a> {
+        AtMention {
+            at_uri: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> AtMention<'a> {
+        AtMention {
+            at_uri: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
+}
+
 fn lexicon_doc_pub_leaflet_richtext_facet() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
@@ -29,6 +137,42 @@ fn lexicon_doc_pub_leaflet_richtext_facet() -> ::jacquard_lexicon::lexicon::Lexi
         description: None,
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
+            map.insert(
+                ::jacquard_common::smol_str::SmolStr::new_static("atMention"),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Facet feature for mentioning an AT URI.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("atURI")],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::std::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("atURI"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: Some(
+                                    ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
+                                ),
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map
+                    },
+                }),
+            );
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("bold"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -105,6 +249,42 @@ fn lexicon_doc_pub_leaflet_richtext_facet() -> ::jacquard_lexicon::lexicon::Lexi
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
+                        map
+                    },
+                }),
+            );
+            map.insert(
+                ::jacquard_common::smol_str::SmolStr::new_static("didMention"),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Facet feature for mentioning a did.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("did")],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::std::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: Some(
+                                    ::jacquard_lexicon::lexicon::LexStringFormat::Did,
+                                ),
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
                         map
                     },
                 }),
@@ -235,6 +415,8 @@ fn lexicon_doc_pub_leaflet_richtext_facet() -> ::jacquard_lexicon::lexicon::Lexi
                                     description: None,
                                     refs: vec![
                                         ::jacquard_common::CowStr::new_static("#link"),
+                                        ::jacquard_common::CowStr::new_static("#didMention"),
+                                        ::jacquard_common::CowStr::new_static("#atMention"),
                                         ::jacquard_common::CowStr::new_static("#code"),
                                         ::jacquard_common::CowStr::new_static("#highlight"),
                                         ::jacquard_common::CowStr::new_static("#underline"),
@@ -299,6 +481,37 @@ fn lexicon_doc_pub_leaflet_richtext_facet() -> ::jacquard_lexicon::lexicon::Lexi
     }
 }
 
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AtMention<'a> {
+    fn nsid() -> &'static str {
+        "pub.leaflet.richtext.facet"
+    }
+    fn def_name() -> &'static str {
+        "atMention"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_pub_leaflet_richtext_facet()
+    }
+    fn validate(
+        &self,
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Facet feature for bold text
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Bold<'a> {}
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Bold<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.richtext.facet"
@@ -542,6 +755,145 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Code<'a> {
     }
 }
 
+/// Facet feature for mentioning a did.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DidMention<'a> {
+    #[serde(borrow)]
+    pub did: jacquard_common::types::string::Did<'a>,
+}
+
+pub mod did_mention_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Did;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Did = Unset;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Did = Set<members::did>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `did` field
+        pub struct did(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct DidMentionBuilder<'a, S: did_mention_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> DidMention<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> DidMentionBuilder<'a, did_mention_state::Empty> {
+        DidMentionBuilder::new()
+    }
+}
+
+impl<'a> DidMentionBuilder<'a, did_mention_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        DidMentionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None,),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DidMentionBuilder<'a, S>
+where
+    S: did_mention_state::State,
+    S::Did: did_mention_state::IsUnset,
+{
+    /// Set the `did` field (required)
+    pub fn did(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> DidMentionBuilder<'a, did_mention_state::SetDid<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        DidMentionBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DidMentionBuilder<'a, S>
+where
+    S: did_mention_state::State,
+    S::Did: did_mention_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> DidMention<'a> {
+        DidMention {
+            did: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> DidMention<'a> {
+        DidMention {
+            did: self.__unsafe_private_named.0.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DidMention<'a> {
+    fn nsid() -> &'static str {
+        "pub.leaflet.richtext.facet"
+    }
+    fn def_name() -> &'static str {
+        "didMention"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_pub_leaflet_richtext_facet()
+    }
+    fn validate(
+        &self,
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 /// Facet feature for highlighted text.
 #[jacquard_derive::lexicon]
 #[derive(
@@ -704,37 +1056,37 @@ pub mod facet_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Features;
         type Index;
+        type Features;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Features = Unset;
         type Index = Unset;
-    }
-    ///State transition - sets the `features` field to Set
-    pub struct SetFeatures<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFeatures<S> {}
-    impl<S: State> State for SetFeatures<S> {
-        type Features = Set<members::features>;
-        type Index = S::Index;
+        type Features = Unset;
     }
     ///State transition - sets the `index` field to Set
     pub struct SetIndex<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIndex<S> {}
     impl<S: State> State for SetIndex<S> {
-        type Features = S::Features;
         type Index = Set<members::index>;
+        type Features = S::Features;
+    }
+    ///State transition - sets the `features` field to Set
+    pub struct SetFeatures<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFeatures<S> {}
+    impl<S: State> State for SetFeatures<S> {
+        type Index = S::Index;
+        type Features = Set<members::features>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `features` field
-        pub struct features(());
         ///Marker type for the `index` field
         pub struct index(());
+        ///Marker type for the `features` field
+        pub struct features(());
     }
 }
 
@@ -807,8 +1159,8 @@ where
 impl<'a, S> FacetBuilder<'a, S>
 where
     S: facet_state::State,
-    S::Features: facet_state::IsSet,
     S::Index: facet_state::IsSet,
+    S::Features: facet_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Facet<'a> {
@@ -849,6 +1201,10 @@ where
 pub enum FacetFeaturesItem<'a> {
     #[serde(rename = "pub.leaflet.richtext.facet#link")]
     Link(Box<crate::pub_leaflet::richtext::facet::Link<'a>>),
+    #[serde(rename = "pub.leaflet.richtext.facet#didMention")]
+    DidMention(Box<crate::pub_leaflet::richtext::facet::DidMention<'a>>),
+    #[serde(rename = "pub.leaflet.richtext.facet#atMention")]
+    AtMention(Box<crate::pub_leaflet::richtext::facet::AtMention<'a>>),
     #[serde(rename = "pub.leaflet.richtext.facet#code")]
     Code(Box<crate::pub_leaflet::richtext::facet::Code<'a>>),
     #[serde(rename = "pub.leaflet.richtext.facet#highlight")]

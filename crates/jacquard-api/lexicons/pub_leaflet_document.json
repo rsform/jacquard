@@ -13,8 +13,7 @@
         "required": [
           "pages",
           "author",
-          "title",
-          "publication"
+          "title"
         ],
         "properties": {
           "author": {
@@ -47,6 +46,17 @@
           "publishedAt": {
             "type": "string",
             "format": "datetime"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 50
+            }
+          },
+          "theme": {
+            "type": "ref",
+            "ref": "pub.leaflet.publication#theme"
           },
           "title": {
             "type": "string",

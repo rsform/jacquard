@@ -21,9 +21,8 @@ pub struct Post<'a> {
     /// Client-declared timestamp when this post was originally created.
     pub created_at: jacquard_common::types::string::Datetime,
     /// The piece of content that this Frontpage post is about.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub subject: std::option::Option<crate::fyi_frontpage::feed::post::UrlSubject<'a>>,
+    pub subject: crate::fyi_frontpage::feed::post::UrlSubject<'a>,
     /// The title of the post.
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
@@ -41,6 +40,7 @@ pub mod post_state {
     pub trait State: sealed::Sealed {
         type Title;
         type CreatedAt;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -48,6 +48,7 @@ pub mod post_state {
     impl State for Empty {
         type Title = Unset;
         type CreatedAt = Unset;
+        type Subject = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
@@ -55,6 +56,7 @@ pub mod post_state {
     impl<S: State> State for SetTitle<S> {
         type Title = Set<members::title>;
         type CreatedAt = S::CreatedAt;
+        type Subject = S::Subject;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
@@ -62,6 +64,15 @@ pub mod post_state {
     impl<S: State> State for SetCreatedAt<S> {
         type Title = S::Title;
         type CreatedAt = Set<members::created_at>;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -70,6 +81,8 @@ pub mod post_state {
         pub struct title(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
@@ -121,22 +134,22 @@ where
     }
 }
 
-impl<'a, S: post_state::State> PostBuilder<'a, S> {
-    /// Set the `subject` field (optional)
+impl<'a, S> PostBuilder<'a, S>
+where
+    S: post_state::State,
+    S::Subject: post_state::IsUnset,
+{
+    /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<Option<crate::fyi_frontpage::feed::post::UrlSubject<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
-        self
-    }
-    /// Set the `subject` field to an Option value (optional)
-    pub fn maybe_subject(
-        mut self,
-        value: Option<crate::fyi_frontpage::feed::post::UrlSubject<'a>>,
-    ) -> Self {
-        self.__unsafe_private_named.1 = value;
-        self
+        value: impl Into<crate::fyi_frontpage::feed::post::UrlSubject<'a>>,
+    ) -> PostBuilder<'a, post_state::SetSubject<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        PostBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
     }
 }
 
@@ -164,12 +177,13 @@ where
     S: post_state::State,
     S::Title: post_state::IsSet,
     S::CreatedAt: post_state::IsSet,
+    S::Subject: post_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Post<'a> {
         Post {
             created_at: self.__unsafe_private_named.0.unwrap(),
-            subject: self.__unsafe_private_named.1,
+            subject: self.__unsafe_private_named.1.unwrap(),
             title: self.__unsafe_private_named.2.unwrap(),
             extra_data: Default::default(),
         }
@@ -184,7 +198,7 @@ where
     ) -> Post<'a> {
         Post {
             created_at: self.__unsafe_private_named.0.unwrap(),
-            subject: self.__unsafe_private_named.1,
+            subject: self.__unsafe_private_named.1.unwrap(),
             title: self.__unsafe_private_named.2.unwrap(),
             extra_data: Some(extra_data),
         }
@@ -325,7 +339,8 @@ fn lexicon_doc_fyi_frontpage_feed_post() -> ::jacquard_lexicon::lexicon::Lexicon
                         required: Some(
                             vec![
                                 ::jacquard_common::smol_str::SmolStr::new_static("title"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("subject")
                             ],
                         ),
                         nullable: None,

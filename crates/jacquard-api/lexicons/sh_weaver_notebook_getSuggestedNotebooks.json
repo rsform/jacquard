@@ -1,0 +1,103 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.notebook.getSuggestedNotebooks",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get notebook recommendations for the authenticated user based on reading history, likes, and follows.",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "default": 20,
+            "minimum": 1,
+            "maximum": 50
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "notebooks"
+          ],
+          "properties": {
+            "notebooks": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "#suggestedNotebook"
+              }
+            }
+          }
+        }
+      }
+    },
+    "suggestedNotebook": {
+      "type": "object",
+      "required": [
+        "notebook",
+        "reason"
+      ],
+      "properties": {
+        "notebook": {
+          "type": "ref",
+          "ref": "sh.weaver.notebook.defs#notebookView"
+        },
+        "reason": {
+          "type": "ref",
+          "ref": "#suggestionReason"
+        },
+        "score": {
+          "type": "integer",
+          "description": "Appview-computed relevance score."
+        }
+      }
+    },
+    "suggestionReason": {
+      "type": "object",
+      "description": "Why this notebook was suggested.",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "relatedAuthor": {
+          "type": "ref",
+          "description": "If followed-author, the author.",
+          "ref": "sh.weaver.actor.defs#profileViewBasic"
+        },
+        "relatedList": {
+          "type": "ref",
+          "description": "If from-list, the list it's from.",
+          "ref": "sh.weaver.graph.defs#listView"
+        },
+        "relatedNotebook": {
+          "type": "ref",
+          "description": "If similar-to-X, the notebook it's similar to.",
+          "ref": "sh.weaver.notebook.defs#notebookView"
+        },
+        "relatedTags": {
+          "type": "array",
+          "description": "Tags that matched.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "type": {
+          "type": "string",
+          "knownValues": [
+            "similar-tags",
+            "similar-to-liked",
+            "similar-to-read",
+            "followed-author",
+            "popular-in-tag",
+            "trending",
+            "from-list"
+          ]
+        }
+      }
+    }
+  }
+}

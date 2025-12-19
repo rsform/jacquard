@@ -24,8 +24,7 @@
             "#segment"
           ]
         }
-      },
-      "errors": []
+      }
     },
     "segment": {
       "type": "bytes",

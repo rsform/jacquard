@@ -21,8 +21,22 @@
             "type": "string",
             "format": "datetime"
           },
+          "mentions": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "did"
+            }
+          },
           "patch": {
             "type": "string"
+          },
+          "references": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "at-uri"
+            }
           },
           "source": {
             "type": "ref",

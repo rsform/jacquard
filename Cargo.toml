@@ -5,7 +5,7 @@ members = ["crates/*"]
 
 [workspace.package]
 edition = "2024"
-version = "0.9.4"
+version = "0.9.5"
 authors = ["Orual <orual@nonbinary.computer>"]
 #repository = "https://github.com/rsform/jacquard"
 repository = "https://tangled.org/@nonbinary.computer/jacquard"

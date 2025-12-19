@@ -7,6 +7,12 @@
 
 pub mod cursor;
 pub mod diff;
+pub mod draft;
+pub mod get_branch;
+pub mod get_contributors;
+pub mod get_edit_history;
+pub mod get_edit_tree;
+pub mod list_drafts;
 pub mod root;
 
 #[jacquard_derive::lexicon]
@@ -145,6 +151,8 @@ pub enum DocRefValue<'a> {
     NotebookRef(Box<crate::sh_weaver::edit::NotebookRef<'a>>),
     #[serde(rename = "sh.weaver.edit.defs#entryRef")]
     EntryRef(Box<crate::sh_weaver::edit::EntryRef<'a>>),
+    #[serde(rename = "sh.weaver.edit.defs#draftRef")]
+    DraftRef(Box<crate::sh_weaver::edit::DraftRef<'a>>),
 }
 
 fn lexicon_doc_sh_weaver_edit_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -174,9 +182,377 @@ fn lexicon_doc_sh_weaver_edit_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                                 description: None,
                                 refs: vec![
                                     ::jacquard_common::CowStr::new_static("#notebookRef"),
-                                    ::jacquard_common::CowStr::new_static("#entryRef")
+                                    ::jacquard_common::CowStr::new_static("#entryRef"),
+                                    ::jacquard_common::CowStr::new_static("#draftRef")
                                 ],
                                 closed: None,
+                            }),
+                        );
+                        map
+                    },
+                }),
+            );
+            map.insert(
+                ::jacquard_common::smol_str::SmolStr::new_static("draftRef"),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("draftKey")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::std::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("draftKey"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: Some(200usize),
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map
+                    },
+                }),
+            );
+            map.insert(
+                ::jacquard_common::smol_str::SmolStr::new_static("editBranchView"),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A branch/fork in edit history (for when collaborators diverge).",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("head"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("author"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("length"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("lastUpdated")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::std::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("author"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "sh.weaver.actor.defs#profileViewBasic",
+                                ),
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "divergesFrom",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "com.atproto.repo.strongRef",
+                                ),
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("head"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "com.atproto.repo.strongRef",
+                                ),
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("isMerged"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "lastUpdated",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: Some(
+                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
+                                ),
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("length"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: None,
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("root"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "com.atproto.repo.strongRef",
+                                ),
+                            }),
+                        );
+                        map
+                    },
+                }),
+            );
+            map.insert(
+                ::jacquard_common::smol_str::SmolStr::new_static("editHistoryEntry"),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Summary of an edit (root or diff) for history queries.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("cid"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("author"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("createdAt"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("type")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::std::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("author"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "sh.weaver.actor.defs#profileViewBasic",
+                                ),
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("cid"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: Some(
+                                    ::jacquard_lexicon::lexicon::LexStringFormat::Cid,
+                                ),
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "createdAt",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: Some(
+                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
+                                ),
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "hasInlineDiff",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("prevRef"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "com.atproto.repo.strongRef",
+                                ),
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("rootRef"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "com.atproto.repo.strongRef",
+                                ),
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "snapshotCid",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: Some(
+                                    ::jacquard_lexicon::lexicon::LexStringFormat::Cid,
+                                ),
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("type"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: Some(
+                                    ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
+                                ),
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map
+                    },
+                }),
+            );
+            map.insert(
+                ::jacquard_common::smol_str::SmolStr::new_static("editTreeView"),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Full tree structure showing all branches for a resource.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("resource"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("branches")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::std::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("branches"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                description: None,
+                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "#editBranchView",
+                                    ),
+                                }),
+                                min_length: None,
+                                max_length: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "conflictPoints",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Diffs where branches diverge",
+                                    ),
+                                ),
+                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "com.atproto.repo.strongRef",
+                                    ),
+                                }),
+                                min_length: None,
+                                max_length: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "hasConflicts",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "mainBranch",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "#editBranchView",
+                                ),
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("resource"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "com.atproto.repo.strongRef",
+                                ),
                             }),
                         );
                         map
@@ -188,16 +564,14 @@ fn lexicon_doc_sh_weaver_edit_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
-                        vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("notebook")
-                        ],
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("entry")],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("notebook"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("entry"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                 description: None,
                                 r#ref: ::jacquard_common::CowStr::new_static(
@@ -265,12 +639,1039 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DocRef<'a> {
     Clone,
     PartialEq,
     Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DraftRef<'a> {
+    #[serde(borrow)]
+    pub draft_key: jacquard_common::CowStr<'a>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DraftRef<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.edit.defs"
+    }
+    fn def_name() -> &'static str {
+        "draftRef"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_edit_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.draft_key;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 200usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "draft_key",
+                    ),
+                    max: 200usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+/// A branch/fork in edit history (for when collaborators diverge).
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct EditBranchView<'a> {
+    #[serde(borrow)]
+    pub author: crate::sh_weaver::actor::ProfileViewBasic<'a>,
+    /// Common ancestor if this is a fork
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub diverges_from: std::option::Option<
+        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    >,
+    #[serde(borrow)]
+    pub head: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub is_merged: std::option::Option<bool>,
+    pub last_updated: jacquard_common::types::string::Datetime,
+    /// Number of diffs in this branch
+    pub length: i64,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub root: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+}
+
+pub mod edit_branch_view_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Author;
+        type LastUpdated;
+        type Length;
+        type Head;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Author = Unset;
+        type LastUpdated = Unset;
+        type Length = Unset;
+        type Head = Unset;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthor<S> {}
+    impl<S: State> State for SetAuthor<S> {
+        type Author = Set<members::author>;
+        type LastUpdated = S::LastUpdated;
+        type Length = S::Length;
+        type Head = S::Head;
+    }
+    ///State transition - sets the `last_updated` field to Set
+    pub struct SetLastUpdated<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLastUpdated<S> {}
+    impl<S: State> State for SetLastUpdated<S> {
+        type Author = S::Author;
+        type LastUpdated = Set<members::last_updated>;
+        type Length = S::Length;
+        type Head = S::Head;
+    }
+    ///State transition - sets the `length` field to Set
+    pub struct SetLength<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLength<S> {}
+    impl<S: State> State for SetLength<S> {
+        type Author = S::Author;
+        type LastUpdated = S::LastUpdated;
+        type Length = Set<members::length>;
+        type Head = S::Head;
+    }
+    ///State transition - sets the `head` field to Set
+    pub struct SetHead<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHead<S> {}
+    impl<S: State> State for SetHead<S> {
+        type Author = S::Author;
+        type LastUpdated = S::LastUpdated;
+        type Length = S::Length;
+        type Head = Set<members::head>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `author` field
+        pub struct author(());
+        ///Marker type for the `last_updated` field
+        pub struct last_updated(());
+        ///Marker type for the `length` field
+        pub struct length(());
+        ///Marker type for the `head` field
+        pub struct head(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct EditBranchViewBuilder<'a, S: edit_branch_view_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<crate::sh_weaver::actor::ProfileViewBasic<'a>>,
+        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> EditBranchView<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> EditBranchViewBuilder<'a, edit_branch_view_state::Empty> {
+        EditBranchViewBuilder::new()
+    }
+}
+
+impl<'a> EditBranchViewBuilder<'a, edit_branch_view_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        EditBranchViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> EditBranchViewBuilder<'a, S>
+where
+    S: edit_branch_view_state::State,
+    S::Author: edit_branch_view_state::IsUnset,
+{
+    /// Set the `author` field (required)
+    pub fn author(
+        mut self,
+        value: impl Into<crate::sh_weaver::actor::ProfileViewBasic<'a>>,
+    ) -> EditBranchViewBuilder<'a, edit_branch_view_state::SetAuthor<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        EditBranchViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: edit_branch_view_state::State> EditBranchViewBuilder<'a, S> {
+    /// Set the `divergesFrom` field (optional)
+    pub fn diverges_from(
+        mut self,
+        value: impl Into<Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `divergesFrom` field to an Option value (optional)
+    pub fn maybe_diverges_from(
+        mut self,
+        value: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> EditBranchViewBuilder<'a, S>
+where
+    S: edit_branch_view_state::State,
+    S::Head: edit_branch_view_state::IsUnset,
+{
+    /// Set the `head` field (required)
+    pub fn head(
+        mut self,
+        value: impl Into<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    ) -> EditBranchViewBuilder<'a, edit_branch_view_state::SetHead<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        EditBranchViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: edit_branch_view_state::State> EditBranchViewBuilder<'a, S> {
+    /// Set the `isMerged` field (optional)
+    pub fn is_merged(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `isMerged` field to an Option value (optional)
+    pub fn maybe_is_merged(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S> EditBranchViewBuilder<'a, S>
+where
+    S: edit_branch_view_state::State,
+    S::LastUpdated: edit_branch_view_state::IsUnset,
+{
+    /// Set the `lastUpdated` field (required)
+    pub fn last_updated(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> EditBranchViewBuilder<'a, edit_branch_view_state::SetLastUpdated<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        EditBranchViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> EditBranchViewBuilder<'a, S>
+where
+    S: edit_branch_view_state::State,
+    S::Length: edit_branch_view_state::IsUnset,
+{
+    /// Set the `length` field (required)
+    pub fn length(
+        mut self,
+        value: impl Into<i64>,
+    ) -> EditBranchViewBuilder<'a, edit_branch_view_state::SetLength<S>> {
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        EditBranchViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: edit_branch_view_state::State> EditBranchViewBuilder<'a, S> {
+    /// Set the `root` field (optional)
+    pub fn root(
+        mut self,
+        value: impl Into<Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `root` field to an Option value (optional)
+    pub fn maybe_root(
+        mut self,
+        value: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S> EditBranchViewBuilder<'a, S>
+where
+    S: edit_branch_view_state::State,
+    S::Author: edit_branch_view_state::IsSet,
+    S::LastUpdated: edit_branch_view_state::IsSet,
+    S::Length: edit_branch_view_state::IsSet,
+    S::Head: edit_branch_view_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> EditBranchView<'a> {
+        EditBranchView {
+            author: self.__unsafe_private_named.0.unwrap(),
+            diverges_from: self.__unsafe_private_named.1,
+            head: self.__unsafe_private_named.2.unwrap(),
+            is_merged: self.__unsafe_private_named.3,
+            last_updated: self.__unsafe_private_named.4.unwrap(),
+            length: self.__unsafe_private_named.5.unwrap(),
+            root: self.__unsafe_private_named.6,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> EditBranchView<'a> {
+        EditBranchView {
+            author: self.__unsafe_private_named.0.unwrap(),
+            diverges_from: self.__unsafe_private_named.1,
+            head: self.__unsafe_private_named.2.unwrap(),
+            is_merged: self.__unsafe_private_named.3,
+            last_updated: self.__unsafe_private_named.4.unwrap(),
+            length: self.__unsafe_private_named.5.unwrap(),
+            root: self.__unsafe_private_named.6,
+            extra_data: Some(extra_data),
+        }
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EditBranchView<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.edit.defs"
+    }
+    fn def_name() -> &'static str {
+        "editBranchView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_edit_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Summary of an edit (root or diff) for history queries.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct EditHistoryEntry<'a> {
+    #[serde(borrow)]
+    pub author: crate::sh_weaver::actor::ProfileViewBasic<'a>,
+    #[serde(borrow)]
+    pub cid: jacquard_common::types::string::Cid<'a>,
+    pub created_at: jacquard_common::types::string::Datetime,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub has_inline_diff: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub prev_ref: std::option::Option<
+        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub root_ref: std::option::Option<
+        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub snapshot_cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub r#type: jacquard_common::CowStr<'a>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+pub mod edit_history_entry_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Author;
+        type CreatedAt;
+        type Type;
+        type Uri;
+        type Cid;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Author = Unset;
+        type CreatedAt = Unset;
+        type Type = Unset;
+        type Uri = Unset;
+        type Cid = Unset;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthor<S> {}
+    impl<S: State> State for SetAuthor<S> {
+        type Author = Set<members::author>;
+        type CreatedAt = S::CreatedAt;
+        type Type = S::Type;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Author = S::Author;
+        type CreatedAt = Set<members::created_at>;
+        type Type = S::Type;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type Author = S::Author;
+        type CreatedAt = S::CreatedAt;
+        type Type = Set<members::r#type>;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Author = S::Author;
+        type CreatedAt = S::CreatedAt;
+        type Type = S::Type;
+        type Uri = Set<members::uri>;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Author = S::Author;
+        type CreatedAt = S::CreatedAt;
+        type Type = S::Type;
+        type Uri = S::Uri;
+        type Cid = Set<members::cid>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `author` field
+        pub struct author(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct EditHistoryEntryBuilder<'a, S: edit_history_entry_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<crate::sh_weaver::actor::ProfileViewBasic<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> EditHistoryEntry<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> EditHistoryEntryBuilder<'a, edit_history_entry_state::Empty> {
+        EditHistoryEntryBuilder::new()
+    }
+}
+
+impl<'a> EditHistoryEntryBuilder<'a, edit_history_entry_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        EditHistoryEntryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> EditHistoryEntryBuilder<'a, S>
+where
+    S: edit_history_entry_state::State,
+    S::Author: edit_history_entry_state::IsUnset,
+{
+    /// Set the `author` field (required)
+    pub fn author(
+        mut self,
+        value: impl Into<crate::sh_weaver::actor::ProfileViewBasic<'a>>,
+    ) -> EditHistoryEntryBuilder<'a, edit_history_entry_state::SetAuthor<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        EditHistoryEntryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> EditHistoryEntryBuilder<'a, S>
+where
+    S: edit_history_entry_state::State,
+    S::Cid: edit_history_entry_state::IsUnset,
+{
+    /// Set the `cid` field (required)
+    pub fn cid(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Cid<'a>>,
+    ) -> EditHistoryEntryBuilder<'a, edit_history_entry_state::SetCid<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        EditHistoryEntryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> EditHistoryEntryBuilder<'a, S>
+where
+    S: edit_history_entry_state::State,
+    S::CreatedAt: edit_history_entry_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> EditHistoryEntryBuilder<'a, edit_history_entry_state::SetCreatedAt<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        EditHistoryEntryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: edit_history_entry_state::State> EditHistoryEntryBuilder<'a, S> {
+    /// Set the `hasInlineDiff` field (optional)
+    pub fn has_inline_diff(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `hasInlineDiff` field to an Option value (optional)
+    pub fn maybe_has_inline_diff(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: edit_history_entry_state::State> EditHistoryEntryBuilder<'a, S> {
+    /// Set the `prevRef` field (optional)
+    pub fn prev_ref(
+        mut self,
+        value: impl Into<Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `prevRef` field to an Option value (optional)
+    pub fn maybe_prev_ref(
+        mut self,
+        value: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: edit_history_entry_state::State> EditHistoryEntryBuilder<'a, S> {
+    /// Set the `rootRef` field (optional)
+    pub fn root_ref(
+        mut self,
+        value: impl Into<Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `rootRef` field to an Option value (optional)
+    pub fn maybe_root_ref(
+        mut self,
+        value: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S: edit_history_entry_state::State> EditHistoryEntryBuilder<'a, S> {
+    /// Set the `snapshotCid` field (optional)
+    pub fn snapshot_cid(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Cid<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `snapshotCid` field to an Option value (optional)
+    pub fn maybe_snapshot_cid(
+        mut self,
+        value: Option<jacquard_common::types::string::Cid<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S> EditHistoryEntryBuilder<'a, S>
+where
+    S: edit_history_entry_state::State,
+    S::Type: edit_history_entry_state::IsUnset,
+{
+    /// Set the `type` field (required)
+    pub fn r#type(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> EditHistoryEntryBuilder<'a, edit_history_entry_state::SetType<S>> {
+        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        EditHistoryEntryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> EditHistoryEntryBuilder<'a, S>
+where
+    S: edit_history_entry_state::State,
+    S::Uri: edit_history_entry_state::IsUnset,
+{
+    /// Set the `uri` field (required)
+    pub fn uri(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> EditHistoryEntryBuilder<'a, edit_history_entry_state::SetUri<S>> {
+        self.__unsafe_private_named.8 = ::core::option::Option::Some(value.into());
+        EditHistoryEntryBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> EditHistoryEntryBuilder<'a, S>
+where
+    S: edit_history_entry_state::State,
+    S::Author: edit_history_entry_state::IsSet,
+    S::CreatedAt: edit_history_entry_state::IsSet,
+    S::Type: edit_history_entry_state::IsSet,
+    S::Uri: edit_history_entry_state::IsSet,
+    S::Cid: edit_history_entry_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> EditHistoryEntry<'a> {
+        EditHistoryEntry {
+            author: self.__unsafe_private_named.0.unwrap(),
+            cid: self.__unsafe_private_named.1.unwrap(),
+            created_at: self.__unsafe_private_named.2.unwrap(),
+            has_inline_diff: self.__unsafe_private_named.3,
+            prev_ref: self.__unsafe_private_named.4,
+            root_ref: self.__unsafe_private_named.5,
+            snapshot_cid: self.__unsafe_private_named.6,
+            r#type: self.__unsafe_private_named.7.unwrap(),
+            uri: self.__unsafe_private_named.8.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> EditHistoryEntry<'a> {
+        EditHistoryEntry {
+            author: self.__unsafe_private_named.0.unwrap(),
+            cid: self.__unsafe_private_named.1.unwrap(),
+            created_at: self.__unsafe_private_named.2.unwrap(),
+            has_inline_diff: self.__unsafe_private_named.3,
+            prev_ref: self.__unsafe_private_named.4,
+            root_ref: self.__unsafe_private_named.5,
+            snapshot_cid: self.__unsafe_private_named.6,
+            r#type: self.__unsafe_private_named.7.unwrap(),
+            uri: self.__unsafe_private_named.8.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EditHistoryEntry<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.edit.defs"
+    }
+    fn def_name() -> &'static str {
+        "editHistoryEntry"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_edit_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Full tree structure showing all branches for a resource.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct EditTreeView<'a> {
+    #[serde(borrow)]
+    pub branches: Vec<crate::sh_weaver::edit::EditBranchView<'a>>,
+    /// Diffs where branches diverge
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub conflict_points: std::option::Option<
+        Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub has_conflicts: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub main_branch: std::option::Option<crate::sh_weaver::edit::EditBranchView<'a>>,
+    #[serde(borrow)]
+    pub resource: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+}
+
+pub mod edit_tree_view_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Resource;
+        type Branches;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Resource = Unset;
+        type Branches = Unset;
+    }
+    ///State transition - sets the `resource` field to Set
+    pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetResource<S> {}
+    impl<S: State> State for SetResource<S> {
+        type Resource = Set<members::resource>;
+        type Branches = S::Branches;
+    }
+    ///State transition - sets the `branches` field to Set
+    pub struct SetBranches<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBranches<S> {}
+    impl<S: State> State for SetBranches<S> {
+        type Resource = S::Resource;
+        type Branches = Set<members::branches>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `resource` field
+        pub struct resource(());
+        ///Marker type for the `branches` field
+        pub struct branches(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct EditTreeViewBuilder<'a, S: edit_tree_view_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<Vec<crate::sh_weaver::edit::EditBranchView<'a>>>,
+        ::core::option::Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<crate::sh_weaver::edit::EditBranchView<'a>>,
+        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> EditTreeView<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> EditTreeViewBuilder<'a, edit_tree_view_state::Empty> {
+        EditTreeViewBuilder::new()
+    }
+}
+
+impl<'a> EditTreeViewBuilder<'a, edit_tree_view_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        EditTreeViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> EditTreeViewBuilder<'a, S>
+where
+    S: edit_tree_view_state::State,
+    S::Branches: edit_tree_view_state::IsUnset,
+{
+    /// Set the `branches` field (required)
+    pub fn branches(
+        mut self,
+        value: impl Into<Vec<crate::sh_weaver::edit::EditBranchView<'a>>>,
+    ) -> EditTreeViewBuilder<'a, edit_tree_view_state::SetBranches<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        EditTreeViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: edit_tree_view_state::State> EditTreeViewBuilder<'a, S> {
+    /// Set the `conflictPoints` field (optional)
+    pub fn conflict_points(
+        mut self,
+        value: impl Into<
+            Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
+        >,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `conflictPoints` field to an Option value (optional)
+    pub fn maybe_conflict_points(
+        mut self,
+        value: Option<Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: edit_tree_view_state::State> EditTreeViewBuilder<'a, S> {
+    /// Set the `hasConflicts` field (optional)
+    pub fn has_conflicts(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `hasConflicts` field to an Option value (optional)
+    pub fn maybe_has_conflicts(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: edit_tree_view_state::State> EditTreeViewBuilder<'a, S> {
+    /// Set the `mainBranch` field (optional)
+    pub fn main_branch(
+        mut self,
+        value: impl Into<Option<crate::sh_weaver::edit::EditBranchView<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `mainBranch` field to an Option value (optional)
+    pub fn maybe_main_branch(
+        mut self,
+        value: Option<crate::sh_weaver::edit::EditBranchView<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S> EditTreeViewBuilder<'a, S>
+where
+    S: edit_tree_view_state::State,
+    S::Resource: edit_tree_view_state::IsUnset,
+{
+    /// Set the `resource` field (required)
+    pub fn resource(
+        mut self,
+        value: impl Into<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    ) -> EditTreeViewBuilder<'a, edit_tree_view_state::SetResource<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        EditTreeViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> EditTreeViewBuilder<'a, S>
+where
+    S: edit_tree_view_state::State,
+    S::Resource: edit_tree_view_state::IsSet,
+    S::Branches: edit_tree_view_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> EditTreeView<'a> {
+        EditTreeView {
+            branches: self.__unsafe_private_named.0.unwrap(),
+            conflict_points: self.__unsafe_private_named.1,
+            has_conflicts: self.__unsafe_private_named.2,
+            main_branch: self.__unsafe_private_named.3,
+            resource: self.__unsafe_private_named.4.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> EditTreeView<'a> {
+        EditTreeView {
+            branches: self.__unsafe_private_named.0.unwrap(),
+            conflict_points: self.__unsafe_private_named.1,
+            has_conflicts: self.__unsafe_private_named.2,
+            main_branch: self.__unsafe_private_named.3,
+            resource: self.__unsafe_private_named.4.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EditTreeView<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.edit.defs"
+    }
+    fn def_name() -> &'static str {
+        "editTreeView"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_edit_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct EntryRef<'a> {
     #[serde(borrow)]
-    pub notebook: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    pub entry: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }
 
 pub mod entry_ref_state {
@@ -283,25 +1684,25 @@ pub mod entry_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Notebook;
+        type Entry;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Notebook = Unset;
+        type Entry = Unset;
     }
-    ///State transition - sets the `notebook` field to Set
-    pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNotebook<S> {}
-    impl<S: State> State for SetNotebook<S> {
-        type Notebook = Set<members::notebook>;
+    ///State transition - sets the `entry` field to Set
+    pub struct SetEntry<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEntry<S> {}
+    impl<S: State> State for SetEntry<S> {
+        type Entry = Set<members::entry>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `notebook` field
-        pub struct notebook(());
+        ///Marker type for the `entry` field
+        pub struct entry(());
     }
 }
 
@@ -335,13 +1736,13 @@ impl<'a> EntryRefBuilder<'a, entry_ref_state::Empty> {
 impl<'a, S> EntryRefBuilder<'a, S>
 where
     S: entry_ref_state::State,
-    S::Notebook: entry_ref_state::IsUnset,
+    S::Entry: entry_ref_state::IsUnset,
 {
-    /// Set the `notebook` field (required)
-    pub fn notebook(
+    /// Set the `entry` field (required)
+    pub fn entry(
         mut self,
         value: impl Into<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    ) -> EntryRefBuilder<'a, entry_ref_state::SetNotebook<S>> {
+    ) -> EntryRefBuilder<'a, entry_ref_state::SetEntry<S>> {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
         EntryRefBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -354,12 +1755,12 @@ where
 impl<'a, S> EntryRefBuilder<'a, S>
 where
     S: entry_ref_state::State,
-    S::Notebook: entry_ref_state::IsSet,
+    S::Entry: entry_ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> EntryRef<'a> {
         EntryRef {
-            notebook: self.__unsafe_private_named.0.unwrap(),
+            entry: self.__unsafe_private_named.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -372,7 +1773,7 @@ where
         >,
     ) -> EntryRef<'a> {
         EntryRef {
-            notebook: self.__unsafe_private_named.0.unwrap(),
+            entry: self.__unsafe_private_named.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }

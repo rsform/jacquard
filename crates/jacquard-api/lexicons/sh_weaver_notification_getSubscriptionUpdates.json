@@ -1,0 +1,50 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.notification.getSubscriptionUpdates",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get new/updated content from notebooks the user subscribes to.",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "cursor": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer",
+            "default": 20,
+            "minimum": 1,
+            "maximum": 50
+          },
+          "since": {
+            "type": "string",
+            "description": "Only show updates since this timestamp.",
+            "format": "datetime"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "updates"
+          ],
+          "properties": {
+            "cursor": {
+              "type": "string"
+            },
+            "updates": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "sh.weaver.notification.defs#subscriptionUpdateView"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

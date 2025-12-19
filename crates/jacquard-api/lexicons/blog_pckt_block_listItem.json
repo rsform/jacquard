@@ -1,7 +1,7 @@
 {
   "lexicon": 1,
   "id": "blog.pckt.block.listItem",
-  "description": "List item within ordered or unordered lists. Can contain paragraphs and nested lists.",
+  "description": "List item within ordered or unordered lists. Can contain text blocks and nested lists.",
   "defs": {
     "main": {
       "type": "object",
@@ -11,11 +11,11 @@
       "properties": {
         "content": {
           "type": "array",
-          "description": "Array of block content (paragraphs or nested lists)",
+          "description": "Array of block content (text or nested lists)",
           "items": {
             "type": "union",
             "refs": [
-              "blog.pckt.block.paragraph",
+              "blog.pckt.block.text",
               "blog.pckt.block.bulletList",
               "blog.pckt.block.orderedList"
             ],

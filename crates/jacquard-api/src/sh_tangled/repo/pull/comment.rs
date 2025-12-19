@@ -20,8 +20,14 @@ pub struct Comment<'a> {
     #[serde(borrow)]
     pub body: jacquard_common::CowStr<'a>,
     pub created_at: jacquard_common::types::string::Datetime,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub mentions: std::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
     #[serde(borrow)]
     pub pull: jacquard_common::types::string::AtUri<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub references: std::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
 }
 
 pub mod comment_state {
@@ -34,51 +40,51 @@ pub mod comment_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Pull;
         type Body;
         type CreatedAt;
-        type Pull;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Pull = Unset;
         type Body = Unset;
         type CreatedAt = Unset;
-        type Pull = Unset;
-    }
-    ///State transition - sets the `body` field to Set
-    pub struct SetBody<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBody<S> {}
-    impl<S: State> State for SetBody<S> {
-        type Body = Set<members::body>;
-        type CreatedAt = S::CreatedAt;
-        type Pull = S::Pull;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Body = S::Body;
-        type CreatedAt = Set<members::created_at>;
-        type Pull = S::Pull;
     }
     ///State transition - sets the `pull` field to Set
     pub struct SetPull<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPull<S> {}
     impl<S: State> State for SetPull<S> {
+        type Pull = Set<members::pull>;
         type Body = S::Body;
         type CreatedAt = S::CreatedAt;
-        type Pull = Set<members::pull>;
+    }
+    ///State transition - sets the `body` field to Set
+    pub struct SetBody<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBody<S> {}
+    impl<S: State> State for SetBody<S> {
+        type Pull = S::Pull;
+        type Body = Set<members::body>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Pull = S::Pull;
+        type Body = S::Body;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `pull` field
+        pub struct pull(());
         ///Marker type for the `body` field
         pub struct body(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `pull` field
-        pub struct pull(());
     }
 }
 
@@ -88,7 +94,9 @@ pub struct CommentBuilder<'a, S: comment_state::State> {
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
         ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+        ::core::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -105,7 +113,7 @@ impl<'a> CommentBuilder<'a, comment_state::Empty> {
     pub fn new() -> Self {
         CommentBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None),
+            __unsafe_private_named: (None, None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -149,6 +157,25 @@ where
     }
 }
 
+impl<'a, S: comment_state::State> CommentBuilder<'a, S> {
+    /// Set the `mentions` field (optional)
+    pub fn mentions(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::types::string::Did<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `mentions` field to an Option value (optional)
+    pub fn maybe_mentions(
+        mut self,
+        value: Option<Vec<jacquard_common::types::string::Did<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
 impl<'a, S> CommentBuilder<'a, S>
 where
     S: comment_state::State,
@@ -159,7 +186,7 @@ where
         mut self,
         value: impl Into<jacquard_common::types::string::AtUri<'a>>,
     ) -> CommentBuilder<'a, comment_state::SetPull<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
         CommentBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -168,19 +195,40 @@ where
     }
 }
 
+impl<'a, S: comment_state::State> CommentBuilder<'a, S> {
+    /// Set the `references` field (optional)
+    pub fn references(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::types::string::AtUri<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `references` field to an Option value (optional)
+    pub fn maybe_references(
+        mut self,
+        value: Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
 impl<'a, S> CommentBuilder<'a, S>
 where
     S: comment_state::State,
+    S::Pull: comment_state::IsSet,
     S::Body: comment_state::IsSet,
     S::CreatedAt: comment_state::IsSet,
-    S::Pull: comment_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Comment<'a> {
         Comment {
             body: self.__unsafe_private_named.0.unwrap(),
             created_at: self.__unsafe_private_named.1.unwrap(),
-            pull: self.__unsafe_private_named.2.unwrap(),
+            mentions: self.__unsafe_private_named.2,
+            pull: self.__unsafe_private_named.3.unwrap(),
+            references: self.__unsafe_private_named.4,
             extra_data: Default::default(),
         }
     }
@@ -195,7 +243,9 @@ where
         Comment {
             body: self.__unsafe_private_named.0.unwrap(),
             created_at: self.__unsafe_private_named.1.unwrap(),
-            pull: self.__unsafe_private_named.2.unwrap(),
+            mentions: self.__unsafe_private_named.2,
+            pull: self.__unsafe_private_named.3.unwrap(),
+            references: self.__unsafe_private_named.4,
             extra_data: Some(extra_data),
         }
     }
@@ -342,6 +392,30 @@ fn lexicon_doc_sh_tangled_repo_pull_comment() -> ::jacquard_lexicon::lexicon::Le
                                 }),
                             );
                             map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "mentions",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                    description: None,
+                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: Some(
+                                            ::jacquard_lexicon::lexicon::LexStringFormat::Did,
+                                        ),
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                    min_length: None,
+                                    max_length: None,
+                                }),
+                            );
+                            map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static("pull"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
@@ -356,6 +430,30 @@ fn lexicon_doc_sh_tangled_repo_pull_comment() -> ::jacquard_lexicon::lexicon::Le
                                     r#enum: None,
                                     r#const: None,
                                     known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "references",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                    description: None,
+                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: Some(
+                                            ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
+                                        ),
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                    min_length: None,
+                                    max_length: None,
                                 }),
                             );
                             map

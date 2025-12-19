@@ -45,9 +45,9 @@ pub struct GetConfigOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetConfigError<'a> {
     #[serde(rename = "InvalidID")]
-    InvalidId(std::option::Option<String>),
+    InvalidId(std::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "InvalidServiceAuth")]
-    InvalidServiceAuth(std::option::Option<String>),
+    InvalidServiceAuth(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl std::fmt::Display for GetConfigError<'_> {

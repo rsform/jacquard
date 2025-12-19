@@ -1,0 +1,66 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.notebook.getEntryNotebooks",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get notebooks that contain an entry. An entry can appear in multiple notebooks.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "entry"
+        ],
+        "properties": {
+          "entry": {
+            "type": "string",
+            "description": "AT URI of the entry",
+            "format": "at-uri"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "notebooks"
+          ],
+          "properties": {
+            "notebooks": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "#notebookRef"
+              }
+            }
+          }
+        }
+      }
+    },
+    "notebookRef": {
+      "type": "object",
+      "description": "Reference to a notebook containing this entry.",
+      "required": [
+        "uri",
+        "cid"
+      ],
+      "properties": {
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "owner": {
+          "type": "ref",
+          "ref": "sh.weaver.actor.defs#profileViewBasic"
+        },
+        "title": {
+          "type": "string"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    }
+  }
+}

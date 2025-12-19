@@ -1,0 +1,35 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.collab.accept",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Acceptance of a collaboration invite. Completes the two-way agreement.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "invite",
+          "resource",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "invite": {
+            "type": "ref",
+            "description": "Reference to the invite record being accepted.",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "resource": {
+            "type": "string",
+            "description": "URI of the resource (denormalized for easier querying).",
+            "format": "at-uri"
+          }
+        }
+      }
+    }
+  }
+}

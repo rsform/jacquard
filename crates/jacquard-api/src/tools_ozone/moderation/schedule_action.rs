@@ -574,6 +574,48 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::le
                             }),
                         );
                         map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "emailContent",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Email content to be sent to the user upon takedown.",
+                                    ),
+                                ),
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "emailSubject",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Subject of the email to be sent to the user upon takedown.",
+                                    ),
+                                ),
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("policies"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: Some(
@@ -595,6 +637,63 @@ fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::le
                                 }),
                                 min_length: None,
                                 max_length: Some(5usize),
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "severityLevel",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Severity level of the violation (e.g., 'sev-0', 'sev-1', 'sev-2', etc.).",
+                                    ),
+                                ),
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "strikeCount",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: None,
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "strikeExpiresAt",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "When the strike should expire. If not provided, the strike never expires.",
+                                    ),
+                                ),
+                                format: Some(
+                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
+                                ),
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
                             }),
                         );
                         map
@@ -662,67 +761,67 @@ pub mod schedule_action_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subjects;
         type CreatedBy;
-        type Scheduling;
+        type Subjects;
         type Action;
+        type Scheduling;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subjects = Unset;
         type CreatedBy = Unset;
-        type Scheduling = Unset;
+        type Subjects = Unset;
         type Action = Unset;
-    }
-    ///State transition - sets the `subjects` field to Set
-    pub struct SetSubjects<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubjects<S> {}
-    impl<S: State> State for SetSubjects<S> {
-        type Subjects = Set<members::subjects>;
-        type CreatedBy = S::CreatedBy;
-        type Scheduling = S::Scheduling;
-        type Action = S::Action;
+        type Scheduling = Unset;
     }
     ///State transition - sets the `created_by` field to Set
     pub struct SetCreatedBy<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedBy<S> {}
     impl<S: State> State for SetCreatedBy<S> {
-        type Subjects = S::Subjects;
         type CreatedBy = Set<members::created_by>;
-        type Scheduling = S::Scheduling;
-        type Action = S::Action;
-    }
-    ///State transition - sets the `scheduling` field to Set
-    pub struct SetScheduling<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetScheduling<S> {}
-    impl<S: State> State for SetScheduling<S> {
         type Subjects = S::Subjects;
-        type CreatedBy = S::CreatedBy;
-        type Scheduling = Set<members::scheduling>;
         type Action = S::Action;
+        type Scheduling = S::Scheduling;
+    }
+    ///State transition - sets the `subjects` field to Set
+    pub struct SetSubjects<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubjects<S> {}
+    impl<S: State> State for SetSubjects<S> {
+        type CreatedBy = S::CreatedBy;
+        type Subjects = Set<members::subjects>;
+        type Action = S::Action;
+        type Scheduling = S::Scheduling;
     }
     ///State transition - sets the `action` field to Set
     pub struct SetAction<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAction<S> {}
     impl<S: State> State for SetAction<S> {
-        type Subjects = S::Subjects;
         type CreatedBy = S::CreatedBy;
-        type Scheduling = S::Scheduling;
+        type Subjects = S::Subjects;
         type Action = Set<members::action>;
+        type Scheduling = S::Scheduling;
+    }
+    ///State transition - sets the `scheduling` field to Set
+    pub struct SetScheduling<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetScheduling<S> {}
+    impl<S: State> State for SetScheduling<S> {
+        type CreatedBy = S::CreatedBy;
+        type Subjects = S::Subjects;
+        type Action = S::Action;
+        type Scheduling = Set<members::scheduling>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subjects` field
-        pub struct subjects(());
         ///Marker type for the `created_by` field
         pub struct created_by(());
-        ///Marker type for the `scheduling` field
-        pub struct scheduling(());
+        ///Marker type for the `subjects` field
+        pub struct subjects(());
         ///Marker type for the `action` field
         pub struct action(());
+        ///Marker type for the `scheduling` field
+        pub struct scheduling(());
     }
 }
 
@@ -861,10 +960,10 @@ where
 impl<'a, S> ScheduleActionBuilder<'a, S>
 where
     S: schedule_action_state::State,
-    S::Subjects: schedule_action_state::IsSet,
     S::CreatedBy: schedule_action_state::IsSet,
-    S::Scheduling: schedule_action_state::IsSet,
+    S::Subjects: schedule_action_state::IsSet,
     S::Action: schedule_action_state::IsSet,
+    S::Scheduling: schedule_action_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ScheduleAction<'a> {
@@ -973,37 +1072,37 @@ pub mod scheduled_action_results_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Succeeded;
         type Failed;
+        type Succeeded;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Succeeded = Unset;
         type Failed = Unset;
-    }
-    ///State transition - sets the `succeeded` field to Set
-    pub struct SetSucceeded<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSucceeded<S> {}
-    impl<S: State> State for SetSucceeded<S> {
-        type Succeeded = Set<members::succeeded>;
-        type Failed = S::Failed;
+        type Succeeded = Unset;
     }
     ///State transition - sets the `failed` field to Set
     pub struct SetFailed<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFailed<S> {}
     impl<S: State> State for SetFailed<S> {
-        type Succeeded = S::Succeeded;
         type Failed = Set<members::failed>;
+        type Succeeded = S::Succeeded;
+    }
+    ///State transition - sets the `succeeded` field to Set
+    pub struct SetSucceeded<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSucceeded<S> {}
+    impl<S: State> State for SetSucceeded<S> {
+        type Failed = S::Failed;
+        type Succeeded = Set<members::succeeded>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `succeeded` field
-        pub struct succeeded(());
         ///Marker type for the `failed` field
         pub struct failed(());
+        ///Marker type for the `succeeded` field
+        pub struct succeeded(());
     }
 }
 
@@ -1089,8 +1188,8 @@ where
 impl<'a, S> ScheduledActionResultsBuilder<'a, S>
 where
     S: scheduled_action_results_state::State,
-    S::Succeeded: scheduled_action_results_state::IsSet,
     S::Failed: scheduled_action_results_state::IsSet,
+    S::Succeeded: scheduled_action_results_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ScheduledActionResults<'a> {
@@ -1198,10 +1297,28 @@ pub struct Takedown<'a> {
     /// Indicates how long the takedown should be in effect before automatically expiring.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub duration_in_hours: std::option::Option<i64>,
+    /// Email content to be sent to the user upon takedown.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub email_content: std::option::Option<jacquard_common::CowStr<'a>>,
+    /// Subject of the email to be sent to the user upon takedown.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub email_subject: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Names/Keywords of the policies that drove the decision.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub policies: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    /// Severity level of the violation (e.g., 'sev-0', 'sev-1', 'sev-2', etc.).
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub severity_level: std::option::Option<jacquard_common::CowStr<'a>>,
+    /// Number of strikes to assign to the user when takedown is applied.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub strike_count: std::option::Option<i64>,
+    /// When the strike should expire. If not provided, the strike never expires.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub strike_expires_at: std::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Takedown<'a> {

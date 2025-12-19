@@ -1,0 +1,2068 @@
+{
+  "lexicon": 1,
+  "id": "social.flockfeeds.lexical.type.NewsArticle",
+  "defs": {
+    "embedded": {
+      "type": "object",
+      "description": "A NewsArticle is an article whose content reports news, or provides background context and supporting materials for understanding the news.\n\nA more detailed overview of [schema.org News markup](/docs/news.html) is also available.",
+      "properties": {
+        "about": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Thing#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#aboutList"
+          ]
+        },
+        "abstract": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#abstractScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#abstractList"
+          ]
+        },
+        "accessMode": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#accessModeScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#accessModeList"
+          ]
+        },
+        "accessModeSufficient": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.ItemList#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#accessModeSufficientList"
+          ]
+        },
+        "accessibilityAPI": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#accessibilityAPIScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#accessibilityAPIList"
+          ]
+        },
+        "accessibilityControl": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#accessibilityControlScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#accessibilityControlList"
+          ]
+        },
+        "accessibilityFeature": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#accessibilityFeatureScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#accessibilityFeatureList"
+          ]
+        },
+        "accessibilityHazard": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#accessibilityHazardScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#accessibilityHazardList"
+          ]
+        },
+        "accessibilitySummary": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#accessibilitySummaryScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#accessibilitySummaryList"
+          ]
+        },
+        "accountablePerson": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#accountablePersonList"
+          ]
+        },
+        "acquireLicensePage": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#acquireLicensePageScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#acquireLicensePageList"
+          ]
+        },
+        "additionalType": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#additionalTypeScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#additionalTypeList"
+          ]
+        },
+        "aggregateRating": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.AggregateRating#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#aggregateRatingList"
+          ]
+        },
+        "alternateName": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#alternateNameScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#alternateNameList"
+          ]
+        },
+        "alternativeHeadline": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#alternativeHeadlineScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#alternativeHeadlineList"
+          ]
+        },
+        "archivedAt": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.WebPage#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#archivedAtScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#archivedAtList"
+          ]
+        },
+        "articleBody": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#articleBodyScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#articleBodyList"
+          ]
+        },
+        "articleSection": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#articleSectionScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#articleSectionList"
+          ]
+        },
+        "assesses": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#assessesScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#assessesList"
+          ]
+        },
+        "associatedMedia": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.MediaObject#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#associatedMediaList"
+          ]
+        },
+        "audience": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Audience#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#audienceList"
+          ]
+        },
+        "audio": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.AudioObject#embedded",
+            "social.flockfeeds.lexical.type.Clip#embedded",
+            "social.flockfeeds.lexical.type.MusicRecording#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#audioList"
+          ]
+        },
+        "author": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#authorList"
+          ]
+        },
+        "award": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#awardScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#awardList"
+          ]
+        },
+        "awards": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#awardsScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#awardsList"
+          ]
+        },
+        "backstory": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#backstoryScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#backstoryList"
+          ]
+        },
+        "character": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#characterList"
+          ]
+        },
+        "citation": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#citationScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#citationList"
+          ]
+        },
+        "comment": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Comment#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#commentList"
+          ]
+        },
+        "commentCount": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#commentCountScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#commentCountList"
+          ]
+        },
+        "conditionsOfAccess": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#conditionsOfAccessScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#conditionsOfAccessList"
+          ]
+        },
+        "contentLocation": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Place#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#contentLocationList"
+          ]
+        },
+        "contentRating": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Rating#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#contentRatingScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#contentRatingList"
+          ]
+        },
+        "contentReferenceTime": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#contentReferenceTimeScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#contentReferenceTimeList"
+          ]
+        },
+        "contributor": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#contributorList"
+          ]
+        },
+        "copyrightHolder": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#copyrightHolderList"
+          ]
+        },
+        "copyrightNotice": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#copyrightNoticeScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#copyrightNoticeList"
+          ]
+        },
+        "copyrightYear": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#copyrightYearScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#copyrightYearList"
+          ]
+        },
+        "correction": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CorrectionComment#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#correctionScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#correctionList"
+          ]
+        },
+        "countryOfOrigin": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Country#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#countryOfOriginList"
+          ]
+        },
+        "creativeWorkStatus": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#creativeWorkStatusScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#creativeWorkStatusList"
+          ]
+        },
+        "creator": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#creatorList"
+          ]
+        },
+        "creditText": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#creditTextScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#creditTextList"
+          ]
+        },
+        "dateCreated": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#dateCreatedScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#dateCreatedList"
+          ]
+        },
+        "dateModified": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#dateModifiedScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#dateModifiedList"
+          ]
+        },
+        "datePublished": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#datePublishedScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#datePublishedList"
+          ]
+        },
+        "dateline": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#datelineScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#datelineList"
+          ]
+        },
+        "description": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.TextObject#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#descriptionScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#descriptionList"
+          ]
+        },
+        "digitalSourceType": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.IPTCDigitalSourceEnumeration#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#digitalSourceTypeScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#digitalSourceTypeList"
+          ]
+        },
+        "disambiguatingDescription": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#disambiguatingDescriptionScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#disambiguatingDescriptionList"
+          ]
+        },
+        "discussionUrl": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#discussionUrlScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#discussionUrlList"
+          ]
+        },
+        "editEIDR": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#editEIDRScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#editEIDRList"
+          ]
+        },
+        "editor": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#editorList"
+          ]
+        },
+        "educationalAlignment": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.AlignmentObject#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#educationalAlignmentList"
+          ]
+        },
+        "educationalLevel": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#educationalLevelScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#educationalLevelList"
+          ]
+        },
+        "educationalUse": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#educationalUseScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#educationalUseList"
+          ]
+        },
+        "encoding": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.MediaObject#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#encodingList"
+          ]
+        },
+        "encodingFormat": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#encodingFormatScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#encodingFormatList"
+          ]
+        },
+        "encodings": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.MediaObject#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#encodingsList"
+          ]
+        },
+        "exampleOfWork": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#exampleOfWorkList"
+          ]
+        },
+        "expires": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#expiresScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#expiresList"
+          ]
+        },
+        "fileFormat": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#fileFormatScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#fileFormatList"
+          ]
+        },
+        "funder": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#funderList"
+          ]
+        },
+        "funding": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Grant#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#fundingList"
+          ]
+        },
+        "genre": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#genreScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#genreList"
+          ]
+        },
+        "hasPart": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#hasPartList"
+          ]
+        },
+        "headline": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#headlineScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#headlineList"
+          ]
+        },
+        "identifier": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.PropertyValue#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#identifierScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#identifierList"
+          ]
+        },
+        "image": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.ImageObject#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#imageScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#imageList"
+          ]
+        },
+        "inLanguage": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Language#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#inLanguageScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#inLanguageList"
+          ]
+        },
+        "interactionStatistic": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.InteractionCounter#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#interactionStatisticList"
+          ]
+        },
+        "interactivityType": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#interactivityTypeScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#interactivityTypeList"
+          ]
+        },
+        "interpretedAsClaim": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Claim#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#interpretedAsClaimList"
+          ]
+        },
+        "isAccessibleForFree": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#isAccessibleForFreeScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#isAccessibleForFreeList"
+          ]
+        },
+        "isBasedOn": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.type.Product#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#isBasedOnScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#isBasedOnList"
+          ]
+        },
+        "isBasedOnUrl": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.type.Product#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#isBasedOnUrlScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#isBasedOnUrlList"
+          ]
+        },
+        "isFamilyFriendly": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#isFamilyFriendlyScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#isFamilyFriendlyList"
+          ]
+        },
+        "isPartOf": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#isPartOfScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#isPartOfList"
+          ]
+        },
+        "keywords": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#keywordsScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#keywordsList"
+          ]
+        },
+        "learningResourceType": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#learningResourceTypeScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#learningResourceTypeList"
+          ]
+        },
+        "license": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#licenseScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#licenseList"
+          ]
+        },
+        "locationCreated": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Place#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#locationCreatedList"
+          ]
+        },
+        "mainEntity": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Thing#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#mainEntityList"
+          ]
+        },
+        "mainEntityOfPage": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#mainEntityOfPageScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#mainEntityOfPageList"
+          ]
+        },
+        "maintainer": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#maintainerList"
+          ]
+        },
+        "material": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Product#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#materialScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#materialList"
+          ]
+        },
+        "materialExtent": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.QuantitativeValue#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#materialExtentScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#materialExtentList"
+          ]
+        },
+        "mentions": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Thing#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#mentionsList"
+          ]
+        },
+        "name": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#nameScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#nameList"
+          ]
+        },
+        "offers": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Demand#embedded",
+            "social.flockfeeds.lexical.type.Offer#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#offersList"
+          ]
+        },
+        "pageEnd": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#pageEndScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#pageEndList"
+          ]
+        },
+        "pageStart": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#pageStartScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#pageStartList"
+          ]
+        },
+        "pagination": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#paginationScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#paginationList"
+          ]
+        },
+        "pattern": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#patternScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#patternList"
+          ]
+        },
+        "position": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#positionScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#positionList"
+          ]
+        },
+        "potentialAction": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Action#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#potentialActionList"
+          ]
+        },
+        "printColumn": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#printColumnScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#printColumnList"
+          ]
+        },
+        "printEdition": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#printEditionScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#printEditionList"
+          ]
+        },
+        "printPage": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#printPageScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#printPageList"
+          ]
+        },
+        "printSection": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#printSectionScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#printSectionList"
+          ]
+        },
+        "producer": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#producerList"
+          ]
+        },
+        "provider": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#providerList"
+          ]
+        },
+        "publication": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.PublicationEvent#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#publicationList"
+          ]
+        },
+        "publisher": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#publisherList"
+          ]
+        },
+        "publisherImprint": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#publisherImprintList"
+          ]
+        },
+        "publishingPrinciples": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#publishingPrinciplesScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#publishingPrinciplesList"
+          ]
+        },
+        "recordedAt": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Event#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#recordedAtList"
+          ]
+        },
+        "releasedEvent": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.PublicationEvent#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#releasedEventList"
+          ]
+        },
+        "review": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Review#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#reviewList"
+          ]
+        },
+        "reviews": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Review#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#reviewsList"
+          ]
+        },
+        "sameAs": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#sameAsScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#sameAsList"
+          ]
+        },
+        "schemaVersion": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#schemaVersionScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#schemaVersionList"
+          ]
+        },
+        "sdDatePublished": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#sdDatePublishedScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#sdDatePublishedList"
+          ]
+        },
+        "sdLicense": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#sdLicenseScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#sdLicenseList"
+          ]
+        },
+        "sdPublisher": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#sdPublisherList"
+          ]
+        },
+        "size": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+            "social.flockfeeds.lexical.type.QuantitativeValue#embedded",
+            "social.flockfeeds.lexical.type.SizeSpecification#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#sizeScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#sizeList"
+          ]
+        },
+        "sourceOrganization": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#sourceOrganizationList"
+          ]
+        },
+        "spatial": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Place#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#spatialList"
+          ]
+        },
+        "spatialCoverage": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Place#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#spatialCoverageList"
+          ]
+        },
+        "speakable": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.SpeakableSpecification#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#speakableScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#speakableList"
+          ]
+        },
+        "sponsor": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#sponsorList"
+          ]
+        },
+        "subjectOf": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.type.Event#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#subjectOfList"
+          ]
+        },
+        "teaches": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#teachesScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#teachesList"
+          ]
+        },
+        "temporal": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#temporalScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#temporalList"
+          ]
+        },
+        "temporalCoverage": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#temporalCoverageScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#temporalCoverageList"
+          ]
+        },
+        "text": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#textScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#textList"
+          ]
+        },
+        "thumbnail": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.ImageObject#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#thumbnailList"
+          ]
+        },
+        "thumbnailUrl": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#thumbnailUrlScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#thumbnailUrlList"
+          ]
+        },
+        "timeRequired": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#timeRequiredScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#timeRequiredList"
+          ]
+        },
+        "translationOfWork": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#translationOfWorkList"
+          ]
+        },
+        "translator": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#translatorList"
+          ]
+        },
+        "typicalAgeRange": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#typicalAgeRangeScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#typicalAgeRangeList"
+          ]
+        },
+        "url": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#urlScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#urlList"
+          ]
+        },
+        "usageInfo": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#usageInfoScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#usageInfoList"
+          ]
+        },
+        "version": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#versionScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#versionList"
+          ]
+        },
+        "video": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Clip#embedded",
+            "social.flockfeeds.lexical.type.VideoObject#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#videoList"
+          ]
+        },
+        "wordCount": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#wordCountScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#wordCountList"
+          ]
+        },
+        "workExample": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#workExampleList"
+          ]
+        },
+        "workTranslation": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#workTranslationList"
+          ]
+        }
+      }
+    },
+    "main": {
+      "type": "object",
+      "description": "A NewsArticle is an article whose content reports news, or provides background context and supporting materials for understanding the news.\n\nA more detailed overview of [schema.org News markup](/docs/news.html) is also available.",
+      "properties": {
+        "about": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Thing#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#aboutList"
+          ]
+        },
+        "abstract": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#abstractScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#abstractList"
+          ]
+        },
+        "accessMode": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#accessModeScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#accessModeList"
+          ]
+        },
+        "accessModeSufficient": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.ItemList#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#accessModeSufficientList"
+          ]
+        },
+        "accessibilityAPI": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#accessibilityAPIScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#accessibilityAPIList"
+          ]
+        },
+        "accessibilityControl": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#accessibilityControlScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#accessibilityControlList"
+          ]
+        },
+        "accessibilityFeature": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#accessibilityFeatureScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#accessibilityFeatureList"
+          ]
+        },
+        "accessibilityHazard": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#accessibilityHazardScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#accessibilityHazardList"
+          ]
+        },
+        "accessibilitySummary": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#accessibilitySummaryScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#accessibilitySummaryList"
+          ]
+        },
+        "accountablePerson": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#accountablePersonList"
+          ]
+        },
+        "acquireLicensePage": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#acquireLicensePageScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#acquireLicensePageList"
+          ]
+        },
+        "additionalType": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#additionalTypeScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#additionalTypeList"
+          ]
+        },
+        "aggregateRating": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.AggregateRating#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#aggregateRatingList"
+          ]
+        },
+        "alternateName": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#alternateNameScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#alternateNameList"
+          ]
+        },
+        "alternativeHeadline": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#alternativeHeadlineScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#alternativeHeadlineList"
+          ]
+        },
+        "archivedAt": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.WebPage#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#archivedAtScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#archivedAtList"
+          ]
+        },
+        "articleBody": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#articleBodyScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#articleBodyList"
+          ]
+        },
+        "articleSection": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#articleSectionScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#articleSectionList"
+          ]
+        },
+        "assesses": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#assessesScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#assessesList"
+          ]
+        },
+        "associatedMedia": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.MediaObject#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#associatedMediaList"
+          ]
+        },
+        "audience": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Audience#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#audienceList"
+          ]
+        },
+        "audio": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.AudioObject#embedded",
+            "social.flockfeeds.lexical.type.Clip#embedded",
+            "social.flockfeeds.lexical.type.MusicRecording#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#audioList"
+          ]
+        },
+        "author": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#authorList"
+          ]
+        },
+        "award": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#awardScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#awardList"
+          ]
+        },
+        "awards": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#awardsScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#awardsList"
+          ]
+        },
+        "backstory": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#backstoryScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#backstoryList"
+          ]
+        },
+        "character": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#characterList"
+          ]
+        },
+        "citation": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#citationScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#citationList"
+          ]
+        },
+        "comment": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Comment#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#commentList"
+          ]
+        },
+        "commentCount": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#commentCountScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#commentCountList"
+          ]
+        },
+        "conditionsOfAccess": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#conditionsOfAccessScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#conditionsOfAccessList"
+          ]
+        },
+        "contentLocation": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Place#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#contentLocationList"
+          ]
+        },
+        "contentRating": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Rating#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#contentRatingScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#contentRatingList"
+          ]
+        },
+        "contentReferenceTime": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#contentReferenceTimeScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#contentReferenceTimeList"
+          ]
+        },
+        "contributor": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#contributorList"
+          ]
+        },
+        "copyrightHolder": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#copyrightHolderList"
+          ]
+        },
+        "copyrightNotice": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#copyrightNoticeScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#copyrightNoticeList"
+          ]
+        },
+        "copyrightYear": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#copyrightYearScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#copyrightYearList"
+          ]
+        },
+        "correction": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CorrectionComment#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#correctionScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#correctionList"
+          ]
+        },
+        "countryOfOrigin": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Country#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#countryOfOriginList"
+          ]
+        },
+        "creativeWorkStatus": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#creativeWorkStatusScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#creativeWorkStatusList"
+          ]
+        },
+        "creator": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#creatorList"
+          ]
+        },
+        "creditText": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#creditTextScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#creditTextList"
+          ]
+        },
+        "dateCreated": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#dateCreatedScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#dateCreatedList"
+          ]
+        },
+        "dateModified": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#dateModifiedScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#dateModifiedList"
+          ]
+        },
+        "datePublished": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#datePublishedScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#datePublishedList"
+          ]
+        },
+        "dateline": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#datelineScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#datelineList"
+          ]
+        },
+        "description": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.TextObject#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#descriptionScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#descriptionList"
+          ]
+        },
+        "digitalSourceType": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.IPTCDigitalSourceEnumeration#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#digitalSourceTypeScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#digitalSourceTypeList"
+          ]
+        },
+        "disambiguatingDescription": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#disambiguatingDescriptionScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#disambiguatingDescriptionList"
+          ]
+        },
+        "discussionUrl": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#discussionUrlScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#discussionUrlList"
+          ]
+        },
+        "editEIDR": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#editEIDRScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#editEIDRList"
+          ]
+        },
+        "editor": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#editorList"
+          ]
+        },
+        "educationalAlignment": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.AlignmentObject#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#educationalAlignmentList"
+          ]
+        },
+        "educationalLevel": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#educationalLevelScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#educationalLevelList"
+          ]
+        },
+        "educationalUse": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#educationalUseScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#educationalUseList"
+          ]
+        },
+        "encoding": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.MediaObject#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#encodingList"
+          ]
+        },
+        "encodingFormat": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#encodingFormatScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#encodingFormatList"
+          ]
+        },
+        "encodings": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.MediaObject#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#encodingsList"
+          ]
+        },
+        "exampleOfWork": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#exampleOfWorkList"
+          ]
+        },
+        "expires": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#expiresScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#expiresList"
+          ]
+        },
+        "fileFormat": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#fileFormatScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#fileFormatList"
+          ]
+        },
+        "funder": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#funderList"
+          ]
+        },
+        "funding": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Grant#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#fundingList"
+          ]
+        },
+        "genre": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#genreScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#genreList"
+          ]
+        },
+        "hasPart": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#hasPartList"
+          ]
+        },
+        "headline": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#headlineScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#headlineList"
+          ]
+        },
+        "identifier": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.PropertyValue#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#identifierScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#identifierList"
+          ]
+        },
+        "image": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.ImageObject#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#imageScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#imageList"
+          ]
+        },
+        "inLanguage": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Language#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#inLanguageScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#inLanguageList"
+          ]
+        },
+        "interactionStatistic": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.InteractionCounter#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#interactionStatisticList"
+          ]
+        },
+        "interactivityType": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#interactivityTypeScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#interactivityTypeList"
+          ]
+        },
+        "interpretedAsClaim": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Claim#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#interpretedAsClaimList"
+          ]
+        },
+        "isAccessibleForFree": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#isAccessibleForFreeScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#isAccessibleForFreeList"
+          ]
+        },
+        "isBasedOn": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.type.Product#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#isBasedOnScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#isBasedOnList"
+          ]
+        },
+        "isBasedOnUrl": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.type.Product#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#isBasedOnUrlScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#isBasedOnUrlList"
+          ]
+        },
+        "isFamilyFriendly": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#isFamilyFriendlyScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#isFamilyFriendlyList"
+          ]
+        },
+        "isPartOf": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#isPartOfScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#isPartOfList"
+          ]
+        },
+        "keywords": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#keywordsScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#keywordsList"
+          ]
+        },
+        "learningResourceType": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#learningResourceTypeScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#learningResourceTypeList"
+          ]
+        },
+        "license": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#licenseScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#licenseList"
+          ]
+        },
+        "locationCreated": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Place#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#locationCreatedList"
+          ]
+        },
+        "mainEntity": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Thing#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#mainEntityList"
+          ]
+        },
+        "mainEntityOfPage": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#mainEntityOfPageScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#mainEntityOfPageList"
+          ]
+        },
+        "maintainer": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#maintainerList"
+          ]
+        },
+        "material": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Product#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#materialScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#materialList"
+          ]
+        },
+        "materialExtent": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.QuantitativeValue#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#materialExtentScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#materialExtentList"
+          ]
+        },
+        "mentions": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Thing#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#mentionsList"
+          ]
+        },
+        "name": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#nameScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#nameList"
+          ]
+        },
+        "offers": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Demand#embedded",
+            "social.flockfeeds.lexical.type.Offer#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#offersList"
+          ]
+        },
+        "pageEnd": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#pageEndScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#pageEndList"
+          ]
+        },
+        "pageStart": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#pageStartScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#pageStartList"
+          ]
+        },
+        "pagination": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#paginationScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#paginationList"
+          ]
+        },
+        "pattern": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#patternScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#patternList"
+          ]
+        },
+        "position": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#positionScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#positionList"
+          ]
+        },
+        "potentialAction": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Action#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#potentialActionList"
+          ]
+        },
+        "printColumn": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#printColumnScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#printColumnList"
+          ]
+        },
+        "printEdition": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#printEditionScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#printEditionList"
+          ]
+        },
+        "printPage": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#printPageScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#printPageList"
+          ]
+        },
+        "printSection": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#printSectionScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#printSectionList"
+          ]
+        },
+        "producer": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#producerList"
+          ]
+        },
+        "provider": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#providerList"
+          ]
+        },
+        "publication": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.PublicationEvent#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#publicationList"
+          ]
+        },
+        "publisher": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#publisherList"
+          ]
+        },
+        "publisherImprint": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#publisherImprintList"
+          ]
+        },
+        "publishingPrinciples": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#publishingPrinciplesScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#publishingPrinciplesList"
+          ]
+        },
+        "recordedAt": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Event#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#recordedAtList"
+          ]
+        },
+        "releasedEvent": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.PublicationEvent#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#releasedEventList"
+          ]
+        },
+        "review": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Review#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#reviewList"
+          ]
+        },
+        "reviews": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Review#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#reviewsList"
+          ]
+        },
+        "sameAs": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#sameAsScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#sameAsList"
+          ]
+        },
+        "schemaVersion": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#schemaVersionScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#schemaVersionList"
+          ]
+        },
+        "sdDatePublished": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#sdDatePublishedScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#sdDatePublishedList"
+          ]
+        },
+        "sdLicense": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#sdLicenseScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#sdLicenseList"
+          ]
+        },
+        "sdPublisher": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#sdPublisherList"
+          ]
+        },
+        "size": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+            "social.flockfeeds.lexical.type.QuantitativeValue#embedded",
+            "social.flockfeeds.lexical.type.SizeSpecification#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#sizeScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#sizeList"
+          ]
+        },
+        "sourceOrganization": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#sourceOrganizationList"
+          ]
+        },
+        "spatial": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Place#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#spatialList"
+          ]
+        },
+        "spatialCoverage": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Place#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#spatialCoverageList"
+          ]
+        },
+        "speakable": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.SpeakableSpecification#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#speakableScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#speakableList"
+          ]
+        },
+        "sponsor": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#sponsorList"
+          ]
+        },
+        "subjectOf": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.type.Event#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#subjectOfList"
+          ]
+        },
+        "teaches": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#teachesScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#teachesList"
+          ]
+        },
+        "temporal": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#temporalScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#temporalList"
+          ]
+        },
+        "temporalCoverage": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#temporalCoverageScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#temporalCoverageList"
+          ]
+        },
+        "text": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#textScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#textList"
+          ]
+        },
+        "thumbnail": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.ImageObject#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#thumbnailList"
+          ]
+        },
+        "thumbnailUrl": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#thumbnailUrlScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#thumbnailUrlList"
+          ]
+        },
+        "timeRequired": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#timeRequiredScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#timeRequiredList"
+          ]
+        },
+        "translationOfWork": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#translationOfWorkList"
+          ]
+        },
+        "translator": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#translatorList"
+          ]
+        },
+        "typicalAgeRange": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#typicalAgeRangeScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#typicalAgeRangeList"
+          ]
+        },
+        "url": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#urlScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#urlList"
+          ]
+        },
+        "usageInfo": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#usageInfoScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#usageInfoList"
+          ]
+        },
+        "version": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#versionScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#versionList"
+          ]
+        },
+        "video": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Clip#embedded",
+            "social.flockfeeds.lexical.type.VideoObject#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#videoList"
+          ]
+        },
+        "wordCount": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.newsArticle#wordCountScalar",
+            "social.flockfeeds.lexical.prop.newsArticle#wordCountList"
+          ]
+        },
+        "workExample": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#workExampleList"
+          ]
+        },
+        "workTranslation": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.newsArticle#workTranslationList"
+          ]
+        }
+      }
+    }
+  }
+}

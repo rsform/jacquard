@@ -1,0 +1,2048 @@
+{
+  "lexicon": 1,
+  "id": "social.flockfeeds.lexical.type.Movie",
+  "defs": {
+    "embedded": {
+      "type": "object",
+      "description": "A movie.",
+      "properties": {
+        "about": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Thing#embedded",
+            "social.flockfeeds.lexical.prop.movie#aboutList"
+          ]
+        },
+        "abstract": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#abstractScalar",
+            "social.flockfeeds.lexical.prop.movie#abstractList"
+          ]
+        },
+        "accessMode": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#accessModeScalar",
+            "social.flockfeeds.lexical.prop.movie#accessModeList"
+          ]
+        },
+        "accessModeSufficient": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.ItemList#embedded",
+            "social.flockfeeds.lexical.prop.movie#accessModeSufficientList"
+          ]
+        },
+        "accessibilityAPI": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#accessibilityAPIScalar",
+            "social.flockfeeds.lexical.prop.movie#accessibilityAPIList"
+          ]
+        },
+        "accessibilityControl": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#accessibilityControlScalar",
+            "social.flockfeeds.lexical.prop.movie#accessibilityControlList"
+          ]
+        },
+        "accessibilityFeature": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#accessibilityFeatureScalar",
+            "social.flockfeeds.lexical.prop.movie#accessibilityFeatureList"
+          ]
+        },
+        "accessibilityHazard": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#accessibilityHazardScalar",
+            "social.flockfeeds.lexical.prop.movie#accessibilityHazardList"
+          ]
+        },
+        "accessibilitySummary": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#accessibilitySummaryScalar",
+            "social.flockfeeds.lexical.prop.movie#accessibilitySummaryList"
+          ]
+        },
+        "accountablePerson": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.movie#accountablePersonList"
+          ]
+        },
+        "acquireLicensePage": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.movie#acquireLicensePageScalar",
+            "social.flockfeeds.lexical.prop.movie#acquireLicensePageList"
+          ]
+        },
+        "actor": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.PerformingGroup#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.movie#actorList"
+          ]
+        },
+        "actors": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.movie#actorsList"
+          ]
+        },
+        "additionalType": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#additionalTypeScalar",
+            "social.flockfeeds.lexical.prop.movie#additionalTypeList"
+          ]
+        },
+        "aggregateRating": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.AggregateRating#embedded",
+            "social.flockfeeds.lexical.prop.movie#aggregateRatingList"
+          ]
+        },
+        "alternateName": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#alternateNameScalar",
+            "social.flockfeeds.lexical.prop.movie#alternateNameList"
+          ]
+        },
+        "alternativeHeadline": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#alternativeHeadlineScalar",
+            "social.flockfeeds.lexical.prop.movie#alternativeHeadlineList"
+          ]
+        },
+        "archivedAt": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.WebPage#embedded",
+            "social.flockfeeds.lexical.prop.movie#archivedAtScalar",
+            "social.flockfeeds.lexical.prop.movie#archivedAtList"
+          ]
+        },
+        "assesses": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+            "social.flockfeeds.lexical.prop.movie#assessesScalar",
+            "social.flockfeeds.lexical.prop.movie#assessesList"
+          ]
+        },
+        "associatedMedia": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.MediaObject#embedded",
+            "social.flockfeeds.lexical.prop.movie#associatedMediaList"
+          ]
+        },
+        "audience": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Audience#embedded",
+            "social.flockfeeds.lexical.prop.movie#audienceList"
+          ]
+        },
+        "audio": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.AudioObject#embedded",
+            "social.flockfeeds.lexical.type.Clip#embedded",
+            "social.flockfeeds.lexical.type.MusicRecording#embedded",
+            "social.flockfeeds.lexical.prop.movie#audioList"
+          ]
+        },
+        "author": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.movie#authorList"
+          ]
+        },
+        "award": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#awardScalar",
+            "social.flockfeeds.lexical.prop.movie#awardList"
+          ]
+        },
+        "awards": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#awardsScalar",
+            "social.flockfeeds.lexical.prop.movie#awardsList"
+          ]
+        },
+        "character": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.movie#characterList"
+          ]
+        },
+        "citation": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.movie#citationScalar",
+            "social.flockfeeds.lexical.prop.movie#citationList"
+          ]
+        },
+        "comment": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Comment#embedded",
+            "social.flockfeeds.lexical.prop.movie#commentList"
+          ]
+        },
+        "commentCount": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#commentCountScalar",
+            "social.flockfeeds.lexical.prop.movie#commentCountList"
+          ]
+        },
+        "conditionsOfAccess": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#conditionsOfAccessScalar",
+            "social.flockfeeds.lexical.prop.movie#conditionsOfAccessList"
+          ]
+        },
+        "contentLocation": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Place#embedded",
+            "social.flockfeeds.lexical.prop.movie#contentLocationList"
+          ]
+        },
+        "contentRating": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Rating#embedded",
+            "social.flockfeeds.lexical.prop.movie#contentRatingScalar",
+            "social.flockfeeds.lexical.prop.movie#contentRatingList"
+          ]
+        },
+        "contentReferenceTime": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#contentReferenceTimeScalar",
+            "social.flockfeeds.lexical.prop.movie#contentReferenceTimeList"
+          ]
+        },
+        "contributor": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.movie#contributorList"
+          ]
+        },
+        "copyrightHolder": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.movie#copyrightHolderList"
+          ]
+        },
+        "copyrightNotice": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#copyrightNoticeScalar",
+            "social.flockfeeds.lexical.prop.movie#copyrightNoticeList"
+          ]
+        },
+        "copyrightYear": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#copyrightYearScalar",
+            "social.flockfeeds.lexical.prop.movie#copyrightYearList"
+          ]
+        },
+        "correction": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CorrectionComment#embedded",
+            "social.flockfeeds.lexical.prop.movie#correctionScalar",
+            "social.flockfeeds.lexical.prop.movie#correctionList"
+          ]
+        },
+        "countryOfOrigin": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Country#embedded",
+            "social.flockfeeds.lexical.prop.movie#countryOfOriginList"
+          ]
+        },
+        "creativeWorkStatus": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+            "social.flockfeeds.lexical.prop.movie#creativeWorkStatusScalar",
+            "social.flockfeeds.lexical.prop.movie#creativeWorkStatusList"
+          ]
+        },
+        "creator": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.movie#creatorList"
+          ]
+        },
+        "creditText": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#creditTextScalar",
+            "social.flockfeeds.lexical.prop.movie#creditTextList"
+          ]
+        },
+        "dateCreated": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#dateCreatedScalar",
+            "social.flockfeeds.lexical.prop.movie#dateCreatedList"
+          ]
+        },
+        "dateModified": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#dateModifiedScalar",
+            "social.flockfeeds.lexical.prop.movie#dateModifiedList"
+          ]
+        },
+        "datePublished": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#datePublishedScalar",
+            "social.flockfeeds.lexical.prop.movie#datePublishedList"
+          ]
+        },
+        "description": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.TextObject#embedded",
+            "social.flockfeeds.lexical.prop.movie#descriptionScalar",
+            "social.flockfeeds.lexical.prop.movie#descriptionList"
+          ]
+        },
+        "digitalSourceType": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.IPTCDigitalSourceEnumeration#embedded",
+            "social.flockfeeds.lexical.prop.movie#digitalSourceTypeScalar",
+            "social.flockfeeds.lexical.prop.movie#digitalSourceTypeList"
+          ]
+        },
+        "director": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.movie#directorList"
+          ]
+        },
+        "directors": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.movie#directorsList"
+          ]
+        },
+        "disambiguatingDescription": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#disambiguatingDescriptionScalar",
+            "social.flockfeeds.lexical.prop.movie#disambiguatingDescriptionList"
+          ]
+        },
+        "discussionUrl": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#discussionUrlScalar",
+            "social.flockfeeds.lexical.prop.movie#discussionUrlList"
+          ]
+        },
+        "duration": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.QuantitativeValue#embedded",
+            "social.flockfeeds.lexical.prop.movie#durationScalar",
+            "social.flockfeeds.lexical.prop.movie#durationList"
+          ]
+        },
+        "editEIDR": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#editEIDRScalar",
+            "social.flockfeeds.lexical.prop.movie#editEIDRList"
+          ]
+        },
+        "editor": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.movie#editorList"
+          ]
+        },
+        "educationalAlignment": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.AlignmentObject#embedded",
+            "social.flockfeeds.lexical.prop.movie#educationalAlignmentList"
+          ]
+        },
+        "educationalLevel": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+            "social.flockfeeds.lexical.prop.movie#educationalLevelScalar",
+            "social.flockfeeds.lexical.prop.movie#educationalLevelList"
+          ]
+        },
+        "educationalUse": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+            "social.flockfeeds.lexical.prop.movie#educationalUseScalar",
+            "social.flockfeeds.lexical.prop.movie#educationalUseList"
+          ]
+        },
+        "encoding": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.MediaObject#embedded",
+            "social.flockfeeds.lexical.prop.movie#encodingList"
+          ]
+        },
+        "encodingFormat": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#encodingFormatScalar",
+            "social.flockfeeds.lexical.prop.movie#encodingFormatList"
+          ]
+        },
+        "encodings": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.MediaObject#embedded",
+            "social.flockfeeds.lexical.prop.movie#encodingsList"
+          ]
+        },
+        "exampleOfWork": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.movie#exampleOfWorkList"
+          ]
+        },
+        "expires": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#expiresScalar",
+            "social.flockfeeds.lexical.prop.movie#expiresList"
+          ]
+        },
+        "fileFormat": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#fileFormatScalar",
+            "social.flockfeeds.lexical.prop.movie#fileFormatList"
+          ]
+        },
+        "funder": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.movie#funderList"
+          ]
+        },
+        "funding": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Grant#embedded",
+            "social.flockfeeds.lexical.prop.movie#fundingList"
+          ]
+        },
+        "genre": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#genreScalar",
+            "social.flockfeeds.lexical.prop.movie#genreList"
+          ]
+        },
+        "hasPart": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.movie#hasPartList"
+          ]
+        },
+        "headline": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#headlineScalar",
+            "social.flockfeeds.lexical.prop.movie#headlineList"
+          ]
+        },
+        "identifier": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.PropertyValue#embedded",
+            "social.flockfeeds.lexical.prop.movie#identifierScalar",
+            "social.flockfeeds.lexical.prop.movie#identifierList"
+          ]
+        },
+        "image": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.ImageObject#embedded",
+            "social.flockfeeds.lexical.prop.movie#imageScalar",
+            "social.flockfeeds.lexical.prop.movie#imageList"
+          ]
+        },
+        "inLanguage": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Language#embedded",
+            "social.flockfeeds.lexical.prop.movie#inLanguageScalar",
+            "social.flockfeeds.lexical.prop.movie#inLanguageList"
+          ]
+        },
+        "interactionStatistic": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.InteractionCounter#embedded",
+            "social.flockfeeds.lexical.prop.movie#interactionStatisticList"
+          ]
+        },
+        "interactivityType": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#interactivityTypeScalar",
+            "social.flockfeeds.lexical.prop.movie#interactivityTypeList"
+          ]
+        },
+        "interpretedAsClaim": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Claim#embedded",
+            "social.flockfeeds.lexical.prop.movie#interpretedAsClaimList"
+          ]
+        },
+        "isAccessibleForFree": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#isAccessibleForFreeScalar",
+            "social.flockfeeds.lexical.prop.movie#isAccessibleForFreeList"
+          ]
+        },
+        "isBasedOn": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.type.Product#embedded",
+            "social.flockfeeds.lexical.prop.movie#isBasedOnScalar",
+            "social.flockfeeds.lexical.prop.movie#isBasedOnList"
+          ]
+        },
+        "isBasedOnUrl": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.type.Product#embedded",
+            "social.flockfeeds.lexical.prop.movie#isBasedOnUrlScalar",
+            "social.flockfeeds.lexical.prop.movie#isBasedOnUrlList"
+          ]
+        },
+        "isFamilyFriendly": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#isFamilyFriendlyScalar",
+            "social.flockfeeds.lexical.prop.movie#isFamilyFriendlyList"
+          ]
+        },
+        "isPartOf": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.movie#isPartOfScalar",
+            "social.flockfeeds.lexical.prop.movie#isPartOfList"
+          ]
+        },
+        "keywords": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+            "social.flockfeeds.lexical.prop.movie#keywordsScalar",
+            "social.flockfeeds.lexical.prop.movie#keywordsList"
+          ]
+        },
+        "learningResourceType": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+            "social.flockfeeds.lexical.prop.movie#learningResourceTypeScalar",
+            "social.flockfeeds.lexical.prop.movie#learningResourceTypeList"
+          ]
+        },
+        "license": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.movie#licenseScalar",
+            "social.flockfeeds.lexical.prop.movie#licenseList"
+          ]
+        },
+        "locationCreated": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Place#embedded",
+            "social.flockfeeds.lexical.prop.movie#locationCreatedList"
+          ]
+        },
+        "mainEntity": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Thing#embedded",
+            "social.flockfeeds.lexical.prop.movie#mainEntityList"
+          ]
+        },
+        "mainEntityOfPage": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.movie#mainEntityOfPageScalar",
+            "social.flockfeeds.lexical.prop.movie#mainEntityOfPageList"
+          ]
+        },
+        "maintainer": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.movie#maintainerList"
+          ]
+        },
+        "material": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Product#embedded",
+            "social.flockfeeds.lexical.prop.movie#materialScalar",
+            "social.flockfeeds.lexical.prop.movie#materialList"
+          ]
+        },
+        "materialExtent": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.QuantitativeValue#embedded",
+            "social.flockfeeds.lexical.prop.movie#materialExtentScalar",
+            "social.flockfeeds.lexical.prop.movie#materialExtentList"
+          ]
+        },
+        "mentions": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Thing#embedded",
+            "social.flockfeeds.lexical.prop.movie#mentionsList"
+          ]
+        },
+        "musicBy": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.MusicGroup#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.movie#musicByList"
+          ]
+        },
+        "name": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#nameScalar",
+            "social.flockfeeds.lexical.prop.movie#nameList"
+          ]
+        },
+        "offers": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Demand#embedded",
+            "social.flockfeeds.lexical.type.Offer#embedded",
+            "social.flockfeeds.lexical.prop.movie#offersList"
+          ]
+        },
+        "pattern": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+            "social.flockfeeds.lexical.prop.movie#patternScalar",
+            "social.flockfeeds.lexical.prop.movie#patternList"
+          ]
+        },
+        "position": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#positionScalar",
+            "social.flockfeeds.lexical.prop.movie#positionList"
+          ]
+        },
+        "potentialAction": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Action#embedded",
+            "social.flockfeeds.lexical.prop.movie#potentialActionList"
+          ]
+        },
+        "producer": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.movie#producerList"
+          ]
+        },
+        "productionCompany": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.prop.movie#productionCompanyList"
+          ]
+        },
+        "provider": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.movie#providerList"
+          ]
+        },
+        "publication": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.PublicationEvent#embedded",
+            "social.flockfeeds.lexical.prop.movie#publicationList"
+          ]
+        },
+        "publisher": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.movie#publisherList"
+          ]
+        },
+        "publisherImprint": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.prop.movie#publisherImprintList"
+          ]
+        },
+        "publishingPrinciples": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.movie#publishingPrinciplesScalar",
+            "social.flockfeeds.lexical.prop.movie#publishingPrinciplesList"
+          ]
+        },
+        "recordedAt": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Event#embedded",
+            "social.flockfeeds.lexical.prop.movie#recordedAtList"
+          ]
+        },
+        "releasedEvent": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.PublicationEvent#embedded",
+            "social.flockfeeds.lexical.prop.movie#releasedEventList"
+          ]
+        },
+        "review": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Review#embedded",
+            "social.flockfeeds.lexical.prop.movie#reviewList"
+          ]
+        },
+        "reviews": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Review#embedded",
+            "social.flockfeeds.lexical.prop.movie#reviewsList"
+          ]
+        },
+        "sameAs": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#sameAsScalar",
+            "social.flockfeeds.lexical.prop.movie#sameAsList"
+          ]
+        },
+        "schemaVersion": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#schemaVersionScalar",
+            "social.flockfeeds.lexical.prop.movie#schemaVersionList"
+          ]
+        },
+        "sdDatePublished": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#sdDatePublishedScalar",
+            "social.flockfeeds.lexical.prop.movie#sdDatePublishedList"
+          ]
+        },
+        "sdLicense": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.movie#sdLicenseScalar",
+            "social.flockfeeds.lexical.prop.movie#sdLicenseList"
+          ]
+        },
+        "sdPublisher": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.movie#sdPublisherList"
+          ]
+        },
+        "size": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+            "social.flockfeeds.lexical.type.QuantitativeValue#embedded",
+            "social.flockfeeds.lexical.type.SizeSpecification#embedded",
+            "social.flockfeeds.lexical.prop.movie#sizeScalar",
+            "social.flockfeeds.lexical.prop.movie#sizeList"
+          ]
+        },
+        "sourceOrganization": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.prop.movie#sourceOrganizationList"
+          ]
+        },
+        "spatial": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Place#embedded",
+            "social.flockfeeds.lexical.prop.movie#spatialList"
+          ]
+        },
+        "spatialCoverage": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Place#embedded",
+            "social.flockfeeds.lexical.prop.movie#spatialCoverageList"
+          ]
+        },
+        "sponsor": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.movie#sponsorList"
+          ]
+        },
+        "subjectOf": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.type.Event#embedded",
+            "social.flockfeeds.lexical.prop.movie#subjectOfList"
+          ]
+        },
+        "subtitleLanguage": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Language#embedded",
+            "social.flockfeeds.lexical.prop.movie#subtitleLanguageScalar",
+            "social.flockfeeds.lexical.prop.movie#subtitleLanguageList"
+          ]
+        },
+        "teaches": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+            "social.flockfeeds.lexical.prop.movie#teachesScalar",
+            "social.flockfeeds.lexical.prop.movie#teachesList"
+          ]
+        },
+        "temporal": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#temporalScalar",
+            "social.flockfeeds.lexical.prop.movie#temporalList"
+          ]
+        },
+        "temporalCoverage": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#temporalCoverageScalar",
+            "social.flockfeeds.lexical.prop.movie#temporalCoverageList"
+          ]
+        },
+        "text": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#textScalar",
+            "social.flockfeeds.lexical.prop.movie#textList"
+          ]
+        },
+        "thumbnail": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.ImageObject#embedded",
+            "social.flockfeeds.lexical.prop.movie#thumbnailList"
+          ]
+        },
+        "thumbnailUrl": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#thumbnailUrlScalar",
+            "social.flockfeeds.lexical.prop.movie#thumbnailUrlList"
+          ]
+        },
+        "timeRequired": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#timeRequiredScalar",
+            "social.flockfeeds.lexical.prop.movie#timeRequiredList"
+          ]
+        },
+        "titleEIDR": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#titleEIDRScalar",
+            "social.flockfeeds.lexical.prop.movie#titleEIDRList"
+          ]
+        },
+        "trailer": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.VideoObject#embedded",
+            "social.flockfeeds.lexical.prop.movie#trailerList"
+          ]
+        },
+        "translationOfWork": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.movie#translationOfWorkList"
+          ]
+        },
+        "translator": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.movie#translatorList"
+          ]
+        },
+        "typicalAgeRange": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#typicalAgeRangeScalar",
+            "social.flockfeeds.lexical.prop.movie#typicalAgeRangeList"
+          ]
+        },
+        "url": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#urlScalar",
+            "social.flockfeeds.lexical.prop.movie#urlList"
+          ]
+        },
+        "usageInfo": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.movie#usageInfoScalar",
+            "social.flockfeeds.lexical.prop.movie#usageInfoList"
+          ]
+        },
+        "version": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#versionScalar",
+            "social.flockfeeds.lexical.prop.movie#versionList"
+          ]
+        },
+        "video": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Clip#embedded",
+            "social.flockfeeds.lexical.type.VideoObject#embedded",
+            "social.flockfeeds.lexical.prop.movie#videoList"
+          ]
+        },
+        "wordCount": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.movie#wordCountScalar",
+            "social.flockfeeds.lexical.prop.movie#wordCountList"
+          ]
+        },
+        "workExample": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.movie#workExampleList"
+          ]
+        },
+        "workTranslation": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.movie#workTranslationList"
+          ]
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "description": "A movie.",
+        "properties": {
+          "about": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Thing#embedded",
+              "social.flockfeeds.lexical.prop.movie#aboutList"
+            ]
+          },
+          "abstract": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#abstractScalar",
+              "social.flockfeeds.lexical.prop.movie#abstractList"
+            ]
+          },
+          "accessMode": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#accessModeScalar",
+              "social.flockfeeds.lexical.prop.movie#accessModeList"
+            ]
+          },
+          "accessModeSufficient": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.ItemList#embedded",
+              "social.flockfeeds.lexical.prop.movie#accessModeSufficientList"
+            ]
+          },
+          "accessibilityAPI": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#accessibilityAPIScalar",
+              "social.flockfeeds.lexical.prop.movie#accessibilityAPIList"
+            ]
+          },
+          "accessibilityControl": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#accessibilityControlScalar",
+              "social.flockfeeds.lexical.prop.movie#accessibilityControlList"
+            ]
+          },
+          "accessibilityFeature": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#accessibilityFeatureScalar",
+              "social.flockfeeds.lexical.prop.movie#accessibilityFeatureList"
+            ]
+          },
+          "accessibilityHazard": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#accessibilityHazardScalar",
+              "social.flockfeeds.lexical.prop.movie#accessibilityHazardList"
+            ]
+          },
+          "accessibilitySummary": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#accessibilitySummaryScalar",
+              "social.flockfeeds.lexical.prop.movie#accessibilitySummaryList"
+            ]
+          },
+          "accountablePerson": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.movie#accountablePersonList"
+            ]
+          },
+          "acquireLicensePage": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.prop.movie#acquireLicensePageScalar",
+              "social.flockfeeds.lexical.prop.movie#acquireLicensePageList"
+            ]
+          },
+          "actor": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.PerformingGroup#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.movie#actorList"
+            ]
+          },
+          "actors": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.movie#actorsList"
+            ]
+          },
+          "additionalType": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#additionalTypeScalar",
+              "social.flockfeeds.lexical.prop.movie#additionalTypeList"
+            ]
+          },
+          "aggregateRating": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.AggregateRating#embedded",
+              "social.flockfeeds.lexical.prop.movie#aggregateRatingList"
+            ]
+          },
+          "alternateName": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#alternateNameScalar",
+              "social.flockfeeds.lexical.prop.movie#alternateNameList"
+            ]
+          },
+          "alternativeHeadline": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#alternativeHeadlineScalar",
+              "social.flockfeeds.lexical.prop.movie#alternativeHeadlineList"
+            ]
+          },
+          "archivedAt": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.WebPage#embedded",
+              "social.flockfeeds.lexical.prop.movie#archivedAtScalar",
+              "social.flockfeeds.lexical.prop.movie#archivedAtList"
+            ]
+          },
+          "assesses": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+              "social.flockfeeds.lexical.prop.movie#assessesScalar",
+              "social.flockfeeds.lexical.prop.movie#assessesList"
+            ]
+          },
+          "associatedMedia": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.MediaObject#embedded",
+              "social.flockfeeds.lexical.prop.movie#associatedMediaList"
+            ]
+          },
+          "audience": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Audience#embedded",
+              "social.flockfeeds.lexical.prop.movie#audienceList"
+            ]
+          },
+          "audio": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.AudioObject#embedded",
+              "social.flockfeeds.lexical.type.Clip#embedded",
+              "social.flockfeeds.lexical.type.MusicRecording#embedded",
+              "social.flockfeeds.lexical.prop.movie#audioList"
+            ]
+          },
+          "author": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.movie#authorList"
+            ]
+          },
+          "award": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#awardScalar",
+              "social.flockfeeds.lexical.prop.movie#awardList"
+            ]
+          },
+          "awards": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#awardsScalar",
+              "social.flockfeeds.lexical.prop.movie#awardsList"
+            ]
+          },
+          "character": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.movie#characterList"
+            ]
+          },
+          "citation": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.prop.movie#citationScalar",
+              "social.flockfeeds.lexical.prop.movie#citationList"
+            ]
+          },
+          "comment": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Comment#embedded",
+              "social.flockfeeds.lexical.prop.movie#commentList"
+            ]
+          },
+          "commentCount": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#commentCountScalar",
+              "social.flockfeeds.lexical.prop.movie#commentCountList"
+            ]
+          },
+          "conditionsOfAccess": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#conditionsOfAccessScalar",
+              "social.flockfeeds.lexical.prop.movie#conditionsOfAccessList"
+            ]
+          },
+          "contentLocation": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Place#embedded",
+              "social.flockfeeds.lexical.prop.movie#contentLocationList"
+            ]
+          },
+          "contentRating": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Rating#embedded",
+              "social.flockfeeds.lexical.prop.movie#contentRatingScalar",
+              "social.flockfeeds.lexical.prop.movie#contentRatingList"
+            ]
+          },
+          "contentReferenceTime": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#contentReferenceTimeScalar",
+              "social.flockfeeds.lexical.prop.movie#contentReferenceTimeList"
+            ]
+          },
+          "contributor": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.movie#contributorList"
+            ]
+          },
+          "copyrightHolder": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.movie#copyrightHolderList"
+            ]
+          },
+          "copyrightNotice": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#copyrightNoticeScalar",
+              "social.flockfeeds.lexical.prop.movie#copyrightNoticeList"
+            ]
+          },
+          "copyrightYear": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#copyrightYearScalar",
+              "social.flockfeeds.lexical.prop.movie#copyrightYearList"
+            ]
+          },
+          "correction": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CorrectionComment#embedded",
+              "social.flockfeeds.lexical.prop.movie#correctionScalar",
+              "social.flockfeeds.lexical.prop.movie#correctionList"
+            ]
+          },
+          "countryOfOrigin": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Country#embedded",
+              "social.flockfeeds.lexical.prop.movie#countryOfOriginList"
+            ]
+          },
+          "creativeWorkStatus": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+              "social.flockfeeds.lexical.prop.movie#creativeWorkStatusScalar",
+              "social.flockfeeds.lexical.prop.movie#creativeWorkStatusList"
+            ]
+          },
+          "creator": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.movie#creatorList"
+            ]
+          },
+          "creditText": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#creditTextScalar",
+              "social.flockfeeds.lexical.prop.movie#creditTextList"
+            ]
+          },
+          "dateCreated": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#dateCreatedScalar",
+              "social.flockfeeds.lexical.prop.movie#dateCreatedList"
+            ]
+          },
+          "dateModified": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#dateModifiedScalar",
+              "social.flockfeeds.lexical.prop.movie#dateModifiedList"
+            ]
+          },
+          "datePublished": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#datePublishedScalar",
+              "social.flockfeeds.lexical.prop.movie#datePublishedList"
+            ]
+          },
+          "description": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.TextObject#embedded",
+              "social.flockfeeds.lexical.prop.movie#descriptionScalar",
+              "social.flockfeeds.lexical.prop.movie#descriptionList"
+            ]
+          },
+          "digitalSourceType": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.IPTCDigitalSourceEnumeration#embedded",
+              "social.flockfeeds.lexical.prop.movie#digitalSourceTypeScalar",
+              "social.flockfeeds.lexical.prop.movie#digitalSourceTypeList"
+            ]
+          },
+          "director": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.movie#directorList"
+            ]
+          },
+          "directors": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.movie#directorsList"
+            ]
+          },
+          "disambiguatingDescription": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#disambiguatingDescriptionScalar",
+              "social.flockfeeds.lexical.prop.movie#disambiguatingDescriptionList"
+            ]
+          },
+          "discussionUrl": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#discussionUrlScalar",
+              "social.flockfeeds.lexical.prop.movie#discussionUrlList"
+            ]
+          },
+          "duration": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.QuantitativeValue#embedded",
+              "social.flockfeeds.lexical.prop.movie#durationScalar",
+              "social.flockfeeds.lexical.prop.movie#durationList"
+            ]
+          },
+          "editEIDR": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#editEIDRScalar",
+              "social.flockfeeds.lexical.prop.movie#editEIDRList"
+            ]
+          },
+          "editor": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.movie#editorList"
+            ]
+          },
+          "educationalAlignment": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.AlignmentObject#embedded",
+              "social.flockfeeds.lexical.prop.movie#educationalAlignmentList"
+            ]
+          },
+          "educationalLevel": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+              "social.flockfeeds.lexical.prop.movie#educationalLevelScalar",
+              "social.flockfeeds.lexical.prop.movie#educationalLevelList"
+            ]
+          },
+          "educationalUse": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+              "social.flockfeeds.lexical.prop.movie#educationalUseScalar",
+              "social.flockfeeds.lexical.prop.movie#educationalUseList"
+            ]
+          },
+          "encoding": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.MediaObject#embedded",
+              "social.flockfeeds.lexical.prop.movie#encodingList"
+            ]
+          },
+          "encodingFormat": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#encodingFormatScalar",
+              "social.flockfeeds.lexical.prop.movie#encodingFormatList"
+            ]
+          },
+          "encodings": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.MediaObject#embedded",
+              "social.flockfeeds.lexical.prop.movie#encodingsList"
+            ]
+          },
+          "exampleOfWork": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.prop.movie#exampleOfWorkList"
+            ]
+          },
+          "expires": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#expiresScalar",
+              "social.flockfeeds.lexical.prop.movie#expiresList"
+            ]
+          },
+          "fileFormat": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#fileFormatScalar",
+              "social.flockfeeds.lexical.prop.movie#fileFormatList"
+            ]
+          },
+          "funder": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.movie#funderList"
+            ]
+          },
+          "funding": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Grant#embedded",
+              "social.flockfeeds.lexical.prop.movie#fundingList"
+            ]
+          },
+          "genre": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#genreScalar",
+              "social.flockfeeds.lexical.prop.movie#genreList"
+            ]
+          },
+          "hasPart": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.prop.movie#hasPartList"
+            ]
+          },
+          "headline": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#headlineScalar",
+              "social.flockfeeds.lexical.prop.movie#headlineList"
+            ]
+          },
+          "identifier": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.PropertyValue#embedded",
+              "social.flockfeeds.lexical.prop.movie#identifierScalar",
+              "social.flockfeeds.lexical.prop.movie#identifierList"
+            ]
+          },
+          "image": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.ImageObject#embedded",
+              "social.flockfeeds.lexical.prop.movie#imageScalar",
+              "social.flockfeeds.lexical.prop.movie#imageList"
+            ]
+          },
+          "inLanguage": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Language#embedded",
+              "social.flockfeeds.lexical.prop.movie#inLanguageScalar",
+              "social.flockfeeds.lexical.prop.movie#inLanguageList"
+            ]
+          },
+          "interactionStatistic": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.InteractionCounter#embedded",
+              "social.flockfeeds.lexical.prop.movie#interactionStatisticList"
+            ]
+          },
+          "interactivityType": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#interactivityTypeScalar",
+              "social.flockfeeds.lexical.prop.movie#interactivityTypeList"
+            ]
+          },
+          "interpretedAsClaim": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Claim#embedded",
+              "social.flockfeeds.lexical.prop.movie#interpretedAsClaimList"
+            ]
+          },
+          "isAccessibleForFree": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#isAccessibleForFreeScalar",
+              "social.flockfeeds.lexical.prop.movie#isAccessibleForFreeList"
+            ]
+          },
+          "isBasedOn": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.type.Product#embedded",
+              "social.flockfeeds.lexical.prop.movie#isBasedOnScalar",
+              "social.flockfeeds.lexical.prop.movie#isBasedOnList"
+            ]
+          },
+          "isBasedOnUrl": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.type.Product#embedded",
+              "social.flockfeeds.lexical.prop.movie#isBasedOnUrlScalar",
+              "social.flockfeeds.lexical.prop.movie#isBasedOnUrlList"
+            ]
+          },
+          "isFamilyFriendly": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#isFamilyFriendlyScalar",
+              "social.flockfeeds.lexical.prop.movie#isFamilyFriendlyList"
+            ]
+          },
+          "isPartOf": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.prop.movie#isPartOfScalar",
+              "social.flockfeeds.lexical.prop.movie#isPartOfList"
+            ]
+          },
+          "keywords": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+              "social.flockfeeds.lexical.prop.movie#keywordsScalar",
+              "social.flockfeeds.lexical.prop.movie#keywordsList"
+            ]
+          },
+          "learningResourceType": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+              "social.flockfeeds.lexical.prop.movie#learningResourceTypeScalar",
+              "social.flockfeeds.lexical.prop.movie#learningResourceTypeList"
+            ]
+          },
+          "license": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.prop.movie#licenseScalar",
+              "social.flockfeeds.lexical.prop.movie#licenseList"
+            ]
+          },
+          "locationCreated": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Place#embedded",
+              "social.flockfeeds.lexical.prop.movie#locationCreatedList"
+            ]
+          },
+          "mainEntity": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Thing#embedded",
+              "social.flockfeeds.lexical.prop.movie#mainEntityList"
+            ]
+          },
+          "mainEntityOfPage": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.prop.movie#mainEntityOfPageScalar",
+              "social.flockfeeds.lexical.prop.movie#mainEntityOfPageList"
+            ]
+          },
+          "maintainer": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.movie#maintainerList"
+            ]
+          },
+          "material": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Product#embedded",
+              "social.flockfeeds.lexical.prop.movie#materialScalar",
+              "social.flockfeeds.lexical.prop.movie#materialList"
+            ]
+          },
+          "materialExtent": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.QuantitativeValue#embedded",
+              "social.flockfeeds.lexical.prop.movie#materialExtentScalar",
+              "social.flockfeeds.lexical.prop.movie#materialExtentList"
+            ]
+          },
+          "mentions": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Thing#embedded",
+              "social.flockfeeds.lexical.prop.movie#mentionsList"
+            ]
+          },
+          "musicBy": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.MusicGroup#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.movie#musicByList"
+            ]
+          },
+          "name": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#nameScalar",
+              "social.flockfeeds.lexical.prop.movie#nameList"
+            ]
+          },
+          "offers": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Demand#embedded",
+              "social.flockfeeds.lexical.type.Offer#embedded",
+              "social.flockfeeds.lexical.prop.movie#offersList"
+            ]
+          },
+          "pattern": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+              "social.flockfeeds.lexical.prop.movie#patternScalar",
+              "social.flockfeeds.lexical.prop.movie#patternList"
+            ]
+          },
+          "position": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#positionScalar",
+              "social.flockfeeds.lexical.prop.movie#positionList"
+            ]
+          },
+          "potentialAction": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Action#embedded",
+              "social.flockfeeds.lexical.prop.movie#potentialActionList"
+            ]
+          },
+          "producer": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.movie#producerList"
+            ]
+          },
+          "productionCompany": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.prop.movie#productionCompanyList"
+            ]
+          },
+          "provider": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.movie#providerList"
+            ]
+          },
+          "publication": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.PublicationEvent#embedded",
+              "social.flockfeeds.lexical.prop.movie#publicationList"
+            ]
+          },
+          "publisher": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.movie#publisherList"
+            ]
+          },
+          "publisherImprint": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.prop.movie#publisherImprintList"
+            ]
+          },
+          "publishingPrinciples": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.prop.movie#publishingPrinciplesScalar",
+              "social.flockfeeds.lexical.prop.movie#publishingPrinciplesList"
+            ]
+          },
+          "recordedAt": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Event#embedded",
+              "social.flockfeeds.lexical.prop.movie#recordedAtList"
+            ]
+          },
+          "releasedEvent": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.PublicationEvent#embedded",
+              "social.flockfeeds.lexical.prop.movie#releasedEventList"
+            ]
+          },
+          "review": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Review#embedded",
+              "social.flockfeeds.lexical.prop.movie#reviewList"
+            ]
+          },
+          "reviews": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Review#embedded",
+              "social.flockfeeds.lexical.prop.movie#reviewsList"
+            ]
+          },
+          "sameAs": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#sameAsScalar",
+              "social.flockfeeds.lexical.prop.movie#sameAsList"
+            ]
+          },
+          "schemaVersion": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#schemaVersionScalar",
+              "social.flockfeeds.lexical.prop.movie#schemaVersionList"
+            ]
+          },
+          "sdDatePublished": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#sdDatePublishedScalar",
+              "social.flockfeeds.lexical.prop.movie#sdDatePublishedList"
+            ]
+          },
+          "sdLicense": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.prop.movie#sdLicenseScalar",
+              "social.flockfeeds.lexical.prop.movie#sdLicenseList"
+            ]
+          },
+          "sdPublisher": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.movie#sdPublisherList"
+            ]
+          },
+          "size": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+              "social.flockfeeds.lexical.type.QuantitativeValue#embedded",
+              "social.flockfeeds.lexical.type.SizeSpecification#embedded",
+              "social.flockfeeds.lexical.prop.movie#sizeScalar",
+              "social.flockfeeds.lexical.prop.movie#sizeList"
+            ]
+          },
+          "sourceOrganization": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.prop.movie#sourceOrganizationList"
+            ]
+          },
+          "spatial": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Place#embedded",
+              "social.flockfeeds.lexical.prop.movie#spatialList"
+            ]
+          },
+          "spatialCoverage": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Place#embedded",
+              "social.flockfeeds.lexical.prop.movie#spatialCoverageList"
+            ]
+          },
+          "sponsor": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.movie#sponsorList"
+            ]
+          },
+          "subjectOf": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.type.Event#embedded",
+              "social.flockfeeds.lexical.prop.movie#subjectOfList"
+            ]
+          },
+          "subtitleLanguage": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Language#embedded",
+              "social.flockfeeds.lexical.prop.movie#subtitleLanguageScalar",
+              "social.flockfeeds.lexical.prop.movie#subtitleLanguageList"
+            ]
+          },
+          "teaches": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+              "social.flockfeeds.lexical.prop.movie#teachesScalar",
+              "social.flockfeeds.lexical.prop.movie#teachesList"
+            ]
+          },
+          "temporal": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#temporalScalar",
+              "social.flockfeeds.lexical.prop.movie#temporalList"
+            ]
+          },
+          "temporalCoverage": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#temporalCoverageScalar",
+              "social.flockfeeds.lexical.prop.movie#temporalCoverageList"
+            ]
+          },
+          "text": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#textScalar",
+              "social.flockfeeds.lexical.prop.movie#textList"
+            ]
+          },
+          "thumbnail": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.ImageObject#embedded",
+              "social.flockfeeds.lexical.prop.movie#thumbnailList"
+            ]
+          },
+          "thumbnailUrl": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#thumbnailUrlScalar",
+              "social.flockfeeds.lexical.prop.movie#thumbnailUrlList"
+            ]
+          },
+          "timeRequired": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#timeRequiredScalar",
+              "social.flockfeeds.lexical.prop.movie#timeRequiredList"
+            ]
+          },
+          "titleEIDR": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#titleEIDRScalar",
+              "social.flockfeeds.lexical.prop.movie#titleEIDRList"
+            ]
+          },
+          "trailer": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.VideoObject#embedded",
+              "social.flockfeeds.lexical.prop.movie#trailerList"
+            ]
+          },
+          "translationOfWork": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.prop.movie#translationOfWorkList"
+            ]
+          },
+          "translator": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.movie#translatorList"
+            ]
+          },
+          "typicalAgeRange": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#typicalAgeRangeScalar",
+              "social.flockfeeds.lexical.prop.movie#typicalAgeRangeList"
+            ]
+          },
+          "url": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#urlScalar",
+              "social.flockfeeds.lexical.prop.movie#urlList"
+            ]
+          },
+          "usageInfo": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.prop.movie#usageInfoScalar",
+              "social.flockfeeds.lexical.prop.movie#usageInfoList"
+            ]
+          },
+          "version": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#versionScalar",
+              "social.flockfeeds.lexical.prop.movie#versionList"
+            ]
+          },
+          "video": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Clip#embedded",
+              "social.flockfeeds.lexical.type.VideoObject#embedded",
+              "social.flockfeeds.lexical.prop.movie#videoList"
+            ]
+          },
+          "wordCount": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.movie#wordCountScalar",
+              "social.flockfeeds.lexical.prop.movie#wordCountList"
+            ]
+          },
+          "workExample": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.prop.movie#workExampleList"
+            ]
+          },
+          "workTranslation": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.prop.movie#workTranslationList"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

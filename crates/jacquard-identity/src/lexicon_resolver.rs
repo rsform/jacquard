@@ -369,10 +369,9 @@ impl LexiconAuthorityResolver for crate::JacquardResolver {
         let result = self.resolve_lexicon_authority_dns(nsid).await;
 
         // Cache on success, invalidate on error
+        #[cfg(feature = "cache")]
         match &result {
-            Ok(did) =>
-            {
-                #[cfg(feature = "cache")]
+            Ok(did) => {
                 if let Some(caches) = &self.caches {
                     let authority =
                         jacquard_common::smol_str::SmolStr::from(nsid.domain_authority());
@@ -380,7 +379,6 @@ impl LexiconAuthorityResolver for crate::JacquardResolver {
                 }
             }
             Err(_) => {
-                #[cfg(feature = "cache")]
                 self.invalidate_authority_chain(nsid.domain_authority())
                     .await;
             }
@@ -446,8 +444,8 @@ impl crate::JacquardResolver {
                         .map_err(|_| LexiconResolutionError::invalid_did(authority, did_str));
 
                     // Cache on success
+                    #[cfg(feature = "cache")]
                     if let Ok(ref did) = result {
-                        #[cfg(feature = "cache")]
                         if let Some(caches) = &self.caches {
                             let authority_key = jacquard_common::smol_str::SmolStr::from(authority);
                             crate::cache_impl::insert(

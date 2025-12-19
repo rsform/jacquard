@@ -37,51 +37,51 @@ pub mod entity_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Index;
         type Type;
         type Value;
-        type Index;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Index = Unset;
         type Type = Unset;
         type Value = Unset;
-        type Index = Unset;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Type = Set<members::r#type>;
-        type Value = S::Value;
-        type Index = S::Index;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type Type = S::Type;
-        type Value = Set<members::value>;
-        type Index = S::Index;
     }
     ///State transition - sets the `index` field to Set
     pub struct SetIndex<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIndex<S> {}
     impl<S: State> State for SetIndex<S> {
+        type Index = Set<members::index>;
         type Type = S::Type;
         type Value = S::Value;
-        type Index = Set<members::index>;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type Index = S::Index;
+        type Type = Set<members::r#type>;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Index = S::Index;
+        type Type = S::Type;
+        type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `index` field
+        pub struct index(());
         ///Marker type for the `type` field
         pub struct r#type(());
         ///Marker type for the `value` field
         pub struct value(());
-        ///Marker type for the `index` field
-        pub struct index(());
     }
 }
 
@@ -174,9 +174,9 @@ where
 impl<'a, S> EntityBuilder<'a, S>
 where
     S: entity_state::State,
+    S::Index: entity_state::IsSet,
     S::Type: entity_state::IsSet,
     S::Value: entity_state::IsSet,
-    S::Index: entity_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Entity<'a> {
@@ -622,37 +622,37 @@ pub mod post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Text;
         type CreatedAt;
+        type Text;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Text = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetText<S> {}
-    impl<S: State> State for SetText<S> {
-        type Text = Set<members::text>;
-        type CreatedAt = S::CreatedAt;
+        type Text = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Text = S::Text;
         type CreatedAt = Set<members::created_at>;
+        type Text = S::Text;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetText<S> {}
+    impl<S: State> State for SetText<S> {
+        type CreatedAt = S::CreatedAt;
+        type Text = Set<members::text>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `text` field
-        pub struct text(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `text` field
+        pub struct text(());
     }
 }
 
@@ -869,8 +869,8 @@ where
 impl<'a, S> PostBuilder<'a, S>
 where
     S: post_state::State,
-    S::Text: post_state::IsSet,
     S::CreatedAt: post_state::IsSet,
+    S::Text: post_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Post<'a> {

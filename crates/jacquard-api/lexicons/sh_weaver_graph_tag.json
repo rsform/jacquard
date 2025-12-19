@@ -1,0 +1,36 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.graph.tag",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Apply a community tag to a notebook or entry. Can be created by readers, authors, or bots for categorization and discovery.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "tag",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "subject": {
+            "type": "ref",
+            "description": "The notebook or entry being tagged.",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "tag": {
+            "type": "string",
+            "description": "The tag value (e.g., 'enemies-to-lovers', 'slow-burn', 'found-family').",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "lexicon": 1,
+  "id": "com.5jiji.test.publishVideo",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Publish a video",
+      "input": {
+        "encoding": "*/*"
+      },
+      "output": {
+        "encoding": "application/json"
+      },
+      "errors": [
+        {
+          "description": "The uploaded file was not a video file (or couldn't get converted to a valid video",
+          "name": "NotAVideo"
+        }
+      ]
+    }
+  }
+}

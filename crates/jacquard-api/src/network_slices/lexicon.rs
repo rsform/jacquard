@@ -50,8 +50,8 @@ pub mod lexicon_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Definitions;
+        type CreatedAt;
         type Nsid;
         type Slice;
     }
@@ -59,26 +59,26 @@ pub mod lexicon_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Definitions = Unset;
+        type CreatedAt = Unset;
         type Nsid = Unset;
         type Slice = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Definitions = S::Definitions;
-        type Nsid = S::Nsid;
-        type Slice = S::Slice;
     }
     ///State transition - sets the `definitions` field to Set
     pub struct SetDefinitions<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDefinitions<S> {}
     impl<S: State> State for SetDefinitions<S> {
-        type CreatedAt = S::CreatedAt;
         type Definitions = Set<members::definitions>;
+        type CreatedAt = S::CreatedAt;
+        type Nsid = S::Nsid;
+        type Slice = S::Slice;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Definitions = S::Definitions;
+        type CreatedAt = Set<members::created_at>;
         type Nsid = S::Nsid;
         type Slice = S::Slice;
     }
@@ -86,8 +86,8 @@ pub mod lexicon_state {
     pub struct SetNsid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetNsid<S> {}
     impl<S: State> State for SetNsid<S> {
-        type CreatedAt = S::CreatedAt;
         type Definitions = S::Definitions;
+        type CreatedAt = S::CreatedAt;
         type Nsid = Set<members::nsid>;
         type Slice = S::Slice;
     }
@@ -95,18 +95,18 @@ pub mod lexicon_state {
     pub struct SetSlice<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSlice<S> {}
     impl<S: State> State for SetSlice<S> {
-        type CreatedAt = S::CreatedAt;
         type Definitions = S::Definitions;
+        type CreatedAt = S::CreatedAt;
         type Nsid = S::Nsid;
         type Slice = Set<members::slice>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `definitions` field
         pub struct definitions(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `nsid` field
         pub struct nsid(());
         ///Marker type for the `slice` field
@@ -277,8 +277,8 @@ impl<'a, S: lexicon_state::State> LexiconBuilder<'a, S> {
 impl<'a, S> LexiconBuilder<'a, S>
 where
     S: lexicon_state::State,
-    S::CreatedAt: lexicon_state::IsSet,
     S::Definitions: lexicon_state::IsSet,
+    S::CreatedAt: lexicon_state::IsSet,
     S::Nsid: lexicon_state::IsSet,
     S::Slice: lexicon_state::IsSet,
 {

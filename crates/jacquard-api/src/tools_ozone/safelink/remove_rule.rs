@@ -247,7 +247,7 @@ pub struct RemoveRuleOutput<'a> {
 pub enum RemoveRuleError<'a> {
     /// No active rule found for this URL/domain
     #[serde(rename = "RuleNotFound")]
-    RuleNotFound(std::option::Option<String>),
+    RuleNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl std::fmt::Display for RemoveRuleError<'_> {

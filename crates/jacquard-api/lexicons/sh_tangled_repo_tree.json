@@ -126,19 +126,9 @@
       "required": [
         "name",
         "mode",
-        "size",
-        "is_file",
-        "is_subtree"
+        "size"
       ],
       "properties": {
-        "is_file": {
-          "type": "boolean",
-          "description": "Whether this entry is a file"
-        },
-        "is_subtree": {
-          "type": "boolean",
-          "description": "Whether this entry is a directory/subtree"
-        },
         "last_commit": {
           "type": "ref",
           "ref": "#lastCommit"

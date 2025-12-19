@@ -33,37 +33,37 @@ pub mod directory_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Entries;
         type Type;
+        type Entries;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Entries = Unset;
         type Type = Unset;
-    }
-    ///State transition - sets the `entries` field to Set
-    pub struct SetEntries<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEntries<S> {}
-    impl<S: State> State for SetEntries<S> {
-        type Entries = Set<members::entries>;
-        type Type = S::Type;
+        type Entries = Unset;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetType<S> {}
     impl<S: State> State for SetType<S> {
-        type Entries = S::Entries;
         type Type = Set<members::r#type>;
+        type Entries = S::Entries;
+    }
+    ///State transition - sets the `entries` field to Set
+    pub struct SetEntries<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEntries<S> {}
+    impl<S: State> State for SetEntries<S> {
+        type Type = S::Type;
+        type Entries = Set<members::entries>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `entries` field
-        pub struct entries(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `entries` field
+        pub struct entries(());
     }
 }
 
@@ -136,8 +136,8 @@ where
 impl<'a, S> DirectoryBuilder<'a, S>
 where
     S: directory_state::State,
-    S::Entries: directory_state::IsSet,
     S::Type: directory_state::IsSet,
+    S::Entries: directory_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Directory<'a> {
@@ -251,7 +251,8 @@ fn lexicon_doc_place_wisp_fs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stati
                                 description: None,
                                 refs: vec![
                                     ::jacquard_common::CowStr::new_static("#file"),
-                                    ::jacquard_common::CowStr::new_static("#directory")
+                                    ::jacquard_common::CowStr::new_static("#directory"),
+                                    ::jacquard_common::CowStr::new_static("#subfs")
                                 ],
                                 closed: None,
                             }),
@@ -426,6 +427,68 @@ fn lexicon_doc_place_wisp_fs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stati
                             map
                         },
                     }),
+                }),
+            );
+            map.insert(
+                ::jacquard_common::smol_str::SmolStr::new_static("subfs"),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("type"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("subject")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::std::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("flat"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("subject"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "AT-URI pointing to a place.wisp.subfs record containing this subtree.",
+                                    ),
+                                ),
+                                format: Some(
+                                    ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
+                                ),
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("type"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map
+                    },
                 }),
             );
             map
@@ -638,6 +701,8 @@ pub enum EntryNode<'a> {
     File(Box<crate::place_wisp::fs::File<'a>>),
     #[serde(rename = "place.wisp.fs#directory")]
     Directory(Box<crate::place_wisp::fs::Directory<'a>>),
+    #[serde(rename = "place.wisp.fs#subfs")]
+    Subfs(Box<crate::place_wisp::fs::Subfs<'a>>),
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
@@ -710,37 +775,37 @@ pub mod file_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Type;
         type Blob;
+        type Type;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Type = Unset;
         type Blob = Unset;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Type = Set<members::r#type>;
-        type Blob = S::Blob;
+        type Type = Unset;
     }
     ///State transition - sets the `blob` field to Set
     pub struct SetBlob<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBlob<S> {}
     impl<S: State> State for SetBlob<S> {
-        type Type = S::Type;
         type Blob = Set<members::blob>;
+        type Type = S::Type;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type Blob = S::Blob;
+        type Type = Set<members::r#type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `type` field
-        pub struct r#type(());
         ///Marker type for the `blob` field
         pub struct blob(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
     }
 }
 
@@ -864,8 +929,8 @@ where
 impl<'a, S> FileBuilder<'a, S>
 where
     S: file_state::State,
-    S::Type: file_state::IsSet,
     S::Blob: file_state::IsSet,
+    S::Type: file_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> File<'a> {
@@ -1225,6 +1290,201 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Fs<'a> {
                 });
             }
         }
+        Ok(())
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Subfs<'a> {
+    /// If true, the subfs record's root entries are merged (flattened) into the parent directory, replacing the subfs entry. If false (default), the subfs entries are placed in a subdirectory with the subfs entry's name. Flat merging is useful for splitting large directories across multiple records while maintaining a flat structure.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub flat: std::option::Option<bool>,
+    /// AT-URI pointing to a place.wisp.subfs record containing this subtree.
+    #[serde(borrow)]
+    pub subject: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub r#type: jacquard_common::CowStr<'a>,
+}
+
+pub mod subfs_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Type;
+        type Subject;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Type = Unset;
+        type Subject = Unset;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type Type = Set<members::r#type>;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type Type = S::Type;
+        type Subject = Set<members::subject>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `type` field
+        pub struct r#type(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct SubfsBuilder<'a, S: subfs_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<bool>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> Subfs<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> SubfsBuilder<'a, subfs_state::Empty> {
+        SubfsBuilder::new()
+    }
+}
+
+impl<'a> SubfsBuilder<'a, subfs_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        SubfsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: subfs_state::State> SubfsBuilder<'a, S> {
+    /// Set the `flat` field (optional)
+    pub fn flat(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `flat` field to an Option value (optional)
+    pub fn maybe_flat(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S> SubfsBuilder<'a, S>
+where
+    S: subfs_state::State,
+    S::Subject: subfs_state::IsUnset,
+{
+    /// Set the `subject` field (required)
+    pub fn subject(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> SubfsBuilder<'a, subfs_state::SetSubject<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        SubfsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SubfsBuilder<'a, S>
+where
+    S: subfs_state::State,
+    S::Type: subfs_state::IsUnset,
+{
+    /// Set the `type` field (required)
+    pub fn r#type(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> SubfsBuilder<'a, subfs_state::SetType<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        SubfsBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SubfsBuilder<'a, S>
+where
+    S: subfs_state::State,
+    S::Type: subfs_state::IsSet,
+    S::Subject: subfs_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> Subfs<'a> {
+        Subfs {
+            flat: self.__unsafe_private_named.0,
+            subject: self.__unsafe_private_named.1.unwrap(),
+            r#type: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> Subfs<'a> {
+        Subfs {
+            flat: self.__unsafe_private_named.0,
+            subject: self.__unsafe_private_named.1.unwrap(),
+            r#type: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Subfs<'a> {
+    fn nsid() -> &'static str {
+        "place.wisp.fs"
+    }
+    fn def_name() -> &'static str {
+        "subfs"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_place_wisp_fs()
+    }
+    fn validate(
+        &self,
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

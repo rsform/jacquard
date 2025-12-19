@@ -91,16 +91,16 @@ pub struct UpdateWebhookOutput<'a> {
 pub enum UpdateWebhookError<'a> {
     /// The specified webhook was not found.
     #[serde(rename = "WebhookNotFound")]
-    WebhookNotFound(std::option::Option<String>),
+    WebhookNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
     /// The authenticated user does not have access to this webhook.
     #[serde(rename = "Unauthorized")]
-    Unauthorized(std::option::Option<String>),
+    Unauthorized(std::option::Option<jacquard_common::CowStr<'a>>),
     /// The provided webhook URL is invalid or unreachable.
     #[serde(rename = "InvalidUrl")]
-    InvalidUrl(std::option::Option<String>),
+    InvalidUrl(std::option::Option<jacquard_common::CowStr<'a>>),
     /// A webhook with this URL already exists for this user.
     #[serde(rename = "DuplicateWebhook")]
-    DuplicateWebhook(std::option::Option<String>),
+    DuplicateWebhook(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl std::fmt::Display for UpdateWebhookError<'_> {

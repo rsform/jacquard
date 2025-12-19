@@ -1,0 +1,66 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.notebook.getContinueReading",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get notebooks the user is currently reading, sorted by most recent activity.",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "default": 10,
+            "minimum": 1,
+            "maximum": 20
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "items"
+          ],
+          "properties": {
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "notebook",
+                  "progress",
+                  "nextEntry"
+                ],
+                "properties": {
+                  "currentEntry": {
+                    "type": "ref",
+                    "description": "Where the user left off.",
+                    "ref": "sh.weaver.notebook.defs#entryView"
+                  },
+                  "entriesRemaining": {
+                    "type": "integer"
+                  },
+                  "nextEntry": {
+                    "type": "ref",
+                    "description": "The next entry to read (if any).",
+                    "ref": "sh.weaver.notebook.defs#entryView"
+                  },
+                  "notebook": {
+                    "type": "ref",
+                    "ref": "sh.weaver.notebook.defs#notebookView"
+                  },
+                  "progress": {
+                    "type": "ref",
+                    "ref": "sh.weaver.notebook.defs#readingProgress"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

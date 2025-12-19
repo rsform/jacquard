@@ -196,6 +196,26 @@
         "did"
       ],
       "properties": {
+        "blockedBy": {
+          "type": "string",
+          "description": "if the actor is blocked by this DID, contains the AT-URI of the block record",
+          "format": "at-uri"
+        },
+        "blockedByList": {
+          "type": "string",
+          "description": "if the actor is blocked by this DID via a block list, contains the AT-URI of the listblock record",
+          "format": "at-uri"
+        },
+        "blocking": {
+          "type": "string",
+          "description": "if the actor blocks this DID, this is the AT-URI of the block record",
+          "format": "at-uri"
+        },
+        "blockingByList": {
+          "type": "string",
+          "description": "if the actor blocks this DID via a block list, this is the AT-URI of the listblock record",
+          "format": "at-uri"
+        },
         "did": {
           "type": "string",
           "format": "did"

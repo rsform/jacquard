@@ -18,10 +18,14 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Paragraph<'a> {
-    /// Array of inline content nodes (text and hard breaks)
+    /// Array of inline content nodes (text, hard breaks, and mentions)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub content: std::option::Option<Vec<ParagraphContentItem<'a>>>,
+    /// Facets for text formatting and features within this paragraph
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub facets: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
 }
 
 #[jacquard_derive::open_union]
@@ -39,6 +43,10 @@ pub struct Paragraph<'a> {
 pub enum ParagraphContentItem<'a> {
     #[serde(rename = "blog.pckt.block.text")]
     Text(Box<crate::blog_pckt::block::text::Text<'a>>),
+    #[serde(rename = "blog.pckt.block.hardBreak")]
+    HardBreak(Box<crate::blog_pckt::block::hard_break::HardBreak<'a>>),
+    #[serde(rename = "blog.pckt.block.mention")]
+    Mention(Box<crate::blog_pckt::block::mention::Mention<'a>>),
 }
 
 fn lexicon_doc_blog_pckt_block_paragraph() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -65,16 +73,35 @@ fn lexicon_doc_blog_pckt_block_paragraph() -> ::jacquard_lexicon::lexicon::Lexic
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
-                                        "Array of inline content nodes (text and hard breaks)",
+                                        "Array of inline content nodes (text, hard breaks, and mentions)",
                                     ),
                                 ),
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
                                         ::jacquard_common::CowStr::new_static("blog.pckt.block.text"),
-                                        ::jacquard_common::CowStr::new_static("blog.pckt.block.hardBreak")
+                                        ::jacquard_common::CowStr::new_static("blog.pckt.block.hardBreak"),
+                                        ::jacquard_common::CowStr::new_static("blog.pckt.block.mention")
                                     ],
                                     closed: Some(false),
+                                }),
+                                min_length: None,
+                                max_length: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("facets"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Facets for text formatting and features within this paragraph",
+                                    ),
+                                ),
+                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "blog.pckt.richtext.facet",
+                                    ),
                                 }),
                                 min_length: None,
                                 max_length: None,

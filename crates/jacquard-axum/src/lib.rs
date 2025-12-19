@@ -66,7 +66,6 @@ use serde_json::json;
 ///
 /// Deserializes incoming requests based on the endpoint's method type (Query or Procedure)
 /// and returns the owned (`'static`) request type ready for handler logic.
-
 pub struct ExtractXrpc<E: XrpcEndpoint>(pub E::Request<'static>);
 
 impl<S, R> FromRequest<S> for ExtractXrpc<R>

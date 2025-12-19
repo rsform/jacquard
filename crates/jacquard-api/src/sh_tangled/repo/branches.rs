@@ -181,10 +181,10 @@ pub struct BranchesOutput {
 pub enum BranchesError<'a> {
     /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(std::option::Option<String>),
+    RepoNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
     /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(std::option::Option<String>),
+    InvalidRequest(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl std::fmt::Display for BranchesError<'_> {

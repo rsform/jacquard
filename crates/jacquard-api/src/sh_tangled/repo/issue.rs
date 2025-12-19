@@ -24,6 +24,12 @@ pub struct Issue<'a> {
     #[serde(borrow)]
     pub body: std::option::Option<jacquard_common::CowStr<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub mentions: std::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub references: std::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
     #[serde(borrow)]
     pub repo: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -41,50 +47,50 @@ pub mod issue_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Repo;
-        type CreatedAt;
         type Title;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Repo = Unset;
-        type CreatedAt = Unset;
         type Title = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepo<S> {}
     impl<S: State> State for SetRepo<S> {
         type Repo = Set<members::repo>;
+        type Title = S::Title;
         type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Repo = S::Repo;
-        type CreatedAt = Set<members::created_at>;
-        type Title = S::Title;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
         type Repo = S::Repo;
-        type CreatedAt = S::CreatedAt;
         type Title = Set<members::title>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Repo = S::Repo;
+        type Title = S::Title;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `repo` field
         pub struct repo(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -94,6 +100,8 @@ pub struct IssueBuilder<'a, S: issue_state::State> {
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
+        ::core::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
         ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
     ),
@@ -112,7 +120,7 @@ impl<'a> IssueBuilder<'a, issue_state::Empty> {
     pub fn new() -> Self {
         IssueBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None),
+            __unsafe_private_named: (None, None, None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -153,6 +161,44 @@ where
     }
 }
 
+impl<'a, S: issue_state::State> IssueBuilder<'a, S> {
+    /// Set the `mentions` field (optional)
+    pub fn mentions(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::types::string::Did<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `mentions` field to an Option value (optional)
+    pub fn maybe_mentions(
+        mut self,
+        value: Option<Vec<jacquard_common::types::string::Did<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: issue_state::State> IssueBuilder<'a, S> {
+    /// Set the `references` field (optional)
+    pub fn references(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::types::string::AtUri<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `references` field to an Option value (optional)
+    pub fn maybe_references(
+        mut self,
+        value: Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
 impl<'a, S> IssueBuilder<'a, S>
 where
     S: issue_state::State,
@@ -163,7 +209,7 @@ where
         mut self,
         value: impl Into<jacquard_common::types::string::AtUri<'a>>,
     ) -> IssueBuilder<'a, issue_state::SetRepo<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
         IssueBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -182,7 +228,7 @@ where
         mut self,
         value: impl Into<jacquard_common::CowStr<'a>>,
     ) -> IssueBuilder<'a, issue_state::SetTitle<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
         IssueBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -195,16 +241,18 @@ impl<'a, S> IssueBuilder<'a, S>
 where
     S: issue_state::State,
     S::Repo: issue_state::IsSet,
-    S::CreatedAt: issue_state::IsSet,
     S::Title: issue_state::IsSet,
+    S::CreatedAt: issue_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Issue<'a> {
         Issue {
             body: self.__unsafe_private_named.0,
             created_at: self.__unsafe_private_named.1.unwrap(),
-            repo: self.__unsafe_private_named.2.unwrap(),
-            title: self.__unsafe_private_named.3.unwrap(),
+            mentions: self.__unsafe_private_named.2,
+            references: self.__unsafe_private_named.3,
+            repo: self.__unsafe_private_named.4.unwrap(),
+            title: self.__unsafe_private_named.5.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -219,8 +267,10 @@ where
         Issue {
             body: self.__unsafe_private_named.0,
             created_at: self.__unsafe_private_named.1.unwrap(),
-            repo: self.__unsafe_private_named.2.unwrap(),
-            title: self.__unsafe_private_named.3.unwrap(),
+            mentions: self.__unsafe_private_named.2,
+            references: self.__unsafe_private_named.3,
+            repo: self.__unsafe_private_named.4.unwrap(),
+            title: self.__unsafe_private_named.5.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -364,6 +414,54 @@ fn lexicon_doc_sh_tangled_repo_issue() -> ::jacquard_lexicon::lexicon::LexiconDo
                                     r#enum: None,
                                     r#const: None,
                                     known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "mentions",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                    description: None,
+                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: Some(
+                                            ::jacquard_lexicon::lexicon::LexStringFormat::Did,
+                                        ),
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                    min_length: None,
+                                    max_length: None,
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "references",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                    description: None,
+                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: Some(
+                                            ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
+                                        ),
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                    min_length: None,
+                                    max_length: None,
                                 }),
                             );
                             map.insert(

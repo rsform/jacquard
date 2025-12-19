@@ -1,0 +1,89 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.edit.listDrafts",
+  "defs": {
+    "draftView": {
+      "type": "object",
+      "description": "Hydrated view of a draft with edit state.",
+      "required": [
+        "uri",
+        "cid",
+        "createdAt"
+      ],
+      "properties": {
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "editRoot": {
+          "type": "ref",
+          "description": "Associated edit root if one exists",
+          "ref": "com.atproto.repo.strongRef"
+        },
+        "lastEditAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "title": {
+          "type": "string",
+          "description": "Extracted title if available from edit state"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
+    "main": {
+      "type": "query",
+      "description": "List draft records for an actor. Drafts are unpublished edit roots that aren't linked to a published entry.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "actor"
+        ],
+        "properties": {
+          "actor": {
+            "type": "string",
+            "description": "DID or handle of the actor",
+            "format": "at-identifier"
+          },
+          "cursor": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 100
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "drafts"
+          ],
+          "properties": {
+            "cursor": {
+              "type": "string"
+            },
+            "drafts": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "#draftView"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

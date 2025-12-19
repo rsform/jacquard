@@ -5,275 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-/// Embed attributes
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(rename_all = "camelCase")]
-pub struct EmbedAttrs<'a> {
-    /// Pre-rendered HTML content of the embedded post
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub html: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// URL of the Bluesky post to embed
-    #[serde(borrow)]
-    pub url: jacquard_common::types::string::Uri<'a>,
-}
-
-pub mod embed_attrs_state {
-
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
-    #[allow(unused)]
-    use ::core::marker::PhantomData;
-    mod sealed {
-        pub trait Sealed {}
-    }
-    /// State trait tracking which required fields have been set
-    pub trait State: sealed::Sealed {
-        type Url;
-    }
-    /// Empty state - all required fields are unset
-    pub struct Empty(());
-    impl sealed::Sealed for Empty {}
-    impl State for Empty {
-        type Url = Unset;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type Url = Set<members::url>;
-    }
-    /// Marker types for field names
-    #[allow(non_camel_case_types)]
-    pub mod members {
-        ///Marker type for the `url` field
-        pub struct url(());
-    }
-}
-
-/// Builder for constructing an instance of this type
-pub struct EmbedAttrsBuilder<'a, S: embed_attrs_state::State> {
-    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
-    ),
-    _phantom: ::core::marker::PhantomData<&'a ()>,
-}
-
-impl<'a> EmbedAttrs<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> EmbedAttrsBuilder<'a, embed_attrs_state::Empty> {
-        EmbedAttrsBuilder::new()
-    }
-}
-
-impl<'a> EmbedAttrsBuilder<'a, embed_attrs_state::Empty> {
-    /// Create a new builder with all fields unset
-    pub fn new() -> Self {
-        EmbedAttrsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S: embed_attrs_state::State> EmbedAttrsBuilder<'a, S> {
-    /// Set the `html` field (optional)
-    pub fn html(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
-        self
-    }
-    /// Set the `html` field to an Option value (optional)
-    pub fn maybe_html(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
-        self
-    }
-}
-
-impl<'a, S> EmbedAttrsBuilder<'a, S>
-where
-    S: embed_attrs_state::State,
-    S::Url: embed_attrs_state::IsUnset,
-{
-    /// Set the `url` field (required)
-    pub fn url(
-        mut self,
-        value: impl Into<jacquard_common::types::string::Uri<'a>>,
-    ) -> EmbedAttrsBuilder<'a, embed_attrs_state::SetUrl<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
-        EmbedAttrsBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> EmbedAttrsBuilder<'a, S>
-where
-    S: embed_attrs_state::State,
-    S::Url: embed_attrs_state::IsSet,
-{
-    /// Build the final struct
-    pub fn build(self) -> EmbedAttrs<'a> {
-        EmbedAttrs {
-            html: self.__unsafe_private_named.0,
-            url: self.__unsafe_private_named.1.unwrap(),
-            extra_data: Default::default(),
-        }
-    }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: std::collections::BTreeMap<
-            jacquard_common::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> EmbedAttrs<'a> {
-        EmbedAttrs {
-            html: self.__unsafe_private_named.0,
-            url: self.__unsafe_private_named.1.unwrap(),
-            extra_data: Some(extra_data),
-        }
-    }
-}
-
-fn lexicon_doc_blog_pckt_block_blueskyEmbed() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("blog.pckt.block.blueskyEmbed"),
-        revision: None,
-        description: None,
-        defs: {
-            let mut map = ::std::collections::BTreeMap::new();
-            map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("embedAttrs"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static("Embed attributes"),
-                    ),
-                    required: Some(
-                        vec![::jacquard_common::smol_str::SmolStr::new_static("url")],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("html"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Pre-rendered HTML content of the embedded post",
-                                    ),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: Some(50000usize),
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("url"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "URL of the Bluesky post to embed",
-                                    ),
-                                ),
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map
-                    },
-                }),
-            );
-            map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![::jacquard_common::smol_str::SmolStr::new_static("attrs")],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("attrs"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#embedAttrs"),
-                            }),
-                        );
-                        map
-                    },
-                }),
-            );
-            map
-        },
-    }
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EmbedAttrs<'a> {
-    fn nsid() -> &'static str {
-        "blog.pckt.block.blueskyEmbed"
-    }
-    fn def_name() -> &'static str {
-        "embedAttrs"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_blog_pckt_block_blueskyEmbed()
-    }
-    fn validate(
-        &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.html {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 50000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "html",
-                    ),
-                    max: 50000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        Ok(())
-    }
-}
-
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -286,9 +17,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EmbedAttrs<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BlueskyEmbed<'a> {
-    /// Embed attributes
+    /// Strong reference to the Bluesky post
     #[serde(borrow)]
-    pub attrs: crate::blog_pckt::block::bluesky_embed::EmbedAttrs<'a>,
+    pub post_ref: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }
 
 pub mod bluesky_embed_state {
@@ -301,25 +32,25 @@ pub mod bluesky_embed_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Attrs;
+        type PostRef;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Attrs = Unset;
+        type PostRef = Unset;
     }
-    ///State transition - sets the `attrs` field to Set
-    pub struct SetAttrs<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAttrs<S> {}
-    impl<S: State> State for SetAttrs<S> {
-        type Attrs = Set<members::attrs>;
+    ///State transition - sets the `post_ref` field to Set
+    pub struct SetPostRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPostRef<S> {}
+    impl<S: State> State for SetPostRef<S> {
+        type PostRef = Set<members::post_ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `attrs` field
-        pub struct attrs(());
+        ///Marker type for the `post_ref` field
+        pub struct post_ref(());
     }
 }
 
@@ -327,7 +58,7 @@ pub mod bluesky_embed_state {
 pub struct BlueskyEmbedBuilder<'a, S: bluesky_embed_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<crate::blog_pckt::block::bluesky_embed::EmbedAttrs<'a>>,
+        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -353,13 +84,13 @@ impl<'a> BlueskyEmbedBuilder<'a, bluesky_embed_state::Empty> {
 impl<'a, S> BlueskyEmbedBuilder<'a, S>
 where
     S: bluesky_embed_state::State,
-    S::Attrs: bluesky_embed_state::IsUnset,
+    S::PostRef: bluesky_embed_state::IsUnset,
 {
-    /// Set the `attrs` field (required)
-    pub fn attrs(
+    /// Set the `postRef` field (required)
+    pub fn post_ref(
         mut self,
-        value: impl Into<crate::blog_pckt::block::bluesky_embed::EmbedAttrs<'a>>,
-    ) -> BlueskyEmbedBuilder<'a, bluesky_embed_state::SetAttrs<S>> {
+        value: impl Into<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    ) -> BlueskyEmbedBuilder<'a, bluesky_embed_state::SetPostRef<S>> {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
         BlueskyEmbedBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -372,12 +103,12 @@ where
 impl<'a, S> BlueskyEmbedBuilder<'a, S>
 where
     S: bluesky_embed_state::State,
-    S::Attrs: bluesky_embed_state::IsSet,
+    S::PostRef: bluesky_embed_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> BlueskyEmbed<'a> {
         BlueskyEmbed {
-            attrs: self.__unsafe_private_named.0.unwrap(),
+            post_ref: self.__unsafe_private_named.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -390,9 +121,48 @@ where
         >,
     ) -> BlueskyEmbed<'a> {
         BlueskyEmbed {
-            attrs: self.__unsafe_private_named.0.unwrap(),
+            post_ref: self.__unsafe_private_named.0.unwrap(),
             extra_data: Some(extra_data),
         }
+    }
+}
+
+fn lexicon_doc_blog_pckt_block_blueskyEmbed() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
+    ::jacquard_lexicon::lexicon::LexiconDoc {
+        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
+        id: ::jacquard_common::CowStr::new_static("blog.pckt.block.blueskyEmbed"),
+        revision: None,
+        description: None,
+        defs: {
+            let mut map = ::std::collections::BTreeMap::new();
+            map.insert(
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("postRef")],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::std::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("postRef"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "com.atproto.repo.strongRef",
+                                ),
+                            }),
+                        );
+                        map
+                    },
+                }),
+            );
+            map
+        },
     }
 }
 

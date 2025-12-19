@@ -21,6 +21,11 @@
             "minLength": 1,
             "maxLength": 2048
           },
+          "bookProgress": {
+            "type": "ref",
+            "description": "Progress tracking details for the book",
+            "ref": "buzz.bookhive.defs#bookProgress"
+          },
           "cover": {
             "type": "blob",
             "description": "Cover image of the book",

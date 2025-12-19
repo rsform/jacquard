@@ -1,0 +1,35 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.graph.bookmark",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Bookmark a notebook or entry for later reading.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "note": {
+            "type": "string",
+            "description": "Optional private note about why you saved this.",
+            "maxLength": 3000,
+            "maxGraphemes": 300
+          },
+          "subject": {
+            "type": "ref",
+            "description": "The notebook or entry being bookmarked.",
+            "ref": "com.atproto.repo.strongRef"
+          }
+        }
+      }
+    }
+  }
+}

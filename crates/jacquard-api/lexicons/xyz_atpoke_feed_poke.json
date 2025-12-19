@@ -1,0 +1,32 @@
+{
+  "lexicon": 1,
+  "id": "xyz.atpoke.feed.poke",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A 'poke' of another record. Kind of like a like. Used to poke a poke (or any other record)",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "subject": {
+            "type": "ref",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "via": {
+            "type": "ref",
+            "ref": "com.atproto.repo.strongRef"
+          }
+        }
+      }
+    }
+  }
+}

@@ -172,7 +172,7 @@ regex = { workspace = true, default-features = false, features = ["std", "perf-l
 [target.'cfg(target_family = "wasm")'.dependencies]
 getrandom = { version = "0.2", features = ["js"] }
 regex-lite = "0.1"
-ring = { version = "0.17", features = ["wasm32_unknown_unknown_js"]}
+#ring = { version = "0.17", features = ["wasm32_unknown_unknown_js"]}
 reqwest = { workspace = true }
 
 [target.'cfg(all(target_family = "wasm", target_os = "unknown"))'.dependencies]
@@ -187,4 +187,4 @@ tiff = { version = "0.6.0-alpha" }
 image = { version = "0.25" }
 
 [package.metadata.docs.rs]
-features = ["api_all", "derive", "dns", "loopback", "streaming"]
+features = ["api_all", "derive", "dns", "streaming"]

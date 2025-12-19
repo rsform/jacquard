@@ -21,6 +21,10 @@
               "ref": "sh.weaver.actor.defs#author"
             }
           },
+          "contentWarnings": {
+            "type": "ref",
+            "ref": "sh.weaver.notebook.defs#contentWarnings"
+          },
           "createdAt": {
             "type": "string",
             "description": "Client-declared timestamp when this was originally created.",
@@ -37,6 +41,10 @@
             "type": "ref",
             "description": "The notebook this chapter belongs to.",
             "ref": "com.atproto.repo.strongRef"
+          },
+          "rating": {
+            "type": "ref",
+            "ref": "sh.weaver.notebook.defs#contentRating"
           },
           "tags": {
             "type": "ref",

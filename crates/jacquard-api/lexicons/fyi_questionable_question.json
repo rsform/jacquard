@@ -1,0 +1,52 @@
+{
+  "lexicon": 1,
+  "id": "fyi.questionable.question",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A question asked on questionable.fyi",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "summary",
+          "createdAt"
+        ],
+        "properties": {
+          "answers": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "com.atproto.repo.strongRef"
+            },
+            "maxLength": 10
+          },
+          "content": {
+            "type": "string",
+            "maxLength": 10000,
+            "maxGraphemes": 10000
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "languages": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "language"
+            },
+            "maxLength": 3
+          },
+          "summary": {
+            "type": "string",
+            "description": "A short summary of the question",
+            "minLength": 3,
+            "maxLength": 3000,
+            "maxGraphemes": 300
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.notebook.updateReadingProgress",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Update reading progress for a notebook (appview-side state).",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "notebook"
+          ],
+          "properties": {
+            "currentEntry": {
+              "type": "string",
+              "description": "The entry the user is currently on.",
+              "format": "at-uri"
+            },
+            "notebook": {
+              "type": "string",
+              "format": "at-uri"
+            },
+            "percentComplete": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "status": {
+              "type": "string",
+              "knownValues": [
+                "reading",
+                "finished",
+                "abandoned",
+                "want-to-read"
+              ]
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "progress"
+          ],
+          "properties": {
+            "progress": {
+              "type": "ref",
+              "ref": "sh.weaver.notebook.defs#readingProgress"
+            }
+          }
+        }
+      }
+    }
+  }
+}

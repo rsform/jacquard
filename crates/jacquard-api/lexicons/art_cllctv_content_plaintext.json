@@ -1,0 +1,26 @@
+{
+  "lexicon": 1,
+  "id": "art.cllctv.content.plaintext",
+  "defs": {
+    "main": {
+      "type": "object",
+      "required": [
+        "plaintext"
+      ],
+      "properties": {
+        "facets": {
+          "type": "array",
+          "items": {
+            "type": "union",
+            "refs": [
+              "app.bsky.richtext.facet"
+            ]
+          }
+        },
+        "plaintext": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

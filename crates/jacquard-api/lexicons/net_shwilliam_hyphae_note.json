@@ -1,0 +1,49 @@
+{
+  "lexicon": 1,
+  "id": "net.shwilliam.hyphae.note",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "createdAt",
+          "text"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "client timestamp",
+            "format": "datetime"
+          },
+          "refs": {
+            "type": "array",
+            "description": "related notes",
+            "items": {
+              "type": "ref",
+              "ref": "com.atproto.repo.strongRef"
+            },
+            "maxLength": 20
+          },
+          "tags": {
+            "type": "array",
+            "description": "note tags",
+            "items": {
+              "type": "string",
+              "maxLength": 640,
+              "maxGraphemes": 64
+            },
+            "maxLength": 8
+          },
+          "text": {
+            "type": "string",
+            "description": "primary note content",
+            "maxLength": 100000,
+            "maxGraphemes": 10000
+          }
+        }
+      }
+    }
+  }
+}

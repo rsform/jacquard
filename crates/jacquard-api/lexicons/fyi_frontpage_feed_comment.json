@@ -21,7 +21,7 @@
               "type": "ref",
               "ref": "fyi.frontpage.richtext.block"
             },
-            "maxLength": 50
+            "maxLength": 200
           },
           "createdAt": {
             "type": "string",

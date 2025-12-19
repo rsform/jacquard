@@ -427,7 +427,7 @@ pub struct SearchPostsSkeletonOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum SearchPostsSkeletonError<'a> {
     #[serde(rename = "BadQueryString")]
-    BadQueryString(std::option::Option<String>),
+    BadQueryString(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl std::fmt::Display for SearchPostsSkeletonError<'_> {

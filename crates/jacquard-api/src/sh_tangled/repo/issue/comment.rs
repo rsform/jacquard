@@ -24,6 +24,12 @@ pub struct Comment<'a> {
     pub issue: jacquard_common::types::string::AtUri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
+    pub mentions: std::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub references: std::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
     pub reply_to: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
 }
 
@@ -92,6 +98,8 @@ pub struct CommentBuilder<'a, S: comment_state::State> {
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+        ::core::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
+        ::core::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
         ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
@@ -109,7 +117,7 @@ impl<'a> CommentBuilder<'a, comment_state::Empty> {
     pub fn new() -> Self {
         CommentBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None),
+            __unsafe_private_named: (None, None, None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -173,12 +181,50 @@ where
 }
 
 impl<'a, S: comment_state::State> CommentBuilder<'a, S> {
+    /// Set the `mentions` field (optional)
+    pub fn mentions(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::types::string::Did<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `mentions` field to an Option value (optional)
+    pub fn maybe_mentions(
+        mut self,
+        value: Option<Vec<jacquard_common::types::string::Did<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: comment_state::State> CommentBuilder<'a, S> {
+    /// Set the `references` field (optional)
+    pub fn references(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::types::string::AtUri<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `references` field to an Option value (optional)
+    pub fn maybe_references(
+        mut self,
+        value: Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: comment_state::State> CommentBuilder<'a, S> {
     /// Set the `replyTo` field (optional)
     pub fn reply_to(
         mut self,
         value: impl Into<Option<jacquard_common::types::string::AtUri<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `replyTo` field to an Option value (optional)
@@ -186,7 +232,7 @@ impl<'a, S: comment_state::State> CommentBuilder<'a, S> {
         mut self,
         value: Option<jacquard_common::types::string::AtUri<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self.__unsafe_private_named.5 = value;
         self
     }
 }
@@ -204,7 +250,9 @@ where
             body: self.__unsafe_private_named.0.unwrap(),
             created_at: self.__unsafe_private_named.1.unwrap(),
             issue: self.__unsafe_private_named.2.unwrap(),
-            reply_to: self.__unsafe_private_named.3,
+            mentions: self.__unsafe_private_named.3,
+            references: self.__unsafe_private_named.4,
+            reply_to: self.__unsafe_private_named.5,
             extra_data: Default::default(),
         }
     }
@@ -220,7 +268,9 @@ where
             body: self.__unsafe_private_named.0.unwrap(),
             created_at: self.__unsafe_private_named.1.unwrap(),
             issue: self.__unsafe_private_named.2.unwrap(),
-            reply_to: self.__unsafe_private_named.3,
+            mentions: self.__unsafe_private_named.3,
+            references: self.__unsafe_private_named.4,
+            reply_to: self.__unsafe_private_named.5,
             extra_data: Some(extra_data),
         }
     }
@@ -381,6 +431,54 @@ fn lexicon_doc_sh_tangled_repo_issue_comment() -> ::jacquard_lexicon::lexicon::L
                                     r#enum: None,
                                     r#const: None,
                                     known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "mentions",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                    description: None,
+                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: Some(
+                                            ::jacquard_lexicon::lexicon::LexStringFormat::Did,
+                                        ),
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                    min_length: None,
+                                    max_length: None,
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "references",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                    description: None,
+                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: Some(
+                                            ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
+                                        ),
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                    min_length: None,
+                                    max_length: None,
                                 }),
                             );
                             map.insert(

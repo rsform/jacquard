@@ -1,0 +1,28 @@
+{
+  "lexicon": 1,
+  "id": "xyz.atpoke.graph.poke",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Record declaring you poked another did, there can be multiple pokes per did",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "subject": {
+            "type": "string",
+            "format": "did"
+          }
+        }
+      }
+    }
+  }
+}

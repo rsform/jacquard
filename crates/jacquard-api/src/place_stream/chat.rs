@@ -55,9 +55,9 @@ pub mod message_view_state {
     pub trait State: sealed::Sealed {
         type Cid;
         type Record;
-        type Uri;
-        type Author;
         type IndexedAt;
+        type Author;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -65,9 +65,9 @@ pub mod message_view_state {
     impl State for Empty {
         type Cid = Unset;
         type Record = Unset;
-        type Uri = Unset;
-        type Author = Unset;
         type IndexedAt = Unset;
+        type Author = Unset;
+        type Uri = Unset;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
@@ -75,9 +75,9 @@ pub mod message_view_state {
     impl<S: State> State for SetCid<S> {
         type Cid = Set<members::cid>;
         type Record = S::Record;
-        type Uri = S::Uri;
-        type Author = S::Author;
         type IndexedAt = S::IndexedAt;
+        type Author = S::Author;
+        type Uri = S::Uri;
     }
     ///State transition - sets the `record` field to Set
     pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
@@ -85,29 +85,9 @@ pub mod message_view_state {
     impl<S: State> State for SetRecord<S> {
         type Cid = S::Cid;
         type Record = Set<members::record>;
-        type Uri = S::Uri;
+        type IndexedAt = S::IndexedAt;
         type Author = S::Author;
-        type IndexedAt = S::IndexedAt;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Cid = S::Cid;
-        type Record = S::Record;
-        type Uri = Set<members::uri>;
-        type Author = S::Author;
-        type IndexedAt = S::IndexedAt;
-    }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthor<S> {}
-    impl<S: State> State for SetAuthor<S> {
-        type Cid = S::Cid;
-        type Record = S::Record;
         type Uri = S::Uri;
-        type Author = Set<members::author>;
-        type IndexedAt = S::IndexedAt;
     }
     ///State transition - sets the `indexed_at` field to Set
     pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
@@ -115,9 +95,29 @@ pub mod message_view_state {
     impl<S: State> State for SetIndexedAt<S> {
         type Cid = S::Cid;
         type Record = S::Record;
-        type Uri = S::Uri;
-        type Author = S::Author;
         type IndexedAt = Set<members::indexed_at>;
+        type Author = S::Author;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthor<S> {}
+    impl<S: State> State for SetAuthor<S> {
+        type Cid = S::Cid;
+        type Record = S::Record;
+        type IndexedAt = S::IndexedAt;
+        type Author = Set<members::author>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Cid = S::Cid;
+        type Record = S::Record;
+        type IndexedAt = S::IndexedAt;
+        type Author = S::Author;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -126,12 +126,12 @@ pub mod message_view_state {
         pub struct cid(());
         ///Marker type for the `record` field
         pub struct record(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `author` field
-        pub struct author(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
+        ///Marker type for the `author` field
+        pub struct author(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -314,9 +314,9 @@ where
     S: message_view_state::State,
     S::Cid: message_view_state::IsSet,
     S::Record: message_view_state::IsSet,
-    S::Uri: message_view_state::IsSet,
-    S::Author: message_view_state::IsSet,
     S::IndexedAt: message_view_state::IsSet,
+    S::Author: message_view_state::IsSet,
+    S::Uri: message_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MessageView<'a> {

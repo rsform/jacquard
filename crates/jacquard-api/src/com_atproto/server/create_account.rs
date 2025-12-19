@@ -378,19 +378,19 @@ pub struct CreateAccountOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum CreateAccountError<'a> {
     #[serde(rename = "InvalidHandle")]
-    InvalidHandle(std::option::Option<String>),
+    InvalidHandle(std::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "InvalidPassword")]
-    InvalidPassword(std::option::Option<String>),
+    InvalidPassword(std::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "InvalidInviteCode")]
-    InvalidInviteCode(std::option::Option<String>),
+    InvalidInviteCode(std::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "HandleNotAvailable")]
-    HandleNotAvailable(std::option::Option<String>),
+    HandleNotAvailable(std::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "UnsupportedDomain")]
-    UnsupportedDomain(std::option::Option<String>),
+    UnsupportedDomain(std::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "UnresolvableDid")]
-    UnresolvableDid(std::option::Option<String>),
+    UnresolvableDid(std::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "IncompatibleDidDoc")]
-    IncompatibleDidDoc(std::option::Option<String>),
+    IncompatibleDidDoc(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl std::fmt::Display for CreateAccountError<'_> {

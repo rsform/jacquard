@@ -188,7 +188,7 @@ pub struct ListWebhooksOutput<'a> {
 pub enum ListWebhooksError<'a> {
     /// The provided cursor is invalid or expired.
     #[serde(rename = "InvalidCursor")]
-    InvalidCursor(std::option::Option<String>),
+    InvalidCursor(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl std::fmt::Display for ListWebhooksError<'_> {

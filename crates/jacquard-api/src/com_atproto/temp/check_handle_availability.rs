@@ -229,7 +229,7 @@ pub enum CheckHandleAvailabilityOutputResult<'a> {
 pub enum CheckHandleAvailabilityError<'a> {
     /// An invalid email was provided.
     #[serde(rename = "InvalidEmail")]
-    InvalidEmail(std::option::Option<String>),
+    InvalidEmail(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl std::fmt::Display for CheckHandleAvailabilityError<'_> {

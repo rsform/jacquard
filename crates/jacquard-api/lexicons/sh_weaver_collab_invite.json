@@ -1,0 +1,60 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.collab.invite",
+  "defs": {
+    "collabScope": {
+      "type": "string",
+      "description": "The scope/type of collaboration.",
+      "knownValues": [
+        "sh.weaver.collab.defs#notebook",
+        "sh.weaver.collab.defs#entry",
+        "sh.weaver.collab.defs#chapter"
+      ]
+    },
+    "main": {
+      "type": "record",
+      "description": "Invitation to collaborate on a resource (notebook, entry, chapter, etc.). Creates half of a two-way agreement.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "resource",
+          "invitee",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "expiresAt": {
+            "type": "string",
+            "description": "Optional expiration for the invite.",
+            "format": "datetime"
+          },
+          "invitee": {
+            "type": "string",
+            "description": "DID of the user being invited.",
+            "format": "did"
+          },
+          "message": {
+            "type": "string",
+            "description": "Optional message to the invitee.",
+            "maxLength": 3000,
+            "maxGraphemes": 300
+          },
+          "resource": {
+            "type": "ref",
+            "description": "The resource to collaborate on (notebook, entry, chapter, etc.).",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "scope": {
+            "type": "ref",
+            "description": "Optional explicit scope type. If omitted, inferred from resource lexicon.",
+            "ref": "#collabScope"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.actor.searchActorsTypeahead",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Fast typeahead search for actors (handle/display name prefix matching).",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "q"
+        ],
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "default": 10,
+            "minimum": 1,
+            "maximum": 25
+          },
+          "q": {
+            "type": "string",
+            "description": "Search query prefix.",
+            "minLength": 1,
+            "maxLength": 100
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "actors"
+          ],
+          "properties": {
+            "actors": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "sh.weaver.actor.defs#profileViewBasic"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

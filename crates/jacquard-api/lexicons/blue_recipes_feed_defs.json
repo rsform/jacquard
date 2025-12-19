@@ -1,0 +1,56 @@
+{
+  "lexicon": 1,
+  "id": "blue.recipes.feed.defs",
+  "defs": {
+    "notFoundRecipe": {
+      "type": "object",
+      "required": [
+        "uri",
+        "notFound"
+      ],
+      "properties": {
+        "notFound": {
+          "type": "boolean",
+          "const": true
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
+    "recipeView": {
+      "type": "object",
+      "description": "Response model for fetching multiple recipes.",
+      "required": [
+        "uri",
+        "cid",
+        "author",
+        "record",
+        "indexedAt"
+      ],
+      "properties": {
+        "author": {
+          "type": "ref",
+          "ref": "blue.recipes.actor.defs#profileViewBasic"
+        },
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "indexedAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "record": {
+          "type": "ref",
+          "ref": "blue.recipes.feed.recipe"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    }
+  }
+}

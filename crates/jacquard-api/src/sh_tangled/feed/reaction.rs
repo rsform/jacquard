@@ -34,51 +34,51 @@ pub mod reaction_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subject;
-        type Reaction;
         type CreatedAt;
+        type Reaction;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subject = Unset;
-        type Reaction = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Subject = Set<members::subject>;
-        type Reaction = S::Reaction;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `reaction` field to Set
-    pub struct SetReaction<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetReaction<S> {}
-    impl<S: State> State for SetReaction<S> {
-        type Subject = S::Subject;
-        type Reaction = Set<members::reaction>;
-        type CreatedAt = S::CreatedAt;
+        type Reaction = Unset;
+        type Subject = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Subject = S::Subject;
-        type Reaction = S::Reaction;
         type CreatedAt = Set<members::created_at>;
+        type Reaction = S::Reaction;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `reaction` field to Set
+    pub struct SetReaction<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetReaction<S> {}
+    impl<S: State> State for SetReaction<S> {
+        type CreatedAt = S::CreatedAt;
+        type Reaction = Set<members::reaction>;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type CreatedAt = S::CreatedAt;
+        type Reaction = S::Reaction;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject` field
-        pub struct subject(());
-        ///Marker type for the `reaction` field
-        pub struct reaction(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `reaction` field
+        pub struct reaction(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
@@ -171,9 +171,9 @@ where
 impl<'a, S> ReactionBuilder<'a, S>
 where
     S: reaction_state::State,
-    S::Subject: reaction_state::IsSet,
-    S::Reaction: reaction_state::IsSet,
     S::CreatedAt: reaction_state::IsSet,
+    S::Reaction: reaction_state::IsSet,
+    S::Subject: reaction_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Reaction<'a> {

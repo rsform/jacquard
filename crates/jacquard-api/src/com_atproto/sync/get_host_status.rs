@@ -151,7 +151,7 @@ pub struct GetHostStatusOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetHostStatusError<'a> {
     #[serde(rename = "HostNotFound")]
-    HostNotFound(std::option::Option<String>),
+    HostNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl std::fmt::Display for GetHostStatusError<'_> {

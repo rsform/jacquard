@@ -1,0 +1,76 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.notification.listNotifications",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get notifications for the authenticated user.",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "cursor": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 100
+          },
+          "reasons": {
+            "type": "array",
+            "description": "Filter by notification reasons.",
+            "items": {
+              "type": "string",
+              "knownValues": [
+                "like",
+                "bookmark",
+                "follow",
+                "followAccept",
+                "subscribe",
+                "subscribeAccept",
+                "collaborationInvite",
+                "collaborationAccept",
+                "newEntry",
+                "entryUpdate",
+                "mention",
+                "tag",
+                "comment"
+              ]
+            }
+          },
+          "seenAt": {
+            "type": "string",
+            "description": "Only show notifications after this timestamp.",
+            "format": "datetime"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "notifications"
+          ],
+          "properties": {
+            "cursor": {
+              "type": "string"
+            },
+            "notifications": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "sh.weaver.notification.defs#notification"
+              }
+            },
+            "seenAt": {
+              "type": "string",
+              "format": "datetime"
+            }
+          }
+        }
+      }
+    }
+  }
+}

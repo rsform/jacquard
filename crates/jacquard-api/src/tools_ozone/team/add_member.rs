@@ -33,37 +33,37 @@ pub mod add_member_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Role;
         type Did;
+        type Role;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Role = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `role` field to Set
-    pub struct SetRole<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRole<S> {}
-    impl<S: State> State for SetRole<S> {
-        type Role = Set<members::role>;
-        type Did = S::Did;
+        type Role = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Role = S::Role;
         type Did = Set<members::did>;
+        type Role = S::Role;
+    }
+    ///State transition - sets the `role` field to Set
+    pub struct SetRole<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRole<S> {}
+    impl<S: State> State for SetRole<S> {
+        type Did = S::Did;
+        type Role = Set<members::role>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `role` field
-        pub struct role(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `role` field
+        pub struct role(());
     }
 }
 
@@ -136,8 +136,8 @@ where
 impl<'a, S> AddMemberBuilder<'a, S>
 where
     S: add_member_state::State,
-    S::Role: add_member_state::IsSet,
     S::Did: add_member_state::IsSet,
+    S::Role: add_member_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> AddMember<'a> {
@@ -197,7 +197,7 @@ pub struct AddMemberOutput<'a> {
 pub enum AddMemberError<'a> {
     /// Member already exists in the team.
     #[serde(rename = "MemberAlreadyExists")]
-    MemberAlreadyExists(std::option::Option<String>),
+    MemberAlreadyExists(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl std::fmt::Display for AddMemberError<'_> {

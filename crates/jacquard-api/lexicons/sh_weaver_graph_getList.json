@@ -1,0 +1,62 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.graph.getList",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get a list with its items.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "list"
+        ],
+        "properties": {
+          "cursor": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 100
+          },
+          "list": {
+            "type": "string",
+            "format": "at-uri"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "list",
+            "items"
+          ],
+          "properties": {
+            "cursor": {
+              "type": "string"
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "sh.weaver.graph.defs#listItemView"
+              }
+            },
+            "list": {
+              "type": "ref",
+              "ref": "sh.weaver.graph.defs#listView"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "name": "ListNotFound"
+        }
+      ]
+    }
+  }
+}

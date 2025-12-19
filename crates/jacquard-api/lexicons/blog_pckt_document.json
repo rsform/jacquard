@@ -1,7 +1,6 @@
 {
   "lexicon": 1,
   "id": "blog.pckt.document",
-  "description": "A long-form blog document with rich content. Documents belong to a publication (blog) and contain structured content blocks, metadata, and optional media. This is the primary record type for blog posts.",
   "defs": {
     "main": {
       "type": "record",
@@ -9,95 +8,12 @@
       "record": {
         "type": "object",
         "required": [
-          "title",
-          "blocks",
-          "url",
-          "blog"
+          "document"
         ],
         "properties": {
-          "blocks": {
-            "type": "array",
-            "description": "Structured content blocks composing the document body",
-            "items": {
-              "type": "union",
-              "refs": [
-                "blog.pckt.block.paragraph",
-                "blog.pckt.block.heading",
-                "blog.pckt.block.image",
-                "blog.pckt.block.bulletList",
-                "blog.pckt.block.orderedList",
-                "blog.pckt.block.listItem",
-                "blog.pckt.block.taskList",
-                "blog.pckt.block.taskItem",
-                "blog.pckt.block.blockquote",
-                "blog.pckt.block.codeBlock",
-                "blog.pckt.block.horizontalRule",
-                "blog.pckt.block.blueskyEmbed"
-              ],
-              "closed": false
-            }
-          },
-          "blog": {
+          "document": {
             "type": "ref",
-            "description": "Reference to the parent publication (blog) this document belongs to",
-            "ref": "com.atproto.repo.strongRef"
-          },
-          "bodyPlain": {
-            "type": "string",
-            "description": "Plain text representation of the document content for search and preview",
-            "maxLength": 100000,
-            "maxGraphemes": 50000
-          },
-          "cover": {
-            "type": "blob",
-            "description": "Optional cover/featured image (10MB max)",
-            "accept": [
-              "image/*"
-            ],
-            "maxSize": 10000000
-          },
-          "images": {
-            "type": "array",
-            "description": "Blob references for images used within the document content",
-            "items": {
-              "type": "blob",
-              "accept": [
-                "image/*"
-              ],
-              "maxSize": 10000000
-            }
-          },
-          "publishedAt": {
-            "type": "string",
-            "description": "Timestamp when the document was first published",
-            "format": "datetime"
-          },
-          "tags": {
-            "type": "array",
-            "description": "Optional tags for categorization and discovery",
-            "items": {
-              "type": "string",
-              "maxLength": 100,
-              "maxGraphemes": 50
-            },
-            "maxLength": 20
-          },
-          "title": {
-            "type": "string",
-            "description": "Document title/headline",
-            "maxLength": 1280,
-            "maxGraphemes": 128
-          },
-          "updatedAt": {
-            "type": "string",
-            "description": "Timestamp when the document was last modified",
-            "format": "datetime"
-          },
-          "url": {
-            "type": "string",
-            "description": "Canonical URL where this document is published",
-            "format": "uri",
-            "maxLength": 2000
+            "ref": "site.standard.document"
           }
         }
       }

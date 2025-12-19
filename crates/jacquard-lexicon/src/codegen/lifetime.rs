@@ -79,7 +79,7 @@ impl HasLifetime for LexUserType<'_> {
                 // Shouldn't be referenced directly
                 true
             }
-            LexUserType::Union(_) => false, // Unions are just refs, no lifetime needed
+            LexUserType::Union(_) => true, // Union enums are always generated with <'a>
         }
     }
 }

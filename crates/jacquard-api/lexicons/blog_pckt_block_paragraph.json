@@ -8,14 +8,23 @@
       "properties": {
         "content": {
           "type": "array",
-          "description": "Array of inline content nodes (text and hard breaks)",
+          "description": "Array of inline content nodes (text, hard breaks, and mentions)",
           "items": {
             "type": "union",
             "refs": [
               "blog.pckt.block.text",
-              "blog.pckt.block.hardBreak"
+              "blog.pckt.block.hardBreak",
+              "blog.pckt.block.mention"
             ],
             "closed": false
+          }
+        },
+        "facets": {
+          "type": "array",
+          "description": "Facets for text formatting and features within this paragraph",
+          "items": {
+            "type": "ref",
+            "ref": "blog.pckt.richtext.facet"
           }
         }
       }

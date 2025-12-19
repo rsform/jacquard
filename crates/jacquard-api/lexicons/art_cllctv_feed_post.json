@@ -1,0 +1,100 @@
+{
+  "lexicon": 1,
+  "id": "art.cllctv.feed.post",
+  "defs": {
+    "category": {
+      "type": "object",
+      "required": [
+        "group"
+      ],
+      "properties": {
+        "group": {
+          "type": "string"
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "Record containing a cllctv.ART post.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "createdAt"
+        ],
+        "properties": {
+          "category": {
+            "type": "ref",
+            "ref": "#category"
+          },
+          "content": {
+            "type": "union",
+            "refs": [
+              "art.cllctv.content.plaintext",
+              "art.cllctv.content.markdoc"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 3000,
+            "maxGraphemes": 300
+          },
+          "embed": {
+            "type": "union",
+            "refs": [
+              "art.cllctv.embed.images",
+              "art.cllctv.embed.external",
+              "art.cllctv.embed.externalVideo"
+            ]
+          },
+          "labels": {
+            "type": "union",
+            "description": "Self-label values for this post. Effectively content warnings.",
+            "refs": [
+              "com.atproto.label.defs#selfLabels"
+            ]
+          },
+          "langs": {
+            "type": "array",
+            "description": "Indicates human language of post primary text content.",
+            "items": {
+              "type": "string",
+              "format": "language"
+            },
+            "maxLength": 3
+          },
+          "ogImage": {
+            "type": "blob",
+            "accept": [
+              "image/png"
+            ],
+            "maxSize": 5000000
+          },
+          "publishedAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 1280,
+            "maxGraphemes": 128
+          },
+          "tombstone": {
+            "type": "ref",
+            "ref": "art.cllctv.embed.defs#tombstone"
+          }
+        }
+      }
+    }
+  }
+}

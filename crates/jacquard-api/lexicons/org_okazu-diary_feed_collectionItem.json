@@ -1,0 +1,61 @@
+{
+  "lexicon": 1,
+  "id": "org.okazu-diary.feed.collectionItem",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Record declaring the inclusion of a single material or a set of materials in a specific collection.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subjects",
+          "collection",
+          "createdAt"
+        ],
+        "properties": {
+          "collection": {
+            "type": "string",
+            "description": "Reference to the collection record (`org.okazu-diary.feed.collection`).",
+            "format": "at-uri"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "labels": {
+            "type": "union",
+            "description": "General-purpose self-label values primarily for consumption by generic AT clients. See the `labels` property of `org.okazu-diary.feed.entry` for details.",
+            "refs": [
+              "com.atproto.label.defs#selfLabels"
+            ]
+          },
+          "subjects": {
+            "type": "array",
+            "description": "The material or set of materials to be included in the collection.",
+            "items": {
+              "type": "ref",
+              "ref": "org.okazu-diary.feed.defs#subject"
+            },
+            "minLength": 1,
+            "maxLength": 16
+          },
+          "tags": {
+            "type": "array",
+            "description": "User-specified tags for the collection item.",
+            "items": {
+              "type": "ref",
+              "ref": "org.okazu-diary.feed.defs#tag"
+            },
+            "maxLength": 64
+          },
+          "via": {
+            "type": "ref",
+            "description": "Reference to an `org.okazu-diary.feed.entry` record or an `org.okazu-diary.feed.collectionItem` of another collection whose `subjects` this collection item is derived from.",
+            "ref": "com.atproto.repo.strongRef"
+          }
+        }
+      }
+    }
+  }
+}

@@ -5,8 +5,13 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+pub mod get_actor_entries;
+pub mod get_actor_notebooks;
 pub mod get_profile;
+pub mod get_suggested_authors;
 pub mod profile;
+pub mod search_actors;
+pub mod search_actors_typeahead;
 
 /// A single author in a Weaver notebook.
 #[jacquard_derive::lexicon]
@@ -23,12 +28,10 @@ pub mod profile;
 pub struct Author<'a> {
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
+    /// signed bytes of the corresponding notebook record in the author's repo
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub handle: std::option::Option<jacquard_common::types::string::Handle<'a>>,
+    #[serde(default, with = "jacquard_common::opt_serde_bytes_helper")]
+    pub signature: std::option::Option<bytes::Bytes>,
 }
 
 pub mod author_state {
@@ -68,8 +71,7 @@ pub struct AuthorBuilder<'a, S: author_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Handle<'a>>,
+        ::core::option::Option<bytes::Bytes>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -86,7 +88,7 @@ impl<'a> AuthorBuilder<'a, author_state::Empty> {
     pub fn new() -> Self {
         AuthorBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None),
+            __unsafe_private_named: (None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -112,39 +114,14 @@ where
 }
 
 impl<'a, S: author_state::State> AuthorBuilder<'a, S> {
-    /// Set the `displayName` field (optional)
-    pub fn display_name(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    /// Set the `signature` field (optional)
+    pub fn signature(mut self, value: impl Into<Option<bytes::Bytes>>) -> Self {
         self.__unsafe_private_named.1 = value.into();
         self
     }
-    /// Set the `displayName` field to an Option value (optional)
-    pub fn maybe_display_name(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    /// Set the `signature` field to an Option value (optional)
+    pub fn maybe_signature(mut self, value: Option<bytes::Bytes>) -> Self {
         self.__unsafe_private_named.1 = value;
-        self
-    }
-}
-
-impl<'a, S: author_state::State> AuthorBuilder<'a, S> {
-    /// Set the `handle` field (optional)
-    pub fn handle(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Handle<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
-        self
-    }
-    /// Set the `handle` field to an Option value (optional)
-    pub fn maybe_handle(
-        mut self,
-        value: Option<jacquard_common::types::string::Handle<'a>>,
-    ) -> Self {
-        self.__unsafe_private_named.2 = value;
         self
     }
 }
@@ -158,8 +135,7 @@ where
     pub fn build(self) -> Author<'a> {
         Author {
             did: self.__unsafe_private_named.0.unwrap(),
-            display_name: self.__unsafe_private_named.1,
-            handle: self.__unsafe_private_named.2,
+            signature: self.__unsafe_private_named.1,
             extra_data: Default::default(),
         }
     }
@@ -173,8 +149,7 @@ where
     ) -> Author<'a> {
         Author {
             did: self.__unsafe_private_named.0.unwrap(),
-            display_name: self.__unsafe_private_named.1,
-            handle: self.__unsafe_private_named.2,
+            signature: self.__unsafe_private_named.1,
             extra_data: Some(extra_data),
         }
     }
@@ -224,36 +199,12 @@ fn lexicon_doc_sh_weaver_actor_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                         );
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
-                                "displayName",
+                                "signature",
                             ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Bytes(::jacquard_lexicon::lexicon::LexBytes {
                                 description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: Some(640usize),
-                                min_graphemes: None,
-                                max_graphemes: Some(64usize),
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("handle"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Handle,
-                                ),
-                                default: None,
-                                min_length: None,
                                 max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
+                                min_length: None,
                             }),
                         );
                         map
@@ -286,6 +237,58 @@ fn lexicon_doc_sh_weaver_actor_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "collaborationCount",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: None,
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "entryCount",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: None,
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "followerCount",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: None,
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "followingCount",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: None,
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("inner"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
@@ -295,6 +298,26 @@ fn lexicon_doc_sh_weaver_actor_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                     ::jacquard_common::CowStr::new_static("#tangledProfileView")
                                 ],
                                 closed: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "notebookCount",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: None,
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("viewer"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: ::jacquard_common::CowStr::new_static("#viewerState"),
                             }),
                         );
                         map
@@ -313,6 +336,32 @@ fn lexicon_doc_sh_weaver_actor_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "followerCount",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: None,
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "followingCount",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: None,
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("inner"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                 description: None,
@@ -322,6 +371,15 @@ fn lexicon_doc_sh_weaver_actor_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                     ::jacquard_common::CowStr::new_static("#tangledProfileView")
                                 ],
                                 closed: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("viewer"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "#viewerStateBasic",
+                                ),
                             }),
                         );
                         map
@@ -374,6 +432,14 @@ fn lexicon_doc_sh_weaver_actor_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 r#enum: None,
                                 r#const: None,
                                 known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("bluesky"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
                             }),
                         );
                         map.insert(
@@ -559,6 +625,16 @@ fn lexicon_doc_sh_weaver_actor_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                         );
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
+                                "streamplace",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
                                 "subscribedCount",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -580,6 +656,14 @@ fn lexicon_doc_sh_weaver_actor_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 minimum: None,
                                 maximum: None,
                                 r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("tangled"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
                                 r#const: None,
                             }),
                         );
@@ -752,6 +836,72 @@ fn lexicon_doc_sh_weaver_actor_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                     }),
                     min_length: None,
                     max_length: Some(5usize),
+                }),
+            );
+            map.insert(
+                ::jacquard_common::smol_str::SmolStr::new_static("subscribedNotebook"),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "A notebook the viewer subscribes to without a global follow.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![::jacquard_common::smol_str::SmolStr::new_static("uri")],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::std::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("path"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("title"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("uri"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: Some(
+                                    ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
+                                ),
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map
+                    },
                 }),
             );
             map.insert(
@@ -931,6 +1081,309 @@ fn lexicon_doc_sh_weaver_actor_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                     },
                 }),
             );
+            map.insert(
+                ::jacquard_common::smol_str::SmolStr::new_static("viewerState"),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Viewer's relationship state with an actor (detailed version).",
+                        ),
+                    ),
+                    required: None,
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::std::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("blocked"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: Some(
+                                    ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
+                                ),
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "blockedBy",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "followRequested",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: Some(
+                                    ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
+                                ),
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "followRequestedBy",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: Some(
+                                    ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
+                                ),
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "followedBy",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: Some(
+                                    ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
+                                ),
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "following",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: Some(
+                                    ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
+                                ),
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("muted"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: Some(
+                                    ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
+                                ),
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "subscribedNotebooks",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                description: None,
+                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "#subscribedNotebook",
+                                    ),
+                                }),
+                                min_length: None,
+                                max_length: None,
+                            }),
+                        );
+                        map
+                    },
+                }),
+            );
+            map.insert(
+                ::jacquard_common::smol_str::SmolStr::new_static("viewerStateBasic"),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Viewer's relationship state with an actor (basic version).",
+                        ),
+                    ),
+                    required: None,
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::std::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("blocked"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: Some(
+                                    ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
+                                ),
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "blockedBy",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "followRequested",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: Some(
+                                    ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
+                                ),
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "followRequestedBy",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: Some(
+                                    ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
+                                ),
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "followedBy",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: Some(
+                                    ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
+                                ),
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "following",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: Some(
+                                    ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
+                                ),
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("muted"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: Some(
+                                    ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
+                                ),
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "subscribedNotebookCount",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: None,
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map
+                    },
+                }),
+            );
             map
         },
     }
@@ -949,36 +1402,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Author<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.display_name {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 640usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "display_name",
-                    ),
-                    max: 640usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.display_name {
-            {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 64usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "display_name",
-                        ),
-                        max: 64usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
         Ok(())
     }
 }
@@ -996,8 +1419,21 @@ pub type PinnedList<'a> = Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileDataView<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub collaboration_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub entry_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub follower_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub following_count: std::option::Option<i64>,
     #[serde(borrow)]
     pub inner: ProfileDataViewInner<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub notebook_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub viewer: std::option::Option<crate::sh_weaver::actor::ViewerState<'a>>,
 }
 
 pub mod profile_data_view_state {
@@ -1035,7 +1471,15 @@ pub mod profile_data_view_state {
 /// Builder for constructing an instance of this type
 pub struct ProfileDataViewBuilder<'a, S: profile_data_view_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<ProfileDataViewInner<'a>>,),
+    __unsafe_private_named: (
+        ::core::option::Option<i64>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<ProfileDataViewInner<'a>>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<crate::sh_weaver::actor::ViewerState<'a>>,
+    ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
@@ -1051,9 +1495,61 @@ impl<'a> ProfileDataViewBuilder<'a, profile_data_view_state::Empty> {
     pub fn new() -> Self {
         ProfileDataViewBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None,),
+            __unsafe_private_named: (None, None, None, None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
+    }
+}
+
+impl<'a, S: profile_data_view_state::State> ProfileDataViewBuilder<'a, S> {
+    /// Set the `collaborationCount` field (optional)
+    pub fn collaboration_count(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `collaborationCount` field to an Option value (optional)
+    pub fn maybe_collaboration_count(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: profile_data_view_state::State> ProfileDataViewBuilder<'a, S> {
+    /// Set the `entryCount` field (optional)
+    pub fn entry_count(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `entryCount` field to an Option value (optional)
+    pub fn maybe_entry_count(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: profile_data_view_state::State> ProfileDataViewBuilder<'a, S> {
+    /// Set the `followerCount` field (optional)
+    pub fn follower_count(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `followerCount` field to an Option value (optional)
+    pub fn maybe_follower_count(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: profile_data_view_state::State> ProfileDataViewBuilder<'a, S> {
+    /// Set the `followingCount` field (optional)
+    pub fn following_count(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `followingCount` field to an Option value (optional)
+    pub fn maybe_following_count(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
     }
 }
 
@@ -1067,12 +1563,44 @@ where
         mut self,
         value: impl Into<ProfileDataViewInner<'a>>,
     ) -> ProfileDataViewBuilder<'a, profile_data_view_state::SetInner<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
         ProfileDataViewBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
             _phantom: ::core::marker::PhantomData,
         }
+    }
+}
+
+impl<'a, S: profile_data_view_state::State> ProfileDataViewBuilder<'a, S> {
+    /// Set the `notebookCount` field (optional)
+    pub fn notebook_count(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `notebookCount` field to an Option value (optional)
+    pub fn maybe_notebook_count(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S: profile_data_view_state::State> ProfileDataViewBuilder<'a, S> {
+    /// Set the `viewer` field (optional)
+    pub fn viewer(
+        mut self,
+        value: impl Into<Option<crate::sh_weaver::actor::ViewerState<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `viewer` field to an Option value (optional)
+    pub fn maybe_viewer(
+        mut self,
+        value: Option<crate::sh_weaver::actor::ViewerState<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
     }
 }
 
@@ -1084,7 +1612,13 @@ where
     /// Build the final struct
     pub fn build(self) -> ProfileDataView<'a> {
         ProfileDataView {
-            inner: self.__unsafe_private_named.0.unwrap(),
+            collaboration_count: self.__unsafe_private_named.0,
+            entry_count: self.__unsafe_private_named.1,
+            follower_count: self.__unsafe_private_named.2,
+            following_count: self.__unsafe_private_named.3,
+            inner: self.__unsafe_private_named.4.unwrap(),
+            notebook_count: self.__unsafe_private_named.5,
+            viewer: self.__unsafe_private_named.6,
             extra_data: Default::default(),
         }
     }
@@ -1097,7 +1631,13 @@ where
         >,
     ) -> ProfileDataView<'a> {
         ProfileDataView {
-            inner: self.__unsafe_private_named.0.unwrap(),
+            collaboration_count: self.__unsafe_private_named.0,
+            entry_count: self.__unsafe_private_named.1,
+            follower_count: self.__unsafe_private_named.2,
+            following_count: self.__unsafe_private_named.3,
+            inner: self.__unsafe_private_named.4.unwrap(),
+            notebook_count: self.__unsafe_private_named.5,
+            viewer: self.__unsafe_private_named.6,
             extra_data: Some(extra_data),
         }
     }
@@ -1153,8 +1693,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileDataView<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileDataViewBasic<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub follower_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub following_count: std::option::Option<i64>,
     #[serde(borrow)]
     pub inner: ProfileDataViewBasicInner<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub viewer: std::option::Option<crate::sh_weaver::actor::ViewerStateBasic<'a>>,
 }
 
 pub mod profile_data_view_basic_state {
@@ -1192,7 +1739,12 @@ pub mod profile_data_view_basic_state {
 /// Builder for constructing an instance of this type
 pub struct ProfileDataViewBasicBuilder<'a, S: profile_data_view_basic_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
-    __unsafe_private_named: (::core::option::Option<ProfileDataViewBasicInner<'a>>,),
+    __unsafe_private_named: (
+        ::core::option::Option<i64>,
+        ::core::option::Option<i64>,
+        ::core::option::Option<ProfileDataViewBasicInner<'a>>,
+        ::core::option::Option<crate::sh_weaver::actor::ViewerStateBasic<'a>>,
+    ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
@@ -1211,9 +1763,35 @@ impl<'a> ProfileDataViewBasicBuilder<'a, profile_data_view_basic_state::Empty> {
     pub fn new() -> Self {
         ProfileDataViewBasicBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None,),
+            __unsafe_private_named: (None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
+    }
+}
+
+impl<'a, S: profile_data_view_basic_state::State> ProfileDataViewBasicBuilder<'a, S> {
+    /// Set the `followerCount` field (optional)
+    pub fn follower_count(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `followerCount` field to an Option value (optional)
+    pub fn maybe_follower_count(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: profile_data_view_basic_state::State> ProfileDataViewBasicBuilder<'a, S> {
+    /// Set the `followingCount` field (optional)
+    pub fn following_count(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `followingCount` field to an Option value (optional)
+    pub fn maybe_following_count(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
     }
 }
 
@@ -1227,12 +1805,31 @@ where
         mut self,
         value: impl Into<ProfileDataViewBasicInner<'a>>,
     ) -> ProfileDataViewBasicBuilder<'a, profile_data_view_basic_state::SetInner<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
         ProfileDataViewBasicBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
             _phantom: ::core::marker::PhantomData,
         }
+    }
+}
+
+impl<'a, S: profile_data_view_basic_state::State> ProfileDataViewBasicBuilder<'a, S> {
+    /// Set the `viewer` field (optional)
+    pub fn viewer(
+        mut self,
+        value: impl Into<Option<crate::sh_weaver::actor::ViewerStateBasic<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `viewer` field to an Option value (optional)
+    pub fn maybe_viewer(
+        mut self,
+        value: Option<crate::sh_weaver::actor::ViewerStateBasic<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
     }
 }
 
@@ -1244,7 +1841,10 @@ where
     /// Build the final struct
     pub fn build(self) -> ProfileDataViewBasic<'a> {
         ProfileDataViewBasic {
-            inner: self.__unsafe_private_named.0.unwrap(),
+            follower_count: self.__unsafe_private_named.0,
+            following_count: self.__unsafe_private_named.1,
+            inner: self.__unsafe_private_named.2.unwrap(),
+            viewer: self.__unsafe_private_named.3,
             extra_data: Default::default(),
         }
     }
@@ -1257,7 +1857,10 @@ where
         >,
     ) -> ProfileDataViewBasic<'a> {
         ProfileDataViewBasic {
-            inner: self.__unsafe_private_named.0.unwrap(),
+            follower_count: self.__unsafe_private_named.0,
+            following_count: self.__unsafe_private_named.1,
+            inner: self.__unsafe_private_named.2.unwrap(),
+            viewer: self.__unsafe_private_named.3,
             extra_data: Some(extra_data),
         }
     }
@@ -1319,6 +1922,9 @@ pub struct ProfileView<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub banner: std::option::Option<jacquard_common::types::string::Uri<'a>>,
+    /// Include link to this account on Bluesky.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub bluesky: std::option::Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -1351,10 +1957,16 @@ pub struct ProfileView<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub pronouns: std::option::Option<crate::sh_weaver::actor::PronounsList<'a>>,
+    /// Include link to this account on stream.place.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub streamplace: std::option::Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub subscribed_count: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub subscriber_count: std::option::Option<i64>,
+    /// Include link to this account on Tangled.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub tangled: std::option::Option<bool>,
 }
 
 pub mod profile_view_state {
@@ -1407,6 +2019,7 @@ pub struct ProfileViewBuilder<'a, S: profile_view_state::State> {
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
         ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
+        ::core::option::Option<bool>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::types::string::Did<'a>>,
@@ -1418,8 +2031,10 @@ pub struct ProfileViewBuilder<'a, S: profile_view_state::State> {
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<crate::sh_weaver::actor::PinnedList<'a>>,
         ::core::option::Option<crate::sh_weaver::actor::PronounsList<'a>>,
+        ::core::option::Option<bool>,
         ::core::option::Option<i64>,
         ::core::option::Option<i64>,
+        ::core::option::Option<bool>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -1437,6 +2052,9 @@ impl<'a> ProfileViewBuilder<'a, profile_view_state::Empty> {
         ProfileViewBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
+                None,
+                None,
+                None,
                 None,
                 None,
                 None,
@@ -1497,12 +2115,25 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
 }
 
 impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
+    /// Set the `bluesky` field (optional)
+    pub fn bluesky(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `bluesky` field to an Option value (optional)
+    pub fn maybe_bluesky(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(
         mut self,
         value: impl Into<Option<jacquard_common::types::string::Datetime>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `createdAt` field to an Option value (optional)
@@ -1510,7 +2141,7 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
         mut self,
         value: Option<jacquard_common::types::string::Datetime>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self.__unsafe_private_named.3 = value;
         self
     }
 }
@@ -1521,7 +2152,7 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
@@ -1529,7 +2160,7 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
         mut self,
         value: Option<jacquard_common::CowStr<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self.__unsafe_private_named.4 = value;
         self
     }
 }
@@ -1544,7 +2175,7 @@ where
         mut self,
         value: impl Into<jacquard_common::types::string::Did<'a>>,
     ) -> ProfileViewBuilder<'a, profile_view_state::SetDid<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
         ProfileViewBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -1559,7 +2190,7 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `displayName` field to an Option value (optional)
@@ -1567,7 +2198,7 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
         mut self,
         value: Option<jacquard_common::CowStr<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self.__unsafe_private_named.6 = value;
         self
     }
 }
@@ -1582,7 +2213,7 @@ where
         mut self,
         value: impl Into<jacquard_common::types::string::Handle<'a>>,
     ) -> ProfileViewBuilder<'a, profile_view_state::SetHandle<S>> {
-        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
         ProfileViewBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -1597,7 +2228,7 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::types::string::Datetime>>,
     ) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self.__unsafe_private_named.8 = value.into();
         self
     }
     /// Set the `indexedAt` field to an Option value (optional)
@@ -1605,7 +2236,7 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
         mut self,
         value: Option<jacquard_common::types::string::Datetime>,
     ) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self.__unsafe_private_named.8 = value;
         self
     }
 }
@@ -1616,7 +2247,7 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<crate::com_atproto::label::Label<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self.__unsafe_private_named.9 = value.into();
         self
     }
     /// Set the `labels` field to an Option value (optional)
@@ -1624,7 +2255,7 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
         mut self,
         value: Option<Vec<crate::com_atproto::label::Label<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self.__unsafe_private_named.9 = value;
         self
     }
 }
@@ -1635,7 +2266,7 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<jacquard_common::types::string::Uri<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self.__unsafe_private_named.10 = value.into();
         self
     }
     /// Set the `links` field to an Option value (optional)
@@ -1643,7 +2274,7 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
         mut self,
         value: Option<Vec<jacquard_common::types::string::Uri<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self.__unsafe_private_named.10 = value;
         self
     }
 }
@@ -1654,12 +2285,12 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self.__unsafe_private_named.11 = value.into();
         self
     }
     /// Set the `location` field to an Option value (optional)
     pub fn maybe_location(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self.__unsafe_private_named.11 = value;
         self
     }
 }
@@ -1670,7 +2301,7 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<crate::sh_weaver::actor::PinnedList<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self.__unsafe_private_named.12 = value.into();
         self
     }
     /// Set the `pinned` field to an Option value (optional)
@@ -1678,7 +2309,7 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
         mut self,
         value: Option<crate::sh_weaver::actor::PinnedList<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self.__unsafe_private_named.12 = value;
         self
     }
 }
@@ -1689,7 +2320,7 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<crate::sh_weaver::actor::PronounsList<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self.__unsafe_private_named.13 = value.into();
         self
     }
     /// Set the `pronouns` field to an Option value (optional)
@@ -1697,7 +2328,20 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
         mut self,
         value: Option<crate::sh_weaver::actor::PronounsList<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self.__unsafe_private_named.13 = value;
+        self
+    }
+}
+
+impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
+    /// Set the `streamplace` field (optional)
+    pub fn streamplace(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.14 = value.into();
+        self
+    }
+    /// Set the `streamplace` field to an Option value (optional)
+    pub fn maybe_streamplace(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.14 = value;
         self
     }
 }
@@ -1705,12 +2349,12 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
 impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
     /// Set the `subscribedCount` field (optional)
     pub fn subscribed_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.13 = value.into();
+        self.__unsafe_private_named.15 = value.into();
         self
     }
     /// Set the `subscribedCount` field to an Option value (optional)
     pub fn maybe_subscribed_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.13 = value;
+        self.__unsafe_private_named.15 = value;
         self
     }
 }
@@ -1718,12 +2362,25 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
 impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
     /// Set the `subscriberCount` field (optional)
     pub fn subscriber_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.14 = value.into();
+        self.__unsafe_private_named.16 = value.into();
         self
     }
     /// Set the `subscriberCount` field to an Option value (optional)
     pub fn maybe_subscriber_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.14 = value;
+        self.__unsafe_private_named.16 = value;
+        self
+    }
+}
+
+impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
+    /// Set the `tangled` field (optional)
+    pub fn tangled(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.17 = value.into();
+        self
+    }
+    /// Set the `tangled` field to an Option value (optional)
+    pub fn maybe_tangled(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.17 = value;
         self
     }
 }
@@ -1739,19 +2396,22 @@ where
         ProfileView {
             avatar: self.__unsafe_private_named.0,
             banner: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2,
-            description: self.__unsafe_private_named.3,
-            did: self.__unsafe_private_named.4.unwrap(),
-            display_name: self.__unsafe_private_named.5,
-            handle: self.__unsafe_private_named.6.unwrap(),
-            indexed_at: self.__unsafe_private_named.7,
-            labels: self.__unsafe_private_named.8,
-            links: self.__unsafe_private_named.9,
-            location: self.__unsafe_private_named.10,
-            pinned: self.__unsafe_private_named.11,
-            pronouns: self.__unsafe_private_named.12,
-            subscribed_count: self.__unsafe_private_named.13,
-            subscriber_count: self.__unsafe_private_named.14,
+            bluesky: self.__unsafe_private_named.2,
+            created_at: self.__unsafe_private_named.3,
+            description: self.__unsafe_private_named.4,
+            did: self.__unsafe_private_named.5.unwrap(),
+            display_name: self.__unsafe_private_named.6,
+            handle: self.__unsafe_private_named.7.unwrap(),
+            indexed_at: self.__unsafe_private_named.8,
+            labels: self.__unsafe_private_named.9,
+            links: self.__unsafe_private_named.10,
+            location: self.__unsafe_private_named.11,
+            pinned: self.__unsafe_private_named.12,
+            pronouns: self.__unsafe_private_named.13,
+            streamplace: self.__unsafe_private_named.14,
+            subscribed_count: self.__unsafe_private_named.15,
+            subscriber_count: self.__unsafe_private_named.16,
+            tangled: self.__unsafe_private_named.17,
             extra_data: Default::default(),
         }
     }
@@ -1766,19 +2426,22 @@ where
         ProfileView {
             avatar: self.__unsafe_private_named.0,
             banner: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2,
-            description: self.__unsafe_private_named.3,
-            did: self.__unsafe_private_named.4.unwrap(),
-            display_name: self.__unsafe_private_named.5,
-            handle: self.__unsafe_private_named.6.unwrap(),
-            indexed_at: self.__unsafe_private_named.7,
-            labels: self.__unsafe_private_named.8,
-            links: self.__unsafe_private_named.9,
-            location: self.__unsafe_private_named.10,
-            pinned: self.__unsafe_private_named.11,
-            pronouns: self.__unsafe_private_named.12,
-            subscribed_count: self.__unsafe_private_named.13,
-            subscriber_count: self.__unsafe_private_named.14,
+            bluesky: self.__unsafe_private_named.2,
+            created_at: self.__unsafe_private_named.3,
+            description: self.__unsafe_private_named.4,
+            did: self.__unsafe_private_named.5.unwrap(),
+            display_name: self.__unsafe_private_named.6,
+            handle: self.__unsafe_private_named.7.unwrap(),
+            indexed_at: self.__unsafe_private_named.8,
+            labels: self.__unsafe_private_named.9,
+            links: self.__unsafe_private_named.10,
+            location: self.__unsafe_private_named.11,
+            pinned: self.__unsafe_private_named.12,
+            pronouns: self.__unsafe_private_named.13,
+            streamplace: self.__unsafe_private_named.14,
+            subscribed_count: self.__unsafe_private_named.15,
+            subscriber_count: self.__unsafe_private_named.16,
+            tangled: self.__unsafe_private_named.17,
             extra_data: Some(extra_data),
         }
     }
@@ -2270,6 +2933,189 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileViewBasic<'a> {
 }
 
 pub type PronounsList<'a> = Vec<jacquard_common::CowStr<'a>>;
+/// A notebook the viewer subscribes to without a global follow.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SubscribedNotebook<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub path: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+pub mod subscribed_notebook_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Uri;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Uri = Unset;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Uri = Set<members::uri>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `uri` field
+        pub struct uri(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct SubscribedNotebookBuilder<'a, S: subscribed_notebook_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> SubscribedNotebook<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> SubscribedNotebookBuilder<'a, subscribed_notebook_state::Empty> {
+        SubscribedNotebookBuilder::new()
+    }
+}
+
+impl<'a> SubscribedNotebookBuilder<'a, subscribed_notebook_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        SubscribedNotebookBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: subscribed_notebook_state::State> SubscribedNotebookBuilder<'a, S> {
+    /// Set the `path` field (optional)
+    pub fn path(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `path` field to an Option value (optional)
+    pub fn maybe_path(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: subscribed_notebook_state::State> SubscribedNotebookBuilder<'a, S> {
+    /// Set the `title` field (optional)
+    pub fn title(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `title` field to an Option value (optional)
+    pub fn maybe_title(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> SubscribedNotebookBuilder<'a, S>
+where
+    S: subscribed_notebook_state::State,
+    S::Uri: subscribed_notebook_state::IsUnset,
+{
+    /// Set the `uri` field (required)
+    pub fn uri(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> SubscribedNotebookBuilder<'a, subscribed_notebook_state::SetUri<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        SubscribedNotebookBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> SubscribedNotebookBuilder<'a, S>
+where
+    S: subscribed_notebook_state::State,
+    S::Uri: subscribed_notebook_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> SubscribedNotebook<'a> {
+        SubscribedNotebook {
+            path: self.__unsafe_private_named.0,
+            title: self.__unsafe_private_named.1,
+            uri: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: std::collections::BTreeMap<
+            jacquard_common::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> SubscribedNotebook<'a> {
+        SubscribedNotebook {
+            path: self.__unsafe_private_named.0,
+            title: self.__unsafe_private_named.1,
+            uri: self.__unsafe_private_named.2.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SubscribedNotebook<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.actor.defs"
+    }
+    fn def_name() -> &'static str {
+        "subscribedNotebook"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_actor_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -2320,51 +3166,51 @@ pub mod tangled_profile_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Bluesky;
         type Did;
         type Handle;
+        type Bluesky;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Bluesky = Unset;
         type Did = Unset;
         type Handle = Unset;
-    }
-    ///State transition - sets the `bluesky` field to Set
-    pub struct SetBluesky<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBluesky<S> {}
-    impl<S: State> State for SetBluesky<S> {
-        type Bluesky = Set<members::bluesky>;
-        type Did = S::Did;
-        type Handle = S::Handle;
+        type Bluesky = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Bluesky = S::Bluesky;
         type Did = Set<members::did>;
         type Handle = S::Handle;
+        type Bluesky = S::Bluesky;
     }
     ///State transition - sets the `handle` field to Set
     pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHandle<S> {}
     impl<S: State> State for SetHandle<S> {
-        type Bluesky = S::Bluesky;
         type Did = S::Did;
         type Handle = Set<members::handle>;
+        type Bluesky = S::Bluesky;
+    }
+    ///State transition - sets the `bluesky` field to Set
+    pub struct SetBluesky<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBluesky<S> {}
+    impl<S: State> State for SetBluesky<S> {
+        type Did = S::Did;
+        type Handle = S::Handle;
+        type Bluesky = Set<members::bluesky>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `bluesky` field
-        pub struct bluesky(());
         ///Marker type for the `did` field
         pub struct did(());
         ///Marker type for the `handle` field
         pub struct handle(());
+        ///Marker type for the `bluesky` field
+        pub struct bluesky(());
     }
 }
 
@@ -2554,9 +3400,9 @@ impl<'a, S: tangled_profile_view_state::State> TangledProfileViewBuilder<'a, S> 
 impl<'a, S> TangledProfileViewBuilder<'a, S>
 where
     S: tangled_profile_view_state::State,
-    S::Bluesky: tangled_profile_view_state::IsSet,
     S::Did: tangled_profile_view_state::IsSet,
     S::Handle: tangled_profile_view_state::IsSet,
+    S::Bluesky: tangled_profile_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TangledProfileView<'a> {
@@ -2739,6 +3585,123 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TangledProfileView<'a> {
                 });
             }
         }
+        Ok(())
+    }
+}
+
+/// Viewer's relationship state with an actor (detailed version).
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ViewerState<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub blocked: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub blocked_by: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub follow_requested: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub follow_requested_by: std::option::Option<
+        jacquard_common::types::string::AtUri<'a>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub followed_by: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub following: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub muted: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub subscribed_notebooks: std::option::Option<
+        Vec<crate::sh_weaver::actor::SubscribedNotebook<'a>>,
+    >,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewerState<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.actor.defs"
+    }
+    fn def_name() -> &'static str {
+        "viewerState"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_actor_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+/// Viewer's relationship state with an actor (basic version).
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ViewerStateBasic<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub blocked: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub blocked_by: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub follow_requested: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub follow_requested_by: std::option::Option<
+        jacquard_common::types::string::AtUri<'a>,
+    >,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub followed_by: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub following: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub muted: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub subscribed_notebook_count: std::option::Option<i64>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewerStateBasic<'a> {
+    fn nsid() -> &'static str {
+        "sh.weaver.actor.defs"
+    }
+    fn def_name() -> &'static str {
+        "viewerStateBasic"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_sh_weaver_actor_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

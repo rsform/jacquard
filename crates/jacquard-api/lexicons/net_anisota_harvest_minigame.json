@@ -1,0 +1,141 @@
+{
+  "lexicon": 1,
+  "id": "net.anisota.harvest.minigame",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A record of a harvest minigame round played by a user",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "playedAt",
+          "roundDuration",
+          "gameContext",
+          "finalScore",
+          "shapesCollected"
+        ],
+        "properties": {
+          "clientVersion": {
+            "type": "string",
+            "description": "Version of the Anisota client"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "When the record was created",
+            "format": "datetime"
+          },
+          "earlyHarvests": {
+            "type": "integer",
+            "description": "Number of shapes harvested early (during growth phase)",
+            "minimum": 0
+          },
+          "efficiencyBonus": {
+            "type": "integer",
+            "description": "Bonus points awarded for harvest efficiency (percentage of shapes collected)",
+            "minimum": 0
+          },
+          "finalScore": {
+            "type": "integer",
+            "description": "Final score achieved in the round",
+            "minimum": 0
+          },
+          "gameContext": {
+            "type": "string",
+            "description": "Where the game was played: dedicated minigame page or harvest loading screen",
+            "enum": [
+              "dedicated",
+              "loading"
+            ]
+          },
+          "lateHarvests": {
+            "type": "integer",
+            "description": "Number of shapes harvested late (during decay phase)",
+            "minimum": 0
+          },
+          "peakHarvestRate": {
+            "type": "integer",
+            "description": "Percentage indicating how close on average the user harvested at peak timing (scaled by 100, so 9550 = 95.50%)",
+            "minimum": 0,
+            "maximum": 10000
+          },
+          "peakRateBonus": {
+            "type": "integer",
+            "description": "Bonus points awarded for achieving high peak harvest rate",
+            "minimum": 0
+          },
+          "perfectHarvests": {
+            "type": "integer",
+            "description": "Number of shapes harvested at perfect (peak) timing",
+            "minimum": 0
+          },
+          "playedAt": {
+            "type": "string",
+            "description": "When the game round was played (ISO 8601)",
+            "format": "datetime"
+          },
+          "pointsPerSecond": {
+            "type": "integer",
+            "description": "Average rate of points scored per second (scaled by 100, so 123 = 1.23 points/second)",
+            "minimum": 0
+          },
+          "rarityBreakdown": {
+            "type": "ref",
+            "ref": "#rarityBreakdown"
+          },
+          "roundDuration": {
+            "type": "integer",
+            "description": "Duration of the round in seconds",
+            "minimum": 0
+          },
+          "shapesCollected": {
+            "type": "integer",
+            "description": "Total number of shapes collected/harvested",
+            "minimum": 0
+          },
+          "shapesMissed": {
+            "type": "integer",
+            "description": "Total number of shapes that expired without being harvested",
+            "minimum": 0
+          },
+          "totalShapesSpawned": {
+            "type": "integer",
+            "description": "Total number of shapes spawned during the round (collected + missed)",
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "rarityBreakdown": {
+      "type": "object",
+      "description": "Count of each rarity level collected",
+      "properties": {
+        "common": {
+          "type": "integer",
+          "description": "Number of common (triangle) shapes collected",
+          "minimum": 0
+        },
+        "rare": {
+          "type": "integer",
+          "description": "Number of rare (star) shapes collected",
+          "minimum": 0
+        },
+        "uncommon": {
+          "type": "integer",
+          "description": "Number of uncommon (diamond) shapes collected",
+          "minimum": 0
+        },
+        "veryCommon": {
+          "type": "integer",
+          "description": "Number of very common (circle) shapes collected",
+          "minimum": 0
+        },
+        "veryRare": {
+          "type": "integer",
+          "description": "Number of very rare (sparkle) shapes collected",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.notebook.getEntry",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get an entry view by its AT-URI.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "uri"
+        ],
+        "properties": {
+          "uri": {
+            "type": "string",
+            "description": "AT-URI of the entry to fetch.",
+            "format": "at-uri"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "ref",
+          "ref": "sh.weaver.notebook.defs#entryView"
+        }
+      },
+      "errors": [
+        {
+          "name": "EntryNotFound"
+        }
+      ]
+    }
+  }
+}

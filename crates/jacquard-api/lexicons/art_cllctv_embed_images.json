@@ -1,0 +1,104 @@
+{
+  "lexicon": 1,
+  "id": "art.cllctv.embed.images",
+  "description": "A set of images embedded in a cllctv.ART record (eg, a post).",
+  "defs": {
+    "image": {
+      "type": "object",
+      "required": [
+        "image",
+        "alt"
+      ],
+      "properties": {
+        "alt": {
+          "type": "string",
+          "description": "Alt text description of the image, for accessibility."
+        },
+        "aspectRatio": {
+          "type": "ref",
+          "ref": "app.bsky.embed.defs#aspectRatio"
+        },
+        "image": {
+          "type": "blob",
+          "accept": [
+            "image/*"
+          ],
+          "maxSize": 50000000
+        },
+        "imageHash": {
+          "type": "string",
+          "maxLength": 640,
+          "maxGraphemes": 64
+        },
+        "tombstone": {
+          "type": "ref",
+          "ref": "art.cllctv.embed.defs#tombstone"
+        }
+      }
+    },
+    "main": {
+      "type": "object",
+      "required": [
+        "images"
+      ],
+      "properties": {
+        "images": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#image"
+          },
+          "maxLength": 9
+        }
+      }
+    },
+    "view": {
+      "type": "object",
+      "required": [
+        "images"
+      ],
+      "properties": {
+        "images": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#viewImage"
+          },
+          "maxLength": 9
+        }
+      }
+    },
+    "viewImage": {
+      "type": "object",
+      "required": [
+        "thumb",
+        "fullsize",
+        "alt"
+      ],
+      "properties": {
+        "alt": {
+          "type": "string",
+          "description": "Alt text description of the image, for accessibility."
+        },
+        "aspectRatio": {
+          "type": "ref",
+          "ref": "app.bsky.embed.defs#aspectRatio"
+        },
+        "fullsize": {
+          "type": "string",
+          "description": "Fully-qualified URL where a large version of the image can be fetched. May or may not be the exact original blob. For example, CDN location provided by the App View.",
+          "format": "uri"
+        },
+        "thumb": {
+          "type": "string",
+          "description": "Fully-qualified URL where a thumbnail of the image can be fetched. For example, CDN location provided by the App View.",
+          "format": "uri"
+        },
+        "tombstone": {
+          "type": "ref",
+          "ref": "art.cllctv.embed.defs#tombstone"
+        }
+      }
+    }
+  }
+}

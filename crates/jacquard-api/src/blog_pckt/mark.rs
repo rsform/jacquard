@@ -3,4 +3,9 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+pub mod bold;
+pub mod code;
+pub mod italic;
 pub mod link;
+pub mod strike;
+pub mod underline;

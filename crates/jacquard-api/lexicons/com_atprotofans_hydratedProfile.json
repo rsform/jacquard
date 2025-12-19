@@ -1,0 +1,73 @@
+{
+  "lexicon": 1,
+  "id": "com.atprotofans.hydratedProfile",
+  "defs": {
+    "main": {
+      "type": "object",
+      "description": "A hydrated identity profile with computed fields.",
+      "required": [
+        "did"
+      ],
+      "properties": {
+        "acceptingSupporters": {
+          "type": "boolean",
+          "description": "Whether the identity is currently accepting new supporters."
+        },
+        "avatar": {
+          "type": "blob",
+          "description": "Avatar image blob reference.",
+          "accept": [
+            "image/png",
+            "image/jpeg",
+            "image/webp"
+          ],
+          "maxSize": 1000000
+        },
+        "banner": {
+          "type": "blob",
+          "description": "Banner image blob reference.",
+          "accept": [
+            "image/png",
+            "image/jpeg",
+            "image/webp"
+          ],
+          "maxSize": 1000000
+        },
+        "description": {
+          "type": "string",
+          "description": "Profile bio/description with optional rich text.",
+          "maxLength": 2560,
+          "maxGraphemes": 256
+        },
+        "did": {
+          "type": "string",
+          "description": "DID of the profile owner.",
+          "format": "did"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Display name for the profile.",
+          "maxLength": 640,
+          "maxGraphemes": 64
+        },
+        "facets": {
+          "type": "array",
+          "description": "Rich text facets for description annotations.",
+          "items": {
+            "type": "ref",
+            "ref": "app.bsky.richtext.facet"
+          }
+        },
+        "handle": {
+          "type": "string",
+          "description": "Handle of the profile owner.",
+          "format": "handle"
+        },
+        "supporterCount": {
+          "type": "integer",
+          "description": "Number of supporters for this profile."
+        }
+      }
+    }
+  }
+}

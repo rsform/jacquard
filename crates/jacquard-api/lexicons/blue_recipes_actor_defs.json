@@ -1,0 +1,43 @@
+{
+  "lexicon": 1,
+  "id": "blue.recipes.actor.defs",
+  "defs": {
+    "profileViewBasic": {
+      "type": "object",
+      "required": [
+        "did",
+        "handle"
+      ],
+      "properties": {
+        "avatar": {
+          "type": "blob",
+          "description": "Small image to be displayed on the profile.",
+          "accept": [
+            "image/png",
+            "image/jpeg"
+          ],
+          "maxSize": 1000000
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "did": {
+          "type": "string",
+          "format": "did"
+        },
+        "displayName": {
+          "type": "string",
+          "maxLength": 640,
+          "maxGraphemes": 64
+        },
+        "handle": {
+          "type": "string",
+          "format": "handle"
+        },
+        "pronouns": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

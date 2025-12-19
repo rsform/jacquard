@@ -193,9 +193,9 @@ pub struct PushNotifyOutput<'a> {}
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum PushNotifyError<'a> {
     #[serde(rename = "ServiceNotAllowedError")]
-    ServiceNotAllowedError(std::option::Option<String>),
+    ServiceNotAllowedError(std::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "DeviceNotFoundError")]
-    DeviceNotFoundError(std::option::Option<String>),
+    DeviceNotFoundError(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl std::fmt::Display for PushNotifyError<'_> {

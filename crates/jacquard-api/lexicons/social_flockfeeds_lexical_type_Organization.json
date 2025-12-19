@@ -1,0 +1,1348 @@
+{
+  "lexicon": 1,
+  "id": "social.flockfeeds.lexical.type.Organization",
+  "defs": {
+    "embedded": {
+      "type": "object",
+      "description": "An organization such as a school, NGO, corporation, club, etc.",
+      "properties": {
+        "acceptedPaymentMethod": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.LoanOrCredit#embedded",
+            "social.flockfeeds.lexical.type.PaymentMethod#embedded",
+            "social.flockfeeds.lexical.prop.organization#acceptedPaymentMethodScalar",
+            "social.flockfeeds.lexical.prop.organization#acceptedPaymentMethodList"
+          ]
+        },
+        "actionableFeedbackPolicy": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.organization#actionableFeedbackPolicyScalar",
+            "social.flockfeeds.lexical.prop.organization#actionableFeedbackPolicyList"
+          ]
+        },
+        "additionalType": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.organization#additionalTypeScalar",
+            "social.flockfeeds.lexical.prop.organization#additionalTypeList"
+          ]
+        },
+        "address": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.PostalAddress#embedded",
+            "social.flockfeeds.lexical.prop.organization#addressScalar",
+            "social.flockfeeds.lexical.prop.organization#addressList"
+          ]
+        },
+        "agentInteractionStatistic": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.InteractionCounter#embedded",
+            "social.flockfeeds.lexical.prop.organization#agentInteractionStatisticList"
+          ]
+        },
+        "aggregateRating": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.AggregateRating#embedded",
+            "social.flockfeeds.lexical.prop.organization#aggregateRatingList"
+          ]
+        },
+        "alternateName": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.organization#alternateNameScalar",
+            "social.flockfeeds.lexical.prop.organization#alternateNameList"
+          ]
+        },
+        "alumni": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.organization#alumniList"
+          ]
+        },
+        "areaServed": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.AdministrativeArea#embedded",
+            "social.flockfeeds.lexical.type.GeoShape#embedded",
+            "social.flockfeeds.lexical.type.Place#embedded",
+            "social.flockfeeds.lexical.prop.organization#areaServedScalar",
+            "social.flockfeeds.lexical.prop.organization#areaServedList"
+          ]
+        },
+        "award": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.organization#awardScalar",
+            "social.flockfeeds.lexical.prop.organization#awardList"
+          ]
+        },
+        "awards": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.organization#awardsScalar",
+            "social.flockfeeds.lexical.prop.organization#awardsList"
+          ]
+        },
+        "brand": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Brand#embedded",
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.prop.organization#brandList"
+          ]
+        },
+        "companyRegistration": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Certification#embedded",
+            "social.flockfeeds.lexical.prop.organization#companyRegistrationList"
+          ]
+        },
+        "contactPoint": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.ContactPoint#embedded",
+            "social.flockfeeds.lexical.prop.organization#contactPointList"
+          ]
+        },
+        "contactPoints": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.ContactPoint#embedded",
+            "social.flockfeeds.lexical.prop.organization#contactPointsList"
+          ]
+        },
+        "correctionsPolicy": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.organization#correctionsPolicyScalar",
+            "social.flockfeeds.lexical.prop.organization#correctionsPolicyList"
+          ]
+        },
+        "department": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.prop.organization#departmentList"
+          ]
+        },
+        "description": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.TextObject#embedded",
+            "social.flockfeeds.lexical.prop.organization#descriptionScalar",
+            "social.flockfeeds.lexical.prop.organization#descriptionList"
+          ]
+        },
+        "disambiguatingDescription": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.organization#disambiguatingDescriptionScalar",
+            "social.flockfeeds.lexical.prop.organization#disambiguatingDescriptionList"
+          ]
+        },
+        "dissolutionDate": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.organization#dissolutionDateScalar",
+            "social.flockfeeds.lexical.prop.organization#dissolutionDateList"
+          ]
+        },
+        "diversityPolicy": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.organization#diversityPolicyScalar",
+            "social.flockfeeds.lexical.prop.organization#diversityPolicyList"
+          ]
+        },
+        "diversityStaffingReport": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Article#embedded",
+            "social.flockfeeds.lexical.prop.organization#diversityStaffingReportScalar",
+            "social.flockfeeds.lexical.prop.organization#diversityStaffingReportList"
+          ]
+        },
+        "duns": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.organization#dunsScalar",
+            "social.flockfeeds.lexical.prop.organization#dunsList"
+          ]
+        },
+        "email": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.organization#emailScalar",
+            "social.flockfeeds.lexical.prop.organization#emailList"
+          ]
+        },
+        "employee": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.organization#employeeList"
+          ]
+        },
+        "employees": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.organization#employeesList"
+          ]
+        },
+        "ethicsPolicy": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.organization#ethicsPolicyScalar",
+            "social.flockfeeds.lexical.prop.organization#ethicsPolicyList"
+          ]
+        },
+        "event": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Event#embedded",
+            "social.flockfeeds.lexical.prop.organization#eventList"
+          ]
+        },
+        "events": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Event#embedded",
+            "social.flockfeeds.lexical.prop.organization#eventsList"
+          ]
+        },
+        "faxNumber": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.organization#faxNumberScalar",
+            "social.flockfeeds.lexical.prop.organization#faxNumberList"
+          ]
+        },
+        "founder": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.organization#founderList"
+          ]
+        },
+        "founders": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.organization#foundersList"
+          ]
+        },
+        "foundingDate": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.organization#foundingDateScalar",
+            "social.flockfeeds.lexical.prop.organization#foundingDateList"
+          ]
+        },
+        "foundingLocation": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Place#embedded",
+            "social.flockfeeds.lexical.prop.organization#foundingLocationList"
+          ]
+        },
+        "funder": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.organization#funderList"
+          ]
+        },
+        "funding": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Grant#embedded",
+            "social.flockfeeds.lexical.prop.organization#fundingList"
+          ]
+        },
+        "globalLocationNumber": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.organization#globalLocationNumberScalar",
+            "social.flockfeeds.lexical.prop.organization#globalLocationNumberList"
+          ]
+        },
+        "hasCertification": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Certification#embedded",
+            "social.flockfeeds.lexical.prop.organization#hasCertificationList"
+          ]
+        },
+        "hasCredential": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.EducationalOccupationalCredential#embedded",
+            "social.flockfeeds.lexical.prop.organization#hasCredentialList"
+          ]
+        },
+        "hasGS1DigitalLink": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.organization#hasGS1DigitalLinkScalar",
+            "social.flockfeeds.lexical.prop.organization#hasGS1DigitalLinkList"
+          ]
+        },
+        "hasMemberProgram": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.MemberProgram#embedded",
+            "social.flockfeeds.lexical.prop.organization#hasMemberProgramList"
+          ]
+        },
+        "hasMerchantReturnPolicy": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.MerchantReturnPolicy#embedded",
+            "social.flockfeeds.lexical.prop.organization#hasMerchantReturnPolicyList"
+          ]
+        },
+        "hasOfferCatalog": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.OfferCatalog#embedded",
+            "social.flockfeeds.lexical.prop.organization#hasOfferCatalogList"
+          ]
+        },
+        "hasPOS": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Place#embedded",
+            "social.flockfeeds.lexical.prop.organization#hasPOSList"
+          ]
+        },
+        "hasProductReturnPolicy": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.ProductReturnPolicy#embedded",
+            "social.flockfeeds.lexical.prop.organization#hasProductReturnPolicyList"
+          ]
+        },
+        "hasShippingService": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.ShippingService#embedded",
+            "social.flockfeeds.lexical.prop.organization#hasShippingServiceList"
+          ]
+        },
+        "identifier": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.PropertyValue#embedded",
+            "social.flockfeeds.lexical.prop.organization#identifierScalar",
+            "social.flockfeeds.lexical.prop.organization#identifierList"
+          ]
+        },
+        "image": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.ImageObject#embedded",
+            "social.flockfeeds.lexical.prop.organization#imageScalar",
+            "social.flockfeeds.lexical.prop.organization#imageList"
+          ]
+        },
+        "interactionStatistic": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.InteractionCounter#embedded",
+            "social.flockfeeds.lexical.prop.organization#interactionStatisticList"
+          ]
+        },
+        "isicV4": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.organization#isicV4Scalar",
+            "social.flockfeeds.lexical.prop.organization#isicV4List"
+          ]
+        },
+        "iso6523Code": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.organization#iso6523CodeScalar",
+            "social.flockfeeds.lexical.prop.organization#iso6523CodeList"
+          ]
+        },
+        "keywords": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+            "social.flockfeeds.lexical.prop.organization#keywordsScalar",
+            "social.flockfeeds.lexical.prop.organization#keywordsList"
+          ]
+        },
+        "knowsAbout": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Thing#embedded",
+            "social.flockfeeds.lexical.prop.organization#knowsAboutScalar",
+            "social.flockfeeds.lexical.prop.organization#knowsAboutList"
+          ]
+        },
+        "knowsLanguage": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Language#embedded",
+            "social.flockfeeds.lexical.prop.organization#knowsLanguageScalar",
+            "social.flockfeeds.lexical.prop.organization#knowsLanguageList"
+          ]
+        },
+        "legalAddress": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.PostalAddress#embedded",
+            "social.flockfeeds.lexical.prop.organization#legalAddressList"
+          ]
+        },
+        "legalName": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.organization#legalNameScalar",
+            "social.flockfeeds.lexical.prop.organization#legalNameList"
+          ]
+        },
+        "legalRepresentative": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.organization#legalRepresentativeList"
+          ]
+        },
+        "leiCode": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.organization#leiCodeScalar",
+            "social.flockfeeds.lexical.prop.organization#leiCodeList"
+          ]
+        },
+        "location": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Place#embedded",
+            "social.flockfeeds.lexical.type.PostalAddress#embedded",
+            "social.flockfeeds.lexical.type.VirtualLocation#embedded",
+            "social.flockfeeds.lexical.prop.organization#locationScalar",
+            "social.flockfeeds.lexical.prop.organization#locationList"
+          ]
+        },
+        "logo": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.ImageObject#embedded",
+            "social.flockfeeds.lexical.prop.organization#logoScalar",
+            "social.flockfeeds.lexical.prop.organization#logoList"
+          ]
+        },
+        "mainEntityOfPage": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.organization#mainEntityOfPageScalar",
+            "social.flockfeeds.lexical.prop.organization#mainEntityOfPageList"
+          ]
+        },
+        "makesOffer": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Offer#embedded",
+            "social.flockfeeds.lexical.prop.organization#makesOfferList"
+          ]
+        },
+        "member": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.organization#memberList"
+          ]
+        },
+        "memberOf": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.MemberProgramTier#embedded",
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.ProgramMembership#embedded",
+            "social.flockfeeds.lexical.prop.organization#memberOfList"
+          ]
+        },
+        "members": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.organization#membersList"
+          ]
+        },
+        "naics": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.organization#naicsScalar",
+            "social.flockfeeds.lexical.prop.organization#naicsList"
+          ]
+        },
+        "name": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.organization#nameScalar",
+            "social.flockfeeds.lexical.prop.organization#nameList"
+          ]
+        },
+        "nonprofitStatus": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.NonprofitType#embedded",
+            "social.flockfeeds.lexical.prop.organization#nonprofitStatusScalar",
+            "social.flockfeeds.lexical.prop.organization#nonprofitStatusList"
+          ]
+        },
+        "numberOfEmployees": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.QuantitativeValue#embedded",
+            "social.flockfeeds.lexical.prop.organization#numberOfEmployeesList"
+          ]
+        },
+        "ownershipFundingInfo": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.AboutPage#embedded",
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.organization#ownershipFundingInfoScalar",
+            "social.flockfeeds.lexical.prop.organization#ownershipFundingInfoList"
+          ]
+        },
+        "owns": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.OwnershipInfo#embedded",
+            "social.flockfeeds.lexical.type.Product#embedded",
+            "social.flockfeeds.lexical.prop.organization#ownsList"
+          ]
+        },
+        "parentOrganization": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.prop.organization#parentOrganizationList"
+          ]
+        },
+        "potentialAction": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Action#embedded",
+            "social.flockfeeds.lexical.prop.organization#potentialActionList"
+          ]
+        },
+        "publishingPrinciples": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.organization#publishingPrinciplesScalar",
+            "social.flockfeeds.lexical.prop.organization#publishingPrinciplesList"
+          ]
+        },
+        "review": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Review#embedded",
+            "social.flockfeeds.lexical.prop.organization#reviewList"
+          ]
+        },
+        "reviews": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Review#embedded",
+            "social.flockfeeds.lexical.prop.organization#reviewsList"
+          ]
+        },
+        "sameAs": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.organization#sameAsScalar",
+            "social.flockfeeds.lexical.prop.organization#sameAsList"
+          ]
+        },
+        "seeks": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Demand#embedded",
+            "social.flockfeeds.lexical.prop.organization#seeksList"
+          ]
+        },
+        "serviceArea": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.AdministrativeArea#embedded",
+            "social.flockfeeds.lexical.type.GeoShape#embedded",
+            "social.flockfeeds.lexical.type.Place#embedded",
+            "social.flockfeeds.lexical.prop.organization#serviceAreaList"
+          ]
+        },
+        "skills": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+            "social.flockfeeds.lexical.prop.organization#skillsScalar",
+            "social.flockfeeds.lexical.prop.organization#skillsList"
+          ]
+        },
+        "slogan": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.organization#sloganScalar",
+            "social.flockfeeds.lexical.prop.organization#sloganList"
+          ]
+        },
+        "sponsor": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.organization#sponsorList"
+          ]
+        },
+        "subOrganization": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.prop.organization#subOrganizationList"
+          ]
+        },
+        "subjectOf": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.type.Event#embedded",
+            "social.flockfeeds.lexical.prop.organization#subjectOfList"
+          ]
+        },
+        "taxID": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.organization#taxIDScalar",
+            "social.flockfeeds.lexical.prop.organization#taxIDList"
+          ]
+        },
+        "telephone": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.organization#telephoneScalar",
+            "social.flockfeeds.lexical.prop.organization#telephoneList"
+          ]
+        },
+        "unnamedSourcesPolicy": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.organization#unnamedSourcesPolicyScalar",
+            "social.flockfeeds.lexical.prop.organization#unnamedSourcesPolicyList"
+          ]
+        },
+        "url": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.organization#urlScalar",
+            "social.flockfeeds.lexical.prop.organization#urlList"
+          ]
+        },
+        "vatID": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.organization#vatIDScalar",
+            "social.flockfeeds.lexical.prop.organization#vatIDList"
+          ]
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "description": "An organization such as a school, NGO, corporation, club, etc.",
+        "properties": {
+          "acceptedPaymentMethod": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.LoanOrCredit#embedded",
+              "social.flockfeeds.lexical.type.PaymentMethod#embedded",
+              "social.flockfeeds.lexical.prop.organization#acceptedPaymentMethodScalar",
+              "social.flockfeeds.lexical.prop.organization#acceptedPaymentMethodList"
+            ]
+          },
+          "actionableFeedbackPolicy": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.prop.organization#actionableFeedbackPolicyScalar",
+              "social.flockfeeds.lexical.prop.organization#actionableFeedbackPolicyList"
+            ]
+          },
+          "additionalType": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.organization#additionalTypeScalar",
+              "social.flockfeeds.lexical.prop.organization#additionalTypeList"
+            ]
+          },
+          "address": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.PostalAddress#embedded",
+              "social.flockfeeds.lexical.prop.organization#addressScalar",
+              "social.flockfeeds.lexical.prop.organization#addressList"
+            ]
+          },
+          "agentInteractionStatistic": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.InteractionCounter#embedded",
+              "social.flockfeeds.lexical.prop.organization#agentInteractionStatisticList"
+            ]
+          },
+          "aggregateRating": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.AggregateRating#embedded",
+              "social.flockfeeds.lexical.prop.organization#aggregateRatingList"
+            ]
+          },
+          "alternateName": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.organization#alternateNameScalar",
+              "social.flockfeeds.lexical.prop.organization#alternateNameList"
+            ]
+          },
+          "alumni": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.organization#alumniList"
+            ]
+          },
+          "areaServed": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.AdministrativeArea#embedded",
+              "social.flockfeeds.lexical.type.GeoShape#embedded",
+              "social.flockfeeds.lexical.type.Place#embedded",
+              "social.flockfeeds.lexical.prop.organization#areaServedScalar",
+              "social.flockfeeds.lexical.prop.organization#areaServedList"
+            ]
+          },
+          "award": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.organization#awardScalar",
+              "social.flockfeeds.lexical.prop.organization#awardList"
+            ]
+          },
+          "awards": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.organization#awardsScalar",
+              "social.flockfeeds.lexical.prop.organization#awardsList"
+            ]
+          },
+          "brand": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Brand#embedded",
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.prop.organization#brandList"
+            ]
+          },
+          "companyRegistration": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Certification#embedded",
+              "social.flockfeeds.lexical.prop.organization#companyRegistrationList"
+            ]
+          },
+          "contactPoint": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.ContactPoint#embedded",
+              "social.flockfeeds.lexical.prop.organization#contactPointList"
+            ]
+          },
+          "contactPoints": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.ContactPoint#embedded",
+              "social.flockfeeds.lexical.prop.organization#contactPointsList"
+            ]
+          },
+          "correctionsPolicy": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.prop.organization#correctionsPolicyScalar",
+              "social.flockfeeds.lexical.prop.organization#correctionsPolicyList"
+            ]
+          },
+          "department": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.prop.organization#departmentList"
+            ]
+          },
+          "description": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.TextObject#embedded",
+              "social.flockfeeds.lexical.prop.organization#descriptionScalar",
+              "social.flockfeeds.lexical.prop.organization#descriptionList"
+            ]
+          },
+          "disambiguatingDescription": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.organization#disambiguatingDescriptionScalar",
+              "social.flockfeeds.lexical.prop.organization#disambiguatingDescriptionList"
+            ]
+          },
+          "dissolutionDate": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.organization#dissolutionDateScalar",
+              "social.flockfeeds.lexical.prop.organization#dissolutionDateList"
+            ]
+          },
+          "diversityPolicy": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.prop.organization#diversityPolicyScalar",
+              "social.flockfeeds.lexical.prop.organization#diversityPolicyList"
+            ]
+          },
+          "diversityStaffingReport": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Article#embedded",
+              "social.flockfeeds.lexical.prop.organization#diversityStaffingReportScalar",
+              "social.flockfeeds.lexical.prop.organization#diversityStaffingReportList"
+            ]
+          },
+          "duns": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.organization#dunsScalar",
+              "social.flockfeeds.lexical.prop.organization#dunsList"
+            ]
+          },
+          "email": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.organization#emailScalar",
+              "social.flockfeeds.lexical.prop.organization#emailList"
+            ]
+          },
+          "employee": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.organization#employeeList"
+            ]
+          },
+          "employees": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.organization#employeesList"
+            ]
+          },
+          "ethicsPolicy": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.prop.organization#ethicsPolicyScalar",
+              "social.flockfeeds.lexical.prop.organization#ethicsPolicyList"
+            ]
+          },
+          "event": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Event#embedded",
+              "social.flockfeeds.lexical.prop.organization#eventList"
+            ]
+          },
+          "events": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Event#embedded",
+              "social.flockfeeds.lexical.prop.organization#eventsList"
+            ]
+          },
+          "faxNumber": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.organization#faxNumberScalar",
+              "social.flockfeeds.lexical.prop.organization#faxNumberList"
+            ]
+          },
+          "founder": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.organization#founderList"
+            ]
+          },
+          "founders": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.organization#foundersList"
+            ]
+          },
+          "foundingDate": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.organization#foundingDateScalar",
+              "social.flockfeeds.lexical.prop.organization#foundingDateList"
+            ]
+          },
+          "foundingLocation": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Place#embedded",
+              "social.flockfeeds.lexical.prop.organization#foundingLocationList"
+            ]
+          },
+          "funder": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.organization#funderList"
+            ]
+          },
+          "funding": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Grant#embedded",
+              "social.flockfeeds.lexical.prop.organization#fundingList"
+            ]
+          },
+          "globalLocationNumber": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.organization#globalLocationNumberScalar",
+              "social.flockfeeds.lexical.prop.organization#globalLocationNumberList"
+            ]
+          },
+          "hasCertification": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Certification#embedded",
+              "social.flockfeeds.lexical.prop.organization#hasCertificationList"
+            ]
+          },
+          "hasCredential": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.EducationalOccupationalCredential#embedded",
+              "social.flockfeeds.lexical.prop.organization#hasCredentialList"
+            ]
+          },
+          "hasGS1DigitalLink": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.organization#hasGS1DigitalLinkScalar",
+              "social.flockfeeds.lexical.prop.organization#hasGS1DigitalLinkList"
+            ]
+          },
+          "hasMemberProgram": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.MemberProgram#embedded",
+              "social.flockfeeds.lexical.prop.organization#hasMemberProgramList"
+            ]
+          },
+          "hasMerchantReturnPolicy": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.MerchantReturnPolicy#embedded",
+              "social.flockfeeds.lexical.prop.organization#hasMerchantReturnPolicyList"
+            ]
+          },
+          "hasOfferCatalog": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.OfferCatalog#embedded",
+              "social.flockfeeds.lexical.prop.organization#hasOfferCatalogList"
+            ]
+          },
+          "hasPOS": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Place#embedded",
+              "social.flockfeeds.lexical.prop.organization#hasPOSList"
+            ]
+          },
+          "hasProductReturnPolicy": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.ProductReturnPolicy#embedded",
+              "social.flockfeeds.lexical.prop.organization#hasProductReturnPolicyList"
+            ]
+          },
+          "hasShippingService": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.ShippingService#embedded",
+              "social.flockfeeds.lexical.prop.organization#hasShippingServiceList"
+            ]
+          },
+          "identifier": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.PropertyValue#embedded",
+              "social.flockfeeds.lexical.prop.organization#identifierScalar",
+              "social.flockfeeds.lexical.prop.organization#identifierList"
+            ]
+          },
+          "image": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.ImageObject#embedded",
+              "social.flockfeeds.lexical.prop.organization#imageScalar",
+              "social.flockfeeds.lexical.prop.organization#imageList"
+            ]
+          },
+          "interactionStatistic": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.InteractionCounter#embedded",
+              "social.flockfeeds.lexical.prop.organization#interactionStatisticList"
+            ]
+          },
+          "isicV4": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.organization#isicV4Scalar",
+              "social.flockfeeds.lexical.prop.organization#isicV4List"
+            ]
+          },
+          "iso6523Code": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.organization#iso6523CodeScalar",
+              "social.flockfeeds.lexical.prop.organization#iso6523CodeList"
+            ]
+          },
+          "keywords": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+              "social.flockfeeds.lexical.prop.organization#keywordsScalar",
+              "social.flockfeeds.lexical.prop.organization#keywordsList"
+            ]
+          },
+          "knowsAbout": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Thing#embedded",
+              "social.flockfeeds.lexical.prop.organization#knowsAboutScalar",
+              "social.flockfeeds.lexical.prop.organization#knowsAboutList"
+            ]
+          },
+          "knowsLanguage": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Language#embedded",
+              "social.flockfeeds.lexical.prop.organization#knowsLanguageScalar",
+              "social.flockfeeds.lexical.prop.organization#knowsLanguageList"
+            ]
+          },
+          "legalAddress": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.PostalAddress#embedded",
+              "social.flockfeeds.lexical.prop.organization#legalAddressList"
+            ]
+          },
+          "legalName": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.organization#legalNameScalar",
+              "social.flockfeeds.lexical.prop.organization#legalNameList"
+            ]
+          },
+          "legalRepresentative": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.organization#legalRepresentativeList"
+            ]
+          },
+          "leiCode": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.organization#leiCodeScalar",
+              "social.flockfeeds.lexical.prop.organization#leiCodeList"
+            ]
+          },
+          "location": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Place#embedded",
+              "social.flockfeeds.lexical.type.PostalAddress#embedded",
+              "social.flockfeeds.lexical.type.VirtualLocation#embedded",
+              "social.flockfeeds.lexical.prop.organization#locationScalar",
+              "social.flockfeeds.lexical.prop.organization#locationList"
+            ]
+          },
+          "logo": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.ImageObject#embedded",
+              "social.flockfeeds.lexical.prop.organization#logoScalar",
+              "social.flockfeeds.lexical.prop.organization#logoList"
+            ]
+          },
+          "mainEntityOfPage": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.prop.organization#mainEntityOfPageScalar",
+              "social.flockfeeds.lexical.prop.organization#mainEntityOfPageList"
+            ]
+          },
+          "makesOffer": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Offer#embedded",
+              "social.flockfeeds.lexical.prop.organization#makesOfferList"
+            ]
+          },
+          "member": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.organization#memberList"
+            ]
+          },
+          "memberOf": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.MemberProgramTier#embedded",
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.ProgramMembership#embedded",
+              "social.flockfeeds.lexical.prop.organization#memberOfList"
+            ]
+          },
+          "members": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.organization#membersList"
+            ]
+          },
+          "naics": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.organization#naicsScalar",
+              "social.flockfeeds.lexical.prop.organization#naicsList"
+            ]
+          },
+          "name": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.organization#nameScalar",
+              "social.flockfeeds.lexical.prop.organization#nameList"
+            ]
+          },
+          "nonprofitStatus": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.NonprofitType#embedded",
+              "social.flockfeeds.lexical.prop.organization#nonprofitStatusScalar",
+              "social.flockfeeds.lexical.prop.organization#nonprofitStatusList"
+            ]
+          },
+          "numberOfEmployees": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.QuantitativeValue#embedded",
+              "social.flockfeeds.lexical.prop.organization#numberOfEmployeesList"
+            ]
+          },
+          "ownershipFundingInfo": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.AboutPage#embedded",
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.prop.organization#ownershipFundingInfoScalar",
+              "social.flockfeeds.lexical.prop.organization#ownershipFundingInfoList"
+            ]
+          },
+          "owns": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.OwnershipInfo#embedded",
+              "social.flockfeeds.lexical.type.Product#embedded",
+              "social.flockfeeds.lexical.prop.organization#ownsList"
+            ]
+          },
+          "parentOrganization": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.prop.organization#parentOrganizationList"
+            ]
+          },
+          "potentialAction": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Action#embedded",
+              "social.flockfeeds.lexical.prop.organization#potentialActionList"
+            ]
+          },
+          "publishingPrinciples": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.prop.organization#publishingPrinciplesScalar",
+              "social.flockfeeds.lexical.prop.organization#publishingPrinciplesList"
+            ]
+          },
+          "review": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Review#embedded",
+              "social.flockfeeds.lexical.prop.organization#reviewList"
+            ]
+          },
+          "reviews": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Review#embedded",
+              "social.flockfeeds.lexical.prop.organization#reviewsList"
+            ]
+          },
+          "sameAs": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.organization#sameAsScalar",
+              "social.flockfeeds.lexical.prop.organization#sameAsList"
+            ]
+          },
+          "seeks": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Demand#embedded",
+              "social.flockfeeds.lexical.prop.organization#seeksList"
+            ]
+          },
+          "serviceArea": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.AdministrativeArea#embedded",
+              "social.flockfeeds.lexical.type.GeoShape#embedded",
+              "social.flockfeeds.lexical.type.Place#embedded",
+              "social.flockfeeds.lexical.prop.organization#serviceAreaList"
+            ]
+          },
+          "skills": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+              "social.flockfeeds.lexical.prop.organization#skillsScalar",
+              "social.flockfeeds.lexical.prop.organization#skillsList"
+            ]
+          },
+          "slogan": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.organization#sloganScalar",
+              "social.flockfeeds.lexical.prop.organization#sloganList"
+            ]
+          },
+          "sponsor": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.organization#sponsorList"
+            ]
+          },
+          "subOrganization": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.prop.organization#subOrganizationList"
+            ]
+          },
+          "subjectOf": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.type.Event#embedded",
+              "social.flockfeeds.lexical.prop.organization#subjectOfList"
+            ]
+          },
+          "taxID": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.organization#taxIDScalar",
+              "social.flockfeeds.lexical.prop.organization#taxIDList"
+            ]
+          },
+          "telephone": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.organization#telephoneScalar",
+              "social.flockfeeds.lexical.prop.organization#telephoneList"
+            ]
+          },
+          "unnamedSourcesPolicy": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.prop.organization#unnamedSourcesPolicyScalar",
+              "social.flockfeeds.lexical.prop.organization#unnamedSourcesPolicyList"
+            ]
+          },
+          "url": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.organization#urlScalar",
+              "social.flockfeeds.lexical.prop.organization#urlList"
+            ]
+          },
+          "vatID": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.organization#vatIDScalar",
+              "social.flockfeeds.lexical.prop.organization#vatIDList"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

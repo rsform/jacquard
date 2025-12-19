@@ -1,0 +1,56 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.graph.list",
+  "defs": {
+    "listPurpose": {
+      "type": "string",
+      "knownValues": [
+        "sh.weaver.graph.defs#curatelist",
+        "sh.weaver.graph.defs#readinglist"
+      ]
+    },
+    "main": {
+      "type": "record",
+      "description": "A curated list of notebooks and/or entries.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "purpose",
+          "createdAt"
+        ],
+        "properties": {
+          "avatar": {
+            "type": "blob",
+            "accept": [
+              "image/png",
+              "image/jpeg"
+            ],
+            "maxSize": 1000000
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 3000,
+            "maxGraphemes": 300
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name for the list.",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "purpose": {
+            "type": "ref",
+            "description": "The purpose/type of list.",
+            "ref": "#listPurpose"
+          }
+        }
+      }
+    }
+  }
+}

@@ -5,7 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-/// Record declaring a publication
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -18,34 +17,8 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Publication<'a> {
-    /// Base URL path for the publication (e.g., https://blog.pckt.blog)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub base_path: std::option::Option<jacquard_common::types::string::Uri<'a>>,
-    /// Timestamp when the publication was first created
-    pub created_at: jacquard_common::types::string::Datetime,
-    /// Publication description or tagline
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// Extension objects (open union) for additional features
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub extensions: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
-    /// Publication icon/avatar image
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub icon: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-    /// Publication name/title
-    #[serde(borrow)]
-    pub name: jacquard_common::CowStr<'a>,
-    /// Theme configuration as an open union; accepts blog.pckt.theme and future types.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub theme: std::option::Option<crate::blog_pckt::theme::Theme<'a>>,
-    /// Timestamp when the publication was last updated (optional)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    pub publication: crate::site_standard::publication::Publication<'a>,
 }
 
 pub mod publication_state {
@@ -58,37 +31,25 @@ pub mod publication_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Name;
+        type Publication;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Name = Unset;
+        type Publication = Unset;
     }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type CreatedAt = S::CreatedAt;
-        type Name = Set<members::name>;
+    ///State transition - sets the `publication` field to Set
+    pub struct SetPublication<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPublication<S> {}
+    impl<S: State> State for SetPublication<S> {
+        type Publication = Set<members::publication>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `name` field
-        pub struct name(());
+        ///Marker type for the `publication` field
+        pub struct publication(());
     }
 }
 
@@ -96,14 +57,7 @@ pub mod publication_state {
 pub struct PublicationBuilder<'a, S: publication_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
-        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<crate::blog_pckt::theme::Theme<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<crate::site_standard::publication::Publication<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -120,42 +74,23 @@ impl<'a> PublicationBuilder<'a, publication_state::Empty> {
     pub fn new() -> Self {
         PublicationBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None),
+            __unsafe_private_named: (None,),
             _phantom: ::core::marker::PhantomData,
         }
-    }
-}
-
-impl<'a, S: publication_state::State> PublicationBuilder<'a, S> {
-    /// Set the `basePath` field (optional)
-    pub fn base_path(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Uri<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
-        self
-    }
-    /// Set the `basePath` field to an Option value (optional)
-    pub fn maybe_base_path(
-        mut self,
-        value: Option<jacquard_common::types::string::Uri<'a>>,
-    ) -> Self {
-        self.__unsafe_private_named.0 = value;
-        self
     }
 }
 
 impl<'a, S> PublicationBuilder<'a, S>
 where
     S: publication_state::State,
-    S::CreatedAt: publication_state::IsUnset,
+    S::Publication: publication_state::IsUnset,
 {
-    /// Set the `createdAt` field (required)
-    pub fn created_at(
+    /// Set the `publication` field (required)
+    pub fn publication(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
-    ) -> PublicationBuilder<'a, publication_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        value: impl Into<crate::site_standard::publication::Publication<'a>>,
+    ) -> PublicationBuilder<'a, publication_state::SetPublication<S>> {
+        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
         PublicationBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -164,137 +99,15 @@ where
     }
 }
 
-impl<'a, S: publication_state::State> PublicationBuilder<'a, S> {
-    /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
-        self
-    }
-    /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
-        self.__unsafe_private_named.2 = value;
-        self
-    }
-}
-
-impl<'a, S: publication_state::State> PublicationBuilder<'a, S> {
-    /// Set the `extensions` field (optional)
-    pub fn extensions(
-        mut self,
-        value: impl Into<Option<Vec<jacquard_common::types::value::Data<'a>>>>,
-    ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
-        self
-    }
-    /// Set the `extensions` field to an Option value (optional)
-    pub fn maybe_extensions(
-        mut self,
-        value: Option<Vec<jacquard_common::types::value::Data<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.3 = value;
-        self
-    }
-}
-
-impl<'a, S: publication_state::State> PublicationBuilder<'a, S> {
-    /// Set the `icon` field (optional)
-    pub fn icon(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::blob::BlobRef<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
-        self
-    }
-    /// Set the `icon` field to an Option value (optional)
-    pub fn maybe_icon(
-        mut self,
-        value: Option<jacquard_common::types::blob::BlobRef<'a>>,
-    ) -> Self {
-        self.__unsafe_private_named.4 = value;
-        self
-    }
-}
-
 impl<'a, S> PublicationBuilder<'a, S>
 where
     S: publication_state::State,
-    S::Name: publication_state::IsUnset,
-{
-    /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
-    ) -> PublicationBuilder<'a, publication_state::SetName<S>> {
-        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
-        PublicationBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S: publication_state::State> PublicationBuilder<'a, S> {
-    /// Set the `theme` field (optional)
-    pub fn theme(
-        mut self,
-        value: impl Into<Option<crate::blog_pckt::theme::Theme<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.6 = value.into();
-        self
-    }
-    /// Set the `theme` field to an Option value (optional)
-    pub fn maybe_theme(
-        mut self,
-        value: Option<crate::blog_pckt::theme::Theme<'a>>,
-    ) -> Self {
-        self.__unsafe_private_named.6 = value;
-        self
-    }
-}
-
-impl<'a, S: publication_state::State> PublicationBuilder<'a, S> {
-    /// Set the `updatedAt` field (optional)
-    pub fn updated_at(
-        mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
-        self.__unsafe_private_named.7 = value.into();
-        self
-    }
-    /// Set the `updatedAt` field to an Option value (optional)
-    pub fn maybe_updated_at(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
-        self.__unsafe_private_named.7 = value;
-        self
-    }
-}
-
-impl<'a, S> PublicationBuilder<'a, S>
-where
-    S: publication_state::State,
-    S::CreatedAt: publication_state::IsSet,
-    S::Name: publication_state::IsSet,
+    S::Publication: publication_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Publication<'a> {
         Publication {
-            base_path: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            description: self.__unsafe_private_named.2,
-            extensions: self.__unsafe_private_named.3,
-            icon: self.__unsafe_private_named.4,
-            name: self.__unsafe_private_named.5.unwrap(),
-            theme: self.__unsafe_private_named.6,
-            updated_at: self.__unsafe_private_named.7,
+            publication: self.__unsafe_private_named.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -307,14 +120,7 @@ where
         >,
     ) -> Publication<'a> {
         Publication {
-            base_path: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            description: self.__unsafe_private_named.2,
-            extensions: self.__unsafe_private_named.3,
-            icon: self.__unsafe_private_named.4,
-            name: self.__unsafe_private_named.5.unwrap(),
-            theme: self.__unsafe_private_named.6,
-            updated_at: self.__unsafe_private_named.7,
+            publication: self.__unsafe_private_named.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -394,92 +200,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Publication<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        if let Some(ref value) = self.base_path {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 2000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "base_path",
-                    ),
-                    max: 2000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.description {
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 2000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "description",
-                    ),
-                    max: 2000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        if let Some(ref value) = self.description {
-            {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 500usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "description",
-                        ),
-                        max: 500usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
-        if let Some(ref value) = self.extensions {
-            #[allow(unused_comparisons)]
-            if value.len() > 10usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "extensions",
-                    ),
-                    max: 10usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.name;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 200usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "name",
-                    ),
-                    max: 200usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.name;
-            {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 100usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "name",
-                        ),
-                        max: 100usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
         Ok(())
     }
 }
@@ -497,18 +217,13 @@ fn lexicon_doc_blog_pckt_publication() -> ::jacquard_lexicon::lexicon::LexiconDo
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static(
-                            "Record declaring a publication",
-                        ),
-                    ),
+                    description: None,
                     key: Some(::jacquard_common::CowStr::new_static("tid")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
-                                ::jacquard_common::smol_str::SmolStr::new_static("createdAt")
+                                ::jacquard_common::smol_str::SmolStr::new_static("publication")
                             ],
                         ),
                         nullable: None,
@@ -517,152 +232,13 @@ fn lexicon_doc_blog_pckt_publication() -> ::jacquard_lexicon::lexicon::LexiconDo
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static(
-                                    "basePath",
+                                    "publication",
                                 ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Base URL path for the publication (e.g., https://blog.pckt.blog)",
-                                        ),
-                                    ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: Some(2000usize),
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
-                            );
-                            map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
-                                    "createdAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Timestamp when the publication was first created",
-                                        ),
-                                    ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
-                            );
-                            map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
-                                    "description",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Publication description or tagline",
-                                        ),
-                                    ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: Some(2000usize),
-                                    min_graphemes: None,
-                                    max_graphemes: Some(500usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
-                            );
-                            map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
-                                    "extensions",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                    description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Extension objects (open union) for additional features",
-                                        ),
-                                    ),
-                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                        description: None,
-                                        refs: vec![],
-                                        closed: Some(false),
-                                    }),
-                                    min_length: None,
-                                    max_length: Some(10usize),
-                                }),
-                            );
-                            map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("icon"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    accept: None,
-                                    max_size: None,
-                                }),
-                            );
-                            map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Publication name/title",
-                                        ),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "site.standard.publication",
                                     ),
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: Some(200usize),
-                                    min_graphemes: None,
-                                    max_graphemes: Some(100usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
-                            );
-                            map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("theme"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Theme configuration as an open union; accepts blog.pckt.theme and future types.",
-                                        ),
-                                    ),
-                                    refs: vec![
-                                        ::jacquard_common::CowStr::new_static("blog.pckt.theme")
-                                    ],
-                                    closed: Some(false),
-                                }),
-                            );
-                            map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static(
-                                    "updatedAt",
-                                ),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: Some(
-                                        ::jacquard_common::CowStr::new_static(
-                                            "Timestamp when the publication was last updated (optional)",
-                                        ),
-                                    ),
-                                    format: Some(
-                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                    ),
-                                    default: None,
-                                    min_length: None,
-                                    max_length: None,
-                                    min_graphemes: None,
-                                    max_graphemes: None,
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
                                 }),
                             );
                             map

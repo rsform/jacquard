@@ -12,18 +12,158 @@
           "type": "union",
           "refs": [
             "#notebookRef",
-            "#entryRef"
+            "#entryRef",
+            "#draftRef"
           ]
+        }
+      }
+    },
+    "draftRef": {
+      "type": "object",
+      "required": [
+        "draftKey"
+      ],
+      "properties": {
+        "draftKey": {
+          "type": "string",
+          "maxLength": 200
+        }
+      }
+    },
+    "editBranchView": {
+      "type": "object",
+      "description": "A branch/fork in edit history (for when collaborators diverge).",
+      "required": [
+        "head",
+        "author",
+        "length",
+        "lastUpdated"
+      ],
+      "properties": {
+        "author": {
+          "type": "ref",
+          "ref": "sh.weaver.actor.defs#profileViewBasic"
+        },
+        "divergesFrom": {
+          "type": "ref",
+          "description": "Common ancestor if this is a fork",
+          "ref": "com.atproto.repo.strongRef"
+        },
+        "head": {
+          "type": "ref",
+          "ref": "com.atproto.repo.strongRef"
+        },
+        "isMerged": {
+          "type": "boolean"
+        },
+        "lastUpdated": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "length": {
+          "type": "integer",
+          "description": "Number of diffs in this branch"
+        },
+        "root": {
+          "type": "ref",
+          "ref": "com.atproto.repo.strongRef"
+        }
+      }
+    },
+    "editHistoryEntry": {
+      "type": "object",
+      "description": "Summary of an edit (root or diff) for history queries.",
+      "required": [
+        "uri",
+        "cid",
+        "author",
+        "createdAt",
+        "type"
+      ],
+      "properties": {
+        "author": {
+          "type": "ref",
+          "ref": "sh.weaver.actor.defs#profileViewBasic"
+        },
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "hasInlineDiff": {
+          "type": "boolean"
+        },
+        "prevRef": {
+          "type": "ref",
+          "ref": "com.atproto.repo.strongRef"
+        },
+        "rootRef": {
+          "type": "ref",
+          "ref": "com.atproto.repo.strongRef"
+        },
+        "snapshotCid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "type": {
+          "type": "string",
+          "knownValues": [
+            "root",
+            "diff"
+          ]
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
+    "editTreeView": {
+      "type": "object",
+      "description": "Full tree structure showing all branches for a resource.",
+      "required": [
+        "resource",
+        "branches"
+      ],
+      "properties": {
+        "branches": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#editBranchView"
+          }
+        },
+        "conflictPoints": {
+          "type": "array",
+          "description": "Diffs where branches diverge",
+          "items": {
+            "type": "ref",
+            "ref": "com.atproto.repo.strongRef"
+          }
+        },
+        "hasConflicts": {
+          "type": "boolean"
+        },
+        "mainBranch": {
+          "type": "ref",
+          "ref": "#editBranchView"
+        },
+        "resource": {
+          "type": "ref",
+          "ref": "com.atproto.repo.strongRef"
         }
       }
     },
     "entryRef": {
       "type": "object",
       "required": [
-        "notebook"
+        "entry"
       ],
       "properties": {
-        "notebook": {
+        "entry": {
           "type": "ref",
           "ref": "com.atproto.repo.strongRef"
         }

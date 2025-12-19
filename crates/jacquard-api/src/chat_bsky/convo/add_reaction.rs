@@ -59,13 +59,13 @@ pub struct AddReactionOutput<'a> {
 pub enum AddReactionError<'a> {
     /// Indicates that the message has been deleted and reactions can no longer be added/removed.
     #[serde(rename = "ReactionMessageDeleted")]
-    ReactionMessageDeleted(std::option::Option<String>),
+    ReactionMessageDeleted(std::option::Option<jacquard_common::CowStr<'a>>),
     /// Indicates that the message has the maximum number of reactions allowed for a single user, and the requested reaction wasn't yet present. If it was already present, the request will not fail since it is idempotent.
     #[serde(rename = "ReactionLimitReached")]
-    ReactionLimitReached(std::option::Option<String>),
+    ReactionLimitReached(std::option::Option<jacquard_common::CowStr<'a>>),
     /// Indicates the value for the reaction is not acceptable. In general, this means it is not an emoji.
     #[serde(rename = "ReactionInvalidValue")]
-    ReactionInvalidValue(std::option::Option<String>),
+    ReactionInvalidValue(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl std::fmt::Display for AddReactionError<'_> {

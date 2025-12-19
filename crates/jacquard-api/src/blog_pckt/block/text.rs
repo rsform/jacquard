@@ -18,30 +18,13 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Text<'a> {
-    /// Optional array of formatting marks applied to this text (bold, italic, links, etc.)
+    /// Facets for text formatting and features
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub marks: std::option::Option<Vec<TextMarksItem<'a>>>,
-    /// The actual text content
+    pub facets: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
+    /// The plain text content
     #[serde(borrow)]
-    pub text: jacquard_common::CowStr<'a>,
-}
-
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum TextMarksItem<'a> {
-    #[serde(rename = "blog.pckt.mark.link")]
-    Link(Box<crate::blog_pckt::mark::link::Link<'a>>),
+    pub plaintext: jacquard_common::CowStr<'a>,
 }
 
 fn lexicon_doc_blog_pckt_block_text() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -59,50 +42,48 @@ fn lexicon_doc_blog_pckt_block_text() -> ::jacquard_lexicon::lexicon::LexiconDoc
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
                     required: Some(
-                        vec![::jacquard_common::smol_str::SmolStr::new_static("text")],
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("plaintext")
+                        ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("marks"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("facets"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
-                                        "Optional array of formatting marks applied to this text (bold, italic, links, etc.)",
+                                        "Facets for text formatting and features",
                                     ),
                                 ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
-                                    refs: vec![
-                                        ::jacquard_common::CowStr::new_static("blog.pckt.mark.bold"),
-                                        ::jacquard_common::CowStr::new_static("blog.pckt.mark.italic"),
-                                        ::jacquard_common::CowStr::new_static("blog.pckt.mark.underline"),
-                                        ::jacquard_common::CowStr::new_static("blog.pckt.mark.strike"),
-                                        ::jacquard_common::CowStr::new_static("blog.pckt.mark.code"),
-                                        ::jacquard_common::CowStr::new_static("blog.pckt.mark.link")
-                                    ],
-                                    closed: Some(false),
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "blog.pckt.richtext.facet",
+                                    ),
                                 }),
                                 min_length: None,
                                 max_length: None,
                             }),
                         );
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("text"),
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "plaintext",
+                            ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
-                                        "The actual text content",
+                                        "The plain text content",
                                     ),
                                 ),
                                 format: None,
                                 default: None,
                                 min_length: None,
-                                max_length: Some(10000usize),
+                                max_length: None,
                                 min_graphemes: None,
-                                max_graphemes: Some(5000usize),
+                                max_graphemes: None,
                                 r#enum: None,
                                 r#const: None,
                                 known_values: None,
@@ -130,38 +111,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Text<'a> {
     fn validate(
         &self,
     ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
-        {
-            let value = &self.text;
-            #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 10000usize {
-                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                        "text",
-                    ),
-                    max: 10000usize,
-                    actual: <str>::len(value.as_ref()),
-                });
-            }
-        }
-        {
-            let value = &self.text;
-            {
-                let count = ::unicode_segmentation::UnicodeSegmentation::graphemes(
-                        value.as_ref(),
-                        true,
-                    )
-                    .count();
-                if count > 5000usize {
-                    return Err(::jacquard_lexicon::validation::ConstraintError::MaxGraphemes {
-                        path: ::jacquard_lexicon::validation::ValidationPath::from_field(
-                            "text",
-                        ),
-                        max: 5000usize,
-                        actual: count,
-                    });
-                }
-            }
-        }
         Ok(())
     }
 }

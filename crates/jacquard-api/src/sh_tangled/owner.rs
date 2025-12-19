@@ -38,7 +38,7 @@ pub struct OwnerOutput<'a> {
 pub enum OwnerError<'a> {
     /// Owner is not set for this service
     #[serde(rename = "OwnerNotFound")]
-    OwnerNotFound(std::option::Option<String>),
+    OwnerNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl std::fmt::Display for OwnerError<'_> {

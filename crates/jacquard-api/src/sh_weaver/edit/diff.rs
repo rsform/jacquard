@@ -18,12 +18,23 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Diff<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub doc: crate::sh_weaver::edit::DocRef<'a>,
+    /// An inline diff for for small edit batches. Either this or snapshot must be present to be valid
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(default, with = "jacquard_common::opt_serde_bytes_helper")]
+    pub inline_diff: std::option::Option<bytes::Bytes>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub prev: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     #[serde(borrow)]
     pub root: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    /// Diff from previous diff. Either this or inlineDiff must be present to be valid
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub snapshot: jacquard_common::types::blob::BlobRef<'a>,
+    pub snapshot: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
 }
 
 pub mod diff_state {
@@ -37,7 +48,6 @@ pub mod diff_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Root;
-        type Snapshot;
         type Doc;
     }
     /// Empty state - all required fields are unset
@@ -45,7 +55,6 @@ pub mod diff_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Root = Unset;
-        type Snapshot = Unset;
         type Doc = Unset;
     }
     ///State transition - sets the `root` field to Set
@@ -53,15 +62,6 @@ pub mod diff_state {
     impl<S: State> sealed::Sealed for SetRoot<S> {}
     impl<S: State> State for SetRoot<S> {
         type Root = Set<members::root>;
-        type Snapshot = S::Snapshot;
-        type Doc = S::Doc;
-    }
-    ///State transition - sets the `snapshot` field to Set
-    pub struct SetSnapshot<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSnapshot<S> {}
-    impl<S: State> State for SetSnapshot<S> {
-        type Root = S::Root;
-        type Snapshot = Set<members::snapshot>;
         type Doc = S::Doc;
     }
     ///State transition - sets the `doc` field to Set
@@ -69,7 +69,6 @@ pub mod diff_state {
     impl<S: State> sealed::Sealed for SetDoc<S> {}
     impl<S: State> State for SetDoc<S> {
         type Root = S::Root;
-        type Snapshot = S::Snapshot;
         type Doc = Set<members::doc>;
     }
     /// Marker types for field names
@@ -77,8 +76,6 @@ pub mod diff_state {
     pub mod members {
         ///Marker type for the `root` field
         pub struct root(());
-        ///Marker type for the `snapshot` field
-        pub struct snapshot(());
         ///Marker type for the `doc` field
         pub struct doc(());
     }
@@ -88,7 +85,10 @@ pub mod diff_state {
 pub struct DiffBuilder<'a, S: diff_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<crate::sh_weaver::edit::DocRef<'a>>,
+        ::core::option::Option<bytes::Bytes>,
+        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
         ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
         ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     ),
@@ -107,9 +107,28 @@ impl<'a> DiffBuilder<'a, diff_state::Empty> {
     pub fn new() -> Self {
         DiffBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None),
+            __unsafe_private_named: (None, None, None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
+    }
+}
+
+impl<'a, S: diff_state::State> DiffBuilder<'a, S> {
+    /// Set the `createdAt` field (optional)
+    pub fn created_at(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `createdAt` field to an Option value (optional)
+    pub fn maybe_created_at(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
     }
 }
 
@@ -123,12 +142,44 @@ where
         mut self,
         value: impl Into<crate::sh_weaver::edit::DocRef<'a>>,
     ) -> DiffBuilder<'a, diff_state::SetDoc<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
         DiffBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
             _phantom: ::core::marker::PhantomData,
         }
+    }
+}
+
+impl<'a, S: diff_state::State> DiffBuilder<'a, S> {
+    /// Set the `inlineDiff` field (optional)
+    pub fn inline_diff(mut self, value: impl Into<Option<bytes::Bytes>>) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `inlineDiff` field to an Option value (optional)
+    pub fn maybe_inline_diff(mut self, value: Option<bytes::Bytes>) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: diff_state::State> DiffBuilder<'a, S> {
+    /// Set the `prev` field (optional)
+    pub fn prev(
+        mut self,
+        value: impl Into<Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `prev` field to an Option value (optional)
+    pub fn maybe_prev(
+        mut self,
+        value: Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
     }
 }
 
@@ -142,7 +193,7 @@ where
         mut self,
         value: impl Into<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     ) -> DiffBuilder<'a, diff_state::SetRoot<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
         DiffBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -151,22 +202,22 @@ where
     }
 }
 
-impl<'a, S> DiffBuilder<'a, S>
-where
-    S: diff_state::State,
-    S::Snapshot: diff_state::IsUnset,
-{
-    /// Set the `snapshot` field (required)
+impl<'a, S: diff_state::State> DiffBuilder<'a, S> {
+    /// Set the `snapshot` field (optional)
     pub fn snapshot(
         mut self,
-        value: impl Into<jacquard_common::types::blob::BlobRef<'a>>,
-    ) -> DiffBuilder<'a, diff_state::SetSnapshot<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
-        DiffBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
+        value: impl Into<Option<jacquard_common::types::blob::BlobRef<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `snapshot` field to an Option value (optional)
+    pub fn maybe_snapshot(
+        mut self,
+        value: Option<jacquard_common::types::blob::BlobRef<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
     }
 }
 
@@ -174,15 +225,17 @@ impl<'a, S> DiffBuilder<'a, S>
 where
     S: diff_state::State,
     S::Root: diff_state::IsSet,
-    S::Snapshot: diff_state::IsSet,
     S::Doc: diff_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Diff<'a> {
         Diff {
-            doc: self.__unsafe_private_named.0.unwrap(),
-            root: self.__unsafe_private_named.1.unwrap(),
-            snapshot: self.__unsafe_private_named.2.unwrap(),
+            created_at: self.__unsafe_private_named.0,
+            doc: self.__unsafe_private_named.1.unwrap(),
+            inline_diff: self.__unsafe_private_named.2,
+            prev: self.__unsafe_private_named.3,
+            root: self.__unsafe_private_named.4.unwrap(),
+            snapshot: self.__unsafe_private_named.5,
             extra_data: Default::default(),
         }
     }
@@ -195,9 +248,12 @@ where
         >,
     ) -> Diff<'a> {
         Diff {
-            doc: self.__unsafe_private_named.0.unwrap(),
-            root: self.__unsafe_private_named.1.unwrap(),
-            snapshot: self.__unsafe_private_named.2.unwrap(),
+            created_at: self.__unsafe_private_named.0,
+            doc: self.__unsafe_private_named.1.unwrap(),
+            inline_diff: self.__unsafe_private_named.2,
+            prev: self.__unsafe_private_named.3,
+            root: self.__unsafe_private_named.4.unwrap(),
+            snapshot: self.__unsafe_private_named.5,
             extra_data: Some(extra_data),
         }
     }
@@ -304,7 +360,6 @@ fn lexicon_doc_sh_weaver_edit_diff() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("snapshot"),
                                 ::jacquard_common::smol_str::SmolStr::new_static("root"),
                                 ::jacquard_common::smol_str::SmolStr::new_static("doc")
                             ],
@@ -314,11 +369,49 @@ fn lexicon_doc_sh_weaver_edit_diff() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                             #[allow(unused_mut)]
                             let mut map = ::std::collections::BTreeMap::new();
                             map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "createdAt",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static("doc"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static(
                                         "sh.weaver.edit.defs#docRef",
+                                    ),
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "inlineDiff",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Bytes(::jacquard_lexicon::lexicon::LexBytes {
+                                    description: None,
+                                    max_length: Some(8192usize),
+                                    min_length: None,
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static("prev"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "com.atproto.repo.strongRef",
                                     ),
                                 }),
                             );

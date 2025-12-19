@@ -16,7 +16,7 @@ source "slices" type="git" priority=100 {
 
 source "bluesky" type="git" priority=101 {
     repo "https://github.com/bluesky-social/atproto"
-    pattern "**/*.json"
+    pattern "lexicons/**/*.json"
 }
 
 source "tangled" type="git" priority=100 {
@@ -26,7 +26,7 @@ source "tangled" type="git" priority=100 {
 
 source "weaver" type="git" priority=90 {
     repo "https://github.com/rsform/weaver"
-    pattern "**/*.json"
+    pattern "lexicons/**/*.json"
 }
 
 source "anisota" type="atproto" {
@@ -85,10 +85,7 @@ source "frontpage" type="git" priority=50 {
     pattern "**/*.json"
 }
 
-source "picosky" type="git" priority=50 {
-    repo "https://github.com/psky-atp/client"
-    pattern "**/*.json"
-}
+
 
 source "skylights" type="git" priority=50 {
     repo "https://github.com/Gregoor/skylights"

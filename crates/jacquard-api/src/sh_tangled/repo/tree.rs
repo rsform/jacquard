@@ -38,50 +38,50 @@ pub mod last_commit_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Hash;
-        type When;
         type Message;
+        type When;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Hash = Unset;
-        type When = Unset;
         type Message = Unset;
+        type When = Unset;
     }
     ///State transition - sets the `hash` field to Set
     pub struct SetHash<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHash<S> {}
     impl<S: State> State for SetHash<S> {
         type Hash = Set<members::hash>;
+        type Message = S::Message;
         type When = S::When;
-        type Message = S::Message;
-    }
-    ///State transition - sets the `when` field to Set
-    pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWhen<S> {}
-    impl<S: State> State for SetWhen<S> {
-        type Hash = S::Hash;
-        type When = Set<members::when>;
-        type Message = S::Message;
     }
     ///State transition - sets the `message` field to Set
     pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMessage<S> {}
     impl<S: State> State for SetMessage<S> {
         type Hash = S::Hash;
-        type When = S::When;
         type Message = Set<members::message>;
+        type When = S::When;
+    }
+    ///State transition - sets the `when` field to Set
+    pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWhen<S> {}
+    impl<S: State> State for SetWhen<S> {
+        type Hash = S::Hash;
+        type Message = S::Message;
+        type When = Set<members::when>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `hash` field
         pub struct hash(());
-        ///Marker type for the `when` field
-        pub struct when(());
         ///Marker type for the `message` field
         pub struct message(());
+        ///Marker type for the `when` field
+        pub struct when(());
     }
 }
 
@@ -175,8 +175,8 @@ impl<'a, S> LastCommitBuilder<'a, S>
 where
     S: last_commit_state::State,
     S::Hash: last_commit_state::IsSet,
-    S::When: last_commit_state::IsSet,
     S::Message: last_commit_state::IsSet,
+    S::When: last_commit_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LastCommit<'a> {
@@ -431,33 +431,13 @@ fn lexicon_doc_sh_tangled_repo_tree() -> ::jacquard_lexicon::lexicon::LexiconDoc
                         vec![
                             ::jacquard_common::smol_str::SmolStr::new_static("name"),
                             ::jacquard_common::smol_str::SmolStr::new_static("mode"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("size"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("is_file"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("is_subtree")
+                            ::jacquard_common::smol_str::SmolStr::new_static("size")
                         ],
                     ),
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::std::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("is_file"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
-                                "is_subtree",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
-                            }),
-                        );
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
                                 "last_commit",
@@ -752,16 +732,16 @@ pub struct TreeOutput<'a> {
 pub enum TreeError<'a> {
     /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(std::option::Option<String>),
+    RepoNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
     /// Git reference not found
     #[serde(rename = "RefNotFound")]
-    RefNotFound(std::option::Option<String>),
+    RefNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
     /// Path not found in repository tree
     #[serde(rename = "PathNotFound")]
-    PathNotFound(std::option::Option<String>),
+    PathNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
     /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(std::option::Option<String>),
+    InvalidRequest(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl std::fmt::Display for TreeError<'_> {
@@ -876,10 +856,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Readme<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TreeEntry<'a> {
-    /// Whether this entry is a file
-    pub is_file: bool,
-    /// Whether this entry is a directory/subtree
-    pub is_subtree: bool,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub last_commit: std::option::Option<crate::sh_tangled::repo::tree::LastCommit<'a>>,
@@ -904,84 +880,50 @@ pub mod tree_entry_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Name;
-        type Size;
-        type IsFile;
-        type IsSubtree;
         type Mode;
+        type Size;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Name = Unset;
-        type Size = Unset;
-        type IsFile = Unset;
-        type IsSubtree = Unset;
         type Mode = Unset;
+        type Size = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
         type Name = Set<members::name>;
+        type Mode = S::Mode;
         type Size = S::Size;
-        type IsFile = S::IsFile;
-        type IsSubtree = S::IsSubtree;
-        type Mode = S::Mode;
-    }
-    ///State transition - sets the `size` field to Set
-    pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSize<S> {}
-    impl<S: State> State for SetSize<S> {
-        type Name = S::Name;
-        type Size = Set<members::size>;
-        type IsFile = S::IsFile;
-        type IsSubtree = S::IsSubtree;
-        type Mode = S::Mode;
-    }
-    ///State transition - sets the `is_file` field to Set
-    pub struct SetIsFile<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIsFile<S> {}
-    impl<S: State> State for SetIsFile<S> {
-        type Name = S::Name;
-        type Size = S::Size;
-        type IsFile = Set<members::is_file>;
-        type IsSubtree = S::IsSubtree;
-        type Mode = S::Mode;
-    }
-    ///State transition - sets the `is_subtree` field to Set
-    pub struct SetIsSubtree<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIsSubtree<S> {}
-    impl<S: State> State for SetIsSubtree<S> {
-        type Name = S::Name;
-        type Size = S::Size;
-        type IsFile = S::IsFile;
-        type IsSubtree = Set<members::is_subtree>;
-        type Mode = S::Mode;
     }
     ///State transition - sets the `mode` field to Set
     pub struct SetMode<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMode<S> {}
     impl<S: State> State for SetMode<S> {
         type Name = S::Name;
-        type Size = S::Size;
-        type IsFile = S::IsFile;
-        type IsSubtree = S::IsSubtree;
         type Mode = Set<members::mode>;
+        type Size = S::Size;
+    }
+    ///State transition - sets the `size` field to Set
+    pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSize<S> {}
+    impl<S: State> State for SetSize<S> {
+        type Name = S::Name;
+        type Mode = S::Mode;
+        type Size = Set<members::size>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `size` field
-        pub struct size(());
-        ///Marker type for the `is_file` field
-        pub struct is_file(());
-        ///Marker type for the `is_subtree` field
-        pub struct is_subtree(());
         ///Marker type for the `mode` field
         pub struct mode(());
+        ///Marker type for the `size` field
+        pub struct size(());
     }
 }
 
@@ -989,8 +931,6 @@ pub mod tree_entry_state {
 pub struct TreeEntryBuilder<'a, S: tree_entry_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<bool>,
-        ::core::option::Option<bool>,
         ::core::option::Option<crate::sh_tangled::repo::tree::LastCommit<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
@@ -1011,45 +951,7 @@ impl<'a> TreeEntryBuilder<'a, tree_entry_state::Empty> {
     pub fn new() -> Self {
         TreeEntryBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> TreeEntryBuilder<'a, S>
-where
-    S: tree_entry_state::State,
-    S::IsFile: tree_entry_state::IsUnset,
-{
-    /// Set the `is_file` field (required)
-    pub fn is_file(
-        mut self,
-        value: impl Into<bool>,
-    ) -> TreeEntryBuilder<'a, tree_entry_state::SetIsFile<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
-        TreeEntryBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, S> TreeEntryBuilder<'a, S>
-where
-    S: tree_entry_state::State,
-    S::IsSubtree: tree_entry_state::IsUnset,
-{
-    /// Set the `is_subtree` field (required)
-    pub fn is_subtree(
-        mut self,
-        value: impl Into<bool>,
-    ) -> TreeEntryBuilder<'a, tree_entry_state::SetIsSubtree<S>> {
-        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
-        TreeEntryBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
+            __unsafe_private_named: (None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -1061,7 +963,7 @@ impl<'a, S: tree_entry_state::State> TreeEntryBuilder<'a, S> {
         mut self,
         value: impl Into<Option<crate::sh_tangled::repo::tree::LastCommit<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self.__unsafe_private_named.0 = value.into();
         self
     }
     /// Set the `last_commit` field to an Option value (optional)
@@ -1069,7 +971,7 @@ impl<'a, S: tree_entry_state::State> TreeEntryBuilder<'a, S> {
         mut self,
         value: Option<crate::sh_tangled::repo::tree::LastCommit<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self.__unsafe_private_named.0 = value;
         self
     }
 }
@@ -1084,7 +986,7 @@ where
         mut self,
         value: impl Into<jacquard_common::CowStr<'a>>,
     ) -> TreeEntryBuilder<'a, tree_entry_state::SetMode<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
         TreeEntryBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -1103,7 +1005,7 @@ where
         mut self,
         value: impl Into<jacquard_common::CowStr<'a>>,
     ) -> TreeEntryBuilder<'a, tree_entry_state::SetName<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
         TreeEntryBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -1122,7 +1024,7 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> TreeEntryBuilder<'a, tree_entry_state::SetSize<S>> {
-        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
         TreeEntryBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -1135,20 +1037,16 @@ impl<'a, S> TreeEntryBuilder<'a, S>
 where
     S: tree_entry_state::State,
     S::Name: tree_entry_state::IsSet,
-    S::Size: tree_entry_state::IsSet,
-    S::IsFile: tree_entry_state::IsSet,
-    S::IsSubtree: tree_entry_state::IsSet,
     S::Mode: tree_entry_state::IsSet,
+    S::Size: tree_entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TreeEntry<'a> {
         TreeEntry {
-            is_file: self.__unsafe_private_named.0.unwrap(),
-            is_subtree: self.__unsafe_private_named.1.unwrap(),
-            last_commit: self.__unsafe_private_named.2,
-            mode: self.__unsafe_private_named.3.unwrap(),
-            name: self.__unsafe_private_named.4.unwrap(),
-            size: self.__unsafe_private_named.5.unwrap(),
+            last_commit: self.__unsafe_private_named.0,
+            mode: self.__unsafe_private_named.1.unwrap(),
+            name: self.__unsafe_private_named.2.unwrap(),
+            size: self.__unsafe_private_named.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1161,12 +1059,10 @@ where
         >,
     ) -> TreeEntry<'a> {
         TreeEntry {
-            is_file: self.__unsafe_private_named.0.unwrap(),
-            is_subtree: self.__unsafe_private_named.1.unwrap(),
-            last_commit: self.__unsafe_private_named.2,
-            mode: self.__unsafe_private_named.3.unwrap(),
-            name: self.__unsafe_private_named.4.unwrap(),
-            size: self.__unsafe_private_named.5.unwrap(),
+            last_commit: self.__unsafe_private_named.0,
+            mode: self.__unsafe_private_named.1.unwrap(),
+            name: self.__unsafe_private_named.2.unwrap(),
+            size: self.__unsafe_private_named.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

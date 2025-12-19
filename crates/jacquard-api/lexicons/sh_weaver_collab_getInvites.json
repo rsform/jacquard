@@ -1,0 +1,71 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.collab.getInvites",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get collaboration invites for an actor (sent, received, or both).",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "actor"
+        ],
+        "properties": {
+          "actor": {
+            "type": "string",
+            "format": "at-identifier"
+          },
+          "cursor": {
+            "type": "string"
+          },
+          "direction": {
+            "type": "string",
+            "default": "all",
+            "knownValues": [
+              "sent",
+              "received",
+              "all"
+            ]
+          },
+          "limit": {
+            "type": "integer",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 100
+          },
+          "status": {
+            "type": "string",
+            "default": "all",
+            "knownValues": [
+              "pending",
+              "accepted",
+              "expired",
+              "all"
+            ]
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "invites"
+          ],
+          "properties": {
+            "cursor": {
+              "type": "string"
+            },
+            "invites": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "sh.weaver.collab.defs#inviteView"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

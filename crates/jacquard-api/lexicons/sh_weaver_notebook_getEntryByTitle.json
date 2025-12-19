@@ -1,0 +1,57 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.notebook.getEntryByTitle",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get an entry view by notebook URI and title. Matches on either the entry's path or title field.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "notebook",
+          "title"
+        ],
+        "properties": {
+          "notebook": {
+            "type": "string",
+            "description": "AT-URI of the notebook containing the entry.",
+            "format": "at-uri"
+          },
+          "title": {
+            "type": "string",
+            "description": "Title or path of the entry to fetch.",
+            "maxLength": 300
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "entry",
+            "record"
+          ],
+          "properties": {
+            "entry": {
+              "type": "ref",
+              "ref": "sh.weaver.notebook.defs#bookEntryView"
+            },
+            "record": {
+              "type": "unknown",
+              "description": "The raw entry record data."
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "name": "NotebookNotFound"
+        },
+        {
+          "name": "EntryNotFound"
+        }
+      ]
+    }
+  }
+}

@@ -145,13 +145,13 @@ pub struct ResolveIdentityOutput<'a> {
 pub enum ResolveIdentityError<'a> {
     /// The resolution process confirmed that the handle does not resolve to any DID.
     #[serde(rename = "HandleNotFound")]
-    HandleNotFound(std::option::Option<String>),
+    HandleNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
     /// The DID resolution process confirmed that there is no current DID.
     #[serde(rename = "DidNotFound")]
-    DidNotFound(std::option::Option<String>),
+    DidNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
     /// The DID previously existed, but has been deactivated.
     #[serde(rename = "DidDeactivated")]
-    DidDeactivated(std::option::Option<String>),
+    DidDeactivated(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl std::fmt::Display for ResolveIdentityError<'_> {

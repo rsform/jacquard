@@ -5,7 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-/// Code block attributes
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -18,11 +17,14 @@
     Default
 )]
 #[serde(rename_all = "camelCase")]
-pub struct CodeBlockAttrs<'a> {
-    /// Programming language for syntax highlighting (e.g., 'javascript', 'python', 'php')
+pub struct CodeBlock<'a> {
+    /// Programming language for syntax highlighting
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub language: std::option::Option<jacquard_common::CowStr<'a>>,
+    /// The code content
+    #[serde(borrow)]
+    pub plaintext: jacquard_common::CowStr<'a>,
 }
 
 fn lexicon_doc_blog_pckt_block_codeBlock() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -36,12 +38,14 @@ fn lexicon_doc_blog_pckt_block_codeBlock() -> ::jacquard_lexicon::lexicon::Lexic
         defs: {
             let mut map = ::std::collections::BTreeMap::new();
             map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("codeBlockAttrs"),
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: Some(
-                        ::jacquard_common::CowStr::new_static("Code block attributes"),
+                    description: None,
+                    required: Some(
+                        vec![
+                            ::jacquard_common::smol_str::SmolStr::new_static("plaintext")
+                        ],
                     ),
-                    required: None,
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
@@ -51,7 +55,7 @@ fn lexicon_doc_blog_pckt_block_codeBlock() -> ::jacquard_lexicon::lexicon::Lexic
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
-                                        "Programming language for syntax highlighting (e.g., 'javascript', 'python', 'php')",
+                                        "Programming language for syntax highlighting",
                                     ),
                                 ),
                                 format: None,
@@ -65,44 +69,23 @@ fn lexicon_doc_blog_pckt_block_codeBlock() -> ::jacquard_lexicon::lexicon::Lexic
                                 known_values: None,
                             }),
                         );
-                        map
-                    },
-                }),
-            );
-            map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: None,
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
                         map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("attrs"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "#codeBlockAttrs",
-                                ),
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("content"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "plaintext",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "Array of text nodes containing the code",
-                                    ),
+                                    ::jacquard_common::CowStr::new_static("The code content"),
                                 ),
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                    description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "blog.pckt.block.text",
-                                    ),
-                                }),
+                                format: None,
+                                default: None,
                                 min_length: None,
                                 max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
                             }),
                         );
                         map
@@ -114,12 +97,12 @@ fn lexicon_doc_blog_pckt_block_codeBlock() -> ::jacquard_lexicon::lexicon::Lexic
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CodeBlockAttrs<'a> {
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CodeBlock<'a> {
     fn nsid() -> &'static str {
         "blog.pckt.block.codeBlock"
     }
     fn def_name() -> &'static str {
-        "codeBlockAttrs"
+        "main"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blog_pckt_block_codeBlock()
@@ -139,48 +122,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CodeBlockAttrs<'a> {
                 });
             }
         }
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct CodeBlock<'a> {
-    /// Code block attributes
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub attrs: std::option::Option<
-        crate::blog_pckt::block::code_block::CodeBlockAttrs<'a>,
-    >,
-    /// Array of text nodes containing the code
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub content: std::option::Option<Vec<crate::blog_pckt::block::text::Text<'a>>>,
-}
-
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CodeBlock<'a> {
-    fn nsid() -> &'static str {
-        "blog.pckt.block.codeBlock"
-    }
-    fn def_name() -> &'static str {
-        "main"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_blog_pckt_block_codeBlock()
-    }
-    fn validate(
-        &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

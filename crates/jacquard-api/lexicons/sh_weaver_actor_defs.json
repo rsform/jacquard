@@ -13,14 +13,9 @@
           "type": "string",
           "format": "did"
         },
-        "displayName": {
-          "type": "string",
-          "maxLength": 640,
-          "maxGraphemes": 64
-        },
-        "handle": {
-          "type": "string",
-          "format": "handle"
+        "signature": {
+          "type": "bytes",
+          "description": "signed bytes of the corresponding notebook record in the author's repo"
         }
       }
     },
@@ -37,6 +32,18 @@
         "inner"
       ],
       "properties": {
+        "collaborationCount": {
+          "type": "integer"
+        },
+        "entryCount": {
+          "type": "integer"
+        },
+        "followerCount": {
+          "type": "integer"
+        },
+        "followingCount": {
+          "type": "integer"
+        },
         "inner": {
           "type": "union",
           "refs": [
@@ -44,6 +51,13 @@
             "app.bsky.actor.defs#profileViewDetailed",
             "#tangledProfileView"
           ]
+        },
+        "notebookCount": {
+          "type": "integer"
+        },
+        "viewer": {
+          "type": "ref",
+          "ref": "#viewerState"
         }
       }
     },
@@ -53,6 +67,12 @@
         "inner"
       ],
       "properties": {
+        "followerCount": {
+          "type": "integer"
+        },
+        "followingCount": {
+          "type": "integer"
+        },
         "inner": {
           "type": "union",
           "refs": [
@@ -60,6 +80,10 @@
             "app.bsky.actor.defs#profileViewBasic",
             "#tangledProfileView"
           ]
+        },
+        "viewer": {
+          "type": "ref",
+          "ref": "#viewerStateBasic"
         }
       }
     },
@@ -77,6 +101,10 @@
         "banner": {
           "type": "string",
           "format": "uri"
+        },
+        "bluesky": {
+          "type": "boolean",
+          "description": "Include link to this account on Bluesky."
         },
         "createdAt": {
           "type": "string",
@@ -137,11 +165,19 @@
           "description": "Pronouns to use in user-generated content.",
           "ref": "#pronounsList"
         },
+        "streamplace": {
+          "type": "boolean",
+          "description": "Include link to this account on stream.place."
+        },
         "subscribedCount": {
           "type": "integer"
         },
         "subscriberCount": {
           "type": "integer"
+        },
+        "tangled": {
+          "type": "boolean",
+          "description": "Include link to this account on Tangled."
         }
       }
     },
@@ -211,6 +247,25 @@
       },
       "maxLength": 5
     },
+    "subscribedNotebook": {
+      "type": "object",
+      "description": "A notebook the viewer subscribes to without a global follow.",
+      "required": [
+        "uri"
+      ],
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
     "tangledProfileView": {
       "type": "object",
       "required": [
@@ -279,6 +334,82 @@
           },
           "minLength": 0,
           "maxLength": 2
+        }
+      }
+    },
+    "viewerState": {
+      "type": "object",
+      "description": "Viewer's relationship state with an actor (detailed version).",
+      "properties": {
+        "blocked": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "blockedBy": {
+          "type": "boolean"
+        },
+        "followRequested": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "followRequestedBy": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "followedBy": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "following": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "muted": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "subscribedNotebooks": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#subscribedNotebook"
+          }
+        }
+      }
+    },
+    "viewerStateBasic": {
+      "type": "object",
+      "description": "Viewer's relationship state with an actor (basic version).",
+      "properties": {
+        "blocked": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "blockedBy": {
+          "type": "boolean"
+        },
+        "followRequested": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "followRequestedBy": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "followedBy": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "following": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "muted": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "subscribedNotebookCount": {
+          "type": "integer"
         }
       }
     }

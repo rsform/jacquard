@@ -41,37 +41,37 @@ pub mod photo_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Alt;
         type Photo;
+        type Alt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Alt = Unset;
         type Photo = Unset;
-    }
-    ///State transition - sets the `alt` field to Set
-    pub struct SetAlt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAlt<S> {}
-    impl<S: State> State for SetAlt<S> {
-        type Alt = Set<members::alt>;
-        type Photo = S::Photo;
+        type Alt = Unset;
     }
     ///State transition - sets the `photo` field to Set
     pub struct SetPhoto<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPhoto<S> {}
     impl<S: State> State for SetPhoto<S> {
-        type Alt = S::Alt;
         type Photo = Set<members::photo>;
+        type Alt = S::Alt;
+    }
+    ///State transition - sets the `alt` field to Set
+    pub struct SetAlt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAlt<S> {}
+    impl<S: State> State for SetAlt<S> {
+        type Photo = S::Photo;
+        type Alt = Set<members::alt>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `alt` field
-        pub struct alt(());
         ///Marker type for the `photo` field
         pub struct photo(());
+        ///Marker type for the `alt` field
+        pub struct alt(());
     }
 }
 
@@ -184,8 +184,8 @@ where
 impl<'a, S> PhotoBuilder<'a, S>
 where
     S: photo_state::State,
-    S::Alt: photo_state::IsSet,
     S::Photo: photo_state::IsSet,
+    S::Alt: photo_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Photo<'a> {
@@ -1294,8 +1294,8 @@ pub mod photo_view_state {
     pub trait State: sealed::Sealed {
         type Cid;
         type Uri;
-        type Alt;
         type Thumb;
+        type Alt;
         type Fullsize;
     }
     /// Empty state - all required fields are unset
@@ -1304,8 +1304,8 @@ pub mod photo_view_state {
     impl State for Empty {
         type Cid = Unset;
         type Uri = Unset;
-        type Alt = Unset;
         type Thumb = Unset;
+        type Alt = Unset;
         type Fullsize = Unset;
     }
     ///State transition - sets the `cid` field to Set
@@ -1314,8 +1314,8 @@ pub mod photo_view_state {
     impl<S: State> State for SetCid<S> {
         type Cid = Set<members::cid>;
         type Uri = S::Uri;
-        type Alt = S::Alt;
         type Thumb = S::Thumb;
+        type Alt = S::Alt;
         type Fullsize = S::Fullsize;
     }
     ///State transition - sets the `uri` field to Set
@@ -1324,18 +1324,8 @@ pub mod photo_view_state {
     impl<S: State> State for SetUri<S> {
         type Cid = S::Cid;
         type Uri = Set<members::uri>;
+        type Thumb = S::Thumb;
         type Alt = S::Alt;
-        type Thumb = S::Thumb;
-        type Fullsize = S::Fullsize;
-    }
-    ///State transition - sets the `alt` field to Set
-    pub struct SetAlt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAlt<S> {}
-    impl<S: State> State for SetAlt<S> {
-        type Cid = S::Cid;
-        type Uri = S::Uri;
-        type Alt = Set<members::alt>;
-        type Thumb = S::Thumb;
         type Fullsize = S::Fullsize;
     }
     ///State transition - sets the `thumb` field to Set
@@ -1344,8 +1334,18 @@ pub mod photo_view_state {
     impl<S: State> State for SetThumb<S> {
         type Cid = S::Cid;
         type Uri = S::Uri;
-        type Alt = S::Alt;
         type Thumb = Set<members::thumb>;
+        type Alt = S::Alt;
+        type Fullsize = S::Fullsize;
+    }
+    ///State transition - sets the `alt` field to Set
+    pub struct SetAlt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAlt<S> {}
+    impl<S: State> State for SetAlt<S> {
+        type Cid = S::Cid;
+        type Uri = S::Uri;
+        type Thumb = S::Thumb;
+        type Alt = Set<members::alt>;
         type Fullsize = S::Fullsize;
     }
     ///State transition - sets the `fullsize` field to Set
@@ -1354,8 +1354,8 @@ pub mod photo_view_state {
     impl<S: State> State for SetFullsize<S> {
         type Cid = S::Cid;
         type Uri = S::Uri;
-        type Alt = S::Alt;
         type Thumb = S::Thumb;
+        type Alt = S::Alt;
         type Fullsize = Set<members::fullsize>;
     }
     /// Marker types for field names
@@ -1365,10 +1365,10 @@ pub mod photo_view_state {
         pub struct cid(());
         ///Marker type for the `uri` field
         pub struct uri(());
-        ///Marker type for the `alt` field
-        pub struct alt(());
         ///Marker type for the `thumb` field
         pub struct thumb(());
+        ///Marker type for the `alt` field
+        pub struct alt(());
         ///Marker type for the `fullsize` field
         pub struct fullsize(());
     }
@@ -1545,8 +1545,8 @@ where
     S: photo_view_state::State,
     S::Cid: photo_view_state::IsSet,
     S::Uri: photo_view_state::IsSet,
-    S::Alt: photo_view_state::IsSet,
     S::Thumb: photo_view_state::IsSet,
+    S::Alt: photo_view_state::IsSet,
     S::Fullsize: photo_view_state::IsSet,
 {
     /// Build the final struct

@@ -142,10 +142,10 @@ pub struct GetWebhookOutput<'a> {
 pub enum GetWebhookError<'a> {
     /// The specified webhook was not found.
     #[serde(rename = "WebhookNotFound")]
-    WebhookNotFound(std::option::Option<String>),
+    WebhookNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
     /// The authenticated user does not have access to this webhook.
     #[serde(rename = "Unauthorized")]
-    Unauthorized(std::option::Option<String>),
+    Unauthorized(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl std::fmt::Display for GetWebhookError<'_> {

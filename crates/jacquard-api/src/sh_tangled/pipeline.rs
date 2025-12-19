@@ -806,37 +806,37 @@ pub mod pipeline_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Workflows;
         type TriggerMetadata;
+        type Workflows;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Workflows = Unset;
         type TriggerMetadata = Unset;
-    }
-    ///State transition - sets the `workflows` field to Set
-    pub struct SetWorkflows<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWorkflows<S> {}
-    impl<S: State> State for SetWorkflows<S> {
-        type Workflows = Set<members::workflows>;
-        type TriggerMetadata = S::TriggerMetadata;
+        type Workflows = Unset;
     }
     ///State transition - sets the `trigger_metadata` field to Set
     pub struct SetTriggerMetadata<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTriggerMetadata<S> {}
     impl<S: State> State for SetTriggerMetadata<S> {
-        type Workflows = S::Workflows;
         type TriggerMetadata = Set<members::trigger_metadata>;
+        type Workflows = S::Workflows;
+    }
+    ///State transition - sets the `workflows` field to Set
+    pub struct SetWorkflows<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWorkflows<S> {}
+    impl<S: State> State for SetWorkflows<S> {
+        type TriggerMetadata = S::TriggerMetadata;
+        type Workflows = Set<members::workflows>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `workflows` field
-        pub struct workflows(());
         ///Marker type for the `trigger_metadata` field
         pub struct trigger_metadata(());
+        ///Marker type for the `workflows` field
+        pub struct workflows(());
     }
 }
 
@@ -909,8 +909,8 @@ where
 impl<'a, S> PipelineBuilder<'a, S>
 where
     S: pipeline_state::State,
-    S::Workflows: pipeline_state::IsSet,
     S::TriggerMetadata: pipeline_state::IsSet,
+    S::Workflows: pipeline_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Pipeline<'a> {
@@ -1780,67 +1780,67 @@ pub mod workflow_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Clone;
         type Raw;
-        type Name;
+        type Clone;
         type Engine;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Clone = Unset;
         type Raw = Unset;
-        type Name = Unset;
+        type Clone = Unset;
         type Engine = Unset;
-    }
-    ///State transition - sets the `clone` field to Set
-    pub struct SetClone<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetClone<S> {}
-    impl<S: State> State for SetClone<S> {
-        type Clone = Set<members::clone>;
-        type Raw = S::Raw;
-        type Name = S::Name;
-        type Engine = S::Engine;
+        type Name = Unset;
     }
     ///State transition - sets the `raw` field to Set
     pub struct SetRaw<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRaw<S> {}
     impl<S: State> State for SetRaw<S> {
-        type Clone = S::Clone;
         type Raw = Set<members::raw>;
-        type Name = S::Name;
-        type Engine = S::Engine;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
         type Clone = S::Clone;
-        type Raw = S::Raw;
-        type Name = Set<members::name>;
         type Engine = S::Engine;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `clone` field to Set
+    pub struct SetClone<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetClone<S> {}
+    impl<S: State> State for SetClone<S> {
+        type Raw = S::Raw;
+        type Clone = Set<members::clone>;
+        type Engine = S::Engine;
+        type Name = S::Name;
     }
     ///State transition - sets the `engine` field to Set
     pub struct SetEngine<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEngine<S> {}
     impl<S: State> State for SetEngine<S> {
-        type Clone = S::Clone;
         type Raw = S::Raw;
-        type Name = S::Name;
+        type Clone = S::Clone;
         type Engine = Set<members::engine>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Raw = S::Raw;
+        type Clone = S::Clone;
+        type Engine = S::Engine;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `clone` field
-        pub struct clone(());
         ///Marker type for the `raw` field
         pub struct raw(());
-        ///Marker type for the `name` field
-        pub struct name(());
+        ///Marker type for the `clone` field
+        pub struct clone(());
         ///Marker type for the `engine` field
         pub struct engine(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -1953,10 +1953,10 @@ where
 impl<'a, S> WorkflowBuilder<'a, S>
 where
     S: workflow_state::State,
-    S::Clone: workflow_state::IsSet,
     S::Raw: workflow_state::IsSet,
-    S::Name: workflow_state::IsSet,
+    S::Clone: workflow_state::IsSet,
     S::Engine: workflow_state::IsSet,
+    S::Name: workflow_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Workflow<'a> {

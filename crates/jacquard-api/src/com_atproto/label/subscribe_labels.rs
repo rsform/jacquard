@@ -493,7 +493,7 @@ impl<'a> SubscribeLabelsMessage<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum SubscribeLabelsError<'a> {
     #[serde(rename = "FutureCursor")]
-    FutureCursor(std::option::Option<String>),
+    FutureCursor(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl std::fmt::Display for SubscribeLabelsError<'_> {

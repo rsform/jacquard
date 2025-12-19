@@ -131,6 +131,9 @@ pub struct GetProfileOutput<'a> {
     /// All books in the user's library
     #[serde(borrow)]
     pub books: Vec<crate::buzz_bookhive::UserBook<'a>>,
+    /// The user's friend activity
+    #[serde(borrow)]
+    pub friend_activity: Vec<crate::buzz_bookhive::UserBook<'a>>,
     /// The user's profile
     #[serde(borrow)]
     pub profile: crate::buzz_bookhive::Profile<'a>,

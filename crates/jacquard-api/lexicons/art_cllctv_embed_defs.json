@@ -1,0 +1,74 @@
+{
+  "lexicon": 1,
+  "id": "art.cllctv.embed.defs",
+  "defs": {
+    "tombstone": {
+      "type": "object",
+      "properties": {
+        "camera": {
+          "type": "ref",
+          "ref": "#tombstoneCamera"
+        },
+        "dimensions": {
+          "type": "ref",
+          "ref": "#tombstoneDimensions"
+        },
+        "lens": {
+          "type": "ref",
+          "ref": "#tombstoneLens"
+        },
+        "materials": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "tombstoneCamera": {
+      "type": "object",
+      "properties": {
+        "make": {
+          "type": "string"
+        },
+        "model": {
+          "type": "string"
+        }
+      }
+    },
+    "tombstoneDimensions": {
+      "type": "object",
+      "properties": {
+        "depth": {
+          "type": "integer"
+        },
+        "height": {
+          "type": "integer"
+        },
+        "unit": {
+          "type": "string"
+        },
+        "width": {
+          "type": "integer"
+        }
+      }
+    },
+    "tombstoneLens": {
+      "type": "object",
+      "properties": {
+        "exposureTime": {
+          "type": "string"
+        },
+        "fnumber": {
+          "type": "string"
+        },
+        "focalLenth": {
+          "type": "string"
+        },
+        "iso": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

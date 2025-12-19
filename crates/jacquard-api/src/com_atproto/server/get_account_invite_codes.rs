@@ -137,7 +137,7 @@ pub struct GetAccountInviteCodesOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetAccountInviteCodesError<'a> {
     #[serde(rename = "DuplicateCreate")]
-    DuplicateCreate(std::option::Option<String>),
+    DuplicateCreate(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl std::fmt::Display for GetAccountInviteCodesError<'_> {

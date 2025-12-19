@@ -143,10 +143,10 @@ where
 pub enum DeleteMemberError<'a> {
     /// The member being deleted does not exist
     #[serde(rename = "MemberNotFound")]
-    MemberNotFound(std::option::Option<String>),
+    MemberNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
     /// You can not delete yourself from the team
     #[serde(rename = "CannotDeleteSelf")]
-    CannotDeleteSelf(std::option::Option<String>),
+    CannotDeleteSelf(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl std::fmt::Display for DeleteMemberError<'_> {

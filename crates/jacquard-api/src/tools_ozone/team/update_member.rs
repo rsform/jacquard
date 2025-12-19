@@ -200,7 +200,7 @@ pub struct UpdateMemberOutput<'a> {
 pub enum UpdateMemberError<'a> {
     /// The member being updated does not exist in the team
     #[serde(rename = "MemberNotFound")]
-    MemberNotFound(std::option::Option<String>),
+    MemberNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl std::fmt::Display for UpdateMemberError<'_> {

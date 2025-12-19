@@ -9,11 +9,17 @@ pub mod app_blebbit;
 #[cfg(feature = "app_bsky")]
 pub mod app_bsky;
 
+#[cfg(feature = "app_dropanchor")]
+pub mod app_dropanchor;
+
 #[cfg(feature = "app_ocho")]
 pub mod app_ocho;
 
 #[cfg(feature = "app_rocksky")]
 pub mod app_rocksky;
+
+#[cfg(feature = "art_cllctv")]
+pub mod art_cllctv;
 
 #[cfg(feature = "beauty_cybernetic")]
 pub mod beauty_cybernetic;
@@ -29,6 +35,9 @@ pub mod blue_atplane;
 
 #[cfg(feature = "blue_linkat")]
 pub mod blue_linkat;
+
+#[cfg(feature = "blue_recipes")]
+pub mod blue_recipes;
 
 #[cfg(feature = "blue_rito")]
 pub mod blue_rito;
@@ -46,8 +55,14 @@ pub mod chat_bsky;
 #[cfg(feature = "club_stellz")]
 pub mod club_stellz;
 
+#[cfg(feature = "com__5jiji")]
+pub mod com__5jiji;
+
 #[cfg(feature = "com_atproto")]
 pub mod com_atproto;
+
+#[cfg(feature = "com_atprotofans")]
+pub mod com_atprotofans;
 
 #[cfg(feature = "com_bad_example")]
 pub mod com_bad_example;
@@ -85,11 +100,17 @@ pub mod fm_teal;
 #[cfg(feature = "fyi_frontpage")]
 pub mod fyi_frontpage;
 
+#[cfg(feature = "fyi_questionable")]
+pub mod fyi_questionable;
+
 #[cfg(feature = "fyi_unravel")]
 pub mod fyi_unravel;
 
 #[cfg(feature = "garden_lexicon")]
 pub mod garden_lexicon;
+
+#[cfg(feature = "link_bridgebeats")]
+pub mod link_bridgebeats;
 
 #[cfg(feature = "lol_jbc")]
 pub mod lol_jbc;
@@ -115,6 +136,9 @@ pub mod net_bnewbold;
 #[cfg(feature = "net_mmatt")]
 pub mod net_mmatt;
 
+#[cfg(feature = "net_shwilliam")]
+pub mod net_shwilliam;
+
 #[cfg(feature = "net_wafrn")]
 pub mod net_wafrn;
 
@@ -127,8 +151,14 @@ pub mod org_devcon;
 #[cfg(feature = "org_farmapps")]
 pub mod org_farmapps;
 
+#[cfg(feature = "org_okazu_diary")]
+pub mod org_okazu_diary;
+
 #[cfg(feature = "org_robocracy")]
 pub mod org_robocracy;
+
+#[cfg(feature = "org_user_intents")]
+pub mod org_user_intents;
 
 #[cfg(feature = "place_atwork")]
 pub mod place_atwork;
@@ -148,8 +178,14 @@ pub mod sh_tangled;
 #[cfg(feature = "sh_weaver")]
 pub mod sh_weaver;
 
+#[cfg(feature = "site_standard")]
+pub mod site_standard;
+
 #[cfg(feature = "social_clippr")]
 pub mod social_clippr;
+
+#[cfg(feature = "social_flockfeeds")]
+pub mod social_flockfeeds;
 
 #[cfg(feature = "social_grain")]
 pub mod social_grain;
@@ -159,6 +195,9 @@ pub mod social_pmsky;
 
 #[cfg(feature = "social_psky")]
 pub mod social_psky;
+
+#[cfg(feature = "social_sket")]
+pub mod social_sket;
 
 #[cfg(feature = "tech_manos")]
 pub mod tech_manos;
@@ -180,3 +219,6 @@ pub mod us_polhem;
 
 #[cfg(feature = "win_tomo_x")]
 pub mod win_tomo_x;
+
+#[cfg(feature = "xyz_atpoke")]
+pub mod xyz_atpoke;

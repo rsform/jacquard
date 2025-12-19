@@ -422,6 +422,16 @@ fn lexicon_doc_net_anisota_settings() -> ::jacquard_lexicon::lexicon::LexiconDoc
                         );
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
+                                "bypassDetachedQuotes",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
                                 "combineRelationshipAndFollowerFilters",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
@@ -629,6 +639,92 @@ fn lexicon_doc_net_anisota_settings() -> ::jacquard_lexicon::lexicon::LexiconDoc
                         );
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
+                                "highlightByFollowerRatio",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "highlightMaxFollowerCount",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: None,
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "highlightMinFollowerCount",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Minimum follower count for notification highlighting (stored as string or integer)",
+                                    ),
+                                ),
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: Some(20usize),
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "highlightMinFollowerRatio",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Minimum follower-to-following ratio for highlighting (stored as string)",
+                                    ),
+                                ),
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: Some(20usize),
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "highlightNotificationTypes",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: ::jacquard_common::CowStr::new_static(
+                                    "#highlightNotificationTypes",
+                                ),
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "highlightNotifications",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
                                 "includeReplyEngagement",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
@@ -736,6 +832,46 @@ fn lexicon_doc_net_anisota_settings() -> ::jacquard_lexicon::lexicon::LexiconDoc
                         );
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
+                                "showBlockedPosts",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "showNewHighlightsSection",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "showNotificationSections",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "showOlderSection",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
                                 "showRarityInHeader",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
@@ -746,7 +882,27 @@ fn lexicon_doc_net_anisota_settings() -> ::jacquard_lexicon::lexicon::LexiconDoc
                         );
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
+                                "showRecentlyReadSection",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
                                 "showThreadSuggestion",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "showUnreadSection",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                 description: None,
@@ -1315,6 +1471,69 @@ fn lexicon_doc_net_anisota_settings() -> ::jacquard_lexicon::lexicon::LexiconDoc
                         );
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("profile"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
+                            }),
+                        );
+                        map
+                    },
+                }),
+            );
+            map.insert(
+                ::jacquard_common::smol_str::SmolStr::new_static(
+                    "highlightNotificationTypes",
+                ),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: None,
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::std::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("follows"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("likes"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("mentions"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("quotes"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("replies"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("reposts"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
                                 description: None,
                                 default: None,
@@ -2789,6 +3008,9 @@ pub struct BehaviorSettings<'a> {
     /// Group similar notifications together
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub batch_notifications: std::option::Option<bool>,
+    /// Bypass detached quotes to see the full content that was removed by the author
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub bypass_detached_quotes: std::option::Option<bool>,
     /// When enabled, show notifications that match either relationship OR follower count filters
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub combine_relationship_and_follower_filters: std::option::Option<bool>,
@@ -2847,6 +3069,28 @@ pub struct BehaviorSettings<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub hide_reposts: std::option::Option<crate::net_anisota::settings::HideReposts<'a>>,
+    /// Also require a minimum follower-to-following ratio for highlighting
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub highlight_by_follower_ratio: std::option::Option<bool>,
+    /// Maximum follower count for notification highlighting
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub highlight_max_follower_count: std::option::Option<i64>,
+    /// Minimum follower count for notification highlighting (stored as string or integer)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub highlight_min_follower_count: std::option::Option<jacquard_common::CowStr<'a>>,
+    /// Minimum follower-to-following ratio for highlighting (stored as string)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub highlight_min_follower_ratio: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub highlight_notification_types: std::option::Option<
+        crate::net_anisota::settings::HighlightNotificationTypes<'a>,
+    >,
+    /// Enable notification highlighting to surface important notifications from notable accounts
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub highlight_notifications: std::option::Option<bool>,
     /// Include engagement metrics from reply posts in stats calculations
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub include_reply_engagement: std::option::Option<bool>,
@@ -2877,12 +3121,30 @@ pub struct BehaviorSettings<'a> {
     /// Show newest posts first
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub reverse_feed_order: std::option::Option<bool>,
+    /// Show content from users you have blocked
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub show_blocked_posts: std::option::Option<bool>,
+    /// Show New Highlights section in notifications
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub show_new_highlights_section: std::option::Option<bool>,
+    /// Enable notification sections (New Highlights, Unread, Recently Read, Older)
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub show_notification_sections: std::option::Option<bool>,
+    /// Show Older section in notifications
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub show_older_section: std::option::Option<bool>,
     /// Display rarity indicator and rate in the stats modal header
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub show_rarity_in_header: std::option::Option<bool>,
+    /// Show Recently Read section in notifications
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub show_recently_read_section: std::option::Option<bool>,
     /// Show thread suggestion when typing beyond character limit in post composer
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub show_thread_suggestion: std::option::Option<bool>,
+    /// Show Unread section in notifications
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub show_unread_section: std::option::Option<bool>,
     /// Selected background audio soundscape
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -2921,6 +3183,30 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BehaviorSettings<'a> {
                     ),
                     min: 1i64,
                     actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.highlight_min_follower_count {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 20usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "highlight_min_follower_count",
+                    ),
+                    max: 20usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.highlight_min_follower_ratio {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 20usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "highlight_min_follower_ratio",
+                    ),
+                    max: 20usize,
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -3239,6 +3525,56 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HideReposts<'a> {
     }
     fn def_name() -> &'static str {
         "hideReposts"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_net_anisota_settings()
+    }
+    fn validate(
+        &self,
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct HighlightNotificationTypes<'a> {
+    /// Highlight follow notifications
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub follows: std::option::Option<bool>,
+    /// Highlight like notifications
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub likes: std::option::Option<bool>,
+    /// Highlight mention notifications
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub mentions: std::option::Option<bool>,
+    /// Highlight quote notifications
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub quotes: std::option::Option<bool>,
+    /// Highlight reply notifications
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub replies: std::option::Option<bool>,
+    /// Highlight repost notifications
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub reposts: std::option::Option<bool>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HighlightNotificationTypes<'a> {
+    fn nsid() -> &'static str {
+        "net.anisota.settings"
+    }
+    fn def_name() -> &'static str {
+        "highlightNotificationTypes"
     }
     fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_settings()
@@ -3830,51 +4166,51 @@ pub mod settings_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UpdatedAt;
-        type Version;
         type CreatedAt;
+        type Version;
+        type UpdatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UpdatedAt = Unset;
-        type Version = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
-        type UpdatedAt = Set<members::updated_at>;
-        type Version = S::Version;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `version` field to Set
-    pub struct SetVersion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVersion<S> {}
-    impl<S: State> State for SetVersion<S> {
-        type UpdatedAt = S::UpdatedAt;
-        type Version = Set<members::version>;
-        type CreatedAt = S::CreatedAt;
+        type Version = Unset;
+        type UpdatedAt = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type UpdatedAt = S::UpdatedAt;
-        type Version = S::Version;
         type CreatedAt = Set<members::created_at>;
+        type Version = S::Version;
+        type UpdatedAt = S::UpdatedAt;
+    }
+    ///State transition - sets the `version` field to Set
+    pub struct SetVersion<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVersion<S> {}
+    impl<S: State> State for SetVersion<S> {
+        type CreatedAt = S::CreatedAt;
+        type Version = Set<members::version>;
+        type UpdatedAt = S::UpdatedAt;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
+    impl<S: State> State for SetUpdatedAt<S> {
+        type CreatedAt = S::CreatedAt;
+        type Version = S::Version;
+        type UpdatedAt = Set<members::updated_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `updated_at` field
-        pub struct updated_at(());
-        ///Marker type for the `version` field
-        pub struct version(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `version` field
+        pub struct version(());
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
     }
 }
 
@@ -4064,9 +4400,9 @@ where
 impl<'a, S> SettingsBuilder<'a, S>
 where
     S: settings_state::State,
-    S::UpdatedAt: settings_state::IsSet,
-    S::Version: settings_state::IsSet,
     S::CreatedAt: settings_state::IsSet,
+    S::Version: settings_state::IsSet,
+    S::UpdatedAt: settings_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Settings<'a> {

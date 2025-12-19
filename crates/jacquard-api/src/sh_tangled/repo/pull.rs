@@ -24,8 +24,14 @@ pub struct Pull<'a> {
     #[serde(borrow)]
     pub body: std::option::Option<jacquard_common::CowStr<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub mentions: std::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
     #[serde(borrow)]
     pub patch: jacquard_common::CowStr<'a>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub references: std::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub source: std::option::Option<crate::sh_tangled::repo::pull::Source<'a>>,
@@ -45,67 +51,67 @@ pub mod pull_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type CreatedAt;
-        type Target;
+        type Title;
         type Patch;
+        type Target;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type CreatedAt = Unset;
-        type Target = Unset;
+        type Title = Unset;
         type Patch = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type CreatedAt = S::CreatedAt;
-        type Target = S::Target;
-        type Patch = S::Patch;
+        type Target = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Title = S::Title;
         type CreatedAt = Set<members::created_at>;
-        type Target = S::Target;
-        type Patch = S::Patch;
-    }
-    ///State transition - sets the `target` field to Set
-    pub struct SetTarget<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTarget<S> {}
-    impl<S: State> State for SetTarget<S> {
         type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-        type Target = Set<members::target>;
         type Patch = S::Patch;
+        type Target = S::Target;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type CreatedAt = S::CreatedAt;
+        type Title = Set<members::title>;
+        type Patch = S::Patch;
+        type Target = S::Target;
     }
     ///State transition - sets the `patch` field to Set
     pub struct SetPatch<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPatch<S> {}
     impl<S: State> State for SetPatch<S> {
-        type Title = S::Title;
         type CreatedAt = S::CreatedAt;
-        type Target = S::Target;
+        type Title = S::Title;
         type Patch = Set<members::patch>;
+        type Target = S::Target;
+    }
+    ///State transition - sets the `target` field to Set
+    pub struct SetTarget<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTarget<S> {}
+    impl<S: State> State for SetTarget<S> {
+        type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
+        type Patch = S::Patch;
+        type Target = Set<members::target>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `target` field
-        pub struct target(());
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `patch` field
         pub struct patch(());
+        ///Marker type for the `target` field
+        pub struct target(());
     }
 }
 
@@ -115,7 +121,9 @@ pub struct PullBuilder<'a, S: pull_state::State> {
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
         ::core::option::Option<crate::sh_tangled::repo::pull::Source<'a>>,
         ::core::option::Option<crate::sh_tangled::repo::pull::Target<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
@@ -135,7 +143,7 @@ impl<'a> PullBuilder<'a, pull_state::Empty> {
     pub fn new() -> Self {
         PullBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
+            __unsafe_private_named: (None, None, None, None, None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -176,6 +184,25 @@ where
     }
 }
 
+impl<'a, S: pull_state::State> PullBuilder<'a, S> {
+    /// Set the `mentions` field (optional)
+    pub fn mentions(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::types::string::Did<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `mentions` field to an Option value (optional)
+    pub fn maybe_mentions(
+        mut self,
+        value: Option<Vec<jacquard_common::types::string::Did<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
 impl<'a, S> PullBuilder<'a, S>
 where
     S: pull_state::State,
@@ -186,7 +213,7 @@ where
         mut self,
         value: impl Into<jacquard_common::CowStr<'a>>,
     ) -> PullBuilder<'a, pull_state::SetPatch<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
         PullBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -196,12 +223,31 @@ where
 }
 
 impl<'a, S: pull_state::State> PullBuilder<'a, S> {
+    /// Set the `references` field (optional)
+    pub fn references(
+        mut self,
+        value: impl Into<Option<Vec<jacquard_common::types::string::AtUri<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `references` field to an Option value (optional)
+    pub fn maybe_references(
+        mut self,
+        value: Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: pull_state::State> PullBuilder<'a, S> {
     /// Set the `source` field (optional)
     pub fn source(
         mut self,
         value: impl Into<Option<crate::sh_tangled::repo::pull::Source<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `source` field to an Option value (optional)
@@ -209,7 +255,7 @@ impl<'a, S: pull_state::State> PullBuilder<'a, S> {
         mut self,
         value: Option<crate::sh_tangled::repo::pull::Source<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self.__unsafe_private_named.5 = value;
         self
     }
 }
@@ -224,7 +270,7 @@ where
         mut self,
         value: impl Into<crate::sh_tangled::repo::pull::Target<'a>>,
     ) -> PullBuilder<'a, pull_state::SetTarget<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
         PullBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -243,7 +289,7 @@ where
         mut self,
         value: impl Into<jacquard_common::CowStr<'a>>,
     ) -> PullBuilder<'a, pull_state::SetTitle<S>> {
-        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
         PullBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -255,20 +301,22 @@ where
 impl<'a, S> PullBuilder<'a, S>
 where
     S: pull_state::State,
-    S::Title: pull_state::IsSet,
     S::CreatedAt: pull_state::IsSet,
-    S::Target: pull_state::IsSet,
+    S::Title: pull_state::IsSet,
     S::Patch: pull_state::IsSet,
+    S::Target: pull_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Pull<'a> {
         Pull {
             body: self.__unsafe_private_named.0,
             created_at: self.__unsafe_private_named.1.unwrap(),
-            patch: self.__unsafe_private_named.2.unwrap(),
-            source: self.__unsafe_private_named.3,
-            target: self.__unsafe_private_named.4.unwrap(),
-            title: self.__unsafe_private_named.5.unwrap(),
+            mentions: self.__unsafe_private_named.2,
+            patch: self.__unsafe_private_named.3.unwrap(),
+            references: self.__unsafe_private_named.4,
+            source: self.__unsafe_private_named.5,
+            target: self.__unsafe_private_named.6.unwrap(),
+            title: self.__unsafe_private_named.7.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -283,10 +331,12 @@ where
         Pull {
             body: self.__unsafe_private_named.0,
             created_at: self.__unsafe_private_named.1.unwrap(),
-            patch: self.__unsafe_private_named.2.unwrap(),
-            source: self.__unsafe_private_named.3,
-            target: self.__unsafe_private_named.4.unwrap(),
-            title: self.__unsafe_private_named.5.unwrap(),
+            mentions: self.__unsafe_private_named.2,
+            patch: self.__unsafe_private_named.3.unwrap(),
+            references: self.__unsafe_private_named.4,
+            source: self.__unsafe_private_named.5,
+            target: self.__unsafe_private_named.6.unwrap(),
+            title: self.__unsafe_private_named.7.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -434,6 +484,30 @@ fn lexicon_doc_sh_tangled_repo_pull() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                 }),
                             );
                             map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "mentions",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                    description: None,
+                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: Some(
+                                            ::jacquard_lexicon::lexicon::LexStringFormat::Did,
+                                        ),
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                    min_length: None,
+                                    max_length: None,
+                                }),
+                            );
+                            map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static("patch"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
@@ -446,6 +520,30 @@ fn lexicon_doc_sh_tangled_repo_pull() -> ::jacquard_lexicon::lexicon::LexiconDoc
                                     r#enum: None,
                                     r#const: None,
                                     known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "references",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                    description: None,
+                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: Some(
+                                            ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
+                                        ),
+                                        default: None,
+                                        min_length: None,
+                                        max_length: None,
+                                        min_graphemes: None,
+                                        max_graphemes: None,
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                    min_length: None,
+                                    max_length: None,
                                 }),
                             );
                             map.insert(

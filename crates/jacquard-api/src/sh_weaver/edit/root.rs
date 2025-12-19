@@ -34,37 +34,37 @@ pub mod root_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Snapshot;
         type Doc;
+        type Snapshot;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Snapshot = Unset;
         type Doc = Unset;
-    }
-    ///State transition - sets the `snapshot` field to Set
-    pub struct SetSnapshot<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSnapshot<S> {}
-    impl<S: State> State for SetSnapshot<S> {
-        type Snapshot = Set<members::snapshot>;
-        type Doc = S::Doc;
+        type Snapshot = Unset;
     }
     ///State transition - sets the `doc` field to Set
     pub struct SetDoc<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDoc<S> {}
     impl<S: State> State for SetDoc<S> {
-        type Snapshot = S::Snapshot;
         type Doc = Set<members::doc>;
+        type Snapshot = S::Snapshot;
+    }
+    ///State transition - sets the `snapshot` field to Set
+    pub struct SetSnapshot<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSnapshot<S> {}
+    impl<S: State> State for SetSnapshot<S> {
+        type Doc = S::Doc;
+        type Snapshot = Set<members::snapshot>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `snapshot` field
-        pub struct snapshot(());
         ///Marker type for the `doc` field
         pub struct doc(());
+        ///Marker type for the `snapshot` field
+        pub struct snapshot(());
     }
 }
 
@@ -137,8 +137,8 @@ where
 impl<'a, S> RootBuilder<'a, S>
 where
     S: root_state::State,
-    S::Snapshot: root_state::IsSet,
     S::Doc: root_state::IsSet,
+    S::Snapshot: root_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Root<'a> {

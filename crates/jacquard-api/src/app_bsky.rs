@@ -4,7 +4,9 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 pub mod actor;
+pub mod ageassurance;
 pub mod bookmark;
+pub mod contact;
 pub mod embed;
 pub mod feed;
 pub mod graph;

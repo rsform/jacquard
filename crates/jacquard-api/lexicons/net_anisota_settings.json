@@ -111,6 +111,10 @@
           "type": "boolean",
           "description": "Group similar notifications together"
         },
+        "bypassDetachedQuotes": {
+          "type": "boolean",
+          "description": "Bypass detached quotes to see the full content that was removed by the author"
+        },
         "combineRelationshipAndFollowerFilters": {
           "type": "boolean",
           "description": "When enabled, show notifications that match either relationship OR follower count filters"
@@ -196,6 +200,32 @@
           "type": "ref",
           "ref": "#hideReposts"
         },
+        "highlightByFollowerRatio": {
+          "type": "boolean",
+          "description": "Also require a minimum follower-to-following ratio for highlighting"
+        },
+        "highlightMaxFollowerCount": {
+          "type": "integer",
+          "description": "Maximum follower count for notification highlighting"
+        },
+        "highlightMinFollowerCount": {
+          "type": "string",
+          "description": "Minimum follower count for notification highlighting (stored as string or integer)",
+          "maxLength": 20
+        },
+        "highlightMinFollowerRatio": {
+          "type": "string",
+          "description": "Minimum follower-to-following ratio for highlighting (stored as string)",
+          "maxLength": 20
+        },
+        "highlightNotificationTypes": {
+          "type": "ref",
+          "ref": "#highlightNotificationTypes"
+        },
+        "highlightNotifications": {
+          "type": "boolean",
+          "description": "Enable notification highlighting to surface important notifications from notable accounts"
+        },
         "includeReplyEngagement": {
           "type": "boolean",
           "description": "Include engagement metrics from reply posts in stats calculations"
@@ -230,13 +260,37 @@
           "type": "boolean",
           "description": "Show newest posts first"
         },
+        "showBlockedPosts": {
+          "type": "boolean",
+          "description": "Show content from users you have blocked"
+        },
+        "showNewHighlightsSection": {
+          "type": "boolean",
+          "description": "Show New Highlights section in notifications"
+        },
+        "showNotificationSections": {
+          "type": "boolean",
+          "description": "Enable notification sections (New Highlights, Unread, Recently Read, Older)"
+        },
+        "showOlderSection": {
+          "type": "boolean",
+          "description": "Show Older section in notifications"
+        },
         "showRarityInHeader": {
           "type": "boolean",
           "description": "Display rarity indicator and rate in the stats modal header"
         },
+        "showRecentlyReadSection": {
+          "type": "boolean",
+          "description": "Show Recently Read section in notifications"
+        },
         "showThreadSuggestion": {
           "type": "boolean",
           "description": "Show thread suggestion when typing beyond character limit in post composer"
+        },
+        "showUnreadSection": {
+          "type": "boolean",
+          "description": "Show Unread section in notifications"
         },
         "soundscape": {
           "type": "string",
@@ -499,6 +553,35 @@
         "profile": {
           "type": "boolean",
           "description": "Hide reposts in profile"
+        }
+      }
+    },
+    "highlightNotificationTypes": {
+      "type": "object",
+      "properties": {
+        "follows": {
+          "type": "boolean",
+          "description": "Highlight follow notifications"
+        },
+        "likes": {
+          "type": "boolean",
+          "description": "Highlight like notifications"
+        },
+        "mentions": {
+          "type": "boolean",
+          "description": "Highlight mention notifications"
+        },
+        "quotes": {
+          "type": "boolean",
+          "description": "Highlight quote notifications"
+        },
+        "replies": {
+          "type": "boolean",
+          "description": "Highlight reply notifications"
+        },
+        "reposts": {
+          "type": "boolean",
+          "description": "Highlight repost notifications"
         }
       }
     },

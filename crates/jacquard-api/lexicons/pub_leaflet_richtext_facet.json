@@ -2,6 +2,19 @@
   "lexicon": 1,
   "id": "pub.leaflet.richtext.facet",
   "defs": {
+    "atMention": {
+      "type": "object",
+      "description": "Facet feature for mentioning an AT URI.",
+      "required": [
+        "atURI"
+      ],
+      "properties": {
+        "atURI": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
     "bold": {
       "type": "object",
       "description": "Facet feature for bold text",
@@ -31,6 +44,19 @@
       "description": "Facet feature for inline code.",
       "required": [],
       "properties": {}
+    },
+    "didMention": {
+      "type": "object",
+      "description": "Facet feature for mentioning a did.",
+      "required": [
+        "did"
+      ],
+      "properties": {
+        "did": {
+          "type": "string",
+          "format": "did"
+        }
+      }
     },
     "highlight": {
       "type": "object",
@@ -80,6 +106,8 @@
             "type": "union",
             "refs": [
               "#link",
+              "#didMention",
+              "#atMention",
               "#code",
               "#highlight",
               "#underline",

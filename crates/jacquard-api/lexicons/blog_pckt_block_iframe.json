@@ -1,0 +1,26 @@
+{
+  "lexicon": 1,
+  "id": "blog.pckt.block.iframe",
+  "description": "Embedded content via iframe (e.g. YouTube, Vimeo, etc.)",
+  "defs": {
+    "main": {
+      "type": "object",
+      "required": [
+        "url"
+      ],
+      "properties": {
+        "height": {
+          "type": "integer",
+          "description": "Height of the embed in pixels",
+          "minimum": 16,
+          "maximum": 1600
+        },
+        "url": {
+          "type": "string",
+          "description": "The URL of the content to embed",
+          "format": "uri"
+        }
+      }
+    }
+  }
+}

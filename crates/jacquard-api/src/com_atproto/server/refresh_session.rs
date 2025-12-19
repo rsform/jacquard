@@ -52,7 +52,7 @@ pub struct RefreshSessionOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum RefreshSessionError<'a> {
     #[serde(rename = "AccountTakedown")]
-    AccountTakedown(std::option::Option<String>),
+    AccountTakedown(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl std::fmt::Display for RefreshSessionError<'_> {

@@ -1,0 +1,62 @@
+[package]
+name = "mini-moka-wasm"
+version = "0.10.99"
+edition = "2018"
+rust-version = "1.76"
+#publish = false
+description = "Temporary vendored fork of mini-moka with wasm browser compat patch"
+license = "MIT OR Apache-2.0"
+# homepage = "https://"
+documentation = "https://docs.rs/mini-moka/"
+repository.workspace = true
+keywords = ["cache", "concurrent"]
+categories = ["caching", "concurrency"]
+readme = "README.md"
+exclude = [".circleci", ".devcontainer", ".github", ".gitpod.yml", ".vscode"]
+
+[features]
+default = ["sync"]
+js = ["dep:web-time"]
+
+sync = ["dashmap"]
+
+[dependencies]
+crossbeam-channel = "0.5.5"
+crossbeam-utils = "0.8"
+smallvec = "1.8"
+tagptr = "0.2"
+web-time = { version = "1.1.0", optional = true }
+
+# Opt-out serde and stable_deref_trait features
+# https://github.com/Manishearth/triomphe/pull/5
+triomphe = { version = "0.1.13", default-features = false }
+
+# Optional dependencies (enabled by default)
+dashmap = { version = "6.1", optional = true }
+
+[dev-dependencies]
+anyhow = "1.0.19"
+getrandom = "0.2"
+once_cell = "1.7"
+wasm-bindgen-test = "0.3.50"
+
+[target.wasm32-unknown-unknown.dev-dependencies]
+getrandom = { version="0.2", features = ["js"] }
+
+[target.'cfg(trybuild)'.dev-dependencies]
+trybuild = "1.0"
+
+# https://docs.rs/about/metadata
+[package.metadata.docs.rs]
+# Build the doc with some features enabled.
+features = []
+rustdoc-args = ["--cfg", "docsrs"]
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = [
+    "cfg(kani)",
+    "cfg(skeptic)",
+    "cfg(circleci)",
+    "cfg(trybuild)",
+    "cfg(beta_clippy)",
+] }

@@ -150,7 +150,7 @@ pub struct ListKeysOutput<'a> {
 pub enum ListKeysError<'a> {
     /// Failed to retrieve public keys
     #[serde(rename = "InternalServerError")]
-    InternalServerError(std::option::Option<String>),
+    InternalServerError(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl std::fmt::Display for ListKeysError<'_> {

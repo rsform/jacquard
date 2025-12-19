@@ -8,7 +8,6 @@
       "key": "any",
       "record": {
         "type": "object",
-        "required": [],
         "properties": {
           "debugRecording": {
             "type": "boolean",

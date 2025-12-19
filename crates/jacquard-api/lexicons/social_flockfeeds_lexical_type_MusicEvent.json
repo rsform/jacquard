@@ -1,0 +1,814 @@
+{
+  "lexicon": 1,
+  "id": "social.flockfeeds.lexical.type.MusicEvent",
+  "defs": {
+    "embedded": {
+      "type": "object",
+      "description": "Event type: Music event.",
+      "properties": {
+        "about": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Thing#embedded",
+            "social.flockfeeds.lexical.prop.musicEvent#aboutList"
+          ]
+        },
+        "actor": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.PerformingGroup#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.musicEvent#actorList"
+          ]
+        },
+        "additionalType": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.musicEvent#additionalTypeScalar",
+            "social.flockfeeds.lexical.prop.musicEvent#additionalTypeList"
+          ]
+        },
+        "aggregateRating": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.AggregateRating#embedded",
+            "social.flockfeeds.lexical.prop.musicEvent#aggregateRatingList"
+          ]
+        },
+        "alternateName": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.musicEvent#alternateNameScalar",
+            "social.flockfeeds.lexical.prop.musicEvent#alternateNameList"
+          ]
+        },
+        "attendee": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.musicEvent#attendeeList"
+          ]
+        },
+        "attendees": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.musicEvent#attendeesList"
+          ]
+        },
+        "audience": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Audience#embedded",
+            "social.flockfeeds.lexical.prop.musicEvent#audienceList"
+          ]
+        },
+        "composer": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.musicEvent#composerList"
+          ]
+        },
+        "contributor": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.musicEvent#contributorList"
+          ]
+        },
+        "description": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.TextObject#embedded",
+            "social.flockfeeds.lexical.prop.musicEvent#descriptionScalar",
+            "social.flockfeeds.lexical.prop.musicEvent#descriptionList"
+          ]
+        },
+        "director": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.musicEvent#directorList"
+          ]
+        },
+        "disambiguatingDescription": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.musicEvent#disambiguatingDescriptionScalar",
+            "social.flockfeeds.lexical.prop.musicEvent#disambiguatingDescriptionList"
+          ]
+        },
+        "doorTime": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.musicEvent#doorTimeScalar",
+            "social.flockfeeds.lexical.prop.musicEvent#doorTimeList"
+          ]
+        },
+        "duration": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.QuantitativeValue#embedded",
+            "social.flockfeeds.lexical.prop.musicEvent#durationScalar",
+            "social.flockfeeds.lexical.prop.musicEvent#durationList"
+          ]
+        },
+        "endDate": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.musicEvent#endDateScalar",
+            "social.flockfeeds.lexical.prop.musicEvent#endDateList"
+          ]
+        },
+        "eventAttendanceMode": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.EventAttendanceModeEnumeration#embedded",
+            "social.flockfeeds.lexical.prop.musicEvent#eventAttendanceModeScalar",
+            "social.flockfeeds.lexical.prop.musicEvent#eventAttendanceModeList"
+          ]
+        },
+        "eventSchedule": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Schedule#embedded",
+            "social.flockfeeds.lexical.prop.musicEvent#eventScheduleList"
+          ]
+        },
+        "eventStatus": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.EventStatusType#embedded",
+            "social.flockfeeds.lexical.prop.musicEvent#eventStatusScalar",
+            "social.flockfeeds.lexical.prop.musicEvent#eventStatusList"
+          ]
+        },
+        "funder": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.musicEvent#funderList"
+          ]
+        },
+        "funding": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Grant#embedded",
+            "social.flockfeeds.lexical.prop.musicEvent#fundingList"
+          ]
+        },
+        "identifier": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.PropertyValue#embedded",
+            "social.flockfeeds.lexical.prop.musicEvent#identifierScalar",
+            "social.flockfeeds.lexical.prop.musicEvent#identifierList"
+          ]
+        },
+        "image": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.ImageObject#embedded",
+            "social.flockfeeds.lexical.prop.musicEvent#imageScalar",
+            "social.flockfeeds.lexical.prop.musicEvent#imageList"
+          ]
+        },
+        "inLanguage": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Language#embedded",
+            "social.flockfeeds.lexical.prop.musicEvent#inLanguageScalar",
+            "social.flockfeeds.lexical.prop.musicEvent#inLanguageList"
+          ]
+        },
+        "isAccessibleForFree": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.musicEvent#isAccessibleForFreeScalar",
+            "social.flockfeeds.lexical.prop.musicEvent#isAccessibleForFreeList"
+          ]
+        },
+        "keywords": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+            "social.flockfeeds.lexical.prop.musicEvent#keywordsScalar",
+            "social.flockfeeds.lexical.prop.musicEvent#keywordsList"
+          ]
+        },
+        "location": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Place#embedded",
+            "social.flockfeeds.lexical.type.PostalAddress#embedded",
+            "social.flockfeeds.lexical.type.VirtualLocation#embedded",
+            "social.flockfeeds.lexical.prop.musicEvent#locationScalar",
+            "social.flockfeeds.lexical.prop.musicEvent#locationList"
+          ]
+        },
+        "mainEntityOfPage": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.musicEvent#mainEntityOfPageScalar",
+            "social.flockfeeds.lexical.prop.musicEvent#mainEntityOfPageList"
+          ]
+        },
+        "maximumAttendeeCapacity": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.musicEvent#maximumAttendeeCapacityScalar",
+            "social.flockfeeds.lexical.prop.musicEvent#maximumAttendeeCapacityList"
+          ]
+        },
+        "maximumPhysicalAttendeeCapacity": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.musicEvent#maximumPhysicalAttendeeCapacityScalar",
+            "social.flockfeeds.lexical.prop.musicEvent#maximumPhysicalAttendeeCapacityList"
+          ]
+        },
+        "maximumVirtualAttendeeCapacity": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.musicEvent#maximumVirtualAttendeeCapacityScalar",
+            "social.flockfeeds.lexical.prop.musicEvent#maximumVirtualAttendeeCapacityList"
+          ]
+        },
+        "name": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.musicEvent#nameScalar",
+            "social.flockfeeds.lexical.prop.musicEvent#nameList"
+          ]
+        },
+        "offers": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Demand#embedded",
+            "social.flockfeeds.lexical.type.Offer#embedded",
+            "social.flockfeeds.lexical.prop.musicEvent#offersList"
+          ]
+        },
+        "organizer": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.musicEvent#organizerList"
+          ]
+        },
+        "performer": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.musicEvent#performerList"
+          ]
+        },
+        "performers": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.musicEvent#performersList"
+          ]
+        },
+        "potentialAction": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Action#embedded",
+            "social.flockfeeds.lexical.prop.musicEvent#potentialActionList"
+          ]
+        },
+        "previousStartDate": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.musicEvent#previousStartDateScalar",
+            "social.flockfeeds.lexical.prop.musicEvent#previousStartDateList"
+          ]
+        },
+        "recordedIn": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.musicEvent#recordedInList"
+          ]
+        },
+        "remainingAttendeeCapacity": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.musicEvent#remainingAttendeeCapacityScalar",
+            "social.flockfeeds.lexical.prop.musicEvent#remainingAttendeeCapacityList"
+          ]
+        },
+        "review": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Review#embedded",
+            "social.flockfeeds.lexical.prop.musicEvent#reviewList"
+          ]
+        },
+        "sameAs": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.musicEvent#sameAsScalar",
+            "social.flockfeeds.lexical.prop.musicEvent#sameAsList"
+          ]
+        },
+        "sponsor": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.musicEvent#sponsorList"
+          ]
+        },
+        "startDate": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.musicEvent#startDateScalar",
+            "social.flockfeeds.lexical.prop.musicEvent#startDateList"
+          ]
+        },
+        "subEvent": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Event#embedded",
+            "social.flockfeeds.lexical.prop.musicEvent#subEventList"
+          ]
+        },
+        "subEvents": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Event#embedded",
+            "social.flockfeeds.lexical.prop.musicEvent#subEventsList"
+          ]
+        },
+        "subjectOf": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.type.Event#embedded",
+            "social.flockfeeds.lexical.prop.musicEvent#subjectOfList"
+          ]
+        },
+        "superEvent": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Event#embedded",
+            "social.flockfeeds.lexical.prop.musicEvent#superEventList"
+          ]
+        },
+        "translator": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.musicEvent#translatorList"
+          ]
+        },
+        "typicalAgeRange": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.musicEvent#typicalAgeRangeScalar",
+            "social.flockfeeds.lexical.prop.musicEvent#typicalAgeRangeList"
+          ]
+        },
+        "url": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.musicEvent#urlScalar",
+            "social.flockfeeds.lexical.prop.musicEvent#urlList"
+          ]
+        },
+        "workFeatured": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.musicEvent#workFeaturedList"
+          ]
+        },
+        "workPerformed": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.musicEvent#workPerformedList"
+          ]
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "description": "Event type: Music event.",
+        "properties": {
+          "about": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Thing#embedded",
+              "social.flockfeeds.lexical.prop.musicEvent#aboutList"
+            ]
+          },
+          "actor": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.PerformingGroup#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.musicEvent#actorList"
+            ]
+          },
+          "additionalType": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.musicEvent#additionalTypeScalar",
+              "social.flockfeeds.lexical.prop.musicEvent#additionalTypeList"
+            ]
+          },
+          "aggregateRating": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.AggregateRating#embedded",
+              "social.flockfeeds.lexical.prop.musicEvent#aggregateRatingList"
+            ]
+          },
+          "alternateName": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.musicEvent#alternateNameScalar",
+              "social.flockfeeds.lexical.prop.musicEvent#alternateNameList"
+            ]
+          },
+          "attendee": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.musicEvent#attendeeList"
+            ]
+          },
+          "attendees": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.musicEvent#attendeesList"
+            ]
+          },
+          "audience": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Audience#embedded",
+              "social.flockfeeds.lexical.prop.musicEvent#audienceList"
+            ]
+          },
+          "composer": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.musicEvent#composerList"
+            ]
+          },
+          "contributor": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.musicEvent#contributorList"
+            ]
+          },
+          "description": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.TextObject#embedded",
+              "social.flockfeeds.lexical.prop.musicEvent#descriptionScalar",
+              "social.flockfeeds.lexical.prop.musicEvent#descriptionList"
+            ]
+          },
+          "director": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.musicEvent#directorList"
+            ]
+          },
+          "disambiguatingDescription": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.musicEvent#disambiguatingDescriptionScalar",
+              "social.flockfeeds.lexical.prop.musicEvent#disambiguatingDescriptionList"
+            ]
+          },
+          "doorTime": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.musicEvent#doorTimeScalar",
+              "social.flockfeeds.lexical.prop.musicEvent#doorTimeList"
+            ]
+          },
+          "duration": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.QuantitativeValue#embedded",
+              "social.flockfeeds.lexical.prop.musicEvent#durationScalar",
+              "social.flockfeeds.lexical.prop.musicEvent#durationList"
+            ]
+          },
+          "endDate": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.musicEvent#endDateScalar",
+              "social.flockfeeds.lexical.prop.musicEvent#endDateList"
+            ]
+          },
+          "eventAttendanceMode": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.EventAttendanceModeEnumeration#embedded",
+              "social.flockfeeds.lexical.prop.musicEvent#eventAttendanceModeScalar",
+              "social.flockfeeds.lexical.prop.musicEvent#eventAttendanceModeList"
+            ]
+          },
+          "eventSchedule": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Schedule#embedded",
+              "social.flockfeeds.lexical.prop.musicEvent#eventScheduleList"
+            ]
+          },
+          "eventStatus": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.EventStatusType#embedded",
+              "social.flockfeeds.lexical.prop.musicEvent#eventStatusScalar",
+              "social.flockfeeds.lexical.prop.musicEvent#eventStatusList"
+            ]
+          },
+          "funder": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.musicEvent#funderList"
+            ]
+          },
+          "funding": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Grant#embedded",
+              "social.flockfeeds.lexical.prop.musicEvent#fundingList"
+            ]
+          },
+          "identifier": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.PropertyValue#embedded",
+              "social.flockfeeds.lexical.prop.musicEvent#identifierScalar",
+              "social.flockfeeds.lexical.prop.musicEvent#identifierList"
+            ]
+          },
+          "image": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.ImageObject#embedded",
+              "social.flockfeeds.lexical.prop.musicEvent#imageScalar",
+              "social.flockfeeds.lexical.prop.musicEvent#imageList"
+            ]
+          },
+          "inLanguage": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Language#embedded",
+              "social.flockfeeds.lexical.prop.musicEvent#inLanguageScalar",
+              "social.flockfeeds.lexical.prop.musicEvent#inLanguageList"
+            ]
+          },
+          "isAccessibleForFree": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.musicEvent#isAccessibleForFreeScalar",
+              "social.flockfeeds.lexical.prop.musicEvent#isAccessibleForFreeList"
+            ]
+          },
+          "keywords": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+              "social.flockfeeds.lexical.prop.musicEvent#keywordsScalar",
+              "social.flockfeeds.lexical.prop.musicEvent#keywordsList"
+            ]
+          },
+          "location": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Place#embedded",
+              "social.flockfeeds.lexical.type.PostalAddress#embedded",
+              "social.flockfeeds.lexical.type.VirtualLocation#embedded",
+              "social.flockfeeds.lexical.prop.musicEvent#locationScalar",
+              "social.flockfeeds.lexical.prop.musicEvent#locationList"
+            ]
+          },
+          "mainEntityOfPage": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.prop.musicEvent#mainEntityOfPageScalar",
+              "social.flockfeeds.lexical.prop.musicEvent#mainEntityOfPageList"
+            ]
+          },
+          "maximumAttendeeCapacity": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.musicEvent#maximumAttendeeCapacityScalar",
+              "social.flockfeeds.lexical.prop.musicEvent#maximumAttendeeCapacityList"
+            ]
+          },
+          "maximumPhysicalAttendeeCapacity": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.musicEvent#maximumPhysicalAttendeeCapacityScalar",
+              "social.flockfeeds.lexical.prop.musicEvent#maximumPhysicalAttendeeCapacityList"
+            ]
+          },
+          "maximumVirtualAttendeeCapacity": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.musicEvent#maximumVirtualAttendeeCapacityScalar",
+              "social.flockfeeds.lexical.prop.musicEvent#maximumVirtualAttendeeCapacityList"
+            ]
+          },
+          "name": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.musicEvent#nameScalar",
+              "social.flockfeeds.lexical.prop.musicEvent#nameList"
+            ]
+          },
+          "offers": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Demand#embedded",
+              "social.flockfeeds.lexical.type.Offer#embedded",
+              "social.flockfeeds.lexical.prop.musicEvent#offersList"
+            ]
+          },
+          "organizer": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.musicEvent#organizerList"
+            ]
+          },
+          "performer": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.musicEvent#performerList"
+            ]
+          },
+          "performers": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.musicEvent#performersList"
+            ]
+          },
+          "potentialAction": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Action#embedded",
+              "social.flockfeeds.lexical.prop.musicEvent#potentialActionList"
+            ]
+          },
+          "previousStartDate": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.musicEvent#previousStartDateScalar",
+              "social.flockfeeds.lexical.prop.musicEvent#previousStartDateList"
+            ]
+          },
+          "recordedIn": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.prop.musicEvent#recordedInList"
+            ]
+          },
+          "remainingAttendeeCapacity": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.musicEvent#remainingAttendeeCapacityScalar",
+              "social.flockfeeds.lexical.prop.musicEvent#remainingAttendeeCapacityList"
+            ]
+          },
+          "review": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Review#embedded",
+              "social.flockfeeds.lexical.prop.musicEvent#reviewList"
+            ]
+          },
+          "sameAs": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.musicEvent#sameAsScalar",
+              "social.flockfeeds.lexical.prop.musicEvent#sameAsList"
+            ]
+          },
+          "sponsor": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.musicEvent#sponsorList"
+            ]
+          },
+          "startDate": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.musicEvent#startDateScalar",
+              "social.flockfeeds.lexical.prop.musicEvent#startDateList"
+            ]
+          },
+          "subEvent": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Event#embedded",
+              "social.flockfeeds.lexical.prop.musicEvent#subEventList"
+            ]
+          },
+          "subEvents": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Event#embedded",
+              "social.flockfeeds.lexical.prop.musicEvent#subEventsList"
+            ]
+          },
+          "subjectOf": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.type.Event#embedded",
+              "social.flockfeeds.lexical.prop.musicEvent#subjectOfList"
+            ]
+          },
+          "superEvent": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Event#embedded",
+              "social.flockfeeds.lexical.prop.musicEvent#superEventList"
+            ]
+          },
+          "translator": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.musicEvent#translatorList"
+            ]
+          },
+          "typicalAgeRange": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.musicEvent#typicalAgeRangeScalar",
+              "social.flockfeeds.lexical.prop.musicEvent#typicalAgeRangeList"
+            ]
+          },
+          "url": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.musicEvent#urlScalar",
+              "social.flockfeeds.lexical.prop.musicEvent#urlList"
+            ]
+          },
+          "workFeatured": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.prop.musicEvent#workFeaturedList"
+            ]
+          },
+          "workPerformed": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.prop.musicEvent#workPerformedList"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

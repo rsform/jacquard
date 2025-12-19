@@ -192,7 +192,7 @@ pub enum GetRelationshipsOutputRelationshipsItem<'a> {
 pub enum GetRelationshipsError<'a> {
     /// the primary actor at-identifier could not be resolved
     #[serde(rename = "ActorNotFound")]
-    ActorNotFound(std::option::Option<String>),
+    ActorNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl std::fmt::Display for GetRelationshipsError<'_> {

@@ -42,37 +42,37 @@ pub mod create_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Value;
         type Collection;
+        type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Value = Unset;
         type Collection = Unset;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type Value = Set<members::value>;
-        type Collection = S::Collection;
+        type Value = Unset;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCollection<S> {}
     impl<S: State> State for SetCollection<S> {
-        type Value = S::Value;
         type Collection = Set<members::collection>;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Collection = S::Collection;
+        type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `value` field
-        pub struct value(());
         ///Marker type for the `collection` field
         pub struct collection(());
+        ///Marker type for the `value` field
+        pub struct value(());
     }
 }
 
@@ -179,8 +179,8 @@ where
 impl<'a, S> CreateBuilder<'a, S>
 where
     S: create_state::State,
-    S::Value: create_state::IsSet,
     S::Collection: create_state::IsSet,
+    S::Value: create_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Create<'a> {
@@ -1395,7 +1395,7 @@ pub enum ApplyWritesOutputResultsItem<'a> {
 pub enum ApplyWritesError<'a> {
     /// Indicates that the 'swapCommit' parameter did not match current commit.
     #[serde(rename = "InvalidSwap")]
-    InvalidSwap(std::option::Option<String>),
+    InvalidSwap(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl std::fmt::Display for ApplyWritesError<'_> {
@@ -1476,51 +1476,51 @@ pub mod update_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Rkey;
         type Value;
         type Collection;
+        type Rkey;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Rkey = Unset;
         type Value = Unset;
         type Collection = Unset;
-    }
-    ///State transition - sets the `rkey` field to Set
-    pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRkey<S> {}
-    impl<S: State> State for SetRkey<S> {
-        type Rkey = Set<members::rkey>;
-        type Value = S::Value;
-        type Collection = S::Collection;
+        type Rkey = Unset;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValue<S> {}
     impl<S: State> State for SetValue<S> {
-        type Rkey = S::Rkey;
         type Value = Set<members::value>;
         type Collection = S::Collection;
+        type Rkey = S::Rkey;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCollection<S> {}
     impl<S: State> State for SetCollection<S> {
-        type Rkey = S::Rkey;
         type Value = S::Value;
         type Collection = Set<members::collection>;
+        type Rkey = S::Rkey;
+    }
+    ///State transition - sets the `rkey` field to Set
+    pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRkey<S> {}
+    impl<S: State> State for SetRkey<S> {
+        type Value = S::Value;
+        type Collection = S::Collection;
+        type Rkey = Set<members::rkey>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `rkey` field
-        pub struct rkey(());
         ///Marker type for the `value` field
         pub struct value(());
         ///Marker type for the `collection` field
         pub struct collection(());
+        ///Marker type for the `rkey` field
+        pub struct rkey(());
     }
 }
 
@@ -1621,9 +1621,9 @@ where
 impl<'a, S> UpdateBuilder<'a, S>
 where
     S: update_state::State,
-    S::Rkey: update_state::IsSet,
     S::Value: update_state::IsSet,
     S::Collection: update_state::IsSet,
+    S::Rkey: update_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Update<'a> {

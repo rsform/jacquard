@@ -239,16 +239,16 @@ pub struct LogOutput {
 pub enum LogError<'a> {
     /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(std::option::Option<String>),
+    RepoNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
     /// Git reference not found
     #[serde(rename = "RefNotFound")]
-    RefNotFound(std::option::Option<String>),
+    RefNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
     /// Path not found in repository
     #[serde(rename = "PathNotFound")]
-    PathNotFound(std::option::Option<String>),
+    PathNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
     /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(std::option::Option<String>),
+    InvalidRequest(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl std::fmt::Display for LogError<'_> {

@@ -12,7 +12,9 @@
         "type",
         "createdAt",
         "hiveId",
-        "title"
+        "title",
+        "userDid",
+        "userHandle"
       ],
       "properties": {
         "createdAt": {
@@ -35,6 +37,54 @@
             "started",
             "finished"
           ]
+        },
+        "userDid": {
+          "type": "string",
+          "description": "The DID of the user who added the book"
+        },
+        "userHandle": {
+          "type": "string",
+          "description": "The handle of the user who added the book"
+        }
+      }
+    },
+    "bookProgress": {
+      "type": "object",
+      "description": "Reading progress tracking data",
+      "required": [
+        "updatedAt"
+      ],
+      "properties": {
+        "currentChapter": {
+          "type": "integer",
+          "description": "Current chapter the user is on",
+          "minimum": 1
+        },
+        "currentPage": {
+          "type": "integer",
+          "description": "Current page the user is on",
+          "minimum": 1
+        },
+        "percent": {
+          "type": "integer",
+          "description": "How far through the book the reader is (0-100)",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "totalChapters": {
+          "type": "integer",
+          "description": "Total number of chapters in the book",
+          "minimum": 1
+        },
+        "totalPages": {
+          "type": "integer",
+          "description": "Total number of pages in the book",
+          "minimum": 1
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "When the progress was last updated",
+          "format": "datetime"
         }
       }
     },
@@ -111,6 +161,10 @@
         "handle": {
           "type": "string"
         },
+        "isFollowing": {
+          "type": "boolean",
+          "description": "Whether the authed user is following this profile"
+        },
         "reviews": {
           "type": "integer",
           "minimum": 0
@@ -156,6 +210,7 @@
     "userBook": {
       "type": "object",
       "required": [
+        "userDid",
         "title",
         "authors",
         "hiveId",
@@ -168,6 +223,11 @@
           "description": "The authors of the book (tab separated)",
           "minLength": 1,
           "maxLength": 2048
+        },
+        "bookProgress": {
+          "type": "ref",
+          "description": "Progress tracking information for the book",
+          "ref": "buzz.bookhive.defs#bookProgress"
         },
         "cover": {
           "type": "string",
@@ -232,6 +292,14 @@
           "description": "The title of the book",
           "minLength": 1,
           "maxLength": 512
+        },
+        "userDid": {
+          "type": "string",
+          "description": "The DID of the user who added the book"
+        },
+        "userHandle": {
+          "type": "string",
+          "description": "The handle of the user who added the book"
         }
       }
     },

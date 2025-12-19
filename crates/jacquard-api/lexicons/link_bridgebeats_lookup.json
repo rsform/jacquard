@@ -1,0 +1,95 @@
+{
+  "lexicon": 1,
+  "id": "link.bridgebeats.lookup",
+  "description": "Unified BridgeBeats lookup result aggregating links across music service providers.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Result of parsing and looking up media links across supported music streaming providers.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "results",
+          "lookedUpAt"
+        ],
+        "properties": {
+          "lookedUpAt": {
+            "type": "string",
+            "description": "ISO8601 timestamp of when this lookup was performed.",
+            "format": "datetime"
+          },
+          "results": {
+            "type": "array",
+            "description": "Collection of lookup results from each provider that returned a match.",
+            "items": {
+              "type": "ref",
+              "ref": "#providerResult"
+            },
+            "minLength": 1,
+            "maxLength": 10
+          }
+        }
+      }
+    },
+    "providerResult": {
+      "type": "object",
+      "description": "Music metadata from a specific provider's API query.",
+      "required": [
+        "provider",
+        "artist",
+        "title",
+        "url",
+        "marketRegion"
+      ],
+      "properties": {
+        "artUrl": {
+          "type": "string",
+          "description": "URL to the cover artwork image.",
+          "format": "uri",
+          "maxLength": 2000
+        },
+        "artist": {
+          "type": "string",
+          "description": "Primary artist name for the track or album artist.",
+          "maxLength": 500
+        },
+        "externalId": {
+          "type": "string",
+          "description": "ISRC (for tracks) or UPC (for albums) identifier for cross-platform matching.",
+          "maxLength": 50
+        },
+        "isAlbum": {
+          "type": "boolean",
+          "description": "True for albums/EPs, false for individual tracks."
+        },
+        "marketRegion": {
+          "type": "string",
+          "description": "ISO3166-1 alpha-2 country code for the market/storefront.",
+          "default": "us",
+          "maxLength": 2
+        },
+        "provider": {
+          "type": "string",
+          "description": "The streaming platform provider.",
+          "enum": [
+            "appleMusic",
+            "spotify",
+            "tidal"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "description": "Official title of the track or album as listed in the provider's catalog.",
+          "maxLength": 500
+        },
+        "url": {
+          "type": "string",
+          "description": "Direct web link to the track or album on the provider's platform.",
+          "format": "uri",
+          "maxLength": 2000
+        }
+      }
+    }
+  }
+}

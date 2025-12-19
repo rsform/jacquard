@@ -1,0 +1,1092 @@
+{
+  "lexicon": 1,
+  "id": "social.flockfeeds.lexical.type.Product",
+  "defs": {
+    "embedded": {
+      "type": "object",
+      "description": "Any offered product or service. For example: a pair of shoes; a concert ticket; the rental of a car; a haircut; or an episode of a TV show streamed online.",
+      "properties": {
+        "additionalProperty": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.PropertyValue#embedded",
+            "social.flockfeeds.lexical.prop.product#additionalPropertyList"
+          ]
+        },
+        "additionalType": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.product#additionalTypeScalar",
+            "social.flockfeeds.lexical.prop.product#additionalTypeList"
+          ]
+        },
+        "aggregateRating": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.AggregateRating#embedded",
+            "social.flockfeeds.lexical.prop.product#aggregateRatingList"
+          ]
+        },
+        "alternateName": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.product#alternateNameScalar",
+            "social.flockfeeds.lexical.prop.product#alternateNameList"
+          ]
+        },
+        "asin": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.product#asinScalar",
+            "social.flockfeeds.lexical.prop.product#asinList"
+          ]
+        },
+        "audience": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Audience#embedded",
+            "social.flockfeeds.lexical.prop.product#audienceList"
+          ]
+        },
+        "award": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.product#awardScalar",
+            "social.flockfeeds.lexical.prop.product#awardList"
+          ]
+        },
+        "awards": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.product#awardsScalar",
+            "social.flockfeeds.lexical.prop.product#awardsList"
+          ]
+        },
+        "brand": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Brand#embedded",
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.prop.product#brandList"
+          ]
+        },
+        "category": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CategoryCode#embedded",
+            "social.flockfeeds.lexical.type.PhysicalActivityCategory#embedded",
+            "social.flockfeeds.lexical.type.Thing#embedded",
+            "social.flockfeeds.lexical.prop.product#categoryScalar",
+            "social.flockfeeds.lexical.prop.product#categoryList"
+          ]
+        },
+        "color": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.product#colorScalar",
+            "social.flockfeeds.lexical.prop.product#colorList"
+          ]
+        },
+        "colorSwatch": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.ImageObject#embedded",
+            "social.flockfeeds.lexical.prop.product#colorSwatchScalar",
+            "social.flockfeeds.lexical.prop.product#colorSwatchList"
+          ]
+        },
+        "countryOfAssembly": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.product#countryOfAssemblyScalar",
+            "social.flockfeeds.lexical.prop.product#countryOfAssemblyList"
+          ]
+        },
+        "countryOfLastProcessing": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.product#countryOfLastProcessingScalar",
+            "social.flockfeeds.lexical.prop.product#countryOfLastProcessingList"
+          ]
+        },
+        "countryOfOrigin": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Country#embedded",
+            "social.flockfeeds.lexical.prop.product#countryOfOriginList"
+          ]
+        },
+        "depth": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Distance#embedded",
+            "social.flockfeeds.lexical.type.QuantitativeValue#embedded",
+            "social.flockfeeds.lexical.prop.product#depthScalar",
+            "social.flockfeeds.lexical.prop.product#depthList"
+          ]
+        },
+        "description": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.TextObject#embedded",
+            "social.flockfeeds.lexical.prop.product#descriptionScalar",
+            "social.flockfeeds.lexical.prop.product#descriptionList"
+          ]
+        },
+        "disambiguatingDescription": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.product#disambiguatingDescriptionScalar",
+            "social.flockfeeds.lexical.prop.product#disambiguatingDescriptionList"
+          ]
+        },
+        "funding": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Grant#embedded",
+            "social.flockfeeds.lexical.prop.product#fundingList"
+          ]
+        },
+        "gtin": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.product#gtinScalar",
+            "social.flockfeeds.lexical.prop.product#gtinList"
+          ]
+        },
+        "gtin12": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.product#gtin12Scalar",
+            "social.flockfeeds.lexical.prop.product#gtin12List"
+          ]
+        },
+        "gtin13": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.product#gtin13Scalar",
+            "social.flockfeeds.lexical.prop.product#gtin13List"
+          ]
+        },
+        "gtin14": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.product#gtin14Scalar",
+            "social.flockfeeds.lexical.prop.product#gtin14List"
+          ]
+        },
+        "gtin8": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.product#gtin8Scalar",
+            "social.flockfeeds.lexical.prop.product#gtin8List"
+          ]
+        },
+        "hasAdultConsideration": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.AdultOrientedEnumeration#embedded",
+            "social.flockfeeds.lexical.prop.product#hasAdultConsiderationScalar",
+            "social.flockfeeds.lexical.prop.product#hasAdultConsiderationList"
+          ]
+        },
+        "hasCertification": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Certification#embedded",
+            "social.flockfeeds.lexical.prop.product#hasCertificationList"
+          ]
+        },
+        "hasEnergyConsumptionDetails": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.EnergyConsumptionDetails#embedded",
+            "social.flockfeeds.lexical.prop.product#hasEnergyConsumptionDetailsList"
+          ]
+        },
+        "hasGS1DigitalLink": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.product#hasGS1DigitalLinkScalar",
+            "social.flockfeeds.lexical.prop.product#hasGS1DigitalLinkList"
+          ]
+        },
+        "hasMeasurement": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.QuantitativeValue#embedded",
+            "social.flockfeeds.lexical.prop.product#hasMeasurementList"
+          ]
+        },
+        "hasMerchantReturnPolicy": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.MerchantReturnPolicy#embedded",
+            "social.flockfeeds.lexical.prop.product#hasMerchantReturnPolicyList"
+          ]
+        },
+        "hasProductReturnPolicy": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.ProductReturnPolicy#embedded",
+            "social.flockfeeds.lexical.prop.product#hasProductReturnPolicyList"
+          ]
+        },
+        "height": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Distance#embedded",
+            "social.flockfeeds.lexical.type.QuantitativeValue#embedded",
+            "social.flockfeeds.lexical.prop.product#heightScalar",
+            "social.flockfeeds.lexical.prop.product#heightList"
+          ]
+        },
+        "identifier": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.PropertyValue#embedded",
+            "social.flockfeeds.lexical.prop.product#identifierScalar",
+            "social.flockfeeds.lexical.prop.product#identifierList"
+          ]
+        },
+        "image": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.ImageObject#embedded",
+            "social.flockfeeds.lexical.prop.product#imageScalar",
+            "social.flockfeeds.lexical.prop.product#imageList"
+          ]
+        },
+        "inProductGroupWithID": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.product#inProductGroupWithIDScalar",
+            "social.flockfeeds.lexical.prop.product#inProductGroupWithIDList"
+          ]
+        },
+        "isAccessoryOrSparePartFor": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Product#embedded",
+            "social.flockfeeds.lexical.prop.product#isAccessoryOrSparePartForList"
+          ]
+        },
+        "isConsumableFor": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Product#embedded",
+            "social.flockfeeds.lexical.prop.product#isConsumableForList"
+          ]
+        },
+        "isFamilyFriendly": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.product#isFamilyFriendlyScalar",
+            "social.flockfeeds.lexical.prop.product#isFamilyFriendlyList"
+          ]
+        },
+        "isRelatedTo": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Product#embedded",
+            "social.flockfeeds.lexical.type.Service#embedded",
+            "social.flockfeeds.lexical.prop.product#isRelatedToList"
+          ]
+        },
+        "isSimilarTo": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Product#embedded",
+            "social.flockfeeds.lexical.type.Service#embedded",
+            "social.flockfeeds.lexical.prop.product#isSimilarToList"
+          ]
+        },
+        "isVariantOf": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.ProductGroup#embedded",
+            "social.flockfeeds.lexical.type.ProductModel#embedded",
+            "social.flockfeeds.lexical.prop.product#isVariantOfList"
+          ]
+        },
+        "itemCondition": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.OfferItemCondition#embedded",
+            "social.flockfeeds.lexical.prop.product#itemConditionScalar",
+            "social.flockfeeds.lexical.prop.product#itemConditionList"
+          ]
+        },
+        "keywords": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+            "social.flockfeeds.lexical.prop.product#keywordsScalar",
+            "social.flockfeeds.lexical.prop.product#keywordsList"
+          ]
+        },
+        "logo": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.ImageObject#embedded",
+            "social.flockfeeds.lexical.prop.product#logoScalar",
+            "social.flockfeeds.lexical.prop.product#logoList"
+          ]
+        },
+        "mainEntityOfPage": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.product#mainEntityOfPageScalar",
+            "social.flockfeeds.lexical.prop.product#mainEntityOfPageList"
+          ]
+        },
+        "manufacturer": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.prop.product#manufacturerList"
+          ]
+        },
+        "material": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Product#embedded",
+            "social.flockfeeds.lexical.prop.product#materialScalar",
+            "social.flockfeeds.lexical.prop.product#materialList"
+          ]
+        },
+        "mobileUrl": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.product#mobileUrlScalar",
+            "social.flockfeeds.lexical.prop.product#mobileUrlList"
+          ]
+        },
+        "model": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.ProductModel#embedded",
+            "social.flockfeeds.lexical.prop.product#modelScalar",
+            "social.flockfeeds.lexical.prop.product#modelList"
+          ]
+        },
+        "mpn": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.product#mpnScalar",
+            "social.flockfeeds.lexical.prop.product#mpnList"
+          ]
+        },
+        "name": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.product#nameScalar",
+            "social.flockfeeds.lexical.prop.product#nameList"
+          ]
+        },
+        "negativeNotes": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.ItemList#embedded",
+            "social.flockfeeds.lexical.type.ListItem#embedded",
+            "social.flockfeeds.lexical.type.WebContent#embedded",
+            "social.flockfeeds.lexical.prop.product#negativeNotesScalar",
+            "social.flockfeeds.lexical.prop.product#negativeNotesList"
+          ]
+        },
+        "nsn": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.product#nsnScalar",
+            "social.flockfeeds.lexical.prop.product#nsnList"
+          ]
+        },
+        "offers": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Demand#embedded",
+            "social.flockfeeds.lexical.type.Offer#embedded",
+            "social.flockfeeds.lexical.prop.product#offersList"
+          ]
+        },
+        "pattern": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+            "social.flockfeeds.lexical.prop.product#patternScalar",
+            "social.flockfeeds.lexical.prop.product#patternList"
+          ]
+        },
+        "positiveNotes": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.ItemList#embedded",
+            "social.flockfeeds.lexical.type.ListItem#embedded",
+            "social.flockfeeds.lexical.type.WebContent#embedded",
+            "social.flockfeeds.lexical.prop.product#positiveNotesScalar",
+            "social.flockfeeds.lexical.prop.product#positiveNotesList"
+          ]
+        },
+        "potentialAction": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Action#embedded",
+            "social.flockfeeds.lexical.prop.product#potentialActionList"
+          ]
+        },
+        "productID": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.product#productIDScalar",
+            "social.flockfeeds.lexical.prop.product#productIDList"
+          ]
+        },
+        "productionDate": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.product#productionDateScalar",
+            "social.flockfeeds.lexical.prop.product#productionDateList"
+          ]
+        },
+        "purchaseDate": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.product#purchaseDateScalar",
+            "social.flockfeeds.lexical.prop.product#purchaseDateList"
+          ]
+        },
+        "releaseDate": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.product#releaseDateScalar",
+            "social.flockfeeds.lexical.prop.product#releaseDateList"
+          ]
+        },
+        "review": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Review#embedded",
+            "social.flockfeeds.lexical.prop.product#reviewList"
+          ]
+        },
+        "reviews": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Review#embedded",
+            "social.flockfeeds.lexical.prop.product#reviewsList"
+          ]
+        },
+        "sameAs": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.product#sameAsScalar",
+            "social.flockfeeds.lexical.prop.product#sameAsList"
+          ]
+        },
+        "size": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+            "social.flockfeeds.lexical.type.QuantitativeValue#embedded",
+            "social.flockfeeds.lexical.type.SizeSpecification#embedded",
+            "social.flockfeeds.lexical.prop.product#sizeScalar",
+            "social.flockfeeds.lexical.prop.product#sizeList"
+          ]
+        },
+        "sku": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.product#skuScalar",
+            "social.flockfeeds.lexical.prop.product#skuList"
+          ]
+        },
+        "slogan": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.product#sloganScalar",
+            "social.flockfeeds.lexical.prop.product#sloganList"
+          ]
+        },
+        "subjectOf": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.type.Event#embedded",
+            "social.flockfeeds.lexical.prop.product#subjectOfList"
+          ]
+        },
+        "url": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.product#urlScalar",
+            "social.flockfeeds.lexical.prop.product#urlList"
+          ]
+        },
+        "weight": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Mass#embedded",
+            "social.flockfeeds.lexical.type.QuantitativeValue#embedded",
+            "social.flockfeeds.lexical.prop.product#weightScalar",
+            "social.flockfeeds.lexical.prop.product#weightList"
+          ]
+        },
+        "width": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Distance#embedded",
+            "social.flockfeeds.lexical.type.QuantitativeValue#embedded",
+            "social.flockfeeds.lexical.prop.product#widthScalar",
+            "social.flockfeeds.lexical.prop.product#widthList"
+          ]
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "description": "Any offered product or service. For example: a pair of shoes; a concert ticket; the rental of a car; a haircut; or an episode of a TV show streamed online.",
+        "properties": {
+          "additionalProperty": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.PropertyValue#embedded",
+              "social.flockfeeds.lexical.prop.product#additionalPropertyList"
+            ]
+          },
+          "additionalType": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.product#additionalTypeScalar",
+              "social.flockfeeds.lexical.prop.product#additionalTypeList"
+            ]
+          },
+          "aggregateRating": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.AggregateRating#embedded",
+              "social.flockfeeds.lexical.prop.product#aggregateRatingList"
+            ]
+          },
+          "alternateName": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.product#alternateNameScalar",
+              "social.flockfeeds.lexical.prop.product#alternateNameList"
+            ]
+          },
+          "asin": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.product#asinScalar",
+              "social.flockfeeds.lexical.prop.product#asinList"
+            ]
+          },
+          "audience": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Audience#embedded",
+              "social.flockfeeds.lexical.prop.product#audienceList"
+            ]
+          },
+          "award": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.product#awardScalar",
+              "social.flockfeeds.lexical.prop.product#awardList"
+            ]
+          },
+          "awards": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.product#awardsScalar",
+              "social.flockfeeds.lexical.prop.product#awardsList"
+            ]
+          },
+          "brand": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Brand#embedded",
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.prop.product#brandList"
+            ]
+          },
+          "category": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CategoryCode#embedded",
+              "social.flockfeeds.lexical.type.PhysicalActivityCategory#embedded",
+              "social.flockfeeds.lexical.type.Thing#embedded",
+              "social.flockfeeds.lexical.prop.product#categoryScalar",
+              "social.flockfeeds.lexical.prop.product#categoryList"
+            ]
+          },
+          "color": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.product#colorScalar",
+              "social.flockfeeds.lexical.prop.product#colorList"
+            ]
+          },
+          "colorSwatch": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.ImageObject#embedded",
+              "social.flockfeeds.lexical.prop.product#colorSwatchScalar",
+              "social.flockfeeds.lexical.prop.product#colorSwatchList"
+            ]
+          },
+          "countryOfAssembly": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.product#countryOfAssemblyScalar",
+              "social.flockfeeds.lexical.prop.product#countryOfAssemblyList"
+            ]
+          },
+          "countryOfLastProcessing": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.product#countryOfLastProcessingScalar",
+              "social.flockfeeds.lexical.prop.product#countryOfLastProcessingList"
+            ]
+          },
+          "countryOfOrigin": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Country#embedded",
+              "social.flockfeeds.lexical.prop.product#countryOfOriginList"
+            ]
+          },
+          "depth": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Distance#embedded",
+              "social.flockfeeds.lexical.type.QuantitativeValue#embedded",
+              "social.flockfeeds.lexical.prop.product#depthScalar",
+              "social.flockfeeds.lexical.prop.product#depthList"
+            ]
+          },
+          "description": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.TextObject#embedded",
+              "social.flockfeeds.lexical.prop.product#descriptionScalar",
+              "social.flockfeeds.lexical.prop.product#descriptionList"
+            ]
+          },
+          "disambiguatingDescription": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.product#disambiguatingDescriptionScalar",
+              "social.flockfeeds.lexical.prop.product#disambiguatingDescriptionList"
+            ]
+          },
+          "funding": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Grant#embedded",
+              "social.flockfeeds.lexical.prop.product#fundingList"
+            ]
+          },
+          "gtin": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.product#gtinScalar",
+              "social.flockfeeds.lexical.prop.product#gtinList"
+            ]
+          },
+          "gtin12": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.product#gtin12Scalar",
+              "social.flockfeeds.lexical.prop.product#gtin12List"
+            ]
+          },
+          "gtin13": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.product#gtin13Scalar",
+              "social.flockfeeds.lexical.prop.product#gtin13List"
+            ]
+          },
+          "gtin14": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.product#gtin14Scalar",
+              "social.flockfeeds.lexical.prop.product#gtin14List"
+            ]
+          },
+          "gtin8": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.product#gtin8Scalar",
+              "social.flockfeeds.lexical.prop.product#gtin8List"
+            ]
+          },
+          "hasAdultConsideration": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.AdultOrientedEnumeration#embedded",
+              "social.flockfeeds.lexical.prop.product#hasAdultConsiderationScalar",
+              "social.flockfeeds.lexical.prop.product#hasAdultConsiderationList"
+            ]
+          },
+          "hasCertification": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Certification#embedded",
+              "social.flockfeeds.lexical.prop.product#hasCertificationList"
+            ]
+          },
+          "hasEnergyConsumptionDetails": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.EnergyConsumptionDetails#embedded",
+              "social.flockfeeds.lexical.prop.product#hasEnergyConsumptionDetailsList"
+            ]
+          },
+          "hasGS1DigitalLink": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.product#hasGS1DigitalLinkScalar",
+              "social.flockfeeds.lexical.prop.product#hasGS1DigitalLinkList"
+            ]
+          },
+          "hasMeasurement": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.QuantitativeValue#embedded",
+              "social.flockfeeds.lexical.prop.product#hasMeasurementList"
+            ]
+          },
+          "hasMerchantReturnPolicy": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.MerchantReturnPolicy#embedded",
+              "social.flockfeeds.lexical.prop.product#hasMerchantReturnPolicyList"
+            ]
+          },
+          "hasProductReturnPolicy": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.ProductReturnPolicy#embedded",
+              "social.flockfeeds.lexical.prop.product#hasProductReturnPolicyList"
+            ]
+          },
+          "height": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Distance#embedded",
+              "social.flockfeeds.lexical.type.QuantitativeValue#embedded",
+              "social.flockfeeds.lexical.prop.product#heightScalar",
+              "social.flockfeeds.lexical.prop.product#heightList"
+            ]
+          },
+          "identifier": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.PropertyValue#embedded",
+              "social.flockfeeds.lexical.prop.product#identifierScalar",
+              "social.flockfeeds.lexical.prop.product#identifierList"
+            ]
+          },
+          "image": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.ImageObject#embedded",
+              "social.flockfeeds.lexical.prop.product#imageScalar",
+              "social.flockfeeds.lexical.prop.product#imageList"
+            ]
+          },
+          "inProductGroupWithID": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.product#inProductGroupWithIDScalar",
+              "social.flockfeeds.lexical.prop.product#inProductGroupWithIDList"
+            ]
+          },
+          "isAccessoryOrSparePartFor": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Product#embedded",
+              "social.flockfeeds.lexical.prop.product#isAccessoryOrSparePartForList"
+            ]
+          },
+          "isConsumableFor": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Product#embedded",
+              "social.flockfeeds.lexical.prop.product#isConsumableForList"
+            ]
+          },
+          "isFamilyFriendly": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.product#isFamilyFriendlyScalar",
+              "social.flockfeeds.lexical.prop.product#isFamilyFriendlyList"
+            ]
+          },
+          "isRelatedTo": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Product#embedded",
+              "social.flockfeeds.lexical.type.Service#embedded",
+              "social.flockfeeds.lexical.prop.product#isRelatedToList"
+            ]
+          },
+          "isSimilarTo": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Product#embedded",
+              "social.flockfeeds.lexical.type.Service#embedded",
+              "social.flockfeeds.lexical.prop.product#isSimilarToList"
+            ]
+          },
+          "isVariantOf": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.ProductGroup#embedded",
+              "social.flockfeeds.lexical.type.ProductModel#embedded",
+              "social.flockfeeds.lexical.prop.product#isVariantOfList"
+            ]
+          },
+          "itemCondition": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.OfferItemCondition#embedded",
+              "social.flockfeeds.lexical.prop.product#itemConditionScalar",
+              "social.flockfeeds.lexical.prop.product#itemConditionList"
+            ]
+          },
+          "keywords": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+              "social.flockfeeds.lexical.prop.product#keywordsScalar",
+              "social.flockfeeds.lexical.prop.product#keywordsList"
+            ]
+          },
+          "logo": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.ImageObject#embedded",
+              "social.flockfeeds.lexical.prop.product#logoScalar",
+              "social.flockfeeds.lexical.prop.product#logoList"
+            ]
+          },
+          "mainEntityOfPage": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.prop.product#mainEntityOfPageScalar",
+              "social.flockfeeds.lexical.prop.product#mainEntityOfPageList"
+            ]
+          },
+          "manufacturer": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.prop.product#manufacturerList"
+            ]
+          },
+          "material": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Product#embedded",
+              "social.flockfeeds.lexical.prop.product#materialScalar",
+              "social.flockfeeds.lexical.prop.product#materialList"
+            ]
+          },
+          "mobileUrl": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.product#mobileUrlScalar",
+              "social.flockfeeds.lexical.prop.product#mobileUrlList"
+            ]
+          },
+          "model": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.ProductModel#embedded",
+              "social.flockfeeds.lexical.prop.product#modelScalar",
+              "social.flockfeeds.lexical.prop.product#modelList"
+            ]
+          },
+          "mpn": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.product#mpnScalar",
+              "social.flockfeeds.lexical.prop.product#mpnList"
+            ]
+          },
+          "name": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.product#nameScalar",
+              "social.flockfeeds.lexical.prop.product#nameList"
+            ]
+          },
+          "negativeNotes": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.ItemList#embedded",
+              "social.flockfeeds.lexical.type.ListItem#embedded",
+              "social.flockfeeds.lexical.type.WebContent#embedded",
+              "social.flockfeeds.lexical.prop.product#negativeNotesScalar",
+              "social.flockfeeds.lexical.prop.product#negativeNotesList"
+            ]
+          },
+          "nsn": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.product#nsnScalar",
+              "social.flockfeeds.lexical.prop.product#nsnList"
+            ]
+          },
+          "offers": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Demand#embedded",
+              "social.flockfeeds.lexical.type.Offer#embedded",
+              "social.flockfeeds.lexical.prop.product#offersList"
+            ]
+          },
+          "pattern": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+              "social.flockfeeds.lexical.prop.product#patternScalar",
+              "social.flockfeeds.lexical.prop.product#patternList"
+            ]
+          },
+          "positiveNotes": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.ItemList#embedded",
+              "social.flockfeeds.lexical.type.ListItem#embedded",
+              "social.flockfeeds.lexical.type.WebContent#embedded",
+              "social.flockfeeds.lexical.prop.product#positiveNotesScalar",
+              "social.flockfeeds.lexical.prop.product#positiveNotesList"
+            ]
+          },
+          "potentialAction": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Action#embedded",
+              "social.flockfeeds.lexical.prop.product#potentialActionList"
+            ]
+          },
+          "productID": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.product#productIDScalar",
+              "social.flockfeeds.lexical.prop.product#productIDList"
+            ]
+          },
+          "productionDate": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.product#productionDateScalar",
+              "social.flockfeeds.lexical.prop.product#productionDateList"
+            ]
+          },
+          "purchaseDate": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.product#purchaseDateScalar",
+              "social.flockfeeds.lexical.prop.product#purchaseDateList"
+            ]
+          },
+          "releaseDate": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.product#releaseDateScalar",
+              "social.flockfeeds.lexical.prop.product#releaseDateList"
+            ]
+          },
+          "review": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Review#embedded",
+              "social.flockfeeds.lexical.prop.product#reviewList"
+            ]
+          },
+          "reviews": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Review#embedded",
+              "social.flockfeeds.lexical.prop.product#reviewsList"
+            ]
+          },
+          "sameAs": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.product#sameAsScalar",
+              "social.flockfeeds.lexical.prop.product#sameAsList"
+            ]
+          },
+          "size": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+              "social.flockfeeds.lexical.type.QuantitativeValue#embedded",
+              "social.flockfeeds.lexical.type.SizeSpecification#embedded",
+              "social.flockfeeds.lexical.prop.product#sizeScalar",
+              "social.flockfeeds.lexical.prop.product#sizeList"
+            ]
+          },
+          "sku": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.product#skuScalar",
+              "social.flockfeeds.lexical.prop.product#skuList"
+            ]
+          },
+          "slogan": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.product#sloganScalar",
+              "social.flockfeeds.lexical.prop.product#sloganList"
+            ]
+          },
+          "subjectOf": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.type.Event#embedded",
+              "social.flockfeeds.lexical.prop.product#subjectOfList"
+            ]
+          },
+          "url": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.product#urlScalar",
+              "social.flockfeeds.lexical.prop.product#urlList"
+            ]
+          },
+          "weight": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Mass#embedded",
+              "social.flockfeeds.lexical.type.QuantitativeValue#embedded",
+              "social.flockfeeds.lexical.prop.product#weightScalar",
+              "social.flockfeeds.lexical.prop.product#weightList"
+            ]
+          },
+          "width": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Distance#embedded",
+              "social.flockfeeds.lexical.type.QuantitativeValue#embedded",
+              "social.flockfeeds.lexical.prop.product#widthScalar",
+              "social.flockfeeds.lexical.prop.product#widthList"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

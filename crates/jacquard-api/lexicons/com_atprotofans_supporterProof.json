@@ -1,0 +1,32 @@
+{
+  "lexicon": 1,
+  "id": "com.atprotofans.supporterProof",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Attestation proof for a supporter relationship. When inline, cid and signature are required. When remote, only cid is required.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "cid"
+        ],
+        "properties": {
+          "cid": {
+            "type": "string",
+            "description": "CID of the proof record. Required for both inline and remote proofs.",
+            "format": "cid"
+          },
+          "key": {
+            "type": "string",
+            "description": "Signing key (for inline proofs)."
+          },
+          "signature": {
+            "type": "bytes",
+            "description": "Signature data (for inline proofs)."
+          }
+        }
+      }
+    }
+  }
+}

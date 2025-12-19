@@ -1,7 +1,7 @@
 {
   "lexicon": 1,
   "id": "blog.pckt.block.blockquote",
-  "description": "Blockquote for quoted text or citations. Typically rendered with distinct visual styling to set quoted content apart from the main text.",
+  "description": "Blockquote for quoted text or citations. Contains text blocks.",
   "defs": {
     "main": {
       "type": "object",
@@ -11,11 +11,11 @@
       "properties": {
         "content": {
           "type": "array",
-          "description": "Array of paragraph content",
+          "description": "Array of text blocks",
           "items": {
             "type": "union",
             "refs": [
-              "blog.pckt.block.paragraph"
+              "blog.pckt.block.text"
             ],
             "closed": false
           }

@@ -1,0 +1,258 @@
+{
+  "lexicon": 1,
+  "id": "social.flockfeeds.lexical.type.Brand",
+  "defs": {
+    "embedded": {
+      "type": "object",
+      "description": "A brand is a name used by an organization or business person for labeling a product, product group, or similar.",
+      "properties": {
+        "additionalType": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.brand#additionalTypeScalar",
+            "social.flockfeeds.lexical.prop.brand#additionalTypeList"
+          ]
+        },
+        "aggregateRating": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.AggregateRating#embedded",
+            "social.flockfeeds.lexical.prop.brand#aggregateRatingList"
+          ]
+        },
+        "alternateName": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.brand#alternateNameScalar",
+            "social.flockfeeds.lexical.prop.brand#alternateNameList"
+          ]
+        },
+        "description": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.TextObject#embedded",
+            "social.flockfeeds.lexical.prop.brand#descriptionScalar",
+            "social.flockfeeds.lexical.prop.brand#descriptionList"
+          ]
+        },
+        "disambiguatingDescription": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.brand#disambiguatingDescriptionScalar",
+            "social.flockfeeds.lexical.prop.brand#disambiguatingDescriptionList"
+          ]
+        },
+        "identifier": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.PropertyValue#embedded",
+            "social.flockfeeds.lexical.prop.brand#identifierScalar",
+            "social.flockfeeds.lexical.prop.brand#identifierList"
+          ]
+        },
+        "image": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.ImageObject#embedded",
+            "social.flockfeeds.lexical.prop.brand#imageScalar",
+            "social.flockfeeds.lexical.prop.brand#imageList"
+          ]
+        },
+        "logo": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.ImageObject#embedded",
+            "social.flockfeeds.lexical.prop.brand#logoScalar",
+            "social.flockfeeds.lexical.prop.brand#logoList"
+          ]
+        },
+        "mainEntityOfPage": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.brand#mainEntityOfPageScalar",
+            "social.flockfeeds.lexical.prop.brand#mainEntityOfPageList"
+          ]
+        },
+        "name": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.brand#nameScalar",
+            "social.flockfeeds.lexical.prop.brand#nameList"
+          ]
+        },
+        "potentialAction": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Action#embedded",
+            "social.flockfeeds.lexical.prop.brand#potentialActionList"
+          ]
+        },
+        "review": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Review#embedded",
+            "social.flockfeeds.lexical.prop.brand#reviewList"
+          ]
+        },
+        "sameAs": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.brand#sameAsScalar",
+            "social.flockfeeds.lexical.prop.brand#sameAsList"
+          ]
+        },
+        "slogan": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.brand#sloganScalar",
+            "social.flockfeeds.lexical.prop.brand#sloganList"
+          ]
+        },
+        "subjectOf": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.type.Event#embedded",
+            "social.flockfeeds.lexical.prop.brand#subjectOfList"
+          ]
+        },
+        "url": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.brand#urlScalar",
+            "social.flockfeeds.lexical.prop.brand#urlList"
+          ]
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "description": "A brand is a name used by an organization or business person for labeling a product, product group, or similar.",
+        "properties": {
+          "additionalType": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.brand#additionalTypeScalar",
+              "social.flockfeeds.lexical.prop.brand#additionalTypeList"
+            ]
+          },
+          "aggregateRating": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.AggregateRating#embedded",
+              "social.flockfeeds.lexical.prop.brand#aggregateRatingList"
+            ]
+          },
+          "alternateName": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.brand#alternateNameScalar",
+              "social.flockfeeds.lexical.prop.brand#alternateNameList"
+            ]
+          },
+          "description": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.TextObject#embedded",
+              "social.flockfeeds.lexical.prop.brand#descriptionScalar",
+              "social.flockfeeds.lexical.prop.brand#descriptionList"
+            ]
+          },
+          "disambiguatingDescription": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.brand#disambiguatingDescriptionScalar",
+              "social.flockfeeds.lexical.prop.brand#disambiguatingDescriptionList"
+            ]
+          },
+          "identifier": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.PropertyValue#embedded",
+              "social.flockfeeds.lexical.prop.brand#identifierScalar",
+              "social.flockfeeds.lexical.prop.brand#identifierList"
+            ]
+          },
+          "image": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.ImageObject#embedded",
+              "social.flockfeeds.lexical.prop.brand#imageScalar",
+              "social.flockfeeds.lexical.prop.brand#imageList"
+            ]
+          },
+          "logo": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.ImageObject#embedded",
+              "social.flockfeeds.lexical.prop.brand#logoScalar",
+              "social.flockfeeds.lexical.prop.brand#logoList"
+            ]
+          },
+          "mainEntityOfPage": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.prop.brand#mainEntityOfPageScalar",
+              "social.flockfeeds.lexical.prop.brand#mainEntityOfPageList"
+            ]
+          },
+          "name": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.brand#nameScalar",
+              "social.flockfeeds.lexical.prop.brand#nameList"
+            ]
+          },
+          "potentialAction": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Action#embedded",
+              "social.flockfeeds.lexical.prop.brand#potentialActionList"
+            ]
+          },
+          "review": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Review#embedded",
+              "social.flockfeeds.lexical.prop.brand#reviewList"
+            ]
+          },
+          "sameAs": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.brand#sameAsScalar",
+              "social.flockfeeds.lexical.prop.brand#sameAsList"
+            ]
+          },
+          "slogan": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.brand#sloganScalar",
+              "social.flockfeeds.lexical.prop.brand#sloganList"
+            ]
+          },
+          "subjectOf": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.type.Event#embedded",
+              "social.flockfeeds.lexical.prop.brand#subjectOfList"
+            ]
+          },
+          "url": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.brand#urlScalar",
+              "social.flockfeeds.lexical.prop.brand#urlList"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

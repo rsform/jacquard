@@ -17,9 +17,9 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Blockquote<'a> {
-    /// Array of paragraph content
+    /// Array of text blocks
     #[serde(borrow)]
-    pub content: Vec<crate::blog_pckt::block::paragraph::Paragraph<'a>>,
+    pub content: Vec<crate::blog_pckt::block::text::Text<'a>>,
 }
 
 pub mod blockquote_state {
@@ -58,7 +58,7 @@ pub mod blockquote_state {
 pub struct BlockquoteBuilder<'a, S: blockquote_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<Vec<crate::blog_pckt::block::paragraph::Paragraph<'a>>>,
+        ::core::option::Option<Vec<crate::blog_pckt::block::text::Text<'a>>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -89,7 +89,7 @@ where
     /// Set the `content` field (required)
     pub fn content(
         mut self,
-        value: impl Into<Vec<crate::blog_pckt::block::paragraph::Paragraph<'a>>>,
+        value: impl Into<Vec<crate::blog_pckt::block::text::Text<'a>>>,
     ) -> BlockquoteBuilder<'a, blockquote_state::SetContent<S>> {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
         BlockquoteBuilder {
@@ -153,13 +153,13 @@ fn lexicon_doc_blog_pckt_block_blockquote() -> ::jacquard_lexicon::lexicon::Lexi
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
                                 description: Some(
                                     ::jacquard_common::CowStr::new_static(
-                                        "Array of paragraph content",
+                                        "Array of text blocks",
                                     ),
                                 ),
                                 items: ::jacquard_lexicon::lexicon::LexArrayItem::Union(::jacquard_lexicon::lexicon::LexRefUnion {
                                     description: None,
                                     refs: vec![
-                                        ::jacquard_common::CowStr::new_static("blog.pckt.block.paragraph")
+                                        ::jacquard_common::CowStr::new_static("blog.pckt.block.text")
                                     ],
                                     closed: Some(false),
                                 }),

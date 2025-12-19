@@ -1,0 +1,60 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.notebook.resolveVersionConflict",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Given multiple URIs that might refer to the same collaborative entry, resolve to canonical version.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "uris"
+        ],
+        "properties": {
+          "uris": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "at-uri"
+            },
+            "minLength": 1,
+            "maxLength": 20
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "canonical",
+            "related"
+          ],
+          "properties": {
+            "canonical": {
+              "type": "ref",
+              "ref": "sh.weaver.notebook.defs#publishedVersionView"
+            },
+            "collaborationState": {
+              "type": "ref",
+              "ref": "sh.weaver.collab.defs#collaborationStateView"
+            },
+            "related": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "sh.weaver.notebook.defs#publishedVersionView"
+              }
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "The URIs don't appear to be related versions",
+          "name": "NoRelatedVersions"
+        }
+      ]
+    }
+  }
+}

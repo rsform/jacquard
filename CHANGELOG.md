@@ -1,5 +1,50 @@
 # Changelog
 
+## [0.9.5] - 2025-12-19
+
+### Fixed
+
+**docs.rs configuration**
+- Fixed typo in `jacquard-common` docs.rs features (`crypto-ed22519` → `crypto-ed25519`) that was causing documentation builds to fail
+- Moved `loopback` feature documentation to `jacquard-oauth` where the feature is defined
+
+**OAuth flow** (`jacquard-oauth`)
+- Minor OAuth flow compatibility improvements
+
+**Serialization** (`jacquard-common`, `jacquard-identity`)
+- Fixed CID deserialization edge cases in `Data` and `RawData` types
+- Fixed DID document serialization when optional fields are absent
+
+**Lexicon code generation** (`jacquard-lexicon`, `jacquard-api`)
+- Fixed nullable field handling in generated code
+- Fixed lifetime handling in codegen of binary xrpc outputs
+- Fixed lifetime handling in unions
+- Fixed incorrectly unescaped rust keywords in module paths
+
+**Observability** (`jacquard`)
+- Fixed tracing span issues associated with some build failures
+
+### Added
+
+**mini-moka-wasm** (`mini-moka-wasm`, `jacquard-identity`)
+- Publishing vendored version of mini-moka with wasm browser compat fix to make usage easier
+
+**Service authentication** (`jacquard-axum`)
+- Optional service auth extractor option
+
+**Data handling** (`jacquard-common`)
+- Serde bytes helpers for JSON fields
+- Made PLC source fields public for library consumers
+
+**Lexicons** (`jacquard-api`)
+- Updated to latest AT Protocol lexicon schemas
+- API regeneration with builder fixes
+
+### Changed
+
+**Logging** (`jacquard`)
+- Improved client error logging with better context
+
 ## [0.9.3] - 2025-11-17 (`jacquard`)
 
 ### Fixed

@@ -1,0 +1,34 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.notification.getUnreadCount",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get count of unread notifications for the authenticated user.",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "seenAt": {
+            "type": "string",
+            "description": "Count notifications after this timestamp.",
+            "format": "datetime"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "count"
+          ],
+          "properties": {
+            "count": {
+              "type": "integer"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.notebook.getNotebookDetail",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get a notebook with its entries in a single call.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "notebook"
+        ],
+        "properties": {
+          "entryCursor": {
+            "type": "string"
+          },
+          "entryLimit": {
+            "type": "integer",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 100
+          },
+          "notebook": {
+            "type": "string",
+            "format": "at-uri"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "notebook",
+            "entries"
+          ],
+          "properties": {
+            "entries": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "sh.weaver.notebook.defs#bookEntryView"
+              }
+            },
+            "entryCursor": {
+              "type": "string"
+            },
+            "notebook": {
+              "type": "ref",
+              "ref": "sh.weaver.notebook.defs#notebookView"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "name": "NotebookNotFound"
+        }
+      ]
+    }
+  }
+}

@@ -271,11 +271,11 @@ pub mod notification_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Reason;
         type IsRead;
-        type IndexedAt;
         type Cid;
         type Author;
-        type Reason;
+        type IndexedAt;
         type Uri;
         type Record;
     }
@@ -283,35 +283,35 @@ pub mod notification_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Reason = Unset;
         type IsRead = Unset;
-        type IndexedAt = Unset;
         type Cid = Unset;
         type Author = Unset;
-        type Reason = Unset;
+        type IndexedAt = Unset;
         type Uri = Unset;
         type Record = Unset;
+    }
+    ///State transition - sets the `reason` field to Set
+    pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetReason<S> {}
+    impl<S: State> State for SetReason<S> {
+        type Reason = Set<members::reason>;
+        type IsRead = S::IsRead;
+        type Cid = S::Cid;
+        type Author = S::Author;
+        type IndexedAt = S::IndexedAt;
+        type Uri = S::Uri;
+        type Record = S::Record;
     }
     ///State transition - sets the `is_read` field to Set
     pub struct SetIsRead<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIsRead<S> {}
     impl<S: State> State for SetIsRead<S> {
+        type Reason = S::Reason;
         type IsRead = Set<members::is_read>;
+        type Cid = S::Cid;
+        type Author = S::Author;
         type IndexedAt = S::IndexedAt;
-        type Cid = S::Cid;
-        type Author = S::Author;
-        type Reason = S::Reason;
-        type Uri = S::Uri;
-        type Record = S::Record;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
-    impl<S: State> State for SetIndexedAt<S> {
-        type IsRead = S::IsRead;
-        type IndexedAt = Set<members::indexed_at>;
-        type Cid = S::Cid;
-        type Author = S::Author;
-        type Reason = S::Reason;
         type Uri = S::Uri;
         type Record = S::Record;
     }
@@ -319,11 +319,11 @@ pub mod notification_state {
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
+        type Reason = S::Reason;
         type IsRead = S::IsRead;
-        type IndexedAt = S::IndexedAt;
         type Cid = Set<members::cid>;
         type Author = S::Author;
-        type Reason = S::Reason;
+        type IndexedAt = S::IndexedAt;
         type Uri = S::Uri;
         type Record = S::Record;
     }
@@ -331,23 +331,23 @@ pub mod notification_state {
     pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthor<S> {}
     impl<S: State> State for SetAuthor<S> {
+        type Reason = S::Reason;
         type IsRead = S::IsRead;
-        type IndexedAt = S::IndexedAt;
         type Cid = S::Cid;
         type Author = Set<members::author>;
-        type Reason = S::Reason;
+        type IndexedAt = S::IndexedAt;
         type Uri = S::Uri;
         type Record = S::Record;
     }
-    ///State transition - sets the `reason` field to Set
-    pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetReason<S> {}
-    impl<S: State> State for SetReason<S> {
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type Reason = S::Reason;
         type IsRead = S::IsRead;
-        type IndexedAt = S::IndexedAt;
         type Cid = S::Cid;
         type Author = S::Author;
-        type Reason = Set<members::reason>;
+        type IndexedAt = Set<members::indexed_at>;
         type Uri = S::Uri;
         type Record = S::Record;
     }
@@ -355,11 +355,11 @@ pub mod notification_state {
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
+        type Reason = S::Reason;
         type IsRead = S::IsRead;
-        type IndexedAt = S::IndexedAt;
         type Cid = S::Cid;
         type Author = S::Author;
-        type Reason = S::Reason;
+        type IndexedAt = S::IndexedAt;
         type Uri = Set<members::uri>;
         type Record = S::Record;
     }
@@ -367,27 +367,27 @@ pub mod notification_state {
     pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRecord<S> {}
     impl<S: State> State for SetRecord<S> {
+        type Reason = S::Reason;
         type IsRead = S::IsRead;
-        type IndexedAt = S::IndexedAt;
         type Cid = S::Cid;
         type Author = S::Author;
-        type Reason = S::Reason;
+        type IndexedAt = S::IndexedAt;
         type Uri = S::Uri;
         type Record = Set<members::record>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `reason` field
+        pub struct reason(());
         ///Marker type for the `is_read` field
         pub struct is_read(());
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
         ///Marker type for the `cid` field
         pub struct cid(());
         ///Marker type for the `author` field
         pub struct author(());
-        ///Marker type for the `reason` field
-        pub struct reason(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
         ///Marker type for the `uri` field
         pub struct uri(());
         ///Marker type for the `record` field
@@ -614,11 +614,11 @@ where
 impl<'a, S> NotificationBuilder<'a, S>
 where
     S: notification_state::State,
+    S::Reason: notification_state::IsSet,
     S::IsRead: notification_state::IsSet,
-    S::IndexedAt: notification_state::IsSet,
     S::Cid: notification_state::IsSet,
     S::Author: notification_state::IsSet,
-    S::Reason: notification_state::IsSet,
+    S::IndexedAt: notification_state::IsSet,
     S::Uri: notification_state::IsSet,
     S::Record: notification_state::IsSet,
 {

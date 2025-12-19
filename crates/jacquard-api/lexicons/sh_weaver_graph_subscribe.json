@@ -1,0 +1,29 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.graph.subscribe",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Request to subscribe to a notebook. Requires acceptance to be active.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "notebook",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "notebook": {
+            "type": "string",
+            "description": "URI of the notebook to subscribe to.",
+            "format": "at-uri"
+          }
+        }
+      }
+    }
+  }
+}

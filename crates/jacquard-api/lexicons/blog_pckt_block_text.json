@@ -1,35 +1,25 @@
 {
   "lexicon": 1,
   "id": "blog.pckt.block.text",
-  "description": "An inline text node with optional formatting marks. Text nodes are the leaf nodes containing actual textual content within paragraphs and other container blocks.",
+  "description": "A text block containing plain text content with optional formatting via facets.",
   "defs": {
     "main": {
       "type": "object",
       "required": [
-        "text"
+        "plaintext"
       ],
       "properties": {
-        "marks": {
+        "facets": {
           "type": "array",
-          "description": "Optional array of formatting marks applied to this text (bold, italic, links, etc.)",
+          "description": "Facets for text formatting and features",
           "items": {
-            "type": "union",
-            "refs": [
-              "blog.pckt.mark.bold",
-              "blog.pckt.mark.italic",
-              "blog.pckt.mark.underline",
-              "blog.pckt.mark.strike",
-              "blog.pckt.mark.code",
-              "blog.pckt.mark.link"
-            ],
-            "closed": false
+            "type": "ref",
+            "ref": "blog.pckt.richtext.facet"
           }
         },
-        "text": {
+        "plaintext": {
           "type": "string",
-          "description": "The actual text content",
-          "maxLength": 10000,
-          "maxGraphemes": 5000
+          "description": "The plain text content"
         }
       }
     }

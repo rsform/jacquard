@@ -1,0 +1,32 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.notification.updateSeen",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Mark notifications as seen up to a given timestamp.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "seenAt"
+          ],
+          "properties": {
+            "seenAt": {
+              "type": "string",
+              "format": "datetime"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {}
+        }
+      }
+    }
+  }
+}

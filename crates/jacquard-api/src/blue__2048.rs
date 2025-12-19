@@ -44,8 +44,8 @@ pub mod sync_status_state {
     pub trait State: sealed::Sealed {
         type UpdatedAt;
         type SyncedWithAtRepo;
-        type Hash;
         type CreatedAt;
+        type Hash;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -53,8 +53,8 @@ pub mod sync_status_state {
     impl State for Empty {
         type UpdatedAt = Unset;
         type SyncedWithAtRepo = Unset;
-        type Hash = Unset;
         type CreatedAt = Unset;
+        type Hash = Unset;
     }
     ///State transition - sets the `updated_at` field to Set
     pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
@@ -62,8 +62,8 @@ pub mod sync_status_state {
     impl<S: State> State for SetUpdatedAt<S> {
         type UpdatedAt = Set<members::updated_at>;
         type SyncedWithAtRepo = S::SyncedWithAtRepo;
-        type Hash = S::Hash;
         type CreatedAt = S::CreatedAt;
+        type Hash = S::Hash;
     }
     ///State transition - sets the `synced_with_at_repo` field to Set
     pub struct SetSyncedWithAtRepo<S: State = Empty>(PhantomData<fn() -> S>);
@@ -71,17 +71,8 @@ pub mod sync_status_state {
     impl<S: State> State for SetSyncedWithAtRepo<S> {
         type UpdatedAt = S::UpdatedAt;
         type SyncedWithAtRepo = Set<members::synced_with_at_repo>;
+        type CreatedAt = S::CreatedAt;
         type Hash = S::Hash;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `hash` field to Set
-    pub struct SetHash<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHash<S> {}
-    impl<S: State> State for SetHash<S> {
-        type UpdatedAt = S::UpdatedAt;
-        type SyncedWithAtRepo = S::SyncedWithAtRepo;
-        type Hash = Set<members::hash>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
@@ -89,8 +80,17 @@ pub mod sync_status_state {
     impl<S: State> State for SetCreatedAt<S> {
         type UpdatedAt = S::UpdatedAt;
         type SyncedWithAtRepo = S::SyncedWithAtRepo;
-        type Hash = S::Hash;
         type CreatedAt = Set<members::created_at>;
+        type Hash = S::Hash;
+    }
+    ///State transition - sets the `hash` field to Set
+    pub struct SetHash<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHash<S> {}
+    impl<S: State> State for SetHash<S> {
+        type UpdatedAt = S::UpdatedAt;
+        type SyncedWithAtRepo = S::SyncedWithAtRepo;
+        type CreatedAt = S::CreatedAt;
+        type Hash = Set<members::hash>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -99,10 +99,10 @@ pub mod sync_status_state {
         pub struct updated_at(());
         ///Marker type for the `synced_with_at_repo` field
         pub struct synced_with_at_repo(());
-        ///Marker type for the `hash` field
-        pub struct hash(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `hash` field
+        pub struct hash(());
     }
 }
 
@@ -217,8 +217,8 @@ where
     S: sync_status_state::State,
     S::UpdatedAt: sync_status_state::IsSet,
     S::SyncedWithAtRepo: sync_status_state::IsSet,
-    S::Hash: sync_status_state::IsSet,
     S::CreatedAt: sync_status_state::IsSet,
+    S::Hash: sync_status_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SyncStatus<'a> {

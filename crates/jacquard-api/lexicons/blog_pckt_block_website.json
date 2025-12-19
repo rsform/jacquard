@@ -1,0 +1,33 @@
+{
+  "lexicon": 1,
+  "id": "blog.pckt.block.website",
+  "description": "A website link preview with title, description, and optional preview image",
+  "defs": {
+    "main": {
+      "type": "object",
+      "required": [
+        "src"
+      ],
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "A brief description of the website or page"
+        },
+        "previewImage": {
+          "type": "string",
+          "description": "URL of the preview image",
+          "format": "uri"
+        },
+        "src": {
+          "type": "string",
+          "description": "The URL of the website",
+          "format": "uri"
+        },
+        "title": {
+          "type": "string",
+          "description": "The title of the website or page"
+        }
+      }
+    }
+  }
+}

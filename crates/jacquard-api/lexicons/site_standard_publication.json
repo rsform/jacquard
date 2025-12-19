@@ -1,0 +1,53 @@
+{
+  "lexicon": 1,
+  "id": "site.standard.publication",
+  "defs": {
+    "main": {
+      "type": "object",
+      "required": [
+        "url",
+        "name"
+      ],
+      "properties": {
+        "basicTheme": {
+          "type": "ref",
+          "ref": "site.standard.theme.basic"
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 3000,
+          "maxGraphemes": 300
+        },
+        "icon": {
+          "type": "blob",
+          "accept": [
+            "image/*"
+          ],
+          "maxSize": 1000000
+        },
+        "name": {
+          "type": "string",
+          "maxLength": 1280,
+          "maxGraphemes": 128
+        },
+        "preferences": {
+          "type": "ref",
+          "ref": "#preferences"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "preferences": {
+      "type": "object",
+      "properties": {
+        "showInDiscover": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    }
+  }
+}

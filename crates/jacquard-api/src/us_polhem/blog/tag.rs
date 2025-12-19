@@ -37,67 +37,67 @@ pub mod tag_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Name;
         type Description;
         type Slug;
+        type Name;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Name = Unset;
         type Description = Unset;
         type Slug = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
-        type Description = S::Description;
-        type Slug = S::Slug;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type CreatedAt = S::CreatedAt;
-        type Name = Set<members::name>;
-        type Description = S::Description;
-        type Slug = S::Slug;
+        type Name = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `description` field to Set
     pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDescription<S> {}
     impl<S: State> State for SetDescription<S> {
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
         type Description = Set<members::description>;
         type Slug = S::Slug;
+        type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `slug` field to Set
     pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSlug<S> {}
     impl<S: State> State for SetSlug<S> {
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
         type Description = S::Description;
         type Slug = Set<members::slug>;
+        type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Description = S::Description;
+        type Slug = S::Slug;
+        type Name = Set<members::name>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Description = S::Description;
+        type Slug = S::Slug;
+        type Name = S::Name;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `description` field
         pub struct description(());
         ///Marker type for the `slug` field
         pub struct slug(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -210,10 +210,10 @@ where
 impl<'a, S> TagBuilder<'a, S>
 where
     S: tag_state::State,
-    S::CreatedAt: tag_state::IsSet,
-    S::Name: tag_state::IsSet,
     S::Description: tag_state::IsSet,
     S::Slug: tag_state::IsSet,
+    S::Name: tag_state::IsSet,
+    S::CreatedAt: tag_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Tag<'a> {

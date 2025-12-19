@@ -1,0 +1,29 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.graph.followAccept",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Acceptance of a follow request. Completes the two-way agreement.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "follow",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "follow": {
+            "type": "ref",
+            "description": "Reference to the follow record being accepted.",
+            "ref": "com.atproto.repo.strongRef"
+          }
+        }
+      }
+    }
+  }
+}

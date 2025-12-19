@@ -1,0 +1,1186 @@
+{
+  "lexicon": 1,
+  "id": "social.flockfeeds.lexical.type.Person",
+  "defs": {
+    "embedded": {
+      "type": "object",
+      "description": "A person (alive, dead, undead, or fictional).",
+      "properties": {
+        "additionalName": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.person#additionalNameScalar",
+            "social.flockfeeds.lexical.prop.person#additionalNameList"
+          ]
+        },
+        "additionalType": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.person#additionalTypeScalar",
+            "social.flockfeeds.lexical.prop.person#additionalTypeList"
+          ]
+        },
+        "address": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.PostalAddress#embedded",
+            "social.flockfeeds.lexical.prop.person#addressScalar",
+            "social.flockfeeds.lexical.prop.person#addressList"
+          ]
+        },
+        "affiliation": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.prop.person#affiliationList"
+          ]
+        },
+        "agentInteractionStatistic": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.InteractionCounter#embedded",
+            "social.flockfeeds.lexical.prop.person#agentInteractionStatisticList"
+          ]
+        },
+        "alternateName": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.person#alternateNameScalar",
+            "social.flockfeeds.lexical.prop.person#alternateNameList"
+          ]
+        },
+        "alumniOf": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.EducationalOrganization#embedded",
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.prop.person#alumniOfList"
+          ]
+        },
+        "award": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.person#awardScalar",
+            "social.flockfeeds.lexical.prop.person#awardList"
+          ]
+        },
+        "awards": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.person#awardsScalar",
+            "social.flockfeeds.lexical.prop.person#awardsList"
+          ]
+        },
+        "birthDate": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.person#birthDateScalar",
+            "social.flockfeeds.lexical.prop.person#birthDateList"
+          ]
+        },
+        "birthPlace": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Place#embedded",
+            "social.flockfeeds.lexical.prop.person#birthPlaceList"
+          ]
+        },
+        "brand": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Brand#embedded",
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.prop.person#brandList"
+          ]
+        },
+        "callSign": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.person#callSignScalar",
+            "social.flockfeeds.lexical.prop.person#callSignList"
+          ]
+        },
+        "children": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.person#childrenList"
+          ]
+        },
+        "colleague": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.person#colleagueScalar",
+            "social.flockfeeds.lexical.prop.person#colleagueList"
+          ]
+        },
+        "colleagues": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.person#colleaguesList"
+          ]
+        },
+        "contactPoint": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.ContactPoint#embedded",
+            "social.flockfeeds.lexical.prop.person#contactPointList"
+          ]
+        },
+        "contactPoints": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.ContactPoint#embedded",
+            "social.flockfeeds.lexical.prop.person#contactPointsList"
+          ]
+        },
+        "deathDate": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.person#deathDateScalar",
+            "social.flockfeeds.lexical.prop.person#deathDateList"
+          ]
+        },
+        "deathPlace": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Place#embedded",
+            "social.flockfeeds.lexical.prop.person#deathPlaceList"
+          ]
+        },
+        "description": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.TextObject#embedded",
+            "social.flockfeeds.lexical.prop.person#descriptionScalar",
+            "social.flockfeeds.lexical.prop.person#descriptionList"
+          ]
+        },
+        "disambiguatingDescription": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.person#disambiguatingDescriptionScalar",
+            "social.flockfeeds.lexical.prop.person#disambiguatingDescriptionList"
+          ]
+        },
+        "duns": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.person#dunsScalar",
+            "social.flockfeeds.lexical.prop.person#dunsList"
+          ]
+        },
+        "email": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.person#emailScalar",
+            "social.flockfeeds.lexical.prop.person#emailList"
+          ]
+        },
+        "familyName": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.person#familyNameScalar",
+            "social.flockfeeds.lexical.prop.person#familyNameList"
+          ]
+        },
+        "faxNumber": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.person#faxNumberScalar",
+            "social.flockfeeds.lexical.prop.person#faxNumberList"
+          ]
+        },
+        "follows": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.person#followsList"
+          ]
+        },
+        "funder": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.person#funderList"
+          ]
+        },
+        "funding": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Grant#embedded",
+            "social.flockfeeds.lexical.prop.person#fundingList"
+          ]
+        },
+        "gender": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.GenderType#embedded",
+            "social.flockfeeds.lexical.prop.person#genderScalar",
+            "social.flockfeeds.lexical.prop.person#genderList"
+          ]
+        },
+        "givenName": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.person#givenNameScalar",
+            "social.flockfeeds.lexical.prop.person#givenNameList"
+          ]
+        },
+        "globalLocationNumber": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.person#globalLocationNumberScalar",
+            "social.flockfeeds.lexical.prop.person#globalLocationNumberList"
+          ]
+        },
+        "hasCertification": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Certification#embedded",
+            "social.flockfeeds.lexical.prop.person#hasCertificationList"
+          ]
+        },
+        "hasCredential": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.EducationalOccupationalCredential#embedded",
+            "social.flockfeeds.lexical.prop.person#hasCredentialList"
+          ]
+        },
+        "hasOccupation": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Occupation#embedded",
+            "social.flockfeeds.lexical.prop.person#hasOccupationList"
+          ]
+        },
+        "hasOfferCatalog": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.OfferCatalog#embedded",
+            "social.flockfeeds.lexical.prop.person#hasOfferCatalogList"
+          ]
+        },
+        "hasPOS": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Place#embedded",
+            "social.flockfeeds.lexical.prop.person#hasPOSList"
+          ]
+        },
+        "height": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Distance#embedded",
+            "social.flockfeeds.lexical.type.QuantitativeValue#embedded",
+            "social.flockfeeds.lexical.prop.person#heightScalar",
+            "social.flockfeeds.lexical.prop.person#heightList"
+          ]
+        },
+        "homeLocation": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.ContactPoint#embedded",
+            "social.flockfeeds.lexical.type.Place#embedded",
+            "social.flockfeeds.lexical.prop.person#homeLocationList"
+          ]
+        },
+        "honorificPrefix": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.person#honorificPrefixScalar",
+            "social.flockfeeds.lexical.prop.person#honorificPrefixList"
+          ]
+        },
+        "honorificSuffix": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.person#honorificSuffixScalar",
+            "social.flockfeeds.lexical.prop.person#honorificSuffixList"
+          ]
+        },
+        "identifier": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.PropertyValue#embedded",
+            "social.flockfeeds.lexical.prop.person#identifierScalar",
+            "social.flockfeeds.lexical.prop.person#identifierList"
+          ]
+        },
+        "image": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.ImageObject#embedded",
+            "social.flockfeeds.lexical.prop.person#imageScalar",
+            "social.flockfeeds.lexical.prop.person#imageList"
+          ]
+        },
+        "interactionStatistic": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.InteractionCounter#embedded",
+            "social.flockfeeds.lexical.prop.person#interactionStatisticList"
+          ]
+        },
+        "isicV4": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.person#isicV4Scalar",
+            "social.flockfeeds.lexical.prop.person#isicV4List"
+          ]
+        },
+        "jobTitle": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+            "social.flockfeeds.lexical.prop.person#jobTitleScalar",
+            "social.flockfeeds.lexical.prop.person#jobTitleList"
+          ]
+        },
+        "knows": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.person#knowsList"
+          ]
+        },
+        "knowsAbout": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Thing#embedded",
+            "social.flockfeeds.lexical.prop.person#knowsAboutScalar",
+            "social.flockfeeds.lexical.prop.person#knowsAboutList"
+          ]
+        },
+        "knowsLanguage": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Language#embedded",
+            "social.flockfeeds.lexical.prop.person#knowsLanguageScalar",
+            "social.flockfeeds.lexical.prop.person#knowsLanguageList"
+          ]
+        },
+        "mainEntityOfPage": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.person#mainEntityOfPageScalar",
+            "social.flockfeeds.lexical.prop.person#mainEntityOfPageList"
+          ]
+        },
+        "makesOffer": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Offer#embedded",
+            "social.flockfeeds.lexical.prop.person#makesOfferList"
+          ]
+        },
+        "memberOf": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.MemberProgramTier#embedded",
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.ProgramMembership#embedded",
+            "social.flockfeeds.lexical.prop.person#memberOfList"
+          ]
+        },
+        "naics": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.person#naicsScalar",
+            "social.flockfeeds.lexical.prop.person#naicsList"
+          ]
+        },
+        "name": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.person#nameScalar",
+            "social.flockfeeds.lexical.prop.person#nameList"
+          ]
+        },
+        "nationality": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Country#embedded",
+            "social.flockfeeds.lexical.prop.person#nationalityList"
+          ]
+        },
+        "netWorth": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.MonetaryAmount#embedded",
+            "social.flockfeeds.lexical.type.PriceSpecification#embedded",
+            "social.flockfeeds.lexical.prop.person#netWorthList"
+          ]
+        },
+        "owns": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.OwnershipInfo#embedded",
+            "social.flockfeeds.lexical.type.Product#embedded",
+            "social.flockfeeds.lexical.prop.person#ownsList"
+          ]
+        },
+        "parent": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.person#parentList"
+          ]
+        },
+        "parents": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.person#parentsList"
+          ]
+        },
+        "performerIn": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Event#embedded",
+            "social.flockfeeds.lexical.prop.person#performerInList"
+          ]
+        },
+        "potentialAction": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Action#embedded",
+            "social.flockfeeds.lexical.prop.person#potentialActionList"
+          ]
+        },
+        "pronouns": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+            "social.flockfeeds.lexical.type.StructuredValue#embedded",
+            "social.flockfeeds.lexical.prop.person#pronounsScalar",
+            "social.flockfeeds.lexical.prop.person#pronounsList"
+          ]
+        },
+        "publishingPrinciples": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.person#publishingPrinciplesScalar",
+            "social.flockfeeds.lexical.prop.person#publishingPrinciplesList"
+          ]
+        },
+        "relatedTo": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.person#relatedToList"
+          ]
+        },
+        "sameAs": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.person#sameAsScalar",
+            "social.flockfeeds.lexical.prop.person#sameAsList"
+          ]
+        },
+        "seeks": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Demand#embedded",
+            "social.flockfeeds.lexical.prop.person#seeksList"
+          ]
+        },
+        "sibling": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.person#siblingList"
+          ]
+        },
+        "siblings": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.person#siblingsList"
+          ]
+        },
+        "skills": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+            "social.flockfeeds.lexical.prop.person#skillsScalar",
+            "social.flockfeeds.lexical.prop.person#skillsList"
+          ]
+        },
+        "sponsor": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.person#sponsorList"
+          ]
+        },
+        "spouse": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.person#spouseList"
+          ]
+        },
+        "subjectOf": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.type.Event#embedded",
+            "social.flockfeeds.lexical.prop.person#subjectOfList"
+          ]
+        },
+        "taxID": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.person#taxIDScalar",
+            "social.flockfeeds.lexical.prop.person#taxIDList"
+          ]
+        },
+        "telephone": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.person#telephoneScalar",
+            "social.flockfeeds.lexical.prop.person#telephoneList"
+          ]
+        },
+        "url": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.person#urlScalar",
+            "social.flockfeeds.lexical.prop.person#urlList"
+          ]
+        },
+        "vatID": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.person#vatIDScalar",
+            "social.flockfeeds.lexical.prop.person#vatIDList"
+          ]
+        },
+        "weight": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Mass#embedded",
+            "social.flockfeeds.lexical.type.QuantitativeValue#embedded",
+            "social.flockfeeds.lexical.prop.person#weightScalar",
+            "social.flockfeeds.lexical.prop.person#weightList"
+          ]
+        },
+        "workLocation": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.ContactPoint#embedded",
+            "social.flockfeeds.lexical.type.Place#embedded",
+            "social.flockfeeds.lexical.prop.person#workLocationList"
+          ]
+        },
+        "worksFor": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.prop.person#worksForList"
+          ]
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "description": "A person (alive, dead, undead, or fictional).",
+        "properties": {
+          "additionalName": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.person#additionalNameScalar",
+              "social.flockfeeds.lexical.prop.person#additionalNameList"
+            ]
+          },
+          "additionalType": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.person#additionalTypeScalar",
+              "social.flockfeeds.lexical.prop.person#additionalTypeList"
+            ]
+          },
+          "address": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.PostalAddress#embedded",
+              "social.flockfeeds.lexical.prop.person#addressScalar",
+              "social.flockfeeds.lexical.prop.person#addressList"
+            ]
+          },
+          "affiliation": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.prop.person#affiliationList"
+            ]
+          },
+          "agentInteractionStatistic": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.InteractionCounter#embedded",
+              "social.flockfeeds.lexical.prop.person#agentInteractionStatisticList"
+            ]
+          },
+          "alternateName": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.person#alternateNameScalar",
+              "social.flockfeeds.lexical.prop.person#alternateNameList"
+            ]
+          },
+          "alumniOf": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.EducationalOrganization#embedded",
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.prop.person#alumniOfList"
+            ]
+          },
+          "award": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.person#awardScalar",
+              "social.flockfeeds.lexical.prop.person#awardList"
+            ]
+          },
+          "awards": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.person#awardsScalar",
+              "social.flockfeeds.lexical.prop.person#awardsList"
+            ]
+          },
+          "birthDate": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.person#birthDateScalar",
+              "social.flockfeeds.lexical.prop.person#birthDateList"
+            ]
+          },
+          "birthPlace": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Place#embedded",
+              "social.flockfeeds.lexical.prop.person#birthPlaceList"
+            ]
+          },
+          "brand": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Brand#embedded",
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.prop.person#brandList"
+            ]
+          },
+          "callSign": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.person#callSignScalar",
+              "social.flockfeeds.lexical.prop.person#callSignList"
+            ]
+          },
+          "children": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.person#childrenList"
+            ]
+          },
+          "colleague": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.person#colleagueScalar",
+              "social.flockfeeds.lexical.prop.person#colleagueList"
+            ]
+          },
+          "colleagues": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.person#colleaguesList"
+            ]
+          },
+          "contactPoint": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.ContactPoint#embedded",
+              "social.flockfeeds.lexical.prop.person#contactPointList"
+            ]
+          },
+          "contactPoints": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.ContactPoint#embedded",
+              "social.flockfeeds.lexical.prop.person#contactPointsList"
+            ]
+          },
+          "deathDate": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.person#deathDateScalar",
+              "social.flockfeeds.lexical.prop.person#deathDateList"
+            ]
+          },
+          "deathPlace": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Place#embedded",
+              "social.flockfeeds.lexical.prop.person#deathPlaceList"
+            ]
+          },
+          "description": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.TextObject#embedded",
+              "social.flockfeeds.lexical.prop.person#descriptionScalar",
+              "social.flockfeeds.lexical.prop.person#descriptionList"
+            ]
+          },
+          "disambiguatingDescription": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.person#disambiguatingDescriptionScalar",
+              "social.flockfeeds.lexical.prop.person#disambiguatingDescriptionList"
+            ]
+          },
+          "duns": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.person#dunsScalar",
+              "social.flockfeeds.lexical.prop.person#dunsList"
+            ]
+          },
+          "email": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.person#emailScalar",
+              "social.flockfeeds.lexical.prop.person#emailList"
+            ]
+          },
+          "familyName": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.person#familyNameScalar",
+              "social.flockfeeds.lexical.prop.person#familyNameList"
+            ]
+          },
+          "faxNumber": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.person#faxNumberScalar",
+              "social.flockfeeds.lexical.prop.person#faxNumberList"
+            ]
+          },
+          "follows": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.person#followsList"
+            ]
+          },
+          "funder": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.person#funderList"
+            ]
+          },
+          "funding": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Grant#embedded",
+              "social.flockfeeds.lexical.prop.person#fundingList"
+            ]
+          },
+          "gender": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.GenderType#embedded",
+              "social.flockfeeds.lexical.prop.person#genderScalar",
+              "social.flockfeeds.lexical.prop.person#genderList"
+            ]
+          },
+          "givenName": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.person#givenNameScalar",
+              "social.flockfeeds.lexical.prop.person#givenNameList"
+            ]
+          },
+          "globalLocationNumber": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.person#globalLocationNumberScalar",
+              "social.flockfeeds.lexical.prop.person#globalLocationNumberList"
+            ]
+          },
+          "hasCertification": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Certification#embedded",
+              "social.flockfeeds.lexical.prop.person#hasCertificationList"
+            ]
+          },
+          "hasCredential": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.EducationalOccupationalCredential#embedded",
+              "social.flockfeeds.lexical.prop.person#hasCredentialList"
+            ]
+          },
+          "hasOccupation": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Occupation#embedded",
+              "social.flockfeeds.lexical.prop.person#hasOccupationList"
+            ]
+          },
+          "hasOfferCatalog": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.OfferCatalog#embedded",
+              "social.flockfeeds.lexical.prop.person#hasOfferCatalogList"
+            ]
+          },
+          "hasPOS": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Place#embedded",
+              "social.flockfeeds.lexical.prop.person#hasPOSList"
+            ]
+          },
+          "height": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Distance#embedded",
+              "social.flockfeeds.lexical.type.QuantitativeValue#embedded",
+              "social.flockfeeds.lexical.prop.person#heightScalar",
+              "social.flockfeeds.lexical.prop.person#heightList"
+            ]
+          },
+          "homeLocation": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.ContactPoint#embedded",
+              "social.flockfeeds.lexical.type.Place#embedded",
+              "social.flockfeeds.lexical.prop.person#homeLocationList"
+            ]
+          },
+          "honorificPrefix": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.person#honorificPrefixScalar",
+              "social.flockfeeds.lexical.prop.person#honorificPrefixList"
+            ]
+          },
+          "honorificSuffix": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.person#honorificSuffixScalar",
+              "social.flockfeeds.lexical.prop.person#honorificSuffixList"
+            ]
+          },
+          "identifier": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.PropertyValue#embedded",
+              "social.flockfeeds.lexical.prop.person#identifierScalar",
+              "social.flockfeeds.lexical.prop.person#identifierList"
+            ]
+          },
+          "image": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.ImageObject#embedded",
+              "social.flockfeeds.lexical.prop.person#imageScalar",
+              "social.flockfeeds.lexical.prop.person#imageList"
+            ]
+          },
+          "interactionStatistic": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.InteractionCounter#embedded",
+              "social.flockfeeds.lexical.prop.person#interactionStatisticList"
+            ]
+          },
+          "isicV4": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.person#isicV4Scalar",
+              "social.flockfeeds.lexical.prop.person#isicV4List"
+            ]
+          },
+          "jobTitle": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+              "social.flockfeeds.lexical.prop.person#jobTitleScalar",
+              "social.flockfeeds.lexical.prop.person#jobTitleList"
+            ]
+          },
+          "knows": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.person#knowsList"
+            ]
+          },
+          "knowsAbout": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Thing#embedded",
+              "social.flockfeeds.lexical.prop.person#knowsAboutScalar",
+              "social.flockfeeds.lexical.prop.person#knowsAboutList"
+            ]
+          },
+          "knowsLanguage": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Language#embedded",
+              "social.flockfeeds.lexical.prop.person#knowsLanguageScalar",
+              "social.flockfeeds.lexical.prop.person#knowsLanguageList"
+            ]
+          },
+          "mainEntityOfPage": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.prop.person#mainEntityOfPageScalar",
+              "social.flockfeeds.lexical.prop.person#mainEntityOfPageList"
+            ]
+          },
+          "makesOffer": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Offer#embedded",
+              "social.flockfeeds.lexical.prop.person#makesOfferList"
+            ]
+          },
+          "memberOf": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.MemberProgramTier#embedded",
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.ProgramMembership#embedded",
+              "social.flockfeeds.lexical.prop.person#memberOfList"
+            ]
+          },
+          "naics": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.person#naicsScalar",
+              "social.flockfeeds.lexical.prop.person#naicsList"
+            ]
+          },
+          "name": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.person#nameScalar",
+              "social.flockfeeds.lexical.prop.person#nameList"
+            ]
+          },
+          "nationality": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Country#embedded",
+              "social.flockfeeds.lexical.prop.person#nationalityList"
+            ]
+          },
+          "netWorth": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.MonetaryAmount#embedded",
+              "social.flockfeeds.lexical.type.PriceSpecification#embedded",
+              "social.flockfeeds.lexical.prop.person#netWorthList"
+            ]
+          },
+          "owns": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.OwnershipInfo#embedded",
+              "social.flockfeeds.lexical.type.Product#embedded",
+              "social.flockfeeds.lexical.prop.person#ownsList"
+            ]
+          },
+          "parent": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.person#parentList"
+            ]
+          },
+          "parents": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.person#parentsList"
+            ]
+          },
+          "performerIn": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Event#embedded",
+              "social.flockfeeds.lexical.prop.person#performerInList"
+            ]
+          },
+          "potentialAction": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Action#embedded",
+              "social.flockfeeds.lexical.prop.person#potentialActionList"
+            ]
+          },
+          "pronouns": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+              "social.flockfeeds.lexical.type.StructuredValue#embedded",
+              "social.flockfeeds.lexical.prop.person#pronounsScalar",
+              "social.flockfeeds.lexical.prop.person#pronounsList"
+            ]
+          },
+          "publishingPrinciples": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.prop.person#publishingPrinciplesScalar",
+              "social.flockfeeds.lexical.prop.person#publishingPrinciplesList"
+            ]
+          },
+          "relatedTo": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.person#relatedToList"
+            ]
+          },
+          "sameAs": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.person#sameAsScalar",
+              "social.flockfeeds.lexical.prop.person#sameAsList"
+            ]
+          },
+          "seeks": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Demand#embedded",
+              "social.flockfeeds.lexical.prop.person#seeksList"
+            ]
+          },
+          "sibling": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.person#siblingList"
+            ]
+          },
+          "siblings": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.person#siblingsList"
+            ]
+          },
+          "skills": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+              "social.flockfeeds.lexical.prop.person#skillsScalar",
+              "social.flockfeeds.lexical.prop.person#skillsList"
+            ]
+          },
+          "sponsor": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.person#sponsorList"
+            ]
+          },
+          "spouse": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.person#spouseList"
+            ]
+          },
+          "subjectOf": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.type.Event#embedded",
+              "social.flockfeeds.lexical.prop.person#subjectOfList"
+            ]
+          },
+          "taxID": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.person#taxIDScalar",
+              "social.flockfeeds.lexical.prop.person#taxIDList"
+            ]
+          },
+          "telephone": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.person#telephoneScalar",
+              "social.flockfeeds.lexical.prop.person#telephoneList"
+            ]
+          },
+          "url": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.person#urlScalar",
+              "social.flockfeeds.lexical.prop.person#urlList"
+            ]
+          },
+          "vatID": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.person#vatIDScalar",
+              "social.flockfeeds.lexical.prop.person#vatIDList"
+            ]
+          },
+          "weight": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Mass#embedded",
+              "social.flockfeeds.lexical.type.QuantitativeValue#embedded",
+              "social.flockfeeds.lexical.prop.person#weightScalar",
+              "social.flockfeeds.lexical.prop.person#weightList"
+            ]
+          },
+          "workLocation": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.ContactPoint#embedded",
+              "social.flockfeeds.lexical.type.Place#embedded",
+              "social.flockfeeds.lexical.prop.person#workLocationList"
+            ]
+          },
+          "worksFor": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.prop.person#worksForList"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

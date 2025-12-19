@@ -25,7 +25,8 @@
           "required": [
             "books",
             "profile",
-            "activity"
+            "activity",
+            "friendActivity"
           ],
           "properties": {
             "activity": {
@@ -39,6 +40,14 @@
             "books": {
               "type": "array",
               "description": "All books in the user's library",
+              "items": {
+                "type": "ref",
+                "ref": "buzz.bookhive.defs#userBook"
+              }
+            },
+            "friendActivity": {
+              "type": "array",
+              "description": "The user's friend activity",
               "items": {
                 "type": "ref",
                 "ref": "buzz.bookhive.defs#userBook"

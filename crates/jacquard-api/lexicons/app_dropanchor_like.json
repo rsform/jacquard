@@ -1,0 +1,51 @@
+{
+  "lexicon": 1,
+  "id": "app.dropanchor.like",
+  "description": "A like record for check-ins in the Anchor app",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A like record for check-ins in the Anchor app",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "createdAt",
+          "checkinRef"
+        ],
+        "properties": {
+          "checkinRef": {
+            "type": "ref",
+            "description": "Reference to the check-in being liked",
+            "ref": "#strongRef"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "When the like was created",
+            "format": "datetime"
+          }
+        }
+      }
+    },
+    "strongRef": {
+      "type": "object",
+      "description": "A strong reference to another record",
+      "required": [
+        "uri",
+        "cid"
+      ],
+      "properties": {
+        "cid": {
+          "type": "string",
+          "description": "Content identifier (CID) of the referenced record",
+          "format": "cid"
+        },
+        "uri": {
+          "type": "string",
+          "description": "AT Protocol URI of the referenced record",
+          "format": "at-uri"
+        }
+      }
+    }
+  }
+}

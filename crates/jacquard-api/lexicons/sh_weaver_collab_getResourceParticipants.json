@@ -1,0 +1,48 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.collab.getResourceParticipants",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get all participants (owner + collaborators) for a resource.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "resource"
+        ],
+        "properties": {
+          "resource": {
+            "type": "string",
+            "format": "at-uri"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "owner",
+            "participants"
+          ],
+          "properties": {
+            "owner": {
+              "type": "ref",
+              "ref": "sh.weaver.actor.defs#profileViewBasic"
+            },
+            "participants": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "sh.weaver.actor.defs#profileViewBasic"
+              }
+            },
+            "viewerCanEdit": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    }
+  }
+}

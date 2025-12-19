@@ -1,0 +1,11 @@
+{
+  "lexicon": 1,
+  "id": "blog.pckt.block.horizontalRule",
+  "defs": {
+    "main": {
+      "type": "object",
+      "required": [],
+      "properties": {}
+    }
+  }
+}

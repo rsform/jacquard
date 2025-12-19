@@ -1,0 +1,40 @@
+{
+  "lexicon": 1,
+  "id": "com.atprotofans.getProfile",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get a creator profile by DID.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "subject"
+        ],
+        "properties": {
+          "subject": {
+            "type": "string",
+            "description": "DID of the subject to get the profile for.",
+            "format": "did"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "ref",
+          "ref": "com.atprotofans.hydratedProfile"
+        }
+      },
+      "errors": [
+        {
+          "description": "Invalid DID format.",
+          "name": "InvalidRequest"
+        },
+        {
+          "description": "No profile found for the given DID.",
+          "name": "ProfileNotFound"
+        }
+      ]
+    }
+  }
+}

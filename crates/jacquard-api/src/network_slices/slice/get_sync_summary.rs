@@ -33,51 +33,51 @@ pub mod collection_summary_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type IsExternal;
         type Collection;
         type EstimatedRepos;
-        type IsExternal;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type IsExternal = Unset;
         type Collection = Unset;
         type EstimatedRepos = Unset;
-        type IsExternal = Unset;
-    }
-    ///State transition - sets the `collection` field to Set
-    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCollection<S> {}
-    impl<S: State> State for SetCollection<S> {
-        type Collection = Set<members::collection>;
-        type EstimatedRepos = S::EstimatedRepos;
-        type IsExternal = S::IsExternal;
-    }
-    ///State transition - sets the `estimated_repos` field to Set
-    pub struct SetEstimatedRepos<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEstimatedRepos<S> {}
-    impl<S: State> State for SetEstimatedRepos<S> {
-        type Collection = S::Collection;
-        type EstimatedRepos = Set<members::estimated_repos>;
-        type IsExternal = S::IsExternal;
     }
     ///State transition - sets the `is_external` field to Set
     pub struct SetIsExternal<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIsExternal<S> {}
     impl<S: State> State for SetIsExternal<S> {
+        type IsExternal = Set<members::is_external>;
         type Collection = S::Collection;
         type EstimatedRepos = S::EstimatedRepos;
-        type IsExternal = Set<members::is_external>;
+    }
+    ///State transition - sets the `collection` field to Set
+    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCollection<S> {}
+    impl<S: State> State for SetCollection<S> {
+        type IsExternal = S::IsExternal;
+        type Collection = Set<members::collection>;
+        type EstimatedRepos = S::EstimatedRepos;
+    }
+    ///State transition - sets the `estimated_repos` field to Set
+    pub struct SetEstimatedRepos<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEstimatedRepos<S> {}
+    impl<S: State> State for SetEstimatedRepos<S> {
+        type IsExternal = S::IsExternal;
+        type Collection = S::Collection;
+        type EstimatedRepos = Set<members::estimated_repos>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `is_external` field
+        pub struct is_external(());
         ///Marker type for the `collection` field
         pub struct collection(());
         ///Marker type for the `estimated_repos` field
         pub struct estimated_repos(());
-        ///Marker type for the `is_external` field
-        pub struct is_external(());
     }
 }
 
@@ -170,9 +170,9 @@ where
 impl<'a, S> CollectionSummaryBuilder<'a, S>
 where
     S: collection_summary_state::State,
+    S::IsExternal: collection_summary_state::IsSet,
     S::Collection: collection_summary_state::IsSet,
     S::EstimatedRepos: collection_summary_state::IsSet,
-    S::IsExternal: collection_summary_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CollectionSummary<'a> {

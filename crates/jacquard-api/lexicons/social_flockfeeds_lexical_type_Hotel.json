@@ -1,0 +1,1996 @@
+{
+  "lexicon": 1,
+  "id": "social.flockfeeds.lexical.type.Hotel",
+  "defs": {
+    "embedded": {
+      "type": "object",
+      "description": "A hotel is an establishment that provides lodging paid on a short-term basis (source: Wikipedia, the free encyclopedia, see http://en.wikipedia.org/wiki/Hotel).\n<br /><br />\nSee also the <a href=\"/docs/hotels.html\">dedicated document on the use of schema.org for marking up hotels and other forms of accommodations</a>.",
+      "properties": {
+        "acceptedPaymentMethod": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.LoanOrCredit#embedded",
+            "social.flockfeeds.lexical.type.PaymentMethod#embedded",
+            "social.flockfeeds.lexical.prop.hotel#acceptedPaymentMethodScalar",
+            "social.flockfeeds.lexical.prop.hotel#acceptedPaymentMethodList"
+          ]
+        },
+        "actionableFeedbackPolicy": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.hotel#actionableFeedbackPolicyScalar",
+            "social.flockfeeds.lexical.prop.hotel#actionableFeedbackPolicyList"
+          ]
+        },
+        "additionalProperty": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.PropertyValue#embedded",
+            "social.flockfeeds.lexical.prop.hotel#additionalPropertyList"
+          ]
+        },
+        "additionalType": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.hotel#additionalTypeScalar",
+            "social.flockfeeds.lexical.prop.hotel#additionalTypeList"
+          ]
+        },
+        "address": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.PostalAddress#embedded",
+            "social.flockfeeds.lexical.prop.hotel#addressScalar",
+            "social.flockfeeds.lexical.prop.hotel#addressList"
+          ]
+        },
+        "agentInteractionStatistic": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.InteractionCounter#embedded",
+            "social.flockfeeds.lexical.prop.hotel#agentInteractionStatisticList"
+          ]
+        },
+        "aggregateRating": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.AggregateRating#embedded",
+            "social.flockfeeds.lexical.prop.hotel#aggregateRatingList"
+          ]
+        },
+        "alternateName": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.hotel#alternateNameScalar",
+            "social.flockfeeds.lexical.prop.hotel#alternateNameList"
+          ]
+        },
+        "alumni": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.hotel#alumniList"
+          ]
+        },
+        "amenityFeature": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.LocationFeatureSpecification#embedded",
+            "social.flockfeeds.lexical.prop.hotel#amenityFeatureList"
+          ]
+        },
+        "areaServed": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.AdministrativeArea#embedded",
+            "social.flockfeeds.lexical.type.GeoShape#embedded",
+            "social.flockfeeds.lexical.type.Place#embedded",
+            "social.flockfeeds.lexical.prop.hotel#areaServedScalar",
+            "social.flockfeeds.lexical.prop.hotel#areaServedList"
+          ]
+        },
+        "audience": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Audience#embedded",
+            "social.flockfeeds.lexical.prop.hotel#audienceList"
+          ]
+        },
+        "availableLanguage": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Language#embedded",
+            "social.flockfeeds.lexical.prop.hotel#availableLanguageScalar",
+            "social.flockfeeds.lexical.prop.hotel#availableLanguageList"
+          ]
+        },
+        "award": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.hotel#awardScalar",
+            "social.flockfeeds.lexical.prop.hotel#awardList"
+          ]
+        },
+        "awards": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.hotel#awardsScalar",
+            "social.flockfeeds.lexical.prop.hotel#awardsList"
+          ]
+        },
+        "branchCode": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.hotel#branchCodeScalar",
+            "social.flockfeeds.lexical.prop.hotel#branchCodeList"
+          ]
+        },
+        "branchOf": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.prop.hotel#branchOfList"
+          ]
+        },
+        "brand": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Brand#embedded",
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.prop.hotel#brandList"
+          ]
+        },
+        "checkinTime": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.hotel#checkinTimeScalar",
+            "social.flockfeeds.lexical.prop.hotel#checkinTimeList"
+          ]
+        },
+        "checkoutTime": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.hotel#checkoutTimeScalar",
+            "social.flockfeeds.lexical.prop.hotel#checkoutTimeList"
+          ]
+        },
+        "companyRegistration": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Certification#embedded",
+            "social.flockfeeds.lexical.prop.hotel#companyRegistrationList"
+          ]
+        },
+        "contactPoint": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.ContactPoint#embedded",
+            "social.flockfeeds.lexical.prop.hotel#contactPointList"
+          ]
+        },
+        "contactPoints": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.ContactPoint#embedded",
+            "social.flockfeeds.lexical.prop.hotel#contactPointsList"
+          ]
+        },
+        "containedIn": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Place#embedded",
+            "social.flockfeeds.lexical.prop.hotel#containedInList"
+          ]
+        },
+        "containedInPlace": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Place#embedded",
+            "social.flockfeeds.lexical.prop.hotel#containedInPlaceList"
+          ]
+        },
+        "containsPlace": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Place#embedded",
+            "social.flockfeeds.lexical.prop.hotel#containsPlaceList"
+          ]
+        },
+        "correctionsPolicy": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.hotel#correctionsPolicyScalar",
+            "social.flockfeeds.lexical.prop.hotel#correctionsPolicyList"
+          ]
+        },
+        "currenciesAccepted": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.hotel#currenciesAcceptedScalar",
+            "social.flockfeeds.lexical.prop.hotel#currenciesAcceptedList"
+          ]
+        },
+        "department": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.prop.hotel#departmentList"
+          ]
+        },
+        "description": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.TextObject#embedded",
+            "social.flockfeeds.lexical.prop.hotel#descriptionScalar",
+            "social.flockfeeds.lexical.prop.hotel#descriptionList"
+          ]
+        },
+        "disambiguatingDescription": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.hotel#disambiguatingDescriptionScalar",
+            "social.flockfeeds.lexical.prop.hotel#disambiguatingDescriptionList"
+          ]
+        },
+        "dissolutionDate": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.hotel#dissolutionDateScalar",
+            "social.flockfeeds.lexical.prop.hotel#dissolutionDateList"
+          ]
+        },
+        "diversityPolicy": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.hotel#diversityPolicyScalar",
+            "social.flockfeeds.lexical.prop.hotel#diversityPolicyList"
+          ]
+        },
+        "diversityStaffingReport": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Article#embedded",
+            "social.flockfeeds.lexical.prop.hotel#diversityStaffingReportScalar",
+            "social.flockfeeds.lexical.prop.hotel#diversityStaffingReportList"
+          ]
+        },
+        "duns": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.hotel#dunsScalar",
+            "social.flockfeeds.lexical.prop.hotel#dunsList"
+          ]
+        },
+        "email": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.hotel#emailScalar",
+            "social.flockfeeds.lexical.prop.hotel#emailList"
+          ]
+        },
+        "employee": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.hotel#employeeList"
+          ]
+        },
+        "employees": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.hotel#employeesList"
+          ]
+        },
+        "ethicsPolicy": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.hotel#ethicsPolicyScalar",
+            "social.flockfeeds.lexical.prop.hotel#ethicsPolicyList"
+          ]
+        },
+        "event": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Event#embedded",
+            "social.flockfeeds.lexical.prop.hotel#eventList"
+          ]
+        },
+        "events": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Event#embedded",
+            "social.flockfeeds.lexical.prop.hotel#eventsList"
+          ]
+        },
+        "faxNumber": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.hotel#faxNumberScalar",
+            "social.flockfeeds.lexical.prop.hotel#faxNumberList"
+          ]
+        },
+        "founder": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.hotel#founderList"
+          ]
+        },
+        "founders": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.hotel#foundersList"
+          ]
+        },
+        "foundingDate": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.hotel#foundingDateScalar",
+            "social.flockfeeds.lexical.prop.hotel#foundingDateList"
+          ]
+        },
+        "foundingLocation": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Place#embedded",
+            "social.flockfeeds.lexical.prop.hotel#foundingLocationList"
+          ]
+        },
+        "funder": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.hotel#funderList"
+          ]
+        },
+        "funding": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Grant#embedded",
+            "social.flockfeeds.lexical.prop.hotel#fundingList"
+          ]
+        },
+        "geo": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.GeoCoordinates#embedded",
+            "social.flockfeeds.lexical.type.GeoShape#embedded",
+            "social.flockfeeds.lexical.prop.hotel#geoList"
+          ]
+        },
+        "geoContains": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.GeospatialGeometry#embedded",
+            "social.flockfeeds.lexical.type.Place#embedded",
+            "social.flockfeeds.lexical.prop.hotel#geoContainsList"
+          ]
+        },
+        "geoCoveredBy": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.GeospatialGeometry#embedded",
+            "social.flockfeeds.lexical.type.Place#embedded",
+            "social.flockfeeds.lexical.prop.hotel#geoCoveredByList"
+          ]
+        },
+        "geoCovers": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.GeospatialGeometry#embedded",
+            "social.flockfeeds.lexical.type.Place#embedded",
+            "social.flockfeeds.lexical.prop.hotel#geoCoversList"
+          ]
+        },
+        "geoCrosses": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.GeospatialGeometry#embedded",
+            "social.flockfeeds.lexical.type.Place#embedded",
+            "social.flockfeeds.lexical.prop.hotel#geoCrossesList"
+          ]
+        },
+        "geoDisjoint": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.GeospatialGeometry#embedded",
+            "social.flockfeeds.lexical.type.Place#embedded",
+            "social.flockfeeds.lexical.prop.hotel#geoDisjointList"
+          ]
+        },
+        "geoEquals": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.GeospatialGeometry#embedded",
+            "social.flockfeeds.lexical.type.Place#embedded",
+            "social.flockfeeds.lexical.prop.hotel#geoEqualsList"
+          ]
+        },
+        "geoIntersects": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.GeospatialGeometry#embedded",
+            "social.flockfeeds.lexical.type.Place#embedded",
+            "social.flockfeeds.lexical.prop.hotel#geoIntersectsList"
+          ]
+        },
+        "geoOverlaps": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.GeospatialGeometry#embedded",
+            "social.flockfeeds.lexical.type.Place#embedded",
+            "social.flockfeeds.lexical.prop.hotel#geoOverlapsList"
+          ]
+        },
+        "geoTouches": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.GeospatialGeometry#embedded",
+            "social.flockfeeds.lexical.type.Place#embedded",
+            "social.flockfeeds.lexical.prop.hotel#geoTouchesList"
+          ]
+        },
+        "geoWithin": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.GeospatialGeometry#embedded",
+            "social.flockfeeds.lexical.type.Place#embedded",
+            "social.flockfeeds.lexical.prop.hotel#geoWithinList"
+          ]
+        },
+        "globalLocationNumber": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.hotel#globalLocationNumberScalar",
+            "social.flockfeeds.lexical.prop.hotel#globalLocationNumberList"
+          ]
+        },
+        "hasCertification": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Certification#embedded",
+            "social.flockfeeds.lexical.prop.hotel#hasCertificationList"
+          ]
+        },
+        "hasCredential": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.EducationalOccupationalCredential#embedded",
+            "social.flockfeeds.lexical.prop.hotel#hasCredentialList"
+          ]
+        },
+        "hasDriveThroughService": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.hotel#hasDriveThroughServiceScalar",
+            "social.flockfeeds.lexical.prop.hotel#hasDriveThroughServiceList"
+          ]
+        },
+        "hasGS1DigitalLink": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.hotel#hasGS1DigitalLinkScalar",
+            "social.flockfeeds.lexical.prop.hotel#hasGS1DigitalLinkList"
+          ]
+        },
+        "hasMap": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Map#embedded",
+            "social.flockfeeds.lexical.prop.hotel#hasMapScalar",
+            "social.flockfeeds.lexical.prop.hotel#hasMapList"
+          ]
+        },
+        "hasMemberProgram": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.MemberProgram#embedded",
+            "social.flockfeeds.lexical.prop.hotel#hasMemberProgramList"
+          ]
+        },
+        "hasMerchantReturnPolicy": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.MerchantReturnPolicy#embedded",
+            "social.flockfeeds.lexical.prop.hotel#hasMerchantReturnPolicyList"
+          ]
+        },
+        "hasOfferCatalog": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.OfferCatalog#embedded",
+            "social.flockfeeds.lexical.prop.hotel#hasOfferCatalogList"
+          ]
+        },
+        "hasPOS": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Place#embedded",
+            "social.flockfeeds.lexical.prop.hotel#hasPOSList"
+          ]
+        },
+        "hasProductReturnPolicy": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.ProductReturnPolicy#embedded",
+            "social.flockfeeds.lexical.prop.hotel#hasProductReturnPolicyList"
+          ]
+        },
+        "hasShippingService": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.ShippingService#embedded",
+            "social.flockfeeds.lexical.prop.hotel#hasShippingServiceList"
+          ]
+        },
+        "identifier": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.PropertyValue#embedded",
+            "social.flockfeeds.lexical.prop.hotel#identifierScalar",
+            "social.flockfeeds.lexical.prop.hotel#identifierList"
+          ]
+        },
+        "image": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.ImageObject#embedded",
+            "social.flockfeeds.lexical.prop.hotel#imageScalar",
+            "social.flockfeeds.lexical.prop.hotel#imageList"
+          ]
+        },
+        "interactionStatistic": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.InteractionCounter#embedded",
+            "social.flockfeeds.lexical.prop.hotel#interactionStatisticList"
+          ]
+        },
+        "isAccessibleForFree": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.hotel#isAccessibleForFreeScalar",
+            "social.flockfeeds.lexical.prop.hotel#isAccessibleForFreeList"
+          ]
+        },
+        "isicV4": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.hotel#isicV4Scalar",
+            "social.flockfeeds.lexical.prop.hotel#isicV4List"
+          ]
+        },
+        "iso6523Code": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.hotel#iso6523CodeScalar",
+            "social.flockfeeds.lexical.prop.hotel#iso6523CodeList"
+          ]
+        },
+        "keywords": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+            "social.flockfeeds.lexical.prop.hotel#keywordsScalar",
+            "social.flockfeeds.lexical.prop.hotel#keywordsList"
+          ]
+        },
+        "knowsAbout": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Thing#embedded",
+            "social.flockfeeds.lexical.prop.hotel#knowsAboutScalar",
+            "social.flockfeeds.lexical.prop.hotel#knowsAboutList"
+          ]
+        },
+        "knowsLanguage": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Language#embedded",
+            "social.flockfeeds.lexical.prop.hotel#knowsLanguageScalar",
+            "social.flockfeeds.lexical.prop.hotel#knowsLanguageList"
+          ]
+        },
+        "latitude": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.hotel#latitudeScalar",
+            "social.flockfeeds.lexical.prop.hotel#latitudeList"
+          ]
+        },
+        "legalAddress": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.PostalAddress#embedded",
+            "social.flockfeeds.lexical.prop.hotel#legalAddressList"
+          ]
+        },
+        "legalName": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.hotel#legalNameScalar",
+            "social.flockfeeds.lexical.prop.hotel#legalNameList"
+          ]
+        },
+        "legalRepresentative": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.hotel#legalRepresentativeList"
+          ]
+        },
+        "leiCode": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.hotel#leiCodeScalar",
+            "social.flockfeeds.lexical.prop.hotel#leiCodeList"
+          ]
+        },
+        "location": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Place#embedded",
+            "social.flockfeeds.lexical.type.PostalAddress#embedded",
+            "social.flockfeeds.lexical.type.VirtualLocation#embedded",
+            "social.flockfeeds.lexical.prop.hotel#locationScalar",
+            "social.flockfeeds.lexical.prop.hotel#locationList"
+          ]
+        },
+        "logo": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.ImageObject#embedded",
+            "social.flockfeeds.lexical.prop.hotel#logoScalar",
+            "social.flockfeeds.lexical.prop.hotel#logoList"
+          ]
+        },
+        "longitude": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.hotel#longitudeScalar",
+            "social.flockfeeds.lexical.prop.hotel#longitudeList"
+          ]
+        },
+        "mainEntityOfPage": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.hotel#mainEntityOfPageScalar",
+            "social.flockfeeds.lexical.prop.hotel#mainEntityOfPageList"
+          ]
+        },
+        "makesOffer": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Offer#embedded",
+            "social.flockfeeds.lexical.prop.hotel#makesOfferList"
+          ]
+        },
+        "map": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.hotel#mapScalar",
+            "social.flockfeeds.lexical.prop.hotel#mapList"
+          ]
+        },
+        "maps": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.hotel#mapsScalar",
+            "social.flockfeeds.lexical.prop.hotel#mapsList"
+          ]
+        },
+        "maximumAttendeeCapacity": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.hotel#maximumAttendeeCapacityScalar",
+            "social.flockfeeds.lexical.prop.hotel#maximumAttendeeCapacityList"
+          ]
+        },
+        "member": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.hotel#memberList"
+          ]
+        },
+        "memberOf": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.MemberProgramTier#embedded",
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.ProgramMembership#embedded",
+            "social.flockfeeds.lexical.prop.hotel#memberOfList"
+          ]
+        },
+        "members": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.hotel#membersList"
+          ]
+        },
+        "naics": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.hotel#naicsScalar",
+            "social.flockfeeds.lexical.prop.hotel#naicsList"
+          ]
+        },
+        "name": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.hotel#nameScalar",
+            "social.flockfeeds.lexical.prop.hotel#nameList"
+          ]
+        },
+        "nonprofitStatus": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.NonprofitType#embedded",
+            "social.flockfeeds.lexical.prop.hotel#nonprofitStatusScalar",
+            "social.flockfeeds.lexical.prop.hotel#nonprofitStatusList"
+          ]
+        },
+        "numberOfEmployees": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.QuantitativeValue#embedded",
+            "social.flockfeeds.lexical.prop.hotel#numberOfEmployeesList"
+          ]
+        },
+        "numberOfRooms": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.QuantitativeValue#embedded",
+            "social.flockfeeds.lexical.prop.hotel#numberOfRoomsScalar",
+            "social.flockfeeds.lexical.prop.hotel#numberOfRoomsList"
+          ]
+        },
+        "openingHours": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.hotel#openingHoursScalar",
+            "social.flockfeeds.lexical.prop.hotel#openingHoursList"
+          ]
+        },
+        "openingHoursSpecification": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.OpeningHoursSpecification#embedded",
+            "social.flockfeeds.lexical.prop.hotel#openingHoursSpecificationList"
+          ]
+        },
+        "ownershipFundingInfo": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.AboutPage#embedded",
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.hotel#ownershipFundingInfoScalar",
+            "social.flockfeeds.lexical.prop.hotel#ownershipFundingInfoList"
+          ]
+        },
+        "owns": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.OwnershipInfo#embedded",
+            "social.flockfeeds.lexical.type.Product#embedded",
+            "social.flockfeeds.lexical.prop.hotel#ownsList"
+          ]
+        },
+        "parentOrganization": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.prop.hotel#parentOrganizationList"
+          ]
+        },
+        "paymentAccepted": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.hotel#paymentAcceptedScalar",
+            "social.flockfeeds.lexical.prop.hotel#paymentAcceptedList"
+          ]
+        },
+        "petsAllowed": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.hotel#petsAllowedScalar",
+            "social.flockfeeds.lexical.prop.hotel#petsAllowedList"
+          ]
+        },
+        "photo": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.ImageObject#embedded",
+            "social.flockfeeds.lexical.type.Photograph#embedded",
+            "social.flockfeeds.lexical.prop.hotel#photoList"
+          ]
+        },
+        "photos": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.ImageObject#embedded",
+            "social.flockfeeds.lexical.type.Photograph#embedded",
+            "social.flockfeeds.lexical.prop.hotel#photosList"
+          ]
+        },
+        "potentialAction": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Action#embedded",
+            "social.flockfeeds.lexical.prop.hotel#potentialActionList"
+          ]
+        },
+        "priceRange": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.hotel#priceRangeScalar",
+            "social.flockfeeds.lexical.prop.hotel#priceRangeList"
+          ]
+        },
+        "publicAccess": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.hotel#publicAccessScalar",
+            "social.flockfeeds.lexical.prop.hotel#publicAccessList"
+          ]
+        },
+        "publishingPrinciples": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.hotel#publishingPrinciplesScalar",
+            "social.flockfeeds.lexical.prop.hotel#publishingPrinciplesList"
+          ]
+        },
+        "review": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Review#embedded",
+            "social.flockfeeds.lexical.prop.hotel#reviewList"
+          ]
+        },
+        "reviews": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Review#embedded",
+            "social.flockfeeds.lexical.prop.hotel#reviewsList"
+          ]
+        },
+        "sameAs": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.hotel#sameAsScalar",
+            "social.flockfeeds.lexical.prop.hotel#sameAsList"
+          ]
+        },
+        "seeks": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Demand#embedded",
+            "social.flockfeeds.lexical.prop.hotel#seeksList"
+          ]
+        },
+        "serviceArea": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.AdministrativeArea#embedded",
+            "social.flockfeeds.lexical.type.GeoShape#embedded",
+            "social.flockfeeds.lexical.type.Place#embedded",
+            "social.flockfeeds.lexical.prop.hotel#serviceAreaList"
+          ]
+        },
+        "skills": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+            "social.flockfeeds.lexical.prop.hotel#skillsScalar",
+            "social.flockfeeds.lexical.prop.hotel#skillsList"
+          ]
+        },
+        "slogan": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.hotel#sloganScalar",
+            "social.flockfeeds.lexical.prop.hotel#sloganList"
+          ]
+        },
+        "smokingAllowed": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.hotel#smokingAllowedScalar",
+            "social.flockfeeds.lexical.prop.hotel#smokingAllowedList"
+          ]
+        },
+        "specialOpeningHoursSpecification": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.OpeningHoursSpecification#embedded",
+            "social.flockfeeds.lexical.prop.hotel#specialOpeningHoursSpecificationList"
+          ]
+        },
+        "sponsor": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.type.Person#embedded",
+            "social.flockfeeds.lexical.prop.hotel#sponsorList"
+          ]
+        },
+        "starRating": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Rating#embedded",
+            "social.flockfeeds.lexical.prop.hotel#starRatingList"
+          ]
+        },
+        "subOrganization": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.Organization#embedded",
+            "social.flockfeeds.lexical.prop.hotel#subOrganizationList"
+          ]
+        },
+        "subjectOf": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.type.Event#embedded",
+            "social.flockfeeds.lexical.prop.hotel#subjectOfList"
+          ]
+        },
+        "taxID": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.hotel#taxIDScalar",
+            "social.flockfeeds.lexical.prop.hotel#taxIDList"
+          ]
+        },
+        "telephone": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.hotel#telephoneScalar",
+            "social.flockfeeds.lexical.prop.hotel#telephoneList"
+          ]
+        },
+        "tourBookingPage": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.hotel#tourBookingPageScalar",
+            "social.flockfeeds.lexical.prop.hotel#tourBookingPageList"
+          ]
+        },
+        "unnamedSourcesPolicy": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.type.CreativeWork#embedded",
+            "social.flockfeeds.lexical.prop.hotel#unnamedSourcesPolicyScalar",
+            "social.flockfeeds.lexical.prop.hotel#unnamedSourcesPolicyList"
+          ]
+        },
+        "url": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.hotel#urlScalar",
+            "social.flockfeeds.lexical.prop.hotel#urlList"
+          ]
+        },
+        "vatID": {
+          "type": "union",
+          "refs": [
+            "social.flockfeeds.lexical.prop.hotel#vatIDScalar",
+            "social.flockfeeds.lexical.prop.hotel#vatIDList"
+          ]
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "description": "A hotel is an establishment that provides lodging paid on a short-term basis (source: Wikipedia, the free encyclopedia, see http://en.wikipedia.org/wiki/Hotel).\n<br /><br />\nSee also the <a href=\"/docs/hotels.html\">dedicated document on the use of schema.org for marking up hotels and other forms of accommodations</a>.",
+        "properties": {
+          "acceptedPaymentMethod": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.LoanOrCredit#embedded",
+              "social.flockfeeds.lexical.type.PaymentMethod#embedded",
+              "social.flockfeeds.lexical.prop.hotel#acceptedPaymentMethodScalar",
+              "social.flockfeeds.lexical.prop.hotel#acceptedPaymentMethodList"
+            ]
+          },
+          "actionableFeedbackPolicy": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.prop.hotel#actionableFeedbackPolicyScalar",
+              "social.flockfeeds.lexical.prop.hotel#actionableFeedbackPolicyList"
+            ]
+          },
+          "additionalProperty": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.PropertyValue#embedded",
+              "social.flockfeeds.lexical.prop.hotel#additionalPropertyList"
+            ]
+          },
+          "additionalType": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.hotel#additionalTypeScalar",
+              "social.flockfeeds.lexical.prop.hotel#additionalTypeList"
+            ]
+          },
+          "address": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.PostalAddress#embedded",
+              "social.flockfeeds.lexical.prop.hotel#addressScalar",
+              "social.flockfeeds.lexical.prop.hotel#addressList"
+            ]
+          },
+          "agentInteractionStatistic": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.InteractionCounter#embedded",
+              "social.flockfeeds.lexical.prop.hotel#agentInteractionStatisticList"
+            ]
+          },
+          "aggregateRating": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.AggregateRating#embedded",
+              "social.flockfeeds.lexical.prop.hotel#aggregateRatingList"
+            ]
+          },
+          "alternateName": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.hotel#alternateNameScalar",
+              "social.flockfeeds.lexical.prop.hotel#alternateNameList"
+            ]
+          },
+          "alumni": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.hotel#alumniList"
+            ]
+          },
+          "amenityFeature": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.LocationFeatureSpecification#embedded",
+              "social.flockfeeds.lexical.prop.hotel#amenityFeatureList"
+            ]
+          },
+          "areaServed": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.AdministrativeArea#embedded",
+              "social.flockfeeds.lexical.type.GeoShape#embedded",
+              "social.flockfeeds.lexical.type.Place#embedded",
+              "social.flockfeeds.lexical.prop.hotel#areaServedScalar",
+              "social.flockfeeds.lexical.prop.hotel#areaServedList"
+            ]
+          },
+          "audience": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Audience#embedded",
+              "social.flockfeeds.lexical.prop.hotel#audienceList"
+            ]
+          },
+          "availableLanguage": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Language#embedded",
+              "social.flockfeeds.lexical.prop.hotel#availableLanguageScalar",
+              "social.flockfeeds.lexical.prop.hotel#availableLanguageList"
+            ]
+          },
+          "award": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.hotel#awardScalar",
+              "social.flockfeeds.lexical.prop.hotel#awardList"
+            ]
+          },
+          "awards": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.hotel#awardsScalar",
+              "social.flockfeeds.lexical.prop.hotel#awardsList"
+            ]
+          },
+          "branchCode": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.hotel#branchCodeScalar",
+              "social.flockfeeds.lexical.prop.hotel#branchCodeList"
+            ]
+          },
+          "branchOf": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.prop.hotel#branchOfList"
+            ]
+          },
+          "brand": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Brand#embedded",
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.prop.hotel#brandList"
+            ]
+          },
+          "checkinTime": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.hotel#checkinTimeScalar",
+              "social.flockfeeds.lexical.prop.hotel#checkinTimeList"
+            ]
+          },
+          "checkoutTime": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.hotel#checkoutTimeScalar",
+              "social.flockfeeds.lexical.prop.hotel#checkoutTimeList"
+            ]
+          },
+          "companyRegistration": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Certification#embedded",
+              "social.flockfeeds.lexical.prop.hotel#companyRegistrationList"
+            ]
+          },
+          "contactPoint": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.ContactPoint#embedded",
+              "social.flockfeeds.lexical.prop.hotel#contactPointList"
+            ]
+          },
+          "contactPoints": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.ContactPoint#embedded",
+              "social.flockfeeds.lexical.prop.hotel#contactPointsList"
+            ]
+          },
+          "containedIn": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Place#embedded",
+              "social.flockfeeds.lexical.prop.hotel#containedInList"
+            ]
+          },
+          "containedInPlace": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Place#embedded",
+              "social.flockfeeds.lexical.prop.hotel#containedInPlaceList"
+            ]
+          },
+          "containsPlace": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Place#embedded",
+              "social.flockfeeds.lexical.prop.hotel#containsPlaceList"
+            ]
+          },
+          "correctionsPolicy": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.prop.hotel#correctionsPolicyScalar",
+              "social.flockfeeds.lexical.prop.hotel#correctionsPolicyList"
+            ]
+          },
+          "currenciesAccepted": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.hotel#currenciesAcceptedScalar",
+              "social.flockfeeds.lexical.prop.hotel#currenciesAcceptedList"
+            ]
+          },
+          "department": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.prop.hotel#departmentList"
+            ]
+          },
+          "description": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.TextObject#embedded",
+              "social.flockfeeds.lexical.prop.hotel#descriptionScalar",
+              "social.flockfeeds.lexical.prop.hotel#descriptionList"
+            ]
+          },
+          "disambiguatingDescription": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.hotel#disambiguatingDescriptionScalar",
+              "social.flockfeeds.lexical.prop.hotel#disambiguatingDescriptionList"
+            ]
+          },
+          "dissolutionDate": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.hotel#dissolutionDateScalar",
+              "social.flockfeeds.lexical.prop.hotel#dissolutionDateList"
+            ]
+          },
+          "diversityPolicy": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.prop.hotel#diversityPolicyScalar",
+              "social.flockfeeds.lexical.prop.hotel#diversityPolicyList"
+            ]
+          },
+          "diversityStaffingReport": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Article#embedded",
+              "social.flockfeeds.lexical.prop.hotel#diversityStaffingReportScalar",
+              "social.flockfeeds.lexical.prop.hotel#diversityStaffingReportList"
+            ]
+          },
+          "duns": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.hotel#dunsScalar",
+              "social.flockfeeds.lexical.prop.hotel#dunsList"
+            ]
+          },
+          "email": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.hotel#emailScalar",
+              "social.flockfeeds.lexical.prop.hotel#emailList"
+            ]
+          },
+          "employee": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.hotel#employeeList"
+            ]
+          },
+          "employees": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.hotel#employeesList"
+            ]
+          },
+          "ethicsPolicy": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.prop.hotel#ethicsPolicyScalar",
+              "social.flockfeeds.lexical.prop.hotel#ethicsPolicyList"
+            ]
+          },
+          "event": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Event#embedded",
+              "social.flockfeeds.lexical.prop.hotel#eventList"
+            ]
+          },
+          "events": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Event#embedded",
+              "social.flockfeeds.lexical.prop.hotel#eventsList"
+            ]
+          },
+          "faxNumber": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.hotel#faxNumberScalar",
+              "social.flockfeeds.lexical.prop.hotel#faxNumberList"
+            ]
+          },
+          "founder": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.hotel#founderList"
+            ]
+          },
+          "founders": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.hotel#foundersList"
+            ]
+          },
+          "foundingDate": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.hotel#foundingDateScalar",
+              "social.flockfeeds.lexical.prop.hotel#foundingDateList"
+            ]
+          },
+          "foundingLocation": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Place#embedded",
+              "social.flockfeeds.lexical.prop.hotel#foundingLocationList"
+            ]
+          },
+          "funder": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.hotel#funderList"
+            ]
+          },
+          "funding": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Grant#embedded",
+              "social.flockfeeds.lexical.prop.hotel#fundingList"
+            ]
+          },
+          "geo": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.GeoCoordinates#embedded",
+              "social.flockfeeds.lexical.type.GeoShape#embedded",
+              "social.flockfeeds.lexical.prop.hotel#geoList"
+            ]
+          },
+          "geoContains": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.GeospatialGeometry#embedded",
+              "social.flockfeeds.lexical.type.Place#embedded",
+              "social.flockfeeds.lexical.prop.hotel#geoContainsList"
+            ]
+          },
+          "geoCoveredBy": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.GeospatialGeometry#embedded",
+              "social.flockfeeds.lexical.type.Place#embedded",
+              "social.flockfeeds.lexical.prop.hotel#geoCoveredByList"
+            ]
+          },
+          "geoCovers": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.GeospatialGeometry#embedded",
+              "social.flockfeeds.lexical.type.Place#embedded",
+              "social.flockfeeds.lexical.prop.hotel#geoCoversList"
+            ]
+          },
+          "geoCrosses": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.GeospatialGeometry#embedded",
+              "social.flockfeeds.lexical.type.Place#embedded",
+              "social.flockfeeds.lexical.prop.hotel#geoCrossesList"
+            ]
+          },
+          "geoDisjoint": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.GeospatialGeometry#embedded",
+              "social.flockfeeds.lexical.type.Place#embedded",
+              "social.flockfeeds.lexical.prop.hotel#geoDisjointList"
+            ]
+          },
+          "geoEquals": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.GeospatialGeometry#embedded",
+              "social.flockfeeds.lexical.type.Place#embedded",
+              "social.flockfeeds.lexical.prop.hotel#geoEqualsList"
+            ]
+          },
+          "geoIntersects": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.GeospatialGeometry#embedded",
+              "social.flockfeeds.lexical.type.Place#embedded",
+              "social.flockfeeds.lexical.prop.hotel#geoIntersectsList"
+            ]
+          },
+          "geoOverlaps": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.GeospatialGeometry#embedded",
+              "social.flockfeeds.lexical.type.Place#embedded",
+              "social.flockfeeds.lexical.prop.hotel#geoOverlapsList"
+            ]
+          },
+          "geoTouches": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.GeospatialGeometry#embedded",
+              "social.flockfeeds.lexical.type.Place#embedded",
+              "social.flockfeeds.lexical.prop.hotel#geoTouchesList"
+            ]
+          },
+          "geoWithin": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.GeospatialGeometry#embedded",
+              "social.flockfeeds.lexical.type.Place#embedded",
+              "social.flockfeeds.lexical.prop.hotel#geoWithinList"
+            ]
+          },
+          "globalLocationNumber": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.hotel#globalLocationNumberScalar",
+              "social.flockfeeds.lexical.prop.hotel#globalLocationNumberList"
+            ]
+          },
+          "hasCertification": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Certification#embedded",
+              "social.flockfeeds.lexical.prop.hotel#hasCertificationList"
+            ]
+          },
+          "hasCredential": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.EducationalOccupationalCredential#embedded",
+              "social.flockfeeds.lexical.prop.hotel#hasCredentialList"
+            ]
+          },
+          "hasDriveThroughService": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.hotel#hasDriveThroughServiceScalar",
+              "social.flockfeeds.lexical.prop.hotel#hasDriveThroughServiceList"
+            ]
+          },
+          "hasGS1DigitalLink": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.hotel#hasGS1DigitalLinkScalar",
+              "social.flockfeeds.lexical.prop.hotel#hasGS1DigitalLinkList"
+            ]
+          },
+          "hasMap": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Map#embedded",
+              "social.flockfeeds.lexical.prop.hotel#hasMapScalar",
+              "social.flockfeeds.lexical.prop.hotel#hasMapList"
+            ]
+          },
+          "hasMemberProgram": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.MemberProgram#embedded",
+              "social.flockfeeds.lexical.prop.hotel#hasMemberProgramList"
+            ]
+          },
+          "hasMerchantReturnPolicy": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.MerchantReturnPolicy#embedded",
+              "social.flockfeeds.lexical.prop.hotel#hasMerchantReturnPolicyList"
+            ]
+          },
+          "hasOfferCatalog": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.OfferCatalog#embedded",
+              "social.flockfeeds.lexical.prop.hotel#hasOfferCatalogList"
+            ]
+          },
+          "hasPOS": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Place#embedded",
+              "social.flockfeeds.lexical.prop.hotel#hasPOSList"
+            ]
+          },
+          "hasProductReturnPolicy": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.ProductReturnPolicy#embedded",
+              "social.flockfeeds.lexical.prop.hotel#hasProductReturnPolicyList"
+            ]
+          },
+          "hasShippingService": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.ShippingService#embedded",
+              "social.flockfeeds.lexical.prop.hotel#hasShippingServiceList"
+            ]
+          },
+          "identifier": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.PropertyValue#embedded",
+              "social.flockfeeds.lexical.prop.hotel#identifierScalar",
+              "social.flockfeeds.lexical.prop.hotel#identifierList"
+            ]
+          },
+          "image": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.ImageObject#embedded",
+              "social.flockfeeds.lexical.prop.hotel#imageScalar",
+              "social.flockfeeds.lexical.prop.hotel#imageList"
+            ]
+          },
+          "interactionStatistic": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.InteractionCounter#embedded",
+              "social.flockfeeds.lexical.prop.hotel#interactionStatisticList"
+            ]
+          },
+          "isAccessibleForFree": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.hotel#isAccessibleForFreeScalar",
+              "social.flockfeeds.lexical.prop.hotel#isAccessibleForFreeList"
+            ]
+          },
+          "isicV4": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.hotel#isicV4Scalar",
+              "social.flockfeeds.lexical.prop.hotel#isicV4List"
+            ]
+          },
+          "iso6523Code": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.hotel#iso6523CodeScalar",
+              "social.flockfeeds.lexical.prop.hotel#iso6523CodeList"
+            ]
+          },
+          "keywords": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+              "social.flockfeeds.lexical.prop.hotel#keywordsScalar",
+              "social.flockfeeds.lexical.prop.hotel#keywordsList"
+            ]
+          },
+          "knowsAbout": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Thing#embedded",
+              "social.flockfeeds.lexical.prop.hotel#knowsAboutScalar",
+              "social.flockfeeds.lexical.prop.hotel#knowsAboutList"
+            ]
+          },
+          "knowsLanguage": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Language#embedded",
+              "social.flockfeeds.lexical.prop.hotel#knowsLanguageScalar",
+              "social.flockfeeds.lexical.prop.hotel#knowsLanguageList"
+            ]
+          },
+          "latitude": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.hotel#latitudeScalar",
+              "social.flockfeeds.lexical.prop.hotel#latitudeList"
+            ]
+          },
+          "legalAddress": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.PostalAddress#embedded",
+              "social.flockfeeds.lexical.prop.hotel#legalAddressList"
+            ]
+          },
+          "legalName": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.hotel#legalNameScalar",
+              "social.flockfeeds.lexical.prop.hotel#legalNameList"
+            ]
+          },
+          "legalRepresentative": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.hotel#legalRepresentativeList"
+            ]
+          },
+          "leiCode": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.hotel#leiCodeScalar",
+              "social.flockfeeds.lexical.prop.hotel#leiCodeList"
+            ]
+          },
+          "location": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Place#embedded",
+              "social.flockfeeds.lexical.type.PostalAddress#embedded",
+              "social.flockfeeds.lexical.type.VirtualLocation#embedded",
+              "social.flockfeeds.lexical.prop.hotel#locationScalar",
+              "social.flockfeeds.lexical.prop.hotel#locationList"
+            ]
+          },
+          "logo": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.ImageObject#embedded",
+              "social.flockfeeds.lexical.prop.hotel#logoScalar",
+              "social.flockfeeds.lexical.prop.hotel#logoList"
+            ]
+          },
+          "longitude": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.hotel#longitudeScalar",
+              "social.flockfeeds.lexical.prop.hotel#longitudeList"
+            ]
+          },
+          "mainEntityOfPage": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.prop.hotel#mainEntityOfPageScalar",
+              "social.flockfeeds.lexical.prop.hotel#mainEntityOfPageList"
+            ]
+          },
+          "makesOffer": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Offer#embedded",
+              "social.flockfeeds.lexical.prop.hotel#makesOfferList"
+            ]
+          },
+          "map": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.hotel#mapScalar",
+              "social.flockfeeds.lexical.prop.hotel#mapList"
+            ]
+          },
+          "maps": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.hotel#mapsScalar",
+              "social.flockfeeds.lexical.prop.hotel#mapsList"
+            ]
+          },
+          "maximumAttendeeCapacity": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.hotel#maximumAttendeeCapacityScalar",
+              "social.flockfeeds.lexical.prop.hotel#maximumAttendeeCapacityList"
+            ]
+          },
+          "member": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.hotel#memberList"
+            ]
+          },
+          "memberOf": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.MemberProgramTier#embedded",
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.ProgramMembership#embedded",
+              "social.flockfeeds.lexical.prop.hotel#memberOfList"
+            ]
+          },
+          "members": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.hotel#membersList"
+            ]
+          },
+          "naics": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.hotel#naicsScalar",
+              "social.flockfeeds.lexical.prop.hotel#naicsList"
+            ]
+          },
+          "name": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.hotel#nameScalar",
+              "social.flockfeeds.lexical.prop.hotel#nameList"
+            ]
+          },
+          "nonprofitStatus": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.NonprofitType#embedded",
+              "social.flockfeeds.lexical.prop.hotel#nonprofitStatusScalar",
+              "social.flockfeeds.lexical.prop.hotel#nonprofitStatusList"
+            ]
+          },
+          "numberOfEmployees": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.QuantitativeValue#embedded",
+              "social.flockfeeds.lexical.prop.hotel#numberOfEmployeesList"
+            ]
+          },
+          "numberOfRooms": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.QuantitativeValue#embedded",
+              "social.flockfeeds.lexical.prop.hotel#numberOfRoomsScalar",
+              "social.flockfeeds.lexical.prop.hotel#numberOfRoomsList"
+            ]
+          },
+          "openingHours": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.hotel#openingHoursScalar",
+              "social.flockfeeds.lexical.prop.hotel#openingHoursList"
+            ]
+          },
+          "openingHoursSpecification": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.OpeningHoursSpecification#embedded",
+              "social.flockfeeds.lexical.prop.hotel#openingHoursSpecificationList"
+            ]
+          },
+          "ownershipFundingInfo": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.AboutPage#embedded",
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.prop.hotel#ownershipFundingInfoScalar",
+              "social.flockfeeds.lexical.prop.hotel#ownershipFundingInfoList"
+            ]
+          },
+          "owns": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.OwnershipInfo#embedded",
+              "social.flockfeeds.lexical.type.Product#embedded",
+              "social.flockfeeds.lexical.prop.hotel#ownsList"
+            ]
+          },
+          "parentOrganization": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.prop.hotel#parentOrganizationList"
+            ]
+          },
+          "paymentAccepted": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.hotel#paymentAcceptedScalar",
+              "social.flockfeeds.lexical.prop.hotel#paymentAcceptedList"
+            ]
+          },
+          "petsAllowed": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.hotel#petsAllowedScalar",
+              "social.flockfeeds.lexical.prop.hotel#petsAllowedList"
+            ]
+          },
+          "photo": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.ImageObject#embedded",
+              "social.flockfeeds.lexical.type.Photograph#embedded",
+              "social.flockfeeds.lexical.prop.hotel#photoList"
+            ]
+          },
+          "photos": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.ImageObject#embedded",
+              "social.flockfeeds.lexical.type.Photograph#embedded",
+              "social.flockfeeds.lexical.prop.hotel#photosList"
+            ]
+          },
+          "potentialAction": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Action#embedded",
+              "social.flockfeeds.lexical.prop.hotel#potentialActionList"
+            ]
+          },
+          "priceRange": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.hotel#priceRangeScalar",
+              "social.flockfeeds.lexical.prop.hotel#priceRangeList"
+            ]
+          },
+          "publicAccess": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.hotel#publicAccessScalar",
+              "social.flockfeeds.lexical.prop.hotel#publicAccessList"
+            ]
+          },
+          "publishingPrinciples": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.prop.hotel#publishingPrinciplesScalar",
+              "social.flockfeeds.lexical.prop.hotel#publishingPrinciplesList"
+            ]
+          },
+          "review": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Review#embedded",
+              "social.flockfeeds.lexical.prop.hotel#reviewList"
+            ]
+          },
+          "reviews": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Review#embedded",
+              "social.flockfeeds.lexical.prop.hotel#reviewsList"
+            ]
+          },
+          "sameAs": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.hotel#sameAsScalar",
+              "social.flockfeeds.lexical.prop.hotel#sameAsList"
+            ]
+          },
+          "seeks": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Demand#embedded",
+              "social.flockfeeds.lexical.prop.hotel#seeksList"
+            ]
+          },
+          "serviceArea": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.AdministrativeArea#embedded",
+              "social.flockfeeds.lexical.type.GeoShape#embedded",
+              "social.flockfeeds.lexical.type.Place#embedded",
+              "social.flockfeeds.lexical.prop.hotel#serviceAreaList"
+            ]
+          },
+          "skills": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.DefinedTerm#embedded",
+              "social.flockfeeds.lexical.prop.hotel#skillsScalar",
+              "social.flockfeeds.lexical.prop.hotel#skillsList"
+            ]
+          },
+          "slogan": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.hotel#sloganScalar",
+              "social.flockfeeds.lexical.prop.hotel#sloganList"
+            ]
+          },
+          "smokingAllowed": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.hotel#smokingAllowedScalar",
+              "social.flockfeeds.lexical.prop.hotel#smokingAllowedList"
+            ]
+          },
+          "specialOpeningHoursSpecification": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.OpeningHoursSpecification#embedded",
+              "social.flockfeeds.lexical.prop.hotel#specialOpeningHoursSpecificationList"
+            ]
+          },
+          "sponsor": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.type.Person#embedded",
+              "social.flockfeeds.lexical.prop.hotel#sponsorList"
+            ]
+          },
+          "starRating": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Rating#embedded",
+              "social.flockfeeds.lexical.prop.hotel#starRatingList"
+            ]
+          },
+          "subOrganization": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.Organization#embedded",
+              "social.flockfeeds.lexical.prop.hotel#subOrganizationList"
+            ]
+          },
+          "subjectOf": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.type.Event#embedded",
+              "social.flockfeeds.lexical.prop.hotel#subjectOfList"
+            ]
+          },
+          "taxID": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.hotel#taxIDScalar",
+              "social.flockfeeds.lexical.prop.hotel#taxIDList"
+            ]
+          },
+          "telephone": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.hotel#telephoneScalar",
+              "social.flockfeeds.lexical.prop.hotel#telephoneList"
+            ]
+          },
+          "tourBookingPage": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.hotel#tourBookingPageScalar",
+              "social.flockfeeds.lexical.prop.hotel#tourBookingPageList"
+            ]
+          },
+          "unnamedSourcesPolicy": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.type.CreativeWork#embedded",
+              "social.flockfeeds.lexical.prop.hotel#unnamedSourcesPolicyScalar",
+              "social.flockfeeds.lexical.prop.hotel#unnamedSourcesPolicyList"
+            ]
+          },
+          "url": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.hotel#urlScalar",
+              "social.flockfeeds.lexical.prop.hotel#urlList"
+            ]
+          },
+          "vatID": {
+            "type": "union",
+            "refs": [
+              "social.flockfeeds.lexical.prop.hotel#vatIDScalar",
+              "social.flockfeeds.lexical.prop.hotel#vatIDList"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

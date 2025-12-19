@@ -11,13 +11,24 @@
         "required": [
           "content",
           "title",
+          "path",
           "createdAt"
         ],
         "properties": {
+          "authors": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "sh.weaver.actor.defs#author"
+            }
+          },
           "content": {
             "type": "string",
-            "description": "The content of the notebook entry. This should be some flavor of Markdown.",
-            "maxLength": 200000
+            "description": "The content of the notebook entry. This should be some flavor of Markdown."
+          },
+          "contentWarnings": {
+            "type": "ref",
+            "ref": "sh.weaver.notebook.defs#contentWarnings"
           },
           "createdAt": {
             "type": "string",
@@ -53,6 +64,14 @@
               }
             }
           },
+          "path": {
+            "type": "ref",
+            "ref": "sh.weaver.notebook.defs#path"
+          },
+          "rating": {
+            "type": "ref",
+            "ref": "sh.weaver.notebook.defs#contentRating"
+          },
           "tags": {
             "type": "ref",
             "ref": "sh.weaver.notebook.defs#tags"
@@ -60,6 +79,11 @@
           "title": {
             "type": "ref",
             "ref": "sh.weaver.notebook.defs#title"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "Client-declared timestamp of last modification. Used for canonicality tiebreaking in multi-author scenarios.",
+            "format": "datetime"
           }
         }
       }

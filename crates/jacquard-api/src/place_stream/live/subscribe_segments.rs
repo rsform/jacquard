@@ -148,29 +148,6 @@ impl<'a> SubscribeSegmentsMessage<'a> {
     }
 }
 
-#[jacquard_derive::open_union]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic,
-    jacquard_derive::IntoStatic
-)]
-#[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum SubscribeSegmentsError<'a> {}
-impl std::fmt::Display for SubscribeSegmentsError<'_> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
-        }
-    }
-}
-
 ///Stream response type for
 ///place.stream.live.subscribeSegments
 pub struct SubscribeSegmentsStream;
@@ -178,7 +155,7 @@ impl jacquard_common::xrpc::SubscriptionResp for SubscribeSegmentsStream {
     const NSID: &'static str = "place.stream.live.subscribeSegments";
     const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
     type Message<'de> = SubscribeSegmentsMessage<'de>;
-    type Error<'de> = SubscribeSegmentsError<'de>;
+    type Error<'de> = jacquard_common::xrpc::GenericError<'de>;
 }
 
 impl<'a> jacquard_common::xrpc::XrpcSubscription for SubscribeSegments<'a> {

@@ -27,10 +27,23 @@
             "comments"
           ],
           "properties": {
+            "activity": {
+              "type": "array",
+              "description": "Other users' activity on the book",
+              "items": {
+                "type": "ref",
+                "ref": "buzz.bookhive.defs#activity"
+              }
+            },
             "book": {
               "type": "ref",
               "description": "The hive book's info",
               "ref": "buzz.bookhive.hiveBook#record"
+            },
+            "bookProgress": {
+              "type": "ref",
+              "description": "Reading progress for the user",
+              "ref": "buzz.bookhive.defs#bookProgress"
             },
             "comments": {
               "type": "array",

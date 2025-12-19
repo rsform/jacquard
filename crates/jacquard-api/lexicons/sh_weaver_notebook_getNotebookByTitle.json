@@ -1,0 +1,57 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.notebook.getNotebookByTitle",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get a notebook view by actor and title. Matches on either the notebook's path or title field.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "actor",
+          "title"
+        ],
+        "properties": {
+          "actor": {
+            "type": "string",
+            "description": "Handle or DID of the notebook owner.",
+            "format": "at-identifier"
+          },
+          "title": {
+            "type": "string",
+            "description": "Title or path of the notebook to fetch.",
+            "maxLength": 300
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "notebook",
+            "entries"
+          ],
+          "properties": {
+            "entries": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "com.atproto.repo.strongRef"
+              }
+            },
+            "notebook": {
+              "type": "ref",
+              "ref": "sh.weaver.notebook.defs#notebookView"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "name": "NotebookNotFound"
+        }
+      ]
+    }
+  }
+}

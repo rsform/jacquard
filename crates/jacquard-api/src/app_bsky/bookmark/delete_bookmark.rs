@@ -143,7 +143,7 @@ where
 pub enum DeleteBookmarkError<'a> {
     /// The URI to be bookmarked is for an unsupported collection.
     #[serde(rename = "UnsupportedCollection")]
-    UnsupportedCollection(std::option::Option<String>),
+    UnsupportedCollection(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl std::fmt::Display for DeleteBookmarkError<'_> {

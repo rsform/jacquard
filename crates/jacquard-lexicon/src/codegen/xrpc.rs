@@ -55,6 +55,11 @@ impl<'c> CodeGenerator<'c> {
             .as_ref()
             .map(|o| o.encoding.as_ref())
             .unwrap_or("application/json");
+        let output_has_schema = query
+            .output
+            .as_ref()
+            .map(|o| o.schema.is_some())
+            .unwrap_or(false);
 
         let xrpc_impl = self.generate_xrpc_request_impl(
             nsid,
@@ -64,6 +69,7 @@ impl<'c> CodeGenerator<'c> {
             has_params,
             params_has_lifetime,
             has_output,
+            output_has_schema,
             has_errors,
             false, // queries never have binary inputs
         )?;
@@ -129,6 +135,11 @@ impl<'c> CodeGenerator<'c> {
             .as_ref()
             .map(|o| o.encoding.as_ref())
             .unwrap_or("application/json");
+        let output_has_schema = proc
+            .output
+            .as_ref()
+            .map(|o| o.schema.is_some())
+            .unwrap_or(false);
         let xrpc_impl = self.generate_xrpc_request_impl(
             nsid,
             &type_base,
@@ -137,6 +148,7 @@ impl<'c> CodeGenerator<'c> {
             has_input,
             params_has_lifetime,
             has_output,
+            output_has_schema,
             has_errors,
             is_binary_input,
         )?;
@@ -865,7 +877,7 @@ impl<'c> CodeGenerator<'c> {
             variants.push(quote! {
                 #doc
                 #[serde(rename = #error_name)]
-                #variant_ident(std::option::Option<String>)
+                #variant_ident(std::option::Option<jacquard_common::CowStr<'a>>)
             });
 
             display_arms.push(quote! {
@@ -911,6 +923,7 @@ impl<'c> CodeGenerator<'c> {
         has_params: bool,
         params_has_lifetime: bool,
         has_output: bool,
+        output_has_schema: bool,
         has_errors: bool,
         is_binary_input: bool,
     ) -> Result<TokenStream> {
@@ -919,7 +932,8 @@ impl<'c> CodeGenerator<'c> {
                 &format!("{}Output", type_base),
                 proc_macro2::Span::call_site(),
             );
-            if output_encoding == "application/json" {
+            // Only add lifetime if output has a schema (binary outputs without schema don't have lifetimes)
+            if output_has_schema {
                 quote! {
                     #output_ident<'de>
                 }

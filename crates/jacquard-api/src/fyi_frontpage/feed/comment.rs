@@ -306,12 +306,12 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Comment<'a> {
         {
             let value = &self.blocks;
             #[allow(unused_comparisons)]
-            if value.len() > 50usize {
+            if value.len() > 200usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
                     path: ::jacquard_lexicon::validation::ValidationPath::from_field(
                         "blocks",
                     ),
-                    max: 50usize,
+                    max: 200usize,
                     actual: value.len(),
                 });
             }
@@ -367,7 +367,7 @@ fn lexicon_doc_fyi_frontpage_feed_comment() -> ::jacquard_lexicon::lexicon::Lexi
                                         ),
                                     }),
                                     min_length: None,
-                                    max_length: Some(50usize),
+                                    max_length: Some(200usize),
                                 }),
                             );
                             map.insert(

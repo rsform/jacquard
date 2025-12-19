@@ -1,0 +1,66 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.notebook.getSimilarNotebooks",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get notebooks similar to a given notebook (by tags, author, readers who also liked, etc).",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "notebook"
+        ],
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "default": 10,
+            "minimum": 1,
+            "maximum": 50
+          },
+          "notebook": {
+            "type": "string",
+            "format": "at-uri"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "notebooks"
+          ],
+          "properties": {
+            "notebooks": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "notebook"
+                ],
+                "properties": {
+                  "notebook": {
+                    "type": "ref",
+                    "ref": "sh.weaver.notebook.defs#notebookView"
+                  },
+                  "readersAlsoLiked": {
+                    "type": "boolean"
+                  },
+                  "sameAuthor": {
+                    "type": "boolean"
+                  },
+                  "sharedTags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

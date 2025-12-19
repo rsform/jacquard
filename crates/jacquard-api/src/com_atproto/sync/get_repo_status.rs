@@ -151,7 +151,7 @@ pub struct GetRepoStatusOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetRepoStatusError<'a> {
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(std::option::Option<String>),
+    RepoNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl std::fmt::Display for GetRepoStatusError<'_> {

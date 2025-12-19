@@ -185,7 +185,7 @@ pub struct GetListFeedOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetListFeedError<'a> {
     #[serde(rename = "UnknownList")]
-    UnknownList(std::option::Option<String>),
+    UnknownList(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl std::fmt::Display for GetListFeedError<'_> {

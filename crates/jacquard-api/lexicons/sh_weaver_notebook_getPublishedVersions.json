@@ -1,0 +1,72 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.notebook.getPublishedVersions",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get all published versions of an entry (same rkey in collaborator repos).",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "entry"
+        ],
+        "properties": {
+          "entry": {
+            "type": "string",
+            "format": "at-uri"
+          },
+          "includeContent": {
+            "type": "boolean",
+            "description": "Include full entry record in response",
+            "default": false
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "versions"
+          ],
+          "properties": {
+            "canonical": {
+              "type": "ref",
+              "ref": "sh.weaver.notebook.defs#publishedVersionView"
+            },
+            "hasDivergence": {
+              "type": "boolean"
+            },
+            "records": {
+              "type": "array",
+              "description": "Full entry records if includeContent=true",
+              "items": {
+                "type": "object",
+                "required": [
+                  "uri",
+                  "record"
+                ],
+                "properties": {
+                  "record": {
+                    "type": "unknown"
+                  },
+                  "uri": {
+                    "type": "string",
+                    "format": "at-uri"
+                  }
+                }
+              }
+            },
+            "versions": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "sh.weaver.notebook.defs#publishedVersionView"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

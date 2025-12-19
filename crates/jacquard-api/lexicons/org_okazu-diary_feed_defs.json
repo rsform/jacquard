@@ -1,0 +1,42 @@
+{
+  "lexicon": 1,
+  "id": "org.okazu-diary.feed.defs",
+  "defs": {
+    "subject": {
+      "type": "object",
+      "description": "A descriptor of a material used to help self-gratification.",
+      "required": [
+        "value"
+      ],
+      "properties": {
+        "labels": {
+          "type": "union",
+          "description": "User-specified self-label values for the material. The Lexicon by its nature assumes the material to be possibly sensitive by default, so the explicit label values are intended to signal that a warning should be put on the material even for the Okazu-Diary.org application users who are willing to see mature contents in general.",
+          "refs": [
+            "com.atproto.label.defs#selfLabels"
+          ]
+        },
+        "value": {
+          "type": "union",
+          "refs": [
+            "org.okazu-diary.embed.external",
+            "org.okazu-diary.embed.record"
+          ]
+        }
+      }
+    },
+    "tag": {
+      "type": "object",
+      "required": [
+        "value"
+      ],
+      "properties": {
+        "value": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      }
+    }
+  }
+}

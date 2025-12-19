@@ -1,0 +1,36 @@
+{
+  "lexicon": 1,
+  "id": "com.atprotofans.supporter",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Record declaring support for another identity. Stored in the supporter's repository.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject"
+        ],
+        "properties": {
+          "signatures": {
+            "type": "array",
+            "description": "Attestation proofs for this support relationship.",
+            "items": {
+              "type": "union",
+              "refs": [
+                "com.atproto.repo.strongRef",
+                "com.atprotofans.supporterProof",
+                "com.atprotofans.brokerProof"
+              ]
+            }
+          },
+          "subject": {
+            "type": "string",
+            "description": "DID of the identity being supported.",
+            "format": "did"
+          }
+        }
+      }
+    }
+  }
+}

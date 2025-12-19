@@ -346,6 +346,53 @@ fn lexicon_doc_app_bsky_actor_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                 }),
             );
             map.insert(
+                ::jacquard_common::smol_str::SmolStr::new_static("declaredAgePref"),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
+                            "Read-only preference containing value(s) inferred from the user's declared birthdate. Absence of this preference object in the response indicates that the user has not made a declaration.",
+                        ),
+                    ),
+                    required: None,
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::std::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "isOverAge13",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "isOverAge16",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "isOverAge18",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
+                            }),
+                        );
+                        map
+                    },
+                }),
+            );
+            map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("feedViewPref"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
                     description: None,
@@ -991,6 +1038,7 @@ fn lexicon_doc_app_bsky_actor_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                             ::jacquard_common::CowStr::new_static("#savedFeedsPref"),
                             ::jacquard_common::CowStr::new_static("#savedFeedsPrefV2"),
                             ::jacquard_common::CowStr::new_static("#personalDetailsPref"),
+                            ::jacquard_common::CowStr::new_static("#declaredAgePref"),
                             ::jacquard_common::CowStr::new_static("#feedViewPref"),
                             ::jacquard_common::CowStr::new_static("#threadViewPref"),
                             ::jacquard_common::CowStr::new_static("#interestsPref"),
@@ -2670,6 +2718,48 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContentLabelPref<'a> {
     }
 }
 
+/// Read-only preference containing value(s) inferred from the user's declared birthdate. Absence of this preference object in the response indicates that the user has not made a declaration.
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Default
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DeclaredAgePref<'a> {
+    /// Indicates if the user has declared that they are over 13 years of age.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub is_over_age13: std::option::Option<bool>,
+    /// Indicates if the user has declared that they are over 16 years of age.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub is_over_age16: std::option::Option<bool>,
+    /// Indicates if the user has declared that they are over 18 years of age.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub is_over_age18: std::option::Option<bool>,
+}
+
+impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DeclaredAgePref<'a> {
+    fn nsid() -> &'static str {
+        "app.bsky.actor.defs"
+    }
+    fn def_name() -> &'static str {
+        "declaredAgePref"
+    }
+    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_app_bsky_actor_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        Ok(())
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -3037,37 +3127,37 @@ pub mod known_followers_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Followers;
         type Count;
+        type Followers;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Followers = Unset;
         type Count = Unset;
-    }
-    ///State transition - sets the `followers` field to Set
-    pub struct SetFollowers<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFollowers<S> {}
-    impl<S: State> State for SetFollowers<S> {
-        type Followers = Set<members::followers>;
-        type Count = S::Count;
+        type Followers = Unset;
     }
     ///State transition - sets the `count` field to Set
     pub struct SetCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCount<S> {}
     impl<S: State> State for SetCount<S> {
-        type Followers = S::Followers;
         type Count = Set<members::count>;
+        type Followers = S::Followers;
+    }
+    ///State transition - sets the `followers` field to Set
+    pub struct SetFollowers<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFollowers<S> {}
+    impl<S: State> State for SetFollowers<S> {
+        type Count = S::Count;
+        type Followers = Set<members::followers>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `followers` field
-        pub struct followers(());
         ///Marker type for the `count` field
         pub struct count(());
+        ///Marker type for the `followers` field
+        pub struct followers(());
     }
 }
 
@@ -3140,8 +3230,8 @@ where
 impl<'a, S> KnownFollowersBuilder<'a, S>
 where
     S: known_followers_state::State,
-    S::Followers: known_followers_state::IsSet,
     S::Count: known_followers_state::IsSet,
+    S::Followers: known_followers_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> KnownFollowers<'a> {
@@ -4397,6 +4487,8 @@ pub enum PreferencesItem<'a> {
     SavedFeedsPrefV2(Box<crate::app_bsky::actor::SavedFeedsPrefV2<'a>>),
     #[serde(rename = "app.bsky.actor.defs#personalDetailsPref")]
     PersonalDetailsPref(Box<crate::app_bsky::actor::PersonalDetailsPref<'a>>),
+    #[serde(rename = "app.bsky.actor.defs#declaredAgePref")]
+    DeclaredAgePref(Box<crate::app_bsky::actor::DeclaredAgePref<'a>>),
     #[serde(rename = "app.bsky.actor.defs#feedViewPref")]
     FeedViewPref(Box<crate::app_bsky::actor::FeedViewPref<'a>>),
     #[serde(rename = "app.bsky.actor.defs#threadViewPref")]
@@ -5633,37 +5725,37 @@ pub mod profile_view_detailed_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Handle;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Handle = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Handle = S::Handle;
+        type Did = Unset;
     }
     ///State transition - sets the `handle` field to Set
     pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHandle<S> {}
     impl<S: State> State for SetHandle<S> {
-        type Did = S::Did;
         type Handle = Set<members::handle>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Handle = S::Handle;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `handle` field
         pub struct handle(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
@@ -6117,8 +6209,8 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
 impl<'a, S> ProfileViewDetailedBuilder<'a, S>
 where
     S: profile_view_detailed_state::State,
-    S::Did: profile_view_detailed_state::IsSet,
     S::Handle: profile_view_detailed_state::IsSet,
+    S::Did: profile_view_detailed_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ProfileViewDetailed<'a> {
@@ -6290,67 +6382,67 @@ pub mod saved_feed_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Type;
         type Pinned;
-        type Value;
         type Id;
+        type Value;
+        type Type;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Type = Unset;
         type Pinned = Unset;
-        type Value = Unset;
         type Id = Unset;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Type = Set<members::r#type>;
-        type Pinned = S::Pinned;
-        type Value = S::Value;
-        type Id = S::Id;
+        type Value = Unset;
+        type Type = Unset;
     }
     ///State transition - sets the `pinned` field to Set
     pub struct SetPinned<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPinned<S> {}
     impl<S: State> State for SetPinned<S> {
-        type Type = S::Type;
         type Pinned = Set<members::pinned>;
+        type Id = S::Id;
         type Value = S::Value;
-        type Id = S::Id;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
         type Type = S::Type;
-        type Pinned = S::Pinned;
-        type Value = Set<members::value>;
-        type Id = S::Id;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
-        type Type = S::Type;
         type Pinned = S::Pinned;
-        type Value = S::Value;
         type Id = Set<members::id>;
+        type Value = S::Value;
+        type Type = S::Type;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Pinned = S::Pinned;
+        type Id = S::Id;
+        type Value = Set<members::value>;
+        type Type = S::Type;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type Pinned = S::Pinned;
+        type Id = S::Id;
+        type Value = S::Value;
+        type Type = Set<members::r#type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `type` field
-        pub struct r#type(());
         ///Marker type for the `pinned` field
         pub struct pinned(());
-        ///Marker type for the `value` field
-        pub struct value(());
         ///Marker type for the `id` field
         pub struct id(());
+        ///Marker type for the `value` field
+        pub struct value(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
     }
 }
 
@@ -6463,10 +6555,10 @@ where
 impl<'a, S> SavedFeedBuilder<'a, S>
 where
     S: saved_feed_state::State,
-    S::Type: saved_feed_state::IsSet,
     S::Pinned: saved_feed_state::IsSet,
-    S::Value: saved_feed_state::IsSet,
     S::Id: saved_feed_state::IsSet,
+    S::Value: saved_feed_state::IsSet,
+    S::Type: saved_feed_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SavedFeed<'a> {
@@ -7197,50 +7289,50 @@ pub mod verification_state_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Verifications;
-        type TrustedVerifierStatus;
         type VerifiedStatus;
+        type TrustedVerifierStatus;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Verifications = Unset;
-        type TrustedVerifierStatus = Unset;
         type VerifiedStatus = Unset;
+        type TrustedVerifierStatus = Unset;
     }
     ///State transition - sets the `verifications` field to Set
     pub struct SetVerifications<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVerifications<S> {}
     impl<S: State> State for SetVerifications<S> {
         type Verifications = Set<members::verifications>;
+        type VerifiedStatus = S::VerifiedStatus;
         type TrustedVerifierStatus = S::TrustedVerifierStatus;
-        type VerifiedStatus = S::VerifiedStatus;
-    }
-    ///State transition - sets the `trusted_verifier_status` field to Set
-    pub struct SetTrustedVerifierStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTrustedVerifierStatus<S> {}
-    impl<S: State> State for SetTrustedVerifierStatus<S> {
-        type Verifications = S::Verifications;
-        type TrustedVerifierStatus = Set<members::trusted_verifier_status>;
-        type VerifiedStatus = S::VerifiedStatus;
     }
     ///State transition - sets the `verified_status` field to Set
     pub struct SetVerifiedStatus<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVerifiedStatus<S> {}
     impl<S: State> State for SetVerifiedStatus<S> {
         type Verifications = S::Verifications;
-        type TrustedVerifierStatus = S::TrustedVerifierStatus;
         type VerifiedStatus = Set<members::verified_status>;
+        type TrustedVerifierStatus = S::TrustedVerifierStatus;
+    }
+    ///State transition - sets the `trusted_verifier_status` field to Set
+    pub struct SetTrustedVerifierStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTrustedVerifierStatus<S> {}
+    impl<S: State> State for SetTrustedVerifierStatus<S> {
+        type Verifications = S::Verifications;
+        type VerifiedStatus = S::VerifiedStatus;
+        type TrustedVerifierStatus = Set<members::trusted_verifier_status>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `verifications` field
         pub struct verifications(());
-        ///Marker type for the `trusted_verifier_status` field
-        pub struct trusted_verifier_status(());
         ///Marker type for the `verified_status` field
         pub struct verified_status(());
+        ///Marker type for the `trusted_verifier_status` field
+        pub struct trusted_verifier_status(());
     }
 }
 
@@ -7337,8 +7429,8 @@ impl<'a, S> VerificationStateBuilder<'a, S>
 where
     S: verification_state_state::State,
     S::Verifications: verification_state_state::IsSet,
-    S::TrustedVerifierStatus: verification_state_state::IsSet,
     S::VerifiedStatus: verification_state_state::IsSet,
+    S::TrustedVerifierStatus: verification_state_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> VerificationState<'a> {
@@ -7418,67 +7510,67 @@ pub mod verification_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type IsValid;
-        type Issuer;
         type Uri;
+        type IsValid;
         type CreatedAt;
+        type Issuer;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type IsValid = Unset;
-        type Issuer = Unset;
         type Uri = Unset;
+        type IsValid = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `is_valid` field to Set
-    pub struct SetIsValid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIsValid<S> {}
-    impl<S: State> State for SetIsValid<S> {
-        type IsValid = Set<members::is_valid>;
-        type Issuer = S::Issuer;
-        type Uri = S::Uri;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `issuer` field to Set
-    pub struct SetIssuer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIssuer<S> {}
-    impl<S: State> State for SetIssuer<S> {
-        type IsValid = S::IsValid;
-        type Issuer = Set<members::issuer>;
-        type Uri = S::Uri;
-        type CreatedAt = S::CreatedAt;
+        type Issuer = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type IsValid = S::IsValid;
-        type Issuer = S::Issuer;
         type Uri = Set<members::uri>;
+        type IsValid = S::IsValid;
         type CreatedAt = S::CreatedAt;
+        type Issuer = S::Issuer;
+    }
+    ///State transition - sets the `is_valid` field to Set
+    pub struct SetIsValid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIsValid<S> {}
+    impl<S: State> State for SetIsValid<S> {
+        type Uri = S::Uri;
+        type IsValid = Set<members::is_valid>;
+        type CreatedAt = S::CreatedAt;
+        type Issuer = S::Issuer;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type IsValid = S::IsValid;
-        type Issuer = S::Issuer;
         type Uri = S::Uri;
+        type IsValid = S::IsValid;
         type CreatedAt = Set<members::created_at>;
+        type Issuer = S::Issuer;
+    }
+    ///State transition - sets the `issuer` field to Set
+    pub struct SetIssuer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIssuer<S> {}
+    impl<S: State> State for SetIssuer<S> {
+        type Uri = S::Uri;
+        type IsValid = S::IsValid;
+        type CreatedAt = S::CreatedAt;
+        type Issuer = Set<members::issuer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `is_valid` field
-        pub struct is_valid(());
-        ///Marker type for the `issuer` field
-        pub struct issuer(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `is_valid` field
+        pub struct is_valid(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `issuer` field
+        pub struct issuer(());
     }
 }
 
@@ -7591,10 +7683,10 @@ where
 impl<'a, S> VerificationViewBuilder<'a, S>
 where
     S: verification_view_state::State,
-    S::IsValid: verification_view_state::IsSet,
-    S::Issuer: verification_view_state::IsSet,
     S::Uri: verification_view_state::IsSet,
+    S::IsValid: verification_view_state::IsSet,
     S::CreatedAt: verification_view_state::IsSet,
+    S::Issuer: verification_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> VerificationView<'a> {

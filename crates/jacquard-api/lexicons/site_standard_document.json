@@ -1,0 +1,72 @@
+{
+  "lexicon": 1,
+  "id": "site.standard.document",
+  "defs": {
+    "main": {
+      "type": "object",
+      "required": [
+        "publication",
+        "title",
+        "publishedAt"
+      ],
+      "properties": {
+        "bskyPostRef": {
+          "type": "ref",
+          "ref": "com.atproto.repo.strongRef"
+        },
+        "content": {
+          "type": "array",
+          "items": {
+            "type": "union",
+            "refs": [],
+            "closed": false
+          }
+        },
+        "coverImage": {
+          "type": "blob",
+          "accept": [
+            "image/*"
+          ],
+          "maxSize": 1000000
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 3000,
+          "maxGraphemes": 300
+        },
+        "path": {
+          "type": "string",
+          "description": "combined with the publications url to construct a full url to the document"
+        },
+        "publication": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "publishedAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 100,
+            "maxGraphemes": 50
+          }
+        },
+        "textContent": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 1280,
+          "maxGraphemes": 128
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "datetime"
+        }
+      }
+    }
+  }
+}

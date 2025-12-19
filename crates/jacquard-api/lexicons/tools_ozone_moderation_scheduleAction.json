@@ -133,6 +133,14 @@
           "type": "integer",
           "description": "Indicates how long the takedown should be in effect before automatically expiring."
         },
+        "emailContent": {
+          "type": "string",
+          "description": "Email content to be sent to the user upon takedown."
+        },
+        "emailSubject": {
+          "type": "string",
+          "description": "Subject of the email to be sent to the user upon takedown."
+        },
         "policies": {
           "type": "array",
           "description": "Names/Keywords of the policies that drove the decision.",
@@ -140,6 +148,19 @@
             "type": "string"
           },
           "maxLength": 5
+        },
+        "severityLevel": {
+          "type": "string",
+          "description": "Severity level of the violation (e.g., 'sev-0', 'sev-1', 'sev-2', etc.)."
+        },
+        "strikeCount": {
+          "type": "integer",
+          "description": "Number of strikes to assign to the user when takedown is applied."
+        },
+        "strikeExpiresAt": {
+          "type": "string",
+          "description": "When the strike should expire. If not provided, the strike never expires.",
+          "format": "datetime"
         }
       }
     }

@@ -36,67 +36,67 @@ pub mod announcement_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type ExpiresAt;
-        type Title;
         type Body;
+        type ExpiresAt;
+        type CreatedAt;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type ExpiresAt = Unset;
-        type Title = Unset;
         type Body = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type ExpiresAt = S::ExpiresAt;
-        type Title = S::Title;
-        type Body = S::Body;
-    }
-    ///State transition - sets the `expires_at` field to Set
-    pub struct SetExpiresAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetExpiresAt<S> {}
-    impl<S: State> State for SetExpiresAt<S> {
-        type CreatedAt = S::CreatedAt;
-        type ExpiresAt = Set<members::expires_at>;
-        type Title = S::Title;
-        type Body = S::Body;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type CreatedAt = S::CreatedAt;
-        type ExpiresAt = S::ExpiresAt;
-        type Title = Set<members::title>;
-        type Body = S::Body;
+        type ExpiresAt = Unset;
+        type CreatedAt = Unset;
+        type Title = Unset;
     }
     ///State transition - sets the `body` field to Set
     pub struct SetBody<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBody<S> {}
     impl<S: State> State for SetBody<S> {
-        type CreatedAt = S::CreatedAt;
-        type ExpiresAt = S::ExpiresAt;
-        type Title = S::Title;
         type Body = Set<members::body>;
+        type ExpiresAt = S::ExpiresAt;
+        type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `expires_at` field to Set
+    pub struct SetExpiresAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetExpiresAt<S> {}
+    impl<S: State> State for SetExpiresAt<S> {
+        type Body = S::Body;
+        type ExpiresAt = Set<members::expires_at>;
+        type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Body = S::Body;
+        type ExpiresAt = S::ExpiresAt;
+        type CreatedAt = Set<members::created_at>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Body = S::Body;
+        type ExpiresAt = S::ExpiresAt;
+        type CreatedAt = S::CreatedAt;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `expires_at` field
-        pub struct expires_at(());
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `body` field
         pub struct body(());
+        ///Marker type for the `expires_at` field
+        pub struct expires_at(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
@@ -209,10 +209,10 @@ where
 impl<'a, S> AnnouncementBuilder<'a, S>
 where
     S: announcement_state::State,
-    S::CreatedAt: announcement_state::IsSet,
-    S::ExpiresAt: announcement_state::IsSet,
-    S::Title: announcement_state::IsSet,
     S::Body: announcement_state::IsSet,
+    S::ExpiresAt: announcement_state::IsSet,
+    S::CreatedAt: announcement_state::IsSet,
+    S::Title: announcement_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Announcement<'a> {

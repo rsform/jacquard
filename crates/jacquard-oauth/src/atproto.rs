@@ -293,7 +293,10 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
                 ],
                 application_type: Some(CowStr::new_static("native")),
                 scope: Some(CowStr::new_static("atproto")),
-                grant_types: None,
+                grant_types: Some(vec![
+                    "authorization_code".to_cowstr(),
+                    "refresh_token".to_cowstr()
+                ]),
                 response_types: vec!["code".to_cowstr()],
                 token_endpoint_auth_method: Some(AuthMethod::None.into()),
                 dpop_bound_access_tokens: Some(true),
@@ -340,7 +343,10 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
                     "account:email atproto transition:generic"
                 )),
                 application_type: Some(CowStr::new_static("native")),
-                grant_types: None,
+                grant_types: Some(vec![
+                    "authorization_code".to_cowstr(),
+                    "refresh_token".to_cowstr()
+                ]),
                 response_types: vec!["code".to_cowstr()],
                 token_endpoint_auth_method: Some(AuthMethod::None.into()),
                 dpop_bound_access_tokens: Some(true),
@@ -377,7 +383,10 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
                     client_uri: None,
                     redirect_uris: vec![CowStr::new_static("http://127.0.0.1")],
                     scope: Some(CowStr::new_static("atproto")),
-                    grant_types: None,
+                    grant_types: Some(vec![
+                        "authorization_code".to_cowstr(),
+                        "refresh_token".to_cowstr()
+                    ]),
                     response_types: vec!["code".to_cowstr()],
                     token_endpoint_auth_method: Some(AuthMethod::None.into()),
                     dpop_bound_access_tokens: Some(true),
@@ -409,7 +418,10 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
                     client_uri: None,
                     redirect_uris: vec![CowStr::new_static("http://127.0.0.1:8000")],
                     scope: Some(CowStr::new_static("atproto")),
-                    grant_types: None,
+                    grant_types: Some(vec![
+                        "authorization_code".to_cowstr(),
+                        "refresh_token".to_cowstr()
+                    ]),
                     application_type: Some(CowStr::new_static("native")),
                     response_types: vec!["code".to_cowstr()],
                     token_endpoint_auth_method: Some(AuthMethod::None.into()),
@@ -442,7 +454,10 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
                     client_uri: None,
                     redirect_uris: vec![CowStr::new_static("http://127.0.0.1")],
                     scope: Some(CowStr::new_static("atproto")),
-                    grant_types: None,
+                    grant_types: Some(vec![
+                        "authorization_code".to_cowstr(),
+                        "refresh_token".to_cowstr()
+                    ]),
                     application_type: Some(CowStr::new_static("native")),
                     response_types: vec!["code".to_cowstr()],
                     token_endpoint_auth_method: Some(AuthMethod::None.into()),

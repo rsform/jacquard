@@ -1,0 +1,58 @@
+{
+  "lexicon": 1,
+  "id": "art.cllctv.embed.externalVideo",
+  "defs": {
+    "main": {
+      "type": "object",
+      "required": [
+        "uri"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "service": {
+          "type": "string"
+        },
+        "thumb": {
+          "type": "blob",
+          "accept": [
+            "image/*"
+          ],
+          "maxSize": 5000000
+        },
+        "thumbHash": {
+          "type": "string",
+          "maxLength": 640,
+          "maxGraphemes": 64
+        },
+        "uri": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "view": {
+      "type": "object",
+      "required": [
+        "uri"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "service": {
+          "type": "string"
+        },
+        "thumb": {
+          "type": "string",
+          "format": "uri"
+        },
+        "uri": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.notebook.getChapter",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get a chapter with its entries.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "chapter"
+        ],
+        "properties": {
+          "chapter": {
+            "type": "string",
+            "format": "at-uri"
+          },
+          "entryCursor": {
+            "type": "string"
+          },
+          "entryLimit": {
+            "type": "integer",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 100
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "chapter",
+            "entries"
+          ],
+          "properties": {
+            "chapter": {
+              "type": "ref",
+              "ref": "sh.weaver.notebook.defs#chapterView"
+            },
+            "entries": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "sh.weaver.notebook.defs#chapterEntryView"
+              }
+            },
+            "entryCursor": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "name": "ChapterNotFound"
+        }
+      ]
+    }
+  }
+}

@@ -47,51 +47,51 @@ pub mod language_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Name;
         type Size;
         type Percentage;
-        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Name = Unset;
         type Size = Unset;
         type Percentage = Unset;
-        type Name = Unset;
-    }
-    ///State transition - sets the `size` field to Set
-    pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSize<S> {}
-    impl<S: State> State for SetSize<S> {
-        type Size = Set<members::size>;
-        type Percentage = S::Percentage;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `percentage` field to Set
-    pub struct SetPercentage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPercentage<S> {}
-    impl<S: State> State for SetPercentage<S> {
-        type Size = S::Size;
-        type Percentage = Set<members::percentage>;
-        type Name = S::Name;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
+        type Name = Set<members::name>;
         type Size = S::Size;
         type Percentage = S::Percentage;
-        type Name = Set<members::name>;
+    }
+    ///State transition - sets the `size` field to Set
+    pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSize<S> {}
+    impl<S: State> State for SetSize<S> {
+        type Name = S::Name;
+        type Size = Set<members::size>;
+        type Percentage = S::Percentage;
+    }
+    ///State transition - sets the `percentage` field to Set
+    pub struct SetPercentage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPercentage<S> {}
+    impl<S: State> State for SetPercentage<S> {
+        type Name = S::Name;
+        type Size = S::Size;
+        type Percentage = Set<members::percentage>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `size` field
         pub struct size(());
         ///Marker type for the `percentage` field
         pub struct percentage(());
-        ///Marker type for the `name` field
-        pub struct name(());
     }
 }
 
@@ -235,9 +235,9 @@ where
 impl<'a, S> LanguageBuilder<'a, S>
 where
     S: language_state::State,
+    S::Name: language_state::IsSet,
     S::Size: language_state::IsSet,
     S::Percentage: language_state::IsSet,
-    S::Name: language_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Language<'a> {
@@ -654,13 +654,13 @@ pub struct LanguagesOutput<'a> {
 pub enum LanguagesError<'a> {
     /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(std::option::Option<String>),
+    RepoNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
     /// Git reference not found
     #[serde(rename = "RefNotFound")]
-    RefNotFound(std::option::Option<String>),
+    RefNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
     /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(std::option::Option<String>),
+    InvalidRequest(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl std::fmt::Display for LanguagesError<'_> {

@@ -1,0 +1,56 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.actor.getActorEntries",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get all entries for an actor, optionally including collaborations.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "actor"
+        ],
+        "properties": {
+          "actor": {
+            "type": "string",
+            "format": "at-identifier"
+          },
+          "cursor": {
+            "type": "string"
+          },
+          "includeCollaborations": {
+            "type": "boolean",
+            "default": false
+          },
+          "limit": {
+            "type": "integer",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 100
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "entries"
+          ],
+          "properties": {
+            "cursor": {
+              "type": "string"
+            },
+            "entries": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "sh.weaver.notebook.defs#entryView"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

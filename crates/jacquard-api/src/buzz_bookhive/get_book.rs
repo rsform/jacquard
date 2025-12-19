@@ -121,9 +121,17 @@ where
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetBookOutput<'a> {
+    /// Other users' activity on the book
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub activity: std::option::Option<Vec<crate::buzz_bookhive::Activity<'a>>>,
     /// The hive book's info
     #[serde(borrow)]
     pub book: jacquard_common::types::value::Data<'a>,
+    /// Reading progress for the user
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub book_progress: std::option::Option<crate::buzz_bookhive::BookProgress<'a>>,
     /// Comments on the book
     #[serde(borrow)]
     pub comments: Vec<crate::buzz_bookhive::Comment<'a>>,

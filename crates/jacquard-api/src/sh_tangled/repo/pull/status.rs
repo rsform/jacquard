@@ -38,37 +38,37 @@ pub mod status_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Status;
         type Pull;
+        type Status;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Status = Unset;
         type Pull = Unset;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type Status = Set<members::status>;
-        type Pull = S::Pull;
+        type Status = Unset;
     }
     ///State transition - sets the `pull` field to Set
     pub struct SetPull<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPull<S> {}
     impl<S: State> State for SetPull<S> {
-        type Status = S::Status;
         type Pull = Set<members::pull>;
+        type Status = S::Status;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStatus<S> {}
+    impl<S: State> State for SetStatus<S> {
+        type Pull = S::Pull;
+        type Status = Set<members::status>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `status` field
-        pub struct status(());
         ///Marker type for the `pull` field
         pub struct pull(());
+        ///Marker type for the `status` field
+        pub struct status(());
     }
 }
 
@@ -141,8 +141,8 @@ where
 impl<'a, S> StatusBuilder<'a, S>
 where
     S: status_state::State,
-    S::Status: status_state::IsSet,
     S::Pull: status_state::IsSet,
+    S::Status: status_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Status<'a> {

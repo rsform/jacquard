@@ -1,0 +1,35 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.graph.listitem",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "An item in a list.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "list",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "list": {
+            "type": "string",
+            "description": "Reference to the list record.",
+            "format": "at-uri"
+          },
+          "subject": {
+            "type": "ref",
+            "description": "The notebook or entry being added to the list.",
+            "ref": "com.atproto.repo.strongRef"
+          }
+        }
+      }
+    }
+  }
+}

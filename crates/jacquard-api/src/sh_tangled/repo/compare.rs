@@ -217,16 +217,16 @@ pub struct CompareOutput {
 pub enum CompareError<'a> {
     /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(std::option::Option<String>),
+    RepoNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
     /// One or both revisions not found
     #[serde(rename = "RevisionNotFound")]
-    RevisionNotFound(std::option::Option<String>),
+    RevisionNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
     /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(std::option::Option<String>),
+    InvalidRequest(std::option::Option<jacquard_common::CowStr<'a>>),
     /// Failed to compare revisions
     #[serde(rename = "CompareError")]
-    CompareError(std::option::Option<String>),
+    CompareError(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl std::fmt::Display for CompareError<'_> {

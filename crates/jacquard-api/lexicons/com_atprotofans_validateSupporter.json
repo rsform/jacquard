@@ -1,0 +1,61 @@
+{
+  "lexicon": 1,
+  "id": "com.atprotofans.validateSupporter",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Validate if a DID is a supporter of another identity with attestations from a specific signer.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "supporter",
+          "subject",
+          "signer"
+        ],
+        "properties": {
+          "signer": {
+            "type": "string",
+            "description": "DID of the signer whose attestation must be valid.",
+            "format": "did"
+          },
+          "subject": {
+            "type": "string",
+            "description": "DID of the subject (creator) being supported.",
+            "format": "did"
+          },
+          "supporter": {
+            "type": "string",
+            "description": "DID of the supporter to validate.",
+            "format": "did"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "valid"
+          ],
+          "properties": {
+            "profile": {
+              "type": "ref",
+              "description": "Hydrated profile of the supporter, if available.",
+              "ref": "com.atprotofans.hydratedProfile"
+            },
+            "valid": {
+              "type": "boolean",
+              "description": "Whether the supporter relationship exists and the required attestation is valid."
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "Invalid DID format or missing required parameters.",
+          "name": "InvalidRequest"
+        }
+      ]
+    }
+  }
+}

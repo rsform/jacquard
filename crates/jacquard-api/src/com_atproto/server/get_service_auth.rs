@@ -186,7 +186,7 @@ pub struct GetServiceAuthOutput<'a> {
 pub enum GetServiceAuthError<'a> {
     /// Indicates that the requested expiration date is not a valid. May be in the past or may be reliant on the requested scopes.
     #[serde(rename = "BadExpiration")]
-    BadExpiration(std::option::Option<String>),
+    BadExpiration(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl std::fmt::Display for GetServiceAuthError<'_> {

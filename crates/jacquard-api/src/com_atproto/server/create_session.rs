@@ -85,9 +85,9 @@ pub struct CreateSessionOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum CreateSessionError<'a> {
     #[serde(rename = "AccountTakedown")]
-    AccountTakedown(std::option::Option<String>),
+    AccountTakedown(std::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "AuthFactorTokenRequired")]
-    AuthFactorTokenRequired(std::option::Option<String>),
+    AuthFactorTokenRequired(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl std::fmt::Display for CreateSessionError<'_> {

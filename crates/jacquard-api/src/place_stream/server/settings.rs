@@ -205,7 +205,7 @@ fn lexicon_doc_place_stream_server_settings() -> ::jacquard_lexicon::lexicon::Le
                     key: Some(::jacquard_common::CowStr::new_static("any")),
                     record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
                         description: None,
-                        required: Some(vec![]),
+                        required: None,
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]

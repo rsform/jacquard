@@ -1,0 +1,26 @@
+{
+  "lexicon": 1,
+  "id": "art.cllctv.content.markdoc",
+  "defs": {
+    "main": {
+      "type": "object",
+      "required": [
+        "markdoc"
+      ],
+      "properties": {
+        "facets": {
+          "type": "array",
+          "items": {
+            "type": "union",
+            "refs": [
+              "app.bsky.richtext.facet"
+            ]
+          }
+        },
+        "markdoc": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

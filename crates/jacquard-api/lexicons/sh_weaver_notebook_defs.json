@@ -13,7 +13,8 @@
           "type": "integer"
         },
         "record": {
-          "type": "unknown"
+          "type": "ref",
+          "ref": "sh.weaver.actor.defs#profileDataView"
         },
         "uri": {
           "type": "string",
@@ -58,6 +59,82 @@
         }
       }
     },
+    "chapterEntryView": {
+      "type": "object",
+      "description": "An entry within a chapter context.",
+      "required": [
+        "entry",
+        "index"
+      ],
+      "properties": {
+        "entry": {
+          "type": "ref",
+          "ref": "#entryView"
+        },
+        "index": {
+          "type": "integer"
+        },
+        "next": {
+          "type": "ref",
+          "ref": "#bookEntryRef"
+        },
+        "prev": {
+          "type": "ref",
+          "ref": "#bookEntryRef"
+        }
+      }
+    },
+    "chapterView": {
+      "type": "object",
+      "description": "Hydrated view of a chapter.",
+      "required": [
+        "uri",
+        "cid",
+        "notebook",
+        "authors",
+        "record",
+        "indexedAt"
+      ],
+      "properties": {
+        "authors": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#authorListView"
+          }
+        },
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "entryCount": {
+          "type": "integer"
+        },
+        "indexedAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "notebook": {
+          "type": "ref",
+          "ref": "#notebookView"
+        },
+        "record": {
+          "type": "unknown"
+        },
+        "tags": {
+          "type": "ref",
+          "ref": "#tags"
+        },
+        "title": {
+          "type": "ref",
+          "ref": "#title"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
     "contentFormat": {
       "type": "object",
       "description": "The format of the content. This is used to determine how to render the content.",
@@ -74,6 +151,42 @@
           ]
         }
       }
+    },
+    "contentRating": {
+      "type": "string",
+      "description": "Author-applied content rating.",
+      "knownValues": [
+        "general",
+        "teen",
+        "mature",
+        "explicit"
+      ]
+    },
+    "contentWarning": {
+      "type": "string",
+      "description": "Author-applied content warning.",
+      "knownValues": [
+        "violence",
+        "graphic-violence",
+        "death",
+        "major-character-death",
+        "sexual-content",
+        "explicit-sexual-content",
+        "language",
+        "substance-use",
+        "self-harm",
+        "abuse",
+        "disturbing-imagery"
+      ]
+    },
+    "contentWarnings": {
+      "type": "array",
+      "description": "Author-applied content warnings.",
+      "items": {
+        "type": "ref",
+        "ref": "#contentWarning"
+      },
+      "maxLength": 10
     },
     "entryView": {
       "type": "object",
@@ -92,6 +205,9 @@
             "ref": "#authorListView"
           }
         },
+        "bookmarkCount": {
+          "type": "integer"
+        },
         "cid": {
           "type": "string",
           "format": "cid"
@@ -99,6 +215,17 @@
         "indexedAt": {
           "type": "string",
           "format": "datetime"
+        },
+        "likeCount": {
+          "type": "integer"
+        },
+        "path": {
+          "type": "ref",
+          "ref": "#path"
+        },
+        "permissions": {
+          "type": "ref",
+          "ref": "#permissionsState"
         },
         "record": {
           "type": "unknown"
@@ -118,8 +245,70 @@
         "uri": {
           "type": "string",
           "format": "at-uri"
+        },
+        "viewerBookmark": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "viewerLike": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "viewerReadingProgress": {
+          "type": "ref",
+          "ref": "#readingProgress"
         }
       }
+    },
+    "feedEntryView": {
+      "type": "object",
+      "description": "Entry with feed-specific context (discovery reason, notebook context).",
+      "required": [
+        "entry"
+      ],
+      "properties": {
+        "entry": {
+          "type": "ref",
+          "ref": "#entryView"
+        },
+        "notebookContext": {
+          "type": "ref",
+          "ref": "#feedNotebookContext"
+        },
+        "reason": {
+          "type": "ref",
+          "ref": "#feedReason"
+        }
+      }
+    },
+    "feedNotebookContext": {
+      "type": "object",
+      "description": "Minimal notebook context for feed display.",
+      "required": [
+        "uri",
+        "title"
+      ],
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
+    "feedReason": {
+      "type": "union",
+      "description": "Why this entry appeared in the feed.",
+      "refs": [
+        "#reasonLike",
+        "#reasonBookmark",
+        "#reasonSubscription"
+      ]
     },
     "notebookView": {
       "type": "object",
@@ -138,13 +327,92 @@
             "ref": "#authorListView"
           }
         },
+        "bookmarkCount": {
+          "type": "integer"
+        },
         "cid": {
           "type": "string",
           "format": "cid"
         },
+        "entryCount": {
+          "type": "integer"
+        },
         "indexedAt": {
           "type": "string",
           "format": "datetime"
+        },
+        "likeCount": {
+          "type": "integer"
+        },
+        "path": {
+          "type": "ref",
+          "ref": "#path"
+        },
+        "permissions": {
+          "type": "ref",
+          "ref": "#permissionsState"
+        },
+        "record": {
+          "type": "unknown"
+        },
+        "subscriberCount": {
+          "type": "integer"
+        },
+        "tags": {
+          "type": "ref",
+          "ref": "#tags"
+        },
+        "title": {
+          "type": "ref",
+          "ref": "#title"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "viewerBookmark": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "viewerLike": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "viewerReadingProgress": {
+          "type": "ref",
+          "ref": "#readingProgress"
+        },
+        "viewerSubscription": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
+    "pageView": {
+      "type": "object",
+      "description": "Hydrated view of a page (entries displayed together).",
+      "required": [
+        "uri",
+        "cid",
+        "notebook",
+        "record",
+        "indexedAt"
+      ],
+      "properties": {
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "entryCount": {
+          "type": "integer"
+        },
+        "indexedAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "notebook": {
+          "type": "ref",
+          "ref": "#notebookView"
         },
         "record": {
           "type": "unknown"
@@ -160,6 +428,194 @@
         "uri": {
           "type": "string",
           "format": "at-uri"
+        }
+      }
+    },
+    "path": {
+      "type": "string",
+      "description": "The path of the notebook.",
+      "maxLength": 100
+    },
+    "permissionGrant": {
+      "type": "object",
+      "description": "A single permission grant. For resource authority: source=resource URI, grantedAt=createdAt. For invitees: source=invite URI, grantedAt=accept createdAt.",
+      "required": [
+        "did",
+        "scope",
+        "source",
+        "grantedAt"
+      ],
+      "properties": {
+        "did": {
+          "type": "string",
+          "format": "did"
+        },
+        "grantedAt": {
+          "type": "string",
+          "description": "For authority: record createdAt. For invitees: accept createdAt",
+          "format": "datetime"
+        },
+        "scope": {
+          "type": "string",
+          "description": "direct = this resource (includes authority), inherited = via notebook invite",
+          "knownValues": [
+            "direct",
+            "inherited"
+          ]
+        },
+        "source": {
+          "type": "string",
+          "description": "For authority: resource URI. For invitees: invite URI",
+          "format": "at-uri"
+        }
+      }
+    },
+    "permissionsState": {
+      "type": "object",
+      "description": "ACL-style permissions for a resource. Separate from authors (who contributed).",
+      "required": [
+        "editors"
+      ],
+      "properties": {
+        "editors": {
+          "type": "array",
+          "description": "DIDs that can edit this resource",
+          "items": {
+            "type": "ref",
+            "ref": "#permissionGrant"
+          }
+        },
+        "viewers": {
+          "type": "array",
+          "description": "DIDs that can view (future use)",
+          "items": {
+            "type": "ref",
+            "ref": "#permissionGrant"
+          }
+        }
+      }
+    },
+    "publishedVersionView": {
+      "type": "object",
+      "description": "A published version of an entry in a collaborator's repo.",
+      "required": [
+        "uri",
+        "cid",
+        "publisher",
+        "publishedAt"
+      ],
+      "properties": {
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "divergedFrom": {
+          "type": "ref",
+          "description": "If content differs, the version it diverged from",
+          "ref": "com.atproto.repo.strongRef"
+        },
+        "isCanonical": {
+          "type": "boolean",
+          "description": "True if this is the 'primary' version (owner's repo)"
+        },
+        "publishedAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "publisher": {
+          "type": "ref",
+          "ref": "sh.weaver.actor.defs#profileViewBasic"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
+    "readingProgress": {
+      "type": "object",
+      "description": "Viewer's reading progress (appview-side state, not a record).",
+      "properties": {
+        "currentEntry": {
+          "type": "string",
+          "description": "Last entry the viewer was reading.",
+          "format": "at-uri"
+        },
+        "finishedAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "lastReadAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "percentComplete": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "startedAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "status": {
+          "type": "string",
+          "knownValues": [
+            "reading",
+            "finished",
+            "abandoned",
+            "want-to-read"
+          ]
+        }
+      }
+    },
+    "reasonBookmark": {
+      "type": "object",
+      "required": [
+        "by",
+        "indexedAt"
+      ],
+      "properties": {
+        "by": {
+          "type": "ref",
+          "ref": "sh.weaver.actor.defs#profileViewBasic"
+        },
+        "indexedAt": {
+          "type": "string",
+          "format": "datetime"
+        }
+      }
+    },
+    "reasonLike": {
+      "type": "object",
+      "required": [
+        "by",
+        "indexedAt"
+      ],
+      "properties": {
+        "by": {
+          "type": "ref",
+          "ref": "sh.weaver.actor.defs#profileViewBasic"
+        },
+        "indexedAt": {
+          "type": "string",
+          "format": "datetime"
+        }
+      }
+    },
+    "reasonSubscription": {
+      "type": "object",
+      "required": [
+        "indexedAt"
+      ],
+      "properties": {
+        "indexedAt": {
+          "type": "string",
+          "format": "datetime"
         }
       }
     },

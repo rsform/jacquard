@@ -20,6 +20,10 @@
               "ref": "sh.weaver.actor.defs#author"
             }
           },
+          "contentWarnings": {
+            "type": "ref",
+            "ref": "sh.weaver.notebook.defs#contentWarnings"
+          },
           "createdAt": {
             "type": "string",
             "description": "Client-declared timestamp when this was originally created.",
@@ -32,6 +36,18 @@
               "ref": "com.atproto.repo.strongRef"
             }
           },
+          "path": {
+            "type": "ref",
+            "ref": "sh.weaver.notebook.defs#path"
+          },
+          "publishGlobal": {
+            "type": "boolean",
+            "description": "Notebook opts into accessiblity by path only without identity scoping. Path must be globally unique."
+          },
+          "rating": {
+            "type": "ref",
+            "ref": "sh.weaver.notebook.defs#contentRating"
+          },
           "tags": {
             "type": "ref",
             "ref": "sh.weaver.notebook.defs#tags"
@@ -43,6 +59,11 @@
           "title": {
             "type": "ref",
             "ref": "sh.weaver.notebook.defs#title"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "Client-declared timestamp of last modification. Used for canonicality tiebreaking in multi-author scenarios.",
+            "format": "datetime"
           }
         }
       }

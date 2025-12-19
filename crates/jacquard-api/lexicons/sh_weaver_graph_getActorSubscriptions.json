@@ -1,0 +1,73 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.graph.getActorSubscriptions",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get notebooks an actor is subscribed to (accepted subscriptions only).",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "actor"
+        ],
+        "properties": {
+          "actor": {
+            "type": "string",
+            "format": "at-identifier"
+          },
+          "cursor": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 100
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "subscriptions"
+          ],
+          "properties": {
+            "cursor": {
+              "type": "string"
+            },
+            "subscriptions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "notebook",
+                  "subscribedAt"
+                ],
+                "properties": {
+                  "hasUpdates": {
+                    "type": "boolean",
+                    "description": "True if notebook has new content since last visit."
+                  },
+                  "newEntryCount": {
+                    "type": "integer",
+                    "description": "Number of new entries since last visit."
+                  },
+                  "notebook": {
+                    "type": "ref",
+                    "ref": "sh.weaver.notebook.defs#notebookView"
+                  },
+                  "subscribedAt": {
+                    "type": "string",
+                    "format": "datetime"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,98 @@
+{
+  "lexicon": 1,
+  "id": "blue.recipes.feed.recipe",
+  "defs": {
+    "ingredient": {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "amount": {
+          "type": "string",
+          "description": "The amount of the ingredient needed."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the ingredient.",
+          "maxLength": 3000,
+          "maxGraphemes": 300
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "Record containing a recipe.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "title",
+          "steps",
+          "ingredients"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "description": "Free-form recipe description text.",
+            "maxLength": 3000,
+            "maxGraphemes": 300
+          },
+          "image": {
+            "type": "blob",
+            "description": "Image representing the recipe.",
+            "accept": [
+              "image/png",
+              "image/jpeg"
+            ],
+            "maxSize": 1000000
+          },
+          "ingredients": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "#ingredient"
+            }
+          },
+          "serves": {
+            "type": "integer",
+            "description": "The number of servings the recipe prepares."
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "#step"
+            }
+          },
+          "time": {
+            "type": "integer",
+            "description": "The amount of time (in minutes) it takes to complete the recipe."
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 3000,
+            "maxGraphemes": 300
+          }
+        }
+      }
+    },
+    "step": {
+      "type": "object",
+      "required": [
+        "text"
+      ],
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "The instruction to provide to the user.",
+          "maxLength": 5000,
+          "maxGraphemes": 500
+        }
+      }
+    }
+  }
+}

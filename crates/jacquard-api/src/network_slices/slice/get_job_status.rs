@@ -875,85 +875,85 @@ pub mod sync_job_result_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Success;
+        type CollectionsSynced;
         type Message;
         type ReposProcessed;
-        type CollectionsSynced;
         type TotalRecords;
+        type Success;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Success = Unset;
+        type CollectionsSynced = Unset;
         type Message = Unset;
         type ReposProcessed = Unset;
-        type CollectionsSynced = Unset;
         type TotalRecords = Unset;
-    }
-    ///State transition - sets the `success` field to Set
-    pub struct SetSuccess<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSuccess<S> {}
-    impl<S: State> State for SetSuccess<S> {
-        type Success = Set<members::success>;
-        type Message = S::Message;
-        type ReposProcessed = S::ReposProcessed;
-        type CollectionsSynced = S::CollectionsSynced;
-        type TotalRecords = S::TotalRecords;
-    }
-    ///State transition - sets the `message` field to Set
-    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMessage<S> {}
-    impl<S: State> State for SetMessage<S> {
-        type Success = S::Success;
-        type Message = Set<members::message>;
-        type ReposProcessed = S::ReposProcessed;
-        type CollectionsSynced = S::CollectionsSynced;
-        type TotalRecords = S::TotalRecords;
-    }
-    ///State transition - sets the `repos_processed` field to Set
-    pub struct SetReposProcessed<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetReposProcessed<S> {}
-    impl<S: State> State for SetReposProcessed<S> {
-        type Success = S::Success;
-        type Message = S::Message;
-        type ReposProcessed = Set<members::repos_processed>;
-        type CollectionsSynced = S::CollectionsSynced;
-        type TotalRecords = S::TotalRecords;
+        type Success = Unset;
     }
     ///State transition - sets the `collections_synced` field to Set
     pub struct SetCollectionsSynced<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCollectionsSynced<S> {}
     impl<S: State> State for SetCollectionsSynced<S> {
-        type Success = S::Success;
+        type CollectionsSynced = Set<members::collections_synced>;
         type Message = S::Message;
         type ReposProcessed = S::ReposProcessed;
-        type CollectionsSynced = Set<members::collections_synced>;
         type TotalRecords = S::TotalRecords;
+        type Success = S::Success;
+    }
+    ///State transition - sets the `message` field to Set
+    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMessage<S> {}
+    impl<S: State> State for SetMessage<S> {
+        type CollectionsSynced = S::CollectionsSynced;
+        type Message = Set<members::message>;
+        type ReposProcessed = S::ReposProcessed;
+        type TotalRecords = S::TotalRecords;
+        type Success = S::Success;
+    }
+    ///State transition - sets the `repos_processed` field to Set
+    pub struct SetReposProcessed<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetReposProcessed<S> {}
+    impl<S: State> State for SetReposProcessed<S> {
+        type CollectionsSynced = S::CollectionsSynced;
+        type Message = S::Message;
+        type ReposProcessed = Set<members::repos_processed>;
+        type TotalRecords = S::TotalRecords;
+        type Success = S::Success;
     }
     ///State transition - sets the `total_records` field to Set
     pub struct SetTotalRecords<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTotalRecords<S> {}
     impl<S: State> State for SetTotalRecords<S> {
-        type Success = S::Success;
+        type CollectionsSynced = S::CollectionsSynced;
         type Message = S::Message;
         type ReposProcessed = S::ReposProcessed;
-        type CollectionsSynced = S::CollectionsSynced;
         type TotalRecords = Set<members::total_records>;
+        type Success = S::Success;
+    }
+    ///State transition - sets the `success` field to Set
+    pub struct SetSuccess<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSuccess<S> {}
+    impl<S: State> State for SetSuccess<S> {
+        type CollectionsSynced = S::CollectionsSynced;
+        type Message = S::Message;
+        type ReposProcessed = S::ReposProcessed;
+        type TotalRecords = S::TotalRecords;
+        type Success = Set<members::success>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `success` field
-        pub struct success(());
+        ///Marker type for the `collections_synced` field
+        pub struct collections_synced(());
         ///Marker type for the `message` field
         pub struct message(());
         ///Marker type for the `repos_processed` field
         pub struct repos_processed(());
-        ///Marker type for the `collections_synced` field
-        pub struct collections_synced(());
         ///Marker type for the `total_records` field
         pub struct total_records(());
+        ///Marker type for the `success` field
+        pub struct success(());
     }
 }
 
@@ -1086,11 +1086,11 @@ where
 impl<'a, S> SyncJobResultBuilder<'a, S>
 where
     S: sync_job_result_state::State,
-    S::Success: sync_job_result_state::IsSet,
+    S::CollectionsSynced: sync_job_result_state::IsSet,
     S::Message: sync_job_result_state::IsSet,
     S::ReposProcessed: sync_job_result_state::IsSet,
-    S::CollectionsSynced: sync_job_result_state::IsSet,
     S::TotalRecords: sync_job_result_state::IsSet,
+    S::Success: sync_job_result_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SyncJobResult<'a> {

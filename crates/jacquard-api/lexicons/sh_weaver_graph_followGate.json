@@ -1,0 +1,33 @@
+{
+  "lexicon": 1,
+  "id": "sh.weaver.graph.followGate",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Settings controlling follow approval behavior. Absence means auto-accept.",
+      "key": "self",
+      "record": {
+        "type": "object",
+        "required": [
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "invalidatePrior": {
+            "type": "boolean",
+            "description": "If true, previously auto-accepted follows are invalidated when requireApproval is enabled. Appview should treat followAccept records created before this gate's createdAt as invalid.",
+            "default": false
+          },
+          "requireApproval": {
+            "type": "boolean",
+            "description": "If true, follows require manual acceptance.",
+            "default": false
+          }
+        }
+      }
+    }
+  }
+}

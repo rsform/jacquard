@@ -44,11 +44,11 @@ pub struct UpdateEmail<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum UpdateEmailError<'a> {
     #[serde(rename = "ExpiredToken")]
-    ExpiredToken(std::option::Option<String>),
+    ExpiredToken(std::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "InvalidToken")]
-    InvalidToken(std::option::Option<String>),
+    InvalidToken(std::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "TokenRequired")]
-    TokenRequired(std::option::Option<String>),
+    TokenRequired(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl std::fmt::Display for UpdateEmailError<'_> {

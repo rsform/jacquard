@@ -40,37 +40,37 @@ pub mod theme_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Dark;
         type Light;
+        type Dark;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Dark = Unset;
         type Light = Unset;
-    }
-    ///State transition - sets the `dark` field to Set
-    pub struct SetDark<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDark<S> {}
-    impl<S: State> State for SetDark<S> {
-        type Dark = Set<members::dark>;
-        type Light = S::Light;
+        type Dark = Unset;
     }
     ///State transition - sets the `light` field to Set
     pub struct SetLight<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLight<S> {}
     impl<S: State> State for SetLight<S> {
-        type Dark = S::Dark;
         type Light = Set<members::light>;
+        type Dark = S::Dark;
+    }
+    ///State transition - sets the `dark` field to Set
+    pub struct SetDark<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDark<S> {}
+    impl<S: State> State for SetDark<S> {
+        type Light = S::Light;
+        type Dark = Set<members::dark>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `dark` field
-        pub struct dark(());
         ///Marker type for the `light` field
         pub struct light(());
+        ///Marker type for the `dark` field
+        pub struct dark(());
     }
 }
 
@@ -160,8 +160,8 @@ where
 impl<'a, S> ThemeBuilder<'a, S>
 where
     S: theme_state::State,
-    S::Dark: theme_state::IsSet,
     S::Light: theme_state::IsSet,
+    S::Dark: theme_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Theme<'a> {
