@@ -151,7 +151,7 @@ The modules are also less well-documented, and don't have code examples. There a
 ### Projects using Jacquard
 
 - [skywatch-phash-rs](https://tangled.org/skywatch.blue/skywatch-phash-rs)
-- [Weaver](https://alpha.weaver.sh/) - [tangled-repository](https://tangled.org/nonbinary.computer/weaver)
+- [Weaver](https://alpha.weaver.sh/) - [tangled repository](https://tangled.org/nonbinary.computer/weaver)
 - [wisp.place CLI tool](https://docs.wisp.place/cli/)
 - [PDS MOOver](https://pdsmoover.com/) - [tangled repository](https://tangled.org/baileytownsend.dev/pds-moover)
 
