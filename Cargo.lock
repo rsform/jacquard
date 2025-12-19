@@ -2581,7 +2581,7 @@ dependencies = [
 
 [[package]]
 name = "jacquard-oauth"
-version = "0.9.5"
+version = "0.9.6"
 dependencies = [
  "base64 0.22.1",
  "bytes",

@@ -2,7 +2,7 @@
 
 use std::{collections::hash_map::DefaultHasher, hash::BuildHasher, sync::Arc};
 
-use mini_moka::sync::Cache;
+use mini_moka_wasm::sync::Cache;
 
 fn main() {
     f1_fail();

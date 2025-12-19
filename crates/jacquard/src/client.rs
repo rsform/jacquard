@@ -442,7 +442,7 @@ impl MemoryCredentialSession {
     /// # #[tokio::main]
     /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// # let (identifier, password, post_text): (CowStr<'_>, CowStr<'_>, CowStr<'_>)  = todo!();
-    /// let (session, _) = MemoryCredentialSession::authenticated(identifier, password, None).await?;
+    /// let (session, _) = MemoryCredentialSession::authenticated(identifier, password, None, None).await?;
     /// let agent = Agent::from(session);
     /// let post = Post::new().text(post_text).created_at(Datetime::now()).build();
     /// let output = agent.create_record(post, None).await?;

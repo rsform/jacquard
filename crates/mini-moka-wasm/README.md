@@ -111,7 +111,7 @@ Here's an example of reading and updating a cache by using multiple threads:
 
 ```rust
 // Use the synchronous cache.
-use mini_moka::sync::Cache;
+use mini_moka_wasm::sync::Cache;
 
 use std::thread;
 
@@ -206,7 +206,7 @@ in `u32`, and the cache will evict entries when the total weighted size exceeds 
 
 ```rust
 use std::convert::TryInto;
-use mini_moka::sync::Cache;
+use mini_moka_wasm::sync::Cache;
 
 fn main() {
     let cache = Cache::builder()
@@ -238,7 +238,7 @@ Mini Moka supports the following expiration policies:
 To set them, use the `CacheBuilder`.
 
 ```rust
-use mini_moka::sync::Cache;
+use mini_moka_wasm::sync::Cache;
 use std::time::Duration;
 
 fn main() {

@@ -1,15 +1,15 @@
-use super::{base_cache::BaseCache, CacheBuilder, ConcurrentCacheExt, EntryRef, Iter};
+use super::{CacheBuilder, ConcurrentCacheExt, EntryRef, Iter, base_cache::BaseCache};
 use crate::{
+    Policy,
     common::{
         concurrent::{
+            Weigher, WriteOp,
             constants::{MAX_SYNC_REPEATS, WRITE_RETRY_INTERVAL_MICROS},
             housekeeper::{Housekeeper, InnerSync},
-            Weigher, WriteOp,
         },
         time::Duration,
         time::Instant,
     },
-    Policy,
 };
 
 use crossbeam_channel::{Sender, TrySendError};
@@ -39,7 +39,7 @@ use std::{
 /// Here's an example of reading and updating a cache by using multiple threads:
 ///
 /// ```rust
-/// use mini_moka::sync::Cache;
+/// use mini_moka_wasm::sync::Cache;
 ///
 /// use std::thread;
 ///
@@ -110,7 +110,7 @@ use std::{
 ///
 /// ```rust
 /// use std::convert::TryInto;
-/// use mini_moka::sync::Cache;
+/// use mini_moka_wasm::sync::Cache;
 ///
 /// // Evict based on the number of entries in the cache.
 /// let cache = Cache::builder()
@@ -161,7 +161,7 @@ use std::{
 ///   past from `get` or `insert`.
 ///
 /// ```rust
-/// use mini_moka::sync::Cache;
+/// use mini_moka_wasm::sync::Cache;
 /// use std::time::Duration;
 ///
 /// let cache = Cache::builder()
@@ -321,7 +321,7 @@ impl<K, V, S> Cache<K, V, S> {
     /// # Example
     ///
     /// ```rust
-    /// use mini_moka::sync::Cache;
+    /// use mini_moka_wasm::sync::Cache;
     ///
     /// let cache = Cache::new(10);
     /// cache.insert('n', "Netherland Dwarf");
@@ -337,7 +337,7 @@ impl<K, V, S> Cache<K, V, S> {
     ///
     /// // To mitigate the inaccuracy, bring `ConcurrentCacheExt` trait to
     /// // the scope so we can use `sync` method.
-    /// use mini_moka::sync::ConcurrentCacheExt;
+    /// use mini_moka_wasm::sync::ConcurrentCacheExt;
     /// // Call `sync` to run pending internal tasks.
     /// cache.sync();
     ///
@@ -521,7 +521,7 @@ where
     /// # Examples
     ///
     /// ```rust
-    /// use mini_moka::sync::Cache;
+    /// use mini_moka_wasm::sync::Cache;
     ///
     /// let cache = Cache::new(100);
     /// cache.insert("Julia", 14);

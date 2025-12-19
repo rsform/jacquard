@@ -15,7 +15,7 @@ use std::{
 /// # Examples
 ///
 /// ```rust
-/// use mini_moka::unsync::Cache;
+/// use mini_moka_wasm::unsync::Cache;
 /// use std::time::Duration;
 ///
 /// let mut cache = Cache::builder()

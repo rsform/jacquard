@@ -1,21 +1,20 @@
 use super::{
-    deques::Deques, AccessTime, CacheBuilder, Iter, KeyDate, KeyHashDate, ValueEntry, Weigher,
+    AccessTime, CacheBuilder, Iter, KeyDate, KeyHashDate, ValueEntry, Weigher, deques::Deques,
 };
 use crate::{
+    Policy,
     common::{
-        self,
+        self, CacheRegion,
         deque::{DeqNode, Deque},
         frequency_sketch::FrequencySketch,
         time::{CheckedTimeOps, Clock, Instant},
-        CacheRegion,
     },
-    Policy,
 };
 
 use smallvec::SmallVec;
 use std::{
     borrow::Borrow,
-    collections::{hash_map::RandomState, HashMap},
+    collections::{HashMap, hash_map::RandomState},
     fmt,
     hash::{BuildHasher, Hash},
     ptr::NonNull,
@@ -55,7 +54,7 @@ type CacheStore<K, V, S> = std::collections::HashMap<Rc<K>, ValueEntry<K, V>, S>
 /// Here's an example of reading and updating a cache by using the main thread:
 ///
 ///```rust
-/// use mini_moka::unsync::Cache;
+/// use mini_moka_wasm::unsync::Cache;
 ///
 /// const NUM_KEYS: usize = 64;
 ///
@@ -90,7 +89,7 @@ type CacheStore<K, V, S> = std::collections::HashMap<Rc<K>, ValueEntry<K, V>, S>
 ///
 /// ```rust
 /// use std::convert::TryInto;
-/// use mini_moka::unsync::Cache;
+/// use mini_moka_wasm::unsync::Cache;
 ///
 /// // Evict based on the number of entries in the cache.
 /// let mut cache = Cache::builder()
@@ -238,7 +237,7 @@ impl<K, V, S> Cache<K, V, S> {
     /// # Example
     ///
     /// ```rust
-    /// use mini_moka::unsync::Cache;
+    /// use mini_moka_wasm::unsync::Cache;
     ///
     /// let mut cache = Cache::new(10);
     /// cache.insert('n', "Netherland Dwarf");
@@ -492,7 +491,7 @@ where
     /// # Examples
     ///
     /// ```rust
-    /// use mini_moka::unsync::Cache;
+    /// use mini_moka_wasm::unsync::Cache;
     ///
     /// let mut cache = Cache::new(100);
     /// cache.insert("Julia", 14);
