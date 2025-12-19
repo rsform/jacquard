@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.6] - 2025-12-19
+
+### Changed
+
+**Logging** (`jacquard`, `jacquard-axum`)
+- [PR from @nekomimi.pet](https://tangled.org/nonbinary.computer/jacquard/pulls/5) cleaning up more debug logs, and adding tracing feature gate to jacquard-axum
+
 ## [0.9.5] - 2025-12-19
 
 ### Fixed
