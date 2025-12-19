@@ -4,9 +4,9 @@
 
 A suite of Rust crates intended to make it much easier to get started with atproto development, without sacrificing flexibility or performance.
 
-[Jacquard is simpler](https://whtwnd.com/nonbinary.computer/3m33efvsylz2s) because it is designed in a way which makes things simple that almost every other atproto library seems to make difficult.
+[Jacquard is simpler](https://alpha.weaver.sh/nonbinary.computer/jacquard/jacquard_magic) because it is designed in a way which makes things simple that almost every other atproto library seems to make difficult.
 
-It is also designed around zero-copy/borrowed deserialization: types like [`Post<'_>`](https://tangled.org/@nonbinary.computer/jacquard/blob/main/crates/jacquard-api/src/app_bsky/feed/post.rs) can borrow data (via the [`CowStr<'_>`](https://docs.rs/jacquard/latest/jacquard/cowstr/enum.CowStr.html) type and a host of other types built on top of it) directly from the response buffer instead of allocating owned copies. Owned versions are themselves mostly inlined or reference-counted pointers and are therefore still quite efficient. The `IntoStatic` trait (which is derivable) makes it easy to get an owned version and avoid worrying about lifetimes.
+It is also designed around zero-copy/borrowed deserialization: types like [`Post<'_>`](https://tangled.org/nonbinary.computer/jacquard/blob/main/crates/jacquard-api/src/app_bsky/feed/post.rs) can borrow data (via the [`CowStr<'_>`](https://docs.rs/jacquard/latest/jacquard/cowstr/enum.CowStr.html) type and a host of other types built on top of it) directly from the response buffer instead of allocating owned copies. Owned versions are themselves mostly inlined or reference-counted pointers and are therefore still quite efficient. The `IntoStatic` trait (which is derivable) makes it easy to get an owned version and avoid worrying about lifetimes.
 
 ## Features
 
@@ -22,7 +22,7 @@ It is also designed around zero-copy/borrowed deserialization: types like [`Post
    - All the building blocks of the convenient abstractions are available
    - Use as much or as little from the crates as you need
 
-## 0.9.0 Release Highlights:
+## 0.9.X Release Highlights:
 
 **`#[derive(LexiconSchema)]` + `#[lexicon_union]` macros**
 - Automatic schema generation for custom lexicons from Rust structs
@@ -54,8 +54,8 @@ It is also designed around zero-copy/borrowed deserialization: types like [`Post
 **Caching in identity/lexicon resolver**
 - Basic LRU in-memory cache implementation using `mini-moka`
 - Reduces number of network requests for certain operations
-- Works on both native and WebAssembly
-- **NOTE** wasm target for `mini-moka` requires a git dependency, use the git version of the crate when compiling for wasm
+- Works on both native and WebAssembly via vendored patched version of mini-moka
+
 
 **XRPC client improvements**
 - `set_options()` and `set_endpoint()` methods on `XrpcClient` trait
@@ -131,7 +131,7 @@ async fn main() -> miette::Result<()> {
 
 ```
 
-If you have `just` installed, you can run the [examples](https://tangled.org/@nonbinary.computer/jacquard/tree/main/examples) using `just example {example-name} {ARGS}` or `just examples` to see what's available.
+If you have `just` installed, you can run the [examples](https://tangled.org/nonbinary.computer/jacquard/tree/main/examples) using `just example {example-name} {ARGS}` or `just examples` to see what's available.
 
 > [!WARNING]
 > A lot of the streaming code is still pretty experimental. The examples work, though.\
