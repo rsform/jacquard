@@ -21,4 +21,4 @@ steps:
 
   - name: run tests
     command: |
-      cargo test -- --skip common::frequency_sketch
+      cargo test --workspace --exclude mini-moka-wasm
