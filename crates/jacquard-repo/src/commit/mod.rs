@@ -12,6 +12,7 @@ use jacquard_common::IntoStatic;
 use jacquard_common::types::crypto::PublicKey;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::tid::Tid;
+
 /// Repository commit object
 ///
 /// This structure represents a signed commit in an AT Protocol repository.
@@ -43,24 +44,116 @@ pub struct Commit<'a> {
     pub sig: Bytes,
 }
 
-impl<'a> Commit<'a> {
+/// Unsigned commit object.
+/// Explicitly a separate struct minus the sig field to match deserialization/signatures
+/// from other implementations.
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct UnsignedCommit<'a> {
+    /// Repository DID
+    #[serde(borrow)]
+    pub did: Did<'a>,
+
+    /// Commit version (2 or 3)
+    pub version: i64,
+
+    /// MST root CID
+    pub data: IpldCid,
+
+    /// Revision TID
+    pub rev: Tid,
+
+    /// Previous commit CID (None for initial commit)
+    pub prev: Option<IpldCid>,
+}
+
+impl<'a> UnsignedCommit<'a> {
     /// Create new unsigned commit (version = 3, sig empty)
-    pub fn new_unsigned(did: Did<'a>, data: IpldCid, rev: Tid, prev: Option<IpldCid>) -> Self {
+    pub fn new_unsigned(
+        did: Did<'a>,
+        data: IpldCid,
+        rev: Tid,
+        prev: Option<IpldCid>,
+    ) -> UnsignedCommit<'a> {
         Self {
             did,
             version: 3,
             data,
             rev,
             prev,
-            sig: Bytes::new(),
         }
+    }
+    /// Get unsigned commit bytes (for signing/verification)
+    pub(super) fn unsigned_bytes(&self) -> Result<Vec<u8>> {
+        // Serialize without signature field
+        let unsigned = self.clone();
+        serde_ipld_dagcbor::to_vec(&unsigned)
+            .map_err(|e| crate::error::CommitError::Serialization(Box::new(e)).into())
     }
 
     /// Sign this commit with a key
-    pub fn sign(mut self, key: &impl SigningKey) -> Result<Self> {
+    pub fn sign(self, key: &impl SigningKey) -> Result<Commit<'a>> {
         let unsigned = self.unsigned_bytes()?;
-        self.sig = key.sign_bytes(&unsigned)?;
-        Ok(self)
+        let sig = key.sign_bytes(&unsigned)?;
+
+        Ok(Commit {
+            did: self.did,
+            version: self.version,
+            data: self.data,
+            rev: self.rev,
+            prev: self.prev,
+            sig,
+        })
+    }
+    /// Get the repository DID
+    pub fn did(&self) -> &Did<'a> {
+        &self.did
+    }
+
+    /// Get the MST root CID
+    pub fn data(&self) -> &IpldCid {
+        &self.data
+    }
+
+    /// Get the revision TID
+    pub fn rev(&self) -> &Tid {
+        &self.rev
+    }
+
+    /// Get the previous commit CID
+    pub fn prev(&self) -> Option<&IpldCid> {
+        self.prev.as_ref()
+    }
+}
+
+impl<'a> Commit<'a> {
+    /// Create new unsigned commit (version = 3, sig empty)
+    pub fn new_unsigned(
+        did: Did<'a>,
+        data: IpldCid,
+        rev: Tid,
+        prev: Option<IpldCid>,
+    ) -> UnsignedCommit<'a> {
+        UnsignedCommit {
+            did,
+            version: 3,
+            data,
+            rev,
+            prev,
+        }
+    }
+
+    /// Get unsigned commit bytes (for signing/verification)
+    pub(super) fn unsigned_bytes(&self) -> Result<Vec<u8>> {
+        // Serialize without signature field
+        let unsigned = UnsignedCommit {
+            did: self.did.clone(),
+            version: self.version,
+            data: self.data.clone(),
+            rev: self.rev.clone(),
+            prev: self.prev.clone(),
+        };
+        serde_ipld_dagcbor::to_vec(&unsigned)
+            .map_err(|e| crate::error::CommitError::Serialization(Box::new(e)).into())
     }
 
     /// Get the repository DID
@@ -86,15 +179,6 @@ impl<'a> Commit<'a> {
     /// Get the signature bytes
     pub fn sig(&self) -> &Bytes {
         &self.sig
-    }
-
-    /// Get unsigned commit bytes (for signing/verification)
-    pub(super) fn unsigned_bytes(&self) -> Result<Vec<u8>> {
-        // Serialize without signature field
-        let mut unsigned = self.clone();
-        unsigned.sig = Bytes::new();
-        serde_ipld_dagcbor::to_vec(&unsigned)
-            .map_err(|e| crate::error::CommitError::Serialization(Box::new(e)).into())
     }
 
     /// Serialize to DAG-CBOR
