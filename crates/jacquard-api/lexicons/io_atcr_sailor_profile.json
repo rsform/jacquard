@@ -1,0 +1,34 @@
+{
+  "lexicon": 1,
+  "id": "io.atcr.sailor.profile",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "User profile for ATCR registry. Stores preferences like default hold for blob storage.",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": [
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Profile creation timestamp",
+            "format": "datetime"
+          },
+          "defaultHold": {
+            "type": "string",
+            "description": "Default hold endpoint for blob storage. If null, user has opted out of defaults.",
+            "format": "uri"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "Profile last updated timestamp",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "lexicon": 1,
+  "id": "io.atcr.hold.crew",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Crew member in a hold's embedded PDS. Grants access permissions to push blobs to the hold. Stored in the hold's embedded PDS (one record per member).",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "member",
+          "role",
+          "permissions",
+          "addedAt"
+        ],
+        "properties": {
+          "addedAt": {
+            "type": "string",
+            "description": "RFC3339 timestamp of when the member was added",
+            "format": "datetime"
+          },
+          "member": {
+            "type": "string",
+            "description": "DID of the crew member",
+            "format": "did"
+          },
+          "permissions": {
+            "type": "array",
+            "description": "Specific permissions granted to this member",
+            "items": {
+              "type": "string"
+            }
+          },
+          "role": {
+            "type": "string",
+            "description": "Member's role in the hold",
+            "knownValues": [
+              "owner",
+              "admin",
+              "write",
+              "read"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

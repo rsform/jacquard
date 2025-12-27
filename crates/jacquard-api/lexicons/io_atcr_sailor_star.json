@@ -1,0 +1,50 @@
+{
+  "lexicon": 1,
+  "id": "io.atcr.sailor.star",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A star (like) on a container image repository. Stored in the starrer's PDS, similar to Bluesky likes.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Star creation timestamp",
+            "format": "datetime"
+          },
+          "subject": {
+            "type": "ref",
+            "description": "The repository being starred",
+            "ref": "#subject"
+          }
+        }
+      }
+    },
+    "subject": {
+      "type": "object",
+      "description": "Reference to a repository owned by a user",
+      "required": [
+        "did",
+        "repository"
+      ],
+      "properties": {
+        "did": {
+          "type": "string",
+          "description": "DID of the repository owner",
+          "format": "did"
+        },
+        "repository": {
+          "type": "string",
+          "description": "Repository name (e.g., 'myapp')",
+          "maxLength": 255
+        }
+      }
+    }
+  }
+}

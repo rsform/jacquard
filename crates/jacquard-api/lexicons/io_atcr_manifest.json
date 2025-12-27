@@ -1,0 +1,195 @@
+{
+  "lexicon": 1,
+  "id": "io.atcr.manifest",
+  "defs": {
+    "blobReference": {
+      "type": "object",
+      "description": "Reference to a blob stored in S3 or external storage",
+      "required": [
+        "mediaType",
+        "size",
+        "digest"
+      ],
+      "properties": {
+        "annotations": {
+          "type": "unknown",
+          "description": "Optional OCI annotation metadata. Map of string keys to string values."
+        },
+        "digest": {
+          "type": "string",
+          "description": "Content digest (e.g., 'sha256:...')"
+        },
+        "mediaType": {
+          "type": "string",
+          "description": "MIME type of the blob"
+        },
+        "size": {
+          "type": "integer",
+          "description": "Size in bytes"
+        },
+        "urls": {
+          "type": "array",
+          "description": "Optional direct URLs to blob (for BYOS)",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          }
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "A container image manifest following OCI specification, stored in ATProto",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "repository",
+          "digest",
+          "mediaType",
+          "schemaVersion",
+          "createdAt"
+        ],
+        "properties": {
+          "annotations": {
+            "type": "unknown",
+            "description": "Optional OCI annotation metadata. Map of string keys to string values (e.g., org.opencontainers.image.title → 'My App')."
+          },
+          "config": {
+            "type": "ref",
+            "description": "Reference to image configuration blob",
+            "ref": "#blobReference"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Record creation timestamp",
+            "format": "datetime"
+          },
+          "digest": {
+            "type": "string",
+            "description": "Content digest (e.g., 'sha256:abc123...')"
+          },
+          "holdDid": {
+            "type": "string",
+            "description": "DID of the hold service where blobs are stored (e.g., 'did:web:hold01.atcr.io'). Primary reference for hold resolution.",
+            "format": "did"
+          },
+          "holdEndpoint": {
+            "type": "string",
+            "description": "Hold service endpoint URL where blobs are stored. DEPRECATED: Use holdDid instead. Kept for backward compatibility.",
+            "format": "uri"
+          },
+          "layers": {
+            "type": "array",
+            "description": "Filesystem layers (for image manifests)",
+            "items": {
+              "type": "ref",
+              "ref": "#blobReference"
+            }
+          },
+          "manifestBlob": {
+            "type": "blob",
+            "description": "The full OCI manifest stored as a blob in ATProto."
+          },
+          "manifests": {
+            "type": "array",
+            "description": "Referenced manifests (for manifest lists/indexes)",
+            "items": {
+              "type": "ref",
+              "ref": "#manifestReference"
+            }
+          },
+          "mediaType": {
+            "type": "string",
+            "description": "OCI media type",
+            "knownValues": [
+              "application/vnd.oci.image.manifest.v1+json",
+              "application/vnd.docker.distribution.manifest.v2+json",
+              "application/vnd.oci.image.index.v1+json",
+              "application/vnd.docker.distribution.manifest.list.v2+json"
+            ]
+          },
+          "repository": {
+            "type": "string",
+            "description": "Repository name (e.g., 'myapp'). Scoped to user's DID.",
+            "maxLength": 255
+          },
+          "schemaVersion": {
+            "type": "integer",
+            "description": "OCI schema version (typically 2)"
+          },
+          "subject": {
+            "type": "ref",
+            "description": "Optional reference to another manifest (for attestations, signatures)",
+            "ref": "#blobReference"
+          }
+        }
+      }
+    },
+    "manifestReference": {
+      "type": "object",
+      "description": "Reference to a manifest in a manifest list/index",
+      "required": [
+        "mediaType",
+        "size",
+        "digest"
+      ],
+      "properties": {
+        "annotations": {
+          "type": "unknown",
+          "description": "Optional OCI annotation metadata. Map of string keys to string values."
+        },
+        "digest": {
+          "type": "string",
+          "description": "Content digest (e.g., 'sha256:...')"
+        },
+        "mediaType": {
+          "type": "string",
+          "description": "Media type of the referenced manifest"
+        },
+        "platform": {
+          "type": "ref",
+          "description": "Platform information for this manifest",
+          "ref": "#platform"
+        },
+        "size": {
+          "type": "integer",
+          "description": "Size in bytes"
+        }
+      }
+    },
+    "platform": {
+      "type": "object",
+      "description": "Platform information describing OS and architecture",
+      "required": [
+        "architecture",
+        "os"
+      ],
+      "properties": {
+        "architecture": {
+          "type": "string",
+          "description": "CPU architecture (e.g., 'amd64', 'arm64', 'arm')"
+        },
+        "os": {
+          "type": "string",
+          "description": "Operating system (e.g., 'linux', 'windows', 'darwin')"
+        },
+        "osFeatures": {
+          "type": "array",
+          "description": "Optional OS features",
+          "items": {
+            "type": "string"
+          }
+        },
+        "osVersion": {
+          "type": "string",
+          "description": "Optional OS version"
+        },
+        "variant": {
+          "type": "string",
+          "description": "Optional CPU variant (e.g., 'v7' for ARM)"
+        }
+      }
+    }
+  }
+}

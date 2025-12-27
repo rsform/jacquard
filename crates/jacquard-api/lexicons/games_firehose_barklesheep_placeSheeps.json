@@ -1,0 +1,62 @@
+{
+  "lexicon": 1,
+  "id": "games.firehose.barklesheep.placeSheeps",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Place sheeps on the barkleboard",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "gameId",
+            "sheeps"
+          ],
+          "properties": {
+            "gameId": {
+              "type": "string"
+            },
+            "sheeps": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "#sheepPlacement"
+              }
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "success": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    },
+    "sheepPlacement": {
+      "type": "object",
+      "required": [
+        "type",
+        "start",
+        "horizontal"
+      ],
+      "properties": {
+        "horizontal": {
+          "type": "boolean"
+        },
+        "start": {
+          "type": "integer"
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

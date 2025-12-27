@@ -1,0 +1,32 @@
+{
+  "lexicon": 1,
+  "id": "games.firehose.barklesheep.reaction",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A reaction in a Barklesheep game",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "gameId",
+          "emoji",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "emoji": {
+            "type": "string",
+            "maxLength": 4
+          },
+          "gameId": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

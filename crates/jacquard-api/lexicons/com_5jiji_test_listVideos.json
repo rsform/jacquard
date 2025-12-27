@@ -1,0 +1,18 @@
+{
+  "lexicon": 1,
+  "id": "com.5jiji.test.listVideos",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Lists videos from given creator",
+      "parameters": {
+        "type": "params",
+        "properties": {}
+      },
+      "output": {
+        "description": "The list of videos",
+        "encoding": "application/json"
+      }
+    }
+  }
+}

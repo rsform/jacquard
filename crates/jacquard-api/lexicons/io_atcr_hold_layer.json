@@ -1,0 +1,56 @@
+{
+  "lexicon": 1,
+  "id": "io.atcr.hold.layer",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Represents metadata about a container layer stored in the hold. Stored in the hold's embedded PDS for tracking and analytics.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "digest",
+          "size",
+          "mediaType",
+          "repository",
+          "userDid",
+          "userHandle",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "RFC3339 timestamp of when the layer was uploaded",
+            "format": "datetime"
+          },
+          "digest": {
+            "type": "string",
+            "description": "Layer digest (e.g., sha256:abc123...)"
+          },
+          "mediaType": {
+            "type": "string",
+            "description": "Media type (e.g., application/vnd.oci.image.layer.v1.tar+gzip)"
+          },
+          "repository": {
+            "type": "string",
+            "description": "Repository this layer belongs to"
+          },
+          "size": {
+            "type": "integer",
+            "description": "Size in bytes"
+          },
+          "userDid": {
+            "type": "string",
+            "description": "DID of user who uploaded this layer",
+            "format": "did"
+          },
+          "userHandle": {
+            "type": "string",
+            "description": "Handle of user (for display purposes)",
+            "format": "handle"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "lexicon": 1,
+  "id": "io.atcr.hold.captain",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Represents the hold's ownership and metadata. Stored as a singleton record at rkey 'self' in the hold's embedded PDS.",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": [
+          "owner",
+          "public",
+          "allowAllCrew",
+          "enableBlueskyPosts",
+          "deployedAt"
+        ],
+        "properties": {
+          "allowAllCrew": {
+            "type": "boolean",
+            "description": "Allow any authenticated user to register as crew"
+          },
+          "deployedAt": {
+            "type": "string",
+            "description": "RFC3339 timestamp of when the hold was deployed",
+            "format": "datetime"
+          },
+          "enableBlueskyPosts": {
+            "type": "boolean",
+            "description": "Enable Bluesky posts when manifests are pushed"
+          },
+          "owner": {
+            "type": "string",
+            "description": "DID of the hold owner",
+            "format": "did"
+          },
+          "provider": {
+            "type": "string",
+            "description": "Deployment provider (e.g., fly.io, aws, etc.)"
+          },
+          "public": {
+            "type": "boolean",
+            "description": "Whether this hold allows public blob reads (pulls) without authentication"
+          },
+          "region": {
+            "type": "string",
+            "description": "S3 region where blobs are stored"
+          }
+        }
+      }
+    }
+  }
+}

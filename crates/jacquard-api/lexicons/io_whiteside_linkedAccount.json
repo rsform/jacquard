@@ -1,0 +1,33 @@
+{
+  "lexicon": 1,
+  "id": "io.whiteside.linkedAccount",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A linked account record containing external account information",
+      "record": {
+        "type": "object",
+        "required": [
+          "icon",
+          "name",
+          "link"
+        ],
+        "properties": {
+          "icon": {
+            "type": "string",
+            "description": "Icon identifier or URL for the linked account"
+          },
+          "link": {
+            "type": "string",
+            "description": "URL to the linked account",
+            "format": "uri"
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name of the linked account"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "lexicon": 1,
+  "id": "io.whiteside.profile",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Profile information (bio, skills, etc.)",
+      "key": "literal:bio",
+      "record": {
+        "type": "object",
+        "required": [
+          "heading",
+          "content",
+          "updatedAt"
+        ],
+        "properties": {
+          "content": {
+            "type": "string",
+            "description": "Profile content in plain text or markdown format",
+            "maxLength": 5000
+          },
+          "heading": {
+            "type": "string",
+            "description": "Profile section heading (e.g. 'Hey, I'm John')",
+            "maxLength": 200
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "Last update timestamp in ISO 8601 format",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

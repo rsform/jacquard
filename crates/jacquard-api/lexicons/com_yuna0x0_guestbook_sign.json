@@ -1,0 +1,33 @@
+{
+  "lexicon": 1,
+  "id": "com.yuna0x0.guestbook.sign",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "a sign in the guestbook",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "createdAt",
+          "message"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "message": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "subject": {
+            "type": "string",
+            "format": "at-identifier"
+          }
+        }
+      }
+    }
+  }
+}
