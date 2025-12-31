@@ -1,9 +1,11 @@
 //! Generic session storage traits and utilities.
 
 use alloc::boxed::Box;
+#[cfg(feature = "std")]
 use alloc::string::ToString;
 use alloc::sync::Arc;
 use core::error::Error as StdError;
+#[cfg(feature = "std")]
 use core::fmt::Display;
 use core::future::Future;
 use core::hash::Hash;

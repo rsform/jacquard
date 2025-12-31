@@ -6,18 +6,22 @@ use alloc::string::ToString;
 use bytes::Bytes;
 use smol_str::SmolStr;
 
+#[cfg(feature = "std")]
+use miette::Diagnostic;
+
 /// Boxed error type for wrapping arbitrary errors
 pub type BoxError = Box<dyn core::error::Error + Send + Sync + 'static>;
 
 /// Client error type for all XRPC client operations
-#[derive(Debug, thiserror::Error, miette::Diagnostic)]
+#[derive(Debug, thiserror::Error)]
+#[cfg_attr(feature = "std", derive(Diagnostic))]
 #[error("{kind}")]
 pub struct ClientError {
-    #[diagnostic_source]
+    #[cfg_attr(feature = "std", diagnostic_source)]
     kind: ClientErrorKind,
     #[source]
     source: Option<BoxError>,
-    #[help]
+    #[cfg_attr(feature = "std", help)]
     help: Option<SmolStr>,
     context: Option<SmolStr>,
     url: Option<SmolStr>,
@@ -26,40 +30,41 @@ pub struct ClientError {
 }
 
 /// Error categories for client operations
-#[derive(Debug, thiserror::Error, miette::Diagnostic)]
+#[derive(Debug, thiserror::Error)]
+#[cfg_attr(feature = "std", derive(Diagnostic))]
 pub enum ClientErrorKind {
     /// HTTP transport error (connection, timeout, etc.)
     #[error("transport error")]
-    #[diagnostic(code(jacquard::client::transport))]
+    #[cfg_attr(feature = "std", diagnostic(code(jacquard::client::transport)))]
     Transport,
 
     /// Request validation/construction failed
     #[error("invalid request: {0}")]
-    #[diagnostic(
+    #[cfg_attr(feature = "std", diagnostic(
         code(jacquard::client::invalid_request),
         help("check request parameters and format")
-    )]
+    ))]
     InvalidRequest(SmolStr),
 
     /// Request serialization failed
     #[error("encode error: {0}")]
-    #[diagnostic(
+    #[cfg_attr(feature = "std", diagnostic(
         code(jacquard::client::encode),
         help("check request body format and encoding")
-    )]
+    ))]
     Encode(SmolStr),
 
     /// Response deserialization failed
     #[error("decode error: {0}")]
-    #[diagnostic(
+    #[cfg_attr(feature = "std", diagnostic(
         code(jacquard::client::decode),
         help("check response format and encoding")
-    )]
+    ))]
     Decode(SmolStr),
 
     /// HTTP error response (non-200 status)
     #[error("HTTP {status}")]
-    #[diagnostic(code(jacquard::client::http))]
+    #[cfg_attr(feature = "std", diagnostic(code(jacquard::client::http)))]
     Http {
         /// HTTP status code
         status: http::StatusCode,
@@ -67,23 +72,23 @@ pub enum ClientErrorKind {
 
     /// Authentication/authorization error
     #[error("auth error: {0}")]
-    #[diagnostic(code(jacquard::client::auth))]
+    #[cfg_attr(feature = "std", diagnostic(code(jacquard::client::auth)))]
     Auth(AuthError),
 
     /// Identity resolution error (handle→DID, DID→Doc)
     #[error("identity resolution failed")]
-    #[diagnostic(
+    #[cfg_attr(feature = "std", diagnostic(
         code(jacquard::client::identity_resolution),
         help("check handle/DID is valid and network is accessible")
-    )]
+    ))]
     IdentityResolution,
 
     /// Storage/persistence error
     #[error("storage error")]
-    #[diagnostic(
+    #[cfg_attr(feature = "std", diagnostic(
         code(jacquard::client::storage),
         help("check storage backend is accessible and has sufficient permissions")
-    )]
+    ))]
     Storage,
 }
 
@@ -164,7 +169,7 @@ impl ClientError {
     // Constructors for each kind
 
     /// Create a transport error
-    pub fn transport(source: impl std::error::Error + Send + Sync + 'static) -> Self {
+    pub fn transport(source: impl core::error::Error + Send + Sync + 'static) -> Self {
         Self::new(ClientErrorKind::Transport, Some(Box::new(source)))
     }
 
@@ -195,49 +200,29 @@ impl ClientError {
     }
 
     /// Create an identity resolution error
-    pub fn identity_resolution(source: impl std::error::Error + Send + Sync + 'static) -> Self {
+    pub fn identity_resolution(source: impl core::error::Error + Send + Sync + 'static) -> Self {
         Self::new(ClientErrorKind::IdentityResolution, Some(Box::new(source)))
     }
 
     /// Create a storage error
-    pub fn storage(source: impl std::error::Error + Send + Sync + 'static) -> Self {
+    pub fn storage(source: impl core::error::Error + Send + Sync + 'static) -> Self {
         Self::new(ClientErrorKind::Storage, Some(Box::new(source)))
     }
 }
 
 /// Result type for client operations
-pub type XrpcResult<T> = std::result::Result<T, ClientError>;
+pub type XrpcResult<T> = Result<T, ClientError>;
 
 // ============================================================================
 // Old error types (deprecated)
 // ============================================================================
 
-/// Transport-level errors that occur during HTTP communication
-// #[deprecated(since = "0.8.0", note = "Use ClientError::transport() instead")]
-// #[derive(Debug, thiserror::Error, miette::Diagnostic)]
-// pub enum TransportError {
-//     /// Failed to establish connection to server
-//     #[error("Connection error: {0}")]
-//     Connect(String),
-
-//     /// Request timed out
-//     #[error("Request timeout")]
-//     Timeout,
-
-//     /// Request construction failed (malformed URI, headers, etc.)
-//     #[error("Invalid request: {0}")]
-//     InvalidRequest(String),
-
-//     /// Other transport error
-//     #[error("Transport error: {0}")]
-//     Other(Box<dyn std::error::Error + Send + Sync>),
-// }
-
 /// Response deserialization errors
 ///
 /// Preserves detailed error information from various deserialization backends.
 /// Can be converted to string for serialization while maintaining the full error context.
-#[derive(Debug, thiserror::Error, miette::Diagnostic)]
+#[derive(Debug, thiserror::Error)]
+#[cfg_attr(feature = "std", derive(Diagnostic))]
 pub enum DecodeError {
     /// JSON deserialization failed
     #[error("Failed to deserialize JSON: {0}")]
@@ -247,6 +232,7 @@ pub enum DecodeError {
         serde_json::Error,
     ),
     /// CBOR deserialization failed (local I/O)
+    #[cfg(feature = "std")]
     #[error("Failed to deserialize CBOR: {0}")]
     CborLocal(
         #[from]
@@ -265,15 +251,24 @@ pub enum DecodeError {
     DagCborInfallible(
         #[from]
         #[source]
-        serde_ipld_dagcbor::DecodeError<std::convert::Infallible>,
+        serde_ipld_dagcbor::DecodeError<core::convert::Infallible>,
     ),
     /// CBOR header deserialization failed (framed WebSocket messages)
-    #[cfg(feature = "websocket")]
+    #[cfg(all(feature = "websocket", feature = "std"))]
     #[error("Failed to deserialize cbor header: {0}")]
     CborHeader(
         #[from]
         #[source]
         ciborium::de::Error<std::io::Error>,
+    ),
+
+    /// CBOR header deserialization failed (framed WebSocket messages, no_std)
+    #[cfg(all(feature = "websocket", not(feature = "std")))]
+    #[error("Failed to deserialize cbor header: {0}")]
+    CborHeader(
+        #[from]
+        #[source]
+        ciborium::de::Error<core::convert::Infallible>,
     ),
 
     /// Unknown event type in framed message
@@ -283,7 +278,8 @@ pub enum DecodeError {
 }
 
 /// HTTP error response (non-200 status codes outside of XRPC error handling)
-#[derive(Debug, thiserror::Error, miette::Diagnostic)]
+#[derive(Debug, thiserror::Error)]
+#[cfg_attr(feature = "std", derive(Diagnostic))]
 pub struct HttpError {
     /// HTTP status code
     pub status: http::StatusCode,
@@ -291,11 +287,11 @@ pub struct HttpError {
     pub body: Option<Bytes>,
 }
 
-impl std::fmt::Display for HttpError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for HttpError {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "HTTP {}", self.status)?;
         if let Some(body) = &self.body {
-            if let Ok(s) = std::str::from_utf8(body) {
+            if let Ok(s) = core::str::from_utf8(body) {
                 write!(f, ":\n{}", s)?;
             }
         }
@@ -304,7 +300,8 @@ impl std::fmt::Display for HttpError {
 }
 
 /// Authentication and authorization errors
-#[derive(Debug, thiserror::Error, miette::Diagnostic)]
+#[derive(Debug, thiserror::Error)]
+#[cfg_attr(feature = "std", derive(Diagnostic))]
 pub enum AuthError {
     /// Access token has expired (use refresh token to get a new one)
     #[error("Access token expired")]
@@ -344,13 +341,6 @@ impl crate::IntoStatic for AuthError {
 // ============================================================================
 // Conversions from old to new
 // ============================================================================
-
-#[allow(deprecated)]
-// impl From<TransportError> for ClientError {
-//     fn from(e: TransportError) -> Self {
-//         Self::transport(e)
-//     }
-// }
 
 impl From<DecodeError> for ClientError {
     fn from(e: DecodeError) -> Self {
@@ -403,6 +393,7 @@ impl From<serde_json::Error> for ClientError {
     }
 }
 
+#[cfg(feature = "std")]
 impl From<serde_ipld_dagcbor::DecodeError<std::io::Error>> for ClientError {
     fn from(e: serde_ipld_dagcbor::DecodeError<std::io::Error>) -> Self {
         let msg = smol_str::format_smolstr!("{:?}", e);
@@ -419,15 +410,15 @@ impl From<serde_ipld_dagcbor::DecodeError<HttpError>> for ClientError {
     }
 }
 
-impl From<serde_ipld_dagcbor::DecodeError<std::convert::Infallible>> for ClientError {
-    fn from(e: serde_ipld_dagcbor::DecodeError<std::convert::Infallible>) -> Self {
+impl From<serde_ipld_dagcbor::DecodeError<core::convert::Infallible>> for ClientError {
+    fn from(e: serde_ipld_dagcbor::DecodeError<core::convert::Infallible>) -> Self {
         let msg = smol_str::format_smolstr!("{:?}", e);
         Self::new(ClientErrorKind::Decode(msg), Some(Box::new(e)))
             .with_context("DAG-CBOR deserialization failed (in-memory)")
     }
 }
 
-#[cfg(feature = "websocket")]
+#[cfg(all(feature = "websocket", feature = "std"))]
 impl From<ciborium::de::Error<std::io::Error>> for ClientError {
     fn from(e: ciborium::de::Error<std::io::Error>) -> Self {
         let msg = smol_str::format_smolstr!("{:?}", e);

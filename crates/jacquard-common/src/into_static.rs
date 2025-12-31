@@ -9,8 +9,15 @@ use alloc::vec::Vec;
 use core::hash::BuildHasher;
 use core::hash::Hash;
 
+#[cfg(not(feature = "std"))]
 use hashbrown::HashMap;
+#[cfg(feature = "std")]
+use std::collections::HashMap;
+
+#[cfg(not(feature = "std"))]
 use hashbrown::HashSet;
+#[cfg(feature = "std")]
+use std::collections::HashSet;
 
 /// Allow turning a value into an "owned" variant, which can then be
 /// returned, moved, etc.

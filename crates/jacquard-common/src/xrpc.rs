@@ -57,7 +57,8 @@ pub use subscription::{
 use url::Url;
 
 /// Error type for encoding XRPC requests
-#[derive(Debug, thiserror::Error, miette::Diagnostic)]
+#[derive(Debug, thiserror::Error)]
+#[cfg_attr(feature = "std", derive(miette::Diagnostic))]
 pub enum EncodeError {
     /// Failed to serialize query parameters
     #[error("Failed to serialize query: {0}")]
@@ -936,8 +937,8 @@ pub struct GenericXrpcError {
     pub http_status: StatusCode,
 }
 
-impl std::fmt::Display for GenericXrpcError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for GenericXrpcError {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         if let Some(msg) = &self.message {
             write!(
                 f,
@@ -962,40 +963,41 @@ impl IntoStatic for GenericXrpcError {
     }
 }
 
-impl std::error::Error for GenericXrpcError {}
+impl core::error::Error for GenericXrpcError {}
 
 /// XRPC-specific errors returned from endpoints
 ///
 /// Represents errors returned in the response body
 /// Type parameter `E` is the endpoint's specific error enum type.
-#[derive(Debug, thiserror::Error, miette::Diagnostic)]
-pub enum XrpcError<E: std::error::Error + IntoStatic> {
+#[derive(Debug, thiserror::Error)]
+#[cfg_attr(feature = "std", derive(miette::Diagnostic))]
+pub enum XrpcError<E: core::error::Error + IntoStatic> {
     /// Typed XRPC error from the endpoint's specific error enum
     #[error("XRPC error: {0}")]
-    #[diagnostic(code(jacquard_common::xrpc::typed))]
+    #[cfg_attr(feature = "std", diagnostic(code(jacquard_common::xrpc::typed)))]
     Xrpc(E),
 
     /// Authentication error (ExpiredToken, InvalidToken, etc.)
     #[error("Authentication error: {0}")]
-    #[diagnostic(code(jacquard_common::xrpc::auth))]
+    #[cfg_attr(feature = "std", diagnostic(code(jacquard_common::xrpc::auth)))]
     Auth(#[from] AuthError),
 
     /// Generic XRPC error not in the endpoint's error enum (e.g., InvalidRequest)
     #[error("XRPC error: {0}")]
-    #[diagnostic(code(jacquard_common::xrpc::generic))]
+    #[cfg_attr(feature = "std", diagnostic(code(jacquard_common::xrpc::generic)))]
     Generic(GenericXrpcError),
 
     /// Failed to decode the response body
     #[error("Failed to decode response: {0}")]
-    #[diagnostic(code(jacquard_common::xrpc::decode))]
+    #[cfg_attr(feature = "std", diagnostic(code(jacquard_common::xrpc::decode)))]
     Decode(#[from] DecodeError),
 }
 
 impl<E> IntoStatic for XrpcError<E>
 where
-    E: std::error::Error + IntoStatic,
-    E::Output: std::error::Error + IntoStatic,
-    <E as IntoStatic>::Output: std::error::Error + IntoStatic,
+    E: core::error::Error + IntoStatic,
+    E::Output: core::error::Error + IntoStatic,
+    <E as IntoStatic>::Output: core::error::Error + IntoStatic,
 {
     type Output = XrpcError<E::Output>;
     fn into_static(self) -> Self::Output {
@@ -1010,7 +1012,7 @@ where
 
 impl<E> Serialize for XrpcError<E>
 where
-    E: std::error::Error + IntoStatic + Serialize,
+    E: core::error::Error + IntoStatic + Serialize,
 {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -1232,6 +1234,7 @@ mod tests {
 
     #[test]
     fn no_double_slash_in_path() {
+        use crate::alloc::string::ToString;
         #[derive(Serialize, Deserialize)]
         struct Req;
         #[derive(Deserialize, Serialize, Debug, thiserror::Error)]

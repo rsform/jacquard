@@ -11,10 +11,12 @@ use smol_str::{SmolStr, ToSmolStr};
 use super::Lazy;
 
 use crate::{CowStr, IntoStatic};
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(all(not(target_arch = "wasm32"), feature = "std"))]
 use regex::Regex;
 #[cfg(target_arch = "wasm32")]
 use regex_lite::Regex;
+#[cfg(all(not(target_arch = "wasm32"), not(feature = "std")))]
+use regex_automata::meta::Regex;
 
 /// Regex for ISO 8601 datetime validation per AT Protocol spec
 pub static ISO8601_REGEX: Lazy<Regex> = Lazy::new(|| {

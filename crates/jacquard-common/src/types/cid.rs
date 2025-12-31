@@ -49,7 +49,7 @@ pub enum Error {
     Ipld(#[from] cid::Error),
     /// Invalid UTF-8 in CID string
     #[error("{:?}", 0)]
-    Utf8(#[from] std::str::Utf8Error),
+    Utf8(#[from] core::str::Utf8Error),
 }
 
 impl<'c> Cid<'c> {
@@ -121,8 +121,8 @@ impl<'c> Cid<'c> {
     }
 }
 
-impl std::fmt::Display for Cid<'_> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for Cid<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Cid::Ipld { cid: _, s } => f.write_str(&s),
             Cid::Str(cow_str) => f.write_str(&cow_str),

@@ -1,10 +1,12 @@
 use crate::types::recordkey::RecordKeyType;
 use crate::types::string::AtStrError;
 use crate::{CowStr, IntoStatic};
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(all(not(target_arch = "wasm32"), feature = "std"))]
 use regex::Regex;
 #[cfg(target_arch = "wasm32")]
 use regex_lite::Regex;
+#[cfg(all(not(target_arch = "wasm32"), not(feature = "std")))]
+use regex_automata::meta::Regex;
 use serde::{Deserialize, Deserializer, Serialize, de::Error};
 use smol_str::{SmolStr, ToSmolStr};
 use alloc::string::{String, ToString};

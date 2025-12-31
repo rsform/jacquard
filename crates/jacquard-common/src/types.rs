@@ -97,8 +97,8 @@ pub enum DataModelType {
     String(LexiconStringType),
 }
 
-impl std::fmt::Display for DataModelType {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+impl core::fmt::Display for DataModelType {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             DataModelType::Null => write!(f, "null"),
             DataModelType::Boolean => write!(f, "boolean"),
@@ -144,8 +144,8 @@ pub enum LexiconStringType {
     String,
 }
 
-impl std::fmt::Display for LexiconStringType {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+impl core::fmt::Display for LexiconStringType {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             LexiconStringType::Datetime => write!(f, "datetime"),
             LexiconStringType::AtUri => write!(f, "at-uri"),
@@ -183,8 +183,8 @@ pub enum UriType {
     Any,
 }
 
-impl std::fmt::Display for UriType {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+impl core::fmt::Display for UriType {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             UriType::Did => write!(f, "did"),
             UriType::At => write!(f, "at"),

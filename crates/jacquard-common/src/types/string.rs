@@ -1,9 +1,30 @@
-use miette::SourceSpan;
+#[cfg(feature = "std")]
+use miette::{Diagnostic, SourceSpan};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use smol_str::{SmolStr, ToSmolStr};
 use alloc::string::{String, ToString};
 use alloc::sync::Arc;
 use core::str::FromStr;
+
+/// Source span for error reporting (offset, length)
+/// With `std` feature, this is `miette::SourceSpan`. Without, a simple tuple struct.
+#[cfg(not(feature = "std"))]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SourceSpan(pub usize, pub usize);
+
+#[cfg(not(feature = "std"))]
+impl SourceSpan {
+    pub fn new(offset: usize, len: usize) -> Self {
+        Self(offset, len)
+    }
+}
+
+#[cfg(not(feature = "std"))]
+impl From<(usize, usize)> for SourceSpan {
+    fn from((offset, len): (usize, usize)) -> Self {
+        Self(offset, len)
+    }
+}
 
 pub use crate::{
     CowStr,
@@ -281,21 +302,22 @@ impl From<AtprotoStr<'_>> for String {
 /// detailing the specification for the type
 /// `source` is the source string, or part of it
 /// `kind` is the type of parsing error: `[StrParseKind]`
-#[derive(Debug, thiserror::Error, miette::Diagnostic, PartialEq, Eq, Clone)]
+#[derive(Debug, thiserror::Error, PartialEq, Eq, Clone)]
+#[cfg_attr(feature = "std", derive(Diagnostic))]
 #[error("error in `{source}`: {kind}")]
-#[diagnostic(
+#[cfg_attr(feature = "std", diagnostic(
     url("https://atproto.com/specs/{spec}"),
     help("if something doesn't match the spec, contact the crate author")
-)]
+))]
 pub struct AtStrError {
     /// AT Protocol spec name this error relates to
     pub spec: SmolStr,
     /// The source string that failed to parse
-    #[source_code]
+    #[cfg_attr(feature = "std", source_code)]
     pub source: String,
     /// The specific kind of parsing error
     #[source]
-    #[diagnostic_source]
+    #[cfg_attr(feature = "std", diagnostic_source)]
     pub kind: StrParseKind,
 }
 
@@ -436,22 +458,23 @@ impl AtStrError {
 }
 
 /// Kinds of parsing errors for AT Protocol string types
-#[derive(Debug, thiserror::Error, miette::Diagnostic, PartialEq, Eq, Clone)]
+#[derive(Debug, thiserror::Error, PartialEq, Eq, Clone)]
+#[cfg_attr(feature = "std", derive(Diagnostic))]
 pub enum StrParseKind {
     /// Regex pattern validation failed
     #[error("regex failure - {message}")]
-    #[diagnostic(code(jacquard::types::string::regex_fail))]
+    #[cfg_attr(feature = "std", diagnostic(code(jacquard::types::string::regex_fail)))]
     RegexFail {
         /// Optional span highlighting the problem area
-        #[label]
+        #[cfg_attr(feature = "std", label)]
         span: Option<SourceSpan>,
         /// Help message explaining the failure
-        #[help]
+        #[cfg_attr(feature = "std", help)]
         message: SmolStr,
     },
     /// String exceeds maximum allowed length
     #[error("string too long (allowed: {max}, actual: {actual})")]
-    #[diagnostic(code(jacquard::types::string::wrong_length))]
+    #[cfg_attr(feature = "std", diagnostic(code(jacquard::types::string::wrong_length)))]
     TooLong {
         /// Maximum allowed length
         max: usize,
@@ -461,7 +484,7 @@ pub enum StrParseKind {
 
     /// String is below minimum required length
     #[error("string too short (allowed: {min}, actual: {actual})")]
-    #[diagnostic(code(jacquard::types::string::wrong_length))]
+    #[cfg_attr(feature = "std", diagnostic(code(jacquard::types::string::wrong_length)))]
     TooShort {
         /// Minimum required length
         min: usize,
@@ -470,32 +493,32 @@ pub enum StrParseKind {
     },
     /// String contains disallowed values
     #[error("disallowed - {message}")]
-    #[diagnostic(code(jacquard::types::string::disallowed))]
+    #[cfg_attr(feature = "std", diagnostic(code(jacquard::types::string::disallowed)))]
     Disallowed {
         /// Optional span highlighting the disallowed content
-        #[label]
+        #[cfg_attr(feature = "std", label)]
         problem: Option<SourceSpan>,
         /// Help message about what's disallowed
-        #[help]
+        #[cfg_attr(feature = "std", help)]
         message: SmolStr,
     },
     /// Required component is missing
     #[error("missing - {message}")]
-    #[diagnostic(code(jacquard::atstr::missing_component))]
+    #[cfg_attr(feature = "std", diagnostic(code(jacquard::atstr::missing_component)))]
     MissingComponent {
         /// Optional span where the component should be
-        #[label]
+        #[cfg_attr(feature = "std", label)]
         span: Option<SourceSpan>,
         /// Help message about what's missing
-        #[help]
+        #[cfg_attr(feature = "std", help)]
         message: SmolStr,
     },
     /// Wraps another error with additional context
     #[error("{err:?}")]
-    #[diagnostic(code(jacquard::atstr::inner))]
+    #[cfg_attr(feature = "std", diagnostic(code(jacquard::atstr::inner)))]
     Wrap {
         /// Optional span in the outer context
-        #[label]
+        #[cfg_attr(feature = "std", label)]
         span: Option<SourceSpan>,
         /// The wrapped inner error
         #[source]

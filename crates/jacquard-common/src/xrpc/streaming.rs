@@ -7,7 +7,7 @@ use core::{marker::PhantomData, pin::Pin};
 use http::StatusCode;
 use n0_future::{StreamExt, TryStreamExt};
 use serde::{Deserialize, Serialize};
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(all(not(target_arch = "wasm32"), feature = "std"))]
 use std::path::Path;
 
 /// Boxed stream type with proper Send bounds for native, no Send for WASM
@@ -129,8 +129,8 @@ impl<F> XrpcStreamFrame<F> {
 
 /// Dumb file upload stream
 ///
-/// Unavailable on wasm due to use of tokio I/O
-#[cfg(not(target_arch = "wasm32"))]
+/// Unavailable on wasm and no_std due to use of tokio I/O
+#[cfg(all(not(target_arch = "wasm32"), feature = "std"))]
 pub async fn upload_stream(file: impl AsRef<Path>) -> Result<XrpcProcedureSend, tokio::io::Error> {
     use tokio_util::io::ReaderStream;
 
@@ -282,8 +282,8 @@ impl StreamingResponse {
     }
 }
 
-impl std::fmt::Debug for StreamingResponse {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Debug for StreamingResponse {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_struct("StreamingResponse")
             .field("status", &self.parts.status)
             .field("version", &self.parts.version)

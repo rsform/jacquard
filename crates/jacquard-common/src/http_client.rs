@@ -1,5 +1,5 @@
 //! Minimal HTTP client abstraction shared across crates.
-
+#[cfg(feature = "reqwest-client")]
 use alloc::string::ToString;
 use alloc::sync::Arc;
 use alloc::vec::Vec;

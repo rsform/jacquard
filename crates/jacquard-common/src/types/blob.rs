@@ -46,7 +46,7 @@ impl Serialize for Blob<'_> {
             map.serialize_entry("$type", "blob")?;
 
             // Serialize ref as {"$link": "cid_string"}
-            let mut ref_map = std::collections::BTreeMap::new();
+            let mut ref_map = alloc::collections::BTreeMap::new();
             ref_map.insert("$link", self.r#ref.as_str());
             map.serialize_entry("ref", &ref_map)?;
 

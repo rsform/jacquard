@@ -101,15 +101,15 @@ impl From<&String> for WsText {
 }
 
 impl TryFrom<Bytes> for WsText {
-    type Error = std::str::Utf8Error;
+    type Error = core::str::Utf8Error;
     fn try_from(bytes: Bytes) -> Result<Self, Self::Error> {
-        std::str::from_utf8(&bytes)?;
+        core::str::from_utf8(&bytes)?;
         Ok(Self(bytes))
     }
 }
 
 impl TryFrom<Vec<u8>> for WsText {
-    type Error = std::str::Utf8Error;
+    type Error = core::str::Utf8Error;
     fn try_from(vec: Vec<u8>) -> Result<Self, Self::Error> {
         Self::try_from(Bytes::from(vec))
     }
@@ -419,7 +419,7 @@ impl WsSink {
     pub fn get_mut(
         &mut self,
     ) -> &mut Pin<Box<dyn n0_future::Sink<WsMessage, Error = StreamError> + Send>> {
-        use std::borrow::BorrowMut;
+        use core::borrow::BorrowMut;
 
         self.0.borrow_mut()
     }
@@ -429,7 +429,7 @@ impl WsSink {
     pub fn get_mut(
         &mut self,
     ) -> &mut Pin<Box<dyn n0_future::Sink<WsMessage, Error = StreamError> + 'static>> {
-        use std::borrow::BorrowMut;
+        use core::borrow::BorrowMut;
 
         self.0.borrow_mut()
     }
@@ -445,7 +445,7 @@ impl fmt::Debug for WsSink {
 #[cfg_attr(not(target_arch = "wasm32"), trait_variant::make(Send))]
 pub trait WebSocketClient: Sync {
     /// Error type for WebSocket operations
-    type Error: std::error::Error + Send + Sync + 'static;
+    type Error: core::error::Error + Send + Sync + 'static;
 
     /// Connect to a WebSocket endpoint
     fn connect(&self, url: Url) -> impl Future<Output = Result<WebSocketConnection, Self::Error>>;

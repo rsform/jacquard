@@ -1,4 +1,9 @@
 [toolchain]
 channel = "nightly"
 profile = "default"
-targets = [ "wasm32-unknown-unknown" ]
+targets = [
+    "wasm32-unknown-unknown",
+    "thumbv7em-none-eabihf",
+    "thumbv8m.main-none-eabihf",
+    "riscv32imac-unknown-none-elf"
+    ]

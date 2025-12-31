@@ -1,11 +1,10 @@
-#[allow(unused)]
-use langtag::InvalidLangTag;
-use serde::{Deserialize, Deserializer, Serialize, de::Error};
-use smol_str::{SmolStr, ToSmolStr};
 use alloc::string::{String, ToString};
 use core::fmt;
 use core::ops::Deref;
 use core::str::FromStr;
+use oxilangtag::LanguageTag;
+use serde::{Deserialize, Deserializer, Serialize, de::Error};
+use smol_str::{SmolStr, ToSmolStr};
 
 use crate::CowStr;
 
@@ -17,8 +16,7 @@ use crate::CowStr;
 /// Examples: `"ja"` (Japanese), `"pt-BR"` (Brazilian Portuguese), `"en-US"` (US English)
 ///
 /// Language tags require semantic parsing rather than simple string comparison.
-/// Uses the `langtag` crate for validation but stores as `SmolStr` for efficiency.
-/// TODO: Implement langtag-style semantic matching for this type, delegating to langtag
+/// Uses the `oxilangtag` crate for validation but stores as `SmolStr` for efficiency.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Hash)]
 #[serde(transparent)]
 #[repr(transparent)]
@@ -26,22 +24,19 @@ pub struct Language(SmolStr);
 
 impl Language {
     /// Parses an IETF language tag from the given string.
-    pub fn new<T>(lang: &T) -> Result<Self, langtag::InvalidLangTag<&T>>
-    where
-        T: AsRef<str> + ?Sized,
-    {
-        let tag = langtag::LangTag::new(lang)?;
+    pub fn new(lang: &str) -> Result<Self, oxilangtag::LanguageTagParseError> {
+        let tag = LanguageTag::parse(lang)?;
         Ok(Language(SmolStr::new(tag.as_str())))
     }
 
     /// Parses an IETF language tag from a static string.
-    pub fn new_static(lang: &'static str) -> Result<Self, langtag::InvalidLangTag<&'static str>> {
-        let tag = langtag::LangTag::new(lang)?;
-        Ok(Language(SmolStr::new_static(tag.as_str())))
+    pub fn new_static(lang: &'static str) -> Result<Self, oxilangtag::LanguageTagParseError> {
+        let _ = LanguageTag::parse(lang)?;
+        Ok(Language(SmolStr::new_static(lang)))
     }
 
     fn new_owned(lang: SmolStr) -> Result<Self, SmolStr> {
-        let tag = langtag::LangTag::new(&lang).map_err(|e| e.to_smolstr())?;
+        let tag = LanguageTag::parse(lang.as_str()).map_err(|e| e.to_smolstr())?;
         Ok(Language(SmolStr::new(tag.as_str())))
     }
 
@@ -51,7 +46,7 @@ impl Language {
     /// The `From<String>` and `From<CowStr>` impls use the same logic.
     pub fn raw(lang: impl AsRef<str>) -> Self {
         let lang = lang.as_ref();
-        let tag = langtag::LangTag::new(lang).expect("valid IETF language tag");
+        let tag = LanguageTag::parse(lang).expect("valid IETF language tag");
         Language(SmolStr::new(tag.as_str()))
     }
 
@@ -75,7 +70,7 @@ impl FromStr for Language {
     type Err = SmolStr;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Self::new(s).map_err(|e| e.0.to_smolstr())
+        Self::new(s).map_err(|e| e.to_smolstr())
     }
 }
 

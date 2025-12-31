@@ -12,10 +12,12 @@ use super::Lazy;
 use crate::CowStr;
 use crate::types::integer::LimitedU32;
 use crate::types::string::{AtStrError, StrParseKind};
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(all(not(target_arch = "wasm32"), feature = "std"))]
 use regex::Regex;
 #[cfg(target_arch = "wasm32")]
 use regex_lite::Regex;
+#[cfg(all(not(target_arch = "wasm32"), not(feature = "std")))]
+use regex_automata::meta::Regex;
 
 const S32_CHAR: &str = "234567abcdefghijklmnopqrstuvwxyz";
 

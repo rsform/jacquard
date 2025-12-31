@@ -1192,7 +1192,7 @@ impl<'de> serde::Deserializer<'de> for I64Deserializer {
 
 // SeqAccess implementation for Data::Array
 struct ArrayDeserializer<'de> {
-    iter: std::slice::Iter<'de, Data<'de>>,
+    iter: core::slice::Iter<'de, Data<'de>>,
 }
 
 impl<'de> ArrayDeserializer<'de> {
@@ -1217,7 +1217,7 @@ impl<'de> serde::de::SeqAccess<'de> for ArrayDeserializer<'de> {
 
 // SeqAccess implementation for Data::Array
 struct OwnedArrayDeserializer {
-    iter: std::vec::IntoIter<Data<'static>>,
+    iter: alloc::vec::IntoIter<Data<'static>>,
 }
 
 impl OwnedArrayDeserializer {
@@ -1244,7 +1244,7 @@ impl<'de> serde::de::SeqAccess<'de> for OwnedArrayDeserializer {
 
 // MapAccess implementation for Data::Object
 struct ObjectDeserializer<'de> {
-    iter: std::collections::btree_map::Iter<'de, SmolStr, Data<'de>>,
+    iter: alloc::collections::btree_map::Iter<'de, SmolStr, Data<'de>>,
     value: Option<&'de Data<'de>>,
 }
 
@@ -1289,7 +1289,7 @@ impl<'de> serde::de::MapAccess<'de> for ObjectDeserializer<'de> {
 
 // MapAccess implementation for Data::Object
 struct OwnedObjectDeserializer {
-    iter: std::collections::btree_map::IntoIter<SmolStr, Data<'static>>,
+    iter: alloc::collections::btree_map::IntoIter<SmolStr, Data<'static>>,
     value: Option<Data<'static>>,
 }
 
@@ -1333,7 +1333,7 @@ impl<'de> serde::de::MapAccess<'de> for OwnedObjectDeserializer {
 
 // SeqAccess implementation for RawData::Array
 struct RawArrayDeserializer<'de> {
-    iter: std::slice::Iter<'de, RawData<'de>>,
+    iter: core::slice::Iter<'de, RawData<'de>>,
 }
 
 impl<'de> RawArrayDeserializer<'de> {
@@ -1358,7 +1358,7 @@ impl<'de> serde::de::SeqAccess<'de> for RawArrayDeserializer<'de> {
 
 // SeqAccess implementation for RawData::Array
 struct RawOwnedArrayDeserializer<'de> {
-    iter: std::vec::IntoIter<RawData<'de>>,
+    iter: alloc::vec::IntoIter<RawData<'de>>,
 }
 
 impl<'de> RawOwnedArrayDeserializer<'de> {
@@ -1385,7 +1385,7 @@ impl<'de> serde::de::SeqAccess<'de> for RawOwnedArrayDeserializer<'de> {
 
 // MapAccess implementation for RawData::Object
 struct RawObjectDeserializer<'de> {
-    iter: std::collections::btree_map::Iter<'de, SmolStr, RawData<'de>>,
+    iter: alloc::collections::btree_map::Iter<'de, SmolStr, RawData<'de>>,
     value: Option<&'de RawData<'de>>,
 }
 
@@ -1430,7 +1430,7 @@ impl<'de> serde::de::MapAccess<'de> for RawObjectDeserializer<'de> {
 
 // MapAccess implementation for RawData::Object
 struct RawOwnedObjectDeserializer<'de> {
-    iter: std::collections::btree_map::IntoIter<SmolStr, RawData<'de>>,
+    iter: alloc::collections::btree_map::IntoIter<SmolStr, RawData<'de>>,
     value: Option<RawData<'de>>,
 }
 
@@ -1487,7 +1487,7 @@ impl fmt::Display for RawDataSerializerError {
     }
 }
 
-impl std::error::Error for RawDataSerializerError {}
+impl core::error::Error for RawDataSerializerError {}
 
 impl serde::ser::Error for RawDataSerializerError {
     fn custom<T: fmt::Display>(msg: T) -> Self {

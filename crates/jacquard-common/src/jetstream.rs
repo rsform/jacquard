@@ -12,9 +12,10 @@ use alloc::vec::Vec;
 use serde::{Deserialize, Serialize};
 
 /// Parameters for subscribing to Jetstream
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, bon::Builder)]
+#[cfg_attr(feature = "std", derive(bon::Builder))]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
-#[builder(start_fn = new)]
+#[cfg_attr(feature = "std", builder(start_fn = new))]
 pub struct JetstreamParams<'a> {
     /// Filter by collection NSIDs (max 100)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -401,9 +402,10 @@ impl IntoStatic for JetstreamParams<'_> {
 }
 
 /// Parameters for subscribing to Jetstream
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, bon::Builder)]
+#[cfg_attr(feature = "std", derive(bon::Builder))]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
-#[builder(start_fn = new)]
+#[cfg_attr(feature = "std", builder(start_fn = new))]
 pub struct RawJetstreamParams<'a> {
     /// Filter by collection NSIDs (max 100)
     #[serde(skip_serializing_if = "Option::is_none")]

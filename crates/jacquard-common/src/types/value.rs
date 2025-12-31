@@ -229,7 +229,7 @@ impl<'s> Data<'s> {
     /// This produces the deterministic CBOR encoding used for content-addressing.
     pub fn to_dag_cbor(
         &self,
-    ) -> Result<Vec<u8>, serde_ipld_dagcbor::EncodeError<std::collections::TryReserveError>> {
+    ) -> Result<Vec<u8>, serde_ipld_dagcbor::EncodeError<alloc::collections::TryReserveError>> {
         serde_ipld_dagcbor::to_vec(self)
     }
 
@@ -361,7 +361,7 @@ impl<'s> Array<'s> {
     }
 
     /// Get an iterator over the array elements
-    pub fn iter(&self) -> std::slice::Iter<'_, Data<'s>> {
+    pub fn iter(&self) -> core::slice::Iter<'_, Data<'s>> {
         self.0.iter()
     }
 
@@ -383,7 +383,7 @@ impl<'s> Array<'s> {
     }
 }
 
-impl<'s> std::ops::Index<usize> for Array<'s> {
+impl<'s> core::ops::Index<usize> for Array<'s> {
     type Output = Data<'s>;
 
     fn index(&self, index: usize) -> &Self::Output {
@@ -429,12 +429,12 @@ impl<'s> Object<'s> {
     }
 
     /// Get an iterator over the key-value pairs
-    pub fn iter(&self) -> std::collections::btree_map::Iter<'_, SmolStr, Data<'s>> {
+    pub fn iter(&self) -> alloc::collections::btree_map::Iter<'_, SmolStr, Data<'s>> {
         self.0.iter()
     }
 
     /// Get an iterator over the keys
-    pub fn keys(&self) -> std::collections::btree_map::Keys<'_, SmolStr, Data<'s>> {
+    pub fn keys(&self) -> alloc::collections::btree_map::Keys<'_, SmolStr, Data<'s>> {
         self.0.keys()
     }
 
@@ -446,7 +446,7 @@ impl<'s> Object<'s> {
     }
 
     /// Get an iterator over the values
-    pub fn values(&self) -> std::collections::btree_map::Values<'_, SmolStr, Data<'s>> {
+    pub fn values(&self) -> alloc::collections::btree_map::Values<'_, SmolStr, Data<'s>> {
         self.0.values()
     }
 
@@ -578,7 +578,7 @@ impl<'s> Object<'s> {
     }
 }
 
-impl<'s> std::ops::Index<&str> for Object<'s> {
+impl<'s> core::ops::Index<&str> for Object<'s> {
     type Output = Data<'s>;
 
     fn index(&self, key: &str) -> &Self::Output {
@@ -714,7 +714,7 @@ impl<'d> RawData<'d> {
     /// This produces the deterministic CBOR encoding used for content-addressing.
     pub fn to_dag_cbor(
         &self,
-    ) -> Result<Vec<u8>, serde_ipld_dagcbor::EncodeError<std::collections::TryReserveError>> {
+    ) -> Result<Vec<u8>, serde_ipld_dagcbor::EncodeError<alloc::collections::TryReserveError>> {
         serde_ipld_dagcbor::to_vec(self)
     }
 

@@ -118,15 +118,61 @@ pub struct EventHeader {
     pub t: smol_str::SmolStr,
 }
 
+/// A minimal cursor for no_std that tracks read position.
+///
+/// Implements `ciborium_io::Read` to work with ciborium's CBOR parser.
+#[cfg(not(feature = "std"))]
+struct SliceCursor<'a> {
+    slice: &'a [u8],
+    position: usize,
+}
+
+#[cfg(not(feature = "std"))]
+impl<'a> SliceCursor<'a> {
+    fn new(slice: &'a [u8]) -> Self {
+        Self { slice, position: 0 }
+    }
+
+    fn position(&self) -> usize {
+        self.position
+    }
+}
+
+#[cfg(not(feature = "std"))]
+impl ciborium_io::Read for SliceCursor<'_> {
+    type Error = core::convert::Infallible;
+
+    fn read_exact(&mut self, buf: &mut [u8]) -> Result<(), Self::Error> {
+        let end = self.position + buf.len();
+        buf.copy_from_slice(&self.slice[self.position..end]);
+        self.position = end;
+        Ok(())
+    }
+}
+
 /// Parse a framed DAG-CBOR message header and return the header plus remaining body bytes.
 ///
 /// Used for two-stage deserialization of subscription messages in formats like
 /// `com.atproto.sync.subscribeRepos`.
+#[cfg(feature = "std")]
 pub fn parse_event_header<'a>(bytes: &'a [u8]) -> Result<(EventHeader, &'a [u8]), DecodeError> {
     let mut cursor = std::io::Cursor::new(bytes);
     let header: EventHeader = ciborium::de::from_reader(&mut cursor)?;
     let position = cursor.position() as usize;
     drop(cursor); // explicit drop before reborrowing bytes
+
+    Ok((header, &bytes[position..]))
+}
+
+/// Parse a framed DAG-CBOR message header and return the header plus remaining body bytes.
+///
+/// Used for two-stage deserialization of subscription messages in formats like
+/// `com.atproto.sync.subscribeRepos`.
+#[cfg(not(feature = "std"))]
+pub fn parse_event_header<'a>(bytes: &'a [u8]) -> Result<(EventHeader, &'a [u8]), DecodeError> {
+    let mut cursor = SliceCursor::new(bytes);
+    let header: EventHeader = ciborium::de::from_reader(&mut cursor)?;
+    let position = cursor.position();
 
     Ok((header, &bytes[position..]))
 }
@@ -360,7 +406,7 @@ impl<S: SubscriptionResp> SubscriptionStream<S> {
         }
         fn parse_cbor<'a>(
             bytes: &'a [u8],
-        ) -> Result<RawData<'a>, serde_ipld_dagcbor::DecodeError<std::convert::Infallible>>
+        ) -> Result<RawData<'a>, serde_ipld_dagcbor::DecodeError<core::convert::Infallible>>
         {
             serde_ipld_dagcbor::from_slice(bytes)
         }
@@ -491,7 +537,7 @@ impl<S: SubscriptionResp> SubscriptionStream<S> {
         }
         fn parse_cbor<'a>(
             bytes: &'a [u8],
-        ) -> Result<Data<'a>, serde_ipld_dagcbor::DecodeError<std::convert::Infallible>> {
+        ) -> Result<Data<'a>, serde_ipld_dagcbor::DecodeError<core::convert::Infallible>> {
             serde_ipld_dagcbor::from_slice(bytes)
         }
 
@@ -628,7 +674,7 @@ impl<S: SubscriptionResp> SubscriptionStream<S> {
 
         let rx = self.connection.receiver_mut();
         let (raw_rx, typed_rx_source) =
-            std::mem::replace(rx, WsStream::new(n0_future::stream::empty())).tee();
+            core::mem::replace(rx, WsStream::new(n0_future::stream::empty())).tee();
 
         // Put the raw stream back
         *rx = raw_rx;
