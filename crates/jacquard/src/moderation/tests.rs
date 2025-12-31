@@ -4,7 +4,10 @@ use crate::moderation::{
 };
 use jacquard_api::app_bsky::feed::FeedViewPost;
 use jacquard_api::app_bsky::labeler::get_services::GetServicesOutput;
-use jacquard_api::com_atproto::label::{Label, LabelValueDefinition};
+use jacquard_api::com_atproto::label::{
+    Label, LabelValueDefinition, LabelValueDefinitionBlurs, LabelValueDefinitionDefaultSetting,
+    LabelValueDefinitionSeverity,
+};
 use jacquard_common::CowStr;
 use jacquard_common::types::string::{Datetime, Did, Uri};
 use serde::Deserialize;
@@ -50,9 +53,9 @@ fn test_moderate_with_default_hide() {
     // Create a label definition with defaultSetting: "hide"
     let spam_def = LabelValueDefinition {
         identifier: CowStr::from("spam"),
-        blurs: CowStr::from("content"),
-        severity: CowStr::from("inform"),
-        default_setting: Some(CowStr::from("hide")),
+        blurs: LabelValueDefinitionBlurs::Content,
+        severity: LabelValueDefinitionSeverity::Inform,
+        default_setting: Some(LabelValueDefinitionDefaultSetting::Hide),
         adult_only: Some(false),
         locales: vec![],
         extra_data: None,
@@ -102,9 +105,9 @@ fn test_moderate_with_user_preference() {
 
     let def = LabelValueDefinition {
         identifier: CowStr::from("test-label"),
-        blurs: CowStr::from("content"),
-        severity: CowStr::from("alert"),
-        default_setting: Some(CowStr::from("hide")),
+        blurs: LabelValueDefinitionBlurs::Content,
+        severity: LabelValueDefinitionSeverity::Alert,
+        default_setting: Some(LabelValueDefinitionDefaultSetting::Hide),
         adult_only: Some(false),
         locales: vec![],
         extra_data: None,
@@ -221,9 +224,9 @@ fn test_blur_media_vs_content() {
     // Media blur
     let media_def = LabelValueDefinition {
         identifier: CowStr::from("media-label"),
-        blurs: CowStr::from("media"),
-        severity: CowStr::from("alert"),
-        default_setting: Some(CowStr::from("warn")),
+        blurs: LabelValueDefinitionBlurs::Media,
+        severity: LabelValueDefinitionSeverity::Alert,
+        default_setting: Some(LabelValueDefinitionDefaultSetting::Warn),
         adult_only: Some(false),
         locales: vec![],
         extra_data: None,
@@ -232,9 +235,9 @@ fn test_blur_media_vs_content() {
     // Content blur
     let content_def = LabelValueDefinition {
         identifier: CowStr::from("content-label"),
-        blurs: CowStr::from("content"),
-        severity: CowStr::from("alert"),
-        default_setting: Some(CowStr::from("warn")),
+        blurs: LabelValueDefinitionBlurs::Content,
+        severity: LabelValueDefinitionSeverity::Alert,
+        default_setting: Some(LabelValueDefinitionDefaultSetting::Warn),
         adult_only: Some(false),
         locales: vec![],
         extra_data: None,
@@ -301,9 +304,9 @@ fn test_adult_only_labels_require_adult_content_enabled() {
 
     let adult_def = LabelValueDefinition {
         identifier: CowStr::from("adult-label"),
-        blurs: CowStr::from("content"),
-        severity: CowStr::from("alert"),
-        default_setting: Some(CowStr::from("warn")),
+        blurs: LabelValueDefinitionBlurs::Content,
+        severity: LabelValueDefinitionSeverity::Alert,
+        default_setting: Some(LabelValueDefinitionDefaultSetting::Warn),
         adult_only: Some(true),
         locales: vec![],
         extra_data: None,

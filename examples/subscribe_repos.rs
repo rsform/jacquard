@@ -8,7 +8,6 @@
 
 use clap::Parser;
 use jacquard::api::com_atproto::sync::subscribe_repos::{SubscribeRepos, SubscribeReposMessage};
-use jacquard_api::com_atproto::sync::subscribe_repos::RepoOp;
 use jacquard_common::xrpc::{SubscriptionClient, TungsteniteSubscriptionClient};
 use miette::IntoDiagnostic;
 use n0_future::StreamExt;
@@ -45,22 +44,20 @@ fn normalize_url(input: &str) -> Result<Url, url::ParseError> {
 fn print_message(msg: &SubscribeReposMessage) {
     match msg {
         SubscribeReposMessage::Commit(commit) => {
-            if commit.ops.iter().any(|op| op.action == "delete") {
-                println!(
-                    "Commit | repo={} seq={} time={} rev={} commit={} ops={:?} prev={}",
-                    commit.repo,
-                    commit.seq,
-                    commit.time,
-                    commit.rev,
-                    commit.commit,
-                    commit.ops,
-                    commit
-                        .since
-                        .as_ref()
-                        .map(|ts| ts.to_smolstr())
-                        .unwrap_or_default(),
-                );
-            }
+            println!(
+                "Commit | repo={} seq={} time={} rev={} commit={} prev={}\n       | ops={:?} ",
+                commit.repo,
+                commit.seq,
+                commit.time,
+                commit.rev,
+                commit.commit,
+                commit
+                    .since
+                    .as_ref()
+                    .map(|ts| ts.to_smolstr())
+                    .unwrap_or_default(),
+                commit.ops,
+            );
         }
         SubscribeReposMessage::Identity(identity) => {
             println!(
