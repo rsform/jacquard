@@ -42,37 +42,37 @@ pub mod remove_rule_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Url;
         type Pattern;
+        type Url;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Url = Unset;
         type Pattern = Unset;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type Url = Set<members::url>;
-        type Pattern = S::Pattern;
+        type Url = Unset;
     }
     ///State transition - sets the `pattern` field to Set
     pub struct SetPattern<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPattern<S> {}
     impl<S: State> State for SetPattern<S> {
-        type Url = S::Url;
         type Pattern = Set<members::pattern>;
+        type Url = S::Url;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type Pattern = S::Pattern;
+        type Url = Set<members::url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `url` field
-        pub struct url(());
         ///Marker type for the `pattern` field
         pub struct pattern(());
+        ///Marker type for the `url` field
+        pub struct url(());
     }
 }
 
@@ -182,8 +182,8 @@ where
 impl<'a, S> RemoveRuleBuilder<'a, S>
 where
     S: remove_rule_state::State,
-    S::Url: remove_rule_state::IsSet,
     S::Pattern: remove_rule_state::IsSet,
+    S::Url: remove_rule_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RemoveRule<'a> {
@@ -250,8 +250,8 @@ pub enum RemoveRuleError<'a> {
     RuleNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
-impl std::fmt::Display for RemoveRuleError<'_> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for RemoveRuleError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::RuleNotFound(msg) => {
                 write!(f, "RuleNotFound")?;

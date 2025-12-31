@@ -132,7 +132,122 @@ pub struct GetRepoStatusOutput<'a> {
     /// If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub status: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub status: std::option::Option<GetRepoStatusOutputStatus<'a>>,
+}
+
+/// If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum GetRepoStatusOutputStatus<'a> {
+    Takendown,
+    Suspended,
+    Deleted,
+    Deactivated,
+    Desynchronized,
+    Throttled,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> GetRepoStatusOutputStatus<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Takendown => "takendown",
+            Self::Suspended => "suspended",
+            Self::Deleted => "deleted",
+            Self::Deactivated => "deactivated",
+            Self::Desynchronized => "desynchronized",
+            Self::Throttled => "throttled",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for GetRepoStatusOutputStatus<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "takendown" => Self::Takendown,
+            "suspended" => Self::Suspended,
+            "deleted" => Self::Deleted,
+            "deactivated" => Self::Deactivated,
+            "desynchronized" => Self::Desynchronized,
+            "throttled" => Self::Throttled,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for GetRepoStatusOutputStatus<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "takendown" => Self::Takendown,
+            "suspended" => Self::Suspended,
+            "deleted" => Self::Deleted,
+            "deactivated" => Self::Deactivated,
+            "desynchronized" => Self::Desynchronized,
+            "throttled" => Self::Throttled,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for GetRepoStatusOutputStatus<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for GetRepoStatusOutputStatus<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for GetRepoStatusOutputStatus<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for GetRepoStatusOutputStatus<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for GetRepoStatusOutputStatus<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for GetRepoStatusOutputStatus<'_> {
+    type Output = GetRepoStatusOutputStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GetRepoStatusOutputStatus::Takendown => GetRepoStatusOutputStatus::Takendown,
+            GetRepoStatusOutputStatus::Suspended => GetRepoStatusOutputStatus::Suspended,
+            GetRepoStatusOutputStatus::Deleted => GetRepoStatusOutputStatus::Deleted,
+            GetRepoStatusOutputStatus::Deactivated => {
+                GetRepoStatusOutputStatus::Deactivated
+            }
+            GetRepoStatusOutputStatus::Desynchronized => {
+                GetRepoStatusOutputStatus::Desynchronized
+            }
+            GetRepoStatusOutputStatus::Throttled => GetRepoStatusOutputStatus::Throttled,
+            GetRepoStatusOutputStatus::Other(v) => {
+                GetRepoStatusOutputStatus::Other(v.into_static())
+            }
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -154,8 +269,8 @@ pub enum GetRepoStatusError<'a> {
     RepoNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
-impl std::fmt::Display for GetRepoStatusError<'_> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for GetRepoStatusError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::RepoNotFound(msg) => {
                 write!(f, "RepoNotFound")?;

@@ -54,49 +54,49 @@ pub mod chapter_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type EntryList;
         type Notebook;
+        type EntryList;
         type Authors;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type EntryList = Unset;
         type Notebook = Unset;
+        type EntryList = Unset;
         type Authors = Unset;
-    }
-    ///State transition - sets the `entry_list` field to Set
-    pub struct SetEntryList<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEntryList<S> {}
-    impl<S: State> State for SetEntryList<S> {
-        type EntryList = Set<members::entry_list>;
-        type Notebook = S::Notebook;
-        type Authors = S::Authors;
     }
     ///State transition - sets the `notebook` field to Set
     pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetNotebook<S> {}
     impl<S: State> State for SetNotebook<S> {
-        type EntryList = S::EntryList;
         type Notebook = Set<members::notebook>;
+        type EntryList = S::EntryList;
+        type Authors = S::Authors;
+    }
+    ///State transition - sets the `entry_list` field to Set
+    pub struct SetEntryList<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEntryList<S> {}
+    impl<S: State> State for SetEntryList<S> {
+        type Notebook = S::Notebook;
+        type EntryList = Set<members::entry_list>;
         type Authors = S::Authors;
     }
     ///State transition - sets the `authors` field to Set
     pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthors<S> {}
     impl<S: State> State for SetAuthors<S> {
-        type EntryList = S::EntryList;
         type Notebook = S::Notebook;
+        type EntryList = S::EntryList;
         type Authors = Set<members::authors>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `entry_list` field
-        pub struct entry_list(());
         ///Marker type for the `notebook` field
         pub struct notebook(());
+        ///Marker type for the `entry_list` field
+        pub struct entry_list(());
         ///Marker type for the `authors` field
         pub struct authors(());
     }
@@ -291,8 +291,8 @@ impl<'a, S: chapter_state::State> ChapterBuilder<'a, S> {
 impl<'a, S> ChapterBuilder<'a, S>
 where
     S: chapter_state::State,
-    S::EntryList: chapter_state::IsSet,
     S::Notebook: chapter_state::IsSet,
+    S::EntryList: chapter_state::IsSet,
     S::Authors: chapter_state::IsSet,
 {
     /// Build the final struct

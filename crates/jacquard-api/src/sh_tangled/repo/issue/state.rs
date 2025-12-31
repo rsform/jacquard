@@ -24,7 +24,7 @@ pub struct State<'a> {
     pub issue: jacquard_common::types::string::AtUri<'a>,
     /// state of the issue
     #[serde(borrow)]
-    pub state: jacquard_common::CowStr<'a>,
+    pub state: StateState<'a>,
 }
 
 pub mod state_state {
@@ -37,37 +37,37 @@ pub mod state_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type State;
         type Issue;
+        type State;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type State = Unset;
         type Issue = Unset;
-    }
-    ///State transition - sets the `state` field to Set
-    pub struct SetState<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetState<S> {}
-    impl<S: State> State for SetState<S> {
-        type State = Set<members::state>;
-        type Issue = S::Issue;
+        type State = Unset;
     }
     ///State transition - sets the `issue` field to Set
     pub struct SetIssue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIssue<S> {}
     impl<S: State> State for SetIssue<S> {
-        type State = S::State;
         type Issue = Set<members::issue>;
+        type State = S::State;
+    }
+    ///State transition - sets the `state` field to Set
+    pub struct SetState<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetState<S> {}
+    impl<S: State> State for SetState<S> {
+        type Issue = S::Issue;
+        type State = Set<members::state>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `state` field
-        pub struct state(());
         ///Marker type for the `issue` field
         pub struct issue(());
+        ///Marker type for the `state` field
+        pub struct state(());
     }
 }
 
@@ -76,7 +76,7 @@ pub struct StateBuilder<'a, S: state_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<StateState<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -126,7 +126,7 @@ where
     /// Set the `state` field (required)
     pub fn state(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<StateState<'a>>,
     ) -> StateBuilder<'a, state_state::SetState<S>> {
         self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
         StateBuilder {
@@ -140,8 +140,8 @@ where
 impl<'a, S> StateBuilder<'a, S>
 where
     S: state_state::State,
-    S::State: state_state::IsSet,
     S::Issue: state_state::IsSet,
+    S::State: state_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> State<'a> {
@@ -177,6 +177,99 @@ impl<'a> State<'a> {
         jacquard_common::types::uri::RecordUri::try_from_uri(
             jacquard_common::types::string::AtUri::new_cow(uri.into())?,
         )
+    }
+}
+
+/// state of the issue
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum StateState<'a> {
+    ShTangledRepoIssueStateOpen,
+    ShTangledRepoIssueStateClosed,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> StateState<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::ShTangledRepoIssueStateOpen => "sh.tangled.repo.issue.state.open",
+            Self::ShTangledRepoIssueStateClosed => "sh.tangled.repo.issue.state.closed",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for StateState<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "sh.tangled.repo.issue.state.open" => Self::ShTangledRepoIssueStateOpen,
+            "sh.tangled.repo.issue.state.closed" => Self::ShTangledRepoIssueStateClosed,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for StateState<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "sh.tangled.repo.issue.state.open" => Self::ShTangledRepoIssueStateOpen,
+            "sh.tangled.repo.issue.state.closed" => Self::ShTangledRepoIssueStateClosed,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for StateState<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for StateState<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for StateState<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for StateState<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for StateState<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for StateState<'_> {
+    type Output = StateState<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            StateState::ShTangledRepoIssueStateOpen => {
+                StateState::ShTangledRepoIssueStateOpen
+            }
+            StateState::ShTangledRepoIssueStateClosed => {
+                StateState::ShTangledRepoIssueStateClosed
+            }
+            StateState::Other(v) => StateState::Other(v.into_static()),
+        }
     }
 }
 

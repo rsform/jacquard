@@ -902,8 +902,8 @@ impl<'c> CodeGenerator<'c> {
                 #(#variants,)*
             }
 
-            impl std::fmt::Display for #ident<'_> {
-                fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            impl core::fmt::Display for #ident<'_> {
+                fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
                     match self {
                         #(#display_arms)*
                         Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),

@@ -432,37 +432,37 @@ pub mod individual_email_commit_count_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Email;
         type Count;
+        type Email;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Email = Unset;
         type Count = Unset;
-    }
-    ///State transition - sets the `email` field to Set
-    pub struct SetEmail<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEmail<S> {}
-    impl<S: State> State for SetEmail<S> {
-        type Email = Set<members::email>;
-        type Count = S::Count;
+        type Email = Unset;
     }
     ///State transition - sets the `count` field to Set
     pub struct SetCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCount<S> {}
     impl<S: State> State for SetCount<S> {
-        type Email = S::Email;
         type Count = Set<members::count>;
+        type Email = S::Email;
+    }
+    ///State transition - sets the `email` field to Set
+    pub struct SetEmail<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEmail<S> {}
+    impl<S: State> State for SetEmail<S> {
+        type Count = S::Count;
+        type Email = Set<members::email>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `email` field
-        pub struct email(());
         ///Marker type for the `count` field
         pub struct count(());
+        ///Marker type for the `email` field
+        pub struct email(());
     }
 }
 
@@ -549,8 +549,8 @@ where
 impl<'a, S> IndividualEmailCommitCountBuilder<'a, S>
 where
     S: individual_email_commit_count_state::State,
-    S::Email: individual_email_commit_count_state::IsSet,
     S::Count: individual_email_commit_count_state::IsSet,
+    S::Email: individual_email_commit_count_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> IndividualEmailCommitCount<'a> {
@@ -854,11 +854,11 @@ pub mod ref_update_state {
     pub trait State: sealed::Sealed {
         type RepoDid;
         type NewSha;
-        type OldSha;
-        type CommitterDid;
         type Meta;
         type Ref;
+        type CommitterDid;
         type RepoName;
+        type OldSha;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -866,11 +866,11 @@ pub mod ref_update_state {
     impl State for Empty {
         type RepoDid = Unset;
         type NewSha = Unset;
-        type OldSha = Unset;
-        type CommitterDid = Unset;
         type Meta = Unset;
         type Ref = Unset;
+        type CommitterDid = Unset;
         type RepoName = Unset;
+        type OldSha = Unset;
     }
     ///State transition - sets the `repo_did` field to Set
     pub struct SetRepoDid<S: State = Empty>(PhantomData<fn() -> S>);
@@ -878,11 +878,11 @@ pub mod ref_update_state {
     impl<S: State> State for SetRepoDid<S> {
         type RepoDid = Set<members::repo_did>;
         type NewSha = S::NewSha;
-        type OldSha = S::OldSha;
-        type CommitterDid = S::CommitterDid;
         type Meta = S::Meta;
         type Ref = S::Ref;
+        type CommitterDid = S::CommitterDid;
         type RepoName = S::RepoName;
+        type OldSha = S::OldSha;
     }
     ///State transition - sets the `new_sha` field to Set
     pub struct SetNewSha<S: State = Empty>(PhantomData<fn() -> S>);
@@ -890,35 +890,11 @@ pub mod ref_update_state {
     impl<S: State> State for SetNewSha<S> {
         type RepoDid = S::RepoDid;
         type NewSha = Set<members::new_sha>;
-        type OldSha = S::OldSha;
+        type Meta = S::Meta;
+        type Ref = S::Ref;
         type CommitterDid = S::CommitterDid;
-        type Meta = S::Meta;
-        type Ref = S::Ref;
         type RepoName = S::RepoName;
-    }
-    ///State transition - sets the `old_sha` field to Set
-    pub struct SetOldSha<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOldSha<S> {}
-    impl<S: State> State for SetOldSha<S> {
-        type RepoDid = S::RepoDid;
-        type NewSha = S::NewSha;
-        type OldSha = Set<members::old_sha>;
-        type CommitterDid = S::CommitterDid;
-        type Meta = S::Meta;
-        type Ref = S::Ref;
-        type RepoName = S::RepoName;
-    }
-    ///State transition - sets the `committer_did` field to Set
-    pub struct SetCommitterDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCommitterDid<S> {}
-    impl<S: State> State for SetCommitterDid<S> {
-        type RepoDid = S::RepoDid;
-        type NewSha = S::NewSha;
         type OldSha = S::OldSha;
-        type CommitterDid = Set<members::committer_did>;
-        type Meta = S::Meta;
-        type Ref = S::Ref;
-        type RepoName = S::RepoName;
     }
     ///State transition - sets the `meta` field to Set
     pub struct SetMeta<S: State = Empty>(PhantomData<fn() -> S>);
@@ -926,11 +902,11 @@ pub mod ref_update_state {
     impl<S: State> State for SetMeta<S> {
         type RepoDid = S::RepoDid;
         type NewSha = S::NewSha;
-        type OldSha = S::OldSha;
-        type CommitterDid = S::CommitterDid;
         type Meta = Set<members::meta>;
         type Ref = S::Ref;
+        type CommitterDid = S::CommitterDid;
         type RepoName = S::RepoName;
+        type OldSha = S::OldSha;
     }
     ///State transition - sets the `ref` field to Set
     pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
@@ -938,11 +914,23 @@ pub mod ref_update_state {
     impl<S: State> State for SetRef<S> {
         type RepoDid = S::RepoDid;
         type NewSha = S::NewSha;
-        type OldSha = S::OldSha;
-        type CommitterDid = S::CommitterDid;
         type Meta = S::Meta;
         type Ref = Set<members::r#ref>;
+        type CommitterDid = S::CommitterDid;
         type RepoName = S::RepoName;
+        type OldSha = S::OldSha;
+    }
+    ///State transition - sets the `committer_did` field to Set
+    pub struct SetCommitterDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCommitterDid<S> {}
+    impl<S: State> State for SetCommitterDid<S> {
+        type RepoDid = S::RepoDid;
+        type NewSha = S::NewSha;
+        type Meta = S::Meta;
+        type Ref = S::Ref;
+        type CommitterDid = Set<members::committer_did>;
+        type RepoName = S::RepoName;
+        type OldSha = S::OldSha;
     }
     ///State transition - sets the `repo_name` field to Set
     pub struct SetRepoName<S: State = Empty>(PhantomData<fn() -> S>);
@@ -950,11 +938,23 @@ pub mod ref_update_state {
     impl<S: State> State for SetRepoName<S> {
         type RepoDid = S::RepoDid;
         type NewSha = S::NewSha;
-        type OldSha = S::OldSha;
-        type CommitterDid = S::CommitterDid;
         type Meta = S::Meta;
         type Ref = S::Ref;
+        type CommitterDid = S::CommitterDid;
         type RepoName = Set<members::repo_name>;
+        type OldSha = S::OldSha;
+    }
+    ///State transition - sets the `old_sha` field to Set
+    pub struct SetOldSha<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOldSha<S> {}
+    impl<S: State> State for SetOldSha<S> {
+        type RepoDid = S::RepoDid;
+        type NewSha = S::NewSha;
+        type Meta = S::Meta;
+        type Ref = S::Ref;
+        type CommitterDid = S::CommitterDid;
+        type RepoName = S::RepoName;
+        type OldSha = Set<members::old_sha>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -963,16 +963,16 @@ pub mod ref_update_state {
         pub struct repo_did(());
         ///Marker type for the `new_sha` field
         pub struct new_sha(());
-        ///Marker type for the `old_sha` field
-        pub struct old_sha(());
-        ///Marker type for the `committer_did` field
-        pub struct committer_did(());
         ///Marker type for the `meta` field
         pub struct meta(());
         ///Marker type for the `ref` field
         pub struct r#ref(());
+        ///Marker type for the `committer_did` field
+        pub struct committer_did(());
         ///Marker type for the `repo_name` field
         pub struct repo_name(());
+        ///Marker type for the `old_sha` field
+        pub struct old_sha(());
     }
 }
 
@@ -1147,11 +1147,11 @@ where
     S: ref_update_state::State,
     S::RepoDid: ref_update_state::IsSet,
     S::NewSha: ref_update_state::IsSet,
-    S::OldSha: ref_update_state::IsSet,
-    S::CommitterDid: ref_update_state::IsSet,
     S::Meta: ref_update_state::IsSet,
     S::Ref: ref_update_state::IsSet,
+    S::CommitterDid: ref_update_state::IsSet,
     S::RepoName: ref_update_state::IsSet,
+    S::OldSha: ref_update_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RefUpdate<'a> {
@@ -1381,37 +1381,37 @@ pub mod meta_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type IsDefaultRef;
         type CommitCount;
+        type IsDefaultRef;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type IsDefaultRef = Unset;
         type CommitCount = Unset;
-    }
-    ///State transition - sets the `is_default_ref` field to Set
-    pub struct SetIsDefaultRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIsDefaultRef<S> {}
-    impl<S: State> State for SetIsDefaultRef<S> {
-        type IsDefaultRef = Set<members::is_default_ref>;
-        type CommitCount = S::CommitCount;
+        type IsDefaultRef = Unset;
     }
     ///State transition - sets the `commit_count` field to Set
     pub struct SetCommitCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCommitCount<S> {}
     impl<S: State> State for SetCommitCount<S> {
-        type IsDefaultRef = S::IsDefaultRef;
         type CommitCount = Set<members::commit_count>;
+        type IsDefaultRef = S::IsDefaultRef;
+    }
+    ///State transition - sets the `is_default_ref` field to Set
+    pub struct SetIsDefaultRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIsDefaultRef<S> {}
+    impl<S: State> State for SetIsDefaultRef<S> {
+        type CommitCount = S::CommitCount;
+        type IsDefaultRef = Set<members::is_default_ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `is_default_ref` field
-        pub struct is_default_ref(());
         ///Marker type for the `commit_count` field
         pub struct commit_count(());
+        ///Marker type for the `is_default_ref` field
+        pub struct is_default_ref(());
     }
 }
 
@@ -1506,8 +1506,8 @@ impl<'a, S: meta_state::State> MetaBuilder<'a, S> {
 impl<'a, S> MetaBuilder<'a, S>
 where
     S: meta_state::State,
-    S::IsDefaultRef: meta_state::IsSet,
     S::CommitCount: meta_state::IsSet,
+    S::IsDefaultRef: meta_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Meta<'a> {

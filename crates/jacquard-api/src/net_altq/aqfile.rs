@@ -21,10 +21,104 @@
 pub struct Checksum<'a> {
     /// Hash algorithm name.
     #[serde(borrow)]
-    pub algo: jacquard_common::CowStr<'a>,
+    pub algo: ChecksumAlgo<'a>,
     /// Hex or base64 encoded digest produced by the algorithm.
     #[serde(borrow)]
     pub hash: jacquard_common::CowStr<'a>,
+}
+
+/// Hash algorithm name.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ChecksumAlgo<'a> {
+    Sha256,
+    Sha512,
+    Blake3,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ChecksumAlgo<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Sha256 => "sha256",
+            Self::Sha512 => "sha512",
+            Self::Blake3 => "blake3",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ChecksumAlgo<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "sha256" => Self::Sha256,
+            "sha512" => Self::Sha512,
+            "blake3" => Self::Blake3,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ChecksumAlgo<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "sha256" => Self::Sha256,
+            "sha512" => Self::Sha512,
+            "blake3" => Self::Blake3,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for ChecksumAlgo<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ChecksumAlgo<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for ChecksumAlgo<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ChecksumAlgo<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ChecksumAlgo<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for ChecksumAlgo<'_> {
+    type Output = ChecksumAlgo<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ChecksumAlgo::Sha256 => ChecksumAlgo::Sha256,
+            ChecksumAlgo::Sha512 => ChecksumAlgo::Sha512,
+            ChecksumAlgo::Blake3 => ChecksumAlgo::Blake3,
+            ChecksumAlgo::Other(v) => ChecksumAlgo::Other(v.into_static()),
+        }
+    }
 }
 
 fn lexicon_doc_net_altq_aqfile() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
@@ -654,51 +748,51 @@ pub mod aqfile_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Blob;
         type File;
         type CreatedAt;
+        type Blob;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Blob = Unset;
         type File = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `blob` field to Set
-    pub struct SetBlob<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlob<S> {}
-    impl<S: State> State for SetBlob<S> {
-        type Blob = Set<members::blob>;
-        type File = S::File;
-        type CreatedAt = S::CreatedAt;
+        type Blob = Unset;
     }
     ///State transition - sets the `file` field to Set
     pub struct SetFile<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFile<S> {}
     impl<S: State> State for SetFile<S> {
-        type Blob = S::Blob;
         type File = Set<members::file>;
         type CreatedAt = S::CreatedAt;
+        type Blob = S::Blob;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Blob = S::Blob;
         type File = S::File;
         type CreatedAt = Set<members::created_at>;
+        type Blob = S::Blob;
+    }
+    ///State transition - sets the `blob` field to Set
+    pub struct SetBlob<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlob<S> {}
+    impl<S: State> State for SetBlob<S> {
+        type File = S::File;
+        type CreatedAt = S::CreatedAt;
+        type Blob = Set<members::blob>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `blob` field
-        pub struct blob(());
         ///Marker type for the `file` field
         pub struct file(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `blob` field
+        pub struct blob(());
     }
 }
 
@@ -831,9 +925,9 @@ where
 impl<'a, S> AqfileBuilder<'a, S>
 where
     S: aqfile_state::State,
-    S::Blob: aqfile_state::IsSet,
     S::File: aqfile_state::IsSet,
     S::CreatedAt: aqfile_state::IsSet,
+    S::Blob: aqfile_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Aqfile<'a> {

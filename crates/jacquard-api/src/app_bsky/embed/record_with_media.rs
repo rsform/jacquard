@@ -33,37 +33,37 @@ pub mod record_with_media_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Record;
         type Media;
+        type Record;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Record = Unset;
         type Media = Unset;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecord<S> {}
-    impl<S: State> State for SetRecord<S> {
-        type Record = Set<members::record>;
-        type Media = S::Media;
+        type Record = Unset;
     }
     ///State transition - sets the `media` field to Set
     pub struct SetMedia<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMedia<S> {}
     impl<S: State> State for SetMedia<S> {
-        type Record = S::Record;
         type Media = Set<members::media>;
+        type Record = S::Record;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecord<S> {}
+    impl<S: State> State for SetRecord<S> {
+        type Media = S::Media;
+        type Record = Set<members::record>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `record` field
-        pub struct record(());
         ///Marker type for the `media` field
         pub struct media(());
+        ///Marker type for the `record` field
+        pub struct record(());
     }
 }
 
@@ -136,8 +136,8 @@ where
 impl<'a, S> RecordWithMediaBuilder<'a, S>
 where
     S: record_with_media_state::State,
-    S::Record: record_with_media_state::IsSet,
     S::Media: record_with_media_state::IsSet,
+    S::Record: record_with_media_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RecordWithMedia<'a> {

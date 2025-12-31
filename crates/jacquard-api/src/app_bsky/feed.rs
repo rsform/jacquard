@@ -2196,7 +2196,7 @@ pub struct GeneratorView<'a> {
     pub cid: jacquard_common::types::string::Cid<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub content_mode: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub content_mode: std::option::Option<GeneratorViewContentMode<'a>>,
     #[serde(borrow)]
     pub creator: crate::app_bsky::actor::ProfileView<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -2234,105 +2234,105 @@ pub mod generator_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Creator;
-        type DisplayName;
-        type Did;
-        type IndexedAt;
         type Uri;
         type Cid;
+        type DisplayName;
+        type IndexedAt;
+        type Did;
+        type Creator;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Creator = Unset;
-        type DisplayName = Unset;
-        type Did = Unset;
-        type IndexedAt = Unset;
         type Uri = Unset;
         type Cid = Unset;
-    }
-    ///State transition - sets the `creator` field to Set
-    pub struct SetCreator<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreator<S> {}
-    impl<S: State> State for SetCreator<S> {
-        type Creator = Set<members::creator>;
-        type DisplayName = S::DisplayName;
-        type Did = S::Did;
-        type IndexedAt = S::IndexedAt;
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-    }
-    ///State transition - sets the `display_name` field to Set
-    pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDisplayName<S> {}
-    impl<S: State> State for SetDisplayName<S> {
-        type Creator = S::Creator;
-        type DisplayName = Set<members::display_name>;
-        type Did = S::Did;
-        type IndexedAt = S::IndexedAt;
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Creator = S::Creator;
-        type DisplayName = S::DisplayName;
-        type Did = Set<members::did>;
-        type IndexedAt = S::IndexedAt;
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
-    impl<S: State> State for SetIndexedAt<S> {
-        type Creator = S::Creator;
-        type DisplayName = S::DisplayName;
-        type Did = S::Did;
-        type IndexedAt = Set<members::indexed_at>;
-        type Uri = S::Uri;
-        type Cid = S::Cid;
+        type DisplayName = Unset;
+        type IndexedAt = Unset;
+        type Did = Unset;
+        type Creator = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Creator = S::Creator;
-        type DisplayName = S::DisplayName;
-        type Did = S::Did;
-        type IndexedAt = S::IndexedAt;
         type Uri = Set<members::uri>;
         type Cid = S::Cid;
+        type DisplayName = S::DisplayName;
+        type IndexedAt = S::IndexedAt;
+        type Did = S::Did;
+        type Creator = S::Creator;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
-        type Creator = S::Creator;
-        type DisplayName = S::DisplayName;
-        type Did = S::Did;
-        type IndexedAt = S::IndexedAt;
         type Uri = S::Uri;
         type Cid = Set<members::cid>;
+        type DisplayName = S::DisplayName;
+        type IndexedAt = S::IndexedAt;
+        type Did = S::Did;
+        type Creator = S::Creator;
+    }
+    ///State transition - sets the `display_name` field to Set
+    pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDisplayName<S> {}
+    impl<S: State> State for SetDisplayName<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type DisplayName = Set<members::display_name>;
+        type IndexedAt = S::IndexedAt;
+        type Did = S::Did;
+        type Creator = S::Creator;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type DisplayName = S::DisplayName;
+        type IndexedAt = Set<members::indexed_at>;
+        type Did = S::Did;
+        type Creator = S::Creator;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type DisplayName = S::DisplayName;
+        type IndexedAt = S::IndexedAt;
+        type Did = Set<members::did>;
+        type Creator = S::Creator;
+    }
+    ///State transition - sets the `creator` field to Set
+    pub struct SetCreator<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreator<S> {}
+    impl<S: State> State for SetCreator<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type DisplayName = S::DisplayName;
+        type IndexedAt = S::IndexedAt;
+        type Did = S::Did;
+        type Creator = Set<members::creator>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `creator` field
-        pub struct creator(());
-        ///Marker type for the `display_name` field
-        pub struct display_name(());
-        ///Marker type for the `did` field
-        pub struct did(());
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
         ///Marker type for the `uri` field
         pub struct uri(());
         ///Marker type for the `cid` field
         pub struct cid(());
+        ///Marker type for the `display_name` field
+        pub struct display_name(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `creator` field
+        pub struct creator(());
     }
 }
 
@@ -2343,7 +2343,7 @@ pub struct GeneratorViewBuilder<'a, S: generator_view_state::State> {
         ::core::option::Option<bool>,
         ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
         ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<GeneratorViewContentMode<'a>>,
         ::core::option::Option<crate::app_bsky::actor::ProfileView<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
@@ -2446,7 +2446,7 @@ impl<'a, S: generator_view_state::State> GeneratorViewBuilder<'a, S> {
     /// Set the `contentMode` field (optional)
     pub fn content_mode(
         mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+        value: impl Into<Option<GeneratorViewContentMode<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
@@ -2454,7 +2454,7 @@ impl<'a, S: generator_view_state::State> GeneratorViewBuilder<'a, S> {
     /// Set the `contentMode` field to an Option value (optional)
     pub fn maybe_content_mode(
         mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
+        value: Option<GeneratorViewContentMode<'a>>,
     ) -> Self {
         self.__unsafe_private_named.3 = value;
         self
@@ -2648,12 +2648,12 @@ impl<'a, S: generator_view_state::State> GeneratorViewBuilder<'a, S> {
 impl<'a, S> GeneratorViewBuilder<'a, S>
 where
     S: generator_view_state::State,
-    S::Creator: generator_view_state::IsSet,
-    S::DisplayName: generator_view_state::IsSet,
-    S::Did: generator_view_state::IsSet,
-    S::IndexedAt: generator_view_state::IsSet,
     S::Uri: generator_view_state::IsSet,
     S::Cid: generator_view_state::IsSet,
+    S::DisplayName: generator_view_state::IsSet,
+    S::IndexedAt: generator_view_state::IsSet,
+    S::Did: generator_view_state::IsSet,
+    S::Creator: generator_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GeneratorView<'a> {
@@ -2699,6 +2699,100 @@ where
             uri: self.__unsafe_private_named.12.unwrap(),
             viewer: self.__unsafe_private_named.13,
             extra_data: Some(extra_data),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum GeneratorViewContentMode<'a> {
+    ContentModeUnspecified,
+    ContentModeVideo,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> GeneratorViewContentMode<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::ContentModeUnspecified => "app.bsky.feed.defs#contentModeUnspecified",
+            Self::ContentModeVideo => "app.bsky.feed.defs#contentModeVideo",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for GeneratorViewContentMode<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "app.bsky.feed.defs#contentModeUnspecified" => Self::ContentModeUnspecified,
+            "app.bsky.feed.defs#contentModeVideo" => Self::ContentModeVideo,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for GeneratorViewContentMode<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "app.bsky.feed.defs#contentModeUnspecified" => Self::ContentModeUnspecified,
+            "app.bsky.feed.defs#contentModeVideo" => Self::ContentModeVideo,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for GeneratorViewContentMode<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for GeneratorViewContentMode<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for GeneratorViewContentMode<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for GeneratorViewContentMode<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for GeneratorViewContentMode<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for GeneratorViewContentMode<'_> {
+    type Output = GeneratorViewContentMode<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GeneratorViewContentMode::ContentModeUnspecified => {
+                GeneratorViewContentMode::ContentModeUnspecified
+            }
+            GeneratorViewContentMode::ContentModeVideo => {
+                GeneratorViewContentMode::ContentModeVideo
+            }
+            GeneratorViewContentMode::Other(v) => {
+                GeneratorViewContentMode::Other(v.into_static())
+            }
         }
     }
 }
@@ -2811,7 +2905,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GeneratorViewerState<'a> 
 pub struct Interaction<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub event: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub event: std::option::Option<InteractionEvent<'a>>,
     /// Context on a feed item that was originally supplied by the feed generator on getFeedSkeleton.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -2823,6 +2917,146 @@ pub struct Interaction<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub req_id: std::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum InteractionEvent<'a> {
+    RequestLess,
+    RequestMore,
+    ClickthroughItem,
+    ClickthroughAuthor,
+    ClickthroughReposter,
+    ClickthroughEmbed,
+    InteractionSeen,
+    InteractionLike,
+    InteractionRepost,
+    InteractionReply,
+    InteractionQuote,
+    InteractionShare,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> InteractionEvent<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::RequestLess => "app.bsky.feed.defs#requestLess",
+            Self::RequestMore => "app.bsky.feed.defs#requestMore",
+            Self::ClickthroughItem => "app.bsky.feed.defs#clickthroughItem",
+            Self::ClickthroughAuthor => "app.bsky.feed.defs#clickthroughAuthor",
+            Self::ClickthroughReposter => "app.bsky.feed.defs#clickthroughReposter",
+            Self::ClickthroughEmbed => "app.bsky.feed.defs#clickthroughEmbed",
+            Self::InteractionSeen => "app.bsky.feed.defs#interactionSeen",
+            Self::InteractionLike => "app.bsky.feed.defs#interactionLike",
+            Self::InteractionRepost => "app.bsky.feed.defs#interactionRepost",
+            Self::InteractionReply => "app.bsky.feed.defs#interactionReply",
+            Self::InteractionQuote => "app.bsky.feed.defs#interactionQuote",
+            Self::InteractionShare => "app.bsky.feed.defs#interactionShare",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for InteractionEvent<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "app.bsky.feed.defs#requestLess" => Self::RequestLess,
+            "app.bsky.feed.defs#requestMore" => Self::RequestMore,
+            "app.bsky.feed.defs#clickthroughItem" => Self::ClickthroughItem,
+            "app.bsky.feed.defs#clickthroughAuthor" => Self::ClickthroughAuthor,
+            "app.bsky.feed.defs#clickthroughReposter" => Self::ClickthroughReposter,
+            "app.bsky.feed.defs#clickthroughEmbed" => Self::ClickthroughEmbed,
+            "app.bsky.feed.defs#interactionSeen" => Self::InteractionSeen,
+            "app.bsky.feed.defs#interactionLike" => Self::InteractionLike,
+            "app.bsky.feed.defs#interactionRepost" => Self::InteractionRepost,
+            "app.bsky.feed.defs#interactionReply" => Self::InteractionReply,
+            "app.bsky.feed.defs#interactionQuote" => Self::InteractionQuote,
+            "app.bsky.feed.defs#interactionShare" => Self::InteractionShare,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for InteractionEvent<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "app.bsky.feed.defs#requestLess" => Self::RequestLess,
+            "app.bsky.feed.defs#requestMore" => Self::RequestMore,
+            "app.bsky.feed.defs#clickthroughItem" => Self::ClickthroughItem,
+            "app.bsky.feed.defs#clickthroughAuthor" => Self::ClickthroughAuthor,
+            "app.bsky.feed.defs#clickthroughReposter" => Self::ClickthroughReposter,
+            "app.bsky.feed.defs#clickthroughEmbed" => Self::ClickthroughEmbed,
+            "app.bsky.feed.defs#interactionSeen" => Self::InteractionSeen,
+            "app.bsky.feed.defs#interactionLike" => Self::InteractionLike,
+            "app.bsky.feed.defs#interactionRepost" => Self::InteractionRepost,
+            "app.bsky.feed.defs#interactionReply" => Self::InteractionReply,
+            "app.bsky.feed.defs#interactionQuote" => Self::InteractionQuote,
+            "app.bsky.feed.defs#interactionShare" => Self::InteractionShare,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for InteractionEvent<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for InteractionEvent<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for InteractionEvent<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for InteractionEvent<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for InteractionEvent<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for InteractionEvent<'_> {
+    type Output = InteractionEvent<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            InteractionEvent::RequestLess => InteractionEvent::RequestLess,
+            InteractionEvent::RequestMore => InteractionEvent::RequestMore,
+            InteractionEvent::ClickthroughItem => InteractionEvent::ClickthroughItem,
+            InteractionEvent::ClickthroughAuthor => InteractionEvent::ClickthroughAuthor,
+            InteractionEvent::ClickthroughReposter => {
+                InteractionEvent::ClickthroughReposter
+            }
+            InteractionEvent::ClickthroughEmbed => InteractionEvent::ClickthroughEmbed,
+            InteractionEvent::InteractionSeen => InteractionEvent::InteractionSeen,
+            InteractionEvent::InteractionLike => InteractionEvent::InteractionLike,
+            InteractionEvent::InteractionRepost => InteractionEvent::InteractionRepost,
+            InteractionEvent::InteractionReply => InteractionEvent::InteractionReply,
+            InteractionEvent::InteractionQuote => InteractionEvent::InteractionQuote,
+            InteractionEvent::InteractionShare => InteractionEvent::InteractionShare,
+            InteractionEvent::Other(v) => InteractionEvent::Other(v.into_static()),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Interaction<'a> {
@@ -3001,37 +3235,37 @@ pub mod not_found_post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type NotFound;
         type Uri;
+        type NotFound;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type NotFound = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `not_found` field to Set
-    pub struct SetNotFound<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNotFound<S> {}
-    impl<S: State> State for SetNotFound<S> {
-        type NotFound = Set<members::not_found>;
-        type Uri = S::Uri;
+        type NotFound = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type NotFound = S::NotFound;
         type Uri = Set<members::uri>;
+        type NotFound = S::NotFound;
+    }
+    ///State transition - sets the `not_found` field to Set
+    pub struct SetNotFound<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNotFound<S> {}
+    impl<S: State> State for SetNotFound<S> {
+        type Uri = S::Uri;
+        type NotFound = Set<members::not_found>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `not_found` field
-        pub struct not_found(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `not_found` field
+        pub struct not_found(());
     }
 }
 
@@ -3104,8 +3338,8 @@ where
 impl<'a, S> NotFoundPostBuilder<'a, S>
 where
     S: not_found_post_state::State,
-    S::NotFound: not_found_post_state::IsSet,
     S::Uri: not_found_post_state::IsSet,
+    S::NotFound: not_found_post_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> NotFoundPost<'a> {
@@ -3207,83 +3441,83 @@ pub mod post_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Cid;
+        type IndexedAt;
         type Uri;
         type Author;
-        type IndexedAt;
-        type Cid;
         type Record;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Cid = Unset;
+        type IndexedAt = Unset;
         type Uri = Unset;
         type Author = Unset;
-        type IndexedAt = Unset;
-        type Cid = Unset;
         type Record = Unset;
     }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type Author = S::Author;
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Cid = Set<members::cid>;
         type IndexedAt = S::IndexedAt;
-        type Cid = S::Cid;
-        type Record = S::Record;
-    }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthor<S> {}
-    impl<S: State> State for SetAuthor<S> {
         type Uri = S::Uri;
-        type Author = Set<members::author>;
-        type IndexedAt = S::IndexedAt;
-        type Cid = S::Cid;
+        type Author = S::Author;
         type Record = S::Record;
     }
     ///State transition - sets the `indexed_at` field to Set
     pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
     impl<S: State> State for SetIndexedAt<S> {
+        type Cid = S::Cid;
+        type IndexedAt = Set<members::indexed_at>;
         type Uri = S::Uri;
         type Author = S::Author;
-        type IndexedAt = Set<members::indexed_at>;
-        type Cid = S::Cid;
         type Record = S::Record;
     }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Uri = S::Uri;
-        type Author = S::Author;
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Cid = S::Cid;
         type IndexedAt = S::IndexedAt;
-        type Cid = Set<members::cid>;
+        type Uri = Set<members::uri>;
+        type Author = S::Author;
+        type Record = S::Record;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthor<S> {}
+    impl<S: State> State for SetAuthor<S> {
+        type Cid = S::Cid;
+        type IndexedAt = S::IndexedAt;
+        type Uri = S::Uri;
+        type Author = Set<members::author>;
         type Record = S::Record;
     }
     ///State transition - sets the `record` field to Set
     pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRecord<S> {}
     impl<S: State> State for SetRecord<S> {
+        type Cid = S::Cid;
+        type IndexedAt = S::IndexedAt;
         type Uri = S::Uri;
         type Author = S::Author;
-        type IndexedAt = S::IndexedAt;
-        type Cid = S::Cid;
         type Record = Set<members::record>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
         ///Marker type for the `uri` field
         pub struct uri(());
         ///Marker type for the `author` field
         pub struct author(());
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `record` field
         pub struct record(());
     }
@@ -3598,10 +3832,10 @@ impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
 impl<'a, S> PostViewBuilder<'a, S>
 where
     S: post_view_state::State,
+    S::Cid: post_view_state::IsSet,
+    S::IndexedAt: post_view_state::IsSet,
     S::Uri: post_view_state::IsSet,
     S::Author: post_view_state::IsSet,
-    S::IndexedAt: post_view_state::IsSet,
-    S::Cid: post_view_state::IsSet,
     S::Record: post_view_state::IsSet,
 {
     /// Build the final struct
@@ -3759,37 +3993,37 @@ pub mod reason_repost_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type By;
         type IndexedAt;
+        type By;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type By = Unset;
         type IndexedAt = Unset;
-    }
-    ///State transition - sets the `by` field to Set
-    pub struct SetBy<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBy<S> {}
-    impl<S: State> State for SetBy<S> {
-        type By = Set<members::by>;
-        type IndexedAt = S::IndexedAt;
+        type By = Unset;
     }
     ///State transition - sets the `indexed_at` field to Set
     pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
     impl<S: State> State for SetIndexedAt<S> {
-        type By = S::By;
         type IndexedAt = Set<members::indexed_at>;
+        type By = S::By;
+    }
+    ///State transition - sets the `by` field to Set
+    pub struct SetBy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBy<S> {}
+    impl<S: State> State for SetBy<S> {
+        type IndexedAt = S::IndexedAt;
+        type By = Set<members::by>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `by` field
-        pub struct by(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
+        ///Marker type for the `by` field
+        pub struct by(());
     }
 }
 
@@ -3902,8 +4136,8 @@ impl<'a, S: reason_repost_state::State> ReasonRepostBuilder<'a, S> {
 impl<'a, S> ReasonRepostBuilder<'a, S>
 where
     S: reason_repost_state::State,
-    S::By: reason_repost_state::IsSet,
     S::IndexedAt: reason_repost_state::IsSet,
+    S::By: reason_repost_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ReasonRepost<'a> {

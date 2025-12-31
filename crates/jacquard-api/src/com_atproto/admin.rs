@@ -80,51 +80,51 @@ pub mod account_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Handle;
         type IndexedAt;
         type Did;
+        type Handle;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Handle = Unset;
         type IndexedAt = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHandle<S> {}
-    impl<S: State> State for SetHandle<S> {
-        type Handle = Set<members::handle>;
-        type IndexedAt = S::IndexedAt;
-        type Did = S::Did;
+        type Handle = Unset;
     }
     ///State transition - sets the `indexed_at` field to Set
     pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
     impl<S: State> State for SetIndexedAt<S> {
-        type Handle = S::Handle;
         type IndexedAt = Set<members::indexed_at>;
         type Did = S::Did;
+        type Handle = S::Handle;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Handle = S::Handle;
         type IndexedAt = S::IndexedAt;
         type Did = Set<members::did>;
+        type Handle = S::Handle;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHandle<S> {}
+    impl<S: State> State for SetHandle<S> {
+        type IndexedAt = S::IndexedAt;
+        type Did = S::Did;
+        type Handle = Set<members::handle>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `handle` field
-        pub struct handle(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `handle` field
+        pub struct handle(());
     }
 }
 
@@ -401,9 +401,9 @@ impl<'a, S: account_view_state::State> AccountViewBuilder<'a, S> {
 impl<'a, S> AccountViewBuilder<'a, S>
 where
     S: account_view_state::State,
-    S::Handle: account_view_state::IsSet,
     S::IndexedAt: account_view_state::IsSet,
     S::Did: account_view_state::IsSet,
+    S::Handle: account_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> AccountView<'a> {
@@ -907,37 +907,37 @@ pub mod repo_blob_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
         type Did;
+        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Cid = Set<members::cid>;
-        type Did = S::Did;
+        type Cid = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Cid = S::Cid;
         type Did = Set<members::did>;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Did = S::Did;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
     }
 }
 
@@ -1030,8 +1030,8 @@ impl<'a, S: repo_blob_ref_state::State> RepoBlobRefBuilder<'a, S> {
 impl<'a, S> RepoBlobRefBuilder<'a, S>
 where
     S: repo_blob_ref_state::State,
-    S::Cid: repo_blob_ref_state::IsSet,
     S::Did: repo_blob_ref_state::IsSet,
+    S::Cid: repo_blob_ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RepoBlobRef<'a> {

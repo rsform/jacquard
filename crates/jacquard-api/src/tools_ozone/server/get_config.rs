@@ -219,7 +219,105 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ServiceConfig<'a> {
 pub struct ViewerConfig<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub role: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub role: std::option::Option<ViewerConfigRole<'a>>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ViewerConfigRole<'a> {
+    RoleAdmin,
+    RoleModerator,
+    RoleTriage,
+    RoleVerifier,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ViewerConfigRole<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::RoleAdmin => "tools.ozone.team.defs#roleAdmin",
+            Self::RoleModerator => "tools.ozone.team.defs#roleModerator",
+            Self::RoleTriage => "tools.ozone.team.defs#roleTriage",
+            Self::RoleVerifier => "tools.ozone.team.defs#roleVerifier",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ViewerConfigRole<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "tools.ozone.team.defs#roleAdmin" => Self::RoleAdmin,
+            "tools.ozone.team.defs#roleModerator" => Self::RoleModerator,
+            "tools.ozone.team.defs#roleTriage" => Self::RoleTriage,
+            "tools.ozone.team.defs#roleVerifier" => Self::RoleVerifier,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ViewerConfigRole<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "tools.ozone.team.defs#roleAdmin" => Self::RoleAdmin,
+            "tools.ozone.team.defs#roleModerator" => Self::RoleModerator,
+            "tools.ozone.team.defs#roleTriage" => Self::RoleTriage,
+            "tools.ozone.team.defs#roleVerifier" => Self::RoleVerifier,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for ViewerConfigRole<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ViewerConfigRole<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for ViewerConfigRole<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ViewerConfigRole<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ViewerConfigRole<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for ViewerConfigRole<'_> {
+    type Output = ViewerConfigRole<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ViewerConfigRole::RoleAdmin => ViewerConfigRole::RoleAdmin,
+            ViewerConfigRole::RoleModerator => ViewerConfigRole::RoleModerator,
+            ViewerConfigRole::RoleTriage => ViewerConfigRole::RoleTriage,
+            ViewerConfigRole::RoleVerifier => ViewerConfigRole::RoleVerifier,
+            ViewerConfigRole::Other(v) => ViewerConfigRole::Other(v.into_static()),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewerConfig<'a> {

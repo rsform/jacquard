@@ -20,7 +20,7 @@ pub struct AddMember<'a> {
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(borrow)]
-    pub role: jacquard_common::CowStr<'a>,
+    pub role: AddMemberRole<'a>,
 }
 
 pub mod add_member_state {
@@ -33,37 +33,37 @@ pub mod add_member_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Role;
         type Did;
+        type Role;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Role = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `role` field to Set
-    pub struct SetRole<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRole<S> {}
-    impl<S: State> State for SetRole<S> {
-        type Role = Set<members::role>;
-        type Did = S::Did;
+        type Role = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Role = S::Role;
         type Did = Set<members::did>;
+        type Role = S::Role;
+    }
+    ///State transition - sets the `role` field to Set
+    pub struct SetRole<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRole<S> {}
+    impl<S: State> State for SetRole<S> {
+        type Did = S::Did;
+        type Role = Set<members::role>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `role` field
-        pub struct role(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `role` field
+        pub struct role(());
     }
 }
 
@@ -72,7 +72,7 @@ pub struct AddMemberBuilder<'a, S: add_member_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<AddMemberRole<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -122,7 +122,7 @@ where
     /// Set the `role` field (required)
     pub fn role(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<AddMemberRole<'a>>,
     ) -> AddMemberBuilder<'a, add_member_state::SetRole<S>> {
         self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
         AddMemberBuilder {
@@ -136,8 +136,8 @@ where
 impl<'a, S> AddMemberBuilder<'a, S>
 where
     S: add_member_state::State,
-    S::Role: add_member_state::IsSet,
     S::Did: add_member_state::IsSet,
+    S::Role: add_member_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> AddMember<'a> {
@@ -159,6 +159,104 @@ where
             did: self.__unsafe_private_named.0.unwrap(),
             role: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum AddMemberRole<'a> {
+    RoleAdmin,
+    RoleModerator,
+    RoleVerifier,
+    RoleTriage,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> AddMemberRole<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::RoleAdmin => "tools.ozone.team.defs#roleAdmin",
+            Self::RoleModerator => "tools.ozone.team.defs#roleModerator",
+            Self::RoleVerifier => "tools.ozone.team.defs#roleVerifier",
+            Self::RoleTriage => "tools.ozone.team.defs#roleTriage",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for AddMemberRole<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "tools.ozone.team.defs#roleAdmin" => Self::RoleAdmin,
+            "tools.ozone.team.defs#roleModerator" => Self::RoleModerator,
+            "tools.ozone.team.defs#roleVerifier" => Self::RoleVerifier,
+            "tools.ozone.team.defs#roleTriage" => Self::RoleTriage,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for AddMemberRole<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "tools.ozone.team.defs#roleAdmin" => Self::RoleAdmin,
+            "tools.ozone.team.defs#roleModerator" => Self::RoleModerator,
+            "tools.ozone.team.defs#roleVerifier" => Self::RoleVerifier,
+            "tools.ozone.team.defs#roleTriage" => Self::RoleTriage,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for AddMemberRole<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for AddMemberRole<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for AddMemberRole<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for AddMemberRole<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for AddMemberRole<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for AddMemberRole<'_> {
+    type Output = AddMemberRole<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            AddMemberRole::RoleAdmin => AddMemberRole::RoleAdmin,
+            AddMemberRole::RoleModerator => AddMemberRole::RoleModerator,
+            AddMemberRole::RoleVerifier => AddMemberRole::RoleVerifier,
+            AddMemberRole::RoleTriage => AddMemberRole::RoleTriage,
+            AddMemberRole::Other(v) => AddMemberRole::Other(v.into_static()),
         }
     }
 }
@@ -200,8 +298,8 @@ pub enum AddMemberError<'a> {
     MemberAlreadyExists(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
-impl std::fmt::Display for AddMemberError<'_> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for AddMemberError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::MemberAlreadyExists(msg) => {
                 write!(f, "MemberAlreadyExists")?;

@@ -715,7 +715,7 @@ pub struct CreateResult<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub validation_status: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub validation_status: std::option::Option<CreateResultValidationStatus<'a>>,
 }
 
 pub mod create_result_state {
@@ -768,7 +768,7 @@ pub struct CreateResultBuilder<'a, S: create_result_state::State> {
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
         ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<CreateResultValidationStatus<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -833,7 +833,7 @@ impl<'a, S: create_result_state::State> CreateResultBuilder<'a, S> {
     /// Set the `validationStatus` field (optional)
     pub fn validation_status(
         mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+        value: impl Into<Option<CreateResultValidationStatus<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
@@ -841,7 +841,7 @@ impl<'a, S: create_result_state::State> CreateResultBuilder<'a, S> {
     /// Set the `validationStatus` field to an Option value (optional)
     pub fn maybe_validation_status(
         mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
+        value: Option<CreateResultValidationStatus<'a>>,
     ) -> Self {
         self.__unsafe_private_named.2 = value;
         self
@@ -876,6 +876,98 @@ where
             uri: self.__unsafe_private_named.1.unwrap(),
             validation_status: self.__unsafe_private_named.2,
             extra_data: Some(extra_data),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum CreateResultValidationStatus<'a> {
+    Valid,
+    Unknown,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> CreateResultValidationStatus<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Valid => "valid",
+            Self::Unknown => "unknown",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for CreateResultValidationStatus<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "valid" => Self::Valid,
+            "unknown" => Self::Unknown,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for CreateResultValidationStatus<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "valid" => Self::Valid,
+            "unknown" => Self::Unknown,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for CreateResultValidationStatus<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for CreateResultValidationStatus<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for CreateResultValidationStatus<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for CreateResultValidationStatus<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for CreateResultValidationStatus<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for CreateResultValidationStatus<'_> {
+    type Output = CreateResultValidationStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            CreateResultValidationStatus::Valid => CreateResultValidationStatus::Valid,
+            CreateResultValidationStatus::Unknown => {
+                CreateResultValidationStatus::Unknown
+            }
+            CreateResultValidationStatus::Other(v) => {
+                CreateResultValidationStatus::Other(v.into_static())
+            }
         }
     }
 }
@@ -1398,8 +1490,8 @@ pub enum ApplyWritesError<'a> {
     InvalidSwap(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
-impl std::fmt::Display for ApplyWritesError<'_> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ApplyWritesError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::InvalidSwap(msg) => {
                 write!(f, "InvalidSwap")?;
@@ -1476,51 +1568,51 @@ pub mod update_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Rkey;
         type Value;
         type Collection;
-        type Rkey;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Rkey = Unset;
         type Value = Unset;
         type Collection = Unset;
-        type Rkey = Unset;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type Value = Set<members::value>;
-        type Collection = S::Collection;
-        type Rkey = S::Rkey;
-    }
-    ///State transition - sets the `collection` field to Set
-    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCollection<S> {}
-    impl<S: State> State for SetCollection<S> {
-        type Value = S::Value;
-        type Collection = Set<members::collection>;
-        type Rkey = S::Rkey;
     }
     ///State transition - sets the `rkey` field to Set
     pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRkey<S> {}
     impl<S: State> State for SetRkey<S> {
+        type Rkey = Set<members::rkey>;
         type Value = S::Value;
         type Collection = S::Collection;
-        type Rkey = Set<members::rkey>;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Rkey = S::Rkey;
+        type Value = Set<members::value>;
+        type Collection = S::Collection;
+    }
+    ///State transition - sets the `collection` field to Set
+    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCollection<S> {}
+    impl<S: State> State for SetCollection<S> {
+        type Rkey = S::Rkey;
+        type Value = S::Value;
+        type Collection = Set<members::collection>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `rkey` field
+        pub struct rkey(());
         ///Marker type for the `value` field
         pub struct value(());
         ///Marker type for the `collection` field
         pub struct collection(());
-        ///Marker type for the `rkey` field
-        pub struct rkey(());
     }
 }
 
@@ -1621,9 +1713,9 @@ where
 impl<'a, S> UpdateBuilder<'a, S>
 where
     S: update_state::State,
+    S::Rkey: update_state::IsSet,
     S::Value: update_state::IsSet,
     S::Collection: update_state::IsSet,
-    S::Rkey: update_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Update<'a> {
@@ -1686,7 +1778,7 @@ pub struct UpdateResult<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub validation_status: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub validation_status: std::option::Option<UpdateResultValidationStatus<'a>>,
 }
 
 pub mod update_result_state {
@@ -1739,7 +1831,7 @@ pub struct UpdateResultBuilder<'a, S: update_result_state::State> {
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
         ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<UpdateResultValidationStatus<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -1804,7 +1896,7 @@ impl<'a, S: update_result_state::State> UpdateResultBuilder<'a, S> {
     /// Set the `validationStatus` field (optional)
     pub fn validation_status(
         mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+        value: impl Into<Option<UpdateResultValidationStatus<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
@@ -1812,7 +1904,7 @@ impl<'a, S: update_result_state::State> UpdateResultBuilder<'a, S> {
     /// Set the `validationStatus` field to an Option value (optional)
     pub fn maybe_validation_status(
         mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
+        value: Option<UpdateResultValidationStatus<'a>>,
     ) -> Self {
         self.__unsafe_private_named.2 = value;
         self
@@ -1847,6 +1939,98 @@ where
             uri: self.__unsafe_private_named.1.unwrap(),
             validation_status: self.__unsafe_private_named.2,
             extra_data: Some(extra_data),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum UpdateResultValidationStatus<'a> {
+    Valid,
+    Unknown,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> UpdateResultValidationStatus<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Valid => "valid",
+            Self::Unknown => "unknown",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for UpdateResultValidationStatus<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "valid" => Self::Valid,
+            "unknown" => Self::Unknown,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for UpdateResultValidationStatus<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "valid" => Self::Valid,
+            "unknown" => Self::Unknown,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for UpdateResultValidationStatus<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for UpdateResultValidationStatus<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for UpdateResultValidationStatus<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for UpdateResultValidationStatus<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for UpdateResultValidationStatus<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for UpdateResultValidationStatus<'_> {
+    type Output = UpdateResultValidationStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            UpdateResultValidationStatus::Valid => UpdateResultValidationStatus::Valid,
+            UpdateResultValidationStatus::Unknown => {
+                UpdateResultValidationStatus::Unknown
+            }
+            UpdateResultValidationStatus::Other(v) => {
+                UpdateResultValidationStatus::Other(v.into_static())
+            }
         }
     }
 }

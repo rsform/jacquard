@@ -47,67 +47,67 @@ pub mod member_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Title;
         type Url;
         type Ring;
+        type CreatedAt;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Title = Unset;
         type Url = Unset;
         type Ring = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Title = S::Title;
-        type Url = S::Url;
-        type Ring = S::Ring;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type CreatedAt = S::CreatedAt;
-        type Title = Set<members::title>;
-        type Url = S::Url;
-        type Ring = S::Ring;
+        type CreatedAt = Unset;
+        type Title = Unset;
     }
     ///State transition - sets the `url` field to Set
     pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUrl<S> {}
     impl<S: State> State for SetUrl<S> {
-        type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
         type Url = Set<members::url>;
         type Ring = S::Ring;
+        type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
     }
     ///State transition - sets the `ring` field to Set
     pub struct SetRing<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRing<S> {}
     impl<S: State> State for SetRing<S> {
-        type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
         type Url = S::Url;
         type Ring = Set<members::ring>;
+        type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Url = S::Url;
+        type Ring = S::Ring;
+        type CreatedAt = Set<members::created_at>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Url = S::Url;
+        type Ring = S::Ring;
+        type CreatedAt = S::CreatedAt;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `url` field
         pub struct url(());
         ///Marker type for the `ring` field
         pub struct ring(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
@@ -257,10 +257,10 @@ where
 impl<'a, S> MemberBuilder<'a, S>
 where
     S: member_state::State,
-    S::CreatedAt: member_state::IsSet,
-    S::Title: member_state::IsSet,
     S::Url: member_state::IsSet,
     S::Ring: member_state::IsSet,
+    S::CreatedAt: member_state::IsSet,
+    S::Title: member_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Member<'a> {

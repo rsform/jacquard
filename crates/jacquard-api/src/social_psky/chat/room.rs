@@ -626,37 +626,37 @@ pub mod modlist_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Users;
         type Active;
+        type Users;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Users = Unset;
         type Active = Unset;
-    }
-    ///State transition - sets the `users` field to Set
-    pub struct SetUsers<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUsers<S> {}
-    impl<S: State> State for SetUsers<S> {
-        type Users = Set<members::users>;
-        type Active = S::Active;
+        type Users = Unset;
     }
     ///State transition - sets the `active` field to Set
     pub struct SetActive<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetActive<S> {}
     impl<S: State> State for SetActive<S> {
-        type Users = S::Users;
         type Active = Set<members::active>;
+        type Users = S::Users;
+    }
+    ///State transition - sets the `users` field to Set
+    pub struct SetUsers<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUsers<S> {}
+    impl<S: State> State for SetUsers<S> {
+        type Active = S::Active;
+        type Users = Set<members::users>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `users` field
-        pub struct users(());
         ///Marker type for the `active` field
         pub struct active(());
+        ///Marker type for the `users` field
+        pub struct users(());
     }
 }
 
@@ -729,8 +729,8 @@ where
 impl<'a, S> ModlistRefBuilder<'a, S>
 where
     S: modlist_ref_state::State,
-    S::Users: modlist_ref_state::IsSet,
     S::Active: modlist_ref_state::IsSet,
+    S::Users: modlist_ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ModlistRef<'a> {

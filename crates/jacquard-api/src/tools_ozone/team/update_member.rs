@@ -23,7 +23,7 @@ pub struct UpdateMember<'a> {
     pub disabled: std::option::Option<bool>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub role: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub role: std::option::Option<UpdateMemberRole<'a>>,
 }
 
 pub mod update_member_state {
@@ -64,7 +64,7 @@ pub struct UpdateMemberBuilder<'a, S: update_member_state::State> {
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::types::string::Did<'a>>,
         ::core::option::Option<bool>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<UpdateMemberRole<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -121,15 +121,12 @@ impl<'a, S: update_member_state::State> UpdateMemberBuilder<'a, S> {
 
 impl<'a, S: update_member_state::State> UpdateMemberBuilder<'a, S> {
     /// Set the `role` field (optional)
-    pub fn role(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn role(mut self, value: impl Into<Option<UpdateMemberRole<'a>>>) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `role` field to an Option value (optional)
-    pub fn maybe_role(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_role(mut self, value: Option<UpdateMemberRole<'a>>) -> Self {
         self.__unsafe_private_named.2 = value;
         self
     }
@@ -162,6 +159,104 @@ where
             disabled: self.__unsafe_private_named.1,
             role: self.__unsafe_private_named.2,
             extra_data: Some(extra_data),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum UpdateMemberRole<'a> {
+    RoleAdmin,
+    RoleModerator,
+    RoleVerifier,
+    RoleTriage,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> UpdateMemberRole<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::RoleAdmin => "tools.ozone.team.defs#roleAdmin",
+            Self::RoleModerator => "tools.ozone.team.defs#roleModerator",
+            Self::RoleVerifier => "tools.ozone.team.defs#roleVerifier",
+            Self::RoleTriage => "tools.ozone.team.defs#roleTriage",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for UpdateMemberRole<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "tools.ozone.team.defs#roleAdmin" => Self::RoleAdmin,
+            "tools.ozone.team.defs#roleModerator" => Self::RoleModerator,
+            "tools.ozone.team.defs#roleVerifier" => Self::RoleVerifier,
+            "tools.ozone.team.defs#roleTriage" => Self::RoleTriage,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for UpdateMemberRole<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "tools.ozone.team.defs#roleAdmin" => Self::RoleAdmin,
+            "tools.ozone.team.defs#roleModerator" => Self::RoleModerator,
+            "tools.ozone.team.defs#roleVerifier" => Self::RoleVerifier,
+            "tools.ozone.team.defs#roleTriage" => Self::RoleTriage,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for UpdateMemberRole<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for UpdateMemberRole<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for UpdateMemberRole<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for UpdateMemberRole<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for UpdateMemberRole<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for UpdateMemberRole<'_> {
+    type Output = UpdateMemberRole<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            UpdateMemberRole::RoleAdmin => UpdateMemberRole::RoleAdmin,
+            UpdateMemberRole::RoleModerator => UpdateMemberRole::RoleModerator,
+            UpdateMemberRole::RoleVerifier => UpdateMemberRole::RoleVerifier,
+            UpdateMemberRole::RoleTriage => UpdateMemberRole::RoleTriage,
+            UpdateMemberRole::Other(v) => UpdateMemberRole::Other(v.into_static()),
         }
     }
 }
@@ -203,8 +298,8 @@ pub enum UpdateMemberError<'a> {
     MemberNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
-impl std::fmt::Display for UpdateMemberError<'_> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for UpdateMemberError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::MemberNotFound(msg) => {
                 write!(f, "MemberNotFound")?;

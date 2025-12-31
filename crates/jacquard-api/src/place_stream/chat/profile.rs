@@ -33,51 +33,51 @@ pub mod color_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Green;
         type Red;
         type Blue;
+        type Green;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Green = Unset;
         type Red = Unset;
         type Blue = Unset;
-    }
-    ///State transition - sets the `green` field to Set
-    pub struct SetGreen<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGreen<S> {}
-    impl<S: State> State for SetGreen<S> {
-        type Green = Set<members::green>;
-        type Red = S::Red;
-        type Blue = S::Blue;
+        type Green = Unset;
     }
     ///State transition - sets the `red` field to Set
     pub struct SetRed<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRed<S> {}
     impl<S: State> State for SetRed<S> {
-        type Green = S::Green;
         type Red = Set<members::red>;
         type Blue = S::Blue;
+        type Green = S::Green;
     }
     ///State transition - sets the `blue` field to Set
     pub struct SetBlue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBlue<S> {}
     impl<S: State> State for SetBlue<S> {
-        type Green = S::Green;
         type Red = S::Red;
         type Blue = Set<members::blue>;
+        type Green = S::Green;
+    }
+    ///State transition - sets the `green` field to Set
+    pub struct SetGreen<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGreen<S> {}
+    impl<S: State> State for SetGreen<S> {
+        type Red = S::Red;
+        type Blue = S::Blue;
+        type Green = Set<members::green>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `green` field
-        pub struct green(());
         ///Marker type for the `red` field
         pub struct red(());
         ///Marker type for the `blue` field
         pub struct blue(());
+        ///Marker type for the `green` field
+        pub struct green(());
     }
 }
 
@@ -170,9 +170,9 @@ where
 impl<'a, S> ColorBuilder<'a, S>
 where
     S: color_state::State,
-    S::Green: color_state::IsSet,
     S::Red: color_state::IsSet,
     S::Blue: color_state::IsSet,
+    S::Green: color_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Color<'a> {

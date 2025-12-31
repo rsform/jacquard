@@ -9,7 +9,7 @@ use quote::quote;
 use std::collections::BTreeMap;
 
 use super::CodeGenerator;
-use super::utils::{make_ident, value_to_variant_name};
+use super::utils::{known_value_to_variant_name, make_ident, value_to_variant_name};
 
 /// Enum variant kind for IntoStatic generation
 #[derive(Debug, Clone)]
@@ -74,6 +74,12 @@ impl<'c> CodeGenerator<'c> {
                             nested.push(union_def);
                         }
                     }
+                }
+                LexObjectProperty::String(s) if s.known_values.is_some() => {
+                    let enum_name =
+                        self.generate_field_type_name(nsid, parent_type_name, field_name, "");
+                    let enum_def = self.generate_inline_known_values_enum(&enum_name, s)?;
+                    nested.push(enum_def);
                 }
                 _ => {}
             }
@@ -534,6 +540,13 @@ impl<'c> CodeGenerator<'c> {
                 }
             }
 
+
+            impl<'a> core::fmt::Display for #ident<'a> {
+                fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+                    write!(f, "{}", self.as_str())
+                }
+            }
+
             impl<'a> serde::Serialize for #ident<'a> {
                 fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
                 where
@@ -553,6 +566,136 @@ impl<'c> CodeGenerator<'c> {
                 {
                     let s = <&'de str>::deserialize(deserializer)?;
                     Ok(Self::from(s))
+                }
+            }
+
+            #into_static_impl
+        })
+    }
+
+    /// Generate enum for inline string property with known values.
+    /// Unlike `generate_known_values_enum`, this takes the type name directly
+    /// and uses fragment extraction for NSID#fragment values.
+    pub(super) fn generate_inline_known_values_enum(
+        &self,
+        type_name: &str,
+        string: &LexString<'static>,
+    ) -> Result<TokenStream> {
+        let ident = syn::Ident::new(type_name, proc_macro2::Span::call_site());
+
+        let known_values = string.known_values.as_ref().unwrap();
+        let mut variants = Vec::new();
+        let mut from_str_arms = Vec::new();
+        let mut as_str_arms = Vec::new();
+
+        for value in known_values {
+            let value_str = value.as_ref();
+            // Use known_value_to_variant_name to extract fragment from NSID#fragment
+            let variant_name = known_value_to_variant_name(value_str);
+            let variant_ident = syn::Ident::new(&variant_name, proc_macro2::Span::call_site());
+
+            variants.push(quote! {
+                #variant_ident
+            });
+
+            from_str_arms.push(quote! {
+                #value_str => Self::#variant_ident
+            });
+
+            as_str_arms.push(quote! {
+                Self::#variant_ident => #value_str
+            });
+        }
+
+        let doc = self.generate_doc_comment(string.description.as_ref());
+
+        // Generate IntoStatic impl
+        let variant_info: Vec<(String, EnumVariantKind)> = known_values
+            .iter()
+            .map(|value| {
+                let variant_name = known_value_to_variant_name(value.as_ref());
+                (variant_name, EnumVariantKind::Unit)
+            })
+            .chain(std::iter::once((
+                "Other".to_string(),
+                EnumVariantKind::Tuple,
+            )))
+            .collect();
+        let into_static_impl =
+            self.generate_into_static_for_enum(type_name, &variant_info, true, false);
+
+        Ok(quote! {
+            #doc
+            #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+            pub enum #ident<'a> {
+                #(#variants,)*
+                Other(jacquard_common::CowStr<'a>),
+            }
+
+            impl<'a> #ident<'a> {
+                pub fn as_str(&self) -> &str {
+                    match self {
+                        #(#as_str_arms,)*
+                        Self::Other(s) => s.as_ref(),
+                    }
+                }
+            }
+
+            impl<'a> From<&'a str> for #ident<'a> {
+                fn from(s: &'a str) -> Self {
+                    match s {
+                        #(#from_str_arms,)*
+                        _ => Self::Other(jacquard_common::CowStr::from(s)),
+                    }
+                }
+            }
+
+            impl<'a> From<String> for #ident<'a> {
+                fn from(s: String) -> Self {
+                    match s.as_str() {
+                        #(#from_str_arms,)*
+                        _ => Self::Other(jacquard_common::CowStr::from(s)),
+                    }
+                }
+            }
+
+            impl<'a> core::fmt::Display for #ident<'a> {
+                fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+                    write!(f, "{}", self.as_str())
+                }
+            }
+
+            impl<'a> AsRef<str> for #ident<'a> {
+                fn as_ref(&self) -> &str {
+                    self.as_str()
+                }
+            }
+
+            impl<'a> serde::Serialize for #ident<'a> {
+                fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+                where
+                    S: serde::Serializer,
+                {
+                    serializer.serialize_str(self.as_str())
+                }
+            }
+
+            impl<'de, 'a> serde::Deserialize<'de> for #ident<'a>
+            where
+                'de: 'a,
+            {
+                fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+                where
+                    D: serde::Deserializer<'de>,
+                {
+                    let s = <&'de str>::deserialize(deserializer)?;
+                    Ok(Self::from(s))
+                }
+            }
+
+            impl<'a> Default for #ident<'a> {
+                fn default() -> Self {
+                    Self::Other(Default::default())
                 }
             }
 

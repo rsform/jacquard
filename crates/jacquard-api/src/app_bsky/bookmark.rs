@@ -281,37 +281,37 @@ pub mod bookmark_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subject;
         type Item;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subject = Unset;
         type Item = Unset;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Subject = Set<members::subject>;
-        type Item = S::Item;
+        type Subject = Unset;
     }
     ///State transition - sets the `item` field to Set
     pub struct SetItem<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetItem<S> {}
     impl<S: State> State for SetItem<S> {
-        type Subject = S::Subject;
         type Item = Set<members::item>;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type Item = S::Item;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `item` field
         pub struct item(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
@@ -404,8 +404,8 @@ where
 impl<'a, S> BookmarkViewBuilder<'a, S>
 where
     S: bookmark_view_state::State,
-    S::Subject: bookmark_view_state::IsSet,
     S::Item: bookmark_view_state::IsSet,
+    S::Subject: bookmark_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> BookmarkView<'a> {

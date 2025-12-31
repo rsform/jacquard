@@ -25,7 +25,7 @@ pub struct Status<'a> {
     pub pull: jacquard_common::types::string::AtUri<'a>,
     /// status of the pull request
     #[serde(borrow)]
-    pub status: jacquard_common::CowStr<'a>,
+    pub status: StatusStatus<'a>,
 }
 
 pub mod status_state {
@@ -38,37 +38,37 @@ pub mod status_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Pull;
         type Status;
+        type Pull;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Pull = Unset;
         type Status = Unset;
-    }
-    ///State transition - sets the `pull` field to Set
-    pub struct SetPull<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPull<S> {}
-    impl<S: State> State for SetPull<S> {
-        type Pull = Set<members::pull>;
-        type Status = S::Status;
+        type Pull = Unset;
     }
     ///State transition - sets the `status` field to Set
     pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStatus<S> {}
     impl<S: State> State for SetStatus<S> {
-        type Pull = S::Pull;
         type Status = Set<members::status>;
+        type Pull = S::Pull;
+    }
+    ///State transition - sets the `pull` field to Set
+    pub struct SetPull<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPull<S> {}
+    impl<S: State> State for SetPull<S> {
+        type Status = S::Status;
+        type Pull = Set<members::pull>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `pull` field
-        pub struct pull(());
         ///Marker type for the `status` field
         pub struct status(());
+        ///Marker type for the `pull` field
+        pub struct pull(());
     }
 }
 
@@ -77,7 +77,7 @@ pub struct StatusBuilder<'a, S: status_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<StatusStatus<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -127,7 +127,7 @@ where
     /// Set the `status` field (required)
     pub fn status(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<StatusStatus<'a>>,
     ) -> StatusBuilder<'a, status_state::SetStatus<S>> {
         self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
         StatusBuilder {
@@ -141,8 +141,8 @@ where
 impl<'a, S> StatusBuilder<'a, S>
 where
     S: status_state::State,
-    S::Pull: status_state::IsSet,
     S::Status: status_state::IsSet,
+    S::Pull: status_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Status<'a> {
@@ -178,6 +178,106 @@ impl<'a> Status<'a> {
         jacquard_common::types::uri::RecordUri::try_from_uri(
             jacquard_common::types::string::AtUri::new_cow(uri.into())?,
         )
+    }
+}
+
+/// status of the pull request
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum StatusStatus<'a> {
+    ShTangledRepoPullStatusOpen,
+    ShTangledRepoPullStatusClosed,
+    ShTangledRepoPullStatusMerged,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> StatusStatus<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::ShTangledRepoPullStatusOpen => "sh.tangled.repo.pull.status.open",
+            Self::ShTangledRepoPullStatusClosed => "sh.tangled.repo.pull.status.closed",
+            Self::ShTangledRepoPullStatusMerged => "sh.tangled.repo.pull.status.merged",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for StatusStatus<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "sh.tangled.repo.pull.status.open" => Self::ShTangledRepoPullStatusOpen,
+            "sh.tangled.repo.pull.status.closed" => Self::ShTangledRepoPullStatusClosed,
+            "sh.tangled.repo.pull.status.merged" => Self::ShTangledRepoPullStatusMerged,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for StatusStatus<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "sh.tangled.repo.pull.status.open" => Self::ShTangledRepoPullStatusOpen,
+            "sh.tangled.repo.pull.status.closed" => Self::ShTangledRepoPullStatusClosed,
+            "sh.tangled.repo.pull.status.merged" => Self::ShTangledRepoPullStatusMerged,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for StatusStatus<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for StatusStatus<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for StatusStatus<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for StatusStatus<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for StatusStatus<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for StatusStatus<'_> {
+    type Output = StatusStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            StatusStatus::ShTangledRepoPullStatusOpen => {
+                StatusStatus::ShTangledRepoPullStatusOpen
+            }
+            StatusStatus::ShTangledRepoPullStatusClosed => {
+                StatusStatus::ShTangledRepoPullStatusClosed
+            }
+            StatusStatus::ShTangledRepoPullStatusMerged => {
+                StatusStatus::ShTangledRepoPullStatusMerged
+            }
+            StatusStatus::Other(v) => StatusStatus::Other(v.into_static()),
+        }
     }
 }
 

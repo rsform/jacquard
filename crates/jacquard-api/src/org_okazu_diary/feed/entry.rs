@@ -47,7 +47,7 @@ pub struct Entry<'a> {
     /// Indicates the intended audience of the entry. A `public` entry (default) is fully public. An `unlisted` entry should not be listed in public profile feeds.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub visibility: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub visibility: std::option::Option<EntryVisibility<'a>>,
 }
 
 pub mod entry_state {
@@ -93,7 +93,7 @@ pub struct EntryBuilder<'a, S: entry_state::State> {
         ::core::option::Option<Vec<crate::org_okazu_diary::feed::Subject<'a>>>,
         ::core::option::Option<Vec<crate::org_okazu_diary::feed::Tag<'a>>>,
         ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<EntryVisibility<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -242,18 +242,12 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `visibility` field (optional)
-    pub fn visibility(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn visibility(mut self, value: impl Into<Option<EntryVisibility<'a>>>) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `visibility` field to an Option value (optional)
-    pub fn maybe_visibility(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_visibility(mut self, value: Option<EntryVisibility<'a>>) -> Self {
         self.__unsafe_private_named.7 = value;
         self
     }
@@ -310,6 +304,95 @@ impl<'a> Entry<'a> {
         jacquard_common::types::uri::RecordUri::try_from_uri(
             jacquard_common::types::string::AtUri::new_cow(uri.into())?,
         )
+    }
+}
+
+/// Indicates the intended audience of the entry. A `public` entry (default) is fully public. An `unlisted` entry should not be listed in public profile feeds.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum EntryVisibility<'a> {
+    Public,
+    Unlisted,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> EntryVisibility<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Public => "public",
+            Self::Unlisted => "unlisted",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for EntryVisibility<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "public" => Self::Public,
+            "unlisted" => Self::Unlisted,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for EntryVisibility<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "public" => Self::Public,
+            "unlisted" => Self::Unlisted,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for EntryVisibility<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for EntryVisibility<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for EntryVisibility<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for EntryVisibility<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for EntryVisibility<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for EntryVisibility<'_> {
+    type Output = EntryVisibility<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            EntryVisibility::Public => EntryVisibility::Public,
+            EntryVisibility::Unlisted => EntryVisibility::Unlisted,
+            EntryVisibility::Other(v) => EntryVisibility::Other(v.into_static()),
+        }
     }
 }
 

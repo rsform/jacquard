@@ -148,8 +148,8 @@ pub enum GetAccountTimelineError<'a> {
     RepoNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
-impl std::fmt::Display for GetAccountTimelineError<'_> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for GetAccountTimelineError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::RepoNotFound(msg) => {
                 write!(f, "RepoNotFound")?;
@@ -219,37 +219,37 @@ pub mod timeline_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Day;
         type Summary;
+        type Day;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Day = Unset;
         type Summary = Unset;
-    }
-    ///State transition - sets the `day` field to Set
-    pub struct SetDay<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDay<S> {}
-    impl<S: State> State for SetDay<S> {
-        type Day = Set<members::day>;
-        type Summary = S::Summary;
+        type Day = Unset;
     }
     ///State transition - sets the `summary` field to Set
     pub struct SetSummary<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSummary<S> {}
     impl<S: State> State for SetSummary<S> {
-        type Day = S::Day;
         type Summary = Set<members::summary>;
+        type Day = S::Day;
+    }
+    ///State transition - sets the `day` field to Set
+    pub struct SetDay<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDay<S> {}
+    impl<S: State> State for SetDay<S> {
+        type Summary = S::Summary;
+        type Day = Set<members::day>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `day` field
-        pub struct day(());
         ///Marker type for the `summary` field
         pub struct summary(());
+        ///Marker type for the `day` field
+        pub struct day(());
     }
 }
 
@@ -334,8 +334,8 @@ where
 impl<'a, S> TimelineItemBuilder<'a, S>
 where
     S: timeline_item_state::State,
-    S::Day: timeline_item_state::IsSet,
     S::Summary: timeline_item_state::IsSet,
+    S::Day: timeline_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TimelineItem<'a> {
@@ -560,9 +560,9 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TimelineItem<'a> {
 pub struct TimelineItemSummary<'a> {
     pub count: i64,
     #[serde(borrow)]
-    pub event_subject_type: jacquard_common::CowStr<'a>,
+    pub event_subject_type: TimelineItemSummaryEventSubjectType<'a>,
     #[serde(borrow)]
-    pub event_type: jacquard_common::CowStr<'a>,
+    pub event_type: TimelineItemSummaryEventType<'a>,
 }
 
 pub mod timeline_item_summary_state {
@@ -575,51 +575,51 @@ pub mod timeline_item_summary_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type EventType;
         type Count;
         type EventSubjectType;
+        type EventType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type EventType = Unset;
         type Count = Unset;
         type EventSubjectType = Unset;
-    }
-    ///State transition - sets the `event_type` field to Set
-    pub struct SetEventType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEventType<S> {}
-    impl<S: State> State for SetEventType<S> {
-        type EventType = Set<members::event_type>;
-        type Count = S::Count;
-        type EventSubjectType = S::EventSubjectType;
+        type EventType = Unset;
     }
     ///State transition - sets the `count` field to Set
     pub struct SetCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCount<S> {}
     impl<S: State> State for SetCount<S> {
-        type EventType = S::EventType;
         type Count = Set<members::count>;
         type EventSubjectType = S::EventSubjectType;
+        type EventType = S::EventType;
     }
     ///State transition - sets the `event_subject_type` field to Set
     pub struct SetEventSubjectType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEventSubjectType<S> {}
     impl<S: State> State for SetEventSubjectType<S> {
-        type EventType = S::EventType;
         type Count = S::Count;
         type EventSubjectType = Set<members::event_subject_type>;
+        type EventType = S::EventType;
+    }
+    ///State transition - sets the `event_type` field to Set
+    pub struct SetEventType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEventType<S> {}
+    impl<S: State> State for SetEventType<S> {
+        type Count = S::Count;
+        type EventSubjectType = S::EventSubjectType;
+        type EventType = Set<members::event_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `event_type` field
-        pub struct event_type(());
         ///Marker type for the `count` field
         pub struct count(());
         ///Marker type for the `event_subject_type` field
         pub struct event_subject_type(());
+        ///Marker type for the `event_type` field
+        pub struct event_type(());
     }
 }
 
@@ -628,8 +628,8 @@ pub struct TimelineItemSummaryBuilder<'a, S: timeline_item_summary_state::State>
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<TimelineItemSummaryEventSubjectType<'a>>,
+        ::core::option::Option<TimelineItemSummaryEventType<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -679,7 +679,7 @@ where
     /// Set the `eventSubjectType` field (required)
     pub fn event_subject_type(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<TimelineItemSummaryEventSubjectType<'a>>,
     ) -> TimelineItemSummaryBuilder<
         'a,
         timeline_item_summary_state::SetEventSubjectType<S>,
@@ -701,7 +701,7 @@ where
     /// Set the `eventType` field (required)
     pub fn event_type(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<TimelineItemSummaryEventType<'a>>,
     ) -> TimelineItemSummaryBuilder<'a, timeline_item_summary_state::SetEventType<S>> {
         self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
         TimelineItemSummaryBuilder {
@@ -715,9 +715,9 @@ where
 impl<'a, S> TimelineItemSummaryBuilder<'a, S>
 where
     S: timeline_item_summary_state::State,
-    S::EventType: timeline_item_summary_state::IsSet,
     S::Count: timeline_item_summary_state::IsSet,
     S::EventSubjectType: timeline_item_summary_state::IsSet,
+    S::EventType: timeline_item_summary_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TimelineItemSummary<'a> {
@@ -741,6 +741,500 @@ where
             event_subject_type: self.__unsafe_private_named.1.unwrap(),
             event_type: self.__unsafe_private_named.2.unwrap(),
             extra_data: Some(extra_data),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum TimelineItemSummaryEventSubjectType<'a> {
+    Account,
+    Record,
+    Chat,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> TimelineItemSummaryEventSubjectType<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Account => "account",
+            Self::Record => "record",
+            Self::Chat => "chat",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for TimelineItemSummaryEventSubjectType<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "account" => Self::Account,
+            "record" => Self::Record,
+            "chat" => Self::Chat,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for TimelineItemSummaryEventSubjectType<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "account" => Self::Account,
+            "record" => Self::Record,
+            "chat" => Self::Chat,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for TimelineItemSummaryEventSubjectType<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for TimelineItemSummaryEventSubjectType<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for TimelineItemSummaryEventSubjectType<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for TimelineItemSummaryEventSubjectType<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for TimelineItemSummaryEventSubjectType<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for TimelineItemSummaryEventSubjectType<'_> {
+    type Output = TimelineItemSummaryEventSubjectType<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            TimelineItemSummaryEventSubjectType::Account => {
+                TimelineItemSummaryEventSubjectType::Account
+            }
+            TimelineItemSummaryEventSubjectType::Record => {
+                TimelineItemSummaryEventSubjectType::Record
+            }
+            TimelineItemSummaryEventSubjectType::Chat => {
+                TimelineItemSummaryEventSubjectType::Chat
+            }
+            TimelineItemSummaryEventSubjectType::Other(v) => {
+                TimelineItemSummaryEventSubjectType::Other(v.into_static())
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum TimelineItemSummaryEventType<'a> {
+    ModEventTakedown,
+    ModEventReverseTakedown,
+    ModEventComment,
+    ModEventReport,
+    ModEventLabel,
+    ModEventAcknowledge,
+    ModEventEscalate,
+    ModEventMute,
+    ModEventUnmute,
+    ModEventMuteReporter,
+    ModEventUnmuteReporter,
+    ModEventEmail,
+    ModEventResolveAppeal,
+    ModEventDivert,
+    ModEventTag,
+    AccountEvent,
+    IdentityEvent,
+    RecordEvent,
+    ModEventPriorityScore,
+    RevokeAccountCredentialsEvent,
+    AgeAssuranceEvent,
+    AgeAssuranceOverrideEvent,
+    TimelineEventPlcCreate,
+    TimelineEventPlcOperation,
+    TimelineEventPlcTombstone,
+    AccountCreated,
+    EmailConfirmed,
+    PasswordUpdated,
+    HandleUpdated,
+    ScheduleTakedownEvent,
+    CancelScheduledTakedownEvent,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> TimelineItemSummaryEventType<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::ModEventTakedown => "tools.ozone.moderation.defs#modEventTakedown",
+            Self::ModEventReverseTakedown => {
+                "tools.ozone.moderation.defs#modEventReverseTakedown"
+            }
+            Self::ModEventComment => "tools.ozone.moderation.defs#modEventComment",
+            Self::ModEventReport => "tools.ozone.moderation.defs#modEventReport",
+            Self::ModEventLabel => "tools.ozone.moderation.defs#modEventLabel",
+            Self::ModEventAcknowledge => {
+                "tools.ozone.moderation.defs#modEventAcknowledge"
+            }
+            Self::ModEventEscalate => "tools.ozone.moderation.defs#modEventEscalate",
+            Self::ModEventMute => "tools.ozone.moderation.defs#modEventMute",
+            Self::ModEventUnmute => "tools.ozone.moderation.defs#modEventUnmute",
+            Self::ModEventMuteReporter => {
+                "tools.ozone.moderation.defs#modEventMuteReporter"
+            }
+            Self::ModEventUnmuteReporter => {
+                "tools.ozone.moderation.defs#modEventUnmuteReporter"
+            }
+            Self::ModEventEmail => "tools.ozone.moderation.defs#modEventEmail",
+            Self::ModEventResolveAppeal => {
+                "tools.ozone.moderation.defs#modEventResolveAppeal"
+            }
+            Self::ModEventDivert => "tools.ozone.moderation.defs#modEventDivert",
+            Self::ModEventTag => "tools.ozone.moderation.defs#modEventTag",
+            Self::AccountEvent => "tools.ozone.moderation.defs#accountEvent",
+            Self::IdentityEvent => "tools.ozone.moderation.defs#identityEvent",
+            Self::RecordEvent => "tools.ozone.moderation.defs#recordEvent",
+            Self::ModEventPriorityScore => {
+                "tools.ozone.moderation.defs#modEventPriorityScore"
+            }
+            Self::RevokeAccountCredentialsEvent => {
+                "tools.ozone.moderation.defs#revokeAccountCredentialsEvent"
+            }
+            Self::AgeAssuranceEvent => "tools.ozone.moderation.defs#ageAssuranceEvent",
+            Self::AgeAssuranceOverrideEvent => {
+                "tools.ozone.moderation.defs#ageAssuranceOverrideEvent"
+            }
+            Self::TimelineEventPlcCreate => {
+                "tools.ozone.moderation.defs#timelineEventPlcCreate"
+            }
+            Self::TimelineEventPlcOperation => {
+                "tools.ozone.moderation.defs#timelineEventPlcOperation"
+            }
+            Self::TimelineEventPlcTombstone => {
+                "tools.ozone.moderation.defs#timelineEventPlcTombstone"
+            }
+            Self::AccountCreated => {
+                "tools.ozone.hosting.getAccountHistory#accountCreated"
+            }
+            Self::EmailConfirmed => {
+                "tools.ozone.hosting.getAccountHistory#emailConfirmed"
+            }
+            Self::PasswordUpdated => {
+                "tools.ozone.hosting.getAccountHistory#passwordUpdated"
+            }
+            Self::HandleUpdated => "tools.ozone.hosting.getAccountHistory#handleUpdated",
+            Self::ScheduleTakedownEvent => {
+                "tools.ozone.moderation.defs#scheduleTakedownEvent"
+            }
+            Self::CancelScheduledTakedownEvent => {
+                "tools.ozone.moderation.defs#cancelScheduledTakedownEvent"
+            }
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for TimelineItemSummaryEventType<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "tools.ozone.moderation.defs#modEventTakedown" => Self::ModEventTakedown,
+            "tools.ozone.moderation.defs#modEventReverseTakedown" => {
+                Self::ModEventReverseTakedown
+            }
+            "tools.ozone.moderation.defs#modEventComment" => Self::ModEventComment,
+            "tools.ozone.moderation.defs#modEventReport" => Self::ModEventReport,
+            "tools.ozone.moderation.defs#modEventLabel" => Self::ModEventLabel,
+            "tools.ozone.moderation.defs#modEventAcknowledge" => {
+                Self::ModEventAcknowledge
+            }
+            "tools.ozone.moderation.defs#modEventEscalate" => Self::ModEventEscalate,
+            "tools.ozone.moderation.defs#modEventMute" => Self::ModEventMute,
+            "tools.ozone.moderation.defs#modEventUnmute" => Self::ModEventUnmute,
+            "tools.ozone.moderation.defs#modEventMuteReporter" => {
+                Self::ModEventMuteReporter
+            }
+            "tools.ozone.moderation.defs#modEventUnmuteReporter" => {
+                Self::ModEventUnmuteReporter
+            }
+            "tools.ozone.moderation.defs#modEventEmail" => Self::ModEventEmail,
+            "tools.ozone.moderation.defs#modEventResolveAppeal" => {
+                Self::ModEventResolveAppeal
+            }
+            "tools.ozone.moderation.defs#modEventDivert" => Self::ModEventDivert,
+            "tools.ozone.moderation.defs#modEventTag" => Self::ModEventTag,
+            "tools.ozone.moderation.defs#accountEvent" => Self::AccountEvent,
+            "tools.ozone.moderation.defs#identityEvent" => Self::IdentityEvent,
+            "tools.ozone.moderation.defs#recordEvent" => Self::RecordEvent,
+            "tools.ozone.moderation.defs#modEventPriorityScore" => {
+                Self::ModEventPriorityScore
+            }
+            "tools.ozone.moderation.defs#revokeAccountCredentialsEvent" => {
+                Self::RevokeAccountCredentialsEvent
+            }
+            "tools.ozone.moderation.defs#ageAssuranceEvent" => Self::AgeAssuranceEvent,
+            "tools.ozone.moderation.defs#ageAssuranceOverrideEvent" => {
+                Self::AgeAssuranceOverrideEvent
+            }
+            "tools.ozone.moderation.defs#timelineEventPlcCreate" => {
+                Self::TimelineEventPlcCreate
+            }
+            "tools.ozone.moderation.defs#timelineEventPlcOperation" => {
+                Self::TimelineEventPlcOperation
+            }
+            "tools.ozone.moderation.defs#timelineEventPlcTombstone" => {
+                Self::TimelineEventPlcTombstone
+            }
+            "tools.ozone.hosting.getAccountHistory#accountCreated" => {
+                Self::AccountCreated
+            }
+            "tools.ozone.hosting.getAccountHistory#emailConfirmed" => {
+                Self::EmailConfirmed
+            }
+            "tools.ozone.hosting.getAccountHistory#passwordUpdated" => {
+                Self::PasswordUpdated
+            }
+            "tools.ozone.hosting.getAccountHistory#handleUpdated" => Self::HandleUpdated,
+            "tools.ozone.moderation.defs#scheduleTakedownEvent" => {
+                Self::ScheduleTakedownEvent
+            }
+            "tools.ozone.moderation.defs#cancelScheduledTakedownEvent" => {
+                Self::CancelScheduledTakedownEvent
+            }
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for TimelineItemSummaryEventType<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "tools.ozone.moderation.defs#modEventTakedown" => Self::ModEventTakedown,
+            "tools.ozone.moderation.defs#modEventReverseTakedown" => {
+                Self::ModEventReverseTakedown
+            }
+            "tools.ozone.moderation.defs#modEventComment" => Self::ModEventComment,
+            "tools.ozone.moderation.defs#modEventReport" => Self::ModEventReport,
+            "tools.ozone.moderation.defs#modEventLabel" => Self::ModEventLabel,
+            "tools.ozone.moderation.defs#modEventAcknowledge" => {
+                Self::ModEventAcknowledge
+            }
+            "tools.ozone.moderation.defs#modEventEscalate" => Self::ModEventEscalate,
+            "tools.ozone.moderation.defs#modEventMute" => Self::ModEventMute,
+            "tools.ozone.moderation.defs#modEventUnmute" => Self::ModEventUnmute,
+            "tools.ozone.moderation.defs#modEventMuteReporter" => {
+                Self::ModEventMuteReporter
+            }
+            "tools.ozone.moderation.defs#modEventUnmuteReporter" => {
+                Self::ModEventUnmuteReporter
+            }
+            "tools.ozone.moderation.defs#modEventEmail" => Self::ModEventEmail,
+            "tools.ozone.moderation.defs#modEventResolveAppeal" => {
+                Self::ModEventResolveAppeal
+            }
+            "tools.ozone.moderation.defs#modEventDivert" => Self::ModEventDivert,
+            "tools.ozone.moderation.defs#modEventTag" => Self::ModEventTag,
+            "tools.ozone.moderation.defs#accountEvent" => Self::AccountEvent,
+            "tools.ozone.moderation.defs#identityEvent" => Self::IdentityEvent,
+            "tools.ozone.moderation.defs#recordEvent" => Self::RecordEvent,
+            "tools.ozone.moderation.defs#modEventPriorityScore" => {
+                Self::ModEventPriorityScore
+            }
+            "tools.ozone.moderation.defs#revokeAccountCredentialsEvent" => {
+                Self::RevokeAccountCredentialsEvent
+            }
+            "tools.ozone.moderation.defs#ageAssuranceEvent" => Self::AgeAssuranceEvent,
+            "tools.ozone.moderation.defs#ageAssuranceOverrideEvent" => {
+                Self::AgeAssuranceOverrideEvent
+            }
+            "tools.ozone.moderation.defs#timelineEventPlcCreate" => {
+                Self::TimelineEventPlcCreate
+            }
+            "tools.ozone.moderation.defs#timelineEventPlcOperation" => {
+                Self::TimelineEventPlcOperation
+            }
+            "tools.ozone.moderation.defs#timelineEventPlcTombstone" => {
+                Self::TimelineEventPlcTombstone
+            }
+            "tools.ozone.hosting.getAccountHistory#accountCreated" => {
+                Self::AccountCreated
+            }
+            "tools.ozone.hosting.getAccountHistory#emailConfirmed" => {
+                Self::EmailConfirmed
+            }
+            "tools.ozone.hosting.getAccountHistory#passwordUpdated" => {
+                Self::PasswordUpdated
+            }
+            "tools.ozone.hosting.getAccountHistory#handleUpdated" => Self::HandleUpdated,
+            "tools.ozone.moderation.defs#scheduleTakedownEvent" => {
+                Self::ScheduleTakedownEvent
+            }
+            "tools.ozone.moderation.defs#cancelScheduledTakedownEvent" => {
+                Self::CancelScheduledTakedownEvent
+            }
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for TimelineItemSummaryEventType<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for TimelineItemSummaryEventType<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for TimelineItemSummaryEventType<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for TimelineItemSummaryEventType<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for TimelineItemSummaryEventType<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for TimelineItemSummaryEventType<'_> {
+    type Output = TimelineItemSummaryEventType<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            TimelineItemSummaryEventType::ModEventTakedown => {
+                TimelineItemSummaryEventType::ModEventTakedown
+            }
+            TimelineItemSummaryEventType::ModEventReverseTakedown => {
+                TimelineItemSummaryEventType::ModEventReverseTakedown
+            }
+            TimelineItemSummaryEventType::ModEventComment => {
+                TimelineItemSummaryEventType::ModEventComment
+            }
+            TimelineItemSummaryEventType::ModEventReport => {
+                TimelineItemSummaryEventType::ModEventReport
+            }
+            TimelineItemSummaryEventType::ModEventLabel => {
+                TimelineItemSummaryEventType::ModEventLabel
+            }
+            TimelineItemSummaryEventType::ModEventAcknowledge => {
+                TimelineItemSummaryEventType::ModEventAcknowledge
+            }
+            TimelineItemSummaryEventType::ModEventEscalate => {
+                TimelineItemSummaryEventType::ModEventEscalate
+            }
+            TimelineItemSummaryEventType::ModEventMute => {
+                TimelineItemSummaryEventType::ModEventMute
+            }
+            TimelineItemSummaryEventType::ModEventUnmute => {
+                TimelineItemSummaryEventType::ModEventUnmute
+            }
+            TimelineItemSummaryEventType::ModEventMuteReporter => {
+                TimelineItemSummaryEventType::ModEventMuteReporter
+            }
+            TimelineItemSummaryEventType::ModEventUnmuteReporter => {
+                TimelineItemSummaryEventType::ModEventUnmuteReporter
+            }
+            TimelineItemSummaryEventType::ModEventEmail => {
+                TimelineItemSummaryEventType::ModEventEmail
+            }
+            TimelineItemSummaryEventType::ModEventResolveAppeal => {
+                TimelineItemSummaryEventType::ModEventResolveAppeal
+            }
+            TimelineItemSummaryEventType::ModEventDivert => {
+                TimelineItemSummaryEventType::ModEventDivert
+            }
+            TimelineItemSummaryEventType::ModEventTag => {
+                TimelineItemSummaryEventType::ModEventTag
+            }
+            TimelineItemSummaryEventType::AccountEvent => {
+                TimelineItemSummaryEventType::AccountEvent
+            }
+            TimelineItemSummaryEventType::IdentityEvent => {
+                TimelineItemSummaryEventType::IdentityEvent
+            }
+            TimelineItemSummaryEventType::RecordEvent => {
+                TimelineItemSummaryEventType::RecordEvent
+            }
+            TimelineItemSummaryEventType::ModEventPriorityScore => {
+                TimelineItemSummaryEventType::ModEventPriorityScore
+            }
+            TimelineItemSummaryEventType::RevokeAccountCredentialsEvent => {
+                TimelineItemSummaryEventType::RevokeAccountCredentialsEvent
+            }
+            TimelineItemSummaryEventType::AgeAssuranceEvent => {
+                TimelineItemSummaryEventType::AgeAssuranceEvent
+            }
+            TimelineItemSummaryEventType::AgeAssuranceOverrideEvent => {
+                TimelineItemSummaryEventType::AgeAssuranceOverrideEvent
+            }
+            TimelineItemSummaryEventType::TimelineEventPlcCreate => {
+                TimelineItemSummaryEventType::TimelineEventPlcCreate
+            }
+            TimelineItemSummaryEventType::TimelineEventPlcOperation => {
+                TimelineItemSummaryEventType::TimelineEventPlcOperation
+            }
+            TimelineItemSummaryEventType::TimelineEventPlcTombstone => {
+                TimelineItemSummaryEventType::TimelineEventPlcTombstone
+            }
+            TimelineItemSummaryEventType::AccountCreated => {
+                TimelineItemSummaryEventType::AccountCreated
+            }
+            TimelineItemSummaryEventType::EmailConfirmed => {
+                TimelineItemSummaryEventType::EmailConfirmed
+            }
+            TimelineItemSummaryEventType::PasswordUpdated => {
+                TimelineItemSummaryEventType::PasswordUpdated
+            }
+            TimelineItemSummaryEventType::HandleUpdated => {
+                TimelineItemSummaryEventType::HandleUpdated
+            }
+            TimelineItemSummaryEventType::ScheduleTakedownEvent => {
+                TimelineItemSummaryEventType::ScheduleTakedownEvent
+            }
+            TimelineItemSummaryEventType::CancelScheduledTakedownEvent => {
+                TimelineItemSummaryEventType::CancelScheduledTakedownEvent
+            }
+            TimelineItemSummaryEventType::Other(v) => {
+                TimelineItemSummaryEventType::Other(v.into_static())
+            }
         }
     }
 }

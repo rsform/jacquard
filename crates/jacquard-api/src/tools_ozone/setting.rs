@@ -36,9 +36,9 @@ pub struct DefsOption<'a> {
     pub last_updated_by: jacquard_common::types::string::Did<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub manager_role: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub manager_role: std::option::Option<DefsOptionManagerRole<'a>>,
     #[serde(borrow)]
-    pub scope: jacquard_common::CowStr<'a>,
+    pub scope: DefsOptionScope<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
@@ -55,105 +55,105 @@ pub mod defs_option_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type LastUpdatedBy;
         type CreatedBy;
         type Key;
-        type Scope;
-        type Did;
         type Value;
+        type Scope;
+        type LastUpdatedBy;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type LastUpdatedBy = Unset;
         type CreatedBy = Unset;
         type Key = Unset;
-        type Scope = Unset;
-        type Did = Unset;
         type Value = Unset;
-    }
-    ///State transition - sets the `last_updated_by` field to Set
-    pub struct SetLastUpdatedBy<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLastUpdatedBy<S> {}
-    impl<S: State> State for SetLastUpdatedBy<S> {
-        type LastUpdatedBy = Set<members::last_updated_by>;
-        type CreatedBy = S::CreatedBy;
-        type Key = S::Key;
-        type Scope = S::Scope;
-        type Did = S::Did;
-        type Value = S::Value;
+        type Scope = Unset;
+        type LastUpdatedBy = Unset;
+        type Did = Unset;
     }
     ///State transition - sets the `created_by` field to Set
     pub struct SetCreatedBy<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedBy<S> {}
     impl<S: State> State for SetCreatedBy<S> {
-        type LastUpdatedBy = S::LastUpdatedBy;
         type CreatedBy = Set<members::created_by>;
         type Key = S::Key;
-        type Scope = S::Scope;
-        type Did = S::Did;
         type Value = S::Value;
+        type Scope = S::Scope;
+        type LastUpdatedBy = S::LastUpdatedBy;
+        type Did = S::Did;
     }
     ///State transition - sets the `key` field to Set
     pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetKey<S> {}
     impl<S: State> State for SetKey<S> {
-        type LastUpdatedBy = S::LastUpdatedBy;
         type CreatedBy = S::CreatedBy;
         type Key = Set<members::key>;
+        type Value = S::Value;
         type Scope = S::Scope;
-        type Did = S::Did;
-        type Value = S::Value;
-    }
-    ///State transition - sets the `scope` field to Set
-    pub struct SetScope<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetScope<S> {}
-    impl<S: State> State for SetScope<S> {
         type LastUpdatedBy = S::LastUpdatedBy;
-        type CreatedBy = S::CreatedBy;
-        type Key = S::Key;
-        type Scope = Set<members::scope>;
         type Did = S::Did;
-        type Value = S::Value;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type LastUpdatedBy = S::LastUpdatedBy;
-        type CreatedBy = S::CreatedBy;
-        type Key = S::Key;
-        type Scope = S::Scope;
-        type Did = Set<members::did>;
-        type Value = S::Value;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValue<S> {}
     impl<S: State> State for SetValue<S> {
-        type LastUpdatedBy = S::LastUpdatedBy;
         type CreatedBy = S::CreatedBy;
         type Key = S::Key;
-        type Scope = S::Scope;
-        type Did = S::Did;
         type Value = Set<members::value>;
+        type Scope = S::Scope;
+        type LastUpdatedBy = S::LastUpdatedBy;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `scope` field to Set
+    pub struct SetScope<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetScope<S> {}
+    impl<S: State> State for SetScope<S> {
+        type CreatedBy = S::CreatedBy;
+        type Key = S::Key;
+        type Value = S::Value;
+        type Scope = Set<members::scope>;
+        type LastUpdatedBy = S::LastUpdatedBy;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `last_updated_by` field to Set
+    pub struct SetLastUpdatedBy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLastUpdatedBy<S> {}
+    impl<S: State> State for SetLastUpdatedBy<S> {
+        type CreatedBy = S::CreatedBy;
+        type Key = S::Key;
+        type Value = S::Value;
+        type Scope = S::Scope;
+        type LastUpdatedBy = Set<members::last_updated_by>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type CreatedBy = S::CreatedBy;
+        type Key = S::Key;
+        type Value = S::Value;
+        type Scope = S::Scope;
+        type LastUpdatedBy = S::LastUpdatedBy;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `last_updated_by` field
-        pub struct last_updated_by(());
         ///Marker type for the `created_by` field
         pub struct created_by(());
         ///Marker type for the `key` field
         pub struct key(());
-        ///Marker type for the `scope` field
-        pub struct scope(());
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `value` field
         pub struct value(());
+        ///Marker type for the `scope` field
+        pub struct scope(());
+        ///Marker type for the `last_updated_by` field
+        pub struct last_updated_by(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
@@ -167,8 +167,8 @@ pub struct DefsOptionBuilder<'a, S: defs_option_state::State> {
         ::core::option::Option<jacquard_common::types::string::Did<'a>>,
         ::core::option::Option<jacquard_common::types::string::Nsid<'a>>,
         ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<DefsOptionManagerRole<'a>>,
+        ::core::option::Option<DefsOptionScope<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<jacquard_common::types::value::Data<'a>>,
     ),
@@ -322,7 +322,7 @@ impl<'a, S: defs_option_state::State> DefsOptionBuilder<'a, S> {
     /// Set the `managerRole` field (optional)
     pub fn manager_role(
         mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+        value: impl Into<Option<DefsOptionManagerRole<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
@@ -330,7 +330,7 @@ impl<'a, S: defs_option_state::State> DefsOptionBuilder<'a, S> {
     /// Set the `managerRole` field to an Option value (optional)
     pub fn maybe_manager_role(
         mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
+        value: Option<DefsOptionManagerRole<'a>>,
     ) -> Self {
         self.__unsafe_private_named.6 = value;
         self
@@ -345,7 +345,7 @@ where
     /// Set the `scope` field (required)
     pub fn scope(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<DefsOptionScope<'a>>,
     ) -> DefsOptionBuilder<'a, defs_option_state::SetScope<S>> {
         self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
         DefsOptionBuilder {
@@ -397,12 +397,12 @@ where
 impl<'a, S> DefsOptionBuilder<'a, S>
 where
     S: defs_option_state::State,
-    S::LastUpdatedBy: defs_option_state::IsSet,
     S::CreatedBy: defs_option_state::IsSet,
     S::Key: defs_option_state::IsSet,
-    S::Scope: defs_option_state::IsSet,
-    S::Did: defs_option_state::IsSet,
     S::Value: defs_option_state::IsSet,
+    S::Scope: defs_option_state::IsSet,
+    S::LastUpdatedBy: defs_option_state::IsSet,
+    S::Did: defs_option_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DefsOption<'a> {
@@ -440,6 +440,194 @@ where
             updated_at: self.__unsafe_private_named.8,
             value: self.__unsafe_private_named.9.unwrap(),
             extra_data: Some(extra_data),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum DefsOptionManagerRole<'a> {
+    RoleModerator,
+    RoleTriage,
+    RoleAdmin,
+    RoleVerifier,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> DefsOptionManagerRole<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::RoleModerator => "tools.ozone.team.defs#roleModerator",
+            Self::RoleTriage => "tools.ozone.team.defs#roleTriage",
+            Self::RoleAdmin => "tools.ozone.team.defs#roleAdmin",
+            Self::RoleVerifier => "tools.ozone.team.defs#roleVerifier",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for DefsOptionManagerRole<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "tools.ozone.team.defs#roleModerator" => Self::RoleModerator,
+            "tools.ozone.team.defs#roleTriage" => Self::RoleTriage,
+            "tools.ozone.team.defs#roleAdmin" => Self::RoleAdmin,
+            "tools.ozone.team.defs#roleVerifier" => Self::RoleVerifier,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for DefsOptionManagerRole<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "tools.ozone.team.defs#roleModerator" => Self::RoleModerator,
+            "tools.ozone.team.defs#roleTriage" => Self::RoleTriage,
+            "tools.ozone.team.defs#roleAdmin" => Self::RoleAdmin,
+            "tools.ozone.team.defs#roleVerifier" => Self::RoleVerifier,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for DefsOptionManagerRole<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for DefsOptionManagerRole<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for DefsOptionManagerRole<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for DefsOptionManagerRole<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for DefsOptionManagerRole<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for DefsOptionManagerRole<'_> {
+    type Output = DefsOptionManagerRole<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            DefsOptionManagerRole::RoleModerator => DefsOptionManagerRole::RoleModerator,
+            DefsOptionManagerRole::RoleTriage => DefsOptionManagerRole::RoleTriage,
+            DefsOptionManagerRole::RoleAdmin => DefsOptionManagerRole::RoleAdmin,
+            DefsOptionManagerRole::RoleVerifier => DefsOptionManagerRole::RoleVerifier,
+            DefsOptionManagerRole::Other(v) => {
+                DefsOptionManagerRole::Other(v.into_static())
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum DefsOptionScope<'a> {
+    Instance,
+    Personal,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> DefsOptionScope<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Instance => "instance",
+            Self::Personal => "personal",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for DefsOptionScope<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "instance" => Self::Instance,
+            "personal" => Self::Personal,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for DefsOptionScope<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "instance" => Self::Instance,
+            "personal" => Self::Personal,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for DefsOptionScope<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for DefsOptionScope<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for DefsOptionScope<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for DefsOptionScope<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for DefsOptionScope<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for DefsOptionScope<'_> {
+    type Output = DefsOptionScope<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            DefsOptionScope::Instance => DefsOptionScope::Instance,
+            DefsOptionScope::Personal => DefsOptionScope::Personal,
+            DefsOptionScope::Other(v) => DefsOptionScope::Other(v.into_static()),
         }
     }
 }

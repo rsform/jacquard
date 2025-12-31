@@ -27,7 +27,7 @@ pub struct UpdateReadingProgress<'a> {
     pub percent_complete: std::option::Option<i64>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub status: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub status: std::option::Option<UpdateReadingProgressStatus<'a>>,
 }
 
 pub mod update_reading_progress_state {
@@ -69,7 +69,7 @@ pub struct UpdateReadingProgressBuilder<'a, S: update_reading_progress_state::St
         ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
         ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
         ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<UpdateReadingProgressStatus<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -153,13 +153,16 @@ impl<'a, S: update_reading_progress_state::State> UpdateReadingProgressBuilder<'
     /// Set the `status` field (optional)
     pub fn status(
         mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+        value: impl Into<Option<UpdateReadingProgressStatus<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
-    pub fn maybe_status(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_status(
+        mut self,
+        value: Option<UpdateReadingProgressStatus<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -194,6 +197,112 @@ where
             percent_complete: self.__unsafe_private_named.2,
             status: self.__unsafe_private_named.3,
             extra_data: Some(extra_data),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum UpdateReadingProgressStatus<'a> {
+    Reading,
+    Finished,
+    Abandoned,
+    WantToRead,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> UpdateReadingProgressStatus<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Reading => "reading",
+            Self::Finished => "finished",
+            Self::Abandoned => "abandoned",
+            Self::WantToRead => "want-to-read",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for UpdateReadingProgressStatus<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "reading" => Self::Reading,
+            "finished" => Self::Finished,
+            "abandoned" => Self::Abandoned,
+            "want-to-read" => Self::WantToRead,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for UpdateReadingProgressStatus<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "reading" => Self::Reading,
+            "finished" => Self::Finished,
+            "abandoned" => Self::Abandoned,
+            "want-to-read" => Self::WantToRead,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for UpdateReadingProgressStatus<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for UpdateReadingProgressStatus<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for UpdateReadingProgressStatus<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for UpdateReadingProgressStatus<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for UpdateReadingProgressStatus<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for UpdateReadingProgressStatus<'_> {
+    type Output = UpdateReadingProgressStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            UpdateReadingProgressStatus::Reading => UpdateReadingProgressStatus::Reading,
+            UpdateReadingProgressStatus::Finished => {
+                UpdateReadingProgressStatus::Finished
+            }
+            UpdateReadingProgressStatus::Abandoned => {
+                UpdateReadingProgressStatus::Abandoned
+            }
+            UpdateReadingProgressStatus::WantToRead => {
+                UpdateReadingProgressStatus::WantToRead
+            }
+            UpdateReadingProgressStatus::Other(v) => {
+                UpdateReadingProgressStatus::Other(v.into_static())
+            }
         }
     }
 }

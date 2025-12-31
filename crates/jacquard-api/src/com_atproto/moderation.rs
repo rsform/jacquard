@@ -620,6 +620,12 @@ impl<'a> AsRef<str> for ReasonType<'a> {
     }
 }
 
+impl<'a> core::fmt::Display for ReasonType<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
 impl<'a> serde::Serialize for ReasonType<'a> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -855,6 +861,12 @@ impl<'a> From<String> for SubjectType<'a> {
 impl<'a> AsRef<str> for SubjectType<'a> {
     fn as_ref(&self) -> &str {
         self.as_str()
+    }
+}
+
+impl<'a> core::fmt::Display for SubjectType<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
     }
 }
 

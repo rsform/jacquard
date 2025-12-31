@@ -40,7 +40,7 @@ pub struct Bug<'a> {
     #[serde(borrow)]
     pub namespace: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    pub severity: jacquard_common::CowStr<'a>,
+    pub severity: BugSeverity<'a>,
     #[serde(borrow)]
     pub steps_to_reproduce: jacquard_common::CowStr<'a>,
     /// Annotations of steps to reproduce (mentions and links)
@@ -63,103 +63,103 @@ pub mod bug_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Description;
-        type Title;
-        type CreatedAt;
-        type StepsToReproduce;
         type Severity;
+        type Title;
+        type StepsToReproduce;
+        type CreatedAt;
+        type Description;
         type Namespace;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Description = Unset;
-        type Title = Unset;
-        type CreatedAt = Unset;
-        type StepsToReproduce = Unset;
         type Severity = Unset;
+        type Title = Unset;
+        type StepsToReproduce = Unset;
+        type CreatedAt = Unset;
+        type Description = Unset;
         type Namespace = Unset;
     }
-    ///State transition - sets the `description` field to Set
-    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDescription<S> {}
-    impl<S: State> State for SetDescription<S> {
-        type Description = Set<members::description>;
+    ///State transition - sets the `severity` field to Set
+    pub struct SetSeverity<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSeverity<S> {}
+    impl<S: State> State for SetSeverity<S> {
+        type Severity = Set<members::severity>;
         type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
         type StepsToReproduce = S::StepsToReproduce;
-        type Severity = S::Severity;
+        type CreatedAt = S::CreatedAt;
+        type Description = S::Description;
         type Namespace = S::Namespace;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Description = S::Description;
+        type Severity = S::Severity;
         type Title = Set<members::title>;
+        type StepsToReproduce = S::StepsToReproduce;
         type CreatedAt = S::CreatedAt;
-        type StepsToReproduce = S::StepsToReproduce;
-        type Severity = S::Severity;
-        type Namespace = S::Namespace;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
         type Description = S::Description;
-        type Title = S::Title;
-        type CreatedAt = Set<members::created_at>;
-        type StepsToReproduce = S::StepsToReproduce;
-        type Severity = S::Severity;
         type Namespace = S::Namespace;
     }
     ///State transition - sets the `steps_to_reproduce` field to Set
     pub struct SetStepsToReproduce<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStepsToReproduce<S> {}
     impl<S: State> State for SetStepsToReproduce<S> {
-        type Description = S::Description;
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-        type StepsToReproduce = Set<members::steps_to_reproduce>;
         type Severity = S::Severity;
+        type Title = S::Title;
+        type StepsToReproduce = Set<members::steps_to_reproduce>;
+        type CreatedAt = S::CreatedAt;
+        type Description = S::Description;
         type Namespace = S::Namespace;
     }
-    ///State transition - sets the `severity` field to Set
-    pub struct SetSeverity<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSeverity<S> {}
-    impl<S: State> State for SetSeverity<S> {
-        type Description = S::Description;
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Severity = S::Severity;
         type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
         type StepsToReproduce = S::StepsToReproduce;
-        type Severity = Set<members::severity>;
+        type CreatedAt = Set<members::created_at>;
+        type Description = S::Description;
+        type Namespace = S::Namespace;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDescription<S> {}
+    impl<S: State> State for SetDescription<S> {
+        type Severity = S::Severity;
+        type Title = S::Title;
+        type StepsToReproduce = S::StepsToReproduce;
+        type CreatedAt = S::CreatedAt;
+        type Description = Set<members::description>;
         type Namespace = S::Namespace;
     }
     ///State transition - sets the `namespace` field to Set
     pub struct SetNamespace<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetNamespace<S> {}
     impl<S: State> State for SetNamespace<S> {
-        type Description = S::Description;
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-        type StepsToReproduce = S::StepsToReproduce;
         type Severity = S::Severity;
+        type Title = S::Title;
+        type StepsToReproduce = S::StepsToReproduce;
+        type CreatedAt = S::CreatedAt;
+        type Description = S::Description;
         type Namespace = Set<members::namespace>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `description` field
-        pub struct description(());
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `steps_to_reproduce` field
-        pub struct steps_to_reproduce(());
         ///Marker type for the `severity` field
         pub struct severity(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `steps_to_reproduce` field
+        pub struct steps_to_reproduce(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `description` field
+        pub struct description(());
         ///Marker type for the `namespace` field
         pub struct namespace(());
     }
@@ -177,7 +177,7 @@ pub struct BugBuilder<'a, S: bug_state::State> {
             Vec<crate::network_slices::tools::richtext::facet::Facet<'a>>,
         >,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<BugSeverity<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<
             Vec<crate::network_slices::tools::richtext::facet::Facet<'a>>,
@@ -337,7 +337,7 @@ where
     /// Set the `severity` field (required)
     pub fn severity(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<BugSeverity<'a>>,
     ) -> BugBuilder<'a, bug_state::SetSeverity<S>> {
         self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
         BugBuilder {
@@ -410,11 +410,11 @@ where
 impl<'a, S> BugBuilder<'a, S>
 where
     S: bug_state::State,
-    S::Description: bug_state::IsSet,
-    S::Title: bug_state::IsSet,
-    S::CreatedAt: bug_state::IsSet,
-    S::StepsToReproduce: bug_state::IsSet,
     S::Severity: bug_state::IsSet,
+    S::Title: bug_state::IsSet,
+    S::StepsToReproduce: bug_state::IsSet,
+    S::CreatedAt: bug_state::IsSet,
+    S::Description: bug_state::IsSet,
     S::Namespace: bug_state::IsSet,
 {
     /// Build the final struct
@@ -467,6 +467,104 @@ impl<'a> Bug<'a> {
         jacquard_common::types::uri::RecordUri::try_from_uri(
             jacquard_common::types::string::AtUri::new_cow(uri.into())?,
         )
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum BugSeverity<'a> {
+    Cosmetic,
+    Annoying,
+    Broken,
+    Unusable,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> BugSeverity<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Cosmetic => "cosmetic",
+            Self::Annoying => "annoying",
+            Self::Broken => "broken",
+            Self::Unusable => "unusable",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for BugSeverity<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "cosmetic" => Self::Cosmetic,
+            "annoying" => Self::Annoying,
+            "broken" => Self::Broken,
+            "unusable" => Self::Unusable,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for BugSeverity<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "cosmetic" => Self::Cosmetic,
+            "annoying" => Self::Annoying,
+            "broken" => Self::Broken,
+            "unusable" => Self::Unusable,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for BugSeverity<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for BugSeverity<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for BugSeverity<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for BugSeverity<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for BugSeverity<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for BugSeverity<'_> {
+    type Output = BugSeverity<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            BugSeverity::Cosmetic => BugSeverity::Cosmetic,
+            BugSeverity::Annoying => BugSeverity::Annoying,
+            BugSeverity::Broken => BugSeverity::Broken,
+            BugSeverity::Unusable => BugSeverity::Unusable,
+            BugSeverity::Other(v) => BugSeverity::Other(v.into_static()),
+        }
     }
 }
 

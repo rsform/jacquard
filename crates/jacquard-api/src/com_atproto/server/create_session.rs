@@ -66,7 +66,105 @@ pub struct CreateSessionOutput<'a> {
     /// If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub status: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub status: std::option::Option<CreateSessionOutputStatus<'a>>,
+}
+
+/// If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum CreateSessionOutputStatus<'a> {
+    Takendown,
+    Suspended,
+    Deactivated,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> CreateSessionOutputStatus<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Takendown => "takendown",
+            Self::Suspended => "suspended",
+            Self::Deactivated => "deactivated",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for CreateSessionOutputStatus<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "takendown" => Self::Takendown,
+            "suspended" => Self::Suspended,
+            "deactivated" => Self::Deactivated,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for CreateSessionOutputStatus<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "takendown" => Self::Takendown,
+            "suspended" => Self::Suspended,
+            "deactivated" => Self::Deactivated,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for CreateSessionOutputStatus<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for CreateSessionOutputStatus<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for CreateSessionOutputStatus<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for CreateSessionOutputStatus<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for CreateSessionOutputStatus<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for CreateSessionOutputStatus<'_> {
+    type Output = CreateSessionOutputStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            CreateSessionOutputStatus::Takendown => CreateSessionOutputStatus::Takendown,
+            CreateSessionOutputStatus::Suspended => CreateSessionOutputStatus::Suspended,
+            CreateSessionOutputStatus::Deactivated => {
+                CreateSessionOutputStatus::Deactivated
+            }
+            CreateSessionOutputStatus::Other(v) => {
+                CreateSessionOutputStatus::Other(v.into_static())
+            }
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -90,8 +188,8 @@ pub enum CreateSessionError<'a> {
     AuthFactorTokenRequired(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
-impl std::fmt::Display for CreateSessionError<'_> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for CreateSessionError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::AccountTakedown(msg) => {
                 write!(f, "AccountTakedown")?;

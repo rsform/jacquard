@@ -54,67 +54,67 @@ pub mod put_record_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Record;
         type Repo;
-        type Rkey;
         type Collection;
+        type Record;
+        type Rkey;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Record = Unset;
         type Repo = Unset;
-        type Rkey = Unset;
         type Collection = Unset;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecord<S> {}
-    impl<S: State> State for SetRecord<S> {
-        type Record = Set<members::record>;
-        type Repo = S::Repo;
-        type Rkey = S::Rkey;
-        type Collection = S::Collection;
+        type Record = Unset;
+        type Rkey = Unset;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepo<S> {}
     impl<S: State> State for SetRepo<S> {
-        type Record = S::Record;
         type Repo = Set<members::repo>;
-        type Rkey = S::Rkey;
         type Collection = S::Collection;
-    }
-    ///State transition - sets the `rkey` field to Set
-    pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRkey<S> {}
-    impl<S: State> State for SetRkey<S> {
         type Record = S::Record;
-        type Repo = S::Repo;
-        type Rkey = Set<members::rkey>;
-        type Collection = S::Collection;
+        type Rkey = S::Rkey;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCollection<S> {}
     impl<S: State> State for SetCollection<S> {
-        type Record = S::Record;
         type Repo = S::Repo;
-        type Rkey = S::Rkey;
         type Collection = Set<members::collection>;
+        type Record = S::Record;
+        type Rkey = S::Rkey;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecord<S> {}
+    impl<S: State> State for SetRecord<S> {
+        type Repo = S::Repo;
+        type Collection = S::Collection;
+        type Record = Set<members::record>;
+        type Rkey = S::Rkey;
+    }
+    ///State transition - sets the `rkey` field to Set
+    pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRkey<S> {}
+    impl<S: State> State for SetRkey<S> {
+        type Repo = S::Repo;
+        type Collection = S::Collection;
+        type Record = S::Record;
+        type Rkey = Set<members::rkey>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `record` field
-        pub struct record(());
         ///Marker type for the `repo` field
         pub struct repo(());
-        ///Marker type for the `rkey` field
-        pub struct rkey(());
         ///Marker type for the `collection` field
         pub struct collection(());
+        ///Marker type for the `record` field
+        pub struct record(());
+        ///Marker type for the `rkey` field
+        pub struct rkey(());
     }
 }
 
@@ -289,10 +289,10 @@ impl<'a, S: put_record_state::State> PutRecordBuilder<'a, S> {
 impl<'a, S> PutRecordBuilder<'a, S>
 where
     S: put_record_state::State,
-    S::Record: put_record_state::IsSet,
     S::Repo: put_record_state::IsSet,
-    S::Rkey: put_record_state::IsSet,
     S::Collection: put_record_state::IsSet,
+    S::Record: put_record_state::IsSet,
+    S::Rkey: put_record_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PutRecord<'a> {
@@ -349,7 +349,101 @@ pub struct PutRecordOutput<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub validation_status: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub validation_status: std::option::Option<PutRecordOutputValidationStatus<'a>>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum PutRecordOutputValidationStatus<'a> {
+    Valid,
+    Unknown,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> PutRecordOutputValidationStatus<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Valid => "valid",
+            Self::Unknown => "unknown",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for PutRecordOutputValidationStatus<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "valid" => Self::Valid,
+            "unknown" => Self::Unknown,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for PutRecordOutputValidationStatus<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "valid" => Self::Valid,
+            "unknown" => Self::Unknown,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for PutRecordOutputValidationStatus<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for PutRecordOutputValidationStatus<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for PutRecordOutputValidationStatus<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for PutRecordOutputValidationStatus<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for PutRecordOutputValidationStatus<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for PutRecordOutputValidationStatus<'_> {
+    type Output = PutRecordOutputValidationStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            PutRecordOutputValidationStatus::Valid => {
+                PutRecordOutputValidationStatus::Valid
+            }
+            PutRecordOutputValidationStatus::Unknown => {
+                PutRecordOutputValidationStatus::Unknown
+            }
+            PutRecordOutputValidationStatus::Other(v) => {
+                PutRecordOutputValidationStatus::Other(v.into_static())
+            }
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -371,8 +465,8 @@ pub enum PutRecordError<'a> {
     InvalidSwap(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
-impl std::fmt::Display for PutRecordError<'_> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for PutRecordError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::InvalidSwap(msg) => {
                 write!(f, "InvalidSwap")?;

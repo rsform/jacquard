@@ -23,7 +23,7 @@ pub struct RegisterPush<'a> {
     #[serde(borrow)]
     pub app_id: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
-    pub platform: jacquard_common::CowStr<'a>,
+    pub platform: RegisterPushPlatform<'a>,
     #[serde(borrow)]
     pub service_did: jacquard_common::types::string::Did<'a>,
     #[serde(borrow)]
@@ -40,65 +40,65 @@ pub mod register_push_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Token;
-        type ServiceDid;
         type AppId;
+        type ServiceDid;
+        type Token;
         type Platform;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Token = Unset;
-        type ServiceDid = Unset;
         type AppId = Unset;
+        type ServiceDid = Unset;
+        type Token = Unset;
         type Platform = Unset;
     }
-    ///State transition - sets the `token` field to Set
-    pub struct SetToken<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetToken<S> {}
-    impl<S: State> State for SetToken<S> {
-        type Token = Set<members::token>;
+    ///State transition - sets the `app_id` field to Set
+    pub struct SetAppId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAppId<S> {}
+    impl<S: State> State for SetAppId<S> {
+        type AppId = Set<members::app_id>;
         type ServiceDid = S::ServiceDid;
-        type AppId = S::AppId;
+        type Token = S::Token;
         type Platform = S::Platform;
     }
     ///State transition - sets the `service_did` field to Set
     pub struct SetServiceDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetServiceDid<S> {}
     impl<S: State> State for SetServiceDid<S> {
-        type Token = S::Token;
-        type ServiceDid = Set<members::service_did>;
         type AppId = S::AppId;
+        type ServiceDid = Set<members::service_did>;
+        type Token = S::Token;
         type Platform = S::Platform;
     }
-    ///State transition - sets the `app_id` field to Set
-    pub struct SetAppId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAppId<S> {}
-    impl<S: State> State for SetAppId<S> {
-        type Token = S::Token;
+    ///State transition - sets the `token` field to Set
+    pub struct SetToken<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetToken<S> {}
+    impl<S: State> State for SetToken<S> {
+        type AppId = S::AppId;
         type ServiceDid = S::ServiceDid;
-        type AppId = Set<members::app_id>;
+        type Token = Set<members::token>;
         type Platform = S::Platform;
     }
     ///State transition - sets the `platform` field to Set
     pub struct SetPlatform<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPlatform<S> {}
     impl<S: State> State for SetPlatform<S> {
-        type Token = S::Token;
-        type ServiceDid = S::ServiceDid;
         type AppId = S::AppId;
+        type ServiceDid = S::ServiceDid;
+        type Token = S::Token;
         type Platform = Set<members::platform>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `token` field
-        pub struct token(());
-        ///Marker type for the `service_did` field
-        pub struct service_did(());
         ///Marker type for the `app_id` field
         pub struct app_id(());
+        ///Marker type for the `service_did` field
+        pub struct service_did(());
+        ///Marker type for the `token` field
+        pub struct token(());
         ///Marker type for the `platform` field
         pub struct platform(());
     }
@@ -110,7 +110,7 @@ pub struct RegisterPushBuilder<'a, S: register_push_state::State> {
     __unsafe_private_named: (
         ::core::option::Option<bool>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<RegisterPushPlatform<'a>>,
         ::core::option::Option<jacquard_common::types::string::Did<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
     ),
@@ -175,7 +175,7 @@ where
     /// Set the `platform` field (required)
     pub fn platform(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<RegisterPushPlatform<'a>>,
     ) -> RegisterPushBuilder<'a, register_push_state::SetPlatform<S>> {
         self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
         RegisterPushBuilder {
@@ -227,9 +227,9 @@ where
 impl<'a, S> RegisterPushBuilder<'a, S>
 where
     S: register_push_state::State,
-    S::Token: register_push_state::IsSet,
-    S::ServiceDid: register_push_state::IsSet,
     S::AppId: register_push_state::IsSet,
+    S::ServiceDid: register_push_state::IsSet,
+    S::Token: register_push_state::IsSet,
     S::Platform: register_push_state::IsSet,
 {
     /// Build the final struct
@@ -258,6 +258,101 @@ where
             service_did: self.__unsafe_private_named.3.unwrap(),
             token: self.__unsafe_private_named.4.unwrap(),
             extra_data: Some(extra_data),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum RegisterPushPlatform<'a> {
+    Ios,
+    Android,
+    Web,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> RegisterPushPlatform<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Ios => "ios",
+            Self::Android => "android",
+            Self::Web => "web",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for RegisterPushPlatform<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "ios" => Self::Ios,
+            "android" => Self::Android,
+            "web" => Self::Web,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for RegisterPushPlatform<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "ios" => Self::Ios,
+            "android" => Self::Android,
+            "web" => Self::Web,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for RegisterPushPlatform<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for RegisterPushPlatform<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for RegisterPushPlatform<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for RegisterPushPlatform<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for RegisterPushPlatform<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for RegisterPushPlatform<'_> {
+    type Output = RegisterPushPlatform<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            RegisterPushPlatform::Ios => RegisterPushPlatform::Ios,
+            RegisterPushPlatform::Android => RegisterPushPlatform::Android,
+            RegisterPushPlatform::Web => RegisterPushPlatform::Web,
+            RegisterPushPlatform::Other(v) => {
+                RegisterPushPlatform::Other(v.into_static())
+            }
         }
     }
 }

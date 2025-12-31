@@ -23,9 +23,102 @@ pub mod rel;
 #[serde(rename_all = "camelCase")]
 pub struct Item<'a> {
     #[serde(borrow)]
-    pub r#ref: jacquard_common::CowStr<'a>,
+    pub r#ref: ItemRef<'a>,
     #[serde(borrow)]
     pub value: jacquard_common::CowStr<'a>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ItemRef<'a> {
+    OpenLibrary,
+    TmdbM,
+    TmdbS,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ItemRef<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::OpenLibrary => "open-library",
+            Self::TmdbM => "tmdb:m",
+            Self::TmdbS => "tmdb:s",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ItemRef<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "open-library" => Self::OpenLibrary,
+            "tmdb:m" => Self::TmdbM,
+            "tmdb:s" => Self::TmdbS,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ItemRef<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "open-library" => Self::OpenLibrary,
+            "tmdb:m" => Self::TmdbM,
+            "tmdb:s" => Self::TmdbS,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for ItemRef<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ItemRef<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for ItemRef<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ItemRef<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ItemRef<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for ItemRef<'_> {
+    type Output = ItemRef<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ItemRef::OpenLibrary => ItemRef::OpenLibrary,
+            ItemRef::TmdbM => ItemRef::TmdbM,
+            ItemRef::TmdbS => ItemRef::TmdbS,
+            ItemRef::Other(v) => ItemRef::Other(v.into_static()),
+        }
+    }
 }
 
 fn lexicon_doc_my_skylights_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {

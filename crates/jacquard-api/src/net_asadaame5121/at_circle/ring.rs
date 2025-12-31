@@ -21,7 +21,7 @@ pub struct Ring<'a> {
     /// How new members are accepted
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub acceptance_policy: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub acceptance_policy: std::option::Option<RingAcceptancePolicy<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
     /// Description of the circle
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
@@ -29,7 +29,7 @@ pub struct Ring<'a> {
     pub description: std::option::Option<jacquard_common::CowStr<'a>>,
     /// Recruitment status
     #[serde(borrow)]
-    pub status: jacquard_common::CowStr<'a>,
+    pub status: RingStatus<'a>,
     /// Name of the circle
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
@@ -45,51 +45,51 @@ pub mod ring_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Status;
         type Title;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Status = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Status = S::Status;
-        type Title = S::Title;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `status` field to Set
     pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStatus<S> {}
     impl<S: State> State for SetStatus<S> {
-        type CreatedAt = S::CreatedAt;
         type Status = Set<members::status>;
         type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type CreatedAt = S::CreatedAt;
         type Status = S::Status;
         type Title = Set<members::title>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Status = S::Status;
+        type Title = S::Title;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `status` field
         pub struct status(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -97,10 +97,10 @@ pub mod ring_state {
 pub struct RingBuilder<'a, S: ring_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<RingAcceptancePolicy<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<RingStatus<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
@@ -128,7 +128,7 @@ impl<'a, S: ring_state::State> RingBuilder<'a, S> {
     /// Set the `acceptancePolicy` field (optional)
     pub fn acceptance_policy(
         mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+        value: impl Into<Option<RingAcceptancePolicy<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
@@ -136,7 +136,7 @@ impl<'a, S: ring_state::State> RingBuilder<'a, S> {
     /// Set the `acceptancePolicy` field to an Option value (optional)
     pub fn maybe_acceptance_policy(
         mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
+        value: Option<RingAcceptancePolicy<'a>>,
     ) -> Self {
         self.__unsafe_private_named.0 = value;
         self
@@ -189,7 +189,7 @@ where
     /// Set the `status` field (required)
     pub fn status(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<RingStatus<'a>>,
     ) -> RingBuilder<'a, ring_state::SetStatus<S>> {
         self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
         RingBuilder {
@@ -222,9 +222,9 @@ where
 impl<'a, S> RingBuilder<'a, S>
 where
     S: ring_state::State,
-    S::CreatedAt: ring_state::IsSet,
     S::Status: ring_state::IsSet,
     S::Title: ring_state::IsSet,
+    S::CreatedAt: ring_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Ring<'a> {
@@ -266,6 +266,186 @@ impl<'a> Ring<'a> {
         jacquard_common::types::uri::RecordUri::try_from_uri(
             jacquard_common::types::string::AtUri::new_cow(uri.into())?,
         )
+    }
+}
+
+/// How new members are accepted
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum RingAcceptancePolicy<'a> {
+    Automatic,
+    Manual,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> RingAcceptancePolicy<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Automatic => "automatic",
+            Self::Manual => "manual",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for RingAcceptancePolicy<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "automatic" => Self::Automatic,
+            "manual" => Self::Manual,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for RingAcceptancePolicy<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "automatic" => Self::Automatic,
+            "manual" => Self::Manual,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for RingAcceptancePolicy<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for RingAcceptancePolicy<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for RingAcceptancePolicy<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for RingAcceptancePolicy<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for RingAcceptancePolicy<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for RingAcceptancePolicy<'_> {
+    type Output = RingAcceptancePolicy<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            RingAcceptancePolicy::Automatic => RingAcceptancePolicy::Automatic,
+            RingAcceptancePolicy::Manual => RingAcceptancePolicy::Manual,
+            RingAcceptancePolicy::Other(v) => {
+                RingAcceptancePolicy::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// Recruitment status
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum RingStatus<'a> {
+    Open,
+    Closed,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> RingStatus<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Open => "open",
+            Self::Closed => "closed",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for RingStatus<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "open" => Self::Open,
+            "closed" => Self::Closed,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for RingStatus<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "open" => Self::Open,
+            "closed" => Self::Closed,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for RingStatus<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for RingStatus<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for RingStatus<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for RingStatus<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for RingStatus<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for RingStatus<'_> {
+    type Output = RingStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            RingStatus::Open => RingStatus::Open,
+            RingStatus::Closed => RingStatus::Closed,
+            RingStatus::Other(v) => RingStatus::Other(v.into_static()),
+        }
     }
 }
 

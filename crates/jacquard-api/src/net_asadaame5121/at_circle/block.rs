@@ -40,51 +40,51 @@ pub mod block_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Subject;
         type CreatedAt;
         type Ring;
-        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Subject = Unset;
         type CreatedAt = Unset;
         type Ring = Unset;
-        type Subject = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Ring = S::Ring;
-        type Subject = S::Subject;
-    }
-    ///State transition - sets the `ring` field to Set
-    pub struct SetRing<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRing<S> {}
-    impl<S: State> State for SetRing<S> {
-        type CreatedAt = S::CreatedAt;
-        type Ring = Set<members::ring>;
-        type Subject = S::Subject;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
+        type Subject = Set<members::subject>;
         type CreatedAt = S::CreatedAt;
         type Ring = S::Ring;
-        type Subject = Set<members::subject>;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Subject = S::Subject;
+        type CreatedAt = Set<members::created_at>;
+        type Ring = S::Ring;
+    }
+    ///State transition - sets the `ring` field to Set
+    pub struct SetRing<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRing<S> {}
+    impl<S: State> State for SetRing<S> {
+        type Subject = S::Subject;
+        type CreatedAt = S::CreatedAt;
+        type Ring = Set<members::ring>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `subject` field
+        pub struct subject(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `ring` field
         pub struct ring(());
-        ///Marker type for the `subject` field
-        pub struct subject(());
     }
 }
 
@@ -194,9 +194,9 @@ where
 impl<'a, S> BlockBuilder<'a, S>
 where
     S: block_state::State,
+    S::Subject: block_state::IsSet,
     S::CreatedAt: block_state::IsSet,
     S::Ring: block_state::IsSet,
-    S::Subject: block_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Block<'a> {

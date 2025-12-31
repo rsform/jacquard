@@ -1172,67 +1172,67 @@ pub mod checkin_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Address;
-        type Geo;
-        type Text;
         type CreatedAt;
+        type Address;
+        type Text;
+        type Geo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Address = Unset;
-        type Geo = Unset;
-        type Text = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `address` field to Set
-    pub struct SetAddress<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAddress<S> {}
-    impl<S: State> State for SetAddress<S> {
-        type Address = Set<members::address>;
-        type Geo = S::Geo;
-        type Text = S::Text;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `geo` field to Set
-    pub struct SetGeo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGeo<S> {}
-    impl<S: State> State for SetGeo<S> {
-        type Address = S::Address;
-        type Geo = Set<members::geo>;
-        type Text = S::Text;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetText<S> {}
-    impl<S: State> State for SetText<S> {
-        type Address = S::Address;
-        type Geo = S::Geo;
-        type Text = Set<members::text>;
-        type CreatedAt = S::CreatedAt;
+        type Address = Unset;
+        type Text = Unset;
+        type Geo = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Address = S::Address;
-        type Geo = S::Geo;
-        type Text = S::Text;
         type CreatedAt = Set<members::created_at>;
+        type Address = S::Address;
+        type Text = S::Text;
+        type Geo = S::Geo;
+    }
+    ///State transition - sets the `address` field to Set
+    pub struct SetAddress<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAddress<S> {}
+    impl<S: State> State for SetAddress<S> {
+        type CreatedAt = S::CreatedAt;
+        type Address = Set<members::address>;
+        type Text = S::Text;
+        type Geo = S::Geo;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetText<S> {}
+    impl<S: State> State for SetText<S> {
+        type CreatedAt = S::CreatedAt;
+        type Address = S::Address;
+        type Text = Set<members::text>;
+        type Geo = S::Geo;
+    }
+    ///State transition - sets the `geo` field to Set
+    pub struct SetGeo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGeo<S> {}
+    impl<S: State> State for SetGeo<S> {
+        type CreatedAt = S::CreatedAt;
+        type Address = S::Address;
+        type Text = S::Text;
+        type Geo = Set<members::geo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `address` field
-        pub struct address(());
-        ///Marker type for the `geo` field
-        pub struct geo(());
-        ///Marker type for the `text` field
-        pub struct text(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `address` field
+        pub struct address(());
+        ///Marker type for the `text` field
+        pub struct text(());
+        ///Marker type for the `geo` field
+        pub struct geo(());
     }
 }
 
@@ -1452,10 +1452,10 @@ where
 impl<'a, S> CheckinBuilder<'a, S>
 where
     S: checkin_state::State,
-    S::Address: checkin_state::IsSet,
-    S::Geo: checkin_state::IsSet,
-    S::Text: checkin_state::IsSet,
     S::CreatedAt: checkin_state::IsSet,
+    S::Address: checkin_state::IsSet,
+    S::Text: checkin_state::IsSet,
+    S::Geo: checkin_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Checkin<'a> {

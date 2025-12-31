@@ -20,7 +20,17 @@ impl<'c> CodeGenerator<'c> {
         match prop {
             LexObjectProperty::Boolean(_) => Ok(quote! { bool }),
             LexObjectProperty::Integer(_) => Ok(quote! { i64 }),
-            LexObjectProperty::String(s) => Ok(self.string_to_rust_type(s)),
+            LexObjectProperty::String(s) => {
+                // If string has known_values, use the generated enum type
+                if s.known_values.is_some() {
+                    let enum_name =
+                        self.generate_field_type_name(nsid, parent_type_name, field_name, "");
+                    let enum_ident = syn::Ident::new(&enum_name, proc_macro2::Span::call_site());
+                    Ok(quote! { #enum_ident<'a> })
+                } else {
+                    Ok(self.string_to_rust_type(s))
+                }
+            }
             LexObjectProperty::Bytes(_) => Ok(quote! { bytes::Bytes }),
             LexObjectProperty::CidLink(_) => {
                 Ok(quote! { jacquard_common::types::cid::CidLink<'a> })
@@ -77,6 +87,8 @@ impl<'c> CodeGenerator<'c> {
                 } else {
                     ref_type.r#ref.to_string()
                 };
+                // Track namespace dependency for cross-namespace refs
+                self.track_ref_namespace_dep(nsid, &ref_str);
                 self.ref_to_rust_type(&ref_str)
             }
             LexObjectProperty::Union(union) => {
@@ -104,6 +116,8 @@ impl<'c> CodeGenerator<'c> {
                         Ok(quote! { #union_ident<'a> })
                     } else {
                         // Non-self-ref single-variant: use the ref type directly
+                        // Track namespace dependency for cross-namespace refs
+                        self.track_ref_namespace_dep(nsid, &ref_str);
                         self.ref_to_rust_type(&ref_str)
                     }
                 } else {

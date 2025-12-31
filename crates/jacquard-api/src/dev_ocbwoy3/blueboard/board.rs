@@ -39,65 +39,65 @@ pub mod board_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type Nsfw;
         type Description;
+        type Title;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type Nsfw = Unset;
         type Description = Unset;
+        type Title = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Nsfw = S::Nsfw;
-        type Description = S::Description;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `nsfw` field to Set
     pub struct SetNsfw<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetNsfw<S> {}
     impl<S: State> State for SetNsfw<S> {
-        type Title = S::Title;
         type Nsfw = Set<members::nsfw>;
         type Description = S::Description;
+        type Title = S::Title;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `description` field to Set
     pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDescription<S> {}
     impl<S: State> State for SetDescription<S> {
-        type Title = S::Title;
         type Nsfw = S::Nsfw;
         type Description = Set<members::description>;
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Nsfw = S::Nsfw;
+        type Description = S::Description;
+        type Title = Set<members::title>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Title = S::Title;
         type Nsfw = S::Nsfw;
         type Description = S::Description;
+        type Title = S::Title;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `nsfw` field
         pub struct nsfw(());
         ///Marker type for the `description` field
         pub struct description(());
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -212,9 +212,9 @@ where
 impl<'a, S> BoardBuilder<'a, S>
 where
     S: board_state::State,
-    S::Title: board_state::IsSet,
     S::Nsfw: board_state::IsSet,
     S::Description: board_state::IsSet,
+    S::Title: board_state::IsSet,
     S::CreatedAt: board_state::IsSet,
 {
     /// Build the final struct

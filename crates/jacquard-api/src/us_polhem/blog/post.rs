@@ -53,67 +53,67 @@ pub mod post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Slug;
         type Title;
         type CreatedAt;
         type Content;
-        type Slug;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Slug = Unset;
         type Title = Unset;
         type CreatedAt = Unset;
         type Content = Unset;
-        type Slug = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type CreatedAt = S::CreatedAt;
-        type Content = S::Content;
-        type Slug = S::Slug;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Title = S::Title;
-        type CreatedAt = Set<members::created_at>;
-        type Content = S::Content;
-        type Slug = S::Slug;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-        type Content = Set<members::content>;
-        type Slug = S::Slug;
     }
     ///State transition - sets the `slug` field to Set
     pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSlug<S> {}
     impl<S: State> State for SetSlug<S> {
+        type Slug = Set<members::slug>;
         type Title = S::Title;
         type CreatedAt = S::CreatedAt;
         type Content = S::Content;
-        type Slug = Set<members::slug>;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Slug = S::Slug;
+        type Title = Set<members::title>;
+        type CreatedAt = S::CreatedAt;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Slug = S::Slug;
+        type Title = S::Title;
+        type CreatedAt = Set<members::created_at>;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type Slug = S::Slug;
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+        type Content = Set<members::content>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `slug` field
+        pub struct slug(());
         ///Marker type for the `title` field
         pub struct title(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `content` field
         pub struct content(());
-        ///Marker type for the `slug` field
-        pub struct slug(());
     }
 }
 
@@ -333,10 +333,10 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 impl<'a, S> PostBuilder<'a, S>
 where
     S: post_state::State,
+    S::Slug: post_state::IsSet,
     S::Title: post_state::IsSet,
     S::CreatedAt: post_state::IsSet,
     S::Content: post_state::IsSet,
-    S::Slug: post_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Post<'a> {

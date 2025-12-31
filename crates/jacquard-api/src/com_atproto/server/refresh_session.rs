@@ -40,7 +40,109 @@ pub struct RefreshSessionOutput<'a> {
     /// Hosting status of the account. If not specified, then assume 'active'.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub status: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub status: std::option::Option<RefreshSessionOutputStatus<'a>>,
+}
+
+/// Hosting status of the account. If not specified, then assume 'active'.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum RefreshSessionOutputStatus<'a> {
+    Takendown,
+    Suspended,
+    Deactivated,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> RefreshSessionOutputStatus<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Takendown => "takendown",
+            Self::Suspended => "suspended",
+            Self::Deactivated => "deactivated",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for RefreshSessionOutputStatus<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "takendown" => Self::Takendown,
+            "suspended" => Self::Suspended,
+            "deactivated" => Self::Deactivated,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for RefreshSessionOutputStatus<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "takendown" => Self::Takendown,
+            "suspended" => Self::Suspended,
+            "deactivated" => Self::Deactivated,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for RefreshSessionOutputStatus<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for RefreshSessionOutputStatus<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for RefreshSessionOutputStatus<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for RefreshSessionOutputStatus<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for RefreshSessionOutputStatus<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for RefreshSessionOutputStatus<'_> {
+    type Output = RefreshSessionOutputStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            RefreshSessionOutputStatus::Takendown => {
+                RefreshSessionOutputStatus::Takendown
+            }
+            RefreshSessionOutputStatus::Suspended => {
+                RefreshSessionOutputStatus::Suspended
+            }
+            RefreshSessionOutputStatus::Deactivated => {
+                RefreshSessionOutputStatus::Deactivated
+            }
+            RefreshSessionOutputStatus::Other(v) => {
+                RefreshSessionOutputStatus::Other(v.into_static())
+            }
+        }
+    }
 }
 
 #[jacquard_derive::open_union]
@@ -66,8 +168,8 @@ pub enum RefreshSessionError<'a> {
     ExpiredToken(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
-impl std::fmt::Display for RefreshSessionError<'_> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for RefreshSessionError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::AccountTakedown(msg) => {
                 write!(f, "AccountTakedown")?;

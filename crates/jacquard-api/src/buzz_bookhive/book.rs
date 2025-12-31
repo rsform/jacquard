@@ -48,7 +48,7 @@ pub struct Book<'a> {
     pub started_at: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub status: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub status: std::option::Option<BookStatus<'a>>,
     /// The title of the book
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
@@ -64,67 +64,67 @@ pub mod book_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Authors;
         type HiveId;
-        type Title;
         type CreatedAt;
+        type Authors;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Authors = Unset;
         type HiveId = Unset;
-        type Title = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `authors` field to Set
-    pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthors<S> {}
-    impl<S: State> State for SetAuthors<S> {
-        type Authors = Set<members::authors>;
-        type HiveId = S::HiveId;
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
+        type Authors = Unset;
+        type Title = Unset;
     }
     ///State transition - sets the `hive_id` field to Set
     pub struct SetHiveId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHiveId<S> {}
     impl<S: State> State for SetHiveId<S> {
-        type Authors = S::Authors;
         type HiveId = Set<members::hive_id>;
-        type Title = S::Title;
         type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
         type Authors = S::Authors;
-        type HiveId = S::HiveId;
-        type Title = Set<members::title>;
-        type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Authors = S::Authors;
         type HiveId = S::HiveId;
-        type Title = S::Title;
         type CreatedAt = Set<members::created_at>;
+        type Authors = S::Authors;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `authors` field to Set
+    pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthors<S> {}
+    impl<S: State> State for SetAuthors<S> {
+        type HiveId = S::HiveId;
+        type CreatedAt = S::CreatedAt;
+        type Authors = Set<members::authors>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type HiveId = S::HiveId;
+        type CreatedAt = S::CreatedAt;
+        type Authors = S::Authors;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `authors` field
-        pub struct authors(());
         ///Marker type for the `hive_id` field
         pub struct hive_id(());
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `authors` field
+        pub struct authors(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
@@ -141,7 +141,7 @@ pub struct BookBuilder<'a, S: book_state::State> {
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<i64>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<BookStatus<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
@@ -341,15 +341,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `status` field (optional)
-    pub fn status(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn status(mut self, value: impl Into<Option<BookStatus<'a>>>) -> Self {
         self.__unsafe_private_named.9 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
-    pub fn maybe_status(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_status(mut self, value: Option<BookStatus<'a>>) -> Self {
         self.__unsafe_private_named.9 = value;
         self
     }
@@ -377,10 +374,10 @@ where
 impl<'a, S> BookBuilder<'a, S>
 where
     S: book_state::State,
-    S::Authors: book_state::IsSet,
     S::HiveId: book_state::IsSet,
-    S::Title: book_state::IsSet,
     S::CreatedAt: book_state::IsSet,
+    S::Authors: book_state::IsSet,
+    S::Title: book_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Book<'a> {
@@ -434,6 +431,109 @@ impl<'a> Book<'a> {
         jacquard_common::types::uri::RecordUri::try_from_uri(
             jacquard_common::types::string::AtUri::new_cow(uri.into())?,
         )
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum BookStatus<'a> {
+    Finished,
+    Reading,
+    WantToRead,
+    Abandoned,
+    Owned,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> BookStatus<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Finished => "buzz.bookhive.defs#finished",
+            Self::Reading => "buzz.bookhive.defs#reading",
+            Self::WantToRead => "buzz.bookhive.defs#wantToRead",
+            Self::Abandoned => "buzz.bookhive.defs#abandoned",
+            Self::Owned => "buzz.bookhive.defs#owned",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for BookStatus<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "buzz.bookhive.defs#finished" => Self::Finished,
+            "buzz.bookhive.defs#reading" => Self::Reading,
+            "buzz.bookhive.defs#wantToRead" => Self::WantToRead,
+            "buzz.bookhive.defs#abandoned" => Self::Abandoned,
+            "buzz.bookhive.defs#owned" => Self::Owned,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for BookStatus<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "buzz.bookhive.defs#finished" => Self::Finished,
+            "buzz.bookhive.defs#reading" => Self::Reading,
+            "buzz.bookhive.defs#wantToRead" => Self::WantToRead,
+            "buzz.bookhive.defs#abandoned" => Self::Abandoned,
+            "buzz.bookhive.defs#owned" => Self::Owned,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for BookStatus<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for BookStatus<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for BookStatus<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for BookStatus<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for BookStatus<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for BookStatus<'_> {
+    type Output = BookStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            BookStatus::Finished => BookStatus::Finished,
+            BookStatus::Reading => BookStatus::Reading,
+            BookStatus::WantToRead => BookStatus::WantToRead,
+            BookStatus::Abandoned => BookStatus::Abandoned,
+            BookStatus::Owned => BookStatus::Owned,
+            BookStatus::Other(v) => BookStatus::Other(v.into_static()),
+        }
     }
 }
 

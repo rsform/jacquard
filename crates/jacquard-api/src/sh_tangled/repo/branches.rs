@@ -187,8 +187,8 @@ pub enum BranchesError<'a> {
     InvalidRequest(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
-impl std::fmt::Display for BranchesError<'_> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for BranchesError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::RepoNotFound(msg) => {
                 write!(f, "RepoNotFound")?;

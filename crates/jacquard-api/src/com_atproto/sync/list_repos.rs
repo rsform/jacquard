@@ -181,7 +181,7 @@ pub struct Repo<'a> {
     /// If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub status: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub status: std::option::Option<RepoStatus<'a>>,
 }
 
 pub mod repo_state {
@@ -194,51 +194,51 @@ pub mod repo_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Head;
         type Rev;
         type Did;
+        type Head;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Head = Unset;
         type Rev = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `head` field to Set
-    pub struct SetHead<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHead<S> {}
-    impl<S: State> State for SetHead<S> {
-        type Head = Set<members::head>;
-        type Rev = S::Rev;
-        type Did = S::Did;
+        type Head = Unset;
     }
     ///State transition - sets the `rev` field to Set
     pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRev<S> {}
     impl<S: State> State for SetRev<S> {
-        type Head = S::Head;
         type Rev = Set<members::rev>;
         type Did = S::Did;
+        type Head = S::Head;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Head = S::Head;
         type Rev = S::Rev;
         type Did = Set<members::did>;
+        type Head = S::Head;
+    }
+    ///State transition - sets the `head` field to Set
+    pub struct SetHead<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHead<S> {}
+    impl<S: State> State for SetHead<S> {
+        type Rev = S::Rev;
+        type Did = S::Did;
+        type Head = Set<members::head>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `head` field
-        pub struct head(());
         ///Marker type for the `rev` field
         pub struct rev(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `head` field
+        pub struct head(());
     }
 }
 
@@ -250,7 +250,7 @@ pub struct RepoBuilder<'a, S: repo_state::State> {
         ::core::option::Option<jacquard_common::types::string::Did<'a>>,
         ::core::option::Option<jacquard_common::types::string::Cid<'a>>,
         ::core::option::Option<jacquard_common::types::string::Tid>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<RepoStatus<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -345,15 +345,12 @@ where
 
 impl<'a, S: repo_state::State> RepoBuilder<'a, S> {
     /// Set the `status` field (optional)
-    pub fn status(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn status(mut self, value: impl Into<Option<RepoStatus<'a>>>) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
-    pub fn maybe_status(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_status(mut self, value: Option<RepoStatus<'a>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -362,9 +359,9 @@ impl<'a, S: repo_state::State> RepoBuilder<'a, S> {
 impl<'a, S> RepoBuilder<'a, S>
 where
     S: repo_state::State,
-    S::Head: repo_state::IsSet,
     S::Rev: repo_state::IsSet,
     S::Did: repo_state::IsSet,
+    S::Head: repo_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Repo<'a> {
@@ -392,6 +389,115 @@ where
             rev: self.__unsafe_private_named.3.unwrap(),
             status: self.__unsafe_private_named.4,
             extra_data: Some(extra_data),
+        }
+    }
+}
+
+/// If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum RepoStatus<'a> {
+    Takendown,
+    Suspended,
+    Deleted,
+    Deactivated,
+    Desynchronized,
+    Throttled,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> RepoStatus<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Takendown => "takendown",
+            Self::Suspended => "suspended",
+            Self::Deleted => "deleted",
+            Self::Deactivated => "deactivated",
+            Self::Desynchronized => "desynchronized",
+            Self::Throttled => "throttled",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for RepoStatus<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "takendown" => Self::Takendown,
+            "suspended" => Self::Suspended,
+            "deleted" => Self::Deleted,
+            "deactivated" => Self::Deactivated,
+            "desynchronized" => Self::Desynchronized,
+            "throttled" => Self::Throttled,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for RepoStatus<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "takendown" => Self::Takendown,
+            "suspended" => Self::Suspended,
+            "deleted" => Self::Deleted,
+            "deactivated" => Self::Deactivated,
+            "desynchronized" => Self::Desynchronized,
+            "throttled" => Self::Throttled,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for RepoStatus<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for RepoStatus<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for RepoStatus<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for RepoStatus<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for RepoStatus<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for RepoStatus<'_> {
+    type Output = RepoStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            RepoStatus::Takendown => RepoStatus::Takendown,
+            RepoStatus::Suspended => RepoStatus::Suspended,
+            RepoStatus::Deleted => RepoStatus::Deleted,
+            RepoStatus::Deactivated => RepoStatus::Deactivated,
+            RepoStatus::Desynchronized => RepoStatus::Desynchronized,
+            RepoStatus::Throttled => RepoStatus::Throttled,
+            RepoStatus::Other(v) => RepoStatus::Other(v.into_static()),
         }
     }
 }

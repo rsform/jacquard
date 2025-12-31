@@ -47,6 +47,27 @@ impl<'c> CodeGenerator<'c> {
         utils::generate_doc_comment(desc)
     }
 
+    /// Track namespace dependency when a ref crosses namespace boundaries
+    pub(crate) fn track_ref_namespace_dep(&self, current_nsid: &str, ref_str: &str) {
+        use nsid_utils::NsidPath;
+
+        let current_path = NsidPath::parse(current_nsid);
+        let ref_path = nsid_utils::RefPath::parse(ref_str, None);
+        let ref_nsid_path = NsidPath::parse(ref_path.nsid());
+
+        let current_ns = current_path.namespace();
+        let ref_ns = ref_nsid_path.namespace();
+
+        // Only track if crossing namespace boundaries
+        if current_ns != ref_ns {
+            self.namespace_deps
+                .borrow_mut()
+                .entry(current_ns)
+                .or_default()
+                .insert(ref_ns);
+        }
+    }
+
     /// Generate or reference the shared lexicon_doc function for this NSID
     /// Returns (optional shared function, trait impl tokens)
     pub(crate) fn generate_schema_impl_with_shared(

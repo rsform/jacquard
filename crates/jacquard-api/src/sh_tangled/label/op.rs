@@ -37,67 +37,67 @@ pub mod op_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Add;
         type Delete;
         type Subject;
         type PerformedAt;
-        type Add;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Add = Unset;
         type Delete = Unset;
         type Subject = Unset;
         type PerformedAt = Unset;
-        type Add = Unset;
-    }
-    ///State transition - sets the `delete` field to Set
-    pub struct SetDelete<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDelete<S> {}
-    impl<S: State> State for SetDelete<S> {
-        type Delete = Set<members::delete>;
-        type Subject = S::Subject;
-        type PerformedAt = S::PerformedAt;
-        type Add = S::Add;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Delete = S::Delete;
-        type Subject = Set<members::subject>;
-        type PerformedAt = S::PerformedAt;
-        type Add = S::Add;
-    }
-    ///State transition - sets the `performed_at` field to Set
-    pub struct SetPerformedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPerformedAt<S> {}
-    impl<S: State> State for SetPerformedAt<S> {
-        type Delete = S::Delete;
-        type Subject = S::Subject;
-        type PerformedAt = Set<members::performed_at>;
-        type Add = S::Add;
     }
     ///State transition - sets the `add` field to Set
     pub struct SetAdd<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAdd<S> {}
     impl<S: State> State for SetAdd<S> {
+        type Add = Set<members::add>;
         type Delete = S::Delete;
         type Subject = S::Subject;
         type PerformedAt = S::PerformedAt;
-        type Add = Set<members::add>;
+    }
+    ///State transition - sets the `delete` field to Set
+    pub struct SetDelete<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDelete<S> {}
+    impl<S: State> State for SetDelete<S> {
+        type Add = S::Add;
+        type Delete = Set<members::delete>;
+        type Subject = S::Subject;
+        type PerformedAt = S::PerformedAt;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type Add = S::Add;
+        type Delete = S::Delete;
+        type Subject = Set<members::subject>;
+        type PerformedAt = S::PerformedAt;
+    }
+    ///State transition - sets the `performed_at` field to Set
+    pub struct SetPerformedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPerformedAt<S> {}
+    impl<S: State> State for SetPerformedAt<S> {
+        type Add = S::Add;
+        type Delete = S::Delete;
+        type Subject = S::Subject;
+        type PerformedAt = Set<members::performed_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `add` field
+        pub struct add(());
         ///Marker type for the `delete` field
         pub struct delete(());
         ///Marker type for the `subject` field
         pub struct subject(());
         ///Marker type for the `performed_at` field
         pub struct performed_at(());
-        ///Marker type for the `add` field
-        pub struct add(());
     }
 }
 
@@ -210,10 +210,10 @@ where
 impl<'a, S> OpBuilder<'a, S>
 where
     S: op_state::State,
+    S::Add: op_state::IsSet,
     S::Delete: op_state::IsSet,
     S::Subject: op_state::IsSet,
     S::PerformedAt: op_state::IsSet,
-    S::Add: op_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Op<'a> {
@@ -512,37 +512,37 @@ pub mod operand_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Value;
         type Key;
+        type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Value = Unset;
         type Key = Unset;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type Value = Set<members::value>;
-        type Key = S::Key;
+        type Value = Unset;
     }
     ///State transition - sets the `key` field to Set
     pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetKey<S> {}
     impl<S: State> State for SetKey<S> {
-        type Value = S::Value;
         type Key = Set<members::key>;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Key = S::Key;
+        type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `value` field
-        pub struct value(());
         ///Marker type for the `key` field
         pub struct key(());
+        ///Marker type for the `value` field
+        pub struct value(());
     }
 }
 
@@ -615,8 +615,8 @@ where
 impl<'a, S> OperandBuilder<'a, S>
 where
     S: operand_state::State,
-    S::Value: operand_state::IsSet,
     S::Key: operand_state::IsSet,
+    S::Value: operand_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Operand<'a> {

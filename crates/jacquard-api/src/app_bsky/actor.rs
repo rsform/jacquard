@@ -2698,7 +2698,107 @@ pub struct ContentLabelPref<'a> {
     #[serde(borrow)]
     pub labeler_did: std::option::Option<jacquard_common::types::string::Did<'a>>,
     #[serde(borrow)]
-    pub visibility: jacquard_common::CowStr<'a>,
+    pub visibility: ContentLabelPrefVisibility<'a>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ContentLabelPrefVisibility<'a> {
+    Ignore,
+    Show,
+    Warn,
+    Hide,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ContentLabelPrefVisibility<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Ignore => "ignore",
+            Self::Show => "show",
+            Self::Warn => "warn",
+            Self::Hide => "hide",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ContentLabelPrefVisibility<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "ignore" => Self::Ignore,
+            "show" => Self::Show,
+            "warn" => Self::Warn,
+            "hide" => Self::Hide,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ContentLabelPrefVisibility<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "ignore" => Self::Ignore,
+            "show" => Self::Show,
+            "warn" => Self::Warn,
+            "hide" => Self::Hide,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for ContentLabelPrefVisibility<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ContentLabelPrefVisibility<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for ContentLabelPrefVisibility<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ContentLabelPrefVisibility<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ContentLabelPrefVisibility<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for ContentLabelPrefVisibility<'_> {
+    type Output = ContentLabelPrefVisibility<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ContentLabelPrefVisibility::Ignore => ContentLabelPrefVisibility::Ignore,
+            ContentLabelPrefVisibility::Show => ContentLabelPrefVisibility::Show,
+            ContentLabelPrefVisibility::Warn => ContentLabelPrefVisibility::Warn,
+            ContentLabelPrefVisibility::Hide => ContentLabelPrefVisibility::Hide,
+            ContentLabelPrefVisibility::Other(v) => {
+                ContentLabelPrefVisibility::Other(v.into_static())
+            }
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContentLabelPref<'a> {
@@ -3592,7 +3692,7 @@ pub struct MutedWord<'a> {
     /// Groups of users to apply the muted word to. If undefined, applies to all users.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub actor_target: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub actor_target: std::option::Option<MutedWordActorTarget<'a>>,
     /// The date and time at which the muted word will expire and no longer be applied.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub expires_at: std::option::Option<jacquard_common::types::string::Datetime>,
@@ -3617,37 +3717,37 @@ pub mod muted_word_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Value;
         type Targets;
+        type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Value = Unset;
         type Targets = Unset;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type Value = Set<members::value>;
-        type Targets = S::Targets;
+        type Value = Unset;
     }
     ///State transition - sets the `targets` field to Set
     pub struct SetTargets<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTargets<S> {}
     impl<S: State> State for SetTargets<S> {
-        type Value = S::Value;
         type Targets = Set<members::targets>;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Targets = S::Targets;
+        type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `value` field
-        pub struct value(());
         ///Marker type for the `targets` field
         pub struct targets(());
+        ///Marker type for the `value` field
+        pub struct value(());
     }
 }
 
@@ -3655,7 +3755,7 @@ pub mod muted_word_state {
 pub struct MutedWordBuilder<'a, S: muted_word_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<MutedWordActorTarget<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<Vec<crate::app_bsky::actor::MutedWordTarget<'a>>>,
@@ -3686,7 +3786,7 @@ impl<'a, S: muted_word_state::State> MutedWordBuilder<'a, S> {
     /// Set the `actorTarget` field (optional)
     pub fn actor_target(
         mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+        value: impl Into<Option<MutedWordActorTarget<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
@@ -3694,7 +3794,7 @@ impl<'a, S: muted_word_state::State> MutedWordBuilder<'a, S> {
     /// Set the `actorTarget` field to an Option value (optional)
     pub fn maybe_actor_target(
         mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
+        value: Option<MutedWordActorTarget<'a>>,
     ) -> Self {
         self.__unsafe_private_named.0 = value;
         self
@@ -3774,8 +3874,8 @@ where
 impl<'a, S> MutedWordBuilder<'a, S>
 where
     S: muted_word_state::State,
-    S::Value: muted_word_state::IsSet,
     S::Targets: muted_word_state::IsSet,
+    S::Value: muted_word_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MutedWord<'a> {
@@ -3803,6 +3903,99 @@ where
             targets: self.__unsafe_private_named.3.unwrap(),
             value: self.__unsafe_private_named.4.unwrap(),
             extra_data: Some(extra_data),
+        }
+    }
+}
+
+/// Groups of users to apply the muted word to. If undefined, applies to all users.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum MutedWordActorTarget<'a> {
+    All,
+    ExcludeFollowing,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> MutedWordActorTarget<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::All => "all",
+            Self::ExcludeFollowing => "exclude-following",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for MutedWordActorTarget<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "all" => Self::All,
+            "exclude-following" => Self::ExcludeFollowing,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for MutedWordActorTarget<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "all" => Self::All,
+            "exclude-following" => Self::ExcludeFollowing,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for MutedWordActorTarget<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for MutedWordActorTarget<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for MutedWordActorTarget<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for MutedWordActorTarget<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for MutedWordActorTarget<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for MutedWordActorTarget<'_> {
+    type Output = MutedWordActorTarget<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            MutedWordActorTarget::All => MutedWordActorTarget::All,
+            MutedWordActorTarget::ExcludeFollowing => {
+                MutedWordActorTarget::ExcludeFollowing
+            }
+            MutedWordActorTarget::Other(v) => {
+                MutedWordActorTarget::Other(v.into_static())
+            }
         }
     }
 }
@@ -3896,6 +4089,12 @@ impl<'a> From<String> for MutedWordTarget<'a> {
 impl<'a> AsRef<str> for MutedWordTarget<'a> {
     fn as_ref(&self) -> &str {
         self.as_str()
+    }
+}
+
+impl<'a> core::fmt::Display for MutedWordTarget<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
     }
 }
 
@@ -4574,7 +4773,114 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileAssociated<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct ProfileAssociatedActivitySubscription<'a> {
     #[serde(borrow)]
-    pub allow_subscriptions: jacquard_common::CowStr<'a>,
+    pub allow_subscriptions: ProfileAssociatedActivitySubscriptionAllowSubscriptions<'a>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ProfileAssociatedActivitySubscriptionAllowSubscriptions<'a> {
+    Followers,
+    Mutuals,
+    None,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ProfileAssociatedActivitySubscriptionAllowSubscriptions<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Followers => "followers",
+            Self::Mutuals => "mutuals",
+            Self::None => "none",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ProfileAssociatedActivitySubscriptionAllowSubscriptions<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "followers" => Self::Followers,
+            "mutuals" => Self::Mutuals,
+            "none" => Self::None,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ProfileAssociatedActivitySubscriptionAllowSubscriptions<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "followers" => Self::Followers,
+            "mutuals" => Self::Mutuals,
+            "none" => Self::None,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display
+for ProfileAssociatedActivitySubscriptionAllowSubscriptions<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ProfileAssociatedActivitySubscriptionAllowSubscriptions<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize
+for ProfileAssociatedActivitySubscriptionAllowSubscriptions<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de>
+for ProfileAssociatedActivitySubscriptionAllowSubscriptions<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ProfileAssociatedActivitySubscriptionAllowSubscriptions<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic
+for ProfileAssociatedActivitySubscriptionAllowSubscriptions<'_> {
+    type Output = ProfileAssociatedActivitySubscriptionAllowSubscriptions<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ProfileAssociatedActivitySubscriptionAllowSubscriptions::Followers => {
+                ProfileAssociatedActivitySubscriptionAllowSubscriptions::Followers
+            }
+            ProfileAssociatedActivitySubscriptionAllowSubscriptions::Mutuals => {
+                ProfileAssociatedActivitySubscriptionAllowSubscriptions::Mutuals
+            }
+            ProfileAssociatedActivitySubscriptionAllowSubscriptions::None => {
+                ProfileAssociatedActivitySubscriptionAllowSubscriptions::None
+            }
+            ProfileAssociatedActivitySubscriptionAllowSubscriptions::Other(v) => {
+                ProfileAssociatedActivitySubscriptionAllowSubscriptions::Other(
+                    v.into_static(),
+                )
+            }
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema
@@ -4609,7 +4915,108 @@ for ProfileAssociatedActivitySubscription<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct ProfileAssociatedChat<'a> {
     #[serde(borrow)]
-    pub allow_incoming: jacquard_common::CowStr<'a>,
+    pub allow_incoming: ProfileAssociatedChatAllowIncoming<'a>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ProfileAssociatedChatAllowIncoming<'a> {
+    All,
+    None,
+    Following,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ProfileAssociatedChatAllowIncoming<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::All => "all",
+            Self::None => "none",
+            Self::Following => "following",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ProfileAssociatedChatAllowIncoming<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "all" => Self::All,
+            "none" => Self::None,
+            "following" => Self::Following,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ProfileAssociatedChatAllowIncoming<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "all" => Self::All,
+            "none" => Self::None,
+            "following" => Self::Following,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for ProfileAssociatedChatAllowIncoming<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ProfileAssociatedChatAllowIncoming<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for ProfileAssociatedChatAllowIncoming<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ProfileAssociatedChatAllowIncoming<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ProfileAssociatedChatAllowIncoming<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for ProfileAssociatedChatAllowIncoming<'_> {
+    type Output = ProfileAssociatedChatAllowIncoming<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ProfileAssociatedChatAllowIncoming::All => {
+                ProfileAssociatedChatAllowIncoming::All
+            }
+            ProfileAssociatedChatAllowIncoming::None => {
+                ProfileAssociatedChatAllowIncoming::None
+            }
+            ProfileAssociatedChatAllowIncoming::Following => {
+                ProfileAssociatedChatAllowIncoming::Following
+            }
+            ProfileAssociatedChatAllowIncoming::Other(v) => {
+                ProfileAssociatedChatAllowIncoming::Other(v.into_static())
+            }
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileAssociatedChat<'a> {
@@ -4692,37 +5099,37 @@ pub mod profile_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Handle;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Handle = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Handle = S::Handle;
+        type Did = Unset;
     }
     ///State transition - sets the `handle` field to Set
     pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHandle<S> {}
     impl<S: State> State for SetHandle<S> {
-        type Did = S::Did;
         type Handle = Set<members::handle>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Handle = S::Handle;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `handle` field
         pub struct handle(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
@@ -5047,8 +5454,8 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
 impl<'a, S> ProfileViewBuilder<'a, S>
 where
     S: profile_view_state::State,
-    S::Did: profile_view_state::IsSet,
     S::Handle: profile_view_state::IsSet,
+    S::Did: profile_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ProfileView<'a> {
@@ -6367,7 +6774,7 @@ pub struct SavedFeed<'a> {
     pub id: jacquard_common::CowStr<'a>,
     pub pinned: bool,
     #[serde(borrow)]
-    pub r#type: jacquard_common::CowStr<'a>,
+    pub r#type: SavedFeedType<'a>,
     #[serde(borrow)]
     pub value: jacquard_common::CowStr<'a>,
 }
@@ -6383,66 +6790,66 @@ pub mod saved_feed_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Id;
-        type Type;
-        type Pinned;
         type Value;
+        type Pinned;
+        type Type;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Id = Unset;
-        type Type = Unset;
-        type Pinned = Unset;
         type Value = Unset;
+        type Pinned = Unset;
+        type Type = Unset;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
         type Id = Set<members::id>;
-        type Type = S::Type;
+        type Value = S::Value;
         type Pinned = S::Pinned;
-        type Value = S::Value;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Id = S::Id;
-        type Type = Set<members::r#type>;
-        type Pinned = S::Pinned;
-        type Value = S::Value;
-    }
-    ///State transition - sets the `pinned` field to Set
-    pub struct SetPinned<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPinned<S> {}
-    impl<S: State> State for SetPinned<S> {
-        type Id = S::Id;
         type Type = S::Type;
-        type Pinned = Set<members::pinned>;
-        type Value = S::Value;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValue<S> {}
     impl<S: State> State for SetValue<S> {
         type Id = S::Id;
-        type Type = S::Type;
-        type Pinned = S::Pinned;
         type Value = Set<members::value>;
+        type Pinned = S::Pinned;
+        type Type = S::Type;
+    }
+    ///State transition - sets the `pinned` field to Set
+    pub struct SetPinned<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPinned<S> {}
+    impl<S: State> State for SetPinned<S> {
+        type Id = S::Id;
+        type Value = S::Value;
+        type Pinned = Set<members::pinned>;
+        type Type = S::Type;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type Id = S::Id;
+        type Value = S::Value;
+        type Pinned = S::Pinned;
+        type Type = Set<members::r#type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `id` field
         pub struct id(());
-        ///Marker type for the `type` field
-        pub struct r#type(());
-        ///Marker type for the `pinned` field
-        pub struct pinned(());
         ///Marker type for the `value` field
         pub struct value(());
+        ///Marker type for the `pinned` field
+        pub struct pinned(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
     }
 }
 
@@ -6452,7 +6859,7 @@ pub struct SavedFeedBuilder<'a, S: saved_feed_state::State> {
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<bool>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<SavedFeedType<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
@@ -6522,7 +6929,7 @@ where
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<SavedFeedType<'a>>,
     ) -> SavedFeedBuilder<'a, saved_feed_state::SetType<S>> {
         self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
         SavedFeedBuilder {
@@ -6556,9 +6963,9 @@ impl<'a, S> SavedFeedBuilder<'a, S>
 where
     S: saved_feed_state::State,
     S::Id: saved_feed_state::IsSet,
-    S::Type: saved_feed_state::IsSet,
-    S::Pinned: saved_feed_state::IsSet,
     S::Value: saved_feed_state::IsSet,
+    S::Pinned: saved_feed_state::IsSet,
+    S::Type: saved_feed_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SavedFeed<'a> {
@@ -6584,6 +6991,99 @@ where
             r#type: self.__unsafe_private_named.2.unwrap(),
             value: self.__unsafe_private_named.3.unwrap(),
             extra_data: Some(extra_data),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum SavedFeedType<'a> {
+    Feed,
+    List,
+    Timeline,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> SavedFeedType<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Feed => "feed",
+            Self::List => "list",
+            Self::Timeline => "timeline",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for SavedFeedType<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "feed" => Self::Feed,
+            "list" => Self::List,
+            "timeline" => Self::Timeline,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for SavedFeedType<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "feed" => Self::Feed,
+            "list" => Self::List,
+            "timeline" => Self::Timeline,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for SavedFeedType<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for SavedFeedType<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for SavedFeedType<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for SavedFeedType<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for SavedFeedType<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for SavedFeedType<'_> {
+    type Output = SavedFeedType<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            SavedFeedType::Feed => SavedFeedType::Feed,
+            SavedFeedType::List => SavedFeedType::List,
+            SavedFeedType::Timeline => SavedFeedType::Timeline,
+            SavedFeedType::Other(v) => SavedFeedType::Other(v.into_static()),
         }
     }
 }
@@ -6635,37 +7135,37 @@ pub mod saved_feeds_pref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Pinned;
         type Saved;
+        type Pinned;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Pinned = Unset;
         type Saved = Unset;
-    }
-    ///State transition - sets the `pinned` field to Set
-    pub struct SetPinned<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPinned<S> {}
-    impl<S: State> State for SetPinned<S> {
-        type Pinned = Set<members::pinned>;
-        type Saved = S::Saved;
+        type Pinned = Unset;
     }
     ///State transition - sets the `saved` field to Set
     pub struct SetSaved<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSaved<S> {}
     impl<S: State> State for SetSaved<S> {
-        type Pinned = S::Pinned;
         type Saved = Set<members::saved>;
+        type Pinned = S::Pinned;
+    }
+    ///State transition - sets the `pinned` field to Set
+    pub struct SetPinned<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPinned<S> {}
+    impl<S: State> State for SetPinned<S> {
+        type Saved = S::Saved;
+        type Pinned = Set<members::pinned>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `pinned` field
-        pub struct pinned(());
         ///Marker type for the `saved` field
         pub struct saved(());
+        ///Marker type for the `pinned` field
+        pub struct pinned(());
     }
 }
 
@@ -6752,8 +7252,8 @@ impl<'a, S: saved_feeds_pref_state::State> SavedFeedsPrefBuilder<'a, S> {
 impl<'a, S> SavedFeedsPrefBuilder<'a, S>
 where
     S: saved_feeds_pref_state::State,
-    S::Pinned: saved_feeds_pref_state::IsSet,
     S::Saved: saved_feeds_pref_state::IsSet,
+    S::Pinned: saved_feeds_pref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SavedFeedsPref<'a> {
@@ -6962,7 +7462,7 @@ pub struct StatusView<'a> {
     pub record: jacquard_common::types::value::Data<'a>,
     /// The status for the account.
     #[serde(borrow)]
-    pub status: jacquard_common::CowStr<'a>,
+    pub status: StatusViewStatus<'a>,
 }
 
 pub mod status_view_state {
@@ -6975,37 +7475,37 @@ pub mod status_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Record;
         type Status;
+        type Record;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Record = Unset;
         type Status = Unset;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecord<S> {}
-    impl<S: State> State for SetRecord<S> {
-        type Record = Set<members::record>;
-        type Status = S::Status;
+        type Record = Unset;
     }
     ///State transition - sets the `status` field to Set
     pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStatus<S> {}
     impl<S: State> State for SetStatus<S> {
-        type Record = S::Record;
         type Status = Set<members::status>;
+        type Record = S::Record;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecord<S> {}
+    impl<S: State> State for SetRecord<S> {
+        type Status = S::Status;
+        type Record = Set<members::record>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `record` field
-        pub struct record(());
         ///Marker type for the `status` field
         pub struct status(());
+        ///Marker type for the `record` field
+        pub struct record(());
     }
 }
 
@@ -7017,7 +7517,7 @@ pub struct StatusViewBuilder<'a, S: status_view_state::State> {
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<bool>,
         ::core::option::Option<jacquard_common::types::value::Data<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<StatusViewStatus<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -7118,7 +7618,7 @@ where
     /// Set the `status` field (required)
     pub fn status(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<StatusViewStatus<'a>>,
     ) -> StatusViewBuilder<'a, status_view_state::SetStatus<S>> {
         self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
         StatusViewBuilder {
@@ -7132,8 +7632,8 @@ where
 impl<'a, S> StatusViewBuilder<'a, S>
 where
     S: status_view_state::State,
-    S::Record: status_view_state::IsSet,
     S::Status: status_view_state::IsSet,
+    S::Record: status_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> StatusView<'a> {
@@ -7161,6 +7661,90 @@ where
             record: self.__unsafe_private_named.3.unwrap(),
             status: self.__unsafe_private_named.4.unwrap(),
             extra_data: Some(extra_data),
+        }
+    }
+}
+
+/// The status for the account.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum StatusViewStatus<'a> {
+    Live,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> StatusViewStatus<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Live => "app.bsky.actor.status#live",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for StatusViewStatus<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "app.bsky.actor.status#live" => Self::Live,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for StatusViewStatus<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "app.bsky.actor.status#live" => Self::Live,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for StatusViewStatus<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for StatusViewStatus<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for StatusViewStatus<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for StatusViewStatus<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for StatusViewStatus<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for StatusViewStatus<'_> {
+    type Output = StatusViewStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            StatusViewStatus::Live => StatusViewStatus::Live,
+            StatusViewStatus::Other(v) => StatusViewStatus::Other(v.into_static()),
         }
     }
 }
@@ -7198,7 +7782,111 @@ pub struct ThreadViewPref<'a> {
     /// Sorting mode for threads.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub sort: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub sort: std::option::Option<ThreadViewPrefSort<'a>>,
+}
+
+/// Sorting mode for threads.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ThreadViewPrefSort<'a> {
+    Oldest,
+    Newest,
+    MostLikes,
+    Random,
+    Hotness,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ThreadViewPrefSort<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Oldest => "oldest",
+            Self::Newest => "newest",
+            Self::MostLikes => "most-likes",
+            Self::Random => "random",
+            Self::Hotness => "hotness",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ThreadViewPrefSort<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "oldest" => Self::Oldest,
+            "newest" => Self::Newest,
+            "most-likes" => Self::MostLikes,
+            "random" => Self::Random,
+            "hotness" => Self::Hotness,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ThreadViewPrefSort<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "oldest" => Self::Oldest,
+            "newest" => Self::Newest,
+            "most-likes" => Self::MostLikes,
+            "random" => Self::Random,
+            "hotness" => Self::Hotness,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for ThreadViewPrefSort<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ThreadViewPrefSort<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for ThreadViewPrefSort<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ThreadViewPrefSort<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ThreadViewPrefSort<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for ThreadViewPrefSort<'_> {
+    type Output = ThreadViewPrefSort<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ThreadViewPrefSort::Oldest => ThreadViewPrefSort::Oldest,
+            ThreadViewPrefSort::Newest => ThreadViewPrefSort::Newest,
+            ThreadViewPrefSort::MostLikes => ThreadViewPrefSort::MostLikes,
+            ThreadViewPrefSort::Random => ThreadViewPrefSort::Random,
+            ThreadViewPrefSort::Hotness => ThreadViewPrefSort::Hotness,
+            ThreadViewPrefSort::Other(v) => ThreadViewPrefSort::Other(v.into_static()),
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThreadViewPref<'a> {
@@ -7269,13 +7957,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for VerificationPrefs<'a> {
 pub struct VerificationState<'a> {
     /// The user's status as a trusted verifier.
     #[serde(borrow)]
-    pub trusted_verifier_status: jacquard_common::CowStr<'a>,
+    pub trusted_verifier_status: VerificationStateTrustedVerifierStatus<'a>,
     /// All verifications issued by trusted verifiers on behalf of this user. Verifications by untrusted verifiers are not included.
     #[serde(borrow)]
     pub verifications: Vec<crate::app_bsky::actor::VerificationView<'a>>,
     /// The user's status as a verified account.
     #[serde(borrow)]
-    pub verified_status: jacquard_common::CowStr<'a>,
+    pub verified_status: VerificationStateVerifiedStatus<'a>,
 }
 
 pub mod verification_state_state {
@@ -7289,50 +7977,50 @@ pub mod verification_state_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type TrustedVerifierStatus;
-        type VerifiedStatus;
         type Verifications;
+        type VerifiedStatus;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type TrustedVerifierStatus = Unset;
-        type VerifiedStatus = Unset;
         type Verifications = Unset;
+        type VerifiedStatus = Unset;
     }
     ///State transition - sets the `trusted_verifier_status` field to Set
     pub struct SetTrustedVerifierStatus<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTrustedVerifierStatus<S> {}
     impl<S: State> State for SetTrustedVerifierStatus<S> {
         type TrustedVerifierStatus = Set<members::trusted_verifier_status>;
+        type Verifications = S::Verifications;
         type VerifiedStatus = S::VerifiedStatus;
-        type Verifications = S::Verifications;
-    }
-    ///State transition - sets the `verified_status` field to Set
-    pub struct SetVerifiedStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVerifiedStatus<S> {}
-    impl<S: State> State for SetVerifiedStatus<S> {
-        type TrustedVerifierStatus = S::TrustedVerifierStatus;
-        type VerifiedStatus = Set<members::verified_status>;
-        type Verifications = S::Verifications;
     }
     ///State transition - sets the `verifications` field to Set
     pub struct SetVerifications<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVerifications<S> {}
     impl<S: State> State for SetVerifications<S> {
         type TrustedVerifierStatus = S::TrustedVerifierStatus;
-        type VerifiedStatus = S::VerifiedStatus;
         type Verifications = Set<members::verifications>;
+        type VerifiedStatus = S::VerifiedStatus;
+    }
+    ///State transition - sets the `verified_status` field to Set
+    pub struct SetVerifiedStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVerifiedStatus<S> {}
+    impl<S: State> State for SetVerifiedStatus<S> {
+        type TrustedVerifierStatus = S::TrustedVerifierStatus;
+        type Verifications = S::Verifications;
+        type VerifiedStatus = Set<members::verified_status>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `trusted_verifier_status` field
         pub struct trusted_verifier_status(());
-        ///Marker type for the `verified_status` field
-        pub struct verified_status(());
         ///Marker type for the `verifications` field
         pub struct verifications(());
+        ///Marker type for the `verified_status` field
+        pub struct verified_status(());
     }
 }
 
@@ -7340,9 +8028,9 @@ pub mod verification_state_state {
 pub struct VerificationStateBuilder<'a, S: verification_state_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<VerificationStateTrustedVerifierStatus<'a>>,
         ::core::option::Option<Vec<crate::app_bsky::actor::VerificationView<'a>>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<VerificationStateVerifiedStatus<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -7373,7 +8061,7 @@ where
     /// Set the `trustedVerifierStatus` field (required)
     pub fn trusted_verifier_status(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<VerificationStateTrustedVerifierStatus<'a>>,
     ) -> VerificationStateBuilder<
         'a,
         verification_state_state::SetTrustedVerifierStatus<S>,
@@ -7414,7 +8102,7 @@ where
     /// Set the `verifiedStatus` field (required)
     pub fn verified_status(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<VerificationStateVerifiedStatus<'a>>,
     ) -> VerificationStateBuilder<'a, verification_state_state::SetVerifiedStatus<S>> {
         self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
         VerificationStateBuilder {
@@ -7429,8 +8117,8 @@ impl<'a, S> VerificationStateBuilder<'a, S>
 where
     S: verification_state_state::State,
     S::TrustedVerifierStatus: verification_state_state::IsSet,
-    S::VerifiedStatus: verification_state_state::IsSet,
     S::Verifications: verification_state_state::IsSet,
+    S::VerifiedStatus: verification_state_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> VerificationState<'a> {
@@ -7454,6 +8142,210 @@ where
             verifications: self.__unsafe_private_named.1.unwrap(),
             verified_status: self.__unsafe_private_named.2.unwrap(),
             extra_data: Some(extra_data),
+        }
+    }
+}
+
+/// The user's status as a trusted verifier.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum VerificationStateTrustedVerifierStatus<'a> {
+    Valid,
+    Invalid,
+    None,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> VerificationStateTrustedVerifierStatus<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Valid => "valid",
+            Self::Invalid => "invalid",
+            Self::None => "none",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for VerificationStateTrustedVerifierStatus<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "valid" => Self::Valid,
+            "invalid" => Self::Invalid,
+            "none" => Self::None,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for VerificationStateTrustedVerifierStatus<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "valid" => Self::Valid,
+            "invalid" => Self::Invalid,
+            "none" => Self::None,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for VerificationStateTrustedVerifierStatus<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for VerificationStateTrustedVerifierStatus<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for VerificationStateTrustedVerifierStatus<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for VerificationStateTrustedVerifierStatus<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for VerificationStateTrustedVerifierStatus<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for VerificationStateTrustedVerifierStatus<'_> {
+    type Output = VerificationStateTrustedVerifierStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            VerificationStateTrustedVerifierStatus::Valid => {
+                VerificationStateTrustedVerifierStatus::Valid
+            }
+            VerificationStateTrustedVerifierStatus::Invalid => {
+                VerificationStateTrustedVerifierStatus::Invalid
+            }
+            VerificationStateTrustedVerifierStatus::None => {
+                VerificationStateTrustedVerifierStatus::None
+            }
+            VerificationStateTrustedVerifierStatus::Other(v) => {
+                VerificationStateTrustedVerifierStatus::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// The user's status as a verified account.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum VerificationStateVerifiedStatus<'a> {
+    Valid,
+    Invalid,
+    None,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> VerificationStateVerifiedStatus<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Valid => "valid",
+            Self::Invalid => "invalid",
+            Self::None => "none",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for VerificationStateVerifiedStatus<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "valid" => Self::Valid,
+            "invalid" => Self::Invalid,
+            "none" => Self::None,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for VerificationStateVerifiedStatus<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "valid" => Self::Valid,
+            "invalid" => Self::Invalid,
+            "none" => Self::None,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for VerificationStateVerifiedStatus<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for VerificationStateVerifiedStatus<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for VerificationStateVerifiedStatus<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for VerificationStateVerifiedStatus<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for VerificationStateVerifiedStatus<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for VerificationStateVerifiedStatus<'_> {
+    type Output = VerificationStateVerifiedStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            VerificationStateVerifiedStatus::Valid => {
+                VerificationStateVerifiedStatus::Valid
+            }
+            VerificationStateVerifiedStatus::Invalid => {
+                VerificationStateVerifiedStatus::Invalid
+            }
+            VerificationStateVerifiedStatus::None => {
+                VerificationStateVerifiedStatus::None
+            }
+            VerificationStateVerifiedStatus::Other(v) => {
+                VerificationStateVerifiedStatus::Other(v.into_static())
+            }
         }
     }
 }
@@ -7510,67 +8402,67 @@ pub mod verification_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Issuer;
-        type IsValid;
-        type Uri;
         type CreatedAt;
+        type Issuer;
+        type Uri;
+        type IsValid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Issuer = Unset;
-        type IsValid = Unset;
-        type Uri = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `issuer` field to Set
-    pub struct SetIssuer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIssuer<S> {}
-    impl<S: State> State for SetIssuer<S> {
-        type Issuer = Set<members::issuer>;
-        type IsValid = S::IsValid;
-        type Uri = S::Uri;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `is_valid` field to Set
-    pub struct SetIsValid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIsValid<S> {}
-    impl<S: State> State for SetIsValid<S> {
-        type Issuer = S::Issuer;
-        type IsValid = Set<members::is_valid>;
-        type Uri = S::Uri;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Issuer = S::Issuer;
-        type IsValid = S::IsValid;
-        type Uri = Set<members::uri>;
-        type CreatedAt = S::CreatedAt;
+        type Issuer = Unset;
+        type Uri = Unset;
+        type IsValid = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Issuer = S::Issuer;
-        type IsValid = S::IsValid;
-        type Uri = S::Uri;
         type CreatedAt = Set<members::created_at>;
+        type Issuer = S::Issuer;
+        type Uri = S::Uri;
+        type IsValid = S::IsValid;
+    }
+    ///State transition - sets the `issuer` field to Set
+    pub struct SetIssuer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIssuer<S> {}
+    impl<S: State> State for SetIssuer<S> {
+        type CreatedAt = S::CreatedAt;
+        type Issuer = Set<members::issuer>;
+        type Uri = S::Uri;
+        type IsValid = S::IsValid;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type CreatedAt = S::CreatedAt;
+        type Issuer = S::Issuer;
+        type Uri = Set<members::uri>;
+        type IsValid = S::IsValid;
+    }
+    ///State transition - sets the `is_valid` field to Set
+    pub struct SetIsValid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIsValid<S> {}
+    impl<S: State> State for SetIsValid<S> {
+        type CreatedAt = S::CreatedAt;
+        type Issuer = S::Issuer;
+        type Uri = S::Uri;
+        type IsValid = Set<members::is_valid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `issuer` field
-        pub struct issuer(());
-        ///Marker type for the `is_valid` field
-        pub struct is_valid(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `issuer` field
+        pub struct issuer(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `is_valid` field
+        pub struct is_valid(());
     }
 }
 
@@ -7683,10 +8575,10 @@ where
 impl<'a, S> VerificationViewBuilder<'a, S>
 where
     S: verification_view_state::State,
-    S::Issuer: verification_view_state::IsSet,
-    S::IsValid: verification_view_state::IsSet,
-    S::Uri: verification_view_state::IsSet,
     S::CreatedAt: verification_view_state::IsSet,
+    S::Issuer: verification_view_state::IsSet,
+    S::Uri: verification_view_state::IsSet,
+    S::IsValid: verification_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> VerificationView<'a> {

@@ -526,50 +526,50 @@ pub mod view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Title;
-        type Uri;
         type Description;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Title = Unset;
-        type Uri = Unset;
         type Description = Unset;
+        type Uri = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
         type Title = Set<members::title>;
+        type Description = S::Description;
         type Uri = S::Uri;
-        type Description = S::Description;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Title = S::Title;
-        type Uri = Set<members::uri>;
-        type Description = S::Description;
     }
     ///State transition - sets the `description` field to Set
     pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDescription<S> {}
     impl<S: State> State for SetDescription<S> {
         type Title = S::Title;
-        type Uri = S::Uri;
         type Description = Set<members::description>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Title = S::Title;
+        type Description = S::Description;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `description` field
         pub struct description(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -683,8 +683,8 @@ impl<'a, S> ViewBuilder<'a, S>
 where
     S: view_state::State,
     S::Title: view_state::IsSet,
-    S::Uri: view_state::IsSet,
     S::Description: view_state::IsSet,
+    S::Uri: view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> View<'a> {

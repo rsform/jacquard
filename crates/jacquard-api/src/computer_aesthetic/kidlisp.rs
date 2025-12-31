@@ -41,65 +41,65 @@ pub mod kidlisp_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Source;
         type When;
         type Code;
-        type Source;
         type Ref;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Source = Unset;
         type When = Unset;
         type Code = Unset;
-        type Source = Unset;
         type Ref = Unset;
+    }
+    ///State transition - sets the `source` field to Set
+    pub struct SetSource<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSource<S> {}
+    impl<S: State> State for SetSource<S> {
+        type Source = Set<members::source>;
+        type When = S::When;
+        type Code = S::Code;
+        type Ref = S::Ref;
     }
     ///State transition - sets the `when` field to Set
     pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWhen<S> {}
     impl<S: State> State for SetWhen<S> {
+        type Source = S::Source;
         type When = Set<members::when>;
         type Code = S::Code;
-        type Source = S::Source;
         type Ref = S::Ref;
     }
     ///State transition - sets the `code` field to Set
     pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCode<S> {}
     impl<S: State> State for SetCode<S> {
+        type Source = S::Source;
         type When = S::When;
         type Code = Set<members::code>;
-        type Source = S::Source;
-        type Ref = S::Ref;
-    }
-    ///State transition - sets the `source` field to Set
-    pub struct SetSource<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSource<S> {}
-    impl<S: State> State for SetSource<S> {
-        type When = S::When;
-        type Code = S::Code;
-        type Source = Set<members::source>;
         type Ref = S::Ref;
     }
     ///State transition - sets the `ref` field to Set
     pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRef<S> {}
     impl<S: State> State for SetRef<S> {
+        type Source = S::Source;
         type When = S::When;
         type Code = S::Code;
-        type Source = S::Source;
         type Ref = Set<members::r#ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `source` field
+        pub struct source(());
         ///Marker type for the `when` field
         pub struct when(());
         ///Marker type for the `code` field
         pub struct code(());
-        ///Marker type for the `source` field
-        pub struct source(());
         ///Marker type for the `ref` field
         pub struct r#ref(());
     }
@@ -214,9 +214,9 @@ where
 impl<'a, S> KidlispBuilder<'a, S>
 where
     S: kidlisp_state::State,
+    S::Source: kidlisp_state::IsSet,
     S::When: kidlisp_state::IsSet,
     S::Code: kidlisp_state::IsSet,
-    S::Source: kidlisp_state::IsSet,
     S::Ref: kidlisp_state::IsSet,
 {
     /// Build the final struct

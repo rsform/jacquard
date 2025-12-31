@@ -206,6 +206,9 @@ pub mod site_standard;
 #[cfg(feature = "social_clippr")]
 pub mod social_clippr;
 
+#[cfg(feature = "social_flockfeeds")]
+pub mod social_flockfeeds;
+
 #[cfg(feature = "social_grain")]
 pub mod social_grain;
 

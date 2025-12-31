@@ -251,7 +251,7 @@ pub struct Notification<'a> {
     pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
     /// The reason why this notification was delivered - e.g. your post was liked, or you received a new follower.
     #[serde(borrow)]
-    pub reason: jacquard_common::CowStr<'a>,
+    pub reason: NotificationReason<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub reason_subject: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
@@ -271,127 +271,127 @@ pub mod notification_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
-        type Reason;
         type IsRead;
         type Uri;
-        type Record;
+        type Cid;
         type IndexedAt;
+        type Reason;
         type Author;
+        type Record;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
-        type Reason = Unset;
         type IsRead = Unset;
         type Uri = Unset;
-        type Record = Unset;
+        type Cid = Unset;
         type IndexedAt = Unset;
+        type Reason = Unset;
         type Author = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Cid = Set<members::cid>;
-        type Reason = S::Reason;
-        type IsRead = S::IsRead;
-        type Uri = S::Uri;
-        type Record = S::Record;
-        type IndexedAt = S::IndexedAt;
-        type Author = S::Author;
-    }
-    ///State transition - sets the `reason` field to Set
-    pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetReason<S> {}
-    impl<S: State> State for SetReason<S> {
-        type Cid = S::Cid;
-        type Reason = Set<members::reason>;
-        type IsRead = S::IsRead;
-        type Uri = S::Uri;
-        type Record = S::Record;
-        type IndexedAt = S::IndexedAt;
-        type Author = S::Author;
+        type Record = Unset;
     }
     ///State transition - sets the `is_read` field to Set
     pub struct SetIsRead<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIsRead<S> {}
     impl<S: State> State for SetIsRead<S> {
-        type Cid = S::Cid;
-        type Reason = S::Reason;
         type IsRead = Set<members::is_read>;
         type Uri = S::Uri;
-        type Record = S::Record;
+        type Cid = S::Cid;
         type IndexedAt = S::IndexedAt;
+        type Reason = S::Reason;
         type Author = S::Author;
+        type Record = S::Record;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Cid = S::Cid;
-        type Reason = S::Reason;
         type IsRead = S::IsRead;
         type Uri = Set<members::uri>;
-        type Record = S::Record;
-        type IndexedAt = S::IndexedAt;
-        type Author = S::Author;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecord<S> {}
-    impl<S: State> State for SetRecord<S> {
         type Cid = S::Cid;
+        type IndexedAt = S::IndexedAt;
         type Reason = S::Reason;
+        type Author = S::Author;
+        type Record = S::Record;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
         type IsRead = S::IsRead;
         type Uri = S::Uri;
-        type Record = Set<members::record>;
+        type Cid = Set<members::cid>;
         type IndexedAt = S::IndexedAt;
+        type Reason = S::Reason;
         type Author = S::Author;
+        type Record = S::Record;
     }
     ///State transition - sets the `indexed_at` field to Set
     pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
     impl<S: State> State for SetIndexedAt<S> {
-        type Cid = S::Cid;
-        type Reason = S::Reason;
         type IsRead = S::IsRead;
         type Uri = S::Uri;
-        type Record = S::Record;
+        type Cid = S::Cid;
         type IndexedAt = Set<members::indexed_at>;
+        type Reason = S::Reason;
         type Author = S::Author;
+        type Record = S::Record;
+    }
+    ///State transition - sets the `reason` field to Set
+    pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetReason<S> {}
+    impl<S: State> State for SetReason<S> {
+        type IsRead = S::IsRead;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type IndexedAt = S::IndexedAt;
+        type Reason = Set<members::reason>;
+        type Author = S::Author;
+        type Record = S::Record;
     }
     ///State transition - sets the `author` field to Set
     pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthor<S> {}
     impl<S: State> State for SetAuthor<S> {
-        type Cid = S::Cid;
-        type Reason = S::Reason;
         type IsRead = S::IsRead;
         type Uri = S::Uri;
-        type Record = S::Record;
+        type Cid = S::Cid;
         type IndexedAt = S::IndexedAt;
+        type Reason = S::Reason;
         type Author = Set<members::author>;
+        type Record = S::Record;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecord<S> {}
+    impl<S: State> State for SetRecord<S> {
+        type IsRead = S::IsRead;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type IndexedAt = S::IndexedAt;
+        type Reason = S::Reason;
+        type Author = S::Author;
+        type Record = Set<members::record>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
-        ///Marker type for the `reason` field
-        pub struct reason(());
         ///Marker type for the `is_read` field
         pub struct is_read(());
         ///Marker type for the `uri` field
         pub struct uri(());
-        ///Marker type for the `record` field
-        pub struct record(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
+        ///Marker type for the `reason` field
+        pub struct reason(());
         ///Marker type for the `author` field
         pub struct author(());
+        ///Marker type for the `record` field
+        pub struct record(());
     }
 }
 
@@ -404,7 +404,7 @@ pub struct NotificationBuilder<'a, S: notification_state::State> {
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<bool>,
         ::core::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<NotificationReason<'a>>,
         ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
         ::core::option::Option<jacquard_common::types::value::Data<'a>>,
         ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
@@ -543,7 +543,7 @@ where
     /// Set the `reason` field (required)
     pub fn reason(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<NotificationReason<'a>>,
     ) -> NotificationBuilder<'a, notification_state::SetReason<S>> {
         self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
         NotificationBuilder {
@@ -614,13 +614,13 @@ where
 impl<'a, S> NotificationBuilder<'a, S>
 where
     S: notification_state::State,
-    S::Cid: notification_state::IsSet,
-    S::Reason: notification_state::IsSet,
     S::IsRead: notification_state::IsSet,
     S::Uri: notification_state::IsSet,
-    S::Record: notification_state::IsSet,
+    S::Cid: notification_state::IsSet,
     S::IndexedAt: notification_state::IsSet,
+    S::Reason: notification_state::IsSet,
     S::Author: notification_state::IsSet,
+    S::Record: notification_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Notification<'a> {
@@ -656,6 +656,152 @@ where
             record: self.__unsafe_private_named.7.unwrap(),
             uri: self.__unsafe_private_named.8.unwrap(),
             extra_data: Some(extra_data),
+        }
+    }
+}
+
+/// The reason why this notification was delivered - e.g. your post was liked, or you received a new follower.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum NotificationReason<'a> {
+    Like,
+    Repost,
+    Follow,
+    Mention,
+    Reply,
+    Quote,
+    StarterpackJoined,
+    Verified,
+    Unverified,
+    LikeViaRepost,
+    RepostViaRepost,
+    SubscribedPost,
+    ContactMatch,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> NotificationReason<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Like => "like",
+            Self::Repost => "repost",
+            Self::Follow => "follow",
+            Self::Mention => "mention",
+            Self::Reply => "reply",
+            Self::Quote => "quote",
+            Self::StarterpackJoined => "starterpack-joined",
+            Self::Verified => "verified",
+            Self::Unverified => "unverified",
+            Self::LikeViaRepost => "like-via-repost",
+            Self::RepostViaRepost => "repost-via-repost",
+            Self::SubscribedPost => "subscribed-post",
+            Self::ContactMatch => "contact-match",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for NotificationReason<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "like" => Self::Like,
+            "repost" => Self::Repost,
+            "follow" => Self::Follow,
+            "mention" => Self::Mention,
+            "reply" => Self::Reply,
+            "quote" => Self::Quote,
+            "starterpack-joined" => Self::StarterpackJoined,
+            "verified" => Self::Verified,
+            "unverified" => Self::Unverified,
+            "like-via-repost" => Self::LikeViaRepost,
+            "repost-via-repost" => Self::RepostViaRepost,
+            "subscribed-post" => Self::SubscribedPost,
+            "contact-match" => Self::ContactMatch,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for NotificationReason<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "like" => Self::Like,
+            "repost" => Self::Repost,
+            "follow" => Self::Follow,
+            "mention" => Self::Mention,
+            "reply" => Self::Reply,
+            "quote" => Self::Quote,
+            "starterpack-joined" => Self::StarterpackJoined,
+            "verified" => Self::Verified,
+            "unverified" => Self::Unverified,
+            "like-via-repost" => Self::LikeViaRepost,
+            "repost-via-repost" => Self::RepostViaRepost,
+            "subscribed-post" => Self::SubscribedPost,
+            "contact-match" => Self::ContactMatch,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for NotificationReason<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for NotificationReason<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for NotificationReason<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for NotificationReason<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for NotificationReason<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for NotificationReason<'_> {
+    type Output = NotificationReason<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            NotificationReason::Like => NotificationReason::Like,
+            NotificationReason::Repost => NotificationReason::Repost,
+            NotificationReason::Follow => NotificationReason::Follow,
+            NotificationReason::Mention => NotificationReason::Mention,
+            NotificationReason::Reply => NotificationReason::Reply,
+            NotificationReason::Quote => NotificationReason::Quote,
+            NotificationReason::StarterpackJoined => {
+                NotificationReason::StarterpackJoined
+            }
+            NotificationReason::Verified => NotificationReason::Verified,
+            NotificationReason::Unverified => NotificationReason::Unverified,
+            NotificationReason::LikeViaRepost => NotificationReason::LikeViaRepost,
+            NotificationReason::RepostViaRepost => NotificationReason::RepostViaRepost,
+            NotificationReason::SubscribedPost => NotificationReason::SubscribedPost,
+            NotificationReason::ContactMatch => NotificationReason::ContactMatch,
+            NotificationReason::Other(v) => NotificationReason::Other(v.into_static()),
         }
     }
 }

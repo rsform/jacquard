@@ -44,11 +44,102 @@ pub struct QueryRules<'a> {
     /// Sort direction
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub sort_direction: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub sort_direction: std::option::Option<QueryRulesSortDirection<'a>>,
     /// Filter by specific URLs or domains
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub urls: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+}
+
+/// Sort direction
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum QueryRulesSortDirection<'a> {
+    Asc,
+    Desc,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> QueryRulesSortDirection<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Asc => "asc",
+            Self::Desc => "desc",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for QueryRulesSortDirection<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "asc" => Self::Asc,
+            "desc" => Self::Desc,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for QueryRulesSortDirection<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "asc" => Self::Asc,
+            "desc" => Self::Desc,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for QueryRulesSortDirection<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for QueryRulesSortDirection<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for QueryRulesSortDirection<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for QueryRulesSortDirection<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for QueryRulesSortDirection<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for QueryRulesSortDirection<'_> {
+    type Output = QueryRulesSortDirection<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            QueryRulesSortDirection::Asc => QueryRulesSortDirection::Asc,
+            QueryRulesSortDirection::Desc => QueryRulesSortDirection::Desc,
+            QueryRulesSortDirection::Other(v) => {
+                QueryRulesSortDirection::Other(v.into_static())
+            }
+        }
+    }
 }
 
 #[jacquard_derive::lexicon]

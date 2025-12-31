@@ -447,37 +447,37 @@ pub mod exif_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Photo;
         type CreatedAt;
+        type Photo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Photo = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `photo` field to Set
-    pub struct SetPhoto<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPhoto<S> {}
-    impl<S: State> State for SetPhoto<S> {
-        type Photo = Set<members::photo>;
-        type CreatedAt = S::CreatedAt;
+        type Photo = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Photo = S::Photo;
         type CreatedAt = Set<members::created_at>;
+        type Photo = S::Photo;
+    }
+    ///State transition - sets the `photo` field to Set
+    pub struct SetPhoto<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPhoto<S> {}
+    impl<S: State> State for SetPhoto<S> {
+        type CreatedAt = S::CreatedAt;
+        type Photo = Set<members::photo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `photo` field
-        pub struct photo(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `photo` field
+        pub struct photo(());
     }
 }
 
@@ -787,8 +787,8 @@ impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
 impl<'a, S> ExifViewBuilder<'a, S>
 where
     S: exif_view_state::State,
-    S::Photo: exif_view_state::IsSet,
     S::CreatedAt: exif_view_state::IsSet,
+    S::Photo: exif_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ExifView<'a> {
@@ -1292,77 +1292,75 @@ pub mod photo_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Thumb;
         type Uri;
         type Alt;
         type Fullsize;
         type Cid;
+        type Thumb;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Thumb = Unset;
         type Uri = Unset;
         type Alt = Unset;
         type Fullsize = Unset;
         type Cid = Unset;
-    }
-    ///State transition - sets the `thumb` field to Set
-    pub struct SetThumb<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetThumb<S> {}
-    impl<S: State> State for SetThumb<S> {
-        type Thumb = Set<members::thumb>;
-        type Uri = S::Uri;
-        type Alt = S::Alt;
-        type Fullsize = S::Fullsize;
-        type Cid = S::Cid;
+        type Thumb = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Thumb = S::Thumb;
         type Uri = Set<members::uri>;
         type Alt = S::Alt;
         type Fullsize = S::Fullsize;
         type Cid = S::Cid;
+        type Thumb = S::Thumb;
     }
     ///State transition - sets the `alt` field to Set
     pub struct SetAlt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAlt<S> {}
     impl<S: State> State for SetAlt<S> {
-        type Thumb = S::Thumb;
         type Uri = S::Uri;
         type Alt = Set<members::alt>;
         type Fullsize = S::Fullsize;
         type Cid = S::Cid;
+        type Thumb = S::Thumb;
     }
     ///State transition - sets the `fullsize` field to Set
     pub struct SetFullsize<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFullsize<S> {}
     impl<S: State> State for SetFullsize<S> {
-        type Thumb = S::Thumb;
         type Uri = S::Uri;
         type Alt = S::Alt;
         type Fullsize = Set<members::fullsize>;
         type Cid = S::Cid;
+        type Thumb = S::Thumb;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
-        type Thumb = S::Thumb;
         type Uri = S::Uri;
         type Alt = S::Alt;
         type Fullsize = S::Fullsize;
         type Cid = Set<members::cid>;
+        type Thumb = S::Thumb;
+    }
+    ///State transition - sets the `thumb` field to Set
+    pub struct SetThumb<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetThumb<S> {}
+    impl<S: State> State for SetThumb<S> {
+        type Uri = S::Uri;
+        type Alt = S::Alt;
+        type Fullsize = S::Fullsize;
+        type Cid = S::Cid;
+        type Thumb = Set<members::thumb>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `thumb` field
-        pub struct thumb(());
         ///Marker type for the `uri` field
         pub struct uri(());
         ///Marker type for the `alt` field
@@ -1371,6 +1369,8 @@ pub mod photo_view_state {
         pub struct fullsize(());
         ///Marker type for the `cid` field
         pub struct cid(());
+        ///Marker type for the `thumb` field
+        pub struct thumb(());
     }
 }
 
@@ -1543,11 +1543,11 @@ where
 impl<'a, S> PhotoViewBuilder<'a, S>
 where
     S: photo_view_state::State,
-    S::Thumb: photo_view_state::IsSet,
     S::Uri: photo_view_state::IsSet,
     S::Alt: photo_view_state::IsSet,
     S::Fullsize: photo_view_state::IsSet,
     S::Cid: photo_view_state::IsSet,
+    S::Thumb: photo_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PhotoView<'a> {

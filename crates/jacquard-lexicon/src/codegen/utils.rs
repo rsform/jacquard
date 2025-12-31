@@ -38,6 +38,20 @@ pub(super) fn value_to_variant_name(value: &str) -> String {
     }
 }
 
+/// Convert a knownValues entry to a valid Rust variant name.
+/// For NSID#fragment values (e.g., "tools.ozone.team.defs#roleAdmin"),
+/// extracts just the fragment part for the variant name.
+/// For plain values (e.g., "create"), uses the whole value.
+pub(super) fn known_value_to_variant_name(value: &str) -> String {
+    // If contains #, use just the fragment part for the variant name
+    let name_part = if let Some(idx) = value.rfind('#') {
+        &value[idx + 1..]
+    } else {
+        value
+    };
+    value_to_variant_name(name_part)
+}
+
 /// Check if a string is already a valid identifier (alphanumeric + underscore, not starting with digit)
 #[inline]
 fn is_valid_identifier(s: &str) -> bool {

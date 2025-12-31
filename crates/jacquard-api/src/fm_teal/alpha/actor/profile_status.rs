@@ -20,7 +20,7 @@
 pub struct ProfileStatus<'a> {
     /// The onboarding completion status
     #[serde(borrow)]
-    pub completed_onboarding: jacquard_common::CowStr<'a>,
+    pub completed_onboarding: ProfileStatusCompletedOnboarding<'a>,
     /// The timestamp when this status was created
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
@@ -65,7 +65,7 @@ pub mod profile_status_state {
 pub struct ProfileStatusBuilder<'a, S: profile_status_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ProfileStatusCompletedOnboarding<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
     ),
@@ -98,7 +98,7 @@ where
     /// Set the `completedOnboarding` field (required)
     pub fn completed_onboarding(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<ProfileStatusCompletedOnboarding<'a>>,
     ) -> ProfileStatusBuilder<'a, profile_status_state::SetCompletedOnboarding<S>> {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
         ProfileStatusBuilder {
@@ -188,6 +188,115 @@ impl<'a> ProfileStatus<'a> {
         jacquard_common::types::uri::RecordUri::try_from_uri(
             jacquard_common::types::string::AtUri::new_cow(uri.into())?,
         )
+    }
+}
+
+/// The onboarding completion status
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ProfileStatusCompletedOnboarding<'a> {
+    None,
+    ProfileOnboarding,
+    PlayOnboarding,
+    Complete,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ProfileStatusCompletedOnboarding<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::None => "none",
+            Self::ProfileOnboarding => "profileOnboarding",
+            Self::PlayOnboarding => "playOnboarding",
+            Self::Complete => "complete",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ProfileStatusCompletedOnboarding<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "none" => Self::None,
+            "profileOnboarding" => Self::ProfileOnboarding,
+            "playOnboarding" => Self::PlayOnboarding,
+            "complete" => Self::Complete,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ProfileStatusCompletedOnboarding<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "none" => Self::None,
+            "profileOnboarding" => Self::ProfileOnboarding,
+            "playOnboarding" => Self::PlayOnboarding,
+            "complete" => Self::Complete,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for ProfileStatusCompletedOnboarding<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ProfileStatusCompletedOnboarding<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for ProfileStatusCompletedOnboarding<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ProfileStatusCompletedOnboarding<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ProfileStatusCompletedOnboarding<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for ProfileStatusCompletedOnboarding<'_> {
+    type Output = ProfileStatusCompletedOnboarding<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ProfileStatusCompletedOnboarding::None => {
+                ProfileStatusCompletedOnboarding::None
+            }
+            ProfileStatusCompletedOnboarding::ProfileOnboarding => {
+                ProfileStatusCompletedOnboarding::ProfileOnboarding
+            }
+            ProfileStatusCompletedOnboarding::PlayOnboarding => {
+                ProfileStatusCompletedOnboarding::PlayOnboarding
+            }
+            ProfileStatusCompletedOnboarding::Complete => {
+                ProfileStatusCompletedOnboarding::Complete
+            }
+            ProfileStatusCompletedOnboarding::Other(v) => {
+                ProfileStatusCompletedOnboarding::Other(v.into_static())
+            }
+        }
     }
 }
 

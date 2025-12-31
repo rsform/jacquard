@@ -68,7 +68,7 @@ pub struct AgeAssuranceEvent<'a> {
     pub init_ua: std::option::Option<jacquard_common::CowStr<'a>>,
     /// The status of the age assurance process.
     #[serde(borrow)]
-    pub status: jacquard_common::CowStr<'a>,
+    pub status: AgeAssuranceEventStatus<'a>,
 }
 
 pub mod age_assurance_event_state {
@@ -82,50 +82,50 @@ pub mod age_assurance_event_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Status;
         type AttemptId;
+        type Status;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Status = Unset;
         type AttemptId = Unset;
+        type Status = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type CreatedAt = Set<members::created_at>;
+        type AttemptId = S::AttemptId;
         type Status = S::Status;
-        type AttemptId = S::AttemptId;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type CreatedAt = S::CreatedAt;
-        type Status = Set<members::status>;
-        type AttemptId = S::AttemptId;
     }
     ///State transition - sets the `attempt_id` field to Set
     pub struct SetAttemptId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAttemptId<S> {}
     impl<S: State> State for SetAttemptId<S> {
         type CreatedAt = S::CreatedAt;
-        type Status = S::Status;
         type AttemptId = Set<members::attempt_id>;
+        type Status = S::Status;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStatus<S> {}
+    impl<S: State> State for SetStatus<S> {
+        type CreatedAt = S::CreatedAt;
+        type AttemptId = S::AttemptId;
+        type Status = Set<members::status>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `status` field
-        pub struct status(());
         ///Marker type for the `attempt_id` field
         pub struct attempt_id(());
+        ///Marker type for the `status` field
+        pub struct status(());
     }
 }
 
@@ -140,7 +140,7 @@ pub struct AgeAssuranceEventBuilder<'a, S: age_assurance_event_state::State> {
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<AgeAssuranceEventStatus<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -295,7 +295,7 @@ where
     /// Set the `status` field (required)
     pub fn status(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<AgeAssuranceEventStatus<'a>>,
     ) -> AgeAssuranceEventBuilder<'a, age_assurance_event_state::SetStatus<S>> {
         self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
         AgeAssuranceEventBuilder {
@@ -310,8 +310,8 @@ impl<'a, S> AgeAssuranceEventBuilder<'a, S>
 where
     S: age_assurance_event_state::State,
     S::CreatedAt: age_assurance_event_state::IsSet,
-    S::Status: age_assurance_event_state::IsSet,
     S::AttemptId: age_assurance_event_state::IsSet,
+    S::Status: age_assurance_event_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> AgeAssuranceEvent<'a> {
@@ -345,6 +345,102 @@ where
             init_ua: self.__unsafe_private_named.6,
             status: self.__unsafe_private_named.7.unwrap(),
             extra_data: Some(extra_data),
+        }
+    }
+}
+
+/// The status of the age assurance process.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum AgeAssuranceEventStatus<'a> {
+    Unknown,
+    Pending,
+    Assured,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> AgeAssuranceEventStatus<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Unknown => "unknown",
+            Self::Pending => "pending",
+            Self::Assured => "assured",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for AgeAssuranceEventStatus<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "unknown" => Self::Unknown,
+            "pending" => Self::Pending,
+            "assured" => Self::Assured,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for AgeAssuranceEventStatus<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "unknown" => Self::Unknown,
+            "pending" => Self::Pending,
+            "assured" => Self::Assured,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for AgeAssuranceEventStatus<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for AgeAssuranceEventStatus<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for AgeAssuranceEventStatus<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for AgeAssuranceEventStatus<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for AgeAssuranceEventStatus<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for AgeAssuranceEventStatus<'_> {
+    type Output = AgeAssuranceEventStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            AgeAssuranceEventStatus::Unknown => AgeAssuranceEventStatus::Unknown,
+            AgeAssuranceEventStatus::Pending => AgeAssuranceEventStatus::Pending,
+            AgeAssuranceEventStatus::Assured => AgeAssuranceEventStatus::Assured,
+            AgeAssuranceEventStatus::Other(v) => {
+                AgeAssuranceEventStatus::Other(v.into_static())
+            }
         }
     }
 }
@@ -1258,7 +1354,108 @@ pub struct AgeAssuranceState<'a> {
     pub last_initiated_at: std::option::Option<jacquard_common::types::string::Datetime>,
     /// The status of the age assurance process.
     #[serde(borrow)]
-    pub status: jacquard_common::CowStr<'a>,
+    pub status: AgeAssuranceStateStatus<'a>,
+}
+
+/// The status of the age assurance process.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum AgeAssuranceStateStatus<'a> {
+    Unknown,
+    Pending,
+    Assured,
+    Blocked,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> AgeAssuranceStateStatus<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Unknown => "unknown",
+            Self::Pending => "pending",
+            Self::Assured => "assured",
+            Self::Blocked => "blocked",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for AgeAssuranceStateStatus<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "unknown" => Self::Unknown,
+            "pending" => Self::Pending,
+            "assured" => Self::Assured,
+            "blocked" => Self::Blocked,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for AgeAssuranceStateStatus<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "unknown" => Self::Unknown,
+            "pending" => Self::Pending,
+            "assured" => Self::Assured,
+            "blocked" => Self::Blocked,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for AgeAssuranceStateStatus<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for AgeAssuranceStateStatus<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for AgeAssuranceStateStatus<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for AgeAssuranceStateStatus<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for AgeAssuranceStateStatus<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for AgeAssuranceStateStatus<'_> {
+    type Output = AgeAssuranceStateStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            AgeAssuranceStateStatus::Unknown => AgeAssuranceStateStatus::Unknown,
+            AgeAssuranceStateStatus::Pending => AgeAssuranceStateStatus::Pending,
+            AgeAssuranceStateStatus::Assured => AgeAssuranceStateStatus::Assured,
+            AgeAssuranceStateStatus::Blocked => AgeAssuranceStateStatus::Blocked,
+            AgeAssuranceStateStatus::Other(v) => {
+                AgeAssuranceStateStatus::Other(v.into_static())
+            }
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AgeAssuranceState<'a> {
@@ -1728,7 +1925,7 @@ pub struct SkeletonTrend<'a> {
     pub started_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub status: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub status: std::option::Option<SkeletonTrendStatus<'a>>,
     #[serde(borrow)]
     pub topic: jacquard_common::CowStr<'a>,
 }
@@ -1743,105 +1940,105 @@ pub mod skeleton_trend_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type PostCount;
-        type Link;
-        type StartedAt;
-        type Dids;
         type Topic;
         type DisplayName;
+        type Dids;
+        type StartedAt;
+        type Link;
+        type PostCount;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type PostCount = Unset;
-        type Link = Unset;
-        type StartedAt = Unset;
-        type Dids = Unset;
         type Topic = Unset;
         type DisplayName = Unset;
-    }
-    ///State transition - sets the `post_count` field to Set
-    pub struct SetPostCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPostCount<S> {}
-    impl<S: State> State for SetPostCount<S> {
-        type PostCount = Set<members::post_count>;
-        type Link = S::Link;
-        type StartedAt = S::StartedAt;
-        type Dids = S::Dids;
-        type Topic = S::Topic;
-        type DisplayName = S::DisplayName;
-    }
-    ///State transition - sets the `link` field to Set
-    pub struct SetLink<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLink<S> {}
-    impl<S: State> State for SetLink<S> {
-        type PostCount = S::PostCount;
-        type Link = Set<members::link>;
-        type StartedAt = S::StartedAt;
-        type Dids = S::Dids;
-        type Topic = S::Topic;
-        type DisplayName = S::DisplayName;
-    }
-    ///State transition - sets the `started_at` field to Set
-    pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStartedAt<S> {}
-    impl<S: State> State for SetStartedAt<S> {
-        type PostCount = S::PostCount;
-        type Link = S::Link;
-        type StartedAt = Set<members::started_at>;
-        type Dids = S::Dids;
-        type Topic = S::Topic;
-        type DisplayName = S::DisplayName;
-    }
-    ///State transition - sets the `dids` field to Set
-    pub struct SetDids<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDids<S> {}
-    impl<S: State> State for SetDids<S> {
-        type PostCount = S::PostCount;
-        type Link = S::Link;
-        type StartedAt = S::StartedAt;
-        type Dids = Set<members::dids>;
-        type Topic = S::Topic;
-        type DisplayName = S::DisplayName;
+        type Dids = Unset;
+        type StartedAt = Unset;
+        type Link = Unset;
+        type PostCount = Unset;
     }
     ///State transition - sets the `topic` field to Set
     pub struct SetTopic<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTopic<S> {}
     impl<S: State> State for SetTopic<S> {
-        type PostCount = S::PostCount;
-        type Link = S::Link;
-        type StartedAt = S::StartedAt;
-        type Dids = S::Dids;
         type Topic = Set<members::topic>;
         type DisplayName = S::DisplayName;
+        type Dids = S::Dids;
+        type StartedAt = S::StartedAt;
+        type Link = S::Link;
+        type PostCount = S::PostCount;
     }
     ///State transition - sets the `display_name` field to Set
     pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDisplayName<S> {}
     impl<S: State> State for SetDisplayName<S> {
-        type PostCount = S::PostCount;
-        type Link = S::Link;
-        type StartedAt = S::StartedAt;
-        type Dids = S::Dids;
         type Topic = S::Topic;
         type DisplayName = Set<members::display_name>;
+        type Dids = S::Dids;
+        type StartedAt = S::StartedAt;
+        type Link = S::Link;
+        type PostCount = S::PostCount;
+    }
+    ///State transition - sets the `dids` field to Set
+    pub struct SetDids<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDids<S> {}
+    impl<S: State> State for SetDids<S> {
+        type Topic = S::Topic;
+        type DisplayName = S::DisplayName;
+        type Dids = Set<members::dids>;
+        type StartedAt = S::StartedAt;
+        type Link = S::Link;
+        type PostCount = S::PostCount;
+    }
+    ///State transition - sets the `started_at` field to Set
+    pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStartedAt<S> {}
+    impl<S: State> State for SetStartedAt<S> {
+        type Topic = S::Topic;
+        type DisplayName = S::DisplayName;
+        type Dids = S::Dids;
+        type StartedAt = Set<members::started_at>;
+        type Link = S::Link;
+        type PostCount = S::PostCount;
+    }
+    ///State transition - sets the `link` field to Set
+    pub struct SetLink<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLink<S> {}
+    impl<S: State> State for SetLink<S> {
+        type Topic = S::Topic;
+        type DisplayName = S::DisplayName;
+        type Dids = S::Dids;
+        type StartedAt = S::StartedAt;
+        type Link = Set<members::link>;
+        type PostCount = S::PostCount;
+    }
+    ///State transition - sets the `post_count` field to Set
+    pub struct SetPostCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPostCount<S> {}
+    impl<S: State> State for SetPostCount<S> {
+        type Topic = S::Topic;
+        type DisplayName = S::DisplayName;
+        type Dids = S::Dids;
+        type StartedAt = S::StartedAt;
+        type Link = S::Link;
+        type PostCount = Set<members::post_count>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `post_count` field
-        pub struct post_count(());
-        ///Marker type for the `link` field
-        pub struct link(());
-        ///Marker type for the `started_at` field
-        pub struct started_at(());
-        ///Marker type for the `dids` field
-        pub struct dids(());
         ///Marker type for the `topic` field
         pub struct topic(());
         ///Marker type for the `display_name` field
         pub struct display_name(());
+        ///Marker type for the `dids` field
+        pub struct dids(());
+        ///Marker type for the `started_at` field
+        pub struct started_at(());
+        ///Marker type for the `link` field
+        pub struct link(());
+        ///Marker type for the `post_count` field
+        pub struct post_count(());
     }
 }
 
@@ -1855,7 +2052,7 @@ pub struct SkeletonTrendBuilder<'a, S: skeleton_trend_state::State> {
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<i64>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<SkeletonTrendStatus<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
@@ -1992,15 +2189,12 @@ where
 
 impl<'a, S: skeleton_trend_state::State> SkeletonTrendBuilder<'a, S> {
     /// Set the `status` field (optional)
-    pub fn status(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn status(mut self, value: impl Into<Option<SkeletonTrendStatus<'a>>>) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
-    pub fn maybe_status(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_status(mut self, value: Option<SkeletonTrendStatus<'a>>) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -2028,12 +2222,12 @@ where
 impl<'a, S> SkeletonTrendBuilder<'a, S>
 where
     S: skeleton_trend_state::State,
-    S::PostCount: skeleton_trend_state::IsSet,
-    S::Link: skeleton_trend_state::IsSet,
-    S::StartedAt: skeleton_trend_state::IsSet,
-    S::Dids: skeleton_trend_state::IsSet,
     S::Topic: skeleton_trend_state::IsSet,
     S::DisplayName: skeleton_trend_state::IsSet,
+    S::Dids: skeleton_trend_state::IsSet,
+    S::StartedAt: skeleton_trend_state::IsSet,
+    S::Link: skeleton_trend_state::IsSet,
+    S::PostCount: skeleton_trend_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SkeletonTrend<'a> {
@@ -2067,6 +2261,89 @@ where
             status: self.__unsafe_private_named.6,
             topic: self.__unsafe_private_named.7.unwrap(),
             extra_data: Some(extra_data),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum SkeletonTrendStatus<'a> {
+    Hot,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> SkeletonTrendStatus<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Hot => "hot",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for SkeletonTrendStatus<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "hot" => Self::Hot,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for SkeletonTrendStatus<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "hot" => Self::Hot,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for SkeletonTrendStatus<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for SkeletonTrendStatus<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for SkeletonTrendStatus<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for SkeletonTrendStatus<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for SkeletonTrendStatus<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for SkeletonTrendStatus<'_> {
+    type Output = SkeletonTrendStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            SkeletonTrendStatus::Hot => SkeletonTrendStatus::Hot,
+            SkeletonTrendStatus::Other(v) => SkeletonTrendStatus::Other(v.into_static()),
         }
     }
 }
@@ -2323,104 +2600,104 @@ pub mod thread_item_post_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Post;
-        type MoreParents;
-        type OpThread;
         type MoreReplies;
         type HiddenByThreadgate;
         type MutedByViewer;
+        type MoreParents;
+        type OpThread;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Post = Unset;
-        type MoreParents = Unset;
-        type OpThread = Unset;
         type MoreReplies = Unset;
         type HiddenByThreadgate = Unset;
         type MutedByViewer = Unset;
+        type MoreParents = Unset;
+        type OpThread = Unset;
     }
     ///State transition - sets the `post` field to Set
     pub struct SetPost<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPost<S> {}
     impl<S: State> State for SetPost<S> {
         type Post = Set<members::post>;
+        type MoreReplies = S::MoreReplies;
+        type HiddenByThreadgate = S::HiddenByThreadgate;
+        type MutedByViewer = S::MutedByViewer;
         type MoreParents = S::MoreParents;
         type OpThread = S::OpThread;
-        type MoreReplies = S::MoreReplies;
-        type HiddenByThreadgate = S::HiddenByThreadgate;
-        type MutedByViewer = S::MutedByViewer;
-    }
-    ///State transition - sets the `more_parents` field to Set
-    pub struct SetMoreParents<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMoreParents<S> {}
-    impl<S: State> State for SetMoreParents<S> {
-        type Post = S::Post;
-        type MoreParents = Set<members::more_parents>;
-        type OpThread = S::OpThread;
-        type MoreReplies = S::MoreReplies;
-        type HiddenByThreadgate = S::HiddenByThreadgate;
-        type MutedByViewer = S::MutedByViewer;
-    }
-    ///State transition - sets the `op_thread` field to Set
-    pub struct SetOpThread<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOpThread<S> {}
-    impl<S: State> State for SetOpThread<S> {
-        type Post = S::Post;
-        type MoreParents = S::MoreParents;
-        type OpThread = Set<members::op_thread>;
-        type MoreReplies = S::MoreReplies;
-        type HiddenByThreadgate = S::HiddenByThreadgate;
-        type MutedByViewer = S::MutedByViewer;
     }
     ///State transition - sets the `more_replies` field to Set
     pub struct SetMoreReplies<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMoreReplies<S> {}
     impl<S: State> State for SetMoreReplies<S> {
         type Post = S::Post;
-        type MoreParents = S::MoreParents;
-        type OpThread = S::OpThread;
         type MoreReplies = Set<members::more_replies>;
         type HiddenByThreadgate = S::HiddenByThreadgate;
         type MutedByViewer = S::MutedByViewer;
+        type MoreParents = S::MoreParents;
+        type OpThread = S::OpThread;
     }
     ///State transition - sets the `hidden_by_threadgate` field to Set
     pub struct SetHiddenByThreadgate<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHiddenByThreadgate<S> {}
     impl<S: State> State for SetHiddenByThreadgate<S> {
         type Post = S::Post;
-        type MoreParents = S::MoreParents;
-        type OpThread = S::OpThread;
         type MoreReplies = S::MoreReplies;
         type HiddenByThreadgate = Set<members::hidden_by_threadgate>;
         type MutedByViewer = S::MutedByViewer;
+        type MoreParents = S::MoreParents;
+        type OpThread = S::OpThread;
     }
     ///State transition - sets the `muted_by_viewer` field to Set
     pub struct SetMutedByViewer<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMutedByViewer<S> {}
     impl<S: State> State for SetMutedByViewer<S> {
         type Post = S::Post;
-        type MoreParents = S::MoreParents;
-        type OpThread = S::OpThread;
         type MoreReplies = S::MoreReplies;
         type HiddenByThreadgate = S::HiddenByThreadgate;
         type MutedByViewer = Set<members::muted_by_viewer>;
+        type MoreParents = S::MoreParents;
+        type OpThread = S::OpThread;
+    }
+    ///State transition - sets the `more_parents` field to Set
+    pub struct SetMoreParents<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMoreParents<S> {}
+    impl<S: State> State for SetMoreParents<S> {
+        type Post = S::Post;
+        type MoreReplies = S::MoreReplies;
+        type HiddenByThreadgate = S::HiddenByThreadgate;
+        type MutedByViewer = S::MutedByViewer;
+        type MoreParents = Set<members::more_parents>;
+        type OpThread = S::OpThread;
+    }
+    ///State transition - sets the `op_thread` field to Set
+    pub struct SetOpThread<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOpThread<S> {}
+    impl<S: State> State for SetOpThread<S> {
+        type Post = S::Post;
+        type MoreReplies = S::MoreReplies;
+        type HiddenByThreadgate = S::HiddenByThreadgate;
+        type MutedByViewer = S::MutedByViewer;
+        type MoreParents = S::MoreParents;
+        type OpThread = Set<members::op_thread>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `post` field
         pub struct post(());
-        ///Marker type for the `more_parents` field
-        pub struct more_parents(());
-        ///Marker type for the `op_thread` field
-        pub struct op_thread(());
         ///Marker type for the `more_replies` field
         pub struct more_replies(());
         ///Marker type for the `hidden_by_threadgate` field
         pub struct hidden_by_threadgate(());
         ///Marker type for the `muted_by_viewer` field
         pub struct muted_by_viewer(());
+        ///Marker type for the `more_parents` field
+        pub struct more_parents(());
+        ///Marker type for the `op_thread` field
+        pub struct op_thread(());
     }
 }
 
@@ -2574,11 +2851,11 @@ impl<'a, S> ThreadItemPostBuilder<'a, S>
 where
     S: thread_item_post_state::State,
     S::Post: thread_item_post_state::IsSet,
-    S::MoreParents: thread_item_post_state::IsSet,
-    S::OpThread: thread_item_post_state::IsSet,
     S::MoreReplies: thread_item_post_state::IsSet,
     S::HiddenByThreadgate: thread_item_post_state::IsSet,
     S::MutedByViewer: thread_item_post_state::IsSet,
+    S::MoreParents: thread_item_post_state::IsSet,
+    S::OpThread: thread_item_post_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ThreadItemPost<'a> {
@@ -2654,7 +2931,7 @@ pub struct TrendView<'a> {
     pub started_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub status: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub status: std::option::Option<TrendViewStatus<'a>>,
     #[serde(borrow)]
     pub topic: jacquard_common::CowStr<'a>,
 }
@@ -2669,105 +2946,105 @@ pub mod trend_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type PostCount;
-        type Actors;
-        type Topic;
-        type Link;
-        type DisplayName;
         type StartedAt;
+        type Topic;
+        type PostCount;
+        type DisplayName;
+        type Actors;
+        type Link;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type PostCount = Unset;
-        type Actors = Unset;
-        type Topic = Unset;
-        type Link = Unset;
-        type DisplayName = Unset;
         type StartedAt = Unset;
-    }
-    ///State transition - sets the `post_count` field to Set
-    pub struct SetPostCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPostCount<S> {}
-    impl<S: State> State for SetPostCount<S> {
-        type PostCount = Set<members::post_count>;
-        type Actors = S::Actors;
-        type Topic = S::Topic;
-        type Link = S::Link;
-        type DisplayName = S::DisplayName;
-        type StartedAt = S::StartedAt;
-    }
-    ///State transition - sets the `actors` field to Set
-    pub struct SetActors<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActors<S> {}
-    impl<S: State> State for SetActors<S> {
-        type PostCount = S::PostCount;
-        type Actors = Set<members::actors>;
-        type Topic = S::Topic;
-        type Link = S::Link;
-        type DisplayName = S::DisplayName;
-        type StartedAt = S::StartedAt;
-    }
-    ///State transition - sets the `topic` field to Set
-    pub struct SetTopic<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTopic<S> {}
-    impl<S: State> State for SetTopic<S> {
-        type PostCount = S::PostCount;
-        type Actors = S::Actors;
-        type Topic = Set<members::topic>;
-        type Link = S::Link;
-        type DisplayName = S::DisplayName;
-        type StartedAt = S::StartedAt;
-    }
-    ///State transition - sets the `link` field to Set
-    pub struct SetLink<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLink<S> {}
-    impl<S: State> State for SetLink<S> {
-        type PostCount = S::PostCount;
-        type Actors = S::Actors;
-        type Topic = S::Topic;
-        type Link = Set<members::link>;
-        type DisplayName = S::DisplayName;
-        type StartedAt = S::StartedAt;
-    }
-    ///State transition - sets the `display_name` field to Set
-    pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDisplayName<S> {}
-    impl<S: State> State for SetDisplayName<S> {
-        type PostCount = S::PostCount;
-        type Actors = S::Actors;
-        type Topic = S::Topic;
-        type Link = S::Link;
-        type DisplayName = Set<members::display_name>;
-        type StartedAt = S::StartedAt;
+        type Topic = Unset;
+        type PostCount = Unset;
+        type DisplayName = Unset;
+        type Actors = Unset;
+        type Link = Unset;
     }
     ///State transition - sets the `started_at` field to Set
     pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStartedAt<S> {}
     impl<S: State> State for SetStartedAt<S> {
-        type PostCount = S::PostCount;
-        type Actors = S::Actors;
-        type Topic = S::Topic;
-        type Link = S::Link;
-        type DisplayName = S::DisplayName;
         type StartedAt = Set<members::started_at>;
+        type Topic = S::Topic;
+        type PostCount = S::PostCount;
+        type DisplayName = S::DisplayName;
+        type Actors = S::Actors;
+        type Link = S::Link;
+    }
+    ///State transition - sets the `topic` field to Set
+    pub struct SetTopic<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTopic<S> {}
+    impl<S: State> State for SetTopic<S> {
+        type StartedAt = S::StartedAt;
+        type Topic = Set<members::topic>;
+        type PostCount = S::PostCount;
+        type DisplayName = S::DisplayName;
+        type Actors = S::Actors;
+        type Link = S::Link;
+    }
+    ///State transition - sets the `post_count` field to Set
+    pub struct SetPostCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPostCount<S> {}
+    impl<S: State> State for SetPostCount<S> {
+        type StartedAt = S::StartedAt;
+        type Topic = S::Topic;
+        type PostCount = Set<members::post_count>;
+        type DisplayName = S::DisplayName;
+        type Actors = S::Actors;
+        type Link = S::Link;
+    }
+    ///State transition - sets the `display_name` field to Set
+    pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDisplayName<S> {}
+    impl<S: State> State for SetDisplayName<S> {
+        type StartedAt = S::StartedAt;
+        type Topic = S::Topic;
+        type PostCount = S::PostCount;
+        type DisplayName = Set<members::display_name>;
+        type Actors = S::Actors;
+        type Link = S::Link;
+    }
+    ///State transition - sets the `actors` field to Set
+    pub struct SetActors<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActors<S> {}
+    impl<S: State> State for SetActors<S> {
+        type StartedAt = S::StartedAt;
+        type Topic = S::Topic;
+        type PostCount = S::PostCount;
+        type DisplayName = S::DisplayName;
+        type Actors = Set<members::actors>;
+        type Link = S::Link;
+    }
+    ///State transition - sets the `link` field to Set
+    pub struct SetLink<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLink<S> {}
+    impl<S: State> State for SetLink<S> {
+        type StartedAt = S::StartedAt;
+        type Topic = S::Topic;
+        type PostCount = S::PostCount;
+        type DisplayName = S::DisplayName;
+        type Actors = S::Actors;
+        type Link = Set<members::link>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `post_count` field
-        pub struct post_count(());
-        ///Marker type for the `actors` field
-        pub struct actors(());
-        ///Marker type for the `topic` field
-        pub struct topic(());
-        ///Marker type for the `link` field
-        pub struct link(());
-        ///Marker type for the `display_name` field
-        pub struct display_name(());
         ///Marker type for the `started_at` field
         pub struct started_at(());
+        ///Marker type for the `topic` field
+        pub struct topic(());
+        ///Marker type for the `post_count` field
+        pub struct post_count(());
+        ///Marker type for the `display_name` field
+        pub struct display_name(());
+        ///Marker type for the `actors` field
+        pub struct actors(());
+        ///Marker type for the `link` field
+        pub struct link(());
     }
 }
 
@@ -2781,7 +3058,7 @@ pub struct TrendViewBuilder<'a, S: trend_view_state::State> {
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<i64>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<TrendViewStatus<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
@@ -2918,15 +3195,12 @@ where
 
 impl<'a, S: trend_view_state::State> TrendViewBuilder<'a, S> {
     /// Set the `status` field (optional)
-    pub fn status(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn status(mut self, value: impl Into<Option<TrendViewStatus<'a>>>) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
-    pub fn maybe_status(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_status(mut self, value: Option<TrendViewStatus<'a>>) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -2954,12 +3228,12 @@ where
 impl<'a, S> TrendViewBuilder<'a, S>
 where
     S: trend_view_state::State,
-    S::PostCount: trend_view_state::IsSet,
-    S::Actors: trend_view_state::IsSet,
-    S::Topic: trend_view_state::IsSet,
-    S::Link: trend_view_state::IsSet,
-    S::DisplayName: trend_view_state::IsSet,
     S::StartedAt: trend_view_state::IsSet,
+    S::Topic: trend_view_state::IsSet,
+    S::PostCount: trend_view_state::IsSet,
+    S::DisplayName: trend_view_state::IsSet,
+    S::Actors: trend_view_state::IsSet,
+    S::Link: trend_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TrendView<'a> {
@@ -2993,6 +3267,89 @@ where
             status: self.__unsafe_private_named.6,
             topic: self.__unsafe_private_named.7.unwrap(),
             extra_data: Some(extra_data),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum TrendViewStatus<'a> {
+    Hot,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> TrendViewStatus<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Hot => "hot",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for TrendViewStatus<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "hot" => Self::Hot,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for TrendViewStatus<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "hot" => Self::Hot,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for TrendViewStatus<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for TrendViewStatus<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for TrendViewStatus<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for TrendViewStatus<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for TrendViewStatus<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for TrendViewStatus<'_> {
+    type Output = TrendViewStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            TrendViewStatus::Hot => TrendViewStatus::Hot,
+            TrendViewStatus::Other(v) => TrendViewStatus::Other(v.into_static()),
         }
     }
 }

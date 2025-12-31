@@ -928,7 +928,7 @@ pub struct Manifest<'a> {
     >,
     /// OCI media type
     #[serde(borrow)]
-    pub media_type: jacquard_common::CowStr<'a>,
+    pub media_type: ManifestMediaType<'a>,
     /// Repository name (e.g., 'myapp'). Scoped to user's DID.
     #[serde(borrow)]
     pub repository: jacquard_common::CowStr<'a>,
@@ -951,84 +951,84 @@ pub mod manifest_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type MediaType;
-        type Repository;
-        type CreatedAt;
         type SchemaVersion;
+        type CreatedAt;
         type Digest;
+        type Repository;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type MediaType = Unset;
-        type Repository = Unset;
-        type CreatedAt = Unset;
         type SchemaVersion = Unset;
+        type CreatedAt = Unset;
         type Digest = Unset;
+        type Repository = Unset;
     }
     ///State transition - sets the `media_type` field to Set
     pub struct SetMediaType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMediaType<S> {}
     impl<S: State> State for SetMediaType<S> {
         type MediaType = Set<members::media_type>;
-        type Repository = S::Repository;
+        type SchemaVersion = S::SchemaVersion;
         type CreatedAt = S::CreatedAt;
-        type SchemaVersion = S::SchemaVersion;
         type Digest = S::Digest;
-    }
-    ///State transition - sets the `repository` field to Set
-    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepository<S> {}
-    impl<S: State> State for SetRepository<S> {
-        type MediaType = S::MediaType;
-        type Repository = Set<members::repository>;
-        type CreatedAt = S::CreatedAt;
-        type SchemaVersion = S::SchemaVersion;
-        type Digest = S::Digest;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type MediaType = S::MediaType;
         type Repository = S::Repository;
-        type CreatedAt = Set<members::created_at>;
-        type SchemaVersion = S::SchemaVersion;
-        type Digest = S::Digest;
     }
     ///State transition - sets the `schema_version` field to Set
     pub struct SetSchemaVersion<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSchemaVersion<S> {}
     impl<S: State> State for SetSchemaVersion<S> {
         type MediaType = S::MediaType;
-        type Repository = S::Repository;
-        type CreatedAt = S::CreatedAt;
         type SchemaVersion = Set<members::schema_version>;
+        type CreatedAt = S::CreatedAt;
         type Digest = S::Digest;
+        type Repository = S::Repository;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type MediaType = S::MediaType;
+        type SchemaVersion = S::SchemaVersion;
+        type CreatedAt = Set<members::created_at>;
+        type Digest = S::Digest;
+        type Repository = S::Repository;
     }
     ///State transition - sets the `digest` field to Set
     pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDigest<S> {}
     impl<S: State> State for SetDigest<S> {
         type MediaType = S::MediaType;
-        type Repository = S::Repository;
-        type CreatedAt = S::CreatedAt;
         type SchemaVersion = S::SchemaVersion;
+        type CreatedAt = S::CreatedAt;
         type Digest = Set<members::digest>;
+        type Repository = S::Repository;
+    }
+    ///State transition - sets the `repository` field to Set
+    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepository<S> {}
+    impl<S: State> State for SetRepository<S> {
+        type MediaType = S::MediaType;
+        type SchemaVersion = S::SchemaVersion;
+        type CreatedAt = S::CreatedAt;
+        type Digest = S::Digest;
+        type Repository = Set<members::repository>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `media_type` field
         pub struct media_type(());
-        ///Marker type for the `repository` field
-        pub struct repository(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `schema_version` field
         pub struct schema_version(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `digest` field
         pub struct digest(());
+        ///Marker type for the `repository` field
+        pub struct repository(());
     }
 }
 
@@ -1045,7 +1045,7 @@ pub struct ManifestBuilder<'a, S: manifest_state::State> {
         ::core::option::Option<Vec<crate::io_atcr::manifest::BlobReference<'a>>>,
         ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
         ::core::option::Option<Vec<crate::io_atcr::manifest::ManifestReference<'a>>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ManifestMediaType<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<i64>,
         ::core::option::Option<crate::io_atcr::manifest::BlobReference<'a>>,
@@ -1264,7 +1264,7 @@ where
     /// Set the `mediaType` field (required)
     pub fn media_type(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<ManifestMediaType<'a>>,
     ) -> ManifestBuilder<'a, manifest_state::SetMediaType<S>> {
         self.__unsafe_private_named.9 = ::core::option::Option::Some(value.into());
         ManifestBuilder {
@@ -1336,10 +1336,10 @@ impl<'a, S> ManifestBuilder<'a, S>
 where
     S: manifest_state::State,
     S::MediaType: manifest_state::IsSet,
-    S::Repository: manifest_state::IsSet,
-    S::CreatedAt: manifest_state::IsSet,
     S::SchemaVersion: manifest_state::IsSet,
+    S::CreatedAt: manifest_state::IsSet,
     S::Digest: manifest_state::IsSet,
+    S::Repository: manifest_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Manifest<'a> {
@@ -1397,6 +1397,137 @@ impl<'a> Manifest<'a> {
         jacquard_common::types::uri::RecordUri::try_from_uri(
             jacquard_common::types::string::AtUri::new_cow(uri.into())?,
         )
+    }
+}
+
+/// OCI media type
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ManifestMediaType<'a> {
+    ApplicationVndOciImageManifestV1Json,
+    ApplicationVndDockerDistributionManifestV2Json,
+    ApplicationVndOciImageIndexV1Json,
+    ApplicationVndDockerDistributionManifestListV2Json,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ManifestMediaType<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::ApplicationVndOciImageManifestV1Json => {
+                "application/vnd.oci.image.manifest.v1+json"
+            }
+            Self::ApplicationVndDockerDistributionManifestV2Json => {
+                "application/vnd.docker.distribution.manifest.v2+json"
+            }
+            Self::ApplicationVndOciImageIndexV1Json => {
+                "application/vnd.oci.image.index.v1+json"
+            }
+            Self::ApplicationVndDockerDistributionManifestListV2Json => {
+                "application/vnd.docker.distribution.manifest.list.v2+json"
+            }
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ManifestMediaType<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "application/vnd.oci.image.manifest.v1+json" => {
+                Self::ApplicationVndOciImageManifestV1Json
+            }
+            "application/vnd.docker.distribution.manifest.v2+json" => {
+                Self::ApplicationVndDockerDistributionManifestV2Json
+            }
+            "application/vnd.oci.image.index.v1+json" => {
+                Self::ApplicationVndOciImageIndexV1Json
+            }
+            "application/vnd.docker.distribution.manifest.list.v2+json" => {
+                Self::ApplicationVndDockerDistributionManifestListV2Json
+            }
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ManifestMediaType<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "application/vnd.oci.image.manifest.v1+json" => {
+                Self::ApplicationVndOciImageManifestV1Json
+            }
+            "application/vnd.docker.distribution.manifest.v2+json" => {
+                Self::ApplicationVndDockerDistributionManifestV2Json
+            }
+            "application/vnd.oci.image.index.v1+json" => {
+                Self::ApplicationVndOciImageIndexV1Json
+            }
+            "application/vnd.docker.distribution.manifest.list.v2+json" => {
+                Self::ApplicationVndDockerDistributionManifestListV2Json
+            }
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for ManifestMediaType<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ManifestMediaType<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for ManifestMediaType<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ManifestMediaType<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ManifestMediaType<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for ManifestMediaType<'_> {
+    type Output = ManifestMediaType<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ManifestMediaType::ApplicationVndOciImageManifestV1Json => {
+                ManifestMediaType::ApplicationVndOciImageManifestV1Json
+            }
+            ManifestMediaType::ApplicationVndDockerDistributionManifestV2Json => {
+                ManifestMediaType::ApplicationVndDockerDistributionManifestV2Json
+            }
+            ManifestMediaType::ApplicationVndOciImageIndexV1Json => {
+                ManifestMediaType::ApplicationVndOciImageIndexV1Json
+            }
+            ManifestMediaType::ApplicationVndDockerDistributionManifestListV2Json => {
+                ManifestMediaType::ApplicationVndDockerDistributionManifestListV2Json
+            }
+            ManifestMediaType::Other(v) => ManifestMediaType::Other(v.into_static()),
+        }
     }
 }
 
@@ -1545,51 +1676,51 @@ pub mod manifest_reference_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type MediaType;
         type Size;
         type Digest;
+        type MediaType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type MediaType = Unset;
         type Size = Unset;
         type Digest = Unset;
-    }
-    ///State transition - sets the `media_type` field to Set
-    pub struct SetMediaType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMediaType<S> {}
-    impl<S: State> State for SetMediaType<S> {
-        type MediaType = Set<members::media_type>;
-        type Size = S::Size;
-        type Digest = S::Digest;
+        type MediaType = Unset;
     }
     ///State transition - sets the `size` field to Set
     pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSize<S> {}
     impl<S: State> State for SetSize<S> {
-        type MediaType = S::MediaType;
         type Size = Set<members::size>;
         type Digest = S::Digest;
+        type MediaType = S::MediaType;
     }
     ///State transition - sets the `digest` field to Set
     pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDigest<S> {}
     impl<S: State> State for SetDigest<S> {
-        type MediaType = S::MediaType;
         type Size = S::Size;
         type Digest = Set<members::digest>;
+        type MediaType = S::MediaType;
+    }
+    ///State transition - sets the `media_type` field to Set
+    pub struct SetMediaType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMediaType<S> {}
+    impl<S: State> State for SetMediaType<S> {
+        type Size = S::Size;
+        type Digest = S::Digest;
+        type MediaType = Set<members::media_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `media_type` field
-        pub struct media_type(());
         ///Marker type for the `size` field
         pub struct size(());
         ///Marker type for the `digest` field
         pub struct digest(());
+        ///Marker type for the `media_type` field
+        pub struct media_type(());
     }
 }
 
@@ -1722,9 +1853,9 @@ where
 impl<'a, S> ManifestReferenceBuilder<'a, S>
 where
     S: manifest_reference_state::State,
-    S::MediaType: manifest_reference_state::IsSet,
     S::Size: manifest_reference_state::IsSet,
     S::Digest: manifest_reference_state::IsSet,
+    S::MediaType: manifest_reference_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ManifestReference<'a> {

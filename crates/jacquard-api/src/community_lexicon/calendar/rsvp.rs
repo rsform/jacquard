@@ -55,7 +55,7 @@ impl std::fmt::Display for Interested {
 #[serde(rename_all = "camelCase")]
 pub struct Rsvp<'a> {
     #[serde(borrow)]
-    pub status: jacquard_common::CowStr<'a>,
+    pub status: RsvpStatus<'a>,
     #[serde(borrow)]
     pub subject: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }
@@ -70,37 +70,37 @@ pub mod rsvp_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subject;
         type Status;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subject = Unset;
         type Status = Unset;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Subject = Set<members::subject>;
-        type Status = S::Status;
+        type Subject = Unset;
     }
     ///State transition - sets the `status` field to Set
     pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStatus<S> {}
     impl<S: State> State for SetStatus<S> {
-        type Subject = S::Subject;
         type Status = Set<members::status>;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type Status = S::Status;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `status` field
         pub struct status(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
@@ -108,7 +108,7 @@ pub mod rsvp_state {
 pub struct RsvpBuilder<'a, S: rsvp_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<RsvpStatus<'a>>,
         ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
@@ -140,7 +140,7 @@ where
     /// Set the `status` field (required)
     pub fn status(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<RsvpStatus<'a>>,
     ) -> RsvpBuilder<'a, rsvp_state::SetStatus<S>> {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
         RsvpBuilder {
@@ -173,8 +173,8 @@ where
 impl<'a, S> RsvpBuilder<'a, S>
 where
     S: rsvp_state::State,
-    S::Subject: rsvp_state::IsSet,
     S::Status: rsvp_state::IsSet,
+    S::Subject: rsvp_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Rsvp<'a> {
@@ -210,6 +210,99 @@ impl<'a> Rsvp<'a> {
         jacquard_common::types::uri::RecordUri::try_from_uri(
             jacquard_common::types::string::AtUri::new_cow(uri.into())?,
         )
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum RsvpStatus<'a> {
+    Interested,
+    Going,
+    Notgoing,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> RsvpStatus<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Interested => "community.lexicon.calendar.rsvp#interested",
+            Self::Going => "community.lexicon.calendar.rsvp#going",
+            Self::Notgoing => "community.lexicon.calendar.rsvp#notgoing",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for RsvpStatus<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "community.lexicon.calendar.rsvp#interested" => Self::Interested,
+            "community.lexicon.calendar.rsvp#going" => Self::Going,
+            "community.lexicon.calendar.rsvp#notgoing" => Self::Notgoing,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for RsvpStatus<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "community.lexicon.calendar.rsvp#interested" => Self::Interested,
+            "community.lexicon.calendar.rsvp#going" => Self::Going,
+            "community.lexicon.calendar.rsvp#notgoing" => Self::Notgoing,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for RsvpStatus<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for RsvpStatus<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for RsvpStatus<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for RsvpStatus<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for RsvpStatus<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for RsvpStatus<'_> {
+    type Output = RsvpStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            RsvpStatus::Interested => RsvpStatus::Interested,
+            RsvpStatus::Going => RsvpStatus::Going,
+            RsvpStatus::Notgoing => RsvpStatus::Notgoing,
+            RsvpStatus::Other(v) => RsvpStatus::Other(v.into_static()),
+        }
     }
 }
 

@@ -181,7 +181,136 @@ pub struct ContentRights<'a> {
     /// License URL or identifier.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub license: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub license: std::option::Option<ContentRightsLicense<'a>>,
+}
+
+/// License URL or identifier.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ContentRightsLicense<'a> {
+    AllRightsReserved,
+    Cc010,
+    CcBy40,
+    CcBySa40,
+    CcByNc40,
+    CcByNcSa40,
+    CcByNd40,
+    CcByNcNd40,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ContentRightsLicense<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::AllRightsReserved => {
+                "place.stream.metadata.contentRights#all-rights-reserved"
+            }
+            Self::Cc010 => "place.stream.metadata.contentRights#cc0_1__0",
+            Self::CcBy40 => "place.stream.metadata.contentRights#cc-by_4__0",
+            Self::CcBySa40 => "place.stream.metadata.contentRights#cc-by-sa_4__0",
+            Self::CcByNc40 => "place.stream.metadata.contentRights#cc-by-nc_4__0",
+            Self::CcByNcSa40 => "place.stream.metadata.contentRights#cc-by-nc-sa_4__0",
+            Self::CcByNd40 => "place.stream.metadata.contentRights#cc-by-nd_4__0",
+            Self::CcByNcNd40 => "place.stream.metadata.contentRights#cc-by-nc-nd_4__0",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ContentRightsLicense<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "place.stream.metadata.contentRights#all-rights-reserved" => {
+                Self::AllRightsReserved
+            }
+            "place.stream.metadata.contentRights#cc0_1__0" => Self::Cc010,
+            "place.stream.metadata.contentRights#cc-by_4__0" => Self::CcBy40,
+            "place.stream.metadata.contentRights#cc-by-sa_4__0" => Self::CcBySa40,
+            "place.stream.metadata.contentRights#cc-by-nc_4__0" => Self::CcByNc40,
+            "place.stream.metadata.contentRights#cc-by-nc-sa_4__0" => Self::CcByNcSa40,
+            "place.stream.metadata.contentRights#cc-by-nd_4__0" => Self::CcByNd40,
+            "place.stream.metadata.contentRights#cc-by-nc-nd_4__0" => Self::CcByNcNd40,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ContentRightsLicense<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "place.stream.metadata.contentRights#all-rights-reserved" => {
+                Self::AllRightsReserved
+            }
+            "place.stream.metadata.contentRights#cc0_1__0" => Self::Cc010,
+            "place.stream.metadata.contentRights#cc-by_4__0" => Self::CcBy40,
+            "place.stream.metadata.contentRights#cc-by-sa_4__0" => Self::CcBySa40,
+            "place.stream.metadata.contentRights#cc-by-nc_4__0" => Self::CcByNc40,
+            "place.stream.metadata.contentRights#cc-by-nc-sa_4__0" => Self::CcByNcSa40,
+            "place.stream.metadata.contentRights#cc-by-nd_4__0" => Self::CcByNd40,
+            "place.stream.metadata.contentRights#cc-by-nc-nd_4__0" => Self::CcByNcNd40,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for ContentRightsLicense<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ContentRightsLicense<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for ContentRightsLicense<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ContentRightsLicense<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ContentRightsLicense<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for ContentRightsLicense<'_> {
+    type Output = ContentRightsLicense<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ContentRightsLicense::AllRightsReserved => {
+                ContentRightsLicense::AllRightsReserved
+            }
+            ContentRightsLicense::Cc010 => ContentRightsLicense::Cc010,
+            ContentRightsLicense::CcBy40 => ContentRightsLicense::CcBy40,
+            ContentRightsLicense::CcBySa40 => ContentRightsLicense::CcBySa40,
+            ContentRightsLicense::CcByNc40 => ContentRightsLicense::CcByNc40,
+            ContentRightsLicense::CcByNcSa40 => ContentRightsLicense::CcByNcSa40,
+            ContentRightsLicense::CcByNd40 => ContentRightsLicense::CcByNd40,
+            ContentRightsLicense::CcByNcNd40 => ContentRightsLicense::CcByNcNd40,
+            ContentRightsLicense::Other(v) => {
+                ContentRightsLicense::Other(v.into_static())
+            }
+        }
+    }
 }
 
 fn lexicon_doc_place_stream_metadata_contentRights() -> ::jacquard_lexicon::lexicon::LexiconDoc<

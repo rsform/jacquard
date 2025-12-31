@@ -77,7 +77,7 @@ pub struct Profile<'a> {
     /// The service used for profile links
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub profile_host: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub profile_host: std::option::Option<ProfileProfileHost<'a>>,
     /// The identity's resume.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -85,7 +85,7 @@ pub struct Profile<'a> {
     /// The current status of the identity.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub status: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub status: std::option::Option<ProfileStatus<'a>>,
 }
 
 pub mod profile_state {
@@ -116,9 +116,9 @@ pub struct ProfileBuilder<'a, S: profile_state::State> {
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ProfileProfileHost<'a>>,
         ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ProfileStatus<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -240,16 +240,13 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `profile_host` field (optional)
     pub fn profile_host(
         mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+        value: impl Into<Option<ProfileProfileHost<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `profile_host` field to an Option value (optional)
-    pub fn maybe_profile_host(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_profile_host(mut self, value: Option<ProfileProfileHost<'a>>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -276,15 +273,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `status` field (optional)
-    pub fn status(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn status(mut self, value: impl Into<Option<ProfileStatus<'a>>>) -> Self {
         self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
-    pub fn maybe_status(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_status(mut self, value: Option<ProfileStatus<'a>>) -> Self {
         self.__unsafe_private_named.7 = value;
         self
     }
@@ -340,6 +334,186 @@ impl<'a> Profile<'a> {
         jacquard_common::types::uri::RecordUri::try_from_uri(
             jacquard_common::types::string::AtUri::new_cow(uri.into())?,
         )
+    }
+}
+
+/// The service used for profile links
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ProfileProfileHost<'a> {
+    BskyApp,
+    BlackskyCommunity,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ProfileProfileHost<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::BskyApp => "bsky.app",
+            Self::BlackskyCommunity => "blacksky.community",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ProfileProfileHost<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "bsky.app" => Self::BskyApp,
+            "blacksky.community" => Self::BlackskyCommunity,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ProfileProfileHost<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "bsky.app" => Self::BskyApp,
+            "blacksky.community" => Self::BlackskyCommunity,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for ProfileProfileHost<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ProfileProfileHost<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for ProfileProfileHost<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ProfileProfileHost<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ProfileProfileHost<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for ProfileProfileHost<'_> {
+    type Output = ProfileProfileHost<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ProfileProfileHost::BskyApp => ProfileProfileHost::BskyApp,
+            ProfileProfileHost::BlackskyCommunity => {
+                ProfileProfileHost::BlackskyCommunity
+            }
+            ProfileProfileHost::Other(v) => ProfileProfileHost::Other(v.into_static()),
+        }
+    }
+}
+
+/// The current status of the identity.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ProfileStatus<'a> {
+    Hiring,
+    Forhire,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ProfileStatus<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Hiring => "place.atwork.profile#hiring",
+            Self::Forhire => "place.atwork.profile#forhire",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ProfileStatus<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "place.atwork.profile#hiring" => Self::Hiring,
+            "place.atwork.profile#forhire" => Self::Forhire,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ProfileStatus<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "place.atwork.profile#hiring" => Self::Hiring,
+            "place.atwork.profile#forhire" => Self::Forhire,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for ProfileStatus<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ProfileStatus<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for ProfileStatus<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ProfileStatus<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ProfileStatus<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for ProfileStatus<'_> {
+    type Output = ProfileStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ProfileStatus::Hiring => ProfileStatus::Hiring,
+            ProfileStatus::Forhire => ProfileStatus::Forhire,
+            ProfileStatus::Other(v) => ProfileStatus::Other(v.into_static()),
+        }
     }
 }
 

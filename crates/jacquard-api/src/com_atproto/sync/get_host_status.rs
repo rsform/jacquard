@@ -154,8 +154,8 @@ pub enum GetHostStatusError<'a> {
     HostNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
-impl std::fmt::Display for GetHostStatusError<'_> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for GetHostStatusError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::HostNotFound(msg) => {
                 write!(f, "HostNotFound")?;

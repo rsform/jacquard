@@ -33,11 +33,11 @@ pub struct Warrant<'a> {
     /// Level of trust being warranted
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub trust_level: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub trust_level: std::option::Option<WarrantTrustLevel<'a>>,
     /// Type of warrant being provided
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub warrant_type: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub warrant_type: std::option::Option<WarrantWarrantType<'a>>,
 }
 
 pub mod warrant_state {
@@ -92,8 +92,8 @@ pub struct WarrantBuilder<'a, S: warrant_state::State> {
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<WarrantTrustLevel<'a>>,
+        ::core::option::Option<WarrantWarrantType<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -196,16 +196,13 @@ impl<'a, S: warrant_state::State> WarrantBuilder<'a, S> {
     /// Set the `trustLevel` field (optional)
     pub fn trust_level(
         mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+        value: impl Into<Option<WarrantTrustLevel<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `trustLevel` field to an Option value (optional)
-    pub fn maybe_trust_level(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_trust_level(mut self, value: Option<WarrantTrustLevel<'a>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -215,16 +212,13 @@ impl<'a, S: warrant_state::State> WarrantBuilder<'a, S> {
     /// Set the `warrantType` field (optional)
     pub fn warrant_type(
         mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+        value: impl Into<Option<WarrantWarrantType<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `warrantType` field to an Option value (optional)
-    pub fn maybe_warrant_type(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_warrant_type(mut self, value: Option<WarrantWarrantType<'a>>) -> Self {
         self.__unsafe_private_named.5 = value;
         self
     }
@@ -278,6 +272,209 @@ impl<'a> Warrant<'a> {
         jacquard_common::types::uri::RecordUri::try_from_uri(
             jacquard_common::types::string::AtUri::new_cow(uri.into())?,
         )
+    }
+}
+
+/// Level of trust being warranted
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum WarrantTrustLevel<'a> {
+    Basic,
+    Verified,
+    Trusted,
+    HighlyTrusted,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> WarrantTrustLevel<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Basic => "basic",
+            Self::Verified => "verified",
+            Self::Trusted => "trusted",
+            Self::HighlyTrusted => "highly-trusted",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for WarrantTrustLevel<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "basic" => Self::Basic,
+            "verified" => Self::Verified,
+            "trusted" => Self::Trusted,
+            "highly-trusted" => Self::HighlyTrusted,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for WarrantTrustLevel<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "basic" => Self::Basic,
+            "verified" => Self::Verified,
+            "trusted" => Self::Trusted,
+            "highly-trusted" => Self::HighlyTrusted,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for WarrantTrustLevel<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for WarrantTrustLevel<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for WarrantTrustLevel<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for WarrantTrustLevel<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for WarrantTrustLevel<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for WarrantTrustLevel<'_> {
+    type Output = WarrantTrustLevel<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            WarrantTrustLevel::Basic => WarrantTrustLevel::Basic,
+            WarrantTrustLevel::Verified => WarrantTrustLevel::Verified,
+            WarrantTrustLevel::Trusted => WarrantTrustLevel::Trusted,
+            WarrantTrustLevel::HighlyTrusted => WarrantTrustLevel::HighlyTrusted,
+            WarrantTrustLevel::Other(v) => WarrantTrustLevel::Other(v.into_static()),
+        }
+    }
+}
+
+/// Type of warrant being provided
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum WarrantWarrantType<'a> {
+    General,
+    Business,
+    Individual,
+    Technical,
+    Financial,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> WarrantWarrantType<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::General => "general",
+            Self::Business => "business",
+            Self::Individual => "individual",
+            Self::Technical => "technical",
+            Self::Financial => "financial",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for WarrantWarrantType<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "general" => Self::General,
+            "business" => Self::Business,
+            "individual" => Self::Individual,
+            "technical" => Self::Technical,
+            "financial" => Self::Financial,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for WarrantWarrantType<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "general" => Self::General,
+            "business" => Self::Business,
+            "individual" => Self::Individual,
+            "technical" => Self::Technical,
+            "financial" => Self::Financial,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for WarrantWarrantType<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for WarrantWarrantType<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for WarrantWarrantType<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for WarrantWarrantType<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for WarrantWarrantType<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for WarrantWarrantType<'_> {
+    type Output = WarrantWarrantType<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            WarrantWarrantType::General => WarrantWarrantType::General,
+            WarrantWarrantType::Business => WarrantWarrantType::Business,
+            WarrantWarrantType::Individual => WarrantWarrantType::Individual,
+            WarrantWarrantType::Technical => WarrantWarrantType::Technical,
+            WarrantWarrantType::Financial => WarrantWarrantType::Financial,
+            WarrantWarrantType::Other(v) => WarrantWarrantType::Other(v.into_static()),
+        }
     }
 }
 

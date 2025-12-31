@@ -33,37 +33,37 @@ pub mod update_account_password_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Password;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Password = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Password = S::Password;
+        type Did = Unset;
     }
     ///State transition - sets the `password` field to Set
     pub struct SetPassword<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPassword<S> {}
     impl<S: State> State for SetPassword<S> {
-        type Did = S::Did;
         type Password = Set<members::password>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Password = S::Password;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `password` field
         pub struct password(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
@@ -142,8 +142,8 @@ where
 impl<'a, S> UpdateAccountPasswordBuilder<'a, S>
 where
     S: update_account_password_state::State,
-    S::Did: update_account_password_state::IsSet,
     S::Password: update_account_password_state::IsSet,
+    S::Did: update_account_password_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> UpdateAccountPassword<'a> {

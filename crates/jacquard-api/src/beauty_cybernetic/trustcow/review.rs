@@ -29,7 +29,7 @@ pub struct Review<'a> {
     /// Whether this review is from the service provider or consumer
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub reviewer_role: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub reviewer_role: std::option::Option<ReviewReviewerRole<'a>>,
     /// The title of the review
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -49,51 +49,51 @@ pub mod review_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Transaction;
         type Rating;
         type CreatedAt;
+        type Transaction;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Transaction = Unset;
         type Rating = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `transaction` field to Set
-    pub struct SetTransaction<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTransaction<S> {}
-    impl<S: State> State for SetTransaction<S> {
-        type Transaction = Set<members::transaction>;
-        type Rating = S::Rating;
-        type CreatedAt = S::CreatedAt;
+        type Transaction = Unset;
     }
     ///State transition - sets the `rating` field to Set
     pub struct SetRating<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRating<S> {}
     impl<S: State> State for SetRating<S> {
-        type Transaction = S::Transaction;
         type Rating = Set<members::rating>;
         type CreatedAt = S::CreatedAt;
+        type Transaction = S::Transaction;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Transaction = S::Transaction;
         type Rating = S::Rating;
         type CreatedAt = Set<members::created_at>;
+        type Transaction = S::Transaction;
+    }
+    ///State transition - sets the `transaction` field to Set
+    pub struct SetTransaction<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTransaction<S> {}
+    impl<S: State> State for SetTransaction<S> {
+        type Rating = S::Rating;
+        type CreatedAt = S::CreatedAt;
+        type Transaction = Set<members::transaction>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `transaction` field
-        pub struct transaction(());
         ///Marker type for the `rating` field
         pub struct rating(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `transaction` field
+        pub struct transaction(());
     }
 }
 
@@ -104,7 +104,7 @@ pub struct ReviewBuilder<'a, S: review_state::State> {
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<i64>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ReviewReviewerRole<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
     ),
@@ -190,16 +190,13 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     /// Set the `reviewerRole` field (optional)
     pub fn reviewer_role(
         mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+        value: impl Into<Option<ReviewReviewerRole<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `reviewerRole` field to an Option value (optional)
-    pub fn maybe_reviewer_role(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_reviewer_role(mut self, value: Option<ReviewReviewerRole<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -243,9 +240,9 @@ where
 impl<'a, S> ReviewBuilder<'a, S>
 where
     S: review_state::State,
-    S::Transaction: review_state::IsSet,
     S::Rating: review_state::IsSet,
     S::CreatedAt: review_state::IsSet,
+    S::Transaction: review_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Review<'a> {
@@ -289,6 +286,95 @@ impl<'a> Review<'a> {
         jacquard_common::types::uri::RecordUri::try_from_uri(
             jacquard_common::types::string::AtUri::new_cow(uri.into())?,
         )
+    }
+}
+
+/// Whether this review is from the service provider or consumer
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ReviewReviewerRole<'a> {
+    ServiceProvider,
+    ServiceConsumer,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ReviewReviewerRole<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::ServiceProvider => "serviceProvider",
+            Self::ServiceConsumer => "serviceConsumer",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ReviewReviewerRole<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "serviceProvider" => Self::ServiceProvider,
+            "serviceConsumer" => Self::ServiceConsumer,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ReviewReviewerRole<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "serviceProvider" => Self::ServiceProvider,
+            "serviceConsumer" => Self::ServiceConsumer,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for ReviewReviewerRole<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ReviewReviewerRole<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for ReviewReviewerRole<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ReviewReviewerRole<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ReviewReviewerRole<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for ReviewReviewerRole<'_> {
+    type Output = ReviewReviewerRole<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ReviewReviewerRole::ServiceProvider => ReviewReviewerRole::ServiceProvider,
+            ReviewReviewerRole::ServiceConsumer => ReviewReviewerRole::ServiceConsumer,
+            ReviewReviewerRole::Other(v) => ReviewReviewerRole::Other(v.into_static()),
+        }
     }
 }
 

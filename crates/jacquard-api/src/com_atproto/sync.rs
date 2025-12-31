@@ -79,6 +79,12 @@ impl<'a> AsRef<str> for HostStatus<'a> {
     }
 }
 
+impl<'a> core::fmt::Display for HostStatus<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
 impl<'a> serde::Serialize for HostStatus<'a> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where

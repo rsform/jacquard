@@ -42,8 +42,8 @@ pub enum RequestCrawlError<'a> {
     HostBanned(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
-impl std::fmt::Display for RequestCrawlError<'_> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for RequestCrawlError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::HostBanned(msg) => {
                 write!(f, "HostBanned")?;

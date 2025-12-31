@@ -52,7 +52,7 @@ pub struct ConvoView<'a> {
     pub rev: jacquard_common::CowStr<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub status: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub status: std::option::Option<ConvoViewStatus<'a>>,
     pub unread_count: i64,
 }
 
@@ -67,84 +67,84 @@ pub mod convo_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Id;
-        type Rev;
         type Muted;
-        type UnreadCount;
         type Members;
+        type Rev;
+        type UnreadCount;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Id = Unset;
-        type Rev = Unset;
         type Muted = Unset;
-        type UnreadCount = Unset;
         type Members = Unset;
+        type Rev = Unset;
+        type UnreadCount = Unset;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
         type Id = Set<members::id>;
+        type Muted = S::Muted;
+        type Members = S::Members;
         type Rev = S::Rev;
-        type Muted = S::Muted;
         type UnreadCount = S::UnreadCount;
-        type Members = S::Members;
-    }
-    ///State transition - sets the `rev` field to Set
-    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRev<S> {}
-    impl<S: State> State for SetRev<S> {
-        type Id = S::Id;
-        type Rev = Set<members::rev>;
-        type Muted = S::Muted;
-        type UnreadCount = S::UnreadCount;
-        type Members = S::Members;
     }
     ///State transition - sets the `muted` field to Set
     pub struct SetMuted<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMuted<S> {}
     impl<S: State> State for SetMuted<S> {
         type Id = S::Id;
-        type Rev = S::Rev;
         type Muted = Set<members::muted>;
-        type UnreadCount = S::UnreadCount;
         type Members = S::Members;
-    }
-    ///State transition - sets the `unread_count` field to Set
-    pub struct SetUnreadCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUnreadCount<S> {}
-    impl<S: State> State for SetUnreadCount<S> {
-        type Id = S::Id;
         type Rev = S::Rev;
-        type Muted = S::Muted;
-        type UnreadCount = Set<members::unread_count>;
-        type Members = S::Members;
+        type UnreadCount = S::UnreadCount;
     }
     ///State transition - sets the `members` field to Set
     pub struct SetMembers<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMembers<S> {}
     impl<S: State> State for SetMembers<S> {
         type Id = S::Id;
-        type Rev = S::Rev;
         type Muted = S::Muted;
-        type UnreadCount = S::UnreadCount;
         type Members = Set<members::members>;
+        type Rev = S::Rev;
+        type UnreadCount = S::UnreadCount;
+    }
+    ///State transition - sets the `rev` field to Set
+    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRev<S> {}
+    impl<S: State> State for SetRev<S> {
+        type Id = S::Id;
+        type Muted = S::Muted;
+        type Members = S::Members;
+        type Rev = Set<members::rev>;
+        type UnreadCount = S::UnreadCount;
+    }
+    ///State transition - sets the `unread_count` field to Set
+    pub struct SetUnreadCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUnreadCount<S> {}
+    impl<S: State> State for SetUnreadCount<S> {
+        type Id = S::Id;
+        type Muted = S::Muted;
+        type Members = S::Members;
+        type Rev = S::Rev;
+        type UnreadCount = Set<members::unread_count>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `id` field
         pub struct id(());
-        ///Marker type for the `rev` field
-        pub struct rev(());
         ///Marker type for the `muted` field
         pub struct muted(());
-        ///Marker type for the `unread_count` field
-        pub struct unread_count(());
         ///Marker type for the `members` field
         pub struct members(());
+        ///Marker type for the `rev` field
+        pub struct rev(());
+        ///Marker type for the `unread_count` field
+        pub struct unread_count(());
     }
 }
 
@@ -158,7 +158,7 @@ pub struct ConvoViewBuilder<'a, S: convo_view_state::State> {
         ::core::option::Option<Vec<crate::chat_bsky::actor::ProfileViewBasic<'a>>>,
         ::core::option::Option<bool>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<ConvoViewStatus<'a>>,
         ::core::option::Option<i64>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
@@ -298,15 +298,12 @@ where
 
 impl<'a, S: convo_view_state::State> ConvoViewBuilder<'a, S> {
     /// Set the `status` field (optional)
-    pub fn status(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
+    pub fn status(mut self, value: impl Into<Option<ConvoViewStatus<'a>>>) -> Self {
         self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
-    pub fn maybe_status(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+    pub fn maybe_status(mut self, value: Option<ConvoViewStatus<'a>>) -> Self {
         self.__unsafe_private_named.6 = value;
         self
     }
@@ -335,10 +332,10 @@ impl<'a, S> ConvoViewBuilder<'a, S>
 where
     S: convo_view_state::State,
     S::Id: convo_view_state::IsSet,
-    S::Rev: convo_view_state::IsSet,
     S::Muted: convo_view_state::IsSet,
-    S::UnreadCount: convo_view_state::IsSet,
     S::Members: convo_view_state::IsSet,
+    S::Rev: convo_view_state::IsSet,
+    S::UnreadCount: convo_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ConvoView<'a> {
@@ -393,6 +390,94 @@ pub enum ConvoViewLastMessage<'a> {
     MessageView(Box<crate::chat_bsky::convo::MessageView<'a>>),
     #[serde(rename = "chat.bsky.convo.defs#deletedMessageView")]
     DeletedMessageView(Box<crate::chat_bsky::convo::DeletedMessageView<'a>>),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ConvoViewStatus<'a> {
+    Request,
+    Accepted,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> ConvoViewStatus<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Request => "request",
+            Self::Accepted => "accepted",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for ConvoViewStatus<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "request" => Self::Request,
+            "accepted" => Self::Accepted,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for ConvoViewStatus<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "request" => Self::Request,
+            "accepted" => Self::Accepted,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for ConvoViewStatus<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for ConvoViewStatus<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for ConvoViewStatus<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for ConvoViewStatus<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for ConvoViewStatus<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for ConvoViewStatus<'_> {
+    type Output = ConvoViewStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ConvoViewStatus::Request => ConvoViewStatus::Request,
+            ConvoViewStatus::Accepted => ConvoViewStatus::Accepted,
+            ConvoViewStatus::Other(v) => ConvoViewStatus::Other(v.into_static()),
+        }
+    }
 }
 
 fn lexicon_doc_chat_bsky_convo_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
@@ -1648,8 +1733,8 @@ pub mod deleted_message_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type SentAt;
         type Id;
+        type SentAt;
         type Rev;
         type Sender;
     }
@@ -1657,26 +1742,26 @@ pub mod deleted_message_view_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type SentAt = Unset;
         type Id = Unset;
+        type SentAt = Unset;
         type Rev = Unset;
         type Sender = Unset;
-    }
-    ///State transition - sets the `sent_at` field to Set
-    pub struct SetSentAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSentAt<S> {}
-    impl<S: State> State for SetSentAt<S> {
-        type SentAt = Set<members::sent_at>;
-        type Id = S::Id;
-        type Rev = S::Rev;
-        type Sender = S::Sender;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
-        type SentAt = S::SentAt;
         type Id = Set<members::id>;
+        type SentAt = S::SentAt;
+        type Rev = S::Rev;
+        type Sender = S::Sender;
+    }
+    ///State transition - sets the `sent_at` field to Set
+    pub struct SetSentAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSentAt<S> {}
+    impl<S: State> State for SetSentAt<S> {
+        type Id = S::Id;
+        type SentAt = Set<members::sent_at>;
         type Rev = S::Rev;
         type Sender = S::Sender;
     }
@@ -1684,8 +1769,8 @@ pub mod deleted_message_view_state {
     pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRev<S> {}
     impl<S: State> State for SetRev<S> {
-        type SentAt = S::SentAt;
         type Id = S::Id;
+        type SentAt = S::SentAt;
         type Rev = Set<members::rev>;
         type Sender = S::Sender;
     }
@@ -1693,18 +1778,18 @@ pub mod deleted_message_view_state {
     pub struct SetSender<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSender<S> {}
     impl<S: State> State for SetSender<S> {
-        type SentAt = S::SentAt;
         type Id = S::Id;
+        type SentAt = S::SentAt;
         type Rev = S::Rev;
         type Sender = Set<members::sender>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `sent_at` field
-        pub struct sent_at(());
         ///Marker type for the `id` field
         pub struct id(());
+        ///Marker type for the `sent_at` field
+        pub struct sent_at(());
         ///Marker type for the `rev` field
         pub struct rev(());
         ///Marker type for the `sender` field
@@ -1821,8 +1906,8 @@ where
 impl<'a, S> DeletedMessageViewBuilder<'a, S>
 where
     S: deleted_message_view_state::State,
-    S::SentAt: deleted_message_view_state::IsSet,
     S::Id: deleted_message_view_state::IsSet,
+    S::SentAt: deleted_message_view_state::IsSet,
     S::Rev: deleted_message_view_state::IsSet,
     S::Sender: deleted_message_view_state::IsSet,
 {
@@ -1939,67 +2024,67 @@ pub mod log_add_reaction_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Message;
-        type Rev;
         type Reaction;
         type ConvoId;
+        type Message;
+        type Rev;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Message = Unset;
-        type Rev = Unset;
         type Reaction = Unset;
         type ConvoId = Unset;
-    }
-    ///State transition - sets the `message` field to Set
-    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMessage<S> {}
-    impl<S: State> State for SetMessage<S> {
-        type Message = Set<members::message>;
-        type Rev = S::Rev;
-        type Reaction = S::Reaction;
-        type ConvoId = S::ConvoId;
-    }
-    ///State transition - sets the `rev` field to Set
-    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRev<S> {}
-    impl<S: State> State for SetRev<S> {
-        type Message = S::Message;
-        type Rev = Set<members::rev>;
-        type Reaction = S::Reaction;
-        type ConvoId = S::ConvoId;
+        type Message = Unset;
+        type Rev = Unset;
     }
     ///State transition - sets the `reaction` field to Set
     pub struct SetReaction<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetReaction<S> {}
     impl<S: State> State for SetReaction<S> {
-        type Message = S::Message;
-        type Rev = S::Rev;
         type Reaction = Set<members::reaction>;
         type ConvoId = S::ConvoId;
+        type Message = S::Message;
+        type Rev = S::Rev;
     }
     ///State transition - sets the `convo_id` field to Set
     pub struct SetConvoId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetConvoId<S> {}
     impl<S: State> State for SetConvoId<S> {
-        type Message = S::Message;
-        type Rev = S::Rev;
         type Reaction = S::Reaction;
         type ConvoId = Set<members::convo_id>;
+        type Message = S::Message;
+        type Rev = S::Rev;
+    }
+    ///State transition - sets the `message` field to Set
+    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMessage<S> {}
+    impl<S: State> State for SetMessage<S> {
+        type Reaction = S::Reaction;
+        type ConvoId = S::ConvoId;
+        type Message = Set<members::message>;
+        type Rev = S::Rev;
+    }
+    ///State transition - sets the `rev` field to Set
+    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRev<S> {}
+    impl<S: State> State for SetRev<S> {
+        type Reaction = S::Reaction;
+        type ConvoId = S::ConvoId;
+        type Message = S::Message;
+        type Rev = Set<members::rev>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `message` field
-        pub struct message(());
-        ///Marker type for the `rev` field
-        pub struct rev(());
         ///Marker type for the `reaction` field
         pub struct reaction(());
         ///Marker type for the `convo_id` field
         pub struct convo_id(());
+        ///Marker type for the `message` field
+        pub struct message(());
+        ///Marker type for the `rev` field
+        pub struct rev(());
     }
 }
 
@@ -2112,10 +2197,10 @@ where
 impl<'a, S> LogAddReactionBuilder<'a, S>
 where
     S: log_add_reaction_state::State,
-    S::Message: log_add_reaction_state::IsSet,
-    S::Rev: log_add_reaction_state::IsSet,
     S::Reaction: log_add_reaction_state::IsSet,
     S::ConvoId: log_add_reaction_state::IsSet,
+    S::Message: log_add_reaction_state::IsSet,
+    S::Rev: log_add_reaction_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LogAddReaction<'a> {
@@ -2480,49 +2565,49 @@ pub mod log_delete_message_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Message;
         type Rev;
+        type Message;
         type ConvoId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Message = Unset;
         type Rev = Unset;
+        type Message = Unset;
         type ConvoId = Unset;
-    }
-    ///State transition - sets the `message` field to Set
-    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMessage<S> {}
-    impl<S: State> State for SetMessage<S> {
-        type Message = Set<members::message>;
-        type Rev = S::Rev;
-        type ConvoId = S::ConvoId;
     }
     ///State transition - sets the `rev` field to Set
     pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRev<S> {}
     impl<S: State> State for SetRev<S> {
-        type Message = S::Message;
         type Rev = Set<members::rev>;
+        type Message = S::Message;
+        type ConvoId = S::ConvoId;
+    }
+    ///State transition - sets the `message` field to Set
+    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMessage<S> {}
+    impl<S: State> State for SetMessage<S> {
+        type Rev = S::Rev;
+        type Message = Set<members::message>;
         type ConvoId = S::ConvoId;
     }
     ///State transition - sets the `convo_id` field to Set
     pub struct SetConvoId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetConvoId<S> {}
     impl<S: State> State for SetConvoId<S> {
-        type Message = S::Message;
         type Rev = S::Rev;
+        type Message = S::Message;
         type ConvoId = Set<members::convo_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `message` field
-        pub struct message(());
         ///Marker type for the `rev` field
         pub struct rev(());
+        ///Marker type for the `message` field
+        pub struct message(());
         ///Marker type for the `convo_id` field
         pub struct convo_id(());
     }
@@ -2617,8 +2702,8 @@ where
 impl<'a, S> LogDeleteMessageBuilder<'a, S>
 where
     S: log_delete_message_state::State,
-    S::Message: log_delete_message_state::IsSet,
     S::Rev: log_delete_message_state::IsSet,
+    S::Message: log_delete_message_state::IsSet,
     S::ConvoId: log_delete_message_state::IsSet,
 {
     /// Build the final struct
@@ -2785,51 +2870,51 @@ pub mod log_read_message_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Rev;
         type ConvoId;
         type Message;
+        type Rev;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Rev = Unset;
         type ConvoId = Unset;
         type Message = Unset;
-    }
-    ///State transition - sets the `rev` field to Set
-    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRev<S> {}
-    impl<S: State> State for SetRev<S> {
-        type Rev = Set<members::rev>;
-        type ConvoId = S::ConvoId;
-        type Message = S::Message;
+        type Rev = Unset;
     }
     ///State transition - sets the `convo_id` field to Set
     pub struct SetConvoId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetConvoId<S> {}
     impl<S: State> State for SetConvoId<S> {
-        type Rev = S::Rev;
         type ConvoId = Set<members::convo_id>;
         type Message = S::Message;
+        type Rev = S::Rev;
     }
     ///State transition - sets the `message` field to Set
     pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMessage<S> {}
     impl<S: State> State for SetMessage<S> {
-        type Rev = S::Rev;
         type ConvoId = S::ConvoId;
         type Message = Set<members::message>;
+        type Rev = S::Rev;
+    }
+    ///State transition - sets the `rev` field to Set
+    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRev<S> {}
+    impl<S: State> State for SetRev<S> {
+        type ConvoId = S::ConvoId;
+        type Message = S::Message;
+        type Rev = Set<members::rev>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `rev` field
-        pub struct rev(());
         ///Marker type for the `convo_id` field
         pub struct convo_id(());
         ///Marker type for the `message` field
         pub struct message(());
+        ///Marker type for the `rev` field
+        pub struct rev(());
     }
 }
 
@@ -2922,9 +3007,9 @@ where
 impl<'a, S> LogReadMessageBuilder<'a, S>
 where
     S: log_read_message_state::State,
-    S::Rev: log_read_message_state::IsSet,
     S::ConvoId: log_read_message_state::IsSet,
     S::Message: log_read_message_state::IsSet,
+    S::Rev: log_read_message_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LogReadMessage<'a> {
@@ -3022,8 +3107,8 @@ pub mod log_remove_reaction_state {
     pub trait State: sealed::Sealed {
         type ConvoId;
         type Reaction;
-        type Message;
         type Rev;
+        type Message;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -3031,8 +3116,8 @@ pub mod log_remove_reaction_state {
     impl State for Empty {
         type ConvoId = Unset;
         type Reaction = Unset;
-        type Message = Unset;
         type Rev = Unset;
+        type Message = Unset;
     }
     ///State transition - sets the `convo_id` field to Set
     pub struct SetConvoId<S: State = Empty>(PhantomData<fn() -> S>);
@@ -3040,8 +3125,8 @@ pub mod log_remove_reaction_state {
     impl<S: State> State for SetConvoId<S> {
         type ConvoId = Set<members::convo_id>;
         type Reaction = S::Reaction;
-        type Message = S::Message;
         type Rev = S::Rev;
+        type Message = S::Message;
     }
     ///State transition - sets the `reaction` field to Set
     pub struct SetReaction<S: State = Empty>(PhantomData<fn() -> S>);
@@ -3049,17 +3134,8 @@ pub mod log_remove_reaction_state {
     impl<S: State> State for SetReaction<S> {
         type ConvoId = S::ConvoId;
         type Reaction = Set<members::reaction>;
+        type Rev = S::Rev;
         type Message = S::Message;
-        type Rev = S::Rev;
-    }
-    ///State transition - sets the `message` field to Set
-    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMessage<S> {}
-    impl<S: State> State for SetMessage<S> {
-        type ConvoId = S::ConvoId;
-        type Reaction = S::Reaction;
-        type Message = Set<members::message>;
-        type Rev = S::Rev;
     }
     ///State transition - sets the `rev` field to Set
     pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
@@ -3067,8 +3143,17 @@ pub mod log_remove_reaction_state {
     impl<S: State> State for SetRev<S> {
         type ConvoId = S::ConvoId;
         type Reaction = S::Reaction;
-        type Message = S::Message;
         type Rev = Set<members::rev>;
+        type Message = S::Message;
+    }
+    ///State transition - sets the `message` field to Set
+    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMessage<S> {}
+    impl<S: State> State for SetMessage<S> {
+        type ConvoId = S::ConvoId;
+        type Reaction = S::Reaction;
+        type Rev = S::Rev;
+        type Message = Set<members::message>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -3077,10 +3162,10 @@ pub mod log_remove_reaction_state {
         pub struct convo_id(());
         ///Marker type for the `reaction` field
         pub struct reaction(());
-        ///Marker type for the `message` field
-        pub struct message(());
         ///Marker type for the `rev` field
         pub struct rev(());
+        ///Marker type for the `message` field
+        pub struct message(());
     }
 }
 
@@ -3195,8 +3280,8 @@ where
     S: log_remove_reaction_state::State,
     S::ConvoId: log_remove_reaction_state::IsSet,
     S::Reaction: log_remove_reaction_state::IsSet,
-    S::Message: log_remove_reaction_state::IsSet,
     S::Rev: log_remove_reaction_state::IsSet,
+    S::Message: log_remove_reaction_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LogRemoveReaction<'a> {
@@ -3326,37 +3411,37 @@ pub mod message_and_reaction_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Reaction;
         type Message;
+        type Reaction;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Reaction = Unset;
         type Message = Unset;
-    }
-    ///State transition - sets the `reaction` field to Set
-    pub struct SetReaction<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetReaction<S> {}
-    impl<S: State> State for SetReaction<S> {
-        type Reaction = Set<members::reaction>;
-        type Message = S::Message;
+        type Reaction = Unset;
     }
     ///State transition - sets the `message` field to Set
     pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMessage<S> {}
     impl<S: State> State for SetMessage<S> {
-        type Reaction = S::Reaction;
         type Message = Set<members::message>;
+        type Reaction = S::Reaction;
+    }
+    ///State transition - sets the `reaction` field to Set
+    pub struct SetReaction<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetReaction<S> {}
+    impl<S: State> State for SetReaction<S> {
+        type Message = S::Message;
+        type Reaction = Set<members::reaction>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `reaction` field
-        pub struct reaction(());
         ///Marker type for the `message` field
         pub struct message(());
+        ///Marker type for the `reaction` field
+        pub struct reaction(());
     }
 }
 
@@ -3438,8 +3523,8 @@ where
 impl<'a, S> MessageAndReactionViewBuilder<'a, S>
 where
     S: message_and_reaction_view_state::State,
-    S::Reaction: message_and_reaction_view_state::IsSet,
     S::Message: message_and_reaction_view_state::IsSet,
+    S::Reaction: message_and_reaction_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MessageAndReactionView<'a> {
@@ -3585,51 +3670,51 @@ pub mod message_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type MessageId;
         type Did;
         type ConvoId;
+        type MessageId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type MessageId = Unset;
         type Did = Unset;
         type ConvoId = Unset;
-    }
-    ///State transition - sets the `message_id` field to Set
-    pub struct SetMessageId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMessageId<S> {}
-    impl<S: State> State for SetMessageId<S> {
-        type MessageId = Set<members::message_id>;
-        type Did = S::Did;
-        type ConvoId = S::ConvoId;
+        type MessageId = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type MessageId = S::MessageId;
         type Did = Set<members::did>;
         type ConvoId = S::ConvoId;
+        type MessageId = S::MessageId;
     }
     ///State transition - sets the `convo_id` field to Set
     pub struct SetConvoId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetConvoId<S> {}
     impl<S: State> State for SetConvoId<S> {
-        type MessageId = S::MessageId;
         type Did = S::Did;
         type ConvoId = Set<members::convo_id>;
+        type MessageId = S::MessageId;
+    }
+    ///State transition - sets the `message_id` field to Set
+    pub struct SetMessageId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMessageId<S> {}
+    impl<S: State> State for SetMessageId<S> {
+        type Did = S::Did;
+        type ConvoId = S::ConvoId;
+        type MessageId = Set<members::message_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `message_id` field
-        pub struct message_id(());
         ///Marker type for the `did` field
         pub struct did(());
         ///Marker type for the `convo_id` field
         pub struct convo_id(());
+        ///Marker type for the `message_id` field
+        pub struct message_id(());
     }
 }
 
@@ -3722,9 +3807,9 @@ where
 impl<'a, S> MessageRefBuilder<'a, S>
 where
     S: message_ref_state::State,
-    S::MessageId: message_ref_state::IsSet,
     S::Did: message_ref_state::IsSet,
     S::ConvoId: message_ref_state::IsSet,
+    S::MessageId: message_ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MessageRef<'a> {
@@ -3814,84 +3899,84 @@ pub mod message_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Rev;
-        type Text;
         type Id;
-        type SentAt;
         type Sender;
+        type SentAt;
+        type Text;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Rev = Unset;
-        type Text = Unset;
         type Id = Unset;
-        type SentAt = Unset;
         type Sender = Unset;
+        type SentAt = Unset;
+        type Text = Unset;
     }
     ///State transition - sets the `rev` field to Set
     pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRev<S> {}
     impl<S: State> State for SetRev<S> {
         type Rev = Set<members::rev>;
+        type Id = S::Id;
+        type Sender = S::Sender;
+        type SentAt = S::SentAt;
         type Text = S::Text;
-        type Id = S::Id;
-        type SentAt = S::SentAt;
-        type Sender = S::Sender;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetText<S> {}
-    impl<S: State> State for SetText<S> {
-        type Rev = S::Rev;
-        type Text = Set<members::text>;
-        type Id = S::Id;
-        type SentAt = S::SentAt;
-        type Sender = S::Sender;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
         type Rev = S::Rev;
-        type Text = S::Text;
         type Id = Set<members::id>;
+        type Sender = S::Sender;
         type SentAt = S::SentAt;
-        type Sender = S::Sender;
-    }
-    ///State transition - sets the `sent_at` field to Set
-    pub struct SetSentAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSentAt<S> {}
-    impl<S: State> State for SetSentAt<S> {
-        type Rev = S::Rev;
         type Text = S::Text;
-        type Id = S::Id;
-        type SentAt = Set<members::sent_at>;
-        type Sender = S::Sender;
     }
     ///State transition - sets the `sender` field to Set
     pub struct SetSender<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSender<S> {}
     impl<S: State> State for SetSender<S> {
         type Rev = S::Rev;
-        type Text = S::Text;
         type Id = S::Id;
-        type SentAt = S::SentAt;
         type Sender = Set<members::sender>;
+        type SentAt = S::SentAt;
+        type Text = S::Text;
+    }
+    ///State transition - sets the `sent_at` field to Set
+    pub struct SetSentAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSentAt<S> {}
+    impl<S: State> State for SetSentAt<S> {
+        type Rev = S::Rev;
+        type Id = S::Id;
+        type Sender = S::Sender;
+        type SentAt = Set<members::sent_at>;
+        type Text = S::Text;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetText<S> {}
+    impl<S: State> State for SetText<S> {
+        type Rev = S::Rev;
+        type Id = S::Id;
+        type Sender = S::Sender;
+        type SentAt = S::SentAt;
+        type Text = Set<members::text>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `rev` field
         pub struct rev(());
-        ///Marker type for the `text` field
-        pub struct text(());
         ///Marker type for the `id` field
         pub struct id(());
-        ///Marker type for the `sent_at` field
-        pub struct sent_at(());
         ///Marker type for the `sender` field
         pub struct sender(());
+        ///Marker type for the `sent_at` field
+        pub struct sent_at(());
+        ///Marker type for the `text` field
+        pub struct text(());
     }
 }
 
@@ -4085,10 +4170,10 @@ impl<'a, S> MessageViewBuilder<'a, S>
 where
     S: message_view_state::State,
     S::Rev: message_view_state::IsSet,
-    S::Text: message_view_state::IsSet,
     S::Id: message_view_state::IsSet,
-    S::SentAt: message_view_state::IsSet,
     S::Sender: message_view_state::IsSet,
+    S::SentAt: message_view_state::IsSet,
+    S::Text: message_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MessageView<'a> {
@@ -4342,51 +4427,51 @@ pub mod reaction_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Sender;
         type Value;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Sender = Unset;
         type Value = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `sender` field to Set
-    pub struct SetSender<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSender<S> {}
-    impl<S: State> State for SetSender<S> {
-        type Sender = Set<members::sender>;
-        type Value = S::Value;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type Sender = S::Sender;
-        type Value = Set<members::value>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
         type Sender = S::Sender;
         type Value = S::Value;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `sender` field to Set
+    pub struct SetSender<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSender<S> {}
+    impl<S: State> State for SetSender<S> {
+        type CreatedAt = S::CreatedAt;
+        type Sender = Set<members::sender>;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type CreatedAt = S::CreatedAt;
+        type Sender = S::Sender;
+        type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `sender` field
         pub struct sender(());
         ///Marker type for the `value` field
         pub struct value(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -4479,9 +4564,9 @@ where
 impl<'a, S> ReactionViewBuilder<'a, S>
 where
     S: reaction_view_state::State,
+    S::CreatedAt: reaction_view_state::IsSet,
     S::Sender: reaction_view_state::IsSet,
     S::Value: reaction_view_state::IsSet,
-    S::CreatedAt: reaction_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ReactionView<'a> {

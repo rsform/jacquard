@@ -38,37 +38,37 @@ pub mod resolve_notebook_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Actor;
         type Name;
+        type Actor;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Actor = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `actor` field to Set
-    pub struct SetActor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActor<S> {}
-    impl<S: State> State for SetActor<S> {
-        type Actor = Set<members::actor>;
-        type Name = S::Name;
+        type Actor = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Actor = S::Actor;
         type Name = Set<members::name>;
+        type Actor = S::Actor;
+    }
+    ///State transition - sets the `actor` field to Set
+    pub struct SetActor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActor<S> {}
+    impl<S: State> State for SetActor<S> {
+        type Name = S::Name;
+        type Actor = Set<members::actor>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `actor` field
-        pub struct actor(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `actor` field
+        pub struct actor(());
     }
 }
 
@@ -175,8 +175,8 @@ where
 impl<'a, S> ResolveNotebookBuilder<'a, S>
 where
     S: resolve_notebook_state::State,
-    S::Actor: resolve_notebook_state::IsSet,
     S::Name: resolve_notebook_state::IsSet,
+    S::Actor: resolve_notebook_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ResolveNotebook<'a> {
@@ -229,8 +229,8 @@ pub enum ResolveNotebookError<'a> {
     NotebookNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
-impl std::fmt::Display for ResolveNotebookError<'_> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ResolveNotebookError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::NotebookNotFound(msg) => {
                 write!(f, "NotebookNotFound")?;

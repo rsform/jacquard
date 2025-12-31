@@ -55,8 +55,8 @@ pub mod post_state {
     pub trait State: sealed::Sealed {
         type Title;
         type Url;
-        type Blocks;
         type Blog;
+        type Blocks;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -64,8 +64,8 @@ pub mod post_state {
     impl State for Empty {
         type Title = Unset;
         type Url = Unset;
-        type Blocks = Unset;
         type Blog = Unset;
+        type Blocks = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
@@ -73,8 +73,8 @@ pub mod post_state {
     impl<S: State> State for SetTitle<S> {
         type Title = Set<members::title>;
         type Url = S::Url;
-        type Blocks = S::Blocks;
         type Blog = S::Blog;
+        type Blocks = S::Blocks;
     }
     ///State transition - sets the `url` field to Set
     pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
@@ -82,17 +82,8 @@ pub mod post_state {
     impl<S: State> State for SetUrl<S> {
         type Title = S::Title;
         type Url = Set<members::url>;
+        type Blog = S::Blog;
         type Blocks = S::Blocks;
-        type Blog = S::Blog;
-    }
-    ///State transition - sets the `blocks` field to Set
-    pub struct SetBlocks<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlocks<S> {}
-    impl<S: State> State for SetBlocks<S> {
-        type Title = S::Title;
-        type Url = S::Url;
-        type Blocks = Set<members::blocks>;
-        type Blog = S::Blog;
     }
     ///State transition - sets the `blog` field to Set
     pub struct SetBlog<S: State = Empty>(PhantomData<fn() -> S>);
@@ -100,8 +91,17 @@ pub mod post_state {
     impl<S: State> State for SetBlog<S> {
         type Title = S::Title;
         type Url = S::Url;
-        type Blocks = S::Blocks;
         type Blog = Set<members::blog>;
+        type Blocks = S::Blocks;
+    }
+    ///State transition - sets the `blocks` field to Set
+    pub struct SetBlocks<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlocks<S> {}
+    impl<S: State> State for SetBlocks<S> {
+        type Title = S::Title;
+        type Url = S::Url;
+        type Blog = S::Blog;
+        type Blocks = Set<members::blocks>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -110,10 +110,10 @@ pub mod post_state {
         pub struct title(());
         ///Marker type for the `url` field
         pub struct url(());
-        ///Marker type for the `blocks` field
-        pub struct blocks(());
         ///Marker type for the `blog` field
         pub struct blog(());
+        ///Marker type for the `blocks` field
+        pub struct blocks(());
     }
 }
 
@@ -359,8 +359,8 @@ where
     S: post_state::State,
     S::Title: post_state::IsSet,
     S::Url: post_state::IsSet,
-    S::Blocks: post_state::IsSet,
     S::Blog: post_state::IsSet,
+    S::Blocks: post_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Post<'a> {

@@ -39,37 +39,37 @@ pub mod archive_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repo;
         type Ref;
+        type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repo = Unset;
         type Ref = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Repo = Set<members::repo>;
-        type Ref = S::Ref;
+        type Repo = Unset;
     }
     ///State transition - sets the `ref` field to Set
     pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRef<S> {}
     impl<S: State> State for SetRef<S> {
-        type Repo = S::Repo;
         type Ref = Set<members::r#ref>;
+        type Repo = S::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Ref = S::Ref;
+        type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `ref` field
         pub struct r#ref(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
     }
 }
 
@@ -176,8 +176,8 @@ where
 impl<'a, S> ArchiveBuilder<'a, S>
 where
     S: archive_state::State,
-    S::Repo: archive_state::IsSet,
     S::Ref: archive_state::IsSet,
+    S::Repo: archive_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Archive<'a> {
@@ -234,8 +234,8 @@ pub enum ArchiveError<'a> {
     ArchiveError(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
-impl std::fmt::Display for ArchiveError<'_> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ArchiveError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::RepoNotFound(msg) => {
                 write!(f, "RepoNotFound")?;

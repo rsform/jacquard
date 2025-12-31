@@ -28,7 +28,7 @@ pub struct Crew<'a> {
     pub permissions: Vec<jacquard_common::CowStr<'a>>,
     /// Member's role in the hold
     #[serde(borrow)]
-    pub role: jacquard_common::CowStr<'a>,
+    pub role: CrewRole<'a>,
 }
 
 pub mod crew_state {
@@ -41,67 +41,67 @@ pub mod crew_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Permissions;
         type Role;
-        type AddedAt;
+        type Permissions;
         type Member;
+        type AddedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Permissions = Unset;
         type Role = Unset;
-        type AddedAt = Unset;
+        type Permissions = Unset;
         type Member = Unset;
-    }
-    ///State transition - sets the `permissions` field to Set
-    pub struct SetPermissions<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPermissions<S> {}
-    impl<S: State> State for SetPermissions<S> {
-        type Permissions = Set<members::permissions>;
-        type Role = S::Role;
-        type AddedAt = S::AddedAt;
-        type Member = S::Member;
+        type AddedAt = Unset;
     }
     ///State transition - sets the `role` field to Set
     pub struct SetRole<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRole<S> {}
     impl<S: State> State for SetRole<S> {
-        type Permissions = S::Permissions;
         type Role = Set<members::role>;
-        type AddedAt = S::AddedAt;
-        type Member = S::Member;
-    }
-    ///State transition - sets the `added_at` field to Set
-    pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAddedAt<S> {}
-    impl<S: State> State for SetAddedAt<S> {
         type Permissions = S::Permissions;
-        type Role = S::Role;
-        type AddedAt = Set<members::added_at>;
         type Member = S::Member;
+        type AddedAt = S::AddedAt;
+    }
+    ///State transition - sets the `permissions` field to Set
+    pub struct SetPermissions<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPermissions<S> {}
+    impl<S: State> State for SetPermissions<S> {
+        type Role = S::Role;
+        type Permissions = Set<members::permissions>;
+        type Member = S::Member;
+        type AddedAt = S::AddedAt;
     }
     ///State transition - sets the `member` field to Set
     pub struct SetMember<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMember<S> {}
     impl<S: State> State for SetMember<S> {
-        type Permissions = S::Permissions;
         type Role = S::Role;
-        type AddedAt = S::AddedAt;
+        type Permissions = S::Permissions;
         type Member = Set<members::member>;
+        type AddedAt = S::AddedAt;
+    }
+    ///State transition - sets the `added_at` field to Set
+    pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAddedAt<S> {}
+    impl<S: State> State for SetAddedAt<S> {
+        type Role = S::Role;
+        type Permissions = S::Permissions;
+        type Member = S::Member;
+        type AddedAt = Set<members::added_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `permissions` field
-        pub struct permissions(());
         ///Marker type for the `role` field
         pub struct role(());
-        ///Marker type for the `added_at` field
-        pub struct added_at(());
+        ///Marker type for the `permissions` field
+        pub struct permissions(());
         ///Marker type for the `member` field
         pub struct member(());
+        ///Marker type for the `added_at` field
+        pub struct added_at(());
     }
 }
 
@@ -112,7 +112,7 @@ pub struct CrewBuilder<'a, S: crew_state::State> {
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<jacquard_common::types::string::Did<'a>>,
         ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<CrewRole<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -200,7 +200,7 @@ where
     /// Set the `role` field (required)
     pub fn role(
         mut self,
-        value: impl Into<jacquard_common::CowStr<'a>>,
+        value: impl Into<CrewRole<'a>>,
     ) -> CrewBuilder<'a, crew_state::SetRole<S>> {
         self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
         CrewBuilder {
@@ -214,10 +214,10 @@ where
 impl<'a, S> CrewBuilder<'a, S>
 where
     S: crew_state::State,
-    S::Permissions: crew_state::IsSet,
     S::Role: crew_state::IsSet,
-    S::AddedAt: crew_state::IsSet,
+    S::Permissions: crew_state::IsSet,
     S::Member: crew_state::IsSet,
+    S::AddedAt: crew_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Crew<'a> {
@@ -257,6 +257,105 @@ impl<'a> Crew<'a> {
         jacquard_common::types::uri::RecordUri::try_from_uri(
             jacquard_common::types::string::AtUri::new_cow(uri.into())?,
         )
+    }
+}
+
+/// Member's role in the hold
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum CrewRole<'a> {
+    Owner,
+    Admin,
+    Write,
+    Read,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> CrewRole<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Owner => "owner",
+            Self::Admin => "admin",
+            Self::Write => "write",
+            Self::Read => "read",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for CrewRole<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "owner" => Self::Owner,
+            "admin" => Self::Admin,
+            "write" => Self::Write,
+            "read" => Self::Read,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for CrewRole<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "owner" => Self::Owner,
+            "admin" => Self::Admin,
+            "write" => Self::Write,
+            "read" => Self::Read,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for CrewRole<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for CrewRole<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for CrewRole<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for CrewRole<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for CrewRole<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for CrewRole<'_> {
+    type Output = CrewRole<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            CrewRole::Owner => CrewRole::Owner,
+            CrewRole::Admin => CrewRole::Admin,
+            CrewRole::Write => CrewRole::Write,
+            CrewRole::Read => CrewRole::Read,
+            CrewRole::Other(v) => CrewRole::Other(v.into_static()),
+        }
     }
 }
 

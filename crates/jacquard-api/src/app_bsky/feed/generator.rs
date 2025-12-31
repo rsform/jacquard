@@ -26,7 +26,7 @@ pub struct Generator<'a> {
     pub avatar: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub content_mode: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub content_mode: std::option::Option<GeneratorContentMode<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
@@ -57,50 +57,50 @@ pub mod generator_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type DisplayName;
-        type CreatedAt;
         type Did;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type DisplayName = Unset;
-        type CreatedAt = Unset;
         type Did = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `display_name` field to Set
     pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDisplayName<S> {}
     impl<S: State> State for SetDisplayName<S> {
         type DisplayName = Set<members::display_name>;
+        type Did = S::Did;
         type CreatedAt = S::CreatedAt;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type DisplayName = S::DisplayName;
-        type CreatedAt = Set<members::created_at>;
-        type Did = S::Did;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
         type DisplayName = S::DisplayName;
-        type CreatedAt = S::CreatedAt;
         type Did = Set<members::did>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type DisplayName = S::DisplayName;
+        type Did = S::Did;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `display_name` field
         pub struct display_name(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -110,7 +110,7 @@ pub struct GeneratorBuilder<'a, S: generator_state::State> {
     __unsafe_private_named: (
         ::core::option::Option<bool>,
         ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<GeneratorContentMode<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
@@ -185,7 +185,7 @@ impl<'a, S: generator_state::State> GeneratorBuilder<'a, S> {
     /// Set the `contentMode` field (optional)
     pub fn content_mode(
         mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+        value: impl Into<Option<GeneratorContentMode<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
@@ -193,7 +193,7 @@ impl<'a, S: generator_state::State> GeneratorBuilder<'a, S> {
     /// Set the `contentMode` field to an Option value (optional)
     pub fn maybe_content_mode(
         mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
+        value: Option<GeneratorContentMode<'a>>,
     ) -> Self {
         self.__unsafe_private_named.2 = value;
         self
@@ -318,8 +318,8 @@ impl<'a, S> GeneratorBuilder<'a, S>
 where
     S: generator_state::State,
     S::DisplayName: generator_state::IsSet,
-    S::CreatedAt: generator_state::IsSet,
     S::Did: generator_state::IsSet,
+    S::CreatedAt: generator_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Generator<'a> {
@@ -369,6 +369,100 @@ impl<'a> Generator<'a> {
         jacquard_common::types::uri::RecordUri::try_from_uri(
             jacquard_common::types::string::AtUri::new_cow(uri.into())?,
         )
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum GeneratorContentMode<'a> {
+    ContentModeUnspecified,
+    ContentModeVideo,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> GeneratorContentMode<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::ContentModeUnspecified => "app.bsky.feed.defs#contentModeUnspecified",
+            Self::ContentModeVideo => "app.bsky.feed.defs#contentModeVideo",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for GeneratorContentMode<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "app.bsky.feed.defs#contentModeUnspecified" => Self::ContentModeUnspecified,
+            "app.bsky.feed.defs#contentModeVideo" => Self::ContentModeVideo,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for GeneratorContentMode<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "app.bsky.feed.defs#contentModeUnspecified" => Self::ContentModeUnspecified,
+            "app.bsky.feed.defs#contentModeVideo" => Self::ContentModeVideo,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for GeneratorContentMode<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for GeneratorContentMode<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for GeneratorContentMode<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for GeneratorContentMode<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for GeneratorContentMode<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for GeneratorContentMode<'_> {
+    type Output = GeneratorContentMode<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GeneratorContentMode::ContentModeUnspecified => {
+                GeneratorContentMode::ContentModeUnspecified
+            }
+            GeneratorContentMode::ContentModeVideo => {
+                GeneratorContentMode::ContentModeVideo
+            }
+            GeneratorContentMode::Other(v) => {
+                GeneratorContentMode::Other(v.into_static())
+            }
+        }
     }
 }
 

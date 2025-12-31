@@ -159,7 +159,110 @@ pub struct GetBookOutput<'a> {
     pub started_at: std::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub status: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub status: std::option::Option<GetBookOutputStatus<'a>>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum GetBookOutputStatus<'a> {
+    Finished,
+    Reading,
+    WantToRead,
+    Abandoned,
+    Owned,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> GetBookOutputStatus<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Finished => "buzz.bookhive.defs#finished",
+            Self::Reading => "buzz.bookhive.defs#reading",
+            Self::WantToRead => "buzz.bookhive.defs#wantToRead",
+            Self::Abandoned => "buzz.bookhive.defs#abandoned",
+            Self::Owned => "buzz.bookhive.defs#owned",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for GetBookOutputStatus<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "buzz.bookhive.defs#finished" => Self::Finished,
+            "buzz.bookhive.defs#reading" => Self::Reading,
+            "buzz.bookhive.defs#wantToRead" => Self::WantToRead,
+            "buzz.bookhive.defs#abandoned" => Self::Abandoned,
+            "buzz.bookhive.defs#owned" => Self::Owned,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for GetBookOutputStatus<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "buzz.bookhive.defs#finished" => Self::Finished,
+            "buzz.bookhive.defs#reading" => Self::Reading,
+            "buzz.bookhive.defs#wantToRead" => Self::WantToRead,
+            "buzz.bookhive.defs#abandoned" => Self::Abandoned,
+            "buzz.bookhive.defs#owned" => Self::Owned,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for GetBookOutputStatus<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for GetBookOutputStatus<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for GetBookOutputStatus<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for GetBookOutputStatus<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for GetBookOutputStatus<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for GetBookOutputStatus<'_> {
+    type Output = GetBookOutputStatus<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GetBookOutputStatus::Finished => GetBookOutputStatus::Finished,
+            GetBookOutputStatus::Reading => GetBookOutputStatus::Reading,
+            GetBookOutputStatus::WantToRead => GetBookOutputStatus::WantToRead,
+            GetBookOutputStatus::Abandoned => GetBookOutputStatus::Abandoned,
+            GetBookOutputStatus::Owned => GetBookOutputStatus::Owned,
+            GetBookOutputStatus::Other(v) => GetBookOutputStatus::Other(v.into_static()),
+        }
+    }
 }
 
 /// Response type for

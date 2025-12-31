@@ -552,7 +552,122 @@ pub struct SuggestionReason<'a> {
     #[serde(borrow)]
     pub related_tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     #[serde(borrow)]
-    pub r#type: jacquard_common::CowStr<'a>,
+    pub r#type: SuggestionReasonType<'a>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum SuggestionReasonType<'a> {
+    SimilarTags,
+    SimilarToLiked,
+    SimilarToRead,
+    FollowedAuthor,
+    PopularInTag,
+    Trending,
+    FromList,
+    Other(jacquard_common::CowStr<'a>),
+}
+
+impl<'a> SuggestionReasonType<'a> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::SimilarTags => "similar-tags",
+            Self::SimilarToLiked => "similar-to-liked",
+            Self::SimilarToRead => "similar-to-read",
+            Self::FollowedAuthor => "followed-author",
+            Self::PopularInTag => "popular-in-tag",
+            Self::Trending => "trending",
+            Self::FromList => "from-list",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+}
+
+impl<'a> From<&'a str> for SuggestionReasonType<'a> {
+    fn from(s: &'a str) -> Self {
+        match s {
+            "similar-tags" => Self::SimilarTags,
+            "similar-to-liked" => Self::SimilarToLiked,
+            "similar-to-read" => Self::SimilarToRead,
+            "followed-author" => Self::FollowedAuthor,
+            "popular-in-tag" => Self::PopularInTag,
+            "trending" => Self::Trending,
+            "from-list" => Self::FromList,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> From<String> for SuggestionReasonType<'a> {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "similar-tags" => Self::SimilarTags,
+            "similar-to-liked" => Self::SimilarToLiked,
+            "similar-to-read" => Self::SimilarToRead,
+            "followed-author" => Self::FollowedAuthor,
+            "popular-in-tag" => Self::PopularInTag,
+            "trending" => Self::Trending,
+            "from-list" => Self::FromList,
+            _ => Self::Other(jacquard_common::CowStr::from(s)),
+        }
+    }
+}
+
+impl<'a> core::fmt::Display for SuggestionReasonType<'a> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<'a> AsRef<str> for SuggestionReasonType<'a> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<'a> serde::Serialize for SuggestionReasonType<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, 'a> serde::Deserialize<'de> for SuggestionReasonType<'a>
+where
+    'de: 'a,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = <&'de str>::deserialize(deserializer)?;
+        Ok(Self::from(s))
+    }
+}
+
+impl<'a> Default for SuggestionReasonType<'a> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl jacquard_common::IntoStatic for SuggestionReasonType<'_> {
+    type Output = SuggestionReasonType<'static>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            SuggestionReasonType::SimilarTags => SuggestionReasonType::SimilarTags,
+            SuggestionReasonType::SimilarToLiked => SuggestionReasonType::SimilarToLiked,
+            SuggestionReasonType::SimilarToRead => SuggestionReasonType::SimilarToRead,
+            SuggestionReasonType::FollowedAuthor => SuggestionReasonType::FollowedAuthor,
+            SuggestionReasonType::PopularInTag => SuggestionReasonType::PopularInTag,
+            SuggestionReasonType::Trending => SuggestionReasonType::Trending,
+            SuggestionReasonType::FromList => SuggestionReasonType::FromList,
+            SuggestionReasonType::Other(v) => {
+                SuggestionReasonType::Other(v.into_static())
+            }
+        }
+    }
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SuggestionReason<'a> {

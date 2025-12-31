@@ -49,50 +49,50 @@ pub mod delete_record_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Rkey;
-        type Repo;
         type Collection;
+        type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Rkey = Unset;
-        type Repo = Unset;
         type Collection = Unset;
+        type Repo = Unset;
     }
     ///State transition - sets the `rkey` field to Set
     pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRkey<S> {}
     impl<S: State> State for SetRkey<S> {
         type Rkey = Set<members::rkey>;
+        type Collection = S::Collection;
         type Repo = S::Repo;
-        type Collection = S::Collection;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Rkey = S::Rkey;
-        type Repo = Set<members::repo>;
-        type Collection = S::Collection;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCollection<S> {}
     impl<S: State> State for SetCollection<S> {
         type Rkey = S::Rkey;
-        type Repo = S::Repo;
         type Collection = Set<members::collection>;
+        type Repo = S::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Rkey = S::Rkey;
+        type Collection = S::Collection;
+        type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `rkey` field
         pub struct rkey(());
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `collection` field
         pub struct collection(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
     }
 }
 
@@ -234,8 +234,8 @@ impl<'a, S> DeleteRecordBuilder<'a, S>
 where
     S: delete_record_state::State,
     S::Rkey: delete_record_state::IsSet,
-    S::Repo: delete_record_state::IsSet,
     S::Collection: delete_record_state::IsSet,
+    S::Repo: delete_record_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DeleteRecord<'a> {
@@ -304,8 +304,8 @@ pub enum DeleteRecordError<'a> {
     InvalidSwap(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
-impl std::fmt::Display for DeleteRecordError<'_> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for DeleteRecordError<'_> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::InvalidSwap(msg) => {
                 write!(f, "InvalidSwap")?;
