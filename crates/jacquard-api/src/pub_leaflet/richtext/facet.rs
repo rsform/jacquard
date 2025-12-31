@@ -136,7 +136,7 @@ fn lexicon_doc_pub_leaflet_richtext_facet() -> ::jacquard_lexicon::lexicon::Lexi
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("atMention"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -151,7 +151,7 @@ fn lexicon_doc_pub_leaflet_richtext_facet() -> ::jacquard_lexicon::lexicon::Lexi
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("atURI"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -185,7 +185,7 @@ fn lexicon_doc_pub_leaflet_richtext_facet() -> ::jacquard_lexicon::lexicon::Lexi
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map
                     },
                 }),
@@ -207,7 +207,7 @@ fn lexicon_doc_pub_leaflet_richtext_facet() -> ::jacquard_lexicon::lexicon::Lexi
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("byteEnd"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -248,7 +248,7 @@ fn lexicon_doc_pub_leaflet_richtext_facet() -> ::jacquard_lexicon::lexicon::Lexi
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map
                     },
                 }),
@@ -267,7 +267,7 @@ fn lexicon_doc_pub_leaflet_richtext_facet() -> ::jacquard_lexicon::lexicon::Lexi
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("did"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -301,7 +301,7 @@ fn lexicon_doc_pub_leaflet_richtext_facet() -> ::jacquard_lexicon::lexicon::Lexi
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map
                     },
                 }),
@@ -318,7 +318,7 @@ fn lexicon_doc_pub_leaflet_richtext_facet() -> ::jacquard_lexicon::lexicon::Lexi
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("id"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -350,7 +350,7 @@ fn lexicon_doc_pub_leaflet_richtext_facet() -> ::jacquard_lexicon::lexicon::Lexi
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map
                     },
                 }),
@@ -369,7 +369,7 @@ fn lexicon_doc_pub_leaflet_richtext_facet() -> ::jacquard_lexicon::lexicon::Lexi
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("uri"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -406,7 +406,7 @@ fn lexicon_doc_pub_leaflet_richtext_facet() -> ::jacquard_lexicon::lexicon::Lexi
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("features"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -454,7 +454,7 @@ fn lexicon_doc_pub_leaflet_richtext_facet() -> ::jacquard_lexicon::lexicon::Lexi
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map
                     },
                 }),
@@ -471,7 +471,7 @@ fn lexicon_doc_pub_leaflet_richtext_facet() -> ::jacquard_lexicon::lexicon::Lexi
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map
                     },
                 }),
@@ -493,7 +493,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AtMention<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -524,7 +524,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Bold<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -695,7 +695,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ByteSlice<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.byte_end;
             if *value < 0i64 {
@@ -750,7 +750,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Code<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -889,7 +889,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DidMention<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -920,7 +920,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Highlight<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -956,7 +956,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Id<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -987,7 +987,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Italic<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1022,7 +1022,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Link<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1056,37 +1056,37 @@ pub mod facet_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Index;
         type Features;
+        type Index;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Index = Unset;
         type Features = Unset;
-    }
-    ///State transition - sets the `index` field to Set
-    pub struct SetIndex<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndex<S> {}
-    impl<S: State> State for SetIndex<S> {
-        type Index = Set<members::index>;
-        type Features = S::Features;
+        type Index = Unset;
     }
     ///State transition - sets the `features` field to Set
     pub struct SetFeatures<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFeatures<S> {}
     impl<S: State> State for SetFeatures<S> {
-        type Index = S::Index;
         type Features = Set<members::features>;
+        type Index = S::Index;
+    }
+    ///State transition - sets the `index` field to Set
+    pub struct SetIndex<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndex<S> {}
+    impl<S: State> State for SetIndex<S> {
+        type Features = S::Features;
+        type Index = Set<members::index>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `index` field
-        pub struct index(());
         ///Marker type for the `features` field
         pub struct features(());
+        ///Marker type for the `index` field
+        pub struct index(());
     }
 }
 
@@ -1159,8 +1159,8 @@ where
 impl<'a, S> FacetBuilder<'a, S>
 where
     S: facet_state::State,
-    S::Index: facet_state::IsSet,
     S::Features: facet_state::IsSet,
+    S::Index: facet_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Facet<'a> {
@@ -1233,7 +1233,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Facet<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1264,7 +1264,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Strikethrough<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1295,7 +1295,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Underline<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

@@ -402,7 +402,7 @@ fn lexicon_doc_sh_tangled_knot_listKeys() -> ::jacquard_lexicon::lexicon::Lexico
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
@@ -413,7 +413,7 @@ fn lexicon_doc_sh_tangled_knot_listKeys() -> ::jacquard_lexicon::lexicon::Lexico
                             required: None,
                             properties: {
                                 #[allow(unused_mut)]
-                                let mut map = ::std::collections::BTreeMap::new();
+                                let mut map = ::alloc::collections::BTreeMap::new();
                                 map.insert(
                                     ::jacquard_common::smol_str::SmolStr::new_static("cursor"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -464,7 +464,7 @@ fn lexicon_doc_sh_tangled_knot_listKeys() -> ::jacquard_lexicon::lexicon::Lexico
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
                                 "createdAt",
@@ -547,7 +547,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PublicKey<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.key;
             #[allow(unused_comparisons)]

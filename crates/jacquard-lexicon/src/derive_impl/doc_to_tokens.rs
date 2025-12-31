@@ -41,7 +41,7 @@ fn defs_map_to_tokens(
 
     quote! {
         {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             #(#def_entries;)*
             map
         }
@@ -271,7 +271,7 @@ fn properties_to_tokens(
     quote! {
         {
             #[allow(unused_mut)]
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             #(#prop_entries;)*
             map
         }
@@ -392,7 +392,7 @@ fn object_property_to_tokens(
                         ::jacquard_lexicon::lexicon::LexRefUnion {
                             description: #description,
                             refs: {
-                                let mut vec: ::std::vec::Vec<::jacquard_common::CowStr<'static>> = ::std::vec::Vec::new();
+                                let mut vec: ::alloc::vec::Vec<::jacquard_common::CowStr<'static>> = ::alloc::vec::Vec::new();
                                 for s in #type_ident::LEXICON_UNION_REFS.iter().copied() {
                                     vec.push(::jacquard_common::CowStr::new_static(s));
                                 }
@@ -630,7 +630,7 @@ fn xrpc_parameters_to_tokens(params: &LexXrpcParameters) -> TokenStream {
             required: #required,
             properties: {
                 #[allow(unused_mut)]
-                let mut map = ::std::collections::BTreeMap::new();
+                let mut map = ::alloc::collections::BTreeMap::new();
                 #(#props;)*
                 map
             },

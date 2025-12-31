@@ -49,7 +49,7 @@ fn lexicon_doc_app_blebbit_authr_group_defs() -> ::jacquard_lexicon::lexicon::Le
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("groupForm"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -60,7 +60,7 @@ fn lexicon_doc_app_blebbit_authr_group_defs() -> ::jacquard_lexicon::lexicon::Le
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
                                 "description",
@@ -128,7 +128,7 @@ fn lexicon_doc_app_blebbit_authr_group_defs() -> ::jacquard_lexicon::lexicon::Le
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("cuid"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -220,7 +220,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GroupForm<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -266,7 +266,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GroupView<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

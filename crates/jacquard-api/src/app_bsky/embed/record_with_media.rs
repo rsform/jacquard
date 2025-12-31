@@ -33,37 +33,37 @@ pub mod record_with_media_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Media;
         type Record;
+        type Media;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Media = Unset;
         type Record = Unset;
-    }
-    ///State transition - sets the `media` field to Set
-    pub struct SetMedia<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMedia<S> {}
-    impl<S: State> State for SetMedia<S> {
-        type Media = Set<members::media>;
-        type Record = S::Record;
+        type Media = Unset;
     }
     ///State transition - sets the `record` field to Set
     pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRecord<S> {}
     impl<S: State> State for SetRecord<S> {
-        type Media = S::Media;
         type Record = Set<members::record>;
+        type Media = S::Media;
+    }
+    ///State transition - sets the `media` field to Set
+    pub struct SetMedia<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMedia<S> {}
+    impl<S: State> State for SetMedia<S> {
+        type Record = S::Record;
+        type Media = Set<members::media>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `media` field
-        pub struct media(());
         ///Marker type for the `record` field
         pub struct record(());
+        ///Marker type for the `media` field
+        pub struct media(());
     }
 }
 
@@ -136,8 +136,8 @@ where
 impl<'a, S> RecordWithMediaBuilder<'a, S>
 where
     S: record_with_media_state::State,
-    S::Media: record_with_media_state::IsSet,
     S::Record: record_with_media_state::IsSet,
+    S::Media: record_with_media_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RecordWithMedia<'a> {
@@ -193,7 +193,7 @@ fn lexicon_doc_app_bsky_embed_recordWithMedia() -> ::jacquard_lexicon::lexicon::
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -207,7 +207,7 @@ fn lexicon_doc_app_bsky_embed_recordWithMedia() -> ::jacquard_lexicon::lexicon::
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("media"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -246,7 +246,7 @@ fn lexicon_doc_app_bsky_embed_recordWithMedia() -> ::jacquard_lexicon::lexicon::
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("media"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -289,7 +289,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RecordWithMedia<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -322,37 +322,37 @@ pub mod view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Media;
         type Record;
+        type Media;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Media = Unset;
         type Record = Unset;
-    }
-    ///State transition - sets the `media` field to Set
-    pub struct SetMedia<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMedia<S> {}
-    impl<S: State> State for SetMedia<S> {
-        type Media = Set<members::media>;
-        type Record = S::Record;
+        type Media = Unset;
     }
     ///State transition - sets the `record` field to Set
     pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRecord<S> {}
     impl<S: State> State for SetRecord<S> {
-        type Media = S::Media;
         type Record = Set<members::record>;
+        type Media = S::Media;
+    }
+    ///State transition - sets the `media` field to Set
+    pub struct SetMedia<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMedia<S> {}
+    impl<S: State> State for SetMedia<S> {
+        type Record = S::Record;
+        type Media = Set<members::media>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `media` field
-        pub struct media(());
         ///Marker type for the `record` field
         pub struct record(());
+        ///Marker type for the `media` field
+        pub struct media(());
     }
 }
 
@@ -425,8 +425,8 @@ where
 impl<'a, S> ViewBuilder<'a, S>
 where
     S: view_state::State,
-    S::Media: view_state::IsSet,
     S::Record: view_state::IsSet,
+    S::Media: view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> View<'a> {
@@ -485,7 +485,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for View<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

@@ -265,137 +265,65 @@ where
     }
 }
 
-fn lexicon_doc_site_standard_publication() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("site.standard.publication"),
-        revision: None,
-        description: None,
-        defs: {
-            let mut map = ::std::collections::BTreeMap::new();
-            map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("url"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("name")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
-                                "basicTheme",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "site.standard.theme.basic",
-                                ),
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
-                                "description",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: Some(3000usize),
-                                min_graphemes: None,
-                                max_graphemes: Some(300usize),
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("icon"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
-                                description: None,
-                                accept: None,
-                                max_size: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("name"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: Some(1280usize),
-                                min_graphemes: None,
-                                max_graphemes: Some(128usize),
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
-                                "preferences",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#preferences"),
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("url"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map
-                    },
-                }),
-            );
-            map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("preferences"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: None,
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
-                                "showInDiscover",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
-                                description: None,
-                                default: None,
-                                r#const: None,
-                            }),
-                        );
-                        map
-                    },
-                }),
-            );
-            map
-        },
+impl<'a> Publication<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, PublicationRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
     }
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct PublicationGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Publication<'a>,
+}
+
+impl From<PublicationGetRecordOutput<'_>> for Publication<'_> {
+    fn from(output: PublicationGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Publication<'_> {
+    const NSID: &'static str = "site.standard.publication";
+    type Record = PublicationRecord;
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct PublicationRecord;
+impl jacquard_common::xrpc::XrpcResp for PublicationRecord {
+    const NSID: &'static str = "site.standard.publication";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = PublicationGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl jacquard_common::types::collection::Collection for PublicationRecord {
+    const NSID: &'static str = "site.standard.publication";
+    type Record = PublicationRecord;
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Publication<'a> {
@@ -410,7 +338,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Publication<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 3000usize {
@@ -477,6 +405,143 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Publication<'a> {
     }
 }
 
+fn lexicon_doc_site_standard_publication() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
+    ::jacquard_lexicon::lexicon::LexiconDoc {
+        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
+        id: ::jacquard_common::CowStr::new_static("site.standard.publication"),
+        revision: None,
+        description: None,
+        defs: {
+            let mut map = ::alloc::collections::BTreeMap::new();
+            map.insert(
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                    description: None,
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
+                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("url"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("name")
+                            ],
+                        ),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "basicTheme",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "site.standard.theme.basic",
+                                    ),
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "description",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: None,
+                                    default: None,
+                                    min_length: None,
+                                    max_length: Some(3000usize),
+                                    min_graphemes: None,
+                                    max_graphemes: Some(300usize),
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static("icon"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
+                                    description: None,
+                                    accept: None,
+                                    max_size: None,
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static("name"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: None,
+                                    default: None,
+                                    min_length: None,
+                                    max_length: Some(1280usize),
+                                    min_graphemes: None,
+                                    max_graphemes: Some(128usize),
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "preferences",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: ::jacquard_common::CowStr::new_static("#preferences"),
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static("url"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map
+                        },
+                    }),
+                }),
+            );
+            map.insert(
+                ::jacquard_common::smol_str::SmolStr::new_static("preferences"),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: None,
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "showInDiscover",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
+                                description: None,
+                                default: None,
+                                r#const: None,
+                            }),
+                        );
+                        map
+                    },
+                }),
+            );
+            map
+        },
+    }
+}
+
 #[jacquard_derive::lexicon]
 #[derive(
     serde::Serialize,
@@ -506,7 +571,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Preferences<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

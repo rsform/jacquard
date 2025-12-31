@@ -33,51 +33,51 @@ pub mod audio_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Rate;
         type Channels;
         type Codec;
-        type Rate;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Rate = Unset;
         type Channels = Unset;
         type Codec = Unset;
-        type Rate = Unset;
-    }
-    ///State transition - sets the `channels` field to Set
-    pub struct SetChannels<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetChannels<S> {}
-    impl<S: State> State for SetChannels<S> {
-        type Channels = Set<members::channels>;
-        type Codec = S::Codec;
-        type Rate = S::Rate;
-    }
-    ///State transition - sets the `codec` field to Set
-    pub struct SetCodec<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCodec<S> {}
-    impl<S: State> State for SetCodec<S> {
-        type Channels = S::Channels;
-        type Codec = Set<members::codec>;
-        type Rate = S::Rate;
     }
     ///State transition - sets the `rate` field to Set
     pub struct SetRate<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRate<S> {}
     impl<S: State> State for SetRate<S> {
+        type Rate = Set<members::rate>;
         type Channels = S::Channels;
         type Codec = S::Codec;
-        type Rate = Set<members::rate>;
+    }
+    ///State transition - sets the `channels` field to Set
+    pub struct SetChannels<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetChannels<S> {}
+    impl<S: State> State for SetChannels<S> {
+        type Rate = S::Rate;
+        type Channels = Set<members::channels>;
+        type Codec = S::Codec;
+    }
+    ///State transition - sets the `codec` field to Set
+    pub struct SetCodec<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCodec<S> {}
+    impl<S: State> State for SetCodec<S> {
+        type Rate = S::Rate;
+        type Channels = S::Channels;
+        type Codec = Set<members::codec>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `rate` field
+        pub struct rate(());
         ///Marker type for the `channels` field
         pub struct channels(());
         ///Marker type for the `codec` field
         pub struct codec(());
-        ///Marker type for the `rate` field
-        pub struct rate(());
     }
 }
 
@@ -170,9 +170,9 @@ where
 impl<'a, S> AudioBuilder<'a, S>
 where
     S: audio_state::State,
+    S::Rate: audio_state::IsSet,
     S::Channels: audio_state::IsSet,
     S::Codec: audio_state::IsSet,
-    S::Rate: audio_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Audio<'a> {
@@ -209,7 +209,7 @@ fn lexicon_doc_place_stream_segment() -> ::jacquard_lexicon::lexicon::LexiconDoc
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("audio"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -224,7 +224,7 @@ fn lexicon_doc_place_stream_segment() -> ::jacquard_lexicon::lexicon::LexiconDoc
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("channels"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -279,7 +279,7 @@ fn lexicon_doc_place_stream_segment() -> ::jacquard_lexicon::lexicon::LexiconDoc
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("den"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -328,7 +328,7 @@ fn lexicon_doc_place_stream_segment() -> ::jacquard_lexicon::lexicon::LexiconDoc
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static("audio"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -508,7 +508,7 @@ fn lexicon_doc_place_stream_segment() -> ::jacquard_lexicon::lexicon::LexiconDoc
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("cid"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -550,7 +550,7 @@ fn lexicon_doc_place_stream_segment() -> ::jacquard_lexicon::lexicon::LexiconDoc
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("bframes"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
@@ -626,7 +626,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Audio<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -657,37 +657,37 @@ pub mod framerate_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Den;
         type Num;
+        type Den;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Den = Unset;
         type Num = Unset;
-    }
-    ///State transition - sets the `den` field to Set
-    pub struct SetDen<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDen<S> {}
-    impl<S: State> State for SetDen<S> {
-        type Den = Set<members::den>;
-        type Num = S::Num;
+        type Den = Unset;
     }
     ///State transition - sets the `num` field to Set
     pub struct SetNum<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetNum<S> {}
     impl<S: State> State for SetNum<S> {
-        type Den = S::Den;
         type Num = Set<members::num>;
+        type Den = S::Den;
+    }
+    ///State transition - sets the `den` field to Set
+    pub struct SetDen<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDen<S> {}
+    impl<S: State> State for SetDen<S> {
+        type Num = S::Num;
+        type Den = Set<members::den>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `den` field
-        pub struct den(());
         ///Marker type for the `num` field
         pub struct num(());
+        ///Marker type for the `den` field
+        pub struct den(());
     }
 }
 
@@ -757,8 +757,8 @@ where
 impl<'a, S> FramerateBuilder<'a, S>
 where
     S: framerate_state::State,
-    S::Den: framerate_state::IsSet,
     S::Num: framerate_state::IsSet,
+    S::Den: framerate_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Framerate<'a> {
@@ -796,7 +796,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Framerate<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -863,67 +863,67 @@ pub mod segment_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type StartTime;
-        type SigningKey;
         type Id;
+        type StartTime;
         type Creator;
+        type SigningKey;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type StartTime = Unset;
-        type SigningKey = Unset;
         type Id = Unset;
+        type StartTime = Unset;
         type Creator = Unset;
-    }
-    ///State transition - sets the `start_time` field to Set
-    pub struct SetStartTime<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStartTime<S> {}
-    impl<S: State> State for SetStartTime<S> {
-        type StartTime = Set<members::start_time>;
-        type SigningKey = S::SigningKey;
-        type Id = S::Id;
-        type Creator = S::Creator;
-    }
-    ///State transition - sets the `signing_key` field to Set
-    pub struct SetSigningKey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSigningKey<S> {}
-    impl<S: State> State for SetSigningKey<S> {
-        type StartTime = S::StartTime;
-        type SigningKey = Set<members::signing_key>;
-        type Id = S::Id;
-        type Creator = S::Creator;
+        type SigningKey = Unset;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
-        type StartTime = S::StartTime;
-        type SigningKey = S::SigningKey;
         type Id = Set<members::id>;
+        type StartTime = S::StartTime;
         type Creator = S::Creator;
+        type SigningKey = S::SigningKey;
+    }
+    ///State transition - sets the `start_time` field to Set
+    pub struct SetStartTime<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStartTime<S> {}
+    impl<S: State> State for SetStartTime<S> {
+        type Id = S::Id;
+        type StartTime = Set<members::start_time>;
+        type Creator = S::Creator;
+        type SigningKey = S::SigningKey;
     }
     ///State transition - sets the `creator` field to Set
     pub struct SetCreator<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreator<S> {}
     impl<S: State> State for SetCreator<S> {
-        type StartTime = S::StartTime;
-        type SigningKey = S::SigningKey;
         type Id = S::Id;
+        type StartTime = S::StartTime;
         type Creator = Set<members::creator>;
+        type SigningKey = S::SigningKey;
+    }
+    ///State transition - sets the `signing_key` field to Set
+    pub struct SetSigningKey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSigningKey<S> {}
+    impl<S: State> State for SetSigningKey<S> {
+        type Id = S::Id;
+        type StartTime = S::StartTime;
+        type Creator = S::Creator;
+        type SigningKey = Set<members::signing_key>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `start_time` field
-        pub struct start_time(());
-        ///Marker type for the `signing_key` field
-        pub struct signing_key(());
         ///Marker type for the `id` field
         pub struct id(());
+        ///Marker type for the `start_time` field
+        pub struct start_time(());
         ///Marker type for the `creator` field
         pub struct creator(());
+        ///Marker type for the `signing_key` field
+        pub struct signing_key(());
     }
 }
 
@@ -1196,10 +1196,10 @@ impl<'a, S: segment_state::State> SegmentBuilder<'a, S> {
 impl<'a, S> SegmentBuilder<'a, S>
 where
     S: segment_state::State,
-    S::StartTime: segment_state::IsSet,
-    S::SigningKey: segment_state::IsSet,
     S::Id: segment_state::IsSet,
+    S::StartTime: segment_state::IsSet,
     S::Creator: segment_state::IsSet,
+    S::SigningKey: segment_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Segment<'a> {
@@ -1316,7 +1316,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Segment<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1349,37 +1349,37 @@ pub mod segment_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
         type Record;
+        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
         type Record = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Cid = Set<members::cid>;
-        type Record = S::Record;
+        type Cid = Unset;
     }
     ///State transition - sets the `record` field to Set
     pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRecord<S> {}
     impl<S: State> State for SetRecord<S> {
-        type Cid = S::Cid;
         type Record = Set<members::record>;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Record = S::Record;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `record` field
         pub struct record(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
     }
 }
 
@@ -1452,8 +1452,8 @@ where
 impl<'a, S> SegmentViewBuilder<'a, S>
 where
     S: segment_view_state::State,
-    S::Cid: segment_view_state::IsSet,
     S::Record: segment_view_state::IsSet,
+    S::Cid: segment_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SegmentView<'a> {
@@ -1491,7 +1491,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SegmentView<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1529,51 +1529,51 @@ pub mod video_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Width;
         type Height;
         type Codec;
-        type Width;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Width = Unset;
         type Height = Unset;
         type Codec = Unset;
-        type Width = Unset;
-    }
-    ///State transition - sets the `height` field to Set
-    pub struct SetHeight<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHeight<S> {}
-    impl<S: State> State for SetHeight<S> {
-        type Height = Set<members::height>;
-        type Codec = S::Codec;
-        type Width = S::Width;
-    }
-    ///State transition - sets the `codec` field to Set
-    pub struct SetCodec<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCodec<S> {}
-    impl<S: State> State for SetCodec<S> {
-        type Height = S::Height;
-        type Codec = Set<members::codec>;
-        type Width = S::Width;
     }
     ///State transition - sets the `width` field to Set
     pub struct SetWidth<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWidth<S> {}
     impl<S: State> State for SetWidth<S> {
+        type Width = Set<members::width>;
         type Height = S::Height;
         type Codec = S::Codec;
-        type Width = Set<members::width>;
+    }
+    ///State transition - sets the `height` field to Set
+    pub struct SetHeight<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHeight<S> {}
+    impl<S: State> State for SetHeight<S> {
+        type Width = S::Width;
+        type Height = Set<members::height>;
+        type Codec = S::Codec;
+    }
+    ///State transition - sets the `codec` field to Set
+    pub struct SetCodec<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCodec<S> {}
+    impl<S: State> State for SetCodec<S> {
+        type Width = S::Width;
+        type Height = S::Height;
+        type Codec = Set<members::codec>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `width` field
+        pub struct width(());
         ///Marker type for the `height` field
         pub struct height(());
         ///Marker type for the `codec` field
         pub struct codec(());
-        ///Marker type for the `width` field
-        pub struct width(());
     }
 }
 
@@ -1700,9 +1700,9 @@ where
 impl<'a, S> VideoBuilder<'a, S>
 where
     S: video_state::State,
+    S::Width: video_state::IsSet,
     S::Height: video_state::IsSet,
     S::Codec: video_state::IsSet,
-    S::Width: video_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Video<'a> {
@@ -1746,7 +1746,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Video<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

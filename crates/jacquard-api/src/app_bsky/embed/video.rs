@@ -171,7 +171,7 @@ fn lexicon_doc_app_bsky_embed_video() -> ::jacquard_lexicon::lexicon::LexiconDoc
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("caption"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -185,7 +185,7 @@ fn lexicon_doc_app_bsky_embed_video() -> ::jacquard_lexicon::lexicon::LexiconDoc
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("file"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
@@ -225,7 +225,7 @@ fn lexicon_doc_app_bsky_embed_video() -> ::jacquard_lexicon::lexicon::LexiconDoc
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("alt"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -293,7 +293,7 @@ fn lexicon_doc_app_bsky_embed_video() -> ::jacquard_lexicon::lexicon::LexiconDoc
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("alt"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -394,7 +394,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Caption<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -603,7 +603,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Video<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.alt {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10000usize {
@@ -889,7 +889,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for View<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.alt {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10000usize {

@@ -26,6 +26,13 @@ pub struct RefreshSessionOutput<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub did_doc: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub email: std::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub email_auth_factor: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub email_confirmed: std::option::Option<bool>,
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
     #[serde(borrow)]
@@ -53,6 +60,10 @@ pub struct RefreshSessionOutput<'a> {
 pub enum RefreshSessionError<'a> {
     #[serde(rename = "AccountTakedown")]
     AccountTakedown(std::option::Option<jacquard_common::CowStr<'a>>),
+    #[serde(rename = "InvalidToken")]
+    InvalidToken(std::option::Option<jacquard_common::CowStr<'a>>),
+    #[serde(rename = "ExpiredToken")]
+    ExpiredToken(std::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl std::fmt::Display for RefreshSessionError<'_> {
@@ -60,6 +71,20 @@ impl std::fmt::Display for RefreshSessionError<'_> {
         match self {
             Self::AccountTakedown(msg) => {
                 write!(f, "AccountTakedown")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::InvalidToken(msg) => {
+                write!(f, "InvalidToken")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::ExpiredToken(msg) => {
+                write!(f, "ExpiredToken")?;
                 if let Some(msg) = msg {
                     write!(f, ": {}", msg)?;
                 }

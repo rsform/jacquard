@@ -37,66 +37,66 @@ pub mod announcement_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Body;
-        type ExpiresAt;
         type CreatedAt;
         type Title;
+        type ExpiresAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Body = Unset;
-        type ExpiresAt = Unset;
         type CreatedAt = Unset;
         type Title = Unset;
+        type ExpiresAt = Unset;
     }
     ///State transition - sets the `body` field to Set
     pub struct SetBody<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBody<S> {}
     impl<S: State> State for SetBody<S> {
         type Body = Set<members::body>;
+        type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
         type ExpiresAt = S::ExpiresAt;
-        type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `expires_at` field to Set
-    pub struct SetExpiresAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetExpiresAt<S> {}
-    impl<S: State> State for SetExpiresAt<S> {
-        type Body = S::Body;
-        type ExpiresAt = Set<members::expires_at>;
-        type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type Body = S::Body;
-        type ExpiresAt = S::ExpiresAt;
         type CreatedAt = Set<members::created_at>;
         type Title = S::Title;
+        type ExpiresAt = S::ExpiresAt;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
         type Body = S::Body;
-        type ExpiresAt = S::ExpiresAt;
         type CreatedAt = S::CreatedAt;
         type Title = Set<members::title>;
+        type ExpiresAt = S::ExpiresAt;
+    }
+    ///State transition - sets the `expires_at` field to Set
+    pub struct SetExpiresAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetExpiresAt<S> {}
+    impl<S: State> State for SetExpiresAt<S> {
+        type Body = S::Body;
+        type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
+        type ExpiresAt = Set<members::expires_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `body` field
         pub struct body(());
-        ///Marker type for the `expires_at` field
-        pub struct expires_at(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `expires_at` field
+        pub struct expires_at(());
     }
 }
 
@@ -210,9 +210,9 @@ impl<'a, S> AnnouncementBuilder<'a, S>
 where
     S: announcement_state::State,
     S::Body: announcement_state::IsSet,
-    S::ExpiresAt: announcement_state::IsSet,
     S::CreatedAt: announcement_state::IsSet,
     S::Title: announcement_state::IsSet,
+    S::ExpiresAt: announcement_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Announcement<'a> {
@@ -315,7 +315,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Announcement<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.body;
             #[allow(unused_comparisons)]
@@ -383,7 +383,7 @@ fn lexicon_doc_dev_fudgeu_experimental_atforumv1_forum_announcement() -> ::jacqu
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
@@ -406,7 +406,7 @@ fn lexicon_doc_dev_fudgeu_experimental_atforumv1_forum_announcement() -> ::jacqu
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static("body"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {

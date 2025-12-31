@@ -34,51 +34,51 @@ pub mod at_proto_callback_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Code;
         type State;
         type Iss;
+        type Code;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Code = Unset;
         type State = Unset;
         type Iss = Unset;
-    }
-    ///State transition - sets the `code` field to Set
-    pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCode<S> {}
-    impl<S: State> State for SetCode<S> {
-        type Code = Set<members::code>;
-        type State = S::State;
-        type Iss = S::Iss;
+        type Code = Unset;
     }
     ///State transition - sets the `state` field to Set
     pub struct SetState<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetState<S> {}
     impl<S: State> State for SetState<S> {
-        type Code = S::Code;
         type State = Set<members::state>;
         type Iss = S::Iss;
+        type Code = S::Code;
     }
     ///State transition - sets the `iss` field to Set
     pub struct SetIss<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIss<S> {}
     impl<S: State> State for SetIss<S> {
-        type Code = S::Code;
         type State = S::State;
         type Iss = Set<members::iss>;
+        type Code = S::Code;
+    }
+    ///State transition - sets the `code` field to Set
+    pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCode<S> {}
+    impl<S: State> State for SetCode<S> {
+        type State = S::State;
+        type Iss = S::Iss;
+        type Code = Set<members::code>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `code` field
-        pub struct code(());
         ///Marker type for the `state` field
         pub struct state(());
         ///Marker type for the `iss` field
         pub struct iss(());
+        ///Marker type for the `code` field
+        pub struct code(());
     }
 }
 
@@ -171,9 +171,9 @@ where
 impl<'a, S> AtProtoCallbackBuilder<'a, S>
 where
     S: at_proto_callback_state::State,
-    S::Code: at_proto_callback_state::IsSet,
     S::State: at_proto_callback_state::IsSet,
     S::Iss: at_proto_callback_state::IsSet,
+    S::Code: at_proto_callback_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> AtProtoCallback<'a> {

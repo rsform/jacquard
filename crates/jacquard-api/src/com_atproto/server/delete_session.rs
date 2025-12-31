@@ -5,6 +5,49 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[jacquard_derive::open_union]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic,
+    jacquard_derive::IntoStatic
+)]
+#[serde(tag = "error", content = "message")]
+#[serde(bound(deserialize = "'de: 'a"))]
+pub enum DeleteSessionError<'a> {
+    #[serde(rename = "InvalidToken")]
+    InvalidToken(std::option::Option<jacquard_common::CowStr<'a>>),
+    #[serde(rename = "ExpiredToken")]
+    ExpiredToken(std::option::Option<jacquard_common::CowStr<'a>>),
+}
+
+impl std::fmt::Display for DeleteSessionError<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::InvalidToken(msg) => {
+                write!(f, "InvalidToken")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::ExpiredToken(msg) => {
+                write!(f, "ExpiredToken")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+        }
+    }
+}
+
 /// XRPC request marker type
 #[derive(
     Debug,
@@ -24,7 +67,7 @@ impl jacquard_common::xrpc::XrpcResp for DeleteSessionResponse {
     const NSID: &'static str = "com.atproto.server.deleteSession";
     const ENCODING: &'static str = "application/json";
     type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Err<'de> = DeleteSessionError<'de>;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for DeleteSession {

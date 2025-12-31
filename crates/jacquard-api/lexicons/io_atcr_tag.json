@@ -26,7 +26,8 @@
           },
           "manifestDigest": {
             "type": "string",
-            "description": "DEPRECATED: Digest of the manifest (e.g., 'sha256:...'). Kept for backward compatibility with old records. New records should use 'manifest' field instead."
+            "description": "DEPRECATED: Digest of the manifest (e.g., 'sha256:...'). Kept for backward compatibility with old records. New records should use 'manifest' field instead.",
+            "maxLength": 128
           },
           "repository": {
             "type": "string",

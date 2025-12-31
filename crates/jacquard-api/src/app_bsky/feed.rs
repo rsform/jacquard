@@ -183,7 +183,7 @@ fn lexicon_doc_app_bsky_feed_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("blockedAuthor"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -194,7 +194,7 @@ fn lexicon_doc_app_bsky_feed_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("did"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -239,7 +239,7 @@ fn lexicon_doc_app_bsky_feed_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("author"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -326,7 +326,7 @@ fn lexicon_doc_app_bsky_feed_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
                                 "feedContext",
@@ -413,7 +413,7 @@ fn lexicon_doc_app_bsky_feed_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
                                 "acceptsInteractions",
@@ -635,7 +635,7 @@ fn lexicon_doc_app_bsky_feed_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("like"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -665,7 +665,7 @@ fn lexicon_doc_app_bsky_feed_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("event"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -791,7 +791,7 @@ fn lexicon_doc_app_bsky_feed_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("notFound"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
@@ -837,7 +837,7 @@ fn lexicon_doc_app_bsky_feed_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("author"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -1035,7 +1035,7 @@ fn lexicon_doc_app_bsky_feed_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map
                     },
                 }),
@@ -1053,7 +1053,7 @@ fn lexicon_doc_app_bsky_feed_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("by"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -1133,7 +1133,7 @@ fn lexicon_doc_app_bsky_feed_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
                                 "grandparentAuthor",
@@ -1195,7 +1195,7 @@ fn lexicon_doc_app_bsky_feed_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
                                 "feedContext",
@@ -1257,7 +1257,7 @@ fn lexicon_doc_app_bsky_feed_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map
                     },
                 }),
@@ -1272,7 +1272,7 @@ fn lexicon_doc_app_bsky_feed_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("repost"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1306,7 +1306,7 @@ fn lexicon_doc_app_bsky_feed_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
                                 "rootAuthorLike",
@@ -1340,7 +1340,7 @@ fn lexicon_doc_app_bsky_feed_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("parent"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -1400,7 +1400,7 @@ fn lexicon_doc_app_bsky_feed_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("cid"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1471,7 +1471,7 @@ fn lexicon_doc_app_bsky_feed_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
                                 "bookmarked",
@@ -1575,7 +1575,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BlockedAuthor<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1609,51 +1609,51 @@ pub mod blocked_post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Blocked;
         type Uri;
         type Author;
+        type Blocked;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Blocked = Unset;
         type Uri = Unset;
         type Author = Unset;
-    }
-    ///State transition - sets the `blocked` field to Set
-    pub struct SetBlocked<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlocked<S> {}
-    impl<S: State> State for SetBlocked<S> {
-        type Blocked = Set<members::blocked>;
-        type Uri = S::Uri;
-        type Author = S::Author;
+        type Blocked = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Blocked = S::Blocked;
         type Uri = Set<members::uri>;
         type Author = S::Author;
+        type Blocked = S::Blocked;
     }
     ///State transition - sets the `author` field to Set
     pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthor<S> {}
     impl<S: State> State for SetAuthor<S> {
-        type Blocked = S::Blocked;
         type Uri = S::Uri;
         type Author = Set<members::author>;
+        type Blocked = S::Blocked;
+    }
+    ///State transition - sets the `blocked` field to Set
+    pub struct SetBlocked<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlocked<S> {}
+    impl<S: State> State for SetBlocked<S> {
+        type Uri = S::Uri;
+        type Author = S::Author;
+        type Blocked = Set<members::blocked>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `blocked` field
-        pub struct blocked(());
         ///Marker type for the `uri` field
         pub struct uri(());
         ///Marker type for the `author` field
         pub struct author(());
+        ///Marker type for the `blocked` field
+        pub struct blocked(());
     }
 }
 
@@ -1746,9 +1746,9 @@ where
 impl<'a, S> BlockedPostBuilder<'a, S>
 where
     S: blocked_post_state::State,
-    S::Blocked: blocked_post_state::IsSet,
     S::Uri: blocked_post_state::IsSet,
     S::Author: blocked_post_state::IsSet,
+    S::Blocked: blocked_post_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> BlockedPost<'a> {
@@ -1788,7 +1788,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BlockedPost<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -2146,7 +2146,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FeedViewPost<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.feed_context {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
@@ -2235,104 +2235,104 @@ pub mod generator_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Creator;
-        type Uri;
-        type IndexedAt;
         type DisplayName;
-        type Cid;
         type Did;
+        type IndexedAt;
+        type Uri;
+        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Creator = Unset;
-        type Uri = Unset;
-        type IndexedAt = Unset;
         type DisplayName = Unset;
-        type Cid = Unset;
         type Did = Unset;
+        type IndexedAt = Unset;
+        type Uri = Unset;
+        type Cid = Unset;
     }
     ///State transition - sets the `creator` field to Set
     pub struct SetCreator<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreator<S> {}
     impl<S: State> State for SetCreator<S> {
         type Creator = Set<members::creator>;
-        type Uri = S::Uri;
+        type DisplayName = S::DisplayName;
+        type Did = S::Did;
         type IndexedAt = S::IndexedAt;
-        type DisplayName = S::DisplayName;
-        type Cid = S::Cid;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Creator = S::Creator;
-        type Uri = Set<members::uri>;
-        type IndexedAt = S::IndexedAt;
-        type DisplayName = S::DisplayName;
-        type Cid = S::Cid;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
-    impl<S: State> State for SetIndexedAt<S> {
-        type Creator = S::Creator;
         type Uri = S::Uri;
-        type IndexedAt = Set<members::indexed_at>;
-        type DisplayName = S::DisplayName;
         type Cid = S::Cid;
-        type Did = S::Did;
     }
     ///State transition - sets the `display_name` field to Set
     pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDisplayName<S> {}
     impl<S: State> State for SetDisplayName<S> {
         type Creator = S::Creator;
-        type Uri = S::Uri;
-        type IndexedAt = S::IndexedAt;
         type DisplayName = Set<members::display_name>;
-        type Cid = S::Cid;
         type Did = S::Did;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Creator = S::Creator;
-        type Uri = S::Uri;
         type IndexedAt = S::IndexedAt;
-        type DisplayName = S::DisplayName;
-        type Cid = Set<members::cid>;
-        type Did = S::Did;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
         type Creator = S::Creator;
-        type Uri = S::Uri;
-        type IndexedAt = S::IndexedAt;
         type DisplayName = S::DisplayName;
-        type Cid = S::Cid;
         type Did = Set<members::did>;
+        type IndexedAt = S::IndexedAt;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type Creator = S::Creator;
+        type DisplayName = S::DisplayName;
+        type Did = S::Did;
+        type IndexedAt = Set<members::indexed_at>;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Creator = S::Creator;
+        type DisplayName = S::DisplayName;
+        type Did = S::Did;
+        type IndexedAt = S::IndexedAt;
+        type Uri = Set<members::uri>;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Creator = S::Creator;
+        type DisplayName = S::DisplayName;
+        type Did = S::Did;
+        type IndexedAt = S::IndexedAt;
+        type Uri = S::Uri;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `creator` field
         pub struct creator(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
         ///Marker type for the `display_name` field
         pub struct display_name(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
     }
 }
 
@@ -2649,11 +2649,11 @@ impl<'a, S> GeneratorViewBuilder<'a, S>
 where
     S: generator_view_state::State,
     S::Creator: generator_view_state::IsSet,
-    S::Uri: generator_view_state::IsSet,
-    S::IndexedAt: generator_view_state::IsSet,
     S::DisplayName: generator_view_state::IsSet,
-    S::Cid: generator_view_state::IsSet,
     S::Did: generator_view_state::IsSet,
+    S::IndexedAt: generator_view_state::IsSet,
+    S::Uri: generator_view_state::IsSet,
+    S::Cid: generator_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GeneratorView<'a> {
@@ -2715,7 +2715,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GeneratorView<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 3000usize {
@@ -2791,7 +2791,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GeneratorViewerState<'a> 
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -2837,7 +2837,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Interaction<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.feed_context {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
@@ -3001,37 +3001,37 @@ pub mod not_found_post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type NotFound;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type NotFound = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type NotFound = S::NotFound;
+        type Uri = Unset;
     }
     ///State transition - sets the `not_found` field to Set
     pub struct SetNotFound<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetNotFound<S> {}
     impl<S: State> State for SetNotFound<S> {
-        type Uri = S::Uri;
         type NotFound = Set<members::not_found>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type NotFound = S::NotFound;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `not_found` field
         pub struct not_found(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -3104,8 +3104,8 @@ where
 impl<'a, S> NotFoundPostBuilder<'a, S>
 where
     S: not_found_post_state::State,
-    S::Uri: not_found_post_state::IsSet,
     S::NotFound: not_found_post_state::IsSet,
+    S::Uri: not_found_post_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> NotFoundPost<'a> {
@@ -3143,7 +3143,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NotFoundPost<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -3207,83 +3207,83 @@ pub mod post_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type IndexedAt;
         type Uri;
-        type Cid;
         type Author;
+        type IndexedAt;
+        type Cid;
         type Record;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type IndexedAt = Unset;
         type Uri = Unset;
-        type Cid = Unset;
         type Author = Unset;
+        type IndexedAt = Unset;
+        type Cid = Unset;
         type Record = Unset;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
-    impl<S: State> State for SetIndexedAt<S> {
-        type IndexedAt = Set<members::indexed_at>;
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-        type Author = S::Author;
-        type Record = S::Record;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type IndexedAt = S::IndexedAt;
         type Uri = Set<members::uri>;
-        type Cid = S::Cid;
         type Author = S::Author;
-        type Record = S::Record;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
         type IndexedAt = S::IndexedAt;
-        type Uri = S::Uri;
-        type Cid = Set<members::cid>;
-        type Author = S::Author;
+        type Cid = S::Cid;
         type Record = S::Record;
     }
     ///State transition - sets the `author` field to Set
     pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthor<S> {}
     impl<S: State> State for SetAuthor<S> {
-        type IndexedAt = S::IndexedAt;
         type Uri = S::Uri;
-        type Cid = S::Cid;
         type Author = Set<members::author>;
+        type IndexedAt = S::IndexedAt;
+        type Cid = S::Cid;
+        type Record = S::Record;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type Uri = S::Uri;
+        type Author = S::Author;
+        type IndexedAt = Set<members::indexed_at>;
+        type Cid = S::Cid;
+        type Record = S::Record;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Uri = S::Uri;
+        type Author = S::Author;
+        type IndexedAt = S::IndexedAt;
+        type Cid = Set<members::cid>;
         type Record = S::Record;
     }
     ///State transition - sets the `record` field to Set
     pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRecord<S> {}
     impl<S: State> State for SetRecord<S> {
-        type IndexedAt = S::IndexedAt;
         type Uri = S::Uri;
-        type Cid = S::Cid;
         type Author = S::Author;
+        type IndexedAt = S::IndexedAt;
+        type Cid = S::Cid;
         type Record = Set<members::record>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
         ///Marker type for the `uri` field
         pub struct uri(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `author` field
         pub struct author(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
         ///Marker type for the `record` field
         pub struct record(());
     }
@@ -3598,10 +3598,10 @@ impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
 impl<'a, S> PostViewBuilder<'a, S>
 where
     S: post_view_state::State,
-    S::IndexedAt: post_view_state::IsSet,
     S::Uri: post_view_state::IsSet,
-    S::Cid: post_view_state::IsSet,
     S::Author: post_view_state::IsSet,
+    S::IndexedAt: post_view_state::IsSet,
+    S::Cid: post_view_state::IsSet,
     S::Record: post_view_state::IsSet,
 {
     /// Build the final struct
@@ -3691,7 +3691,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PostView<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -3721,7 +3721,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReasonPin<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -3945,7 +3945,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReasonRepost<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -4190,7 +4190,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReplyRef<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -4431,7 +4431,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SkeletonFeedPost<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.feed_context {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
@@ -4473,7 +4473,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SkeletonReasonPin<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -4614,7 +4614,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SkeletonReasonRepost<'a> 
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -4650,7 +4650,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThreadContext<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -4899,7 +4899,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThreadViewPost<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -4943,7 +4943,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThreadgateView<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -4992,7 +4992,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewerState<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

@@ -1,0 +1,36 @@
+{
+  "lexicon": 1,
+  "id": "tech.tokimeki.poll.vote",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A vote on a poll",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "poll",
+          "optionIndex",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "optionIndex": {
+            "type": "integer",
+            "description": "Index of the selected option (0-3)",
+            "minimum": 0,
+            "maximum": 3
+          },
+          "poll": {
+            "type": "ref",
+            "description": "Reference to the poll record being voted on",
+            "ref": "com.atproto.repo.strongRef"
+          }
+        }
+      }
+    }
+  }
+}

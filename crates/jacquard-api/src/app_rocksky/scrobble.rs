@@ -114,105 +114,105 @@ pub mod scrobble_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Album;
-        type Artist;
-        type AlbumArtist;
-        type Duration;
         type Title;
+        type Duration;
+        type Artist;
+        type CreatedAt;
+        type AlbumArtist;
+        type Album;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Album = Unset;
-        type Artist = Unset;
-        type AlbumArtist = Unset;
-        type Duration = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Album = S::Album;
-        type Artist = S::Artist;
-        type AlbumArtist = S::AlbumArtist;
-        type Duration = S::Duration;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `album` field to Set
-    pub struct SetAlbum<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAlbum<S> {}
-    impl<S: State> State for SetAlbum<S> {
-        type CreatedAt = S::CreatedAt;
-        type Album = Set<members::album>;
-        type Artist = S::Artist;
-        type AlbumArtist = S::AlbumArtist;
-        type Duration = S::Duration;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `artist` field to Set
-    pub struct SetArtist<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetArtist<S> {}
-    impl<S: State> State for SetArtist<S> {
-        type CreatedAt = S::CreatedAt;
-        type Album = S::Album;
-        type Artist = Set<members::artist>;
-        type AlbumArtist = S::AlbumArtist;
-        type Duration = S::Duration;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `album_artist` field to Set
-    pub struct SetAlbumArtist<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAlbumArtist<S> {}
-    impl<S: State> State for SetAlbumArtist<S> {
-        type CreatedAt = S::CreatedAt;
-        type Album = S::Album;
-        type Artist = S::Artist;
-        type AlbumArtist = Set<members::album_artist>;
-        type Duration = S::Duration;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `duration` field to Set
-    pub struct SetDuration<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDuration<S> {}
-    impl<S: State> State for SetDuration<S> {
-        type CreatedAt = S::CreatedAt;
-        type Album = S::Album;
-        type Artist = S::Artist;
-        type AlbumArtist = S::AlbumArtist;
-        type Duration = Set<members::duration>;
-        type Title = S::Title;
+        type Duration = Unset;
+        type Artist = Unset;
+        type CreatedAt = Unset;
+        type AlbumArtist = Unset;
+        type Album = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type CreatedAt = S::CreatedAt;
-        type Album = S::Album;
-        type Artist = S::Artist;
-        type AlbumArtist = S::AlbumArtist;
-        type Duration = S::Duration;
         type Title = Set<members::title>;
+        type Duration = S::Duration;
+        type Artist = S::Artist;
+        type CreatedAt = S::CreatedAt;
+        type AlbumArtist = S::AlbumArtist;
+        type Album = S::Album;
+    }
+    ///State transition - sets the `duration` field to Set
+    pub struct SetDuration<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDuration<S> {}
+    impl<S: State> State for SetDuration<S> {
+        type Title = S::Title;
+        type Duration = Set<members::duration>;
+        type Artist = S::Artist;
+        type CreatedAt = S::CreatedAt;
+        type AlbumArtist = S::AlbumArtist;
+        type Album = S::Album;
+    }
+    ///State transition - sets the `artist` field to Set
+    pub struct SetArtist<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetArtist<S> {}
+    impl<S: State> State for SetArtist<S> {
+        type Title = S::Title;
+        type Duration = S::Duration;
+        type Artist = Set<members::artist>;
+        type CreatedAt = S::CreatedAt;
+        type AlbumArtist = S::AlbumArtist;
+        type Album = S::Album;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Title = S::Title;
+        type Duration = S::Duration;
+        type Artist = S::Artist;
+        type CreatedAt = Set<members::created_at>;
+        type AlbumArtist = S::AlbumArtist;
+        type Album = S::Album;
+    }
+    ///State transition - sets the `album_artist` field to Set
+    pub struct SetAlbumArtist<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAlbumArtist<S> {}
+    impl<S: State> State for SetAlbumArtist<S> {
+        type Title = S::Title;
+        type Duration = S::Duration;
+        type Artist = S::Artist;
+        type CreatedAt = S::CreatedAt;
+        type AlbumArtist = Set<members::album_artist>;
+        type Album = S::Album;
+    }
+    ///State transition - sets the `album` field to Set
+    pub struct SetAlbum<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAlbum<S> {}
+    impl<S: State> State for SetAlbum<S> {
+        type Title = S::Title;
+        type Duration = S::Duration;
+        type Artist = S::Artist;
+        type CreatedAt = S::CreatedAt;
+        type AlbumArtist = S::AlbumArtist;
+        type Album = Set<members::album>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `album` field
-        pub struct album(());
-        ///Marker type for the `artist` field
-        pub struct artist(());
-        ///Marker type for the `album_artist` field
-        pub struct album_artist(());
-        ///Marker type for the `duration` field
-        pub struct duration(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `duration` field
+        pub struct duration(());
+        ///Marker type for the `artist` field
+        pub struct artist(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `album_artist` field
+        pub struct album_artist(());
+        ///Marker type for the `album` field
+        pub struct album(());
     }
 }
 
@@ -693,12 +693,12 @@ impl<'a, S: scrobble_state::State> ScrobbleBuilder<'a, S> {
 impl<'a, S> ScrobbleBuilder<'a, S>
 where
     S: scrobble_state::State,
-    S::CreatedAt: scrobble_state::IsSet,
-    S::Album: scrobble_state::IsSet,
-    S::Artist: scrobble_state::IsSet,
-    S::AlbumArtist: scrobble_state::IsSet,
-    S::Duration: scrobble_state::IsSet,
     S::Title: scrobble_state::IsSet,
+    S::Duration: scrobble_state::IsSet,
+    S::Artist: scrobble_state::IsSet,
+    S::CreatedAt: scrobble_state::IsSet,
+    S::AlbumArtist: scrobble_state::IsSet,
+    S::Album: scrobble_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Scrobble<'a> {
@@ -839,7 +839,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Scrobble<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.album;
             #[allow(unused_comparisons)]
@@ -1063,7 +1063,7 @@ fn lexicon_doc_app_rocksky_scrobble() -> ::jacquard_lexicon::lexicon::LexiconDoc
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
@@ -1088,7 +1088,7 @@ fn lexicon_doc_app_rocksky_scrobble() -> ::jacquard_lexicon::lexicon::LexiconDoc
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static("album"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1603,7 +1603,7 @@ fn lexicon_doc_app_rocksky_scrobble_defs() -> ::jacquard_lexicon::lexicon::Lexic
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("scrobbleViewBasic"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -1612,7 +1612,7 @@ fn lexicon_doc_app_rocksky_scrobble_defs() -> ::jacquard_lexicon::lexicon::Lexic
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("album"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1846,7 +1846,7 @@ fn lexicon_doc_app_rocksky_scrobble_defs() -> ::jacquard_lexicon::lexicon::Lexic
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("album"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -2115,7 +2115,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ScrobbleViewBasic<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -2196,7 +2196,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ScrobbleViewDetailed<'a> 
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

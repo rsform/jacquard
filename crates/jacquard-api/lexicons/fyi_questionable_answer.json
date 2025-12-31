@@ -10,22 +10,33 @@
         "type": "object",
         "required": [
           "question",
-          "content",
+          "text",
           "createdAt"
         ],
         "properties": {
-          "content": {
-            "type": "string",
-            "maxLength": 10000,
-            "maxGraphemes": 10000
-          },
           "createdAt": {
             "type": "string",
             "format": "datetime"
           },
+          "languages": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "language"
+            },
+            "maxLength": 3
+          },
           "question": {
             "type": "ref",
+            "description": "Indicates the question to which this is a proposed answer to",
             "ref": "com.atproto.repo.strongRef"
+          },
+          "text": {
+            "type": "string",
+            "description": "The full text of the answer",
+            "minLength": 1,
+            "maxLength": 10000,
+            "maxGraphemes": 10000
           }
         }
       }

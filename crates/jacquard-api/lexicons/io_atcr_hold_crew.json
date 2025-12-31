@@ -29,12 +29,14 @@
             "type": "array",
             "description": "Specific permissions granted to this member",
             "items": {
-              "type": "string"
+              "type": "string",
+              "maxLength": 64
             }
           },
           "role": {
             "type": "string",
             "description": "Member's role in the hold",
+            "maxLength": 32,
             "knownValues": [
               "owner",
               "admin",

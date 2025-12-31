@@ -33,37 +33,37 @@ pub mod live_now_config_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Domains;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Domains = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Domains = S::Domains;
+        type Did = Unset;
     }
     ///State transition - sets the `domains` field to Set
     pub struct SetDomains<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDomains<S> {}
     impl<S: State> State for SetDomains<S> {
-        type Did = S::Did;
         type Domains = Set<members::domains>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Domains = S::Domains;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `domains` field
         pub struct domains(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
@@ -136,8 +136,8 @@ where
 impl<'a, S> LiveNowConfigBuilder<'a, S>
 where
     S: live_now_config_state::State,
-    S::Did: live_now_config_state::IsSet,
     S::Domains: live_now_config_state::IsSet,
+    S::Did: live_now_config_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LiveNowConfig<'a> {
@@ -172,7 +172,7 @@ fn lexicon_doc_app_bsky_unspecced_getConfig() -> ::jacquard_lexicon::lexicon::Le
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("liveNowConfig"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -186,7 +186,7 @@ fn lexicon_doc_app_bsky_unspecced_getConfig() -> ::jacquard_lexicon::lexicon::Le
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("did"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -254,7 +254,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LiveNowConfig<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

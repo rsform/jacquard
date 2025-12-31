@@ -3,68 +3,73 @@
   "id": "site.standard.document",
   "defs": {
     "main": {
-      "type": "object",
-      "required": [
-        "publication",
-        "title",
-        "publishedAt"
-      ],
-      "properties": {
-        "bskyPostRef": {
-          "type": "ref",
-          "ref": "com.atproto.repo.strongRef"
-        },
-        "content": {
-          "type": "array",
-          "items": {
-            "type": "union",
-            "refs": [],
-            "closed": false
-          }
-        },
-        "coverImage": {
-          "type": "blob",
-          "accept": [
-            "image/*"
-          ],
-          "maxSize": 1000000
-        },
-        "description": {
-          "type": "string",
-          "maxLength": 3000,
-          "maxGraphemes": 300
-        },
-        "path": {
-          "type": "string",
-          "description": "combined with the publications url to construct a full url to the document"
-        },
-        "publication": {
-          "type": "string",
-          "format": "at-uri"
-        },
-        "publishedAt": {
-          "type": "string",
-          "format": "datetime"
-        },
-        "tags": {
-          "type": "array",
-          "items": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "site",
+          "title",
+          "publishedAt"
+        ],
+        "properties": {
+          "bskyPostRef": {
+            "type": "ref",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "type": "union",
+              "refs": [],
+              "closed": false
+            }
+          },
+          "coverImage": {
+            "type": "blob",
+            "accept": [
+              "image/*"
+            ],
+            "maxSize": 1000000
+          },
+          "description": {
             "type": "string",
-            "maxLength": 100,
-            "maxGraphemes": 50
+            "maxLength": 3000,
+            "maxGraphemes": 300
+          },
+          "path": {
+            "type": "string",
+            "description": "combine with the publication url or the document site to construct a full url to the document"
+          },
+          "publishedAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "site": {
+            "type": "string",
+            "description": "URI to the site or publication this document belongs to (https or at-uri)",
+            "format": "uri"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 100,
+              "maxGraphemes": 50
+            }
+          },
+          "textContent": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 1280,
+            "maxGraphemes": 128
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "datetime"
           }
-        },
-        "textContent": {
-          "type": "string"
-        },
-        "title": {
-          "type": "string",
-          "maxLength": 1280,
-          "maxGraphemes": 128
-        },
-        "updatedAt": {
-          "type": "string",
-          "format": "datetime"
         }
       }
     }

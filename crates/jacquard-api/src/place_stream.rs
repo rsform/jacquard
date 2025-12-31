@@ -49,85 +49,85 @@ pub mod block_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
-        type IndexedAt;
         type Record;
-        type Blocker;
         type Uri;
+        type IndexedAt;
+        type Blocker;
+        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
-        type IndexedAt = Unset;
         type Record = Unset;
-        type Blocker = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Cid = Set<members::cid>;
-        type IndexedAt = S::IndexedAt;
-        type Record = S::Record;
-        type Blocker = S::Blocker;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
-    impl<S: State> State for SetIndexedAt<S> {
-        type Cid = S::Cid;
-        type IndexedAt = Set<members::indexed_at>;
-        type Record = S::Record;
-        type Blocker = S::Blocker;
-        type Uri = S::Uri;
+        type IndexedAt = Unset;
+        type Blocker = Unset;
+        type Cid = Unset;
     }
     ///State transition - sets the `record` field to Set
     pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRecord<S> {}
     impl<S: State> State for SetRecord<S> {
-        type Cid = S::Cid;
-        type IndexedAt = S::IndexedAt;
         type Record = Set<members::record>;
-        type Blocker = S::Blocker;
         type Uri = S::Uri;
-    }
-    ///State transition - sets the `blocker` field to Set
-    pub struct SetBlocker<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlocker<S> {}
-    impl<S: State> State for SetBlocker<S> {
-        type Cid = S::Cid;
         type IndexedAt = S::IndexedAt;
-        type Record = S::Record;
-        type Blocker = Set<members::blocker>;
-        type Uri = S::Uri;
+        type Blocker = S::Blocker;
+        type Cid = S::Cid;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Cid = S::Cid;
-        type IndexedAt = S::IndexedAt;
         type Record = S::Record;
-        type Blocker = S::Blocker;
         type Uri = Set<members::uri>;
+        type IndexedAt = S::IndexedAt;
+        type Blocker = S::Blocker;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type Record = S::Record;
+        type Uri = S::Uri;
+        type IndexedAt = Set<members::indexed_at>;
+        type Blocker = S::Blocker;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `blocker` field to Set
+    pub struct SetBlocker<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlocker<S> {}
+    impl<S: State> State for SetBlocker<S> {
+        type Record = S::Record;
+        type Uri = S::Uri;
+        type IndexedAt = S::IndexedAt;
+        type Blocker = Set<members::blocker>;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Record = S::Record;
+        type Uri = S::Uri;
+        type IndexedAt = S::IndexedAt;
+        type Blocker = S::Blocker;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
         ///Marker type for the `record` field
         pub struct record(());
-        ///Marker type for the `blocker` field
-        pub struct blocker(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
+        ///Marker type for the `blocker` field
+        pub struct blocker(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
     }
 }
 
@@ -260,11 +260,11 @@ where
 impl<'a, S> BlockViewBuilder<'a, S>
 where
     S: block_view_state::State,
-    S::Cid: block_view_state::IsSet,
-    S::IndexedAt: block_view_state::IsSet,
     S::Record: block_view_state::IsSet,
-    S::Blocker: block_view_state::IsSet,
     S::Uri: block_view_state::IsSet,
+    S::IndexedAt: block_view_state::IsSet,
+    S::Blocker: block_view_state::IsSet,
+    S::Cid: block_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> BlockView<'a> {
@@ -303,7 +303,7 @@ fn lexicon_doc_place_stream_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("blockView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -320,7 +320,7 @@ fn lexicon_doc_place_stream_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("blocker"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -406,7 +406,7 @@ fn lexicon_doc_place_stream_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("name"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -438,7 +438,7 @@ fn lexicon_doc_place_stream_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
                                 "renditions",
@@ -474,7 +474,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BlockView<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -508,7 +508,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Rendition<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -646,7 +646,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Renditions<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

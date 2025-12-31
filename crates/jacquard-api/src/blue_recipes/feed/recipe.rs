@@ -36,7 +36,7 @@ fn lexicon_doc_blue_recipes_feed_recipe() -> ::jacquard_lexicon::lexicon::Lexico
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("ingredient"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -47,7 +47,7 @@ fn lexicon_doc_blue_recipes_feed_recipe() -> ::jacquard_lexicon::lexicon::Lexico
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("amount"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -111,7 +111,7 @@ fn lexicon_doc_blue_recipes_feed_recipe() -> ::jacquard_lexicon::lexicon::Lexico
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static(
                                     "createdAt",
@@ -236,7 +236,7 @@ fn lexicon_doc_blue_recipes_feed_recipe() -> ::jacquard_lexicon::lexicon::Lexico
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("text"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -277,7 +277,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Ingredient<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.name;
             #[allow(unused_comparisons)]
@@ -700,7 +700,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Recipe<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 3000usize {
@@ -797,7 +797,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Step<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.text;
             #[allow(unused_comparisons)]

@@ -6,4 +6,5 @@
 pub mod actor;
 pub mod lexicon;
 pub mod slice;
+pub mod tools;
 pub mod waitlist;

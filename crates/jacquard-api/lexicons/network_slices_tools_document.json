@@ -1,0 +1,178 @@
+{
+  "lexicon": 1,
+  "id": "network.slices.tools.document",
+  "defs": {
+    "codeBlock": {
+      "type": "object",
+      "description": "A fenced code block",
+      "required": [
+        "code"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "maxLength": 20000
+        },
+        "lang": {
+          "type": "string",
+          "maxLength": 50
+        }
+      }
+    },
+    "heading": {
+      "type": "object",
+      "description": "A heading block (h1-h3) with optional inline formatting",
+      "required": [
+        "level",
+        "text"
+      ],
+      "properties": {
+        "facets": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "network.slices.tools.richtext.facet"
+          }
+        },
+        "level": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3
+        },
+        "text": {
+          "type": "string",
+          "maxLength": 300
+        }
+      }
+    },
+    "imageEmbed": {
+      "type": "object",
+      "description": "An embedded image with alt text",
+      "required": [
+        "image"
+      ],
+      "properties": {
+        "alt": {
+          "type": "string",
+          "description": "Alt text for accessibility",
+          "maxLength": 1000
+        },
+        "image": {
+          "type": "blob",
+          "accept": [
+            "image/*"
+          ],
+          "maxSize": 1000000
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "title",
+          "slug",
+          "blocks",
+          "createdAt"
+        ],
+        "properties": {
+          "blocks": {
+            "type": "array",
+            "description": "Document content as array of blocks",
+            "items": {
+              "type": "union",
+              "refs": [
+                "#paragraph",
+                "#heading",
+                "#codeBlock",
+                "#quote",
+                "#tangledEmbed",
+                "#imageEmbed"
+              ]
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "slug": {
+            "type": "string",
+            "description": "URL-friendly identifier, unique per author",
+            "maxLength": 100
+          },
+          "title": {
+            "type": "string",
+            "description": "Document title",
+            "maxLength": 300
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "datetime"
+          }
+        }
+      }
+    },
+    "paragraph": {
+      "type": "object",
+      "description": "A paragraph block with optional inline formatting",
+      "required": [
+        "text"
+      ],
+      "properties": {
+        "facets": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "network.slices.tools.richtext.facet"
+          }
+        },
+        "text": {
+          "type": "string",
+          "maxLength": 10000
+        }
+      }
+    },
+    "quote": {
+      "type": "object",
+      "description": "A blockquote with optional inline formatting",
+      "required": [
+        "text"
+      ],
+      "properties": {
+        "facets": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "network.slices.tools.richtext.facet"
+          }
+        },
+        "text": {
+          "type": "string",
+          "maxLength": 5000
+        }
+      }
+    },
+    "tangledEmbed": {
+      "type": "object",
+      "description": "An embedded Tangled repo card",
+      "required": [
+        "handle",
+        "repo"
+      ],
+      "properties": {
+        "handle": {
+          "type": "string",
+          "description": "The repo owner's handle",
+          "maxLength": 300
+        },
+        "repo": {
+          "type": "string",
+          "description": "The repository name",
+          "maxLength": 300
+        }
+      }
+    }
+  }
+}

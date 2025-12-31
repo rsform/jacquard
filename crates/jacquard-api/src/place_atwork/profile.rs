@@ -403,7 +403,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
@@ -477,7 +477,7 @@ fn lexicon_doc_place_atwork_profile() -> ::jacquard_lexicon::lexicon::LexiconDoc
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("forhire"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
@@ -505,7 +505,7 @@ fn lexicon_doc_place_atwork_profile() -> ::jacquard_lexicon::lexicon::LexiconDoc
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static("avatar"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {

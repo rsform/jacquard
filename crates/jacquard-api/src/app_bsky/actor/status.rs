@@ -300,7 +300,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Status<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.duration_minutes {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -325,7 +325,7 @@ fn lexicon_doc_app_bsky_actor_status() -> ::jacquard_lexicon::lexicon::LexiconDo
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("live"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
@@ -352,7 +352,7 @@ fn lexicon_doc_app_bsky_actor_status() -> ::jacquard_lexicon::lexicon::LexiconDo
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static(
                                     "createdAt",

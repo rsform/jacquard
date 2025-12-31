@@ -36,7 +36,8 @@
           },
           "provider": {
             "type": "string",
-            "description": "Deployment provider (e.g., fly.io, aws, etc.)"
+            "description": "Deployment provider (e.g., fly.io, aws, etc.)",
+            "maxLength": 64
           },
           "public": {
             "type": "boolean",
@@ -44,7 +45,8 @@
           },
           "region": {
             "type": "string",
-            "description": "S3 region where blobs are stored"
+            "description": "S3 region where blobs are stored",
+            "maxLength": 64
           }
         }
       }

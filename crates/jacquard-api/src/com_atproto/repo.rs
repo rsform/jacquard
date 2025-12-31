@@ -44,37 +44,37 @@ pub mod commit_meta_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
         type Rev;
+        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
         type Rev = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Cid = Set<members::cid>;
-        type Rev = S::Rev;
+        type Cid = Unset;
     }
     ///State transition - sets the `rev` field to Set
     pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRev<S> {}
     impl<S: State> State for SetRev<S> {
-        type Cid = S::Cid;
         type Rev = Set<members::rev>;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Rev = S::Rev;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `rev` field
         pub struct rev(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
     }
 }
 
@@ -147,8 +147,8 @@ where
 impl<'a, S> CommitMetaBuilder<'a, S>
 where
     S: commit_meta_state::State,
-    S::Cid: commit_meta_state::IsSet,
     S::Rev: commit_meta_state::IsSet,
+    S::Cid: commit_meta_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CommitMeta<'a> {
@@ -183,7 +183,7 @@ fn lexicon_doc_com_atproto_repo_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("commitMeta"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -197,7 +197,7 @@ fn lexicon_doc_com_atproto_repo_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("cid"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -253,7 +253,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CommitMeta<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

@@ -55,67 +55,67 @@ pub mod vote_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Val;
-        type Uri;
-        type Src;
         type Cts;
+        type Src;
+        type Uri;
+        type Val;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Val = Unset;
-        type Uri = Unset;
-        type Src = Unset;
         type Cts = Unset;
-    }
-    ///State transition - sets the `val` field to Set
-    pub struct SetVal<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVal<S> {}
-    impl<S: State> State for SetVal<S> {
-        type Val = Set<members::val>;
-        type Uri = S::Uri;
-        type Src = S::Src;
-        type Cts = S::Cts;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Val = S::Val;
-        type Uri = Set<members::uri>;
-        type Src = S::Src;
-        type Cts = S::Cts;
-    }
-    ///State transition - sets the `src` field to Set
-    pub struct SetSrc<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSrc<S> {}
-    impl<S: State> State for SetSrc<S> {
-        type Val = S::Val;
-        type Uri = S::Uri;
-        type Src = Set<members::src>;
-        type Cts = S::Cts;
+        type Src = Unset;
+        type Uri = Unset;
+        type Val = Unset;
     }
     ///State transition - sets the `cts` field to Set
     pub struct SetCts<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCts<S> {}
     impl<S: State> State for SetCts<S> {
-        type Val = S::Val;
-        type Uri = S::Uri;
-        type Src = S::Src;
         type Cts = Set<members::cts>;
+        type Src = S::Src;
+        type Uri = S::Uri;
+        type Val = S::Val;
+    }
+    ///State transition - sets the `src` field to Set
+    pub struct SetSrc<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSrc<S> {}
+    impl<S: State> State for SetSrc<S> {
+        type Cts = S::Cts;
+        type Src = Set<members::src>;
+        type Uri = S::Uri;
+        type Val = S::Val;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Cts = S::Cts;
+        type Src = S::Src;
+        type Uri = Set<members::uri>;
+        type Val = S::Val;
+    }
+    ///State transition - sets the `val` field to Set
+    pub struct SetVal<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVal<S> {}
+    impl<S: State> State for SetVal<S> {
+        type Cts = S::Cts;
+        type Src = S::Src;
+        type Uri = S::Uri;
+        type Val = Set<members::val>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `val` field
-        pub struct val(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `src` field
-        pub struct src(());
         ///Marker type for the `cts` field
         pub struct cts(());
+        ///Marker type for the `src` field
+        pub struct src(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `val` field
+        pub struct val(());
     }
 }
 
@@ -296,10 +296,10 @@ where
 impl<'a, S> VoteBuilder<'a, S>
 where
     S: vote_state::State,
-    S::Val: vote_state::IsSet,
-    S::Uri: vote_state::IsSet,
-    S::Src: vote_state::IsSet,
     S::Cts: vote_state::IsSet,
+    S::Src: vote_state::IsSet,
+    S::Uri: vote_state::IsSet,
+    S::Val: vote_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Vote<'a> {
@@ -410,7 +410,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Vote<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -422,7 +422,7 @@ fn lexicon_doc_social_pmsky_vote() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
@@ -445,7 +445,7 @@ fn lexicon_doc_social_pmsky_vote() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static("aid"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {

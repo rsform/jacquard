@@ -40,7 +40,7 @@ fn lexicon_doc_place_wisp_settings() -> ::jacquard_lexicon::lexicon::LexiconDoc<
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("customHeader"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -58,7 +58,7 @@ fn lexicon_doc_place_wisp_settings() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("name"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -133,7 +133,7 @@ fn lexicon_doc_place_wisp_settings() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static(
                                     "cleanUrls",
@@ -260,7 +260,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CustomHeader<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.name;
             #[allow(unused_comparisons)]
@@ -599,7 +599,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Settings<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.custom404 {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {

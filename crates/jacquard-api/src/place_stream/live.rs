@@ -5,7 +5,10 @@
 
 pub mod get_live_users;
 pub mod get_profile_card;
+pub mod get_recommendations;
 pub mod get_segments;
+pub mod recommendations;
+pub mod search_actors_typeahead;
 
 #[cfg(feature = "streaming")]
 pub mod subscribe_segments;

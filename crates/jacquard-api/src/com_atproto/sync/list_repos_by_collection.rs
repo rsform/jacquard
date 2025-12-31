@@ -333,7 +333,7 @@ fn lexicon_doc_com_atproto_sync_listReposByCollection() -> ::jacquard_lexicon::l
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
@@ -348,7 +348,7 @@ fn lexicon_doc_com_atproto_sync_listReposByCollection() -> ::jacquard_lexicon::l
                             ),
                             properties: {
                                 #[allow(unused_mut)]
-                                let mut map = ::std::collections::BTreeMap::new();
+                                let mut map = ::alloc::collections::BTreeMap::new();
                                 map.insert(
                                     ::jacquard_common::smol_str::SmolStr::new_static(
                                         "collection",
@@ -412,7 +412,7 @@ fn lexicon_doc_com_atproto_sync_listReposByCollection() -> ::jacquard_lexicon::l
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("did"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -451,7 +451,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Repo<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

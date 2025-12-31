@@ -170,7 +170,7 @@ fn lexicon_doc_place_wisp_fs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stati
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("directory"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -184,7 +184,7 @@ fn lexicon_doc_place_wisp_fs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stati
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("entries"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -229,7 +229,7 @@ fn lexicon_doc_place_wisp_fs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stati
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("name"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -274,7 +274,7 @@ fn lexicon_doc_place_wisp_fs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stati
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("base64"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
@@ -369,7 +369,7 @@ fn lexicon_doc_place_wisp_fs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stati
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static(
                                     "createdAt",
@@ -442,7 +442,7 @@ fn lexicon_doc_place_wisp_fs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stati
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("flat"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
@@ -508,7 +508,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Directory<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.entries;
             #[allow(unused_comparisons)]
@@ -554,37 +554,37 @@ pub mod entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Node;
         type Name;
+        type Node;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Node = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `node` field to Set
-    pub struct SetNode<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNode<S> {}
-    impl<S: State> State for SetNode<S> {
-        type Node = Set<members::node>;
-        type Name = S::Name;
+        type Node = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Node = S::Node;
         type Name = Set<members::name>;
+        type Node = S::Node;
+    }
+    ///State transition - sets the `node` field to Set
+    pub struct SetNode<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNode<S> {}
+    impl<S: State> State for SetNode<S> {
+        type Name = S::Name;
+        type Node = Set<members::node>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `node` field
-        pub struct node(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `node` field
+        pub struct node(());
     }
 }
 
@@ -657,8 +657,8 @@ where
 impl<'a, S> EntryBuilder<'a, S>
 where
     S: entry_state::State,
-    S::Node: entry_state::IsSet,
     S::Name: entry_state::IsSet,
+    S::Node: entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Entry<'a> {
@@ -717,7 +717,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.name;
             #[allow(unused_comparisons)]
@@ -974,7 +974,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for File<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1012,50 +1012,50 @@ pub mod fs_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Root;
-        type CreatedAt;
         type Site;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Root = Unset;
-        type CreatedAt = Unset;
         type Site = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `root` field to Set
     pub struct SetRoot<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRoot<S> {}
     impl<S: State> State for SetRoot<S> {
         type Root = Set<members::root>;
+        type Site = S::Site;
         type CreatedAt = S::CreatedAt;
-        type Site = S::Site;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Root = S::Root;
-        type CreatedAt = Set<members::created_at>;
-        type Site = S::Site;
     }
     ///State transition - sets the `site` field to Set
     pub struct SetSite<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSite<S> {}
     impl<S: State> State for SetSite<S> {
         type Root = S::Root;
-        type CreatedAt = S::CreatedAt;
         type Site = Set<members::site>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Root = S::Root;
+        type Site = S::Site;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `root` field
         pub struct root(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `site` field
         pub struct site(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -1163,8 +1163,8 @@ impl<'a, S> FsBuilder<'a, S>
 where
     S: fs_state::State,
     S::Root: fs_state::IsSet,
-    S::CreatedAt: fs_state::IsSet,
     S::Site: fs_state::IsSet,
+    S::CreatedAt: fs_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Fs<'a> {
@@ -1267,7 +1267,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Fs<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.file_count {
             if *value > 1000i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
@@ -1484,7 +1484,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Subfs<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

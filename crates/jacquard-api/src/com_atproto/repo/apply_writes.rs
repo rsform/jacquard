@@ -217,7 +217,7 @@ fn lexicon_doc_com_atproto_repo_applyWrites() -> ::jacquard_lexicon::lexicon::Le
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("create"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -235,7 +235,7 @@ fn lexicon_doc_com_atproto_repo_applyWrites() -> ::jacquard_lexicon::lexicon::Le
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
                                 "collection",
@@ -299,7 +299,7 @@ fn lexicon_doc_com_atproto_repo_applyWrites() -> ::jacquard_lexicon::lexicon::Le
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("cid"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -372,7 +372,7 @@ fn lexicon_doc_com_atproto_repo_applyWrites() -> ::jacquard_lexicon::lexicon::Le
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
                                 "collection",
@@ -421,7 +421,7 @@ fn lexicon_doc_com_atproto_repo_applyWrites() -> ::jacquard_lexicon::lexicon::Le
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map
                     },
                 }),
@@ -448,7 +448,7 @@ fn lexicon_doc_com_atproto_repo_applyWrites() -> ::jacquard_lexicon::lexicon::Le
                                 nullable: None,
                                 properties: {
                                     #[allow(unused_mut)]
-                                    let mut map = ::std::collections::BTreeMap::new();
+                                    let mut map = ::alloc::collections::BTreeMap::new();
                                     map.insert(
                                         ::jacquard_common::smol_str::SmolStr::new_static("repo"),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -547,7 +547,7 @@ fn lexicon_doc_com_atproto_repo_applyWrites() -> ::jacquard_lexicon::lexicon::Le
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
                                 "collection",
@@ -607,7 +607,7 @@ fn lexicon_doc_com_atproto_repo_applyWrites() -> ::jacquard_lexicon::lexicon::Le
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("cid"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -680,7 +680,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Create<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.rkey {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 512usize {
@@ -892,7 +892,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CreateResult<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1078,7 +1078,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Delete<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1108,7 +1108,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DeleteResult<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1149,37 +1149,37 @@ pub mod apply_writes_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Writes;
         type Repo;
+        type Writes;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Writes = Unset;
         type Repo = Unset;
-    }
-    ///State transition - sets the `writes` field to Set
-    pub struct SetWrites<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWrites<S> {}
-    impl<S: State> State for SetWrites<S> {
-        type Writes = Set<members::writes>;
-        type Repo = S::Repo;
+        type Writes = Unset;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepo<S> {}
     impl<S: State> State for SetRepo<S> {
-        type Writes = S::Writes;
         type Repo = Set<members::repo>;
+        type Writes = S::Writes;
+    }
+    ///State transition - sets the `writes` field to Set
+    pub struct SetWrites<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWrites<S> {}
+    impl<S: State> State for SetWrites<S> {
+        type Repo = S::Repo;
+        type Writes = Set<members::writes>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `writes` field
-        pub struct writes(());
         ///Marker type for the `repo` field
         pub struct repo(());
+        ///Marker type for the `writes` field
+        pub struct writes(());
     }
 }
 
@@ -1286,8 +1286,8 @@ where
 impl<'a, S> ApplyWritesBuilder<'a, S>
 where
     S: apply_writes_state::State,
-    S::Writes: apply_writes_state::IsSet,
     S::Repo: apply_writes_state::IsSet,
+    S::Writes: apply_writes_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ApplyWrites<'a> {
@@ -1663,7 +1663,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Update<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1699,37 +1699,37 @@ pub mod update_result_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
         type Uri;
+        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Cid = Set<members::cid>;
-        type Uri = S::Uri;
+        type Cid = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Cid = S::Cid;
         type Uri = Set<members::uri>;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Uri = S::Uri;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
     }
 }
 
@@ -1822,8 +1822,8 @@ impl<'a, S: update_result_state::State> UpdateResultBuilder<'a, S> {
 impl<'a, S> UpdateResultBuilder<'a, S>
 where
     S: update_result_state::State,
-    S::Cid: update_result_state::IsSet,
     S::Uri: update_result_state::IsSet,
+    S::Cid: update_result_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> UpdateResult<'a> {
@@ -1863,7 +1863,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UpdateResult<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

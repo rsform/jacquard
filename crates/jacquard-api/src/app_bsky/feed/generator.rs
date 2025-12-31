@@ -56,51 +56,51 @@ pub mod generator_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type DisplayName;
         type CreatedAt;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type DisplayName = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type DisplayName = S::DisplayName;
-        type CreatedAt = S::CreatedAt;
+        type Did = Unset;
     }
     ///State transition - sets the `display_name` field to Set
     pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDisplayName<S> {}
     impl<S: State> State for SetDisplayName<S> {
-        type Did = S::Did;
         type DisplayName = Set<members::display_name>;
         type CreatedAt = S::CreatedAt;
+        type Did = S::Did;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Did = S::Did;
         type DisplayName = S::DisplayName;
         type CreatedAt = Set<members::created_at>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type DisplayName = S::DisplayName;
+        type CreatedAt = S::CreatedAt;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `display_name` field
         pub struct display_name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
@@ -317,9 +317,9 @@ impl<'a, S: generator_state::State> GeneratorBuilder<'a, S> {
 impl<'a, S> GeneratorBuilder<'a, S>
 where
     S: generator_state::State,
-    S::Did: generator_state::IsSet,
     S::DisplayName: generator_state::IsSet,
     S::CreatedAt: generator_state::IsSet,
+    S::Did: generator_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Generator<'a> {
@@ -432,7 +432,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Generator<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 3000usize {
@@ -508,7 +508,7 @@ fn lexicon_doc_app_bsky_feed_generator() -> ::jacquard_lexicon::lexicon::Lexicon
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
@@ -530,7 +530,7 @@ fn lexicon_doc_app_bsky_feed_generator() -> ::jacquard_lexicon::lexicon::Lexicon
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static(
                                     "acceptsInteractions",

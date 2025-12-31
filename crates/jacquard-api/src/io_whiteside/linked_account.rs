@@ -8,7 +8,13 @@
 /// A linked account record containing external account information
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LinkedAccount<'a> {
@@ -21,11 +27,14 @@ pub struct LinkedAccount<'a> {
     /// Display name of the linked account
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
+    /// Sort order for displaying linked accounts (lower numbers appear first). Defaults to 999 if not specified.
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub order: std::option::Option<i64>,
 }
 
 pub mod linked_account_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -34,50 +43,50 @@ pub mod linked_account_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Name;
-        type Link;
         type Icon;
+        type Link;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Name = Unset;
-        type Link = Unset;
         type Icon = Unset;
+        type Link = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
         type Name = Set<members::name>;
+        type Icon = S::Icon;
         type Link = S::Link;
-        type Icon = S::Icon;
-    }
-    ///State transition - sets the `link` field to Set
-    pub struct SetLink<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLink<S> {}
-    impl<S: State> State for SetLink<S> {
-        type Name = S::Name;
-        type Link = Set<members::link>;
-        type Icon = S::Icon;
     }
     ///State transition - sets the `icon` field to Set
     pub struct SetIcon<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIcon<S> {}
     impl<S: State> State for SetIcon<S> {
         type Name = S::Name;
-        type Link = S::Link;
         type Icon = Set<members::icon>;
+        type Link = S::Link;
+    }
+    ///State transition - sets the `link` field to Set
+    pub struct SetLink<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLink<S> {}
+    impl<S: State> State for SetLink<S> {
+        type Name = S::Name;
+        type Icon = S::Icon;
+        type Link = Set<members::link>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `link` field
-        pub struct link(());
         ///Marker type for the `icon` field
         pub struct icon(());
+        ///Marker type for the `link` field
+        pub struct link(());
     }
 }
 
@@ -88,6 +97,7 @@ pub struct LinkedAccountBuilder<'a, S: linked_account_state::State> {
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<i64>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -104,7 +114,7 @@ impl<'a> LinkedAccountBuilder<'a, linked_account_state::Empty> {
     pub fn new() -> Self {
         LinkedAccountBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None),
+            __unsafe_private_named: (None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -167,12 +177,25 @@ where
     }
 }
 
+impl<'a, S: linked_account_state::State> LinkedAccountBuilder<'a, S> {
+    /// Set the `order` field (optional)
+    pub fn order(mut self, value: impl Into<Option<i64>>) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `order` field to an Option value (optional)
+    pub fn maybe_order(mut self, value: Option<i64>) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
 impl<'a, S> LinkedAccountBuilder<'a, S>
 where
     S: linked_account_state::State,
     S::Name: linked_account_state::IsSet,
-    S::Link: linked_account_state::IsSet,
     S::Icon: linked_account_state::IsSet,
+    S::Link: linked_account_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LinkedAccount<'a> {
@@ -180,6 +203,7 @@ where
             icon: self.__unsafe_private_named.0.unwrap(),
             link: self.__unsafe_private_named.1.unwrap(),
             name: self.__unsafe_private_named.2.unwrap(),
+            order: self.__unsafe_private_named.3,
             extra_data: Default::default(),
         }
     }
@@ -195,6 +219,7 @@ where
             icon: self.__unsafe_private_named.0.unwrap(),
             link: self.__unsafe_private_named.1.unwrap(),
             name: self.__unsafe_private_named.2.unwrap(),
+            order: self.__unsafe_private_named.3,
             extra_data: Some(extra_data),
         }
     }
@@ -215,7 +240,13 @@ impl<'a> LinkedAccount<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LinkedAccountGetRecordOutput<'a> {
@@ -267,19 +298,21 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LinkedAccount<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-fn lexicon_doc_io_whiteside_linkedAccount() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_io_whiteside_linkedAccount() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("io.whiteside.linkedAccount"),
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
@@ -301,7 +334,7 @@ fn lexicon_doc_io_whiteside_linkedAccount() -> ::jacquard_lexicon::lexicon::Lexi
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static("icon"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -359,6 +392,17 @@ fn lexicon_doc_io_whiteside_linkedAccount() -> ::jacquard_lexicon::lexicon::Lexi
                                     r#enum: None,
                                     r#const: None,
                                     known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static("order"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                    description: None,
+                                    default: None,
+                                    minimum: None,
+                                    maximum: None,
+                                    r#enum: None,
+                                    r#const: None,
                                 }),
                             );
                             map

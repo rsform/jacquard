@@ -194,51 +194,51 @@ pub mod repo_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Head;
         type Rev;
         type Did;
-        type Head;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Head = Unset;
         type Rev = Unset;
         type Did = Unset;
-        type Head = Unset;
-    }
-    ///State transition - sets the `rev` field to Set
-    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRev<S> {}
-    impl<S: State> State for SetRev<S> {
-        type Rev = Set<members::rev>;
-        type Did = S::Did;
-        type Head = S::Head;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Rev = S::Rev;
-        type Did = Set<members::did>;
-        type Head = S::Head;
     }
     ///State transition - sets the `head` field to Set
     pub struct SetHead<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHead<S> {}
     impl<S: State> State for SetHead<S> {
+        type Head = Set<members::head>;
         type Rev = S::Rev;
         type Did = S::Did;
-        type Head = Set<members::head>;
+    }
+    ///State transition - sets the `rev` field to Set
+    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRev<S> {}
+    impl<S: State> State for SetRev<S> {
+        type Head = S::Head;
+        type Rev = Set<members::rev>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Head = S::Head;
+        type Rev = S::Rev;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `head` field
+        pub struct head(());
         ///Marker type for the `rev` field
         pub struct rev(());
         ///Marker type for the `did` field
         pub struct did(());
-        ///Marker type for the `head` field
-        pub struct head(());
     }
 }
 
@@ -362,9 +362,9 @@ impl<'a, S: repo_state::State> RepoBuilder<'a, S> {
 impl<'a, S> RepoBuilder<'a, S>
 where
     S: repo_state::State,
+    S::Head: repo_state::IsSet,
     S::Rev: repo_state::IsSet,
     S::Did: repo_state::IsSet,
-    S::Head: repo_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Repo<'a> {
@@ -405,7 +405,7 @@ fn lexicon_doc_com_atproto_sync_listRepos() -> ::jacquard_lexicon::lexicon::Lexi
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
@@ -416,7 +416,7 @@ fn lexicon_doc_com_atproto_sync_listRepos() -> ::jacquard_lexicon::lexicon::Lexi
                             required: None,
                             properties: {
                                 #[allow(unused_mut)]
-                                let mut map = ::std::collections::BTreeMap::new();
+                                let mut map = ::alloc::collections::BTreeMap::new();
                                 map.insert(
                                     ::jacquard_common::smol_str::SmolStr::new_static("cursor"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -465,7 +465,7 @@ fn lexicon_doc_com_atproto_sync_listRepos() -> ::jacquard_lexicon::lexicon::Lexi
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("active"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
@@ -569,7 +569,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Repo<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

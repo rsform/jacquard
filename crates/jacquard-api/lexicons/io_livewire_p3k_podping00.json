@@ -1,0 +1,30 @@
+{
+  "lexicon": 1,
+  "id": "io.livewire.p3k.podping00",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Podping v0.0.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "url",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "The timestamp of when the podping was created.",
+            "format": "datetime"
+          },
+          "url": {
+            "type": "string",
+            "description": "The feed URL that updated.",
+            "format": "uri"
+          }
+        }
+      }
+    }
+  }
+}

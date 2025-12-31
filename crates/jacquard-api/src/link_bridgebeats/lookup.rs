@@ -238,7 +238,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Lookup<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.results;
             #[allow(unused_comparisons)]
@@ -278,7 +278,7 @@ fn lexicon_doc_link_bridgebeats_lookup() -> ::jacquard_lexicon::lexicon::Lexicon
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
@@ -299,7 +299,7 @@ fn lexicon_doc_link_bridgebeats_lookup() -> ::jacquard_lexicon::lexicon::Lexicon
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static(
                                     "lookedUpAt",
@@ -366,7 +366,7 @@ fn lexicon_doc_link_bridgebeats_lookup() -> ::jacquard_lexicon::lexicon::Lexicon
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("artUrl"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -576,85 +576,85 @@ pub mod provider_result_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Artist;
-        type Provider;
-        type Title;
         type Url;
+        type Provider;
         type MarketRegion;
+        type Title;
+        type Artist;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Artist = Unset;
-        type Provider = Unset;
-        type Title = Unset;
         type Url = Unset;
+        type Provider = Unset;
         type MarketRegion = Unset;
-    }
-    ///State transition - sets the `artist` field to Set
-    pub struct SetArtist<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetArtist<S> {}
-    impl<S: State> State for SetArtist<S> {
-        type Artist = Set<members::artist>;
-        type Provider = S::Provider;
-        type Title = S::Title;
-        type Url = S::Url;
-        type MarketRegion = S::MarketRegion;
-    }
-    ///State transition - sets the `provider` field to Set
-    pub struct SetProvider<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetProvider<S> {}
-    impl<S: State> State for SetProvider<S> {
-        type Artist = S::Artist;
-        type Provider = Set<members::provider>;
-        type Title = S::Title;
-        type Url = S::Url;
-        type MarketRegion = S::MarketRegion;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Artist = S::Artist;
-        type Provider = S::Provider;
-        type Title = Set<members::title>;
-        type Url = S::Url;
-        type MarketRegion = S::MarketRegion;
+        type Title = Unset;
+        type Artist = Unset;
     }
     ///State transition - sets the `url` field to Set
     pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUrl<S> {}
     impl<S: State> State for SetUrl<S> {
-        type Artist = S::Artist;
-        type Provider = S::Provider;
-        type Title = S::Title;
         type Url = Set<members::url>;
+        type Provider = S::Provider;
         type MarketRegion = S::MarketRegion;
+        type Title = S::Title;
+        type Artist = S::Artist;
+    }
+    ///State transition - sets the `provider` field to Set
+    pub struct SetProvider<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetProvider<S> {}
+    impl<S: State> State for SetProvider<S> {
+        type Url = S::Url;
+        type Provider = Set<members::provider>;
+        type MarketRegion = S::MarketRegion;
+        type Title = S::Title;
+        type Artist = S::Artist;
     }
     ///State transition - sets the `market_region` field to Set
     pub struct SetMarketRegion<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMarketRegion<S> {}
     impl<S: State> State for SetMarketRegion<S> {
-        type Artist = S::Artist;
-        type Provider = S::Provider;
-        type Title = S::Title;
         type Url = S::Url;
+        type Provider = S::Provider;
         type MarketRegion = Set<members::market_region>;
+        type Title = S::Title;
+        type Artist = S::Artist;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Url = S::Url;
+        type Provider = S::Provider;
+        type MarketRegion = S::MarketRegion;
+        type Title = Set<members::title>;
+        type Artist = S::Artist;
+    }
+    ///State transition - sets the `artist` field to Set
+    pub struct SetArtist<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetArtist<S> {}
+    impl<S: State> State for SetArtist<S> {
+        type Url = S::Url;
+        type Provider = S::Provider;
+        type MarketRegion = S::MarketRegion;
+        type Title = S::Title;
+        type Artist = Set<members::artist>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `artist` field
-        pub struct artist(());
-        ///Marker type for the `provider` field
-        pub struct provider(());
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `url` field
         pub struct url(());
+        ///Marker type for the `provider` field
+        pub struct provider(());
         ///Marker type for the `market_region` field
         pub struct market_region(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `artist` field
+        pub struct artist(());
     }
 }
 
@@ -841,11 +841,11 @@ where
 impl<'a, S> ProviderResultBuilder<'a, S>
 where
     S: provider_result_state::State,
-    S::Artist: provider_result_state::IsSet,
-    S::Provider: provider_result_state::IsSet,
-    S::Title: provider_result_state::IsSet,
     S::Url: provider_result_state::IsSet,
+    S::Provider: provider_result_state::IsSet,
     S::MarketRegion: provider_result_state::IsSet,
+    S::Title: provider_result_state::IsSet,
+    S::Artist: provider_result_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ProviderResult<'a> {
@@ -895,7 +895,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProviderResult<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.art_url {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {

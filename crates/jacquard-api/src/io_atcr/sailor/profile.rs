@@ -8,7 +8,13 @@
 /// User profile for ATCR registry. Stores preferences like default hold for blob storage.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Profile<'a> {
@@ -25,7 +31,7 @@ pub struct Profile<'a> {
 
 pub mod profile_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -187,7 +193,13 @@ impl<'a> Profile<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileGetRecordOutput<'a> {
@@ -239,19 +251,21 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-fn lexicon_doc_io_atcr_sailor_profile() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_io_atcr_sailor_profile() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("io.atcr.sailor.profile"),
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
@@ -271,7 +285,7 @@ fn lexicon_doc_io_atcr_sailor_profile() -> ::jacquard_lexicon::lexicon::LexiconD
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static(
                                     "createdAt",

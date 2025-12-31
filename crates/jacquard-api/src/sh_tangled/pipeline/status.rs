@@ -47,67 +47,67 @@ pub mod status_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Pipeline;
-        type Workflow;
-        type Status;
         type CreatedAt;
+        type Status;
+        type Workflow;
+        type Pipeline;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Pipeline = Unset;
-        type Workflow = Unset;
-        type Status = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `pipeline` field to Set
-    pub struct SetPipeline<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPipeline<S> {}
-    impl<S: State> State for SetPipeline<S> {
-        type Pipeline = Set<members::pipeline>;
-        type Workflow = S::Workflow;
-        type Status = S::Status;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `workflow` field to Set
-    pub struct SetWorkflow<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWorkflow<S> {}
-    impl<S: State> State for SetWorkflow<S> {
-        type Pipeline = S::Pipeline;
-        type Workflow = Set<members::workflow>;
-        type Status = S::Status;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type Pipeline = S::Pipeline;
-        type Workflow = S::Workflow;
-        type Status = Set<members::status>;
-        type CreatedAt = S::CreatedAt;
+        type Status = Unset;
+        type Workflow = Unset;
+        type Pipeline = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Pipeline = S::Pipeline;
-        type Workflow = S::Workflow;
-        type Status = S::Status;
         type CreatedAt = Set<members::created_at>;
+        type Status = S::Status;
+        type Workflow = S::Workflow;
+        type Pipeline = S::Pipeline;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStatus<S> {}
+    impl<S: State> State for SetStatus<S> {
+        type CreatedAt = S::CreatedAt;
+        type Status = Set<members::status>;
+        type Workflow = S::Workflow;
+        type Pipeline = S::Pipeline;
+    }
+    ///State transition - sets the `workflow` field to Set
+    pub struct SetWorkflow<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWorkflow<S> {}
+    impl<S: State> State for SetWorkflow<S> {
+        type CreatedAt = S::CreatedAt;
+        type Status = S::Status;
+        type Workflow = Set<members::workflow>;
+        type Pipeline = S::Pipeline;
+    }
+    ///State transition - sets the `pipeline` field to Set
+    pub struct SetPipeline<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPipeline<S> {}
+    impl<S: State> State for SetPipeline<S> {
+        type CreatedAt = S::CreatedAt;
+        type Status = S::Status;
+        type Workflow = S::Workflow;
+        type Pipeline = Set<members::pipeline>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `pipeline` field
-        pub struct pipeline(());
-        ///Marker type for the `workflow` field
-        pub struct workflow(());
-        ///Marker type for the `status` field
-        pub struct status(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `status` field
+        pub struct status(());
+        ///Marker type for the `workflow` field
+        pub struct workflow(());
+        ///Marker type for the `pipeline` field
+        pub struct pipeline(());
     }
 }
 
@@ -251,10 +251,10 @@ where
 impl<'a, S> StatusBuilder<'a, S>
 where
     S: status_state::State,
-    S::Pipeline: status_state::IsSet,
-    S::Workflow: status_state::IsSet,
-    S::Status: status_state::IsSet,
     S::CreatedAt: status_state::IsSet,
+    S::Status: status_state::IsSet,
+    S::Workflow: status_state::IsSet,
+    S::Pipeline: status_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Status<'a> {
@@ -361,7 +361,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Status<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -375,7 +375,7 @@ fn lexicon_doc_sh_tangled_pipeline_status() -> ::jacquard_lexicon::lexicon::Lexi
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
@@ -394,7 +394,7 @@ fn lexicon_doc_sh_tangled_pipeline_status() -> ::jacquard_lexicon::lexicon::Lexi
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static(
                                     "createdAt",

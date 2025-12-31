@@ -8,7 +8,13 @@
 /// Reference to a blob stored in S3 or external storage
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BlobReference<'a> {
@@ -32,7 +38,7 @@ pub struct BlobReference<'a> {
 
 pub mod blob_reference_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -258,7 +264,7 @@ fn lexicon_doc_io_atcr_manifest() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("blobReference"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -277,7 +283,7 @@ fn lexicon_doc_io_atcr_manifest() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
                                 "annotations",
@@ -297,7 +303,7 @@ fn lexicon_doc_io_atcr_manifest() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                                 format: None,
                                 default: None,
                                 min_length: None,
-                                max_length: None,
+                                max_length: Some(128usize),
                                 min_graphemes: None,
                                 max_graphemes: None,
                                 r#enum: None,
@@ -318,7 +324,7 @@ fn lexicon_doc_io_atcr_manifest() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                                 format: None,
                                 default: None,
                                 min_length: None,
-                                max_length: None,
+                                max_length: Some(128usize),
                                 min_graphemes: None,
                                 max_graphemes: None,
                                 r#enum: None,
@@ -390,7 +396,7 @@ fn lexicon_doc_io_atcr_manifest() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static(
                                     "annotations",
@@ -442,7 +448,7 @@ fn lexicon_doc_io_atcr_manifest() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                                     format: None,
                                     default: None,
                                     min_length: None,
-                                    max_length: None,
+                                    max_length: Some(128usize),
                                     min_graphemes: None,
                                     max_graphemes: None,
                                     r#enum: None,
@@ -553,7 +559,7 @@ fn lexicon_doc_io_atcr_manifest() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                                     format: None,
                                     default: None,
                                     min_length: None,
-                                    max_length: None,
+                                    max_length: Some(128usize),
                                     min_graphemes: None,
                                     max_graphemes: None,
                                     r#enum: None,
@@ -611,212 +617,218 @@ fn lexicon_doc_io_atcr_manifest() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
             );
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("manifestReference"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(
-                    ::jacquard_lexicon::lexicon::LexObject {
-                        description: Some(::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
                             "Reference to a manifest in a manifest list/index",
-                        )),
-                        required: Some(vec![
+                        ),
+                    ),
+                    required: Some(
+                        vec![
                             ::jacquard_common::smol_str::SmolStr::new_static("mediaType"),
                             ::jacquard_common::smol_str::SmolStr::new_static("size"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("digest")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "annotations",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(::jacquard_lexicon::lexicon::LexUnknown {
+                                description: None,
+                            }),
+                        );
+                        map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("digest"),
-                        ]),
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("annotations"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Unknown(
-                                    ::jacquard_lexicon::lexicon::LexUnknown { description: None },
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Content digest (e.g., 'sha256:...')",
+                                    ),
                                 ),
-                            );
-                            map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("digest"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "Content digest (e.g., 'sha256:...')",
-                                        )),
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: Some(128usize),
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "mediaType",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Media type of the referenced manifest",
+                                    ),
                                 ),
-                            );
-                            map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("mediaType"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "Media type of the referenced manifest",
-                                        )),
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
-                                ),
-                            );
-                            map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("platform"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(
-                                    ::jacquard_lexicon::lexicon::LexRef {
-                                        description: None,
-                                        r#ref: ::jacquard_common::CowStr::new_static("#platform"),
-                                    },
-                                ),
-                            );
-                            map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("size"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(
-                                    ::jacquard_lexicon::lexicon::LexInteger {
-                                        description: None,
-                                        default: None,
-                                        minimum: None,
-                                        maximum: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                    },
-                                ),
-                            );
-                            map
-                        },
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: Some(128usize),
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("platform"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                description: None,
+                                r#ref: ::jacquard_common::CowStr::new_static("#platform"),
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("size"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
+                                description: None,
+                                default: None,
+                                minimum: None,
+                                maximum: None,
+                                r#enum: None,
+                                r#const: None,
+                            }),
+                        );
+                        map
                     },
-                ),
+                }),
             );
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("platform"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(
-                    ::jacquard_lexicon::lexicon::LexObject {
-                        description: Some(::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
                             "Platform information describing OS and architecture",
-                        )),
-                        required: Some(vec![
+                        ),
+                    ),
+                    required: Some(
+                        vec![
                             ::jacquard_common::smol_str::SmolStr::new_static("architecture"),
+                            ::jacquard_common::smol_str::SmolStr::new_static("os")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "architecture",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "CPU architecture (e.g., 'amd64', 'arm64', 'arm')",
+                                    ),
+                                ),
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: Some(32usize),
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("os"),
-                        ]),
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("architecture"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "CPU architecture (e.g., 'amd64', 'arm64', 'arm')",
-                                        )),
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Operating system (e.g., 'linux', 'windows', 'darwin')",
+                                    ),
                                 ),
-                            );
-                            map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("os"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "Operating system (e.g., 'linux', 'windows', 'darwin')",
-                                        )),
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: Some(32usize),
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "osFeatures",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Optional OS features",
+                                    ),
                                 ),
-                            );
-                            map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("osFeatures"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(
-                                    ::jacquard_lexicon::lexicon::LexArray {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "Optional OS features",
-                                        )),
-                                        items: ::jacquard_lexicon::lexicon::LexArrayItem::String(
-                                            ::jacquard_lexicon::lexicon::LexString {
-                                                description: None,
-                                                format: None,
-                                                default: None,
-                                                min_length: None,
-                                                max_length: None,
-                                                min_graphemes: None,
-                                                max_graphemes: None,
-                                                r#enum: None,
-                                                r#const: None,
-                                                known_values: None,
-                                            },
-                                        ),
-                                        min_length: None,
-                                        max_length: None,
-                                    },
+                                items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: None,
+                                    default: None,
+                                    min_length: None,
+                                    max_length: Some(64usize),
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                                min_length: None,
+                                max_length: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "osVersion",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static("Optional OS version"),
                                 ),
-                            );
-                            map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("osVersion"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "Optional OS version",
-                                        )),
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: Some(64usize),
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("variant"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Optional CPU variant (e.g., 'v7' for ARM)",
+                                    ),
                                 ),
-                            );
-                            map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("variant"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "Optional CPU variant (e.g., 'v7' for ARM)",
-                                        )),
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
-                                ),
-                            );
-                            map
-                        },
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: Some(32usize),
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map
                     },
-                ),
+                }),
             );
             map
         },
@@ -835,7 +847,33 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BlobReference<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.digest;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 128usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "digest",
+                    ),
+                    max: 128usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.media_type;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 128usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "media_type",
+                    ),
+                    max: 128usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
         Ok(())
     }
 }
@@ -843,7 +881,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BlobReference<'a> {
 /// A container image manifest following OCI specification, stored in ATProto
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Manifest<'a> {
@@ -879,7 +923,9 @@ pub struct Manifest<'a> {
     /// Referenced manifests (for manifest lists/indexes)
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub manifests: std::option::Option<Vec<crate::io_atcr::manifest::ManifestReference<'a>>>,
+    pub manifests: std::option::Option<
+        Vec<crate::io_atcr::manifest::ManifestReference<'a>>,
+    >,
     /// OCI media type
     #[serde(borrow)]
     pub media_type: jacquard_common::CowStr<'a>,
@@ -896,7 +942,7 @@ pub struct Manifest<'a> {
 
 pub mod manifest_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -904,83 +950,83 @@ pub mod manifest_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type MediaType;
+        type Repository;
         type CreatedAt;
         type SchemaVersion;
-        type Repository;
-        type MediaType;
         type Digest;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type MediaType = Unset;
+        type Repository = Unset;
         type CreatedAt = Unset;
         type SchemaVersion = Unset;
-        type Repository = Unset;
-        type MediaType = Unset;
         type Digest = Unset;
     }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type SchemaVersion = S::SchemaVersion;
+    ///State transition - sets the `media_type` field to Set
+    pub struct SetMediaType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMediaType<S> {}
+    impl<S: State> State for SetMediaType<S> {
+        type MediaType = Set<members::media_type>;
         type Repository = S::Repository;
-        type MediaType = S::MediaType;
-        type Digest = S::Digest;
-    }
-    ///State transition - sets the `schema_version` field to Set
-    pub struct SetSchemaVersion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSchemaVersion<S> {}
-    impl<S: State> State for SetSchemaVersion<S> {
         type CreatedAt = S::CreatedAt;
-        type SchemaVersion = Set<members::schema_version>;
-        type Repository = S::Repository;
-        type MediaType = S::MediaType;
+        type SchemaVersion = S::SchemaVersion;
         type Digest = S::Digest;
     }
     ///State transition - sets the `repository` field to Set
     pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepository<S> {}
     impl<S: State> State for SetRepository<S> {
+        type MediaType = S::MediaType;
+        type Repository = Set<members::repository>;
         type CreatedAt = S::CreatedAt;
         type SchemaVersion = S::SchemaVersion;
-        type Repository = Set<members::repository>;
-        type MediaType = S::MediaType;
         type Digest = S::Digest;
     }
-    ///State transition - sets the `media_type` field to Set
-    pub struct SetMediaType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMediaType<S> {}
-    impl<S: State> State for SetMediaType<S> {
-        type CreatedAt = S::CreatedAt;
-        type SchemaVersion = S::SchemaVersion;
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type MediaType = S::MediaType;
         type Repository = S::Repository;
-        type MediaType = Set<members::media_type>;
+        type CreatedAt = Set<members::created_at>;
+        type SchemaVersion = S::SchemaVersion;
+        type Digest = S::Digest;
+    }
+    ///State transition - sets the `schema_version` field to Set
+    pub struct SetSchemaVersion<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSchemaVersion<S> {}
+    impl<S: State> State for SetSchemaVersion<S> {
+        type MediaType = S::MediaType;
+        type Repository = S::Repository;
+        type CreatedAt = S::CreatedAt;
+        type SchemaVersion = Set<members::schema_version>;
         type Digest = S::Digest;
     }
     ///State transition - sets the `digest` field to Set
     pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDigest<S> {}
     impl<S: State> State for SetDigest<S> {
+        type MediaType = S::MediaType;
+        type Repository = S::Repository;
         type CreatedAt = S::CreatedAt;
         type SchemaVersion = S::SchemaVersion;
-        type Repository = S::Repository;
-        type MediaType = S::MediaType;
         type Digest = Set<members::digest>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `media_type` field
+        pub struct media_type(());
+        ///Marker type for the `repository` field
+        pub struct repository(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `schema_version` field
         pub struct schema_version(());
-        ///Marker type for the `repository` field
-        pub struct repository(());
-        ///Marker type for the `media_type` field
-        pub struct media_type(());
         ///Marker type for the `digest` field
         pub struct digest(());
     }
@@ -1020,7 +1066,19 @@ impl<'a> ManifestBuilder<'a, manifest_state::Empty> {
         ManifestBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
@@ -1277,10 +1335,10 @@ impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
 impl<'a, S> ManifestBuilder<'a, S>
 where
     S: manifest_state::State,
+    S::MediaType: manifest_state::IsSet,
+    S::Repository: manifest_state::IsSet,
     S::CreatedAt: manifest_state::IsSet,
     S::SchemaVersion: manifest_state::IsSet,
-    S::Repository: manifest_state::IsSet,
-    S::MediaType: manifest_state::IsSet,
     S::Digest: manifest_state::IsSet,
 {
     /// Build the final struct
@@ -1344,7 +1402,13 @@ impl<'a> Manifest<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ManifestGetRecordOutput<'a> {
@@ -1396,13 +1460,41 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Manifest<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.digest;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 128usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "digest",
+                    ),
+                    max: 128usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.media_type;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 128usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "media_type",
+                    ),
+                    max: 128usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
         {
             let value = &self.repository;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 255usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("repository"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "repository",
+                    ),
                     max: 255usize,
                     actual: <str>::len(value.as_ref()),
                 });
@@ -1415,7 +1507,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Manifest<'a> {
 /// Reference to a manifest in a manifest list/index
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ManifestReference<'a> {
@@ -1439,7 +1537,7 @@ pub struct ManifestReference<'a> {
 
 pub mod manifest_reference_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1447,51 +1545,51 @@ pub mod manifest_reference_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Digest;
-        type Size;
         type MediaType;
+        type Size;
+        type Digest;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Digest = Unset;
-        type Size = Unset;
         type MediaType = Unset;
-    }
-    ///State transition - sets the `digest` field to Set
-    pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDigest<S> {}
-    impl<S: State> State for SetDigest<S> {
-        type Digest = Set<members::digest>;
-        type Size = S::Size;
-        type MediaType = S::MediaType;
-    }
-    ///State transition - sets the `size` field to Set
-    pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSize<S> {}
-    impl<S: State> State for SetSize<S> {
-        type Digest = S::Digest;
-        type Size = Set<members::size>;
-        type MediaType = S::MediaType;
+        type Size = Unset;
+        type Digest = Unset;
     }
     ///State transition - sets the `media_type` field to Set
     pub struct SetMediaType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMediaType<S> {}
     impl<S: State> State for SetMediaType<S> {
-        type Digest = S::Digest;
-        type Size = S::Size;
         type MediaType = Set<members::media_type>;
+        type Size = S::Size;
+        type Digest = S::Digest;
+    }
+    ///State transition - sets the `size` field to Set
+    pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSize<S> {}
+    impl<S: State> State for SetSize<S> {
+        type MediaType = S::MediaType;
+        type Size = Set<members::size>;
+        type Digest = S::Digest;
+    }
+    ///State transition - sets the `digest` field to Set
+    pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDigest<S> {}
+    impl<S: State> State for SetDigest<S> {
+        type MediaType = S::MediaType;
+        type Size = S::Size;
+        type Digest = Set<members::digest>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `digest` field
-        pub struct digest(());
-        ///Marker type for the `size` field
-        pub struct size(());
         ///Marker type for the `media_type` field
         pub struct media_type(());
+        ///Marker type for the `size` field
+        pub struct size(());
+        ///Marker type for the `digest` field
+        pub struct digest(());
     }
 }
 
@@ -1593,7 +1691,10 @@ impl<'a, S: manifest_reference_state::State> ManifestReferenceBuilder<'a, S> {
         self
     }
     /// Set the `platform` field to an Option value (optional)
-    pub fn maybe_platform(mut self, value: Option<crate::io_atcr::manifest::Platform<'a>>) -> Self {
+    pub fn maybe_platform(
+        mut self,
+        value: Option<crate::io_atcr::manifest::Platform<'a>>,
+    ) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -1621,9 +1722,9 @@ where
 impl<'a, S> ManifestReferenceBuilder<'a, S>
 where
     S: manifest_reference_state::State,
-    S::Digest: manifest_reference_state::IsSet,
-    S::Size: manifest_reference_state::IsSet,
     S::MediaType: manifest_reference_state::IsSet,
+    S::Size: manifest_reference_state::IsSet,
+    S::Digest: manifest_reference_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ManifestReference<'a> {
@@ -1667,7 +1768,33 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ManifestReference<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.digest;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 128usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "digest",
+                    ),
+                    max: 128usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.media_type;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 128usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "media_type",
+                    ),
+                    max: 128usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
         Ok(())
     }
 }
@@ -1682,7 +1809,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ManifestReference<'a> {
     PartialEq,
     Eq,
     jacquard_derive::IntoStatic,
-    Default,
+    Default
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Platform<'a> {
@@ -1718,7 +1845,57 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Platform<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.architecture;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 32usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "architecture",
+                    ),
+                    max: 32usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.os;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 32usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "os",
+                    ),
+                    max: 32usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.os_version {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 64usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "os_version",
+                    ),
+                    max: 64usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.variant {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 32usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "variant",
+                    ),
+                    max: 32usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
         Ok(())
     }
 }

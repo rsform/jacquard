@@ -37,51 +37,51 @@ pub mod device_list_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Name;
         type Id;
         type Current;
-        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Name = Unset;
         type Id = Unset;
         type Current = Unset;
-        type Name = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Id = Set<members::id>;
-        type Current = S::Current;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `current` field to Set
-    pub struct SetCurrent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCurrent<S> {}
-    impl<S: State> State for SetCurrent<S> {
-        type Id = S::Id;
-        type Current = Set<members::current>;
-        type Name = S::Name;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
+        type Name = Set<members::name>;
         type Id = S::Id;
         type Current = S::Current;
-        type Name = Set<members::name>;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Name = S::Name;
+        type Id = Set<members::id>;
+        type Current = S::Current;
+    }
+    ///State transition - sets the `current` field to Set
+    pub struct SetCurrent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCurrent<S> {}
+    impl<S: State> State for SetCurrent<S> {
+        type Name = S::Name;
+        type Id = S::Id;
+        type Current = Set<members::current>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `id` field
         pub struct id(());
         ///Marker type for the `current` field
         pub struct current(());
-        ///Marker type for the `name` field
-        pub struct name(());
     }
 }
 
@@ -174,9 +174,9 @@ where
 impl<'a, S> DeviceListItemBuilder<'a, S>
 where
     S: device_list_item_state::State,
+    S::Name: device_list_item_state::IsSet,
     S::Id: device_list_item_state::IsSet,
     S::Current: device_list_item_state::IsSet,
-    S::Name: device_list_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DeviceListItem<'a> {
@@ -213,7 +213,7 @@ fn lexicon_doc_win_tomo_x_pushat_defs() -> ::jacquard_lexicon::lexicon::LexiconD
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("deviceList"),
                 ::jacquard_lexicon::lexicon::LexUserType::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -240,7 +240,7 @@ fn lexicon_doc_win_tomo_x_pushat_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("current"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
@@ -298,7 +298,7 @@ fn lexicon_doc_win_tomo_x_pushat_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("body"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -400,7 +400,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DeviceListItem<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.name;
             #[allow(unused_comparisons)]
@@ -478,7 +478,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NotifyBody<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

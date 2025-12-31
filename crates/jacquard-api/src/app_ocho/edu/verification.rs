@@ -39,50 +39,50 @@ pub mod verification_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Domain;
-        type CreatedAt;
         type Subject;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Domain = Unset;
-        type CreatedAt = Unset;
         type Subject = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `domain` field to Set
     pub struct SetDomain<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDomain<S> {}
     impl<S: State> State for SetDomain<S> {
         type Domain = Set<members::domain>;
+        type Subject = S::Subject;
         type CreatedAt = S::CreatedAt;
-        type Subject = S::Subject;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Domain = S::Domain;
-        type CreatedAt = Set<members::created_at>;
-        type Subject = S::Subject;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
         type Domain = S::Domain;
-        type CreatedAt = S::CreatedAt;
         type Subject = Set<members::subject>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Domain = S::Domain;
+        type Subject = S::Subject;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `domain` field
         pub struct domain(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -176,8 +176,8 @@ impl<'a, S> VerificationBuilder<'a, S>
 where
     S: verification_state::State,
     S::Domain: verification_state::IsSet,
-    S::CreatedAt: verification_state::IsSet,
     S::Subject: verification_state::IsSet,
+    S::CreatedAt: verification_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Verification<'a> {
@@ -278,7 +278,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Verification<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -292,7 +292,7 @@ fn lexicon_doc_app_ocho_edu_verification() -> ::jacquard_lexicon::lexicon::Lexic
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
@@ -314,7 +314,7 @@ fn lexicon_doc_app_ocho_edu_verification() -> ::jacquard_lexicon::lexicon::Lexic
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static(
                                     "createdAt",

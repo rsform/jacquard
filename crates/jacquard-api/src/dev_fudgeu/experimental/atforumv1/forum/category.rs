@@ -39,51 +39,51 @@ pub mod category_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Group;
         type Name;
         type CategoryType;
+        type Group;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Group = Unset;
         type Name = Unset;
         type CategoryType = Unset;
-    }
-    ///State transition - sets the `group` field to Set
-    pub struct SetGroup<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGroup<S> {}
-    impl<S: State> State for SetGroup<S> {
-        type Group = Set<members::group>;
-        type Name = S::Name;
-        type CategoryType = S::CategoryType;
+        type Group = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Group = S::Group;
         type Name = Set<members::name>;
         type CategoryType = S::CategoryType;
+        type Group = S::Group;
     }
     ///State transition - sets the `category_type` field to Set
     pub struct SetCategoryType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCategoryType<S> {}
     impl<S: State> State for SetCategoryType<S> {
-        type Group = S::Group;
         type Name = S::Name;
         type CategoryType = Set<members::category_type>;
+        type Group = S::Group;
+    }
+    ///State transition - sets the `group` field to Set
+    pub struct SetGroup<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGroup<S> {}
+    impl<S: State> State for SetGroup<S> {
+        type Name = S::Name;
+        type CategoryType = S::CategoryType;
+        type Group = Set<members::group>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `group` field
-        pub struct group(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `category_type` field
         pub struct category_type(());
+        ///Marker type for the `group` field
+        pub struct group(());
     }
 }
 
@@ -196,9 +196,9 @@ where
 impl<'a, S> CategoryBuilder<'a, S>
 where
     S: category_state::State,
-    S::Group: category_state::IsSet,
     S::Name: category_state::IsSet,
     S::CategoryType: category_state::IsSet,
+    S::Group: category_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Category<'a> {
@@ -301,7 +301,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Category<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.category_type;
             #[allow(unused_comparisons)]
@@ -368,7 +368,7 @@ fn lexicon_doc_dev_fudgeu_experimental_atforumv1_forum_category() -> ::jacquard_
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
@@ -390,7 +390,7 @@ fn lexicon_doc_dev_fudgeu_experimental_atforumv1_forum_category() -> ::jacquard_
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static(
                                     "categoryType",

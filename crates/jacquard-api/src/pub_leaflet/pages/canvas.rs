@@ -39,67 +39,67 @@ pub mod block_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type X;
-        type Block;
-        type Width;
         type Y;
+        type Width;
+        type Block;
+        type X;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type X = Unset;
-        type Block = Unset;
-        type Width = Unset;
         type Y = Unset;
-    }
-    ///State transition - sets the `x` field to Set
-    pub struct SetX<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetX<S> {}
-    impl<S: State> State for SetX<S> {
-        type X = Set<members::x>;
-        type Block = S::Block;
-        type Width = S::Width;
-        type Y = S::Y;
-    }
-    ///State transition - sets the `block` field to Set
-    pub struct SetBlock<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlock<S> {}
-    impl<S: State> State for SetBlock<S> {
-        type X = S::X;
-        type Block = Set<members::block>;
-        type Width = S::Width;
-        type Y = S::Y;
-    }
-    ///State transition - sets the `width` field to Set
-    pub struct SetWidth<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWidth<S> {}
-    impl<S: State> State for SetWidth<S> {
-        type X = S::X;
-        type Block = S::Block;
-        type Width = Set<members::width>;
-        type Y = S::Y;
+        type Width = Unset;
+        type Block = Unset;
+        type X = Unset;
     }
     ///State transition - sets the `y` field to Set
     pub struct SetY<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetY<S> {}
     impl<S: State> State for SetY<S> {
-        type X = S::X;
-        type Block = S::Block;
-        type Width = S::Width;
         type Y = Set<members::y>;
+        type Width = S::Width;
+        type Block = S::Block;
+        type X = S::X;
+    }
+    ///State transition - sets the `width` field to Set
+    pub struct SetWidth<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWidth<S> {}
+    impl<S: State> State for SetWidth<S> {
+        type Y = S::Y;
+        type Width = Set<members::width>;
+        type Block = S::Block;
+        type X = S::X;
+    }
+    ///State transition - sets the `block` field to Set
+    pub struct SetBlock<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlock<S> {}
+    impl<S: State> State for SetBlock<S> {
+        type Y = S::Y;
+        type Width = S::Width;
+        type Block = Set<members::block>;
+        type X = S::X;
+    }
+    ///State transition - sets the `x` field to Set
+    pub struct SetX<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetX<S> {}
+    impl<S: State> State for SetX<S> {
+        type Y = S::Y;
+        type Width = S::Width;
+        type Block = S::Block;
+        type X = Set<members::x>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `x` field
-        pub struct x(());
-        ///Marker type for the `block` field
-        pub struct block(());
-        ///Marker type for the `width` field
-        pub struct width(());
         ///Marker type for the `y` field
         pub struct y(());
+        ///Marker type for the `width` field
+        pub struct width(());
+        ///Marker type for the `block` field
+        pub struct block(());
+        ///Marker type for the `x` field
+        pub struct x(());
     }
 }
 
@@ -234,10 +234,10 @@ where
 impl<'a, S> BlockBuilder<'a, S>
 where
     S: block_state::State,
-    S::X: block_state::IsSet,
-    S::Block: block_state::IsSet,
-    S::Width: block_state::IsSet,
     S::Y: block_state::IsSet,
+    S::Width: block_state::IsSet,
+    S::Block: block_state::IsSet,
+    S::X: block_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Block<'a> {
@@ -323,7 +323,7 @@ fn lexicon_doc_pub_leaflet_pages_canvas() -> ::jacquard_lexicon::lexicon::Lexico
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("block"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -339,7 +339,7 @@ fn lexicon_doc_pub_leaflet_pages_canvas() -> ::jacquard_lexicon::lexicon::Lexico
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("block"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -432,7 +432,7 @@ fn lexicon_doc_pub_leaflet_pages_canvas() -> ::jacquard_lexicon::lexicon::Lexico
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("blocks"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -477,7 +477,7 @@ fn lexicon_doc_pub_leaflet_pages_canvas() -> ::jacquard_lexicon::lexicon::Lexico
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("block"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -522,7 +522,7 @@ fn lexicon_doc_pub_leaflet_pages_canvas() -> ::jacquard_lexicon::lexicon::Lexico
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("end"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -576,7 +576,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Block<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -733,7 +733,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Canvas<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -906,7 +906,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Position<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -939,37 +939,37 @@ pub mod quote_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Start;
         type End;
+        type Start;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Start = Unset;
         type End = Unset;
-    }
-    ///State transition - sets the `start` field to Set
-    pub struct SetStart<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStart<S> {}
-    impl<S: State> State for SetStart<S> {
-        type Start = Set<members::start>;
-        type End = S::End;
+        type Start = Unset;
     }
     ///State transition - sets the `end` field to Set
     pub struct SetEnd<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEnd<S> {}
     impl<S: State> State for SetEnd<S> {
-        type Start = S::Start;
         type End = Set<members::end>;
+        type Start = S::Start;
+    }
+    ///State transition - sets the `start` field to Set
+    pub struct SetStart<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStart<S> {}
+    impl<S: State> State for SetStart<S> {
+        type End = S::End;
+        type Start = Set<members::start>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `start` field
-        pub struct start(());
         ///Marker type for the `end` field
         pub struct end(());
+        ///Marker type for the `start` field
+        pub struct start(());
     }
 }
 
@@ -1042,8 +1042,8 @@ where
 impl<'a, S> QuoteBuilder<'a, S>
 where
     S: quote_state::State,
-    S::Start: quote_state::IsSet,
     S::End: quote_state::IsSet,
+    S::Start: quote_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Quote<'a> {
@@ -1081,7 +1081,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Quote<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

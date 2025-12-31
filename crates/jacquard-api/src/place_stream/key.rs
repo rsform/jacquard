@@ -264,7 +264,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Key<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.signing_key;
             #[allow(unused_comparisons)]
@@ -302,7 +302,7 @@ fn lexicon_doc_place_stream_key() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
@@ -323,7 +323,7 @@ fn lexicon_doc_place_stream_key() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static(
                                     "createdAt",

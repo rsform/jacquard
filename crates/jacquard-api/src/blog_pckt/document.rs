@@ -18,7 +18,9 @@
 #[serde(rename_all = "camelCase")]
 pub struct Document<'a> {
     #[serde(borrow)]
-    pub document: crate::site_standard::document::Document<'a>,
+    pub document: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    #[serde(borrow)]
+    pub site: jacquard_common::types::string::Uri<'a>,
 }
 
 pub mod document_state {
@@ -32,24 +34,36 @@ pub mod document_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Document;
+        type Site;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Document = Unset;
+        type Site = Unset;
     }
     ///State transition - sets the `document` field to Set
     pub struct SetDocument<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDocument<S> {}
     impl<S: State> State for SetDocument<S> {
         type Document = Set<members::document>;
+        type Site = S::Site;
+    }
+    ///State transition - sets the `site` field to Set
+    pub struct SetSite<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSite<S> {}
+    impl<S: State> State for SetSite<S> {
+        type Document = S::Document;
+        type Site = Set<members::site>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `document` field
         pub struct document(());
+        ///Marker type for the `site` field
+        pub struct site(());
     }
 }
 
@@ -57,7 +71,8 @@ pub mod document_state {
 pub struct DocumentBuilder<'a, S: document_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<crate::site_standard::document::Document<'a>>,
+        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -74,7 +89,7 @@ impl<'a> DocumentBuilder<'a, document_state::Empty> {
     pub fn new() -> Self {
         DocumentBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None,),
+            __unsafe_private_named: (None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -88,7 +103,7 @@ where
     /// Set the `document` field (required)
     pub fn document(
         mut self,
-        value: impl Into<crate::site_standard::document::Document<'a>>,
+        value: impl Into<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     ) -> DocumentBuilder<'a, document_state::SetDocument<S>> {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
         DocumentBuilder {
@@ -102,12 +117,33 @@ where
 impl<'a, S> DocumentBuilder<'a, S>
 where
     S: document_state::State,
+    S::Site: document_state::IsUnset,
+{
+    /// Set the `site` field (required)
+    pub fn site(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+    ) -> DocumentBuilder<'a, document_state::SetSite<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        DocumentBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> DocumentBuilder<'a, S>
+where
+    S: document_state::State,
     S::Document: document_state::IsSet,
+    S::Site: document_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Document<'a> {
         Document {
             document: self.__unsafe_private_named.0.unwrap(),
+            site: self.__unsafe_private_named.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -121,6 +157,7 @@ where
     ) -> Document<'a> {
         Document {
             document: self.__unsafe_private_named.0.unwrap(),
+            site: self.__unsafe_private_named.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -199,7 +236,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Document<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -211,7 +248,7 @@ fn lexicon_doc_blog_pckt_document() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
@@ -221,13 +258,14 @@ fn lexicon_doc_blog_pckt_document() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                         description: None,
                         required: Some(
                             vec![
-                                ::jacquard_common::smol_str::SmolStr::new_static("document")
+                                ::jacquard_common::smol_str::SmolStr::new_static("document"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("site")
                             ],
                         ),
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static(
                                     "document",
@@ -235,8 +273,25 @@ fn lexicon_doc_blog_pckt_document() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static(
-                                        "site.standard.document",
+                                        "com.atproto.repo.strongRef",
                                     ),
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static("site"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
                                 }),
                             );
                             map

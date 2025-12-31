@@ -34,7 +34,7 @@ fn lexicon_doc_com_atproto_label_subscribeLabels() -> ::jacquard_lexicon::lexico
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("info"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -45,7 +45,7 @@ fn lexicon_doc_com_atproto_label_subscribeLabels() -> ::jacquard_lexicon::lexico
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("message"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -93,7 +93,7 @@ fn lexicon_doc_com_atproto_label_subscribeLabels() -> ::jacquard_lexicon::lexico
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("labels"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -133,7 +133,7 @@ fn lexicon_doc_com_atproto_label_subscribeLabels() -> ::jacquard_lexicon::lexico
                             required: None,
                             properties: {
                                 #[allow(unused_mut)]
-                                let mut map = ::std::collections::BTreeMap::new();
+                                let mut map = ::alloc::collections::BTreeMap::new();
                                 map.insert(
                                     ::jacquard_common::smol_str::SmolStr::new_static("cursor"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -171,7 +171,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Info<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -345,7 +345,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Labels<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

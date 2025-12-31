@@ -43,51 +43,51 @@ pub mod artist_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type PlayCount;
         type Mbid;
         type Name;
-        type PlayCount;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type PlayCount = Unset;
         type Mbid = Unset;
         type Name = Unset;
-        type PlayCount = Unset;
-    }
-    ///State transition - sets the `mbid` field to Set
-    pub struct SetMbid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMbid<S> {}
-    impl<S: State> State for SetMbid<S> {
-        type Mbid = Set<members::mbid>;
-        type Name = S::Name;
-        type PlayCount = S::PlayCount;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Mbid = S::Mbid;
-        type Name = Set<members::name>;
-        type PlayCount = S::PlayCount;
     }
     ///State transition - sets the `play_count` field to Set
     pub struct SetPlayCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPlayCount<S> {}
     impl<S: State> State for SetPlayCount<S> {
+        type PlayCount = Set<members::play_count>;
         type Mbid = S::Mbid;
         type Name = S::Name;
-        type PlayCount = Set<members::play_count>;
+    }
+    ///State transition - sets the `mbid` field to Set
+    pub struct SetMbid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMbid<S> {}
+    impl<S: State> State for SetMbid<S> {
+        type PlayCount = S::PlayCount;
+        type Mbid = Set<members::mbid>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type PlayCount = S::PlayCount;
+        type Mbid = S::Mbid;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `play_count` field
+        pub struct play_count(());
         ///Marker type for the `mbid` field
         pub struct mbid(());
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `play_count` field
-        pub struct play_count(());
     }
 }
 
@@ -180,9 +180,9 @@ where
 impl<'a, S> ArtistViewBuilder<'a, S>
 where
     S: artist_view_state::State,
+    S::PlayCount: artist_view_state::IsSet,
     S::Mbid: artist_view_state::IsSet,
     S::Name: artist_view_state::IsSet,
-    S::PlayCount: artist_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ArtistView<'a> {
@@ -219,7 +219,7 @@ fn lexicon_doc_fm_teal_alpha_stats_defs() -> ::jacquard_lexicon::lexicon::Lexico
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("artistView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -234,7 +234,7 @@ fn lexicon_doc_fm_teal_alpha_stats_defs() -> ::jacquard_lexicon::lexicon::Lexico
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("mbid"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -302,7 +302,7 @@ fn lexicon_doc_fm_teal_alpha_stats_defs() -> ::jacquard_lexicon::lexicon::Lexico
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("mbid"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -372,7 +372,7 @@ fn lexicon_doc_fm_teal_alpha_stats_defs() -> ::jacquard_lexicon::lexicon::Lexico
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("mbid"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -443,7 +443,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ArtistView<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -480,49 +480,49 @@ pub mod recording_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Mbid;
         type PlayCount;
+        type Mbid;
         type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Mbid = Unset;
         type PlayCount = Unset;
+        type Mbid = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `mbid` field to Set
-    pub struct SetMbid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMbid<S> {}
-    impl<S: State> State for SetMbid<S> {
-        type Mbid = Set<members::mbid>;
-        type PlayCount = S::PlayCount;
-        type Name = S::Name;
     }
     ///State transition - sets the `play_count` field to Set
     pub struct SetPlayCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPlayCount<S> {}
     impl<S: State> State for SetPlayCount<S> {
-        type Mbid = S::Mbid;
         type PlayCount = Set<members::play_count>;
+        type Mbid = S::Mbid;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `mbid` field to Set
+    pub struct SetMbid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMbid<S> {}
+    impl<S: State> State for SetMbid<S> {
+        type PlayCount = S::PlayCount;
+        type Mbid = Set<members::mbid>;
         type Name = S::Name;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Mbid = S::Mbid;
         type PlayCount = S::PlayCount;
+        type Mbid = S::Mbid;
         type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `mbid` field
-        pub struct mbid(());
         ///Marker type for the `play_count` field
         pub struct play_count(());
+        ///Marker type for the `mbid` field
+        pub struct mbid(());
         ///Marker type for the `name` field
         pub struct name(());
     }
@@ -617,8 +617,8 @@ where
 impl<'a, S> RecordingViewBuilder<'a, S>
 where
     S: recording_view_state::State,
-    S::Mbid: recording_view_state::IsSet,
     S::PlayCount: recording_view_state::IsSet,
+    S::Mbid: recording_view_state::IsSet,
     S::Name: recording_view_state::IsSet,
 {
     /// Build the final struct
@@ -659,7 +659,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RecordingView<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -697,50 +697,50 @@ pub mod release_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type PlayCount;
-        type Name;
         type Mbid;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type PlayCount = Unset;
-        type Name = Unset;
         type Mbid = Unset;
+        type Name = Unset;
     }
     ///State transition - sets the `play_count` field to Set
     pub struct SetPlayCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPlayCount<S> {}
     impl<S: State> State for SetPlayCount<S> {
         type PlayCount = Set<members::play_count>;
+        type Mbid = S::Mbid;
         type Name = S::Name;
-        type Mbid = S::Mbid;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type PlayCount = S::PlayCount;
-        type Name = Set<members::name>;
-        type Mbid = S::Mbid;
     }
     ///State transition - sets the `mbid` field to Set
     pub struct SetMbid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMbid<S> {}
     impl<S: State> State for SetMbid<S> {
         type PlayCount = S::PlayCount;
-        type Name = S::Name;
         type Mbid = Set<members::mbid>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type PlayCount = S::PlayCount;
+        type Mbid = S::Mbid;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `play_count` field
         pub struct play_count(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `mbid` field
         pub struct mbid(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -834,8 +834,8 @@ impl<'a, S> ReleaseViewBuilder<'a, S>
 where
     S: release_view_state::State,
     S::PlayCount: release_view_state::IsSet,
-    S::Name: release_view_state::IsSet,
     S::Mbid: release_view_state::IsSet,
+    S::Name: release_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ReleaseView<'a> {
@@ -875,7 +875,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReleaseView<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

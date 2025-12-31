@@ -164,7 +164,7 @@ fn lexicon_doc_sh_weaver_edit_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("docRef"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -175,7 +175,7 @@ fn lexicon_doc_sh_weaver_edit_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("value"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -204,7 +204,7 @@ fn lexicon_doc_sh_weaver_edit_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("draftKey"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -243,7 +243,7 @@ fn lexicon_doc_sh_weaver_edit_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("author"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -344,7 +344,7 @@ fn lexicon_doc_sh_weaver_edit_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("author"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -490,7 +490,7 @@ fn lexicon_doc_sh_weaver_edit_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("branches"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -569,7 +569,7 @@ fn lexicon_doc_sh_weaver_edit_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("entry"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -595,7 +595,7 @@ fn lexicon_doc_sh_weaver_edit_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("notebook"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -626,7 +626,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DocRef<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -660,7 +660,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DraftRef<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.draft_key;
             #[allow(unused_comparisons)]
@@ -721,67 +721,67 @@ pub mod edit_branch_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Author;
-        type LastUpdated;
-        type Length;
         type Head;
+        type Author;
+        type Length;
+        type LastUpdated;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Author = Unset;
-        type LastUpdated = Unset;
-        type Length = Unset;
         type Head = Unset;
-    }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthor<S> {}
-    impl<S: State> State for SetAuthor<S> {
-        type Author = Set<members::author>;
-        type LastUpdated = S::LastUpdated;
-        type Length = S::Length;
-        type Head = S::Head;
-    }
-    ///State transition - sets the `last_updated` field to Set
-    pub struct SetLastUpdated<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLastUpdated<S> {}
-    impl<S: State> State for SetLastUpdated<S> {
-        type Author = S::Author;
-        type LastUpdated = Set<members::last_updated>;
-        type Length = S::Length;
-        type Head = S::Head;
-    }
-    ///State transition - sets the `length` field to Set
-    pub struct SetLength<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLength<S> {}
-    impl<S: State> State for SetLength<S> {
-        type Author = S::Author;
-        type LastUpdated = S::LastUpdated;
-        type Length = Set<members::length>;
-        type Head = S::Head;
+        type Author = Unset;
+        type Length = Unset;
+        type LastUpdated = Unset;
     }
     ///State transition - sets the `head` field to Set
     pub struct SetHead<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHead<S> {}
     impl<S: State> State for SetHead<S> {
-        type Author = S::Author;
-        type LastUpdated = S::LastUpdated;
-        type Length = S::Length;
         type Head = Set<members::head>;
+        type Author = S::Author;
+        type Length = S::Length;
+        type LastUpdated = S::LastUpdated;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthor<S> {}
+    impl<S: State> State for SetAuthor<S> {
+        type Head = S::Head;
+        type Author = Set<members::author>;
+        type Length = S::Length;
+        type LastUpdated = S::LastUpdated;
+    }
+    ///State transition - sets the `length` field to Set
+    pub struct SetLength<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLength<S> {}
+    impl<S: State> State for SetLength<S> {
+        type Head = S::Head;
+        type Author = S::Author;
+        type Length = Set<members::length>;
+        type LastUpdated = S::LastUpdated;
+    }
+    ///State transition - sets the `last_updated` field to Set
+    pub struct SetLastUpdated<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLastUpdated<S> {}
+    impl<S: State> State for SetLastUpdated<S> {
+        type Head = S::Head;
+        type Author = S::Author;
+        type Length = S::Length;
+        type LastUpdated = Set<members::last_updated>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `author` field
-        pub struct author(());
-        ///Marker type for the `last_updated` field
-        pub struct last_updated(());
-        ///Marker type for the `length` field
-        pub struct length(());
         ///Marker type for the `head` field
         pub struct head(());
+        ///Marker type for the `author` field
+        pub struct author(());
+        ///Marker type for the `length` field
+        pub struct length(());
+        ///Marker type for the `last_updated` field
+        pub struct last_updated(());
     }
 }
 
@@ -948,10 +948,10 @@ impl<'a, S: edit_branch_view_state::State> EditBranchViewBuilder<'a, S> {
 impl<'a, S> EditBranchViewBuilder<'a, S>
 where
     S: edit_branch_view_state::State,
-    S::Author: edit_branch_view_state::IsSet,
-    S::LastUpdated: edit_branch_view_state::IsSet,
-    S::Length: edit_branch_view_state::IsSet,
     S::Head: edit_branch_view_state::IsSet,
+    S::Author: edit_branch_view_state::IsSet,
+    S::Length: edit_branch_view_state::IsSet,
+    S::LastUpdated: edit_branch_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> EditBranchView<'a> {
@@ -999,7 +999,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EditBranchView<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1054,84 +1054,84 @@ pub mod edit_history_entry_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Author;
-        type CreatedAt;
-        type Type;
         type Uri;
         type Cid;
+        type CreatedAt;
+        type Type;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Author = Unset;
-        type CreatedAt = Unset;
-        type Type = Unset;
         type Uri = Unset;
         type Cid = Unset;
+        type CreatedAt = Unset;
+        type Type = Unset;
     }
     ///State transition - sets the `author` field to Set
     pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthor<S> {}
     impl<S: State> State for SetAuthor<S> {
         type Author = Set<members::author>;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
         type CreatedAt = S::CreatedAt;
         type Type = S::Type;
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Author = S::Author;
-        type CreatedAt = Set<members::created_at>;
-        type Type = S::Type;
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Author = S::Author;
-        type CreatedAt = S::CreatedAt;
-        type Type = Set<members::r#type>;
-        type Uri = S::Uri;
-        type Cid = S::Cid;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
         type Author = S::Author;
-        type CreatedAt = S::CreatedAt;
-        type Type = S::Type;
         type Uri = Set<members::uri>;
         type Cid = S::Cid;
+        type CreatedAt = S::CreatedAt;
+        type Type = S::Type;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
         type Author = S::Author;
-        type CreatedAt = S::CreatedAt;
-        type Type = S::Type;
         type Uri = S::Uri;
         type Cid = Set<members::cid>;
+        type CreatedAt = S::CreatedAt;
+        type Type = S::Type;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Author = S::Author;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type CreatedAt = Set<members::created_at>;
+        type Type = S::Type;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type Author = S::Author;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type CreatedAt = S::CreatedAt;
+        type Type = Set<members::r#type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `author` field
         pub struct author(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `type` field
-        pub struct r#type(());
         ///Marker type for the `uri` field
         pub struct uri(());
         ///Marker type for the `cid` field
         pub struct cid(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
     }
 }
 
@@ -1349,10 +1349,10 @@ impl<'a, S> EditHistoryEntryBuilder<'a, S>
 where
     S: edit_history_entry_state::State,
     S::Author: edit_history_entry_state::IsSet,
-    S::CreatedAt: edit_history_entry_state::IsSet,
-    S::Type: edit_history_entry_state::IsSet,
     S::Uri: edit_history_entry_state::IsSet,
     S::Cid: edit_history_entry_state::IsSet,
+    S::CreatedAt: edit_history_entry_state::IsSet,
+    S::Type: edit_history_entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> EditHistoryEntry<'a> {
@@ -1404,7 +1404,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EditHistoryEntry<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1653,7 +1653,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EditTreeView<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1791,7 +1791,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EntryRef<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1929,7 +1929,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NotebookRef<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

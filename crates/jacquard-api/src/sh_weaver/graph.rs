@@ -198,7 +198,7 @@ fn lexicon_doc_sh_weaver_graph_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("communityTagCount"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -216,7 +216,7 @@ fn lexicon_doc_sh_weaver_graph_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("count"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -270,7 +270,7 @@ fn lexicon_doc_sh_weaver_graph_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("addedAt"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -355,7 +355,7 @@ fn lexicon_doc_sh_weaver_graph_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("avatar"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -534,7 +534,7 @@ fn lexicon_doc_sh_weaver_graph_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
                                 "authorTags",
@@ -645,7 +645,7 @@ fn lexicon_doc_sh_weaver_graph_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
                                 "appliedBy",
@@ -729,7 +729,7 @@ fn lexicon_doc_sh_weaver_graph_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
                                 "entryCount",
@@ -829,7 +829,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CommunityTagCount<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1066,7 +1066,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListItemView<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1206,127 +1206,127 @@ pub mod list_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Creator;
         type Purpose;
-        type ItemCount;
         type Uri;
+        type Creator;
+        type Name;
+        type ItemCount;
         type IndexedAt;
         type Cid;
-        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Creator = Unset;
         type Purpose = Unset;
-        type ItemCount = Unset;
         type Uri = Unset;
+        type Creator = Unset;
+        type Name = Unset;
+        type ItemCount = Unset;
         type IndexedAt = Unset;
         type Cid = Unset;
-        type Name = Unset;
-    }
-    ///State transition - sets the `creator` field to Set
-    pub struct SetCreator<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreator<S> {}
-    impl<S: State> State for SetCreator<S> {
-        type Creator = Set<members::creator>;
-        type Purpose = S::Purpose;
-        type ItemCount = S::ItemCount;
-        type Uri = S::Uri;
-        type IndexedAt = S::IndexedAt;
-        type Cid = S::Cid;
-        type Name = S::Name;
     }
     ///State transition - sets the `purpose` field to Set
     pub struct SetPurpose<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPurpose<S> {}
     impl<S: State> State for SetPurpose<S> {
-        type Creator = S::Creator;
         type Purpose = Set<members::purpose>;
-        type ItemCount = S::ItemCount;
         type Uri = S::Uri;
-        type IndexedAt = S::IndexedAt;
-        type Cid = S::Cid;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `item_count` field to Set
-    pub struct SetItemCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetItemCount<S> {}
-    impl<S: State> State for SetItemCount<S> {
         type Creator = S::Creator;
-        type Purpose = S::Purpose;
-        type ItemCount = Set<members::item_count>;
-        type Uri = S::Uri;
+        type Name = S::Name;
+        type ItemCount = S::ItemCount;
         type IndexedAt = S::IndexedAt;
         type Cid = S::Cid;
-        type Name = S::Name;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Creator = S::Creator;
         type Purpose = S::Purpose;
-        type ItemCount = S::ItemCount;
         type Uri = Set<members::uri>;
+        type Creator = S::Creator;
+        type Name = S::Name;
+        type ItemCount = S::ItemCount;
         type IndexedAt = S::IndexedAt;
         type Cid = S::Cid;
-        type Name = S::Name;
     }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
-    impl<S: State> State for SetIndexedAt<S> {
-        type Creator = S::Creator;
+    ///State transition - sets the `creator` field to Set
+    pub struct SetCreator<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreator<S> {}
+    impl<S: State> State for SetCreator<S> {
         type Purpose = S::Purpose;
-        type ItemCount = S::ItemCount;
         type Uri = S::Uri;
-        type IndexedAt = Set<members::indexed_at>;
-        type Cid = S::Cid;
+        type Creator = Set<members::creator>;
         type Name = S::Name;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Creator = S::Creator;
-        type Purpose = S::Purpose;
         type ItemCount = S::ItemCount;
-        type Uri = S::Uri;
         type IndexedAt = S::IndexedAt;
-        type Cid = Set<members::cid>;
-        type Name = S::Name;
+        type Cid = S::Cid;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Creator = S::Creator;
         type Purpose = S::Purpose;
-        type ItemCount = S::ItemCount;
         type Uri = S::Uri;
+        type Creator = S::Creator;
+        type Name = Set<members::name>;
+        type ItemCount = S::ItemCount;
         type IndexedAt = S::IndexedAt;
         type Cid = S::Cid;
-        type Name = Set<members::name>;
+    }
+    ///State transition - sets the `item_count` field to Set
+    pub struct SetItemCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetItemCount<S> {}
+    impl<S: State> State for SetItemCount<S> {
+        type Purpose = S::Purpose;
+        type Uri = S::Uri;
+        type Creator = S::Creator;
+        type Name = S::Name;
+        type ItemCount = Set<members::item_count>;
+        type IndexedAt = S::IndexedAt;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type Purpose = S::Purpose;
+        type Uri = S::Uri;
+        type Creator = S::Creator;
+        type Name = S::Name;
+        type ItemCount = S::ItemCount;
+        type IndexedAt = Set<members::indexed_at>;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Purpose = S::Purpose;
+        type Uri = S::Uri;
+        type Creator = S::Creator;
+        type Name = S::Name;
+        type ItemCount = S::ItemCount;
+        type IndexedAt = S::IndexedAt;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `creator` field
-        pub struct creator(());
         ///Marker type for the `purpose` field
         pub struct purpose(());
-        ///Marker type for the `item_count` field
-        pub struct item_count(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `creator` field
+        pub struct creator(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `item_count` field
+        pub struct item_count(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
         ///Marker type for the `cid` field
         pub struct cid(());
-        ///Marker type for the `name` field
-        pub struct name(());
     }
 }
 
@@ -1570,13 +1570,13 @@ impl<'a, S: list_view_state::State> ListViewBuilder<'a, S> {
 impl<'a, S> ListViewBuilder<'a, S>
 where
     S: list_view_state::State,
-    S::Creator: list_view_state::IsSet,
     S::Purpose: list_view_state::IsSet,
-    S::ItemCount: list_view_state::IsSet,
     S::Uri: list_view_state::IsSet,
+    S::Creator: list_view_state::IsSet,
+    S::Name: list_view_state::IsSet,
+    S::ItemCount: list_view_state::IsSet,
     S::IndexedAt: list_view_state::IsSet,
     S::Cid: list_view_state::IsSet,
-    S::Name: list_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ListView<'a> {
@@ -1630,7 +1630,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListView<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1691,50 +1691,50 @@ pub mod resource_tags_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type AuthorTags;
-        type Resource;
         type CommunityTags;
+        type Resource;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type AuthorTags = Unset;
-        type Resource = Unset;
         type CommunityTags = Unset;
+        type Resource = Unset;
     }
     ///State transition - sets the `author_tags` field to Set
     pub struct SetAuthorTags<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthorTags<S> {}
     impl<S: State> State for SetAuthorTags<S> {
         type AuthorTags = Set<members::author_tags>;
+        type CommunityTags = S::CommunityTags;
         type Resource = S::Resource;
-        type CommunityTags = S::CommunityTags;
-    }
-    ///State transition - sets the `resource` field to Set
-    pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetResource<S> {}
-    impl<S: State> State for SetResource<S> {
-        type AuthorTags = S::AuthorTags;
-        type Resource = Set<members::resource>;
-        type CommunityTags = S::CommunityTags;
     }
     ///State transition - sets the `community_tags` field to Set
     pub struct SetCommunityTags<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCommunityTags<S> {}
     impl<S: State> State for SetCommunityTags<S> {
         type AuthorTags = S::AuthorTags;
-        type Resource = S::Resource;
         type CommunityTags = Set<members::community_tags>;
+        type Resource = S::Resource;
+    }
+    ///State transition - sets the `resource` field to Set
+    pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetResource<S> {}
+    impl<S: State> State for SetResource<S> {
+        type AuthorTags = S::AuthorTags;
+        type CommunityTags = S::CommunityTags;
+        type Resource = Set<members::resource>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `author_tags` field
         pub struct author_tags(());
-        ///Marker type for the `resource` field
-        pub struct resource(());
         ///Marker type for the `community_tags` field
         pub struct community_tags(());
+        ///Marker type for the `resource` field
+        pub struct resource(());
     }
 }
 
@@ -1848,8 +1848,8 @@ impl<'a, S> ResourceTagsViewBuilder<'a, S>
 where
     S: resource_tags_view_state::State,
     S::AuthorTags: resource_tags_view_state::IsSet,
-    S::Resource: resource_tags_view_state::IsSet,
     S::CommunityTags: resource_tags_view_state::IsSet,
+    S::Resource: resource_tags_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ResourceTagsView<'a> {
@@ -1891,7 +1891,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ResourceTagsView<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1946,67 +1946,67 @@ pub mod tag_application_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Tag;
-        type AppliedBy;
         type CreatedAt;
         type Uri;
+        type AppliedBy;
+        type Tag;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Tag = Unset;
-        type AppliedBy = Unset;
         type CreatedAt = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `tag` field to Set
-    pub struct SetTag<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTag<S> {}
-    impl<S: State> State for SetTag<S> {
-        type Tag = Set<members::tag>;
-        type AppliedBy = S::AppliedBy;
-        type CreatedAt = S::CreatedAt;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `applied_by` field to Set
-    pub struct SetAppliedBy<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAppliedBy<S> {}
-    impl<S: State> State for SetAppliedBy<S> {
-        type Tag = S::Tag;
-        type AppliedBy = Set<members::applied_by>;
-        type CreatedAt = S::CreatedAt;
-        type Uri = S::Uri;
+        type AppliedBy = Unset;
+        type Tag = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Tag = S::Tag;
-        type AppliedBy = S::AppliedBy;
         type CreatedAt = Set<members::created_at>;
         type Uri = S::Uri;
+        type AppliedBy = S::AppliedBy;
+        type Tag = S::Tag;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Tag = S::Tag;
-        type AppliedBy = S::AppliedBy;
         type CreatedAt = S::CreatedAt;
         type Uri = Set<members::uri>;
+        type AppliedBy = S::AppliedBy;
+        type Tag = S::Tag;
+    }
+    ///State transition - sets the `applied_by` field to Set
+    pub struct SetAppliedBy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAppliedBy<S> {}
+    impl<S: State> State for SetAppliedBy<S> {
+        type CreatedAt = S::CreatedAt;
+        type Uri = S::Uri;
+        type AppliedBy = Set<members::applied_by>;
+        type Tag = S::Tag;
+    }
+    ///State transition - sets the `tag` field to Set
+    pub struct SetTag<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTag<S> {}
+    impl<S: State> State for SetTag<S> {
+        type CreatedAt = S::CreatedAt;
+        type Uri = S::Uri;
+        type AppliedBy = S::AppliedBy;
+        type Tag = Set<members::tag>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `tag` field
-        pub struct tag(());
-        ///Marker type for the `applied_by` field
-        pub struct applied_by(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `applied_by` field
+        pub struct applied_by(());
+        ///Marker type for the `tag` field
+        pub struct tag(());
     }
 }
 
@@ -2119,10 +2119,10 @@ where
 impl<'a, S> TagApplicationViewBuilder<'a, S>
 where
     S: tag_application_view_state::State,
-    S::Tag: tag_application_view_state::IsSet,
-    S::AppliedBy: tag_application_view_state::IsSet,
     S::CreatedAt: tag_application_view_state::IsSet,
     S::Uri: tag_application_view_state::IsSet,
+    S::AppliedBy: tag_application_view_state::IsSet,
+    S::Tag: tag_application_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TagApplicationView<'a> {
@@ -2164,7 +2164,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TagApplicationView<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -2208,37 +2208,37 @@ pub mod tag_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Tag;
         type UseCount;
+        type Tag;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Tag = Unset;
         type UseCount = Unset;
-    }
-    ///State transition - sets the `tag` field to Set
-    pub struct SetTag<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTag<S> {}
-    impl<S: State> State for SetTag<S> {
-        type Tag = Set<members::tag>;
-        type UseCount = S::UseCount;
+        type Tag = Unset;
     }
     ///State transition - sets the `use_count` field to Set
     pub struct SetUseCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUseCount<S> {}
     impl<S: State> State for SetUseCount<S> {
-        type Tag = S::Tag;
         type UseCount = Set<members::use_count>;
+        type Tag = S::Tag;
+    }
+    ///State transition - sets the `tag` field to Set
+    pub struct SetTag<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTag<S> {}
+    impl<S: State> State for SetTag<S> {
+        type UseCount = S::UseCount;
+        type Tag = Set<members::tag>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `tag` field
-        pub struct tag(());
         ///Marker type for the `use_count` field
         pub struct use_count(());
+        ///Marker type for the `tag` field
+        pub struct tag(());
     }
 }
 
@@ -2367,8 +2367,8 @@ where
 impl<'a, S> TagViewBuilder<'a, S>
 where
     S: tag_view_state::State,
-    S::Tag: tag_view_state::IsSet,
     S::UseCount: tag_view_state::IsSet,
+    S::Tag: tag_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TagView<'a> {
@@ -2414,7 +2414,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TagView<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

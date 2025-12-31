@@ -1,0 +1,41 @@
+{
+  "lexicon": 1,
+  "id": "net.asadaame5121.at-circle.block",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Block/Kick a member from the circle",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "ring",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "reason": {
+            "type": "string",
+            "description": "Reason for blocking",
+            "maxLength": 1000,
+            "maxGraphemes": 100
+          },
+          "ring": {
+            "type": "ref",
+            "ref": "net.asadaame5121.at-circle.defs#ringRef"
+          },
+          "subject": {
+            "type": "string",
+            "description": "DID of the member to block",
+            "format": "did",
+            "maxLength": 2000
+          }
+        }
+      }
+    }
+  }
+}

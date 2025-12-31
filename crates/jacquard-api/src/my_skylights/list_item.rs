@@ -75,7 +75,7 @@ fn lexicon_doc_my_skylights_listItem() -> ::jacquard_lexicon::lexicon::LexiconDo
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("abandoned"),
                 ::jacquard_lexicon::lexicon::LexUserType::Token(::jacquard_lexicon::lexicon::LexToken {
@@ -90,7 +90,7 @@ fn lexicon_doc_my_skylights_listItem() -> ::jacquard_lexicon::lexicon::LexiconDo
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("type"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {
@@ -129,7 +129,7 @@ fn lexicon_doc_my_skylights_listItem() -> ::jacquard_lexicon::lexicon::LexiconDo
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("addedAt"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -236,7 +236,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Builtin<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -294,49 +294,49 @@ pub mod list_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type List;
         type Position;
+        type List;
         type AddedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type List = Unset;
         type Position = Unset;
+        type List = Unset;
         type AddedAt = Unset;
-    }
-    ///State transition - sets the `list` field to Set
-    pub struct SetList<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetList<S> {}
-    impl<S: State> State for SetList<S> {
-        type List = Set<members::list>;
-        type Position = S::Position;
-        type AddedAt = S::AddedAt;
     }
     ///State transition - sets the `position` field to Set
     pub struct SetPosition<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPosition<S> {}
     impl<S: State> State for SetPosition<S> {
-        type List = S::List;
         type Position = Set<members::position>;
+        type List = S::List;
+        type AddedAt = S::AddedAt;
+    }
+    ///State transition - sets the `list` field to Set
+    pub struct SetList<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetList<S> {}
+    impl<S: State> State for SetList<S> {
+        type Position = S::Position;
+        type List = Set<members::list>;
         type AddedAt = S::AddedAt;
     }
     ///State transition - sets the `added_at` field to Set
     pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAddedAt<S> {}
     impl<S: State> State for SetAddedAt<S> {
-        type List = S::List;
         type Position = S::Position;
+        type List = S::List;
         type AddedAt = Set<members::added_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `list` field
-        pub struct list(());
         ///Marker type for the `position` field
         pub struct position(());
+        ///Marker type for the `list` field
+        pub struct list(());
         ///Marker type for the `added_at` field
         pub struct added_at(());
     }
@@ -465,8 +465,8 @@ where
 impl<'a, S> ListItemBuilder<'a, S>
 where
     S: list_item_state::State,
-    S::List: list_item_state::IsSet,
     S::Position: list_item_state::IsSet,
+    S::List: list_item_state::IsSet,
     S::AddedAt: list_item_state::IsSet,
 {
     /// Build the final struct
@@ -530,7 +530,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListItem<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

@@ -55,7 +55,7 @@ fn lexicon_doc_net_anisota_beta_game_log() -> ::jacquard_lexicon::lexicon::Lexic
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("collectionData"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -68,7 +68,7 @@ fn lexicon_doc_net_anisota_beta_game_log() -> ::jacquard_lexicon::lexicon::Lexic
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
                                 "catchProbability",
@@ -201,7 +201,7 @@ fn lexicon_doc_net_anisota_beta_game_log() -> ::jacquard_lexicon::lexicon::Lexic
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
                                 "rewardItems",
@@ -269,7 +269,7 @@ fn lexicon_doc_net_anisota_beta_game_log() -> ::jacquard_lexicon::lexicon::Lexic
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("feedUri"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -344,7 +344,7 @@ fn lexicon_doc_net_anisota_beta_game_log() -> ::jacquard_lexicon::lexicon::Lexic
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("cardType"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -478,7 +478,7 @@ fn lexicon_doc_net_anisota_beta_game_log() -> ::jacquard_lexicon::lexicon::Lexic
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
                                 "effectApplied",
@@ -589,7 +589,7 @@ fn lexicon_doc_net_anisota_beta_game_log() -> ::jacquard_lexicon::lexicon::Lexic
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static(
                                     "collectionData",
@@ -841,7 +841,7 @@ fn lexicon_doc_net_anisota_beta_game_log() -> ::jacquard_lexicon::lexicon::Lexic
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
                                 "clientVersion",
@@ -919,7 +919,7 @@ fn lexicon_doc_net_anisota_beta_game_log() -> ::jacquard_lexicon::lexicon::Lexic
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("itemId"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -982,7 +982,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CollectionData<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.time_since_generation {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -1051,7 +1051,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DailyRewardsData<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.rewards_count {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -1130,7 +1130,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FeedContext<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.game_card_count {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -1222,7 +1222,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GameCardData<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.injection_position {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -1295,7 +1295,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ItemUsageData<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.quantity_used {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -1402,49 +1402,49 @@ pub mod log_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type EventType;
         type SessionId;
+        type EventType;
         type Timestamp;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type EventType = Unset;
         type SessionId = Unset;
+        type EventType = Unset;
         type Timestamp = Unset;
-    }
-    ///State transition - sets the `event_type` field to Set
-    pub struct SetEventType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEventType<S> {}
-    impl<S: State> State for SetEventType<S> {
-        type EventType = Set<members::event_type>;
-        type SessionId = S::SessionId;
-        type Timestamp = S::Timestamp;
     }
     ///State transition - sets the `session_id` field to Set
     pub struct SetSessionId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSessionId<S> {}
     impl<S: State> State for SetSessionId<S> {
-        type EventType = S::EventType;
         type SessionId = Set<members::session_id>;
+        type EventType = S::EventType;
+        type Timestamp = S::Timestamp;
+    }
+    ///State transition - sets the `event_type` field to Set
+    pub struct SetEventType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEventType<S> {}
+    impl<S: State> State for SetEventType<S> {
+        type SessionId = S::SessionId;
+        type EventType = Set<members::event_type>;
         type Timestamp = S::Timestamp;
     }
     ///State transition - sets the `timestamp` field to Set
     pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTimestamp<S> {}
     impl<S: State> State for SetTimestamp<S> {
-        type EventType = S::EventType;
         type SessionId = S::SessionId;
+        type EventType = S::EventType;
         type Timestamp = Set<members::timestamp>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `event_type` field
-        pub struct event_type(());
         ///Marker type for the `session_id` field
         pub struct session_id(());
+        ///Marker type for the `event_type` field
+        pub struct event_type(());
         ///Marker type for the `timestamp` field
         pub struct timestamp(());
     }
@@ -1778,8 +1778,8 @@ where
 impl<'a, S> LogBuilder<'a, S>
 where
     S: log_state::State,
-    S::EventType: log_state::IsSet,
     S::SessionId: log_state::IsSet,
+    S::EventType: log_state::IsSet,
     S::Timestamp: log_state::IsSet,
 {
     /// Build the final struct
@@ -1903,7 +1903,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Log<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.session_id;
             #[allow(unused_comparisons)]
@@ -1966,7 +1966,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Metadata<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.network_latency {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -2018,7 +2018,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RewardItem<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.quantity {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {

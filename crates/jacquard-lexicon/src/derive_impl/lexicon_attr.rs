@@ -39,9 +39,9 @@ pub fn impl_lexicon(_attr: TokenStream, item: TokenStream) -> TokenStream {
                         syn::parse_quote! {
                             #[serde(flatten)]
                             #[serde(borrow)]
-                            #[serde(skip_serializing_if = "std::option::Option::is_none")]
+                            #[serde(skip_serializing_if = "Option::is_none")]
                             #[serde(default)]
-                            pub extra_data: ::std::option::Option<::std::collections::BTreeMap<
+                            pub extra_data: ::core::option::Option<::alloc::collections::BTreeMap<
                                 ::jacquard_common::smol_str::SmolStr,
                                 ::jacquard_common::types::value::Data<#lifetime>
                             >>
@@ -50,9 +50,9 @@ pub fn impl_lexicon(_attr: TokenStream, item: TokenStream) -> TokenStream {
                         syn::parse_quote! {
                             #[serde(flatten)]
                             #[serde(borrow)]
-                            #[serde(skip_serializing_if = "std::option::Option::is_none")]
+                            #[serde(skip_serializing_if = "Option::is_none")]
                             #[serde(default)]
-                            pub extra_data: ::std::option::Option<::std::collections::BTreeMap<
+                            pub extra_data: ::core::option::Option<::alloc::collections::BTreeMap<
                                 ::jacquard_common::smol_str::SmolStr,
                                 ::jacquard_common::types::value::Data<#lifetime>
                             >>

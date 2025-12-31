@@ -42,50 +42,50 @@ pub mod invite_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Slice;
-        type CreatedAt;
         type Did;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Slice = Unset;
-        type CreatedAt = Unset;
         type Did = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `slice` field to Set
     pub struct SetSlice<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSlice<S> {}
     impl<S: State> State for SetSlice<S> {
         type Slice = Set<members::slice>;
+        type Did = S::Did;
         type CreatedAt = S::CreatedAt;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Slice = S::Slice;
-        type CreatedAt = Set<members::created_at>;
-        type Did = S::Did;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
         type Slice = S::Slice;
-        type CreatedAt = S::CreatedAt;
         type Did = Set<members::did>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Slice = S::Slice;
+        type Did = S::Did;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `slice` field
         pub struct slice(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -199,8 +199,8 @@ impl<'a, S> InviteBuilder<'a, S>
 where
     S: invite_state::State,
     S::Slice: invite_state::IsSet,
-    S::CreatedAt: invite_state::IsSet,
     S::Did: invite_state::IsSet,
+    S::CreatedAt: invite_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Invite<'a> {
@@ -303,7 +303,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Invite<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -317,7 +317,7 @@ fn lexicon_doc_network_slices_waitlist_invite() -> ::jacquard_lexicon::lexicon::
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
@@ -339,7 +339,7 @@ fn lexicon_doc_network_slices_waitlist_invite() -> ::jacquard_lexicon::lexicon::
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static(
                                     "createdAt",

@@ -52,49 +52,49 @@ pub mod job_status_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type State;
         type JobId;
+        type State;
         type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type State = Unset;
         type JobId = Unset;
+        type State = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `state` field to Set
-    pub struct SetState<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetState<S> {}
-    impl<S: State> State for SetState<S> {
-        type State = Set<members::state>;
-        type JobId = S::JobId;
-        type Did = S::Did;
     }
     ///State transition - sets the `job_id` field to Set
     pub struct SetJobId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetJobId<S> {}
     impl<S: State> State for SetJobId<S> {
-        type State = S::State;
         type JobId = Set<members::job_id>;
+        type State = S::State;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `state` field to Set
+    pub struct SetState<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetState<S> {}
+    impl<S: State> State for SetState<S> {
+        type JobId = S::JobId;
+        type State = Set<members::state>;
         type Did = S::Did;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type State = S::State;
         type JobId = S::JobId;
+        type State = S::State;
         type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `state` field
-        pub struct state(());
         ///Marker type for the `job_id` field
         pub struct job_id(());
+        ///Marker type for the `state` field
+        pub struct state(());
         ///Marker type for the `did` field
         pub struct did(());
     }
@@ -257,8 +257,8 @@ where
 impl<'a, S> JobStatusBuilder<'a, S>
 where
     S: job_status_state::State,
-    S::State: job_status_state::IsSet,
     S::JobId: job_status_state::IsSet,
+    S::State: job_status_state::IsSet,
     S::Did: job_status_state::IsSet,
 {
     /// Build the final struct
@@ -304,7 +304,7 @@ fn lexicon_doc_app_bsky_video_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("jobStatus"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -319,7 +319,7 @@ fn lexicon_doc_app_bsky_video_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("blob"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
@@ -441,7 +441,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for JobStatus<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.progress {
             if *value > 100i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {

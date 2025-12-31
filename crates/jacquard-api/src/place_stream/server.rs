@@ -43,7 +43,7 @@ fn lexicon_doc_place_stream_server_defs() -> ::jacquard_lexicon::lexicon::Lexico
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("rewriteRule"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -57,7 +57,7 @@ fn lexicon_doc_place_stream_server_defs() -> ::jacquard_lexicon::lexicon::Lexico
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("from"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -120,7 +120,7 @@ fn lexicon_doc_place_stream_server_defs() -> ::jacquard_lexicon::lexicon::Lexico
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("active"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
@@ -416,7 +416,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RewriteRule<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.from;
             #[allow(unused_comparisons)]
@@ -531,85 +531,85 @@ pub mod webhook_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
         type Events;
+        type Id;
+        type CreatedAt;
         type Active;
         type Url;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
         type Events = Unset;
+        type Id = Unset;
+        type CreatedAt = Unset;
         type Active = Unset;
         type Url = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Id = Set<members::id>;
-        type Events = S::Events;
-        type Active = S::Active;
-        type Url = S::Url;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `events` field to Set
     pub struct SetEvents<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEvents<S> {}
     impl<S: State> State for SetEvents<S> {
-        type Id = S::Id;
         type Events = Set<members::events>;
+        type Id = S::Id;
+        type CreatedAt = S::CreatedAt;
         type Active = S::Active;
         type Url = S::Url;
-        type CreatedAt = S::CreatedAt;
     }
-    ///State transition - sets the `active` field to Set
-    pub struct SetActive<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActive<S> {}
-    impl<S: State> State for SetActive<S> {
-        type Id = S::Id;
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
         type Events = S::Events;
-        type Active = Set<members::active>;
-        type Url = S::Url;
+        type Id = Set<members::id>;
         type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type Id = S::Id;
-        type Events = S::Events;
         type Active = S::Active;
-        type Url = Set<members::url>;
-        type CreatedAt = S::CreatedAt;
+        type Url = S::Url;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Id = S::Id;
         type Events = S::Events;
+        type Id = S::Id;
+        type CreatedAt = Set<members::created_at>;
         type Active = S::Active;
         type Url = S::Url;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `active` field to Set
+    pub struct SetActive<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActive<S> {}
+    impl<S: State> State for SetActive<S> {
+        type Events = S::Events;
+        type Id = S::Id;
+        type CreatedAt = S::CreatedAt;
+        type Active = Set<members::active>;
+        type Url = S::Url;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type Events = S::Events;
+        type Id = S::Id;
+        type CreatedAt = S::CreatedAt;
+        type Active = S::Active;
+        type Url = Set<members::url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `events` field
         pub struct events(());
+        ///Marker type for the `id` field
+        pub struct id(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `active` field
         pub struct active(());
         ///Marker type for the `url` field
         pub struct url(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -922,11 +922,11 @@ where
 impl<'a, S> WebhookBuilder<'a, S>
 where
     S: webhook_state::State,
-    S::Id: webhook_state::IsSet,
     S::Events: webhook_state::IsSet,
+    S::Id: webhook_state::IsSet,
+    S::CreatedAt: webhook_state::IsSet,
     S::Active: webhook_state::IsSet,
     S::Url: webhook_state::IsSet,
-    S::CreatedAt: webhook_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Webhook<'a> {
@@ -988,7 +988,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Webhook<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {

@@ -47,66 +47,66 @@ pub mod definition_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type ValueType;
-        type CreatedAt;
         type Name;
         type Scope;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type ValueType = Unset;
-        type CreatedAt = Unset;
         type Name = Unset;
         type Scope = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `value_type` field to Set
     pub struct SetValueType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValueType<S> {}
     impl<S: State> State for SetValueType<S> {
         type ValueType = Set<members::value_type>;
+        type Name = S::Name;
+        type Scope = S::Scope;
         type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
-        type Scope = S::Scope;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type ValueType = S::ValueType;
-        type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
-        type Scope = S::Scope;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
         type ValueType = S::ValueType;
-        type CreatedAt = S::CreatedAt;
         type Name = Set<members::name>;
         type Scope = S::Scope;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `scope` field to Set
     pub struct SetScope<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetScope<S> {}
     impl<S: State> State for SetScope<S> {
         type ValueType = S::ValueType;
-        type CreatedAt = S::CreatedAt;
         type Name = S::Name;
         type Scope = Set<members::scope>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type ValueType = S::ValueType;
+        type Name = S::Name;
+        type Scope = S::Scope;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `value_type` field
         pub struct value_type(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `scope` field
         pub struct scope(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -251,9 +251,9 @@ impl<'a, S> DefinitionBuilder<'a, S>
 where
     S: definition_state::State,
     S::ValueType: definition_state::IsSet,
-    S::CreatedAt: definition_state::IsSet,
     S::Name: definition_state::IsSet,
     S::Scope: definition_state::IsSet,
+    S::CreatedAt: definition_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Definition<'a> {
@@ -360,7 +360,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Definition<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.name;
             {
@@ -412,7 +412,7 @@ fn lexicon_doc_sh_tangled_label_definition() -> ::jacquard_lexicon::lexicon::Lex
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
@@ -431,7 +431,7 @@ fn lexicon_doc_sh_tangled_label_definition() -> ::jacquard_lexicon::lexicon::Lex
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static("color"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -552,7 +552,7 @@ fn lexicon_doc_sh_tangled_label_definition() -> ::jacquard_lexicon::lexicon::Lex
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("enum"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -661,7 +661,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ValueType<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

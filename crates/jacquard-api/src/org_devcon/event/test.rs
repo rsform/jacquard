@@ -50,49 +50,49 @@ pub mod test_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type End;
         type Title;
+        type End;
         type Start;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type End = Unset;
         type Title = Unset;
+        type End = Unset;
         type Start = Unset;
-    }
-    ///State transition - sets the `end` field to Set
-    pub struct SetEnd<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEnd<S> {}
-    impl<S: State> State for SetEnd<S> {
-        type End = Set<members::end>;
-        type Title = S::Title;
-        type Start = S::Start;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type End = S::End;
         type Title = Set<members::title>;
+        type End = S::End;
+        type Start = S::Start;
+    }
+    ///State transition - sets the `end` field to Set
+    pub struct SetEnd<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEnd<S> {}
+    impl<S: State> State for SetEnd<S> {
+        type Title = S::Title;
+        type End = Set<members::end>;
         type Start = S::Start;
     }
     ///State transition - sets the `start` field to Set
     pub struct SetStart<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStart<S> {}
     impl<S: State> State for SetStart<S> {
-        type End = S::End;
         type Title = S::Title;
+        type End = S::End;
         type Start = Set<members::start>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `end` field
-        pub struct end(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `end` field
+        pub struct end(());
         ///Marker type for the `start` field
         pub struct start(());
     }
@@ -258,8 +258,8 @@ impl<'a, S: test_state::State> TestBuilder<'a, S> {
 impl<'a, S> TestBuilder<'a, S>
 where
     S: test_state::State,
-    S::End: test_state::IsSet,
     S::Title: test_state::IsSet,
+    S::End: test_state::IsSet,
     S::Start: test_state::IsSet,
 {
     /// Build the final struct
@@ -369,7 +369,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Test<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -383,7 +383,7 @@ fn lexicon_doc_org_devcon_event_test() -> ::jacquard_lexicon::lexicon::LexiconDo
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
@@ -401,7 +401,7 @@ fn lexicon_doc_org_devcon_event_test() -> ::jacquard_lexicon::lexicon::LexiconDo
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static(
                                     "createdAt",

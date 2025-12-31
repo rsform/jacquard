@@ -174,7 +174,7 @@ fn lexicon_doc_com_atproto_server_createInviteCodes() -> ::jacquard_lexicon::lex
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("accountCodes"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -188,7 +188,7 @@ fn lexicon_doc_com_atproto_server_createInviteCodes() -> ::jacquard_lexicon::lex
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("account"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -250,7 +250,7 @@ fn lexicon_doc_com_atproto_server_createInviteCodes() -> ::jacquard_lexicon::lex
                                 nullable: None,
                                 properties: {
                                     #[allow(unused_mut)]
-                                    let mut map = ::std::collections::BTreeMap::new();
+                                    let mut map = ::alloc::collections::BTreeMap::new();
                                     map.insert(
                                         ::jacquard_common::smol_str::SmolStr::new_static(
                                             "codeCount",
@@ -327,7 +327,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AccountCodes<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

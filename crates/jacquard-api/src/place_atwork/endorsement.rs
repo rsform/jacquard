@@ -47,8 +47,8 @@ pub mod endorsement_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Giver;
         type Text;
+        type Giver;
         type Receiver;
         type CreatedAt;
     }
@@ -56,26 +56,26 @@ pub mod endorsement_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Giver = Unset;
         type Text = Unset;
+        type Giver = Unset;
         type Receiver = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `giver` field to Set
-    pub struct SetGiver<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGiver<S> {}
-    impl<S: State> State for SetGiver<S> {
-        type Giver = Set<members::giver>;
-        type Text = S::Text;
-        type Receiver = S::Receiver;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `text` field to Set
     pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetText<S> {}
     impl<S: State> State for SetText<S> {
-        type Giver = S::Giver;
         type Text = Set<members::text>;
+        type Giver = S::Giver;
+        type Receiver = S::Receiver;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `giver` field to Set
+    pub struct SetGiver<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGiver<S> {}
+    impl<S: State> State for SetGiver<S> {
+        type Text = S::Text;
+        type Giver = Set<members::giver>;
         type Receiver = S::Receiver;
         type CreatedAt = S::CreatedAt;
     }
@@ -83,8 +83,8 @@ pub mod endorsement_state {
     pub struct SetReceiver<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetReceiver<S> {}
     impl<S: State> State for SetReceiver<S> {
-        type Giver = S::Giver;
         type Text = S::Text;
+        type Giver = S::Giver;
         type Receiver = Set<members::receiver>;
         type CreatedAt = S::CreatedAt;
     }
@@ -92,18 +92,18 @@ pub mod endorsement_state {
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Giver = S::Giver;
         type Text = S::Text;
+        type Giver = S::Giver;
         type Receiver = S::Receiver;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `giver` field
-        pub struct giver(());
         ///Marker type for the `text` field
         pub struct text(());
+        ///Marker type for the `giver` field
+        pub struct giver(());
         ///Marker type for the `receiver` field
         pub struct receiver(());
         ///Marker type for the `created_at` field
@@ -242,8 +242,8 @@ where
 impl<'a, S> EndorsementBuilder<'a, S>
 where
     S: endorsement_state::State,
-    S::Giver: endorsement_state::IsSet,
     S::Text: endorsement_state::IsSet,
+    S::Giver: endorsement_state::IsSet,
     S::Receiver: endorsement_state::IsSet,
     S::CreatedAt: endorsement_state::IsSet,
 {
@@ -350,7 +350,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Endorsement<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.text;
             #[allow(unused_comparisons)]
@@ -396,7 +396,7 @@ fn lexicon_doc_place_atwork_endorsement() -> ::jacquard_lexicon::lexicon::Lexico
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
@@ -419,7 +419,7 @@ fn lexicon_doc_place_atwork_endorsement() -> ::jacquard_lexicon::lexicon::Lexico
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static(
                                     "createdAt",

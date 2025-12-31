@@ -40,7 +40,7 @@ fn lexicon_doc_fm_teal_alpha_feed_defs() -> ::jacquard_lexicon::lexicon::Lexicon
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("artist"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -53,7 +53,7 @@ fn lexicon_doc_fm_teal_alpha_feed_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
                                 "artistMbId",
@@ -113,7 +113,7 @@ fn lexicon_doc_fm_teal_alpha_feed_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("artists"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -372,7 +372,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Artist<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.artist_name;
             #[allow(unused_comparisons)]
@@ -856,7 +856,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PlayView<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.release_name {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 256usize {

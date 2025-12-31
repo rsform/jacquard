@@ -47,51 +47,51 @@ pub mod language_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Size;
         type Percentage;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Size = Unset;
         type Percentage = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Size = S::Size;
-        type Percentage = S::Percentage;
+        type Name = Unset;
     }
     ///State transition - sets the `size` field to Set
     pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSize<S> {}
     impl<S: State> State for SetSize<S> {
-        type Name = S::Name;
         type Size = Set<members::size>;
         type Percentage = S::Percentage;
+        type Name = S::Name;
     }
     ///State transition - sets the `percentage` field to Set
     pub struct SetPercentage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPercentage<S> {}
     impl<S: State> State for SetPercentage<S> {
-        type Name = S::Name;
         type Size = S::Size;
         type Percentage = Set<members::percentage>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Size = S::Size;
+        type Percentage = S::Percentage;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `size` field
         pub struct size(());
         ///Marker type for the `percentage` field
         pub struct percentage(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -235,9 +235,9 @@ where
 impl<'a, S> LanguageBuilder<'a, S>
 where
     S: language_state::State,
-    S::Name: language_state::IsSet,
     S::Size: language_state::IsSet,
     S::Percentage: language_state::IsSet,
+    S::Name: language_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Language<'a> {
@@ -280,7 +280,7 @@ fn lexicon_doc_sh_tangled_repo_languages() -> ::jacquard_lexicon::lexicon::Lexic
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("language"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -295,7 +295,7 @@ fn lexicon_doc_sh_tangled_repo_languages() -> ::jacquard_lexicon::lexicon::Lexic
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("color"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -415,7 +415,7 @@ fn lexicon_doc_sh_tangled_repo_languages() -> ::jacquard_lexicon::lexicon::Lexic
                             ),
                             properties: {
                                 #[allow(unused_mut)]
-                                let mut map = ::std::collections::BTreeMap::new();
+                                let mut map = ::alloc::collections::BTreeMap::new();
                                 map.insert(
                                     ::jacquard_common::smol_str::SmolStr::new_static("ref"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -479,7 +479,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Language<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

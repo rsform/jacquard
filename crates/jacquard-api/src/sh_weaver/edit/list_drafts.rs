@@ -47,51 +47,51 @@ pub mod draft_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Uri;
         type Cid;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Uri = Unset;
         type Cid = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Uri = S::Uri;
-        type Cid = S::Cid;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type CreatedAt = S::CreatedAt;
         type Uri = Set<members::uri>;
         type Cid = S::Cid;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
-        type CreatedAt = S::CreatedAt;
         type Uri = S::Uri;
         type Cid = Set<members::cid>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `uri` field
         pub struct uri(());
         ///Marker type for the `cid` field
         pub struct cid(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -241,9 +241,9 @@ where
 impl<'a, S> DraftViewBuilder<'a, S>
 where
     S: draft_view_state::State,
-    S::CreatedAt: draft_view_state::IsSet,
     S::Uri: draft_view_state::IsSet,
     S::Cid: draft_view_state::IsSet,
+    S::CreatedAt: draft_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DraftView<'a> {
@@ -286,7 +286,7 @@ fn lexicon_doc_sh_weaver_edit_listDrafts() -> ::jacquard_lexicon::lexicon::Lexic
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("draftView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -305,7 +305,7 @@ fn lexicon_doc_sh_weaver_edit_listDrafts() -> ::jacquard_lexicon::lexicon::Lexic
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("cid"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -424,7 +424,7 @@ fn lexicon_doc_sh_weaver_edit_listDrafts() -> ::jacquard_lexicon::lexicon::Lexic
                             ),
                             properties: {
                                 #[allow(unused_mut)]
-                                let mut map = ::std::collections::BTreeMap::new();
+                                let mut map = ::alloc::collections::BTreeMap::new();
                                 map.insert(
                                     ::jacquard_common::smol_str::SmolStr::new_static("actor"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -497,7 +497,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DraftView<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

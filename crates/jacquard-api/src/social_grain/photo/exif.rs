@@ -60,37 +60,37 @@ pub mod exif_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Photo;
         type CreatedAt;
+        type Photo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Photo = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `photo` field to Set
-    pub struct SetPhoto<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPhoto<S> {}
-    impl<S: State> State for SetPhoto<S> {
-        type Photo = Set<members::photo>;
-        type CreatedAt = S::CreatedAt;
+        type Photo = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Photo = S::Photo;
         type CreatedAt = Set<members::created_at>;
+        type Photo = S::Photo;
+    }
+    ///State transition - sets the `photo` field to Set
+    pub struct SetPhoto<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPhoto<S> {}
+    impl<S: State> State for SetPhoto<S> {
+        type CreatedAt = S::CreatedAt;
+        type Photo = Set<members::photo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `photo` field
-        pub struct photo(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `photo` field
+        pub struct photo(());
     }
 }
 
@@ -343,8 +343,8 @@ where
 impl<'a, S> ExifBuilder<'a, S>
 where
     S: exif_state::State,
-    S::Photo: exif_state::IsSet,
     S::CreatedAt: exif_state::IsSet,
+    S::Photo: exif_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Exif<'a> {
@@ -463,7 +463,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Exif<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -477,7 +477,7 @@ fn lexicon_doc_social_grain_photo_exif() -> ::jacquard_lexicon::lexicon::Lexicon
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
@@ -498,7 +498,7 @@ fn lexicon_doc_social_grain_photo_exif() -> ::jacquard_lexicon::lexicon::Lexicon
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static(
                                     "createdAt",

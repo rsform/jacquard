@@ -44,37 +44,37 @@ pub mod match_and_contact_index_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ContactIndex;
         type Match;
+        type ContactIndex;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ContactIndex = Unset;
         type Match = Unset;
-    }
-    ///State transition - sets the `contact_index` field to Set
-    pub struct SetContactIndex<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContactIndex<S> {}
-    impl<S: State> State for SetContactIndex<S> {
-        type ContactIndex = Set<members::contact_index>;
-        type Match = S::Match;
+        type ContactIndex = Unset;
     }
     ///State transition - sets the `match` field to Set
     pub struct SetMatch<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMatch<S> {}
     impl<S: State> State for SetMatch<S> {
-        type ContactIndex = S::ContactIndex;
         type Match = Set<members::r#match>;
+        type ContactIndex = S::ContactIndex;
+    }
+    ///State transition - sets the `contact_index` field to Set
+    pub struct SetContactIndex<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContactIndex<S> {}
+    impl<S: State> State for SetContactIndex<S> {
+        type Match = S::Match;
+        type ContactIndex = Set<members::contact_index>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `contact_index` field
-        pub struct contact_index(());
         ///Marker type for the `match` field
         pub struct r#match(());
+        ///Marker type for the `contact_index` field
+        pub struct contact_index(());
     }
 }
 
@@ -153,8 +153,8 @@ where
 impl<'a, S> MatchAndContactIndexBuilder<'a, S>
 where
     S: match_and_contact_index_state::State,
-    S::ContactIndex: match_and_contact_index_state::IsSet,
     S::Match: match_and_contact_index_state::IsSet,
+    S::ContactIndex: match_and_contact_index_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MatchAndContactIndex<'a> {
@@ -189,7 +189,7 @@ fn lexicon_doc_app_bsky_contact_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("matchAndContactIndex"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -207,7 +207,7 @@ fn lexicon_doc_app_bsky_contact_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
                                 "contactIndex",
@@ -251,7 +251,7 @@ fn lexicon_doc_app_bsky_contact_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("from"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -311,7 +311,7 @@ fn lexicon_doc_app_bsky_contact_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
                                 "matchesCount",
@@ -367,7 +367,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MatchAndContactIndex<'a> 
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.contact_index;
             if *value > 999i64 {
@@ -569,7 +569,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Notification<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -602,37 +602,37 @@ pub mod sync_status_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type MatchesCount;
         type SyncedAt;
+        type MatchesCount;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type MatchesCount = Unset;
         type SyncedAt = Unset;
-    }
-    ///State transition - sets the `matches_count` field to Set
-    pub struct SetMatchesCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMatchesCount<S> {}
-    impl<S: State> State for SetMatchesCount<S> {
-        type MatchesCount = Set<members::matches_count>;
-        type SyncedAt = S::SyncedAt;
+        type MatchesCount = Unset;
     }
     ///State transition - sets the `synced_at` field to Set
     pub struct SetSyncedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSyncedAt<S> {}
     impl<S: State> State for SetSyncedAt<S> {
-        type MatchesCount = S::MatchesCount;
         type SyncedAt = Set<members::synced_at>;
+        type MatchesCount = S::MatchesCount;
+    }
+    ///State transition - sets the `matches_count` field to Set
+    pub struct SetMatchesCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMatchesCount<S> {}
+    impl<S: State> State for SetMatchesCount<S> {
+        type SyncedAt = S::SyncedAt;
+        type MatchesCount = Set<members::matches_count>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `matches_count` field
-        pub struct matches_count(());
         ///Marker type for the `synced_at` field
         pub struct synced_at(());
+        ///Marker type for the `matches_count` field
+        pub struct matches_count(());
     }
 }
 
@@ -705,8 +705,8 @@ where
 impl<'a, S> SyncStatusBuilder<'a, S>
 where
     S: sync_status_state::State,
-    S::MatchesCount: sync_status_state::IsSet,
     S::SyncedAt: sync_status_state::IsSet,
+    S::MatchesCount: sync_status_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SyncStatus<'a> {
@@ -744,7 +744,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SyncStatus<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.matches_count;
             if *value < 0i64 {

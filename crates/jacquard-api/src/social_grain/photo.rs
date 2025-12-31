@@ -288,7 +288,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Photo<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -300,7 +300,7 @@ fn lexicon_doc_social_grain_photo() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
@@ -317,7 +317,7 @@ fn lexicon_doc_social_grain_photo() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static("alt"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -847,7 +847,7 @@ fn lexicon_doc_social_grain_photo_defs() -> ::jacquard_lexicon::lexicon::Lexicon
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("exifView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -861,7 +861,7 @@ fn lexicon_doc_social_grain_photo_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("cid"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1106,7 +1106,7 @@ fn lexicon_doc_social_grain_photo_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("alt"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1243,7 +1243,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ExifView<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1292,85 +1292,85 @@ pub mod photo_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
-        type Uri;
         type Thumb;
+        type Uri;
         type Alt;
         type Fullsize;
+        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
-        type Uri = Unset;
         type Thumb = Unset;
+        type Uri = Unset;
         type Alt = Unset;
         type Fullsize = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Cid = Set<members::cid>;
-        type Uri = S::Uri;
-        type Thumb = S::Thumb;
-        type Alt = S::Alt;
-        type Fullsize = S::Fullsize;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Cid = S::Cid;
-        type Uri = Set<members::uri>;
-        type Thumb = S::Thumb;
-        type Alt = S::Alt;
-        type Fullsize = S::Fullsize;
+        type Cid = Unset;
     }
     ///State transition - sets the `thumb` field to Set
     pub struct SetThumb<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetThumb<S> {}
     impl<S: State> State for SetThumb<S> {
-        type Cid = S::Cid;
-        type Uri = S::Uri;
         type Thumb = Set<members::thumb>;
+        type Uri = S::Uri;
         type Alt = S::Alt;
         type Fullsize = S::Fullsize;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Thumb = S::Thumb;
+        type Uri = Set<members::uri>;
+        type Alt = S::Alt;
+        type Fullsize = S::Fullsize;
+        type Cid = S::Cid;
     }
     ///State transition - sets the `alt` field to Set
     pub struct SetAlt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAlt<S> {}
     impl<S: State> State for SetAlt<S> {
-        type Cid = S::Cid;
-        type Uri = S::Uri;
         type Thumb = S::Thumb;
+        type Uri = S::Uri;
         type Alt = Set<members::alt>;
         type Fullsize = S::Fullsize;
+        type Cid = S::Cid;
     }
     ///State transition - sets the `fullsize` field to Set
     pub struct SetFullsize<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFullsize<S> {}
     impl<S: State> State for SetFullsize<S> {
-        type Cid = S::Cid;
-        type Uri = S::Uri;
         type Thumb = S::Thumb;
+        type Uri = S::Uri;
         type Alt = S::Alt;
         type Fullsize = Set<members::fullsize>;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Thumb = S::Thumb;
+        type Uri = S::Uri;
+        type Alt = S::Alt;
+        type Fullsize = S::Fullsize;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `thumb` field
         pub struct thumb(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
         ///Marker type for the `alt` field
         pub struct alt(());
         ///Marker type for the `fullsize` field
         pub struct fullsize(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
     }
 }
 
@@ -1543,11 +1543,11 @@ where
 impl<'a, S> PhotoViewBuilder<'a, S>
 where
     S: photo_view_state::State,
-    S::Cid: photo_view_state::IsSet,
-    S::Uri: photo_view_state::IsSet,
     S::Thumb: photo_view_state::IsSet,
+    S::Uri: photo_view_state::IsSet,
     S::Alt: photo_view_state::IsSet,
     S::Fullsize: photo_view_state::IsSet,
+    S::Cid: photo_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PhotoView<'a> {
@@ -1595,7 +1595,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PhotoView<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

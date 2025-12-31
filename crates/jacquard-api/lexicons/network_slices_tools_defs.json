@@ -1,0 +1,42 @@
+{
+  "lexicon": 1,
+  "id": "network.slices.tools.defs",
+  "defs": {
+    "image": {
+      "type": "object",
+      "required": [
+        "image",
+        "alt"
+      ],
+      "properties": {
+        "alt": {
+          "type": "string",
+          "description": "Alt text description of the image, for accessibility"
+        },
+        "image": {
+          "type": "blob",
+          "accept": [
+            "image/*"
+          ],
+          "maxSize": 1000000
+        }
+      }
+    },
+    "images": {
+      "type": "object",
+      "required": [
+        "images"
+      ],
+      "properties": {
+        "images": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#image"
+          },
+          "maxLength": 4
+        }
+      }
+    }
+  }
+}

@@ -4,5 +4,6 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 pub mod document;
+pub mod graph;
 pub mod publication;
 pub mod theme;

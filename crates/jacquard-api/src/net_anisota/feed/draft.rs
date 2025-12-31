@@ -59,37 +59,37 @@ pub mod draft_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Text;
         type CreatedAt;
+        type Text;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Text = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetText<S> {}
-    impl<S: State> State for SetText<S> {
-        type Text = Set<members::text>;
-        type CreatedAt = S::CreatedAt;
+        type Text = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Text = S::Text;
         type CreatedAt = Set<members::created_at>;
+        type Text = S::Text;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetText<S> {}
+    impl<S: State> State for SetText<S> {
+        type CreatedAt = S::CreatedAt;
+        type Text = Set<members::text>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `text` field
-        pub struct text(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `text` field
+        pub struct text(());
     }
 }
 
@@ -306,8 +306,8 @@ impl<'a, S: draft_state::State> DraftBuilder<'a, S> {
 impl<'a, S> DraftBuilder<'a, S>
 where
     S: draft_state::State,
-    S::Text: draft_state::IsSet,
     S::CreatedAt: draft_state::IsSet,
+    S::Text: draft_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Draft<'a> {
@@ -445,7 +445,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Draft<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.langs {
             #[allow(unused_comparisons)]
             if value.len() > 3usize {
@@ -515,7 +515,7 @@ fn lexicon_doc_net_anisota_feed_draft() -> ::jacquard_lexicon::lexicon::LexiconD
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
@@ -536,7 +536,7 @@ fn lexicon_doc_net_anisota_feed_draft() -> ::jacquard_lexicon::lexicon::LexiconD
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static(
                                     "createdAt",
@@ -723,7 +723,7 @@ fn lexicon_doc_net_anisota_feed_draft() -> ::jacquard_lexicon::lexicon::LexiconD
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("parent"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -779,37 +779,37 @@ pub mod reply_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Root;
         type Parent;
+        type Root;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Root = Unset;
         type Parent = Unset;
-    }
-    ///State transition - sets the `root` field to Set
-    pub struct SetRoot<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRoot<S> {}
-    impl<S: State> State for SetRoot<S> {
-        type Root = Set<members::root>;
-        type Parent = S::Parent;
+        type Root = Unset;
     }
     ///State transition - sets the `parent` field to Set
     pub struct SetParent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetParent<S> {}
     impl<S: State> State for SetParent<S> {
-        type Root = S::Root;
         type Parent = Set<members::parent>;
+        type Root = S::Root;
+    }
+    ///State transition - sets the `root` field to Set
+    pub struct SetRoot<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRoot<S> {}
+    impl<S: State> State for SetRoot<S> {
+        type Parent = S::Parent;
+        type Root = Set<members::root>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `root` field
-        pub struct root(());
         ///Marker type for the `parent` field
         pub struct parent(());
+        ///Marker type for the `root` field
+        pub struct root(());
     }
 }
 
@@ -882,8 +882,8 @@ where
 impl<'a, S> ReplyRefBuilder<'a, S>
 where
     S: reply_ref_state::State,
-    S::Root: reply_ref_state::IsSet,
     S::Parent: reply_ref_state::IsSet,
+    S::Root: reply_ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ReplyRef<'a> {
@@ -921,7 +921,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReplyRef<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

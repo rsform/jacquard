@@ -248,7 +248,7 @@ fn lexicon_doc_art_cllctv_embed_images() -> ::jacquard_lexicon::lexicon::Lexicon
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("image"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -262,7 +262,7 @@ fn lexicon_doc_art_cllctv_embed_images() -> ::jacquard_lexicon::lexicon::Lexicon
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("alt"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -343,7 +343,7 @@ fn lexicon_doc_art_cllctv_embed_images() -> ::jacquard_lexicon::lexicon::Lexicon
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("images"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -370,7 +370,7 @@ fn lexicon_doc_art_cllctv_embed_images() -> ::jacquard_lexicon::lexicon::Lexicon
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("images"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -401,7 +401,7 @@ fn lexicon_doc_art_cllctv_embed_images() -> ::jacquard_lexicon::lexicon::Lexicon
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("alt"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -506,7 +506,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Image<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.image_hash {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 640usize {
@@ -674,7 +674,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Images<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.images;
             #[allow(unused_comparisons)]
@@ -825,7 +825,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for View<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.images;
             #[allow(unused_comparisons)]
@@ -882,51 +882,51 @@ pub mod view_image_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Alt;
-        type Thumb;
         type Fullsize;
+        type Thumb;
+        type Alt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Alt = Unset;
-        type Thumb = Unset;
         type Fullsize = Unset;
-    }
-    ///State transition - sets the `alt` field to Set
-    pub struct SetAlt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAlt<S> {}
-    impl<S: State> State for SetAlt<S> {
-        type Alt = Set<members::alt>;
-        type Thumb = S::Thumb;
-        type Fullsize = S::Fullsize;
-    }
-    ///State transition - sets the `thumb` field to Set
-    pub struct SetThumb<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetThumb<S> {}
-    impl<S: State> State for SetThumb<S> {
-        type Alt = S::Alt;
-        type Thumb = Set<members::thumb>;
-        type Fullsize = S::Fullsize;
+        type Thumb = Unset;
+        type Alt = Unset;
     }
     ///State transition - sets the `fullsize` field to Set
     pub struct SetFullsize<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFullsize<S> {}
     impl<S: State> State for SetFullsize<S> {
-        type Alt = S::Alt;
-        type Thumb = S::Thumb;
         type Fullsize = Set<members::fullsize>;
+        type Thumb = S::Thumb;
+        type Alt = S::Alt;
+    }
+    ///State transition - sets the `thumb` field to Set
+    pub struct SetThumb<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetThumb<S> {}
+    impl<S: State> State for SetThumb<S> {
+        type Fullsize = S::Fullsize;
+        type Thumb = Set<members::thumb>;
+        type Alt = S::Alt;
+    }
+    ///State transition - sets the `alt` field to Set
+    pub struct SetAlt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAlt<S> {}
+    impl<S: State> State for SetAlt<S> {
+        type Fullsize = S::Fullsize;
+        type Thumb = S::Thumb;
+        type Alt = Set<members::alt>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `alt` field
-        pub struct alt(());
-        ///Marker type for the `thumb` field
-        pub struct thumb(());
         ///Marker type for the `fullsize` field
         pub struct fullsize(());
+        ///Marker type for the `thumb` field
+        pub struct thumb(());
+        ///Marker type for the `alt` field
+        pub struct alt(());
     }
 }
 
@@ -1059,9 +1059,9 @@ impl<'a, S: view_image_state::State> ViewImageBuilder<'a, S> {
 impl<'a, S> ViewImageBuilder<'a, S>
 where
     S: view_image_state::State,
-    S::Alt: view_image_state::IsSet,
-    S::Thumb: view_image_state::IsSet,
     S::Fullsize: view_image_state::IsSet,
+    S::Thumb: view_image_state::IsSet,
+    S::Alt: view_image_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ViewImage<'a> {
@@ -1105,7 +1105,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewImage<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

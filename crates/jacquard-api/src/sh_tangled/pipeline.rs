@@ -210,7 +210,7 @@ fn lexicon_doc_sh_tangled_pipeline() -> ::jacquard_lexicon::lexicon::LexiconDoc<
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("cloneOpts"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -225,7 +225,7 @@ fn lexicon_doc_sh_tangled_pipeline() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("depth"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -275,7 +275,7 @@ fn lexicon_doc_sh_tangled_pipeline() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static(
                                     "triggerMetadata",
@@ -314,7 +314,7 @@ fn lexicon_doc_sh_tangled_pipeline() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("inputs"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -344,7 +344,7 @@ fn lexicon_doc_sh_tangled_pipeline() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("key"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -396,7 +396,7 @@ fn lexicon_doc_sh_tangled_pipeline() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("action"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -481,7 +481,7 @@ fn lexicon_doc_sh_tangled_pipeline() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("newSha"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -544,7 +544,7 @@ fn lexicon_doc_sh_tangled_pipeline() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("kind"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -615,7 +615,7 @@ fn lexicon_doc_sh_tangled_pipeline() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
                                 "defaultBranch",
@@ -699,7 +699,7 @@ fn lexicon_doc_sh_tangled_pipeline() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("clone"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -773,7 +773,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CloneOpts<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1009,7 +1009,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Pipeline<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1044,7 +1044,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ManualTriggerData<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1080,7 +1080,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Pair<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1120,7 +1120,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PullRequestTriggerData<'a
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.source_sha;
             #[allow(unused_comparisons)]
@@ -1184,7 +1184,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PushTriggerData<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.new_sha;
             #[allow(unused_comparisons)]
@@ -1280,37 +1280,37 @@ pub mod trigger_metadata_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Kind;
         type Repo;
+        type Kind;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Kind = Unset;
         type Repo = Unset;
-    }
-    ///State transition - sets the `kind` field to Set
-    pub struct SetKind<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetKind<S> {}
-    impl<S: State> State for SetKind<S> {
-        type Kind = Set<members::kind>;
-        type Repo = S::Repo;
+        type Kind = Unset;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepo<S> {}
     impl<S: State> State for SetRepo<S> {
-        type Kind = S::Kind;
         type Repo = Set<members::repo>;
+        type Kind = S::Kind;
+    }
+    ///State transition - sets the `kind` field to Set
+    pub struct SetKind<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetKind<S> {}
+    impl<S: State> State for SetKind<S> {
+        type Repo = S::Repo;
+        type Kind = Set<members::kind>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `kind` field
-        pub struct kind(());
         ///Marker type for the `repo` field
         pub struct repo(());
+        ///Marker type for the `kind` field
+        pub struct kind(());
     }
 }
 
@@ -1443,8 +1443,8 @@ where
 impl<'a, S> TriggerMetadataBuilder<'a, S>
 where
     S: trigger_metadata_state::State,
-    S::Kind: trigger_metadata_state::IsSet,
     S::Repo: trigger_metadata_state::IsSet,
+    S::Kind: trigger_metadata_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TriggerMetadata<'a> {
@@ -1488,7 +1488,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TriggerMetadata<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1525,67 +1525,67 @@ pub mod trigger_repo_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Knot;
+        type DefaultBranch;
         type Did;
         type Repo;
-        type DefaultBranch;
+        type Knot;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Knot = Unset;
+        type DefaultBranch = Unset;
         type Did = Unset;
         type Repo = Unset;
-        type DefaultBranch = Unset;
-    }
-    ///State transition - sets the `knot` field to Set
-    pub struct SetKnot<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetKnot<S> {}
-    impl<S: State> State for SetKnot<S> {
-        type Knot = Set<members::knot>;
-        type Did = S::Did;
-        type Repo = S::Repo;
-        type DefaultBranch = S::DefaultBranch;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Knot = S::Knot;
-        type Did = Set<members::did>;
-        type Repo = S::Repo;
-        type DefaultBranch = S::DefaultBranch;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Knot = S::Knot;
-        type Did = S::Did;
-        type Repo = Set<members::repo>;
-        type DefaultBranch = S::DefaultBranch;
+        type Knot = Unset;
     }
     ///State transition - sets the `default_branch` field to Set
     pub struct SetDefaultBranch<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDefaultBranch<S> {}
     impl<S: State> State for SetDefaultBranch<S> {
-        type Knot = S::Knot;
+        type DefaultBranch = Set<members::default_branch>;
         type Did = S::Did;
         type Repo = S::Repo;
-        type DefaultBranch = Set<members::default_branch>;
+        type Knot = S::Knot;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type DefaultBranch = S::DefaultBranch;
+        type Did = Set<members::did>;
+        type Repo = S::Repo;
+        type Knot = S::Knot;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type DefaultBranch = S::DefaultBranch;
+        type Did = S::Did;
+        type Repo = Set<members::repo>;
+        type Knot = S::Knot;
+    }
+    ///State transition - sets the `knot` field to Set
+    pub struct SetKnot<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetKnot<S> {}
+    impl<S: State> State for SetKnot<S> {
+        type DefaultBranch = S::DefaultBranch;
+        type Did = S::Did;
+        type Repo = S::Repo;
+        type Knot = Set<members::knot>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `knot` field
-        pub struct knot(());
+        ///Marker type for the `default_branch` field
+        pub struct default_branch(());
         ///Marker type for the `did` field
         pub struct did(());
         ///Marker type for the `repo` field
         pub struct repo(());
-        ///Marker type for the `default_branch` field
-        pub struct default_branch(());
+        ///Marker type for the `knot` field
+        pub struct knot(());
     }
 }
 
@@ -1698,10 +1698,10 @@ where
 impl<'a, S> TriggerRepoBuilder<'a, S>
 where
     S: trigger_repo_state::State,
-    S::Knot: trigger_repo_state::IsSet,
+    S::DefaultBranch: trigger_repo_state::IsSet,
     S::Did: trigger_repo_state::IsSet,
     S::Repo: trigger_repo_state::IsSet,
-    S::DefaultBranch: trigger_repo_state::IsSet,
+    S::Knot: trigger_repo_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TriggerRepo<'a> {
@@ -1743,7 +1743,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TriggerRepo<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1780,67 +1780,67 @@ pub mod workflow_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Raw;
+        type Name;
         type Clone;
         type Engine;
-        type Name;
+        type Raw;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Raw = Unset;
+        type Name = Unset;
         type Clone = Unset;
         type Engine = Unset;
-        type Name = Unset;
-    }
-    ///State transition - sets the `raw` field to Set
-    pub struct SetRaw<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRaw<S> {}
-    impl<S: State> State for SetRaw<S> {
-        type Raw = Set<members::raw>;
-        type Clone = S::Clone;
-        type Engine = S::Engine;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `clone` field to Set
-    pub struct SetClone<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetClone<S> {}
-    impl<S: State> State for SetClone<S> {
-        type Raw = S::Raw;
-        type Clone = Set<members::clone>;
-        type Engine = S::Engine;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `engine` field to Set
-    pub struct SetEngine<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEngine<S> {}
-    impl<S: State> State for SetEngine<S> {
-        type Raw = S::Raw;
-        type Clone = S::Clone;
-        type Engine = Set<members::engine>;
-        type Name = S::Name;
+        type Raw = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Raw = S::Raw;
+        type Name = Set<members::name>;
         type Clone = S::Clone;
         type Engine = S::Engine;
-        type Name = Set<members::name>;
+        type Raw = S::Raw;
+    }
+    ///State transition - sets the `clone` field to Set
+    pub struct SetClone<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetClone<S> {}
+    impl<S: State> State for SetClone<S> {
+        type Name = S::Name;
+        type Clone = Set<members::clone>;
+        type Engine = S::Engine;
+        type Raw = S::Raw;
+    }
+    ///State transition - sets the `engine` field to Set
+    pub struct SetEngine<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEngine<S> {}
+    impl<S: State> State for SetEngine<S> {
+        type Name = S::Name;
+        type Clone = S::Clone;
+        type Engine = Set<members::engine>;
+        type Raw = S::Raw;
+    }
+    ///State transition - sets the `raw` field to Set
+    pub struct SetRaw<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRaw<S> {}
+    impl<S: State> State for SetRaw<S> {
+        type Name = S::Name;
+        type Clone = S::Clone;
+        type Engine = S::Engine;
+        type Raw = Set<members::raw>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `raw` field
-        pub struct raw(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `clone` field
         pub struct clone(());
         ///Marker type for the `engine` field
         pub struct engine(());
-        ///Marker type for the `name` field
-        pub struct name(());
+        ///Marker type for the `raw` field
+        pub struct raw(());
     }
 }
 
@@ -1953,10 +1953,10 @@ where
 impl<'a, S> WorkflowBuilder<'a, S>
 where
     S: workflow_state::State,
-    S::Raw: workflow_state::IsSet,
+    S::Name: workflow_state::IsSet,
     S::Clone: workflow_state::IsSet,
     S::Engine: workflow_state::IsSet,
-    S::Name: workflow_state::IsSet,
+    S::Raw: workflow_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Workflow<'a> {
@@ -1998,7 +1998,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Workflow<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

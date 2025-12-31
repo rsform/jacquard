@@ -43,85 +43,85 @@ pub mod artifact_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repo;
         type Tag;
-        type Name;
         type CreatedAt;
         type Artifact;
+        type Repo;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repo = Unset;
         type Tag = Unset;
-        type Name = Unset;
         type CreatedAt = Unset;
         type Artifact = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Repo = Set<members::repo>;
-        type Tag = S::Tag;
-        type Name = S::Name;
-        type CreatedAt = S::CreatedAt;
-        type Artifact = S::Artifact;
+        type Repo = Unset;
+        type Name = Unset;
     }
     ///State transition - sets the `tag` field to Set
     pub struct SetTag<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTag<S> {}
     impl<S: State> State for SetTag<S> {
-        type Repo = S::Repo;
         type Tag = Set<members::tag>;
-        type Name = S::Name;
         type CreatedAt = S::CreatedAt;
         type Artifact = S::Artifact;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
         type Repo = S::Repo;
-        type Tag = S::Tag;
-        type Name = Set<members::name>;
-        type CreatedAt = S::CreatedAt;
-        type Artifact = S::Artifact;
+        type Name = S::Name;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Repo = S::Repo;
         type Tag = S::Tag;
-        type Name = S::Name;
         type CreatedAt = Set<members::created_at>;
         type Artifact = S::Artifact;
+        type Repo = S::Repo;
+        type Name = S::Name;
     }
     ///State transition - sets the `artifact` field to Set
     pub struct SetArtifact<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetArtifact<S> {}
     impl<S: State> State for SetArtifact<S> {
-        type Repo = S::Repo;
         type Tag = S::Tag;
-        type Name = S::Name;
         type CreatedAt = S::CreatedAt;
         type Artifact = Set<members::artifact>;
+        type Repo = S::Repo;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Tag = S::Tag;
+        type CreatedAt = S::CreatedAt;
+        type Artifact = S::Artifact;
+        type Repo = Set<members::repo>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Tag = S::Tag;
+        type CreatedAt = S::CreatedAt;
+        type Artifact = S::Artifact;
+        type Repo = S::Repo;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `tag` field
         pub struct tag(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `artifact` field
         pub struct artifact(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -254,11 +254,11 @@ where
 impl<'a, S> ArtifactBuilder<'a, S>
 where
     S: artifact_state::State,
-    S::Repo: artifact_state::IsSet,
     S::Tag: artifact_state::IsSet,
-    S::Name: artifact_state::IsSet,
     S::CreatedAt: artifact_state::IsSet,
     S::Artifact: artifact_state::IsSet,
+    S::Repo: artifact_state::IsSet,
+    S::Name: artifact_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Artifact<'a> {
@@ -363,7 +363,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Artifact<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -377,7 +377,7 @@ fn lexicon_doc_sh_tangled_repo_artifact() -> ::jacquard_lexicon::lexicon::Lexico
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
@@ -397,7 +397,7 @@ fn lexicon_doc_sh_tangled_repo_artifact() -> ::jacquard_lexicon::lexicon::Lexico
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static(
                                     "artifact",

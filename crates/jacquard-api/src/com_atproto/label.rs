@@ -63,67 +63,67 @@ pub mod label_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cts;
-        type Uri;
         type Src;
+        type Uri;
         type Val;
+        type Cts;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cts = Unset;
-        type Uri = Unset;
         type Src = Unset;
+        type Uri = Unset;
         type Val = Unset;
-    }
-    ///State transition - sets the `cts` field to Set
-    pub struct SetCts<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCts<S> {}
-    impl<S: State> State for SetCts<S> {
-        type Cts = Set<members::cts>;
-        type Uri = S::Uri;
-        type Src = S::Src;
-        type Val = S::Val;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Cts = S::Cts;
-        type Uri = Set<members::uri>;
-        type Src = S::Src;
-        type Val = S::Val;
+        type Cts = Unset;
     }
     ///State transition - sets the `src` field to Set
     pub struct SetSrc<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSrc<S> {}
     impl<S: State> State for SetSrc<S> {
-        type Cts = S::Cts;
-        type Uri = S::Uri;
         type Src = Set<members::src>;
+        type Uri = S::Uri;
         type Val = S::Val;
+        type Cts = S::Cts;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Src = S::Src;
+        type Uri = Set<members::uri>;
+        type Val = S::Val;
+        type Cts = S::Cts;
     }
     ///State transition - sets the `val` field to Set
     pub struct SetVal<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVal<S> {}
     impl<S: State> State for SetVal<S> {
-        type Cts = S::Cts;
-        type Uri = S::Uri;
         type Src = S::Src;
+        type Uri = S::Uri;
         type Val = Set<members::val>;
+        type Cts = S::Cts;
+    }
+    ///State transition - sets the `cts` field to Set
+    pub struct SetCts<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCts<S> {}
+    impl<S: State> State for SetCts<S> {
+        type Src = S::Src;
+        type Uri = S::Uri;
+        type Val = S::Val;
+        type Cts = Set<members::cts>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cts` field
-        pub struct cts(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `src` field
         pub struct src(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
         ///Marker type for the `val` field
         pub struct val(());
+        ///Marker type for the `cts` field
+        pub struct cts(());
     }
 }
 
@@ -328,10 +328,10 @@ impl<'a, S: label_state::State> LabelBuilder<'a, S> {
 impl<'a, S> LabelBuilder<'a, S>
 where
     S: label_state::State,
-    S::Cts: label_state::IsSet,
-    S::Uri: label_state::IsSet,
     S::Src: label_state::IsSet,
+    S::Uri: label_state::IsSet,
     S::Val: label_state::IsSet,
+    S::Cts: label_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Label<'a> {
@@ -380,7 +380,7 @@ fn lexicon_doc_com_atproto_label_defs() -> ::jacquard_lexicon::lexicon::LexiconD
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("label"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -400,7 +400,7 @@ fn lexicon_doc_com_atproto_label_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("cid"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -590,7 +590,7 @@ fn lexicon_doc_com_atproto_label_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
                                 "adultOnly",
@@ -719,7 +719,7 @@ fn lexicon_doc_com_atproto_label_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
                                 "description",
@@ -799,7 +799,7 @@ fn lexicon_doc_com_atproto_label_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("val"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -837,7 +837,7 @@ fn lexicon_doc_com_atproto_label_defs() -> ::jacquard_lexicon::lexicon::LexiconD
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("values"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -871,7 +871,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Label<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.val;
             #[allow(unused_comparisons)]
@@ -1053,65 +1053,65 @@ pub mod label_value_definition_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Identifier;
         type Blurs;
         type Locales;
-        type Identifier;
         type Severity;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Identifier = Unset;
         type Blurs = Unset;
         type Locales = Unset;
-        type Identifier = Unset;
         type Severity = Unset;
+    }
+    ///State transition - sets the `identifier` field to Set
+    pub struct SetIdentifier<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIdentifier<S> {}
+    impl<S: State> State for SetIdentifier<S> {
+        type Identifier = Set<members::identifier>;
+        type Blurs = S::Blurs;
+        type Locales = S::Locales;
+        type Severity = S::Severity;
     }
     ///State transition - sets the `blurs` field to Set
     pub struct SetBlurs<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBlurs<S> {}
     impl<S: State> State for SetBlurs<S> {
+        type Identifier = S::Identifier;
         type Blurs = Set<members::blurs>;
         type Locales = S::Locales;
-        type Identifier = S::Identifier;
         type Severity = S::Severity;
     }
     ///State transition - sets the `locales` field to Set
     pub struct SetLocales<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLocales<S> {}
     impl<S: State> State for SetLocales<S> {
+        type Identifier = S::Identifier;
         type Blurs = S::Blurs;
         type Locales = Set<members::locales>;
-        type Identifier = S::Identifier;
-        type Severity = S::Severity;
-    }
-    ///State transition - sets the `identifier` field to Set
-    pub struct SetIdentifier<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIdentifier<S> {}
-    impl<S: State> State for SetIdentifier<S> {
-        type Blurs = S::Blurs;
-        type Locales = S::Locales;
-        type Identifier = Set<members::identifier>;
         type Severity = S::Severity;
     }
     ///State transition - sets the `severity` field to Set
     pub struct SetSeverity<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSeverity<S> {}
     impl<S: State> State for SetSeverity<S> {
+        type Identifier = S::Identifier;
         type Blurs = S::Blurs;
         type Locales = S::Locales;
-        type Identifier = S::Identifier;
         type Severity = Set<members::severity>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `identifier` field
+        pub struct identifier(());
         ///Marker type for the `blurs` field
         pub struct blurs(());
         ///Marker type for the `locales` field
         pub struct locales(());
-        ///Marker type for the `identifier` field
-        pub struct identifier(());
         ///Marker type for the `severity` field
         pub struct severity(());
     }
@@ -1268,9 +1268,9 @@ where
 impl<'a, S> LabelValueDefinitionBuilder<'a, S>
 where
     S: label_value_definition_state::State,
+    S::Identifier: label_value_definition_state::IsSet,
     S::Blurs: label_value_definition_state::IsSet,
     S::Locales: label_value_definition_state::IsSet,
-    S::Identifier: label_value_definition_state::IsSet,
     S::Severity: label_value_definition_state::IsSet,
 {
     /// Build the final struct
@@ -1317,7 +1317,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LabelValueDefinition<'a> 
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.identifier;
             #[allow(unused_comparisons)]
@@ -1583,7 +1583,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LabelValueDefinitionStrin
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.description;
             #[allow(unused_comparisons)]
@@ -1683,7 +1683,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SelfLabel<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.val;
             #[allow(unused_comparisons)]
@@ -1835,7 +1835,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SelfLabels<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.values;
             #[allow(unused_comparisons)]

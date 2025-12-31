@@ -70,10 +70,10 @@ pub mod hive_book_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
-        type Id;
         type UpdatedAt;
+        type Id;
         type Thumbnail;
+        type Title;
         type CreatedAt;
         type Authors;
     }
@@ -81,21 +81,21 @@ pub mod hive_book_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
-        type Id = Unset;
         type UpdatedAt = Unset;
+        type Id = Unset;
         type Thumbnail = Unset;
+        type Title = Unset;
         type CreatedAt = Unset;
         type Authors = Unset;
     }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
+    impl<S: State> State for SetUpdatedAt<S> {
+        type UpdatedAt = Set<members::updated_at>;
         type Id = S::Id;
-        type UpdatedAt = S::UpdatedAt;
         type Thumbnail = S::Thumbnail;
+        type Title = S::Title;
         type CreatedAt = S::CreatedAt;
         type Authors = S::Authors;
     }
@@ -103,21 +103,10 @@ pub mod hive_book_state {
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
-        type Title = S::Title;
-        type Id = Set<members::id>;
         type UpdatedAt = S::UpdatedAt;
+        type Id = Set<members::id>;
         type Thumbnail = S::Thumbnail;
-        type CreatedAt = S::CreatedAt;
-        type Authors = S::Authors;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
         type Title = S::Title;
-        type Id = S::Id;
-        type UpdatedAt = Set<members::updated_at>;
-        type Thumbnail = S::Thumbnail;
         type CreatedAt = S::CreatedAt;
         type Authors = S::Authors;
     }
@@ -125,10 +114,21 @@ pub mod hive_book_state {
     pub struct SetThumbnail<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetThumbnail<S> {}
     impl<S: State> State for SetThumbnail<S> {
-        type Title = S::Title;
-        type Id = S::Id;
         type UpdatedAt = S::UpdatedAt;
+        type Id = S::Id;
         type Thumbnail = Set<members::thumbnail>;
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+        type Authors = S::Authors;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type UpdatedAt = S::UpdatedAt;
+        type Id = S::Id;
+        type Thumbnail = S::Thumbnail;
+        type Title = Set<members::title>;
         type CreatedAt = S::CreatedAt;
         type Authors = S::Authors;
     }
@@ -136,10 +136,10 @@ pub mod hive_book_state {
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Title = S::Title;
-        type Id = S::Id;
         type UpdatedAt = S::UpdatedAt;
+        type Id = S::Id;
         type Thumbnail = S::Thumbnail;
+        type Title = S::Title;
         type CreatedAt = Set<members::created_at>;
         type Authors = S::Authors;
     }
@@ -147,24 +147,24 @@ pub mod hive_book_state {
     pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthors<S> {}
     impl<S: State> State for SetAuthors<S> {
-        type Title = S::Title;
-        type Id = S::Id;
         type UpdatedAt = S::UpdatedAt;
+        type Id = S::Id;
         type Thumbnail = S::Thumbnail;
+        type Title = S::Title;
         type CreatedAt = S::CreatedAt;
         type Authors = Set<members::authors>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
+        ///Marker type for the `id` field
+        pub struct id(());
         ///Marker type for the `thumbnail` field
         pub struct thumbnail(());
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `authors` field
@@ -457,10 +457,10 @@ where
 impl<'a, S> HiveBookBuilder<'a, S>
 where
     S: hive_book_state::State,
-    S::Title: hive_book_state::IsSet,
-    S::Id: hive_book_state::IsSet,
     S::UpdatedAt: hive_book_state::IsSet,
+    S::Id: hive_book_state::IsSet,
     S::Thumbnail: hive_book_state::IsSet,
+    S::Title: hive_book_state::IsSet,
     S::CreatedAt: hive_book_state::IsSet,
     S::Authors: hive_book_state::IsSet,
 {
@@ -583,7 +583,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HiveBook<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.authors;
             #[allow(unused_comparisons)]
@@ -683,7 +683,7 @@ fn lexicon_doc_buzz_bookhive_hiveBook() -> ::jacquard_lexicon::lexicon::LexiconD
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
@@ -706,7 +706,7 @@ fn lexicon_doc_buzz_bookhive_hiveBook() -> ::jacquard_lexicon::lexicon::LexiconD
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static("authors"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {

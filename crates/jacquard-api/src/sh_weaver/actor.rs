@@ -164,7 +164,7 @@ fn lexicon_doc_sh_weaver_actor_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("author"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -179,7 +179,7 @@ fn lexicon_doc_sh_weaver_actor_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("did"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -235,7 +235,7 @@ fn lexicon_doc_sh_weaver_actor_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
                                 "collaborationCount",
@@ -334,7 +334,7 @@ fn lexicon_doc_sh_weaver_actor_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
                                 "followerCount",
@@ -399,7 +399,7 @@ fn lexicon_doc_sh_weaver_actor_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("avatar"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -684,7 +684,7 @@ fn lexicon_doc_sh_weaver_actor_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("avatar"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -852,7 +852,7 @@ fn lexicon_doc_sh_weaver_actor_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("path"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -918,7 +918,7 @@ fn lexicon_doc_sh_weaver_actor_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("bluesky"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
@@ -1093,7 +1093,7 @@ fn lexicon_doc_sh_weaver_actor_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("blocked"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1246,7 +1246,7 @@ fn lexicon_doc_sh_weaver_actor_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("blocked"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1401,7 +1401,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Author<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1676,7 +1676,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileDataView<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1899,7 +1899,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileDataViewBasic<'a> 
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1979,37 +1979,37 @@ pub mod profile_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Handle;
         type Did;
+        type Handle;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Handle = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHandle<S> {}
-    impl<S: State> State for SetHandle<S> {
-        type Handle = Set<members::handle>;
-        type Did = S::Did;
+        type Handle = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Handle = S::Handle;
         type Did = Set<members::did>;
+        type Handle = S::Handle;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHandle<S> {}
+    impl<S: State> State for SetHandle<S> {
+        type Did = S::Did;
+        type Handle = Set<members::handle>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `handle` field
-        pub struct handle(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `handle` field
+        pub struct handle(());
     }
 }
 
@@ -2388,8 +2388,8 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
 impl<'a, S> ProfileViewBuilder<'a, S>
 where
     S: profile_view_state::State,
-    S::Handle: profile_view_state::IsSet,
     S::Did: profile_view_state::IsSet,
+    S::Handle: profile_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ProfileView<'a> {
@@ -2459,7 +2459,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileView<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10240usize {
@@ -2623,37 +2623,37 @@ pub mod profile_view_basic_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Handle;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Handle = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Handle = S::Handle;
+        type Did = Unset;
     }
     ///State transition - sets the `handle` field to Set
     pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHandle<S> {}
     impl<S: State> State for SetHandle<S> {
-        type Did = S::Did;
         type Handle = Set<members::handle>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Handle = S::Handle;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `handle` field
         pub struct handle(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
@@ -2846,8 +2846,8 @@ impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
 impl<'a, S> ProfileViewBasicBuilder<'a, S>
 where
     S: profile_view_basic_state::State,
-    S::Did: profile_view_basic_state::IsSet,
     S::Handle: profile_view_basic_state::IsSet,
+    S::Did: profile_view_basic_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ProfileViewBasic<'a> {
@@ -2897,7 +2897,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileViewBasic<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.display_name {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 640usize {
@@ -3111,7 +3111,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SubscribedNotebook<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -3166,51 +3166,51 @@ pub mod tangled_profile_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Handle;
         type Bluesky;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Handle = Unset;
         type Bluesky = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Handle = S::Handle;
-        type Bluesky = S::Bluesky;
+        type Did = Unset;
     }
     ///State transition - sets the `handle` field to Set
     pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHandle<S> {}
     impl<S: State> State for SetHandle<S> {
-        type Did = S::Did;
         type Handle = Set<members::handle>;
         type Bluesky = S::Bluesky;
+        type Did = S::Did;
     }
     ///State transition - sets the `bluesky` field to Set
     pub struct SetBluesky<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBluesky<S> {}
     impl<S: State> State for SetBluesky<S> {
-        type Did = S::Did;
         type Handle = S::Handle;
         type Bluesky = Set<members::bluesky>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Handle = S::Handle;
+        type Bluesky = S::Bluesky;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `handle` field
         pub struct handle(());
         ///Marker type for the `bluesky` field
         pub struct bluesky(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
@@ -3400,9 +3400,9 @@ impl<'a, S: tangled_profile_view_state::State> TangledProfileViewBuilder<'a, S> 
 impl<'a, S> TangledProfileViewBuilder<'a, S>
 where
     S: tangled_profile_view_state::State,
-    S::Did: tangled_profile_view_state::IsSet,
     S::Handle: tangled_profile_view_state::IsSet,
     S::Bluesky: tangled_profile_view_state::IsSet,
+    S::Did: tangled_profile_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TangledProfileView<'a> {
@@ -3452,7 +3452,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TangledProfileView<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2560usize {
@@ -3644,7 +3644,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewerState<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -3701,7 +3701,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewerStateBasic<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

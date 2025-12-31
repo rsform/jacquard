@@ -34,7 +34,7 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> ::jacquard_lexicon::lexicon::Lexico
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("commitCountBreakdown"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -43,7 +43,7 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> ::jacquard_lexicon::lexicon::Lexico
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("byEmail"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -77,7 +77,7 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> ::jacquard_lexicon::lexicon::Lexico
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("count"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -123,7 +123,7 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> ::jacquard_lexicon::lexicon::Lexico
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("lang"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -162,7 +162,7 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> ::jacquard_lexicon::lexicon::Lexico
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("inputs"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -206,7 +206,7 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> ::jacquard_lexicon::lexicon::Lexico
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static(
                                     "committerDid",
@@ -346,7 +346,7 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> ::jacquard_lexicon::lexicon::Lexico
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
                                 "commitCount",
@@ -400,7 +400,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CommitCountBreakdown<'a> 
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -588,7 +588,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for IndividualEmailCommitCoun
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -765,7 +765,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for IndividualLanguageSize<'a
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -802,7 +802,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LangBreakdown<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -852,127 +852,127 @@ pub mod ref_update_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type NewSha;
         type RepoDid;
-        type Ref;
+        type NewSha;
         type OldSha;
-        type RepoName;
-        type Meta;
         type CommitterDid;
+        type Meta;
+        type Ref;
+        type RepoName;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type NewSha = Unset;
         type RepoDid = Unset;
-        type Ref = Unset;
+        type NewSha = Unset;
         type OldSha = Unset;
-        type RepoName = Unset;
-        type Meta = Unset;
         type CommitterDid = Unset;
-    }
-    ///State transition - sets the `new_sha` field to Set
-    pub struct SetNewSha<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNewSha<S> {}
-    impl<S: State> State for SetNewSha<S> {
-        type NewSha = Set<members::new_sha>;
-        type RepoDid = S::RepoDid;
-        type Ref = S::Ref;
-        type OldSha = S::OldSha;
-        type RepoName = S::RepoName;
-        type Meta = S::Meta;
-        type CommitterDid = S::CommitterDid;
+        type Meta = Unset;
+        type Ref = Unset;
+        type RepoName = Unset;
     }
     ///State transition - sets the `repo_did` field to Set
     pub struct SetRepoDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepoDid<S> {}
     impl<S: State> State for SetRepoDid<S> {
-        type NewSha = S::NewSha;
         type RepoDid = Set<members::repo_did>;
-        type Ref = S::Ref;
-        type OldSha = S::OldSha;
-        type RepoName = S::RepoName;
-        type Meta = S::Meta;
-        type CommitterDid = S::CommitterDid;
-    }
-    ///State transition - sets the `ref` field to Set
-    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRef<S> {}
-    impl<S: State> State for SetRef<S> {
         type NewSha = S::NewSha;
-        type RepoDid = S::RepoDid;
-        type Ref = Set<members::r#ref>;
         type OldSha = S::OldSha;
-        type RepoName = S::RepoName;
-        type Meta = S::Meta;
         type CommitterDid = S::CommitterDid;
+        type Meta = S::Meta;
+        type Ref = S::Ref;
+        type RepoName = S::RepoName;
+    }
+    ///State transition - sets the `new_sha` field to Set
+    pub struct SetNewSha<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNewSha<S> {}
+    impl<S: State> State for SetNewSha<S> {
+        type RepoDid = S::RepoDid;
+        type NewSha = Set<members::new_sha>;
+        type OldSha = S::OldSha;
+        type CommitterDid = S::CommitterDid;
+        type Meta = S::Meta;
+        type Ref = S::Ref;
+        type RepoName = S::RepoName;
     }
     ///State transition - sets the `old_sha` field to Set
     pub struct SetOldSha<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetOldSha<S> {}
     impl<S: State> State for SetOldSha<S> {
-        type NewSha = S::NewSha;
         type RepoDid = S::RepoDid;
-        type Ref = S::Ref;
+        type NewSha = S::NewSha;
         type OldSha = Set<members::old_sha>;
-        type RepoName = S::RepoName;
+        type CommitterDid = S::CommitterDid;
         type Meta = S::Meta;
-        type CommitterDid = S::CommitterDid;
-    }
-    ///State transition - sets the `repo_name` field to Set
-    pub struct SetRepoName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepoName<S> {}
-    impl<S: State> State for SetRepoName<S> {
-        type NewSha = S::NewSha;
-        type RepoDid = S::RepoDid;
         type Ref = S::Ref;
-        type OldSha = S::OldSha;
-        type RepoName = Set<members::repo_name>;
-        type Meta = S::Meta;
-        type CommitterDid = S::CommitterDid;
-    }
-    ///State transition - sets the `meta` field to Set
-    pub struct SetMeta<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMeta<S> {}
-    impl<S: State> State for SetMeta<S> {
-        type NewSha = S::NewSha;
-        type RepoDid = S::RepoDid;
-        type Ref = S::Ref;
-        type OldSha = S::OldSha;
         type RepoName = S::RepoName;
-        type Meta = Set<members::meta>;
-        type CommitterDid = S::CommitterDid;
     }
     ///State transition - sets the `committer_did` field to Set
     pub struct SetCommitterDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCommitterDid<S> {}
     impl<S: State> State for SetCommitterDid<S> {
-        type NewSha = S::NewSha;
         type RepoDid = S::RepoDid;
-        type Ref = S::Ref;
+        type NewSha = S::NewSha;
         type OldSha = S::OldSha;
-        type RepoName = S::RepoName;
-        type Meta = S::Meta;
         type CommitterDid = Set<members::committer_did>;
+        type Meta = S::Meta;
+        type Ref = S::Ref;
+        type RepoName = S::RepoName;
+    }
+    ///State transition - sets the `meta` field to Set
+    pub struct SetMeta<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMeta<S> {}
+    impl<S: State> State for SetMeta<S> {
+        type RepoDid = S::RepoDid;
+        type NewSha = S::NewSha;
+        type OldSha = S::OldSha;
+        type CommitterDid = S::CommitterDid;
+        type Meta = Set<members::meta>;
+        type Ref = S::Ref;
+        type RepoName = S::RepoName;
+    }
+    ///State transition - sets the `ref` field to Set
+    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRef<S> {}
+    impl<S: State> State for SetRef<S> {
+        type RepoDid = S::RepoDid;
+        type NewSha = S::NewSha;
+        type OldSha = S::OldSha;
+        type CommitterDid = S::CommitterDid;
+        type Meta = S::Meta;
+        type Ref = Set<members::r#ref>;
+        type RepoName = S::RepoName;
+    }
+    ///State transition - sets the `repo_name` field to Set
+    pub struct SetRepoName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepoName<S> {}
+    impl<S: State> State for SetRepoName<S> {
+        type RepoDid = S::RepoDid;
+        type NewSha = S::NewSha;
+        type OldSha = S::OldSha;
+        type CommitterDid = S::CommitterDid;
+        type Meta = S::Meta;
+        type Ref = S::Ref;
+        type RepoName = Set<members::repo_name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `new_sha` field
-        pub struct new_sha(());
         ///Marker type for the `repo_did` field
         pub struct repo_did(());
-        ///Marker type for the `ref` field
-        pub struct r#ref(());
+        ///Marker type for the `new_sha` field
+        pub struct new_sha(());
         ///Marker type for the `old_sha` field
         pub struct old_sha(());
-        ///Marker type for the `repo_name` field
-        pub struct repo_name(());
-        ///Marker type for the `meta` field
-        pub struct meta(());
         ///Marker type for the `committer_did` field
         pub struct committer_did(());
+        ///Marker type for the `meta` field
+        pub struct meta(());
+        ///Marker type for the `ref` field
+        pub struct r#ref(());
+        ///Marker type for the `repo_name` field
+        pub struct repo_name(());
     }
 }
 
@@ -1145,13 +1145,13 @@ where
 impl<'a, S> RefUpdateBuilder<'a, S>
 where
     S: ref_update_state::State,
-    S::NewSha: ref_update_state::IsSet,
     S::RepoDid: ref_update_state::IsSet,
-    S::Ref: ref_update_state::IsSet,
+    S::NewSha: ref_update_state::IsSet,
     S::OldSha: ref_update_state::IsSet,
-    S::RepoName: ref_update_state::IsSet,
-    S::Meta: ref_update_state::IsSet,
     S::CommitterDid: ref_update_state::IsSet,
+    S::Meta: ref_update_state::IsSet,
+    S::Ref: ref_update_state::IsSet,
+    S::RepoName: ref_update_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RefUpdate<'a> {
@@ -1260,7 +1260,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RefUpdate<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.new_sha;
             #[allow(unused_comparisons)]
@@ -1547,7 +1547,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Meta<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

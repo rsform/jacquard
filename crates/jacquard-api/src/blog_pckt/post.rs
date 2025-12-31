@@ -53,67 +53,67 @@ pub mod post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Blog;
+        type Title;
         type Url;
         type Blocks;
-        type Title;
+        type Blog;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Blog = Unset;
+        type Title = Unset;
         type Url = Unset;
         type Blocks = Unset;
-        type Title = Unset;
-    }
-    ///State transition - sets the `blog` field to Set
-    pub struct SetBlog<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlog<S> {}
-    impl<S: State> State for SetBlog<S> {
-        type Blog = Set<members::blog>;
-        type Url = S::Url;
-        type Blocks = S::Blocks;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type Blog = S::Blog;
-        type Url = Set<members::url>;
-        type Blocks = S::Blocks;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `blocks` field to Set
-    pub struct SetBlocks<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlocks<S> {}
-    impl<S: State> State for SetBlocks<S> {
-        type Blog = S::Blog;
-        type Url = S::Url;
-        type Blocks = Set<members::blocks>;
-        type Title = S::Title;
+        type Blog = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Blog = S::Blog;
+        type Title = Set<members::title>;
         type Url = S::Url;
         type Blocks = S::Blocks;
-        type Title = Set<members::title>;
+        type Blog = S::Blog;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type Title = S::Title;
+        type Url = Set<members::url>;
+        type Blocks = S::Blocks;
+        type Blog = S::Blog;
+    }
+    ///State transition - sets the `blocks` field to Set
+    pub struct SetBlocks<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlocks<S> {}
+    impl<S: State> State for SetBlocks<S> {
+        type Title = S::Title;
+        type Url = S::Url;
+        type Blocks = Set<members::blocks>;
+        type Blog = S::Blog;
+    }
+    ///State transition - sets the `blog` field to Set
+    pub struct SetBlog<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlog<S> {}
+    impl<S: State> State for SetBlog<S> {
+        type Title = S::Title;
+        type Url = S::Url;
+        type Blocks = S::Blocks;
+        type Blog = Set<members::blog>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `blog` field
-        pub struct blog(());
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `url` field
         pub struct url(());
         ///Marker type for the `blocks` field
         pub struct blocks(());
-        ///Marker type for the `title` field
-        pub struct title(());
+        ///Marker type for the `blog` field
+        pub struct blog(());
     }
 }
 
@@ -357,10 +357,10 @@ where
 impl<'a, S> PostBuilder<'a, S>
 where
     S: post_state::State,
-    S::Blog: post_state::IsSet,
+    S::Title: post_state::IsSet,
     S::Url: post_state::IsSet,
     S::Blocks: post_state::IsSet,
-    S::Title: post_state::IsSet,
+    S::Blog: post_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Post<'a> {
@@ -475,7 +475,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Post<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -487,7 +487,7 @@ fn lexicon_doc_blog_pckt_post() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
@@ -506,7 +506,7 @@ fn lexicon_doc_blog_pckt_post() -> ::jacquard_lexicon::lexicon::LexiconDoc<'stat
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static("blocks"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Union(::jacquard_lexicon::lexicon::LexRefUnion {

@@ -81,9 +81,9 @@ pub mod progress_state {
     pub trait State: sealed::Sealed {
         type XpToNextLevel;
         type Level;
-        type ProgressPercentage;
-        type TotalXp;
         type CreatedAt;
+        type TotalXp;
+        type ProgressPercentage;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -91,9 +91,9 @@ pub mod progress_state {
     impl State for Empty {
         type XpToNextLevel = Unset;
         type Level = Unset;
-        type ProgressPercentage = Unset;
-        type TotalXp = Unset;
         type CreatedAt = Unset;
+        type TotalXp = Unset;
+        type ProgressPercentage = Unset;
     }
     ///State transition - sets the `xp_to_next_level` field to Set
     pub struct SetXpToNextLevel<S: State = Empty>(PhantomData<fn() -> S>);
@@ -101,9 +101,9 @@ pub mod progress_state {
     impl<S: State> State for SetXpToNextLevel<S> {
         type XpToNextLevel = Set<members::xp_to_next_level>;
         type Level = S::Level;
-        type ProgressPercentage = S::ProgressPercentage;
-        type TotalXp = S::TotalXp;
         type CreatedAt = S::CreatedAt;
+        type TotalXp = S::TotalXp;
+        type ProgressPercentage = S::ProgressPercentage;
     }
     ///State transition - sets the `level` field to Set
     pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
@@ -111,29 +111,9 @@ pub mod progress_state {
     impl<S: State> State for SetLevel<S> {
         type XpToNextLevel = S::XpToNextLevel;
         type Level = Set<members::level>;
-        type ProgressPercentage = S::ProgressPercentage;
+        type CreatedAt = S::CreatedAt;
         type TotalXp = S::TotalXp;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `progress_percentage` field to Set
-    pub struct SetProgressPercentage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetProgressPercentage<S> {}
-    impl<S: State> State for SetProgressPercentage<S> {
-        type XpToNextLevel = S::XpToNextLevel;
-        type Level = S::Level;
-        type ProgressPercentage = Set<members::progress_percentage>;
-        type TotalXp = S::TotalXp;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `total_xp` field to Set
-    pub struct SetTotalXp<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTotalXp<S> {}
-    impl<S: State> State for SetTotalXp<S> {
-        type XpToNextLevel = S::XpToNextLevel;
-        type Level = S::Level;
         type ProgressPercentage = S::ProgressPercentage;
-        type TotalXp = Set<members::total_xp>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
@@ -141,9 +121,29 @@ pub mod progress_state {
     impl<S: State> State for SetCreatedAt<S> {
         type XpToNextLevel = S::XpToNextLevel;
         type Level = S::Level;
-        type ProgressPercentage = S::ProgressPercentage;
-        type TotalXp = S::TotalXp;
         type CreatedAt = Set<members::created_at>;
+        type TotalXp = S::TotalXp;
+        type ProgressPercentage = S::ProgressPercentage;
+    }
+    ///State transition - sets the `total_xp` field to Set
+    pub struct SetTotalXp<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTotalXp<S> {}
+    impl<S: State> State for SetTotalXp<S> {
+        type XpToNextLevel = S::XpToNextLevel;
+        type Level = S::Level;
+        type CreatedAt = S::CreatedAt;
+        type TotalXp = Set<members::total_xp>;
+        type ProgressPercentage = S::ProgressPercentage;
+    }
+    ///State transition - sets the `progress_percentage` field to Set
+    pub struct SetProgressPercentage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetProgressPercentage<S> {}
+    impl<S: State> State for SetProgressPercentage<S> {
+        type XpToNextLevel = S::XpToNextLevel;
+        type Level = S::Level;
+        type CreatedAt = S::CreatedAt;
+        type TotalXp = S::TotalXp;
+        type ProgressPercentage = Set<members::progress_percentage>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -152,12 +152,12 @@ pub mod progress_state {
         pub struct xp_to_next_level(());
         ///Marker type for the `level` field
         pub struct level(());
-        ///Marker type for the `progress_percentage` field
-        pub struct progress_percentage(());
-        ///Marker type for the `total_xp` field
-        pub struct total_xp(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `total_xp` field
+        pub struct total_xp(());
+        ///Marker type for the `progress_percentage` field
+        pub struct progress_percentage(());
     }
 }
 
@@ -493,9 +493,9 @@ where
     S: progress_state::State,
     S::XpToNextLevel: progress_state::IsSet,
     S::Level: progress_state::IsSet,
-    S::ProgressPercentage: progress_state::IsSet,
-    S::TotalXp: progress_state::IsSet,
     S::CreatedAt: progress_state::IsSet,
+    S::TotalXp: progress_state::IsSet,
+    S::ProgressPercentage: progress_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Progress<'a> {
@@ -620,7 +620,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Progress<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.level;
             if *value < 1i64 {
@@ -692,7 +692,7 @@ fn lexicon_doc_net_anisota_beta_game_progress() -> ::jacquard_lexicon::lexicon::
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
@@ -716,7 +716,7 @@ fn lexicon_doc_net_anisota_beta_game_progress() -> ::jacquard_lexicon::lexicon::
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static("cardUri"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -984,7 +984,7 @@ fn lexicon_doc_net_anisota_beta_game_progress() -> ::jacquard_lexicon::lexicon::
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
                                 "clientVersion",
@@ -1041,7 +1041,7 @@ fn lexicon_doc_net_anisota_beta_game_progress() -> ::jacquard_lexicon::lexicon::
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
                                 "dailyRewardsClaimed",
@@ -1201,7 +1201,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Metadata<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1260,7 +1260,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Stats<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.daily_rewards_claimed {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {

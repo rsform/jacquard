@@ -80,8 +80,8 @@ pub mod minigame_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type PlayedAt;
         type RoundDuration;
+        type PlayedAt;
         type GameContext;
         type FinalScore;
         type ShapesCollected;
@@ -90,28 +90,28 @@ pub mod minigame_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type PlayedAt = Unset;
         type RoundDuration = Unset;
+        type PlayedAt = Unset;
         type GameContext = Unset;
         type FinalScore = Unset;
         type ShapesCollected = Unset;
-    }
-    ///State transition - sets the `played_at` field to Set
-    pub struct SetPlayedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPlayedAt<S> {}
-    impl<S: State> State for SetPlayedAt<S> {
-        type PlayedAt = Set<members::played_at>;
-        type RoundDuration = S::RoundDuration;
-        type GameContext = S::GameContext;
-        type FinalScore = S::FinalScore;
-        type ShapesCollected = S::ShapesCollected;
     }
     ///State transition - sets the `round_duration` field to Set
     pub struct SetRoundDuration<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRoundDuration<S> {}
     impl<S: State> State for SetRoundDuration<S> {
-        type PlayedAt = S::PlayedAt;
         type RoundDuration = Set<members::round_duration>;
+        type PlayedAt = S::PlayedAt;
+        type GameContext = S::GameContext;
+        type FinalScore = S::FinalScore;
+        type ShapesCollected = S::ShapesCollected;
+    }
+    ///State transition - sets the `played_at` field to Set
+    pub struct SetPlayedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPlayedAt<S> {}
+    impl<S: State> State for SetPlayedAt<S> {
+        type RoundDuration = S::RoundDuration;
+        type PlayedAt = Set<members::played_at>;
         type GameContext = S::GameContext;
         type FinalScore = S::FinalScore;
         type ShapesCollected = S::ShapesCollected;
@@ -120,8 +120,8 @@ pub mod minigame_state {
     pub struct SetGameContext<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGameContext<S> {}
     impl<S: State> State for SetGameContext<S> {
-        type PlayedAt = S::PlayedAt;
         type RoundDuration = S::RoundDuration;
+        type PlayedAt = S::PlayedAt;
         type GameContext = Set<members::game_context>;
         type FinalScore = S::FinalScore;
         type ShapesCollected = S::ShapesCollected;
@@ -130,8 +130,8 @@ pub mod minigame_state {
     pub struct SetFinalScore<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFinalScore<S> {}
     impl<S: State> State for SetFinalScore<S> {
-        type PlayedAt = S::PlayedAt;
         type RoundDuration = S::RoundDuration;
+        type PlayedAt = S::PlayedAt;
         type GameContext = S::GameContext;
         type FinalScore = Set<members::final_score>;
         type ShapesCollected = S::ShapesCollected;
@@ -140,8 +140,8 @@ pub mod minigame_state {
     pub struct SetShapesCollected<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetShapesCollected<S> {}
     impl<S: State> State for SetShapesCollected<S> {
-        type PlayedAt = S::PlayedAt;
         type RoundDuration = S::RoundDuration;
+        type PlayedAt = S::PlayedAt;
         type GameContext = S::GameContext;
         type FinalScore = S::FinalScore;
         type ShapesCollected = Set<members::shapes_collected>;
@@ -149,10 +149,10 @@ pub mod minigame_state {
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `played_at` field
-        pub struct played_at(());
         ///Marker type for the `round_duration` field
         pub struct round_duration(());
+        ///Marker type for the `played_at` field
+        pub struct played_at(());
         ///Marker type for the `game_context` field
         pub struct game_context(());
         ///Marker type for the `final_score` field
@@ -499,8 +499,8 @@ impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
 impl<'a, S> MinigameBuilder<'a, S>
 where
     S: minigame_state::State,
-    S::PlayedAt: minigame_state::IsSet,
     S::RoundDuration: minigame_state::IsSet,
+    S::PlayedAt: minigame_state::IsSet,
     S::GameContext: minigame_state::IsSet,
     S::FinalScore: minigame_state::IsSet,
     S::ShapesCollected: minigame_state::IsSet,
@@ -632,7 +632,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Minigame<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.early_harvests {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -792,7 +792,7 @@ fn lexicon_doc_net_anisota_harvest_minigame() -> ::jacquard_lexicon::lexicon::Le
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
@@ -816,7 +816,7 @@ fn lexicon_doc_net_anisota_harvest_minigame() -> ::jacquard_lexicon::lexicon::Le
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static(
                                     "clientVersion",
@@ -1089,7 +1089,7 @@ fn lexicon_doc_net_anisota_harvest_minigame() -> ::jacquard_lexicon::lexicon::Le
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("common"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -1199,7 +1199,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RarityBreakdown<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.common {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {

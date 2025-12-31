@@ -263,7 +263,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.bio {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2400usize {
@@ -349,7 +349,7 @@ fn lexicon_doc_com_shinolabs_pinksea_profile() -> ::jacquard_lexicon::lexicon::L
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
@@ -365,7 +365,7 @@ fn lexicon_doc_com_shinolabs_pinksea_profile() -> ::jacquard_lexicon::lexicon::L
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static("avatar"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -449,7 +449,7 @@ fn lexicon_doc_com_shinolabs_pinksea_profile() -> ::jacquard_lexicon::lexicon::L
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("link"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -529,37 +529,37 @@ pub mod profile_link_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Link;
         type Name;
+        type Link;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Link = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `link` field to Set
-    pub struct SetLink<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLink<S> {}
-    impl<S: State> State for SetLink<S> {
-        type Link = Set<members::link>;
-        type Name = S::Name;
+        type Link = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Link = S::Link;
         type Name = Set<members::name>;
+        type Link = S::Link;
+    }
+    ///State transition - sets the `link` field to Set
+    pub struct SetLink<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLink<S> {}
+    impl<S: State> State for SetLink<S> {
+        type Name = S::Name;
+        type Link = Set<members::link>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `link` field
-        pub struct link(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `link` field
+        pub struct link(());
     }
 }
 
@@ -632,8 +632,8 @@ where
 impl<'a, S> ProfileLinkBuilder<'a, S>
 where
     S: profile_link_state::State,
-    S::Link: profile_link_state::IsSet,
     S::Name: profile_link_state::IsSet,
+    S::Link: profile_link_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ProfileLink<'a> {
@@ -671,7 +671,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileLink<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.name;
             #[allow(unused_comparisons)]

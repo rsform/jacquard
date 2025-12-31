@@ -127,7 +127,12 @@ impl<'c> CodeGenerator<'c> {
                 .collect();
 
             // If this file already exists in defs_only (e.g., from defs), merge the content
-            let module_tokens = quote! { #(#mods)* };
+            let module_tokens = if is_root {
+                // lib.rs needs extern crate alloc for no_std compatibility
+                quote! { extern crate alloc; #(#mods)* }
+            } else {
+                quote! { #(#mods)* }
+            };
             if let Some((existing_tokens, nsid)) = defs_only.get(&mod_file_path) {
                 // Put module declarations FIRST, then existing defs content
                 result.insert(

@@ -219,37 +219,37 @@ pub mod timeline_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Summary;
         type Day;
+        type Summary;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Summary = Unset;
         type Day = Unset;
-    }
-    ///State transition - sets the `summary` field to Set
-    pub struct SetSummary<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSummary<S> {}
-    impl<S: State> State for SetSummary<S> {
-        type Summary = Set<members::summary>;
-        type Day = S::Day;
+        type Summary = Unset;
     }
     ///State transition - sets the `day` field to Set
     pub struct SetDay<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDay<S> {}
     impl<S: State> State for SetDay<S> {
-        type Summary = S::Summary;
         type Day = Set<members::day>;
+        type Summary = S::Summary;
+    }
+    ///State transition - sets the `summary` field to Set
+    pub struct SetSummary<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSummary<S> {}
+    impl<S: State> State for SetSummary<S> {
+        type Day = S::Day;
+        type Summary = Set<members::summary>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `summary` field
-        pub struct summary(());
         ///Marker type for the `day` field
         pub struct day(());
+        ///Marker type for the `summary` field
+        pub struct summary(());
     }
 }
 
@@ -334,8 +334,8 @@ where
 impl<'a, S> TimelineItemBuilder<'a, S>
 where
     S: timeline_item_state::State,
-    S::Summary: timeline_item_state::IsSet,
     S::Day: timeline_item_state::IsSet,
+    S::Summary: timeline_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TimelineItem<'a> {
@@ -372,7 +372,7 @@ fn lexicon_doc_tools_ozone_moderation_getAccountTimeline() -> ::jacquard_lexicon
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
@@ -387,7 +387,7 @@ fn lexicon_doc_tools_ozone_moderation_getAccountTimeline() -> ::jacquard_lexicon
                             ),
                             properties: {
                                 #[allow(unused_mut)]
-                                let mut map = ::std::collections::BTreeMap::new();
+                                let mut map = ::alloc::collections::BTreeMap::new();
                                 map.insert(
                                     ::jacquard_common::smol_str::SmolStr::new_static("did"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -426,7 +426,7 @@ fn lexicon_doc_tools_ozone_moderation_getAccountTimeline() -> ::jacquard_lexicon
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("day"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -474,7 +474,7 @@ fn lexicon_doc_tools_ozone_moderation_getAccountTimeline() -> ::jacquard_lexicon
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("count"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -541,7 +541,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TimelineItem<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -575,51 +575,51 @@ pub mod timeline_item_summary_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type EventType;
         type Count;
         type EventSubjectType;
-        type EventType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type EventType = Unset;
         type Count = Unset;
         type EventSubjectType = Unset;
-        type EventType = Unset;
-    }
-    ///State transition - sets the `count` field to Set
-    pub struct SetCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCount<S> {}
-    impl<S: State> State for SetCount<S> {
-        type Count = Set<members::count>;
-        type EventSubjectType = S::EventSubjectType;
-        type EventType = S::EventType;
-    }
-    ///State transition - sets the `event_subject_type` field to Set
-    pub struct SetEventSubjectType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEventSubjectType<S> {}
-    impl<S: State> State for SetEventSubjectType<S> {
-        type Count = S::Count;
-        type EventSubjectType = Set<members::event_subject_type>;
-        type EventType = S::EventType;
     }
     ///State transition - sets the `event_type` field to Set
     pub struct SetEventType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEventType<S> {}
     impl<S: State> State for SetEventType<S> {
+        type EventType = Set<members::event_type>;
         type Count = S::Count;
         type EventSubjectType = S::EventSubjectType;
-        type EventType = Set<members::event_type>;
+    }
+    ///State transition - sets the `count` field to Set
+    pub struct SetCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCount<S> {}
+    impl<S: State> State for SetCount<S> {
+        type EventType = S::EventType;
+        type Count = Set<members::count>;
+        type EventSubjectType = S::EventSubjectType;
+    }
+    ///State transition - sets the `event_subject_type` field to Set
+    pub struct SetEventSubjectType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEventSubjectType<S> {}
+    impl<S: State> State for SetEventSubjectType<S> {
+        type EventType = S::EventType;
+        type Count = S::Count;
+        type EventSubjectType = Set<members::event_subject_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `event_type` field
+        pub struct event_type(());
         ///Marker type for the `count` field
         pub struct count(());
         ///Marker type for the `event_subject_type` field
         pub struct event_subject_type(());
-        ///Marker type for the `event_type` field
-        pub struct event_type(());
     }
 }
 
@@ -715,9 +715,9 @@ where
 impl<'a, S> TimelineItemSummaryBuilder<'a, S>
 where
     S: timeline_item_summary_state::State,
+    S::EventType: timeline_item_summary_state::IsSet,
     S::Count: timeline_item_summary_state::IsSet,
     S::EventSubjectType: timeline_item_summary_state::IsSet,
-    S::EventType: timeline_item_summary_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TimelineItemSummary<'a> {
@@ -757,7 +757,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TimelineItemSummary<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

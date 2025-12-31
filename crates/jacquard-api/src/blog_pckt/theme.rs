@@ -196,7 +196,7 @@ fn lexicon_doc_blog_pckt_theme() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -214,7 +214,7 @@ fn lexicon_doc_blog_pckt_theme() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("dark"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -272,7 +272,7 @@ fn lexicon_doc_blog_pckt_theme() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("accent"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -393,7 +393,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Theme<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.font {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
@@ -453,7 +453,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Palette<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.accent;
             #[allow(unused_comparisons)]

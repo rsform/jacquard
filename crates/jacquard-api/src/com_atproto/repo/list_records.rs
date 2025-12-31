@@ -278,49 +278,49 @@ pub mod record_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
         type Value;
+        type Cid;
         type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
         type Value = Unset;
+        type Cid = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Cid = Set<members::cid>;
-        type Value = S::Value;
-        type Uri = S::Uri;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValue<S> {}
     impl<S: State> State for SetValue<S> {
-        type Cid = S::Cid;
         type Value = Set<members::value>;
+        type Cid = S::Cid;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Value = S::Value;
+        type Cid = Set<members::cid>;
         type Uri = S::Uri;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Cid = S::Cid;
         type Value = S::Value;
+        type Cid = S::Cid;
         type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `value` field
         pub struct value(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
         ///Marker type for the `uri` field
         pub struct uri(());
     }
@@ -415,8 +415,8 @@ where
 impl<'a, S> RecordBuilder<'a, S>
 where
     S: record_state::State,
-    S::Cid: record_state::IsSet,
     S::Value: record_state::IsSet,
+    S::Cid: record_state::IsSet,
     S::Uri: record_state::IsSet,
 {
     /// Build the final struct
@@ -454,7 +454,7 @@ fn lexicon_doc_com_atproto_repo_listRecords() -> ::jacquard_lexicon::lexicon::Le
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
@@ -470,7 +470,7 @@ fn lexicon_doc_com_atproto_repo_listRecords() -> ::jacquard_lexicon::lexicon::Le
                             ),
                             properties: {
                                 #[allow(unused_mut)]
-                                let mut map = ::std::collections::BTreeMap::new();
+                                let mut map = ::alloc::collections::BTreeMap::new();
                                 map.insert(
                                     ::jacquard_common::smol_str::SmolStr::new_static(
                                         "collection",
@@ -571,7 +571,7 @@ fn lexicon_doc_com_atproto_repo_listRecords() -> ::jacquard_lexicon::lexicon::Le
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("cid"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -633,7 +633,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Record<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

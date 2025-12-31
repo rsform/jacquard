@@ -38,51 +38,51 @@ pub mod comment_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CheckinRef;
-        type Text;
         type CreatedAt;
+        type Text;
+        type CheckinRef;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CheckinRef = Unset;
-        type Text = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `checkin_ref` field to Set
-    pub struct SetCheckinRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCheckinRef<S> {}
-    impl<S: State> State for SetCheckinRef<S> {
-        type CheckinRef = Set<members::checkin_ref>;
-        type Text = S::Text;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetText<S> {}
-    impl<S: State> State for SetText<S> {
-        type CheckinRef = S::CheckinRef;
-        type Text = Set<members::text>;
-        type CreatedAt = S::CreatedAt;
+        type Text = Unset;
+        type CheckinRef = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type CheckinRef = S::CheckinRef;
-        type Text = S::Text;
         type CreatedAt = Set<members::created_at>;
+        type Text = S::Text;
+        type CheckinRef = S::CheckinRef;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetText<S> {}
+    impl<S: State> State for SetText<S> {
+        type CreatedAt = S::CreatedAt;
+        type Text = Set<members::text>;
+        type CheckinRef = S::CheckinRef;
+    }
+    ///State transition - sets the `checkin_ref` field to Set
+    pub struct SetCheckinRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCheckinRef<S> {}
+    impl<S: State> State for SetCheckinRef<S> {
+        type CreatedAt = S::CreatedAt;
+        type Text = S::Text;
+        type CheckinRef = Set<members::checkin_ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `checkin_ref` field
-        pub struct checkin_ref(());
-        ///Marker type for the `text` field
-        pub struct text(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `text` field
+        pub struct text(());
+        ///Marker type for the `checkin_ref` field
+        pub struct checkin_ref(());
     }
 }
 
@@ -175,9 +175,9 @@ where
 impl<'a, S> CommentBuilder<'a, S>
 where
     S: comment_state::State,
-    S::CheckinRef: comment_state::IsSet,
-    S::Text: comment_state::IsSet,
     S::CreatedAt: comment_state::IsSet,
+    S::Text: comment_state::IsSet,
+    S::CheckinRef: comment_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Comment<'a> {
@@ -278,7 +278,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Comment<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.text;
             #[allow(unused_comparisons)]
@@ -305,7 +305,7 @@ fn lexicon_doc_app_dropanchor_comment() -> ::jacquard_lexicon::lexicon::LexiconD
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
@@ -327,7 +327,7 @@ fn lexicon_doc_app_dropanchor_comment() -> ::jacquard_lexicon::lexicon::LexiconD
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static(
                                     "checkinRef",
@@ -401,7 +401,7 @@ fn lexicon_doc_app_dropanchor_comment() -> ::jacquard_lexicon::lexicon::LexiconD
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("cid"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -484,37 +484,37 @@ pub mod strong_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
         type Uri;
+        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Cid = Set<members::cid>;
-        type Uri = S::Uri;
+        type Cid = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Cid = S::Cid;
         type Uri = Set<members::uri>;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Uri = S::Uri;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
     }
 }
 
@@ -587,8 +587,8 @@ where
 impl<'a, S> StrongRefBuilder<'a, S>
 where
     S: strong_ref_state::State,
-    S::Cid: strong_ref_state::IsSet,
     S::Uri: strong_ref_state::IsSet,
+    S::Cid: strong_ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> StrongRef<'a> {
@@ -626,7 +626,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StrongRef<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

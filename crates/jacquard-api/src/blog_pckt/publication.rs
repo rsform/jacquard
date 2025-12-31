@@ -18,7 +18,7 @@
 #[serde(rename_all = "camelCase")]
 pub struct Publication<'a> {
     #[serde(borrow)]
-    pub publication: crate::site_standard::publication::Publication<'a>,
+    pub publication: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }
 
 pub mod publication_state {
@@ -57,7 +57,7 @@ pub mod publication_state {
 pub struct PublicationBuilder<'a, S: publication_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<crate::site_standard::publication::Publication<'a>>,
+        ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -88,7 +88,7 @@ where
     /// Set the `publication` field (required)
     pub fn publication(
         mut self,
-        value: impl Into<crate::site_standard::publication::Publication<'a>>,
+        value: impl Into<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     ) -> PublicationBuilder<'a, publication_state::SetPublication<S>> {
         self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
         PublicationBuilder {
@@ -199,7 +199,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Publication<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -213,7 +213,7 @@ fn lexicon_doc_blog_pckt_publication() -> ::jacquard_lexicon::lexicon::LexiconDo
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
@@ -229,7 +229,7 @@ fn lexicon_doc_blog_pckt_publication() -> ::jacquard_lexicon::lexicon::LexiconDo
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static(
                                     "publication",
@@ -237,7 +237,7 @@ fn lexicon_doc_blog_pckt_publication() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
                                     description: None,
                                     r#ref: ::jacquard_common::CowStr::new_static(
-                                        "site.standard.publication",
+                                        "com.atproto.repo.strongRef",
                                     ),
                                 }),
                             );

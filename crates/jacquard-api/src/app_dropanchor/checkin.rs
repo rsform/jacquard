@@ -53,7 +53,7 @@ fn lexicon_doc_app_dropanchor_checkin() -> ::jacquard_lexicon::lexicon::LexiconD
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("address"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -68,7 +68,7 @@ fn lexicon_doc_app_dropanchor_checkin() -> ::jacquard_lexicon::lexicon::LexiconD
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("country"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -202,7 +202,7 @@ fn lexicon_doc_app_dropanchor_checkin() -> ::jacquard_lexicon::lexicon::LexiconD
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("alt"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -258,7 +258,7 @@ fn lexicon_doc_app_dropanchor_checkin() -> ::jacquard_lexicon::lexicon::LexiconD
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
                                 "fsqPlaceId",
@@ -360,7 +360,7 @@ fn lexicon_doc_app_dropanchor_checkin() -> ::jacquard_lexicon::lexicon::LexiconD
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("altitude"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -463,7 +463,7 @@ fn lexicon_doc_app_dropanchor_checkin() -> ::jacquard_lexicon::lexicon::LexiconD
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static("address"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -621,7 +621,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Address<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.country;
             #[allow(unused_comparisons)]
@@ -747,37 +747,37 @@ pub mod checkin_image_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Thumb;
         type Fullsize;
+        type Thumb;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Thumb = Unset;
         type Fullsize = Unset;
-    }
-    ///State transition - sets the `thumb` field to Set
-    pub struct SetThumb<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetThumb<S> {}
-    impl<S: State> State for SetThumb<S> {
-        type Thumb = Set<members::thumb>;
-        type Fullsize = S::Fullsize;
+        type Thumb = Unset;
     }
     ///State transition - sets the `fullsize` field to Set
     pub struct SetFullsize<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFullsize<S> {}
     impl<S: State> State for SetFullsize<S> {
-        type Thumb = S::Thumb;
         type Fullsize = Set<members::fullsize>;
+        type Thumb = S::Thumb;
+    }
+    ///State transition - sets the `thumb` field to Set
+    pub struct SetThumb<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetThumb<S> {}
+    impl<S: State> State for SetThumb<S> {
+        type Fullsize = S::Fullsize;
+        type Thumb = Set<members::thumb>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `thumb` field
-        pub struct thumb(());
         ///Marker type for the `fullsize` field
         pub struct fullsize(());
+        ///Marker type for the `thumb` field
+        pub struct thumb(());
     }
 }
 
@@ -864,8 +864,8 @@ where
 impl<'a, S> CheckinImageBuilder<'a, S>
 where
     S: checkin_image_state::State,
-    S::Thumb: checkin_image_state::IsSet,
     S::Fullsize: checkin_image_state::IsSet,
+    S::Thumb: checkin_image_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CheckinImage<'a> {
@@ -905,7 +905,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CheckinImage<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.alt {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
@@ -965,7 +965,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FsqPlace<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.fsq_place_id;
             #[allow(unused_comparisons)]
@@ -1061,7 +1061,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Geo<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.altitude {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 32usize {
@@ -1173,66 +1173,66 @@ pub mod checkin_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Address;
-        type CreatedAt;
-        type Text;
         type Geo;
+        type Text;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Address = Unset;
-        type CreatedAt = Unset;
-        type Text = Unset;
         type Geo = Unset;
+        type Text = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `address` field to Set
     pub struct SetAddress<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAddress<S> {}
     impl<S: State> State for SetAddress<S> {
         type Address = Set<members::address>;
-        type CreatedAt = S::CreatedAt;
+        type Geo = S::Geo;
         type Text = S::Text;
-        type Geo = S::Geo;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Address = S::Address;
-        type CreatedAt = Set<members::created_at>;
-        type Text = S::Text;
-        type Geo = S::Geo;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetText<S> {}
-    impl<S: State> State for SetText<S> {
-        type Address = S::Address;
         type CreatedAt = S::CreatedAt;
-        type Text = Set<members::text>;
-        type Geo = S::Geo;
     }
     ///State transition - sets the `geo` field to Set
     pub struct SetGeo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGeo<S> {}
     impl<S: State> State for SetGeo<S> {
         type Address = S::Address;
-        type CreatedAt = S::CreatedAt;
-        type Text = S::Text;
         type Geo = Set<members::geo>;
+        type Text = S::Text;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetText<S> {}
+    impl<S: State> State for SetText<S> {
+        type Address = S::Address;
+        type Geo = S::Geo;
+        type Text = Set<members::text>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Address = S::Address;
+        type Geo = S::Geo;
+        type Text = S::Text;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `address` field
         pub struct address(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `text` field
-        pub struct text(());
         ///Marker type for the `geo` field
         pub struct geo(());
+        ///Marker type for the `text` field
+        pub struct text(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -1453,9 +1453,9 @@ impl<'a, S> CheckinBuilder<'a, S>
 where
     S: checkin_state::State,
     S::Address: checkin_state::IsSet,
-    S::CreatedAt: checkin_state::IsSet,
-    S::Text: checkin_state::IsSet,
     S::Geo: checkin_state::IsSet,
+    S::Text: checkin_state::IsSet,
+    S::CreatedAt: checkin_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Checkin<'a> {
@@ -1568,7 +1568,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Checkin<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.category {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {

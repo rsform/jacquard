@@ -1,0 +1,53 @@
+{
+  "lexicon": 1,
+  "id": "network.slices.tools.bug.response",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "bug",
+          "status",
+          "createdAt"
+        ],
+        "properties": {
+          "bug": {
+            "type": "string",
+            "description": "Reference to the bug report",
+            "format": "at-uri"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "message": {
+            "type": "string",
+            "description": "Optional explanation or link to fix",
+            "maxLength": 3000,
+            "maxGraphemes": 1000
+          },
+          "messageFacets": {
+            "type": "array",
+            "description": "Annotations of message (mentions and links)",
+            "items": {
+              "type": "ref",
+              "ref": "app.bsky.richtext.facet"
+            }
+          },
+          "status": {
+            "type": "string",
+            "knownValues": [
+              "acknowledged",
+              "fixed",
+              "wontfix",
+              "duplicate",
+              "invalid"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

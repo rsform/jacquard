@@ -66,127 +66,127 @@ pub mod invite_code_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ForAccount;
         type Disabled;
-        type CreatedBy;
         type Uses;
-        type CreatedAt;
-        type Available;
         type Code;
+        type Available;
+        type CreatedAt;
+        type CreatedBy;
+        type ForAccount;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ForAccount = Unset;
         type Disabled = Unset;
-        type CreatedBy = Unset;
         type Uses = Unset;
-        type CreatedAt = Unset;
-        type Available = Unset;
         type Code = Unset;
-    }
-    ///State transition - sets the `for_account` field to Set
-    pub struct SetForAccount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetForAccount<S> {}
-    impl<S: State> State for SetForAccount<S> {
-        type ForAccount = Set<members::for_account>;
-        type Disabled = S::Disabled;
-        type CreatedBy = S::CreatedBy;
-        type Uses = S::Uses;
-        type CreatedAt = S::CreatedAt;
-        type Available = S::Available;
-        type Code = S::Code;
+        type Available = Unset;
+        type CreatedAt = Unset;
+        type CreatedBy = Unset;
+        type ForAccount = Unset;
     }
     ///State transition - sets the `disabled` field to Set
     pub struct SetDisabled<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDisabled<S> {}
     impl<S: State> State for SetDisabled<S> {
-        type ForAccount = S::ForAccount;
         type Disabled = Set<members::disabled>;
+        type Uses = S::Uses;
+        type Code = S::Code;
+        type Available = S::Available;
+        type CreatedAt = S::CreatedAt;
         type CreatedBy = S::CreatedBy;
-        type Uses = S::Uses;
-        type CreatedAt = S::CreatedAt;
-        type Available = S::Available;
-        type Code = S::Code;
-    }
-    ///State transition - sets the `created_by` field to Set
-    pub struct SetCreatedBy<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedBy<S> {}
-    impl<S: State> State for SetCreatedBy<S> {
         type ForAccount = S::ForAccount;
-        type Disabled = S::Disabled;
-        type CreatedBy = Set<members::created_by>;
-        type Uses = S::Uses;
-        type CreatedAt = S::CreatedAt;
-        type Available = S::Available;
-        type Code = S::Code;
     }
     ///State transition - sets the `uses` field to Set
     pub struct SetUses<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUses<S> {}
     impl<S: State> State for SetUses<S> {
-        type ForAccount = S::ForAccount;
         type Disabled = S::Disabled;
-        type CreatedBy = S::CreatedBy;
         type Uses = Set<members::uses>;
-        type CreatedAt = S::CreatedAt;
+        type Code = S::Code;
         type Available = S::Available;
-        type Code = S::Code;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type ForAccount = S::ForAccount;
-        type Disabled = S::Disabled;
-        type CreatedBy = S::CreatedBy;
-        type Uses = S::Uses;
-        type CreatedAt = Set<members::created_at>;
-        type Available = S::Available;
-        type Code = S::Code;
-    }
-    ///State transition - sets the `available` field to Set
-    pub struct SetAvailable<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAvailable<S> {}
-    impl<S: State> State for SetAvailable<S> {
-        type ForAccount = S::ForAccount;
-        type Disabled = S::Disabled;
-        type CreatedBy = S::CreatedBy;
-        type Uses = S::Uses;
         type CreatedAt = S::CreatedAt;
-        type Available = Set<members::available>;
-        type Code = S::Code;
+        type CreatedBy = S::CreatedBy;
+        type ForAccount = S::ForAccount;
     }
     ///State transition - sets the `code` field to Set
     pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCode<S> {}
     impl<S: State> State for SetCode<S> {
-        type ForAccount = S::ForAccount;
         type Disabled = S::Disabled;
-        type CreatedBy = S::CreatedBy;
         type Uses = S::Uses;
-        type CreatedAt = S::CreatedAt;
-        type Available = S::Available;
         type Code = Set<members::code>;
+        type Available = S::Available;
+        type CreatedAt = S::CreatedAt;
+        type CreatedBy = S::CreatedBy;
+        type ForAccount = S::ForAccount;
+    }
+    ///State transition - sets the `available` field to Set
+    pub struct SetAvailable<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAvailable<S> {}
+    impl<S: State> State for SetAvailable<S> {
+        type Disabled = S::Disabled;
+        type Uses = S::Uses;
+        type Code = S::Code;
+        type Available = Set<members::available>;
+        type CreatedAt = S::CreatedAt;
+        type CreatedBy = S::CreatedBy;
+        type ForAccount = S::ForAccount;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Disabled = S::Disabled;
+        type Uses = S::Uses;
+        type Code = S::Code;
+        type Available = S::Available;
+        type CreatedAt = Set<members::created_at>;
+        type CreatedBy = S::CreatedBy;
+        type ForAccount = S::ForAccount;
+    }
+    ///State transition - sets the `created_by` field to Set
+    pub struct SetCreatedBy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedBy<S> {}
+    impl<S: State> State for SetCreatedBy<S> {
+        type Disabled = S::Disabled;
+        type Uses = S::Uses;
+        type Code = S::Code;
+        type Available = S::Available;
+        type CreatedAt = S::CreatedAt;
+        type CreatedBy = Set<members::created_by>;
+        type ForAccount = S::ForAccount;
+    }
+    ///State transition - sets the `for_account` field to Set
+    pub struct SetForAccount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetForAccount<S> {}
+    impl<S: State> State for SetForAccount<S> {
+        type Disabled = S::Disabled;
+        type Uses = S::Uses;
+        type Code = S::Code;
+        type Available = S::Available;
+        type CreatedAt = S::CreatedAt;
+        type CreatedBy = S::CreatedBy;
+        type ForAccount = Set<members::for_account>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `for_account` field
-        pub struct for_account(());
         ///Marker type for the `disabled` field
         pub struct disabled(());
-        ///Marker type for the `created_by` field
-        pub struct created_by(());
         ///Marker type for the `uses` field
         pub struct uses(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `available` field
-        pub struct available(());
         ///Marker type for the `code` field
         pub struct code(());
+        ///Marker type for the `available` field
+        pub struct available(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `created_by` field
+        pub struct created_by(());
+        ///Marker type for the `for_account` field
+        pub struct for_account(());
     }
 }
 
@@ -359,13 +359,13 @@ where
 impl<'a, S> InviteCodeBuilder<'a, S>
 where
     S: invite_code_state::State,
-    S::ForAccount: invite_code_state::IsSet,
     S::Disabled: invite_code_state::IsSet,
-    S::CreatedBy: invite_code_state::IsSet,
     S::Uses: invite_code_state::IsSet,
-    S::CreatedAt: invite_code_state::IsSet,
-    S::Available: invite_code_state::IsSet,
     S::Code: invite_code_state::IsSet,
+    S::Available: invite_code_state::IsSet,
+    S::CreatedAt: invite_code_state::IsSet,
+    S::CreatedBy: invite_code_state::IsSet,
+    S::ForAccount: invite_code_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> InviteCode<'a> {
@@ -410,7 +410,7 @@ fn lexicon_doc_com_atproto_server_defs() -> ::jacquard_lexicon::lexicon::Lexicon
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("inviteCode"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -429,7 +429,7 @@ fn lexicon_doc_com_atproto_server_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
                                 "available",
@@ -550,7 +550,7 @@ fn lexicon_doc_com_atproto_server_defs() -> ::jacquard_lexicon::lexicon::Lexicon
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("usedAt"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -606,7 +606,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for InviteCode<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -638,37 +638,37 @@ pub mod invite_code_use_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UsedAt;
         type UsedBy;
+        type UsedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UsedAt = Unset;
         type UsedBy = Unset;
-    }
-    ///State transition - sets the `used_at` field to Set
-    pub struct SetUsedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUsedAt<S> {}
-    impl<S: State> State for SetUsedAt<S> {
-        type UsedAt = Set<members::used_at>;
-        type UsedBy = S::UsedBy;
+        type UsedAt = Unset;
     }
     ///State transition - sets the `used_by` field to Set
     pub struct SetUsedBy<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUsedBy<S> {}
     impl<S: State> State for SetUsedBy<S> {
-        type UsedAt = S::UsedAt;
         type UsedBy = Set<members::used_by>;
+        type UsedAt = S::UsedAt;
+    }
+    ///State transition - sets the `used_at` field to Set
+    pub struct SetUsedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUsedAt<S> {}
+    impl<S: State> State for SetUsedAt<S> {
+        type UsedBy = S::UsedBy;
+        type UsedAt = Set<members::used_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `used_at` field
-        pub struct used_at(());
         ///Marker type for the `used_by` field
         pub struct used_by(());
+        ///Marker type for the `used_at` field
+        pub struct used_at(());
     }
 }
 
@@ -741,8 +741,8 @@ where
 impl<'a, S> InviteCodeUseBuilder<'a, S>
 where
     S: invite_code_use_state::State,
-    S::UsedAt: invite_code_use_state::IsSet,
     S::UsedBy: invite_code_use_state::IsSet,
+    S::UsedAt: invite_code_use_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> InviteCodeUse<'a> {
@@ -780,7 +780,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for InviteCodeUse<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

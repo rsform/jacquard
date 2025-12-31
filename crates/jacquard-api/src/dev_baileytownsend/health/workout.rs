@@ -44,105 +44,105 @@ pub mod workout_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type StartTime;
-        type EndTime;
         type CreatedAt;
-        type CaloriesBurned;
         type Duration;
+        type CaloriesBurned;
+        type EndTime;
         type Activity;
+        type StartTime;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type StartTime = Unset;
-        type EndTime = Unset;
         type CreatedAt = Unset;
-        type CaloriesBurned = Unset;
         type Duration = Unset;
+        type CaloriesBurned = Unset;
+        type EndTime = Unset;
         type Activity = Unset;
-    }
-    ///State transition - sets the `start_time` field to Set
-    pub struct SetStartTime<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStartTime<S> {}
-    impl<S: State> State for SetStartTime<S> {
-        type StartTime = Set<members::start_time>;
-        type EndTime = S::EndTime;
-        type CreatedAt = S::CreatedAt;
-        type CaloriesBurned = S::CaloriesBurned;
-        type Duration = S::Duration;
-        type Activity = S::Activity;
-    }
-    ///State transition - sets the `end_time` field to Set
-    pub struct SetEndTime<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEndTime<S> {}
-    impl<S: State> State for SetEndTime<S> {
-        type StartTime = S::StartTime;
-        type EndTime = Set<members::end_time>;
-        type CreatedAt = S::CreatedAt;
-        type CaloriesBurned = S::CaloriesBurned;
-        type Duration = S::Duration;
-        type Activity = S::Activity;
+        type StartTime = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type StartTime = S::StartTime;
-        type EndTime = S::EndTime;
         type CreatedAt = Set<members::created_at>;
+        type Duration = S::Duration;
         type CaloriesBurned = S::CaloriesBurned;
-        type Duration = S::Duration;
-        type Activity = S::Activity;
-    }
-    ///State transition - sets the `calories_burned` field to Set
-    pub struct SetCaloriesBurned<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCaloriesBurned<S> {}
-    impl<S: State> State for SetCaloriesBurned<S> {
-        type StartTime = S::StartTime;
         type EndTime = S::EndTime;
-        type CreatedAt = S::CreatedAt;
-        type CaloriesBurned = Set<members::calories_burned>;
-        type Duration = S::Duration;
         type Activity = S::Activity;
+        type StartTime = S::StartTime;
     }
     ///State transition - sets the `duration` field to Set
     pub struct SetDuration<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDuration<S> {}
     impl<S: State> State for SetDuration<S> {
-        type StartTime = S::StartTime;
-        type EndTime = S::EndTime;
         type CreatedAt = S::CreatedAt;
-        type CaloriesBurned = S::CaloriesBurned;
         type Duration = Set<members::duration>;
+        type CaloriesBurned = S::CaloriesBurned;
+        type EndTime = S::EndTime;
         type Activity = S::Activity;
+        type StartTime = S::StartTime;
+    }
+    ///State transition - sets the `calories_burned` field to Set
+    pub struct SetCaloriesBurned<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCaloriesBurned<S> {}
+    impl<S: State> State for SetCaloriesBurned<S> {
+        type CreatedAt = S::CreatedAt;
+        type Duration = S::Duration;
+        type CaloriesBurned = Set<members::calories_burned>;
+        type EndTime = S::EndTime;
+        type Activity = S::Activity;
+        type StartTime = S::StartTime;
+    }
+    ///State transition - sets the `end_time` field to Set
+    pub struct SetEndTime<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEndTime<S> {}
+    impl<S: State> State for SetEndTime<S> {
+        type CreatedAt = S::CreatedAt;
+        type Duration = S::Duration;
+        type CaloriesBurned = S::CaloriesBurned;
+        type EndTime = Set<members::end_time>;
+        type Activity = S::Activity;
+        type StartTime = S::StartTime;
     }
     ///State transition - sets the `activity` field to Set
     pub struct SetActivity<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetActivity<S> {}
     impl<S: State> State for SetActivity<S> {
-        type StartTime = S::StartTime;
-        type EndTime = S::EndTime;
         type CreatedAt = S::CreatedAt;
-        type CaloriesBurned = S::CaloriesBurned;
         type Duration = S::Duration;
+        type CaloriesBurned = S::CaloriesBurned;
+        type EndTime = S::EndTime;
         type Activity = Set<members::activity>;
+        type StartTime = S::StartTime;
+    }
+    ///State transition - sets the `start_time` field to Set
+    pub struct SetStartTime<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStartTime<S> {}
+    impl<S: State> State for SetStartTime<S> {
+        type CreatedAt = S::CreatedAt;
+        type Duration = S::Duration;
+        type CaloriesBurned = S::CaloriesBurned;
+        type EndTime = S::EndTime;
+        type Activity = S::Activity;
+        type StartTime = Set<members::start_time>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `start_time` field
-        pub struct start_time(());
-        ///Marker type for the `end_time` field
-        pub struct end_time(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `calories_burned` field
-        pub struct calories_burned(());
         ///Marker type for the `duration` field
         pub struct duration(());
+        ///Marker type for the `calories_burned` field
+        pub struct calories_burned(());
+        ///Marker type for the `end_time` field
+        pub struct end_time(());
         ///Marker type for the `activity` field
         pub struct activity(());
+        ///Marker type for the `start_time` field
+        pub struct start_time(());
     }
 }
 
@@ -312,12 +312,12 @@ where
 impl<'a, S> WorkoutBuilder<'a, S>
 where
     S: workout_state::State,
-    S::StartTime: workout_state::IsSet,
-    S::EndTime: workout_state::IsSet,
     S::CreatedAt: workout_state::IsSet,
-    S::CaloriesBurned: workout_state::IsSet,
     S::Duration: workout_state::IsSet,
+    S::CaloriesBurned: workout_state::IsSet,
+    S::EndTime: workout_state::IsSet,
     S::Activity: workout_state::IsSet,
+    S::StartTime: workout_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Workout<'a> {
@@ -426,7 +426,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Workout<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -440,7 +440,7 @@ fn lexicon_doc_dev_baileytownsend_health_workout() -> ::jacquard_lexicon::lexico
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
@@ -461,7 +461,7 @@ fn lexicon_doc_dev_baileytownsend_health_workout() -> ::jacquard_lexicon::lexico
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static(
                                     "activity",

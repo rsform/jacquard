@@ -8,7 +8,13 @@
 /// A star (like) on a container image repository. Stored in the starrer's PDS, similar to Bluesky likes.
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Star<'a> {
@@ -21,7 +27,7 @@ pub struct Star<'a> {
 
 pub mod star_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -174,7 +180,13 @@ impl<'a> Star<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StarGetRecordOutput<'a> {
@@ -226,19 +238,21 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Star<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-fn lexicon_doc_io_atcr_sailor_star() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_io_atcr_sailor_star() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("io.atcr.sailor.star"),
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
@@ -259,7 +273,7 @@ fn lexicon_doc_io_atcr_sailor_star() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static(
                                     "createdAt",
@@ -297,63 +311,67 @@ fn lexicon_doc_io_atcr_sailor_star() -> ::jacquard_lexicon::lexicon::LexiconDoc<
             );
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("subject"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(
-                    ::jacquard_lexicon::lexicon::LexObject {
-                        description: Some(::jacquard_common::CowStr::new_static(
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: Some(
+                        ::jacquard_common::CowStr::new_static(
                             "Reference to a repository owned by a user",
-                        )),
-                        required: Some(vec![
+                        ),
+                    ),
+                    required: Some(
+                        vec![
                             ::jacquard_common::smol_str::SmolStr::new_static("did"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("repository"),
-                        ]),
-                        nullable: None,
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
-                            map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("did"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "DID of the repository owner",
-                                        )),
-                                        format: Some(
-                                            ::jacquard_lexicon::lexicon::LexStringFormat::Did,
-                                        ),
-                                        default: None,
-                                        min_length: None,
-                                        max_length: None,
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
+                            ::jacquard_common::smol_str::SmolStr::new_static("repository")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static("did"),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "DID of the repository owner",
+                                    ),
                                 ),
-                            );
-                            map.insert(
-                                ::jacquard_common::smol_str::SmolStr::new_static("repository"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(
-                                    ::jacquard_lexicon::lexicon::LexString {
-                                        description: Some(::jacquard_common::CowStr::new_static(
-                                            "Repository name (e.g., 'myapp')",
-                                        )),
-                                        format: None,
-                                        default: None,
-                                        min_length: None,
-                                        max_length: Some(255usize),
-                                        min_graphemes: None,
-                                        max_graphemes: None,
-                                        r#enum: None,
-                                        r#const: None,
-                                        known_values: None,
-                                    },
+                                format: Some(
+                                    ::jacquard_lexicon::lexicon::LexStringFormat::Did,
                                 ),
-                            );
-                            map
-                        },
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::smol_str::SmolStr::new_static(
+                                "repository",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: Some(
+                                    ::jacquard_common::CowStr::new_static(
+                                        "Repository name (e.g., 'myapp')",
+                                    ),
+                                ),
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: Some(255usize),
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map
                     },
-                ),
+                }),
             );
             map
         },
@@ -363,7 +381,13 @@ fn lexicon_doc_io_atcr_sailor_star() -> ::jacquard_lexicon::lexicon::LexiconDoc<
 /// Reference to a repository owned by a user
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Subject<'a> {
@@ -377,7 +401,7 @@ pub struct Subject<'a> {
 
 pub mod subject_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -385,37 +409,37 @@ pub mod subject_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repository;
         type Did;
+        type Repository;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repository = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `repository` field to Set
-    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepository<S> {}
-    impl<S: State> State for SetRepository<S> {
-        type Repository = Set<members::repository>;
-        type Did = S::Did;
+        type Repository = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Repository = S::Repository;
         type Did = Set<members::did>;
+        type Repository = S::Repository;
+    }
+    ///State transition - sets the `repository` field to Set
+    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepository<S> {}
+    impl<S: State> State for SetRepository<S> {
+        type Did = S::Did;
+        type Repository = Set<members::repository>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repository` field
-        pub struct repository(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `repository` field
+        pub struct repository(());
     }
 }
 
@@ -488,8 +512,8 @@ where
 impl<'a, S> SubjectBuilder<'a, S>
 where
     S: subject_state::State,
-    S::Repository: subject_state::IsSet,
     S::Did: subject_state::IsSet,
+    S::Repository: subject_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Subject<'a> {
@@ -527,13 +551,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Subject<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.repository;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 255usize {
                 return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
-                    path: ::jacquard_lexicon::validation::ValidationPath::from_field("repository"),
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "repository",
+                    ),
                     max: 255usize,
                     actual: <str>::len(value.as_ref()),
                 });

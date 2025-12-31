@@ -326,7 +326,7 @@ fn lexicon_doc_sh_weaver_notebook_getSuggestedNotebooks() -> ::jacquard_lexicon:
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
@@ -337,7 +337,7 @@ fn lexicon_doc_sh_weaver_notebook_getSuggestedNotebooks() -> ::jacquard_lexicon:
                             required: None,
                             properties: {
                                 #[allow(unused_mut)]
-                                let mut map = ::std::collections::BTreeMap::new();
+                                let mut map = ::alloc::collections::BTreeMap::new();
                                 map.insert(
                                     ::jacquard_common::smol_str::SmolStr::new_static("limit"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -370,7 +370,7 @@ fn lexicon_doc_sh_weaver_notebook_getSuggestedNotebooks() -> ::jacquard_lexicon:
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("notebook"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
@@ -418,7 +418,7 @@ fn lexicon_doc_sh_weaver_notebook_getSuggestedNotebooks() -> ::jacquard_lexicon:
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
                                 "relatedAuthor",
@@ -512,7 +512,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SuggestedNotebook<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -567,7 +567,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SuggestionReason<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

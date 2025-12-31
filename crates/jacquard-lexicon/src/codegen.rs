@@ -107,7 +107,7 @@ impl<'c> CodeGenerator<'c> {
                     #shared_fn_ident()
                 }
 
-                fn validate(&self) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+                fn validate(&self) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
                     #validation_code
                 }
             }

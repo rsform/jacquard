@@ -1,0 +1,55 @@
+{
+  "lexicon": 1,
+  "id": "net.asadaame5121.at-circle.ring",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "An at-circle group definition",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "title",
+          "createdAt",
+          "status"
+        ],
+        "properties": {
+          "acceptancePolicy": {
+            "type": "string",
+            "description": "How new members are accepted",
+            "maxLength": 64,
+            "knownValues": [
+              "automatic",
+              "manual"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the circle",
+            "maxLength": 10000,
+            "maxGraphemes": 1000
+          },
+          "status": {
+            "type": "string",
+            "description": "Recruitment status",
+            "maxLength": 64,
+            "knownValues": [
+              "open",
+              "closed"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "description": "Name of the circle",
+            "maxLength": 1000,
+            "maxGraphemes": 100
+          }
+        }
+      }
+    }
+  }
+}

@@ -51,51 +51,51 @@ pub mod list_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Name;
         type Purpose;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Name = Unset;
         type Purpose = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Purpose = S::Purpose;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `purpose` field to Set
-    pub struct SetPurpose<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPurpose<S> {}
-    impl<S: State> State for SetPurpose<S> {
-        type Name = S::Name;
-        type Purpose = Set<members::purpose>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
         type Name = S::Name;
         type Purpose = S::Purpose;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type CreatedAt = S::CreatedAt;
+        type Name = Set<members::name>;
+        type Purpose = S::Purpose;
+    }
+    ///State transition - sets the `purpose` field to Set
+    pub struct SetPurpose<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPurpose<S> {}
+    impl<S: State> State for SetPurpose<S> {
+        type CreatedAt = S::CreatedAt;
+        type Name = S::Name;
+        type Purpose = Set<members::purpose>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `purpose` field
         pub struct purpose(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -268,9 +268,9 @@ where
 impl<'a, S> ListBuilder<'a, S>
 where
     S: list_state::State,
+    S::CreatedAt: list_state::IsSet,
     S::Name: list_state::IsSet,
     S::Purpose: list_state::IsSet,
-    S::CreatedAt: list_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> List<'a> {
@@ -379,7 +379,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for List<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 3000usize {
@@ -449,7 +449,7 @@ fn lexicon_doc_app_bsky_graph_list() -> ::jacquard_lexicon::lexicon::LexiconDoc<
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
@@ -471,7 +471,7 @@ fn lexicon_doc_app_bsky_graph_list() -> ::jacquard_lexicon::lexicon::LexiconDoc<
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static("avatar"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {

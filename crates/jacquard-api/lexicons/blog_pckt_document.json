@@ -8,12 +8,17 @@
       "record": {
         "type": "object",
         "required": [
-          "document"
+          "document",
+          "site"
         ],
         "properties": {
           "document": {
             "type": "ref",
-            "ref": "site.standard.document"
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "site": {
+            "type": "string",
+            "format": "uri"
           }
         }
       }

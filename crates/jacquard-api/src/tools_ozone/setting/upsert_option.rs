@@ -42,50 +42,50 @@ pub mod upsert_option_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Key;
-        type Scope;
         type Value;
+        type Scope;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Key = Unset;
-        type Scope = Unset;
         type Value = Unset;
+        type Scope = Unset;
     }
     ///State transition - sets the `key` field to Set
     pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetKey<S> {}
     impl<S: State> State for SetKey<S> {
         type Key = Set<members::key>;
+        type Value = S::Value;
         type Scope = S::Scope;
-        type Value = S::Value;
-    }
-    ///State transition - sets the `scope` field to Set
-    pub struct SetScope<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetScope<S> {}
-    impl<S: State> State for SetScope<S> {
-        type Key = S::Key;
-        type Scope = Set<members::scope>;
-        type Value = S::Value;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValue<S> {}
     impl<S: State> State for SetValue<S> {
         type Key = S::Key;
-        type Scope = S::Scope;
         type Value = Set<members::value>;
+        type Scope = S::Scope;
+    }
+    ///State transition - sets the `scope` field to Set
+    pub struct SetScope<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetScope<S> {}
+    impl<S: State> State for SetScope<S> {
+        type Key = S::Key;
+        type Value = S::Value;
+        type Scope = Set<members::scope>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `key` field
         pub struct key(());
-        ///Marker type for the `scope` field
-        pub struct scope(());
         ///Marker type for the `value` field
         pub struct value(());
+        ///Marker type for the `scope` field
+        pub struct scope(());
     }
 }
 
@@ -219,8 +219,8 @@ impl<'a, S> UpsertOptionBuilder<'a, S>
 where
     S: upsert_option_state::State,
     S::Key: upsert_option_state::IsSet,
-    S::Scope: upsert_option_state::IsSet,
     S::Value: upsert_option_state::IsSet,
+    S::Scope: upsert_option_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> UpsertOption<'a> {

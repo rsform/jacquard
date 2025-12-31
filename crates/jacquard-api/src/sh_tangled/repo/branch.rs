@@ -32,37 +32,37 @@ pub mod branch_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repo;
         type Name;
+        type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repo = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Repo = Set<members::repo>;
-        type Name = S::Name;
+        type Repo = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Repo = S::Repo;
         type Name = Set<members::name>;
+        type Repo = S::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Name = S::Name;
+        type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
     }
 }
 
@@ -135,8 +135,8 @@ where
 impl<'a, S> BranchBuilder<'a, S>
 where
     S: branch_state::State,
-    S::Repo: branch_state::IsSet,
     S::Name: branch_state::IsSet,
+    S::Repo: branch_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Branch<'a> {
@@ -296,51 +296,51 @@ pub mod signature_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Email;
         type When;
         type Name;
+        type Email;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Email = Unset;
         type When = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `email` field to Set
-    pub struct SetEmail<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEmail<S> {}
-    impl<S: State> State for SetEmail<S> {
-        type Email = Set<members::email>;
-        type When = S::When;
-        type Name = S::Name;
+        type Email = Unset;
     }
     ///State transition - sets the `when` field to Set
     pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWhen<S> {}
     impl<S: State> State for SetWhen<S> {
-        type Email = S::Email;
         type When = Set<members::when>;
         type Name = S::Name;
+        type Email = S::Email;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Email = S::Email;
         type When = S::When;
         type Name = Set<members::name>;
+        type Email = S::Email;
+    }
+    ///State transition - sets the `email` field to Set
+    pub struct SetEmail<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEmail<S> {}
+    impl<S: State> State for SetEmail<S> {
+        type When = S::When;
+        type Name = S::Name;
+        type Email = Set<members::email>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `email` field
-        pub struct email(());
         ///Marker type for the `when` field
         pub struct when(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `email` field
+        pub struct email(());
     }
 }
 
@@ -433,9 +433,9 @@ where
 impl<'a, S> SignatureBuilder<'a, S>
 where
     S: signature_state::State,
-    S::Email: signature_state::IsSet,
     S::When: signature_state::IsSet,
     S::Name: signature_state::IsSet,
+    S::Email: signature_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Signature<'a> {
@@ -472,7 +472,7 @@ fn lexicon_doc_sh_tangled_repo_branch() -> ::jacquard_lexicon::lexicon::LexiconD
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::XrpcQuery(::jacquard_lexicon::lexicon::LexXrpcQuery {
@@ -488,7 +488,7 @@ fn lexicon_doc_sh_tangled_repo_branch() -> ::jacquard_lexicon::lexicon::LexiconD
                             ),
                             properties: {
                                 #[allow(unused_mut)]
-                                let mut map = ::std::collections::BTreeMap::new();
+                                let mut map = ::alloc::collections::BTreeMap::new();
                                 map.insert(
                                     ::jacquard_common::smol_str::SmolStr::new_static("name"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -549,7 +549,7 @@ fn lexicon_doc_sh_tangled_repo_branch() -> ::jacquard_lexicon::lexicon::LexiconD
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("email"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -624,7 +624,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Signature<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

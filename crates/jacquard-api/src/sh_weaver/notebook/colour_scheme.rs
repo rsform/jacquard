@@ -38,51 +38,51 @@ pub mod colour_scheme_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Name;
         type Variant;
         type Colours;
-        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Name = Unset;
         type Variant = Unset;
         type Colours = Unset;
-        type Name = Unset;
-    }
-    ///State transition - sets the `variant` field to Set
-    pub struct SetVariant<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVariant<S> {}
-    impl<S: State> State for SetVariant<S> {
-        type Variant = Set<members::variant>;
-        type Colours = S::Colours;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `colours` field to Set
-    pub struct SetColours<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetColours<S> {}
-    impl<S: State> State for SetColours<S> {
-        type Variant = S::Variant;
-        type Colours = Set<members::colours>;
-        type Name = S::Name;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
+        type Name = Set<members::name>;
         type Variant = S::Variant;
         type Colours = S::Colours;
-        type Name = Set<members::name>;
+    }
+    ///State transition - sets the `variant` field to Set
+    pub struct SetVariant<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVariant<S> {}
+    impl<S: State> State for SetVariant<S> {
+        type Name = S::Name;
+        type Variant = Set<members::variant>;
+        type Colours = S::Colours;
+    }
+    ///State transition - sets the `colours` field to Set
+    pub struct SetColours<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetColours<S> {}
+    impl<S: State> State for SetColours<S> {
+        type Name = S::Name;
+        type Variant = S::Variant;
+        type Colours = Set<members::colours>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `variant` field
         pub struct variant(());
         ///Marker type for the `colours` field
         pub struct colours(());
-        ///Marker type for the `name` field
-        pub struct name(());
     }
 }
 
@@ -175,9 +175,9 @@ where
 impl<'a, S> ColourSchemeBuilder<'a, S>
 where
     S: colour_scheme_state::State,
+    S::Name: colour_scheme_state::IsSet,
     S::Variant: colour_scheme_state::IsSet,
     S::Colours: colour_scheme_state::IsSet,
-    S::Name: colour_scheme_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ColourScheme<'a> {
@@ -290,7 +290,7 @@ fn lexicon_doc_sh_weaver_notebook_colourScheme() -> ::jacquard_lexicon::lexicon:
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
@@ -312,7 +312,7 @@ fn lexicon_doc_sh_weaver_notebook_colourScheme() -> ::jacquard_lexicon::lexicon:
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static("colours"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -340,7 +340,7 @@ fn lexicon_doc_sh_weaver_notebook_colourScheme() -> ::jacquard_lexicon::lexicon:
                                     nullable: None,
                                     properties: {
                                         #[allow(unused_mut)]
-                                        let mut map = ::std::collections::BTreeMap::new();
+                                        let mut map = ::alloc::collections::BTreeMap::new();
                                         map.insert(
                                             ::jacquard_common::smol_str::SmolStr::new_static("base"),
                                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -713,7 +713,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ColourSchemeColours<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -778,7 +778,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ColourScheme<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

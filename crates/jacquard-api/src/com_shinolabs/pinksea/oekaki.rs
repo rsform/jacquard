@@ -34,37 +34,37 @@ pub mod image_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ImageLink;
         type Blob;
+        type ImageLink;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ImageLink = Unset;
         type Blob = Unset;
-    }
-    ///State transition - sets the `image_link` field to Set
-    pub struct SetImageLink<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetImageLink<S> {}
-    impl<S: State> State for SetImageLink<S> {
-        type ImageLink = Set<members::image_link>;
-        type Blob = S::Blob;
+        type ImageLink = Unset;
     }
     ///State transition - sets the `blob` field to Set
     pub struct SetBlob<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBlob<S> {}
     impl<S: State> State for SetBlob<S> {
-        type ImageLink = S::ImageLink;
         type Blob = Set<members::blob>;
+        type ImageLink = S::ImageLink;
+    }
+    ///State transition - sets the `image_link` field to Set
+    pub struct SetImageLink<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetImageLink<S> {}
+    impl<S: State> State for SetImageLink<S> {
+        type Blob = S::Blob;
+        type ImageLink = Set<members::image_link>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `image_link` field
-        pub struct image_link(());
         ///Marker type for the `blob` field
         pub struct blob(());
+        ///Marker type for the `image_link` field
+        pub struct image_link(());
     }
 }
 
@@ -137,8 +137,8 @@ where
 impl<'a, S> ImageBuilder<'a, S>
 where
     S: image_state::State,
-    S::ImageLink: image_state::IsSet,
     S::Blob: image_state::IsSet,
+    S::ImageLink: image_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Image<'a> {
@@ -173,7 +173,7 @@ fn lexicon_doc_com_shinolabs_pinksea_oekaki() -> ::jacquard_lexicon::lexicon::Le
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("image"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -187,7 +187,7 @@ fn lexicon_doc_com_shinolabs_pinksea_oekaki() -> ::jacquard_lexicon::lexicon::Le
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("blob"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
@@ -221,7 +221,7 @@ fn lexicon_doc_com_shinolabs_pinksea_oekaki() -> ::jacquard_lexicon::lexicon::Le
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("alt"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -263,7 +263,7 @@ fn lexicon_doc_com_shinolabs_pinksea_oekaki() -> ::jacquard_lexicon::lexicon::Le
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static(
                                     "createdAt",
@@ -359,7 +359,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Image<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -396,7 +396,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ImageLink<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -706,7 +706,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Oekaki<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.tags {
             #[allow(unused_comparisons)]
             if value.len() > 10usize {

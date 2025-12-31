@@ -68,8 +68,8 @@ pub mod proposal_state {
     pub trait State: sealed::Sealed {
         type Typ;
         type Uri;
-        type Src;
         type Cts;
+        type Src;
         type Val;
     }
     /// Empty state - all required fields are unset
@@ -78,8 +78,8 @@ pub mod proposal_state {
     impl State for Empty {
         type Typ = Unset;
         type Uri = Unset;
-        type Src = Unset;
         type Cts = Unset;
+        type Src = Unset;
         type Val = Unset;
     }
     ///State transition - sets the `typ` field to Set
@@ -88,8 +88,8 @@ pub mod proposal_state {
     impl<S: State> State for SetTyp<S> {
         type Typ = Set<members::typ>;
         type Uri = S::Uri;
-        type Src = S::Src;
         type Cts = S::Cts;
+        type Src = S::Src;
         type Val = S::Val;
     }
     ///State transition - sets the `uri` field to Set
@@ -98,18 +98,8 @@ pub mod proposal_state {
     impl<S: State> State for SetUri<S> {
         type Typ = S::Typ;
         type Uri = Set<members::uri>;
+        type Cts = S::Cts;
         type Src = S::Src;
-        type Cts = S::Cts;
-        type Val = S::Val;
-    }
-    ///State transition - sets the `src` field to Set
-    pub struct SetSrc<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSrc<S> {}
-    impl<S: State> State for SetSrc<S> {
-        type Typ = S::Typ;
-        type Uri = S::Uri;
-        type Src = Set<members::src>;
-        type Cts = S::Cts;
         type Val = S::Val;
     }
     ///State transition - sets the `cts` field to Set
@@ -118,8 +108,18 @@ pub mod proposal_state {
     impl<S: State> State for SetCts<S> {
         type Typ = S::Typ;
         type Uri = S::Uri;
-        type Src = S::Src;
         type Cts = Set<members::cts>;
+        type Src = S::Src;
+        type Val = S::Val;
+    }
+    ///State transition - sets the `src` field to Set
+    pub struct SetSrc<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSrc<S> {}
+    impl<S: State> State for SetSrc<S> {
+        type Typ = S::Typ;
+        type Uri = S::Uri;
+        type Cts = S::Cts;
+        type Src = Set<members::src>;
         type Val = S::Val;
     }
     ///State transition - sets the `val` field to Set
@@ -128,8 +128,8 @@ pub mod proposal_state {
     impl<S: State> State for SetVal<S> {
         type Typ = S::Typ;
         type Uri = S::Uri;
-        type Src = S::Src;
         type Cts = S::Cts;
+        type Src = S::Src;
         type Val = Set<members::val>;
     }
     /// Marker types for field names
@@ -139,10 +139,10 @@ pub mod proposal_state {
         pub struct typ(());
         ///Marker type for the `uri` field
         pub struct uri(());
-        ///Marker type for the `src` field
-        pub struct src(());
         ///Marker type for the `cts` field
         pub struct cts(());
+        ///Marker type for the `src` field
+        pub struct src(());
         ///Marker type for the `val` field
         pub struct val(());
     }
@@ -390,8 +390,8 @@ where
     S: proposal_state::State,
     S::Typ: proposal_state::IsSet,
     S::Uri: proposal_state::IsSet,
-    S::Src: proposal_state::IsSet,
     S::Cts: proposal_state::IsSet,
+    S::Src: proposal_state::IsSet,
     S::Val: proposal_state::IsSet,
 {
     /// Build the final struct
@@ -509,7 +509,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Proposal<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.val;
             #[allow(unused_comparisons)]
@@ -536,7 +536,7 @@ fn lexicon_doc_social_pmsky_proposal() -> ::jacquard_lexicon::lexicon::LexiconDo
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
@@ -560,7 +560,7 @@ fn lexicon_doc_social_pmsky_proposal() -> ::jacquard_lexicon::lexicon::LexiconDo
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static("aid"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {

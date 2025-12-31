@@ -294,7 +294,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Slice<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.domain;
             #[allow(unused_comparisons)]
@@ -334,7 +334,7 @@ fn lexicon_doc_network_slices_slice() -> ::jacquard_lexicon::lexicon::LexiconDoc
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
@@ -352,7 +352,7 @@ fn lexicon_doc_network_slices_slice() -> ::jacquard_lexicon::lexicon::LexiconDoc
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static(
                                     "createdAt",
@@ -481,105 +481,105 @@ pub mod slice_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Domain;
-        type Cid;
-        type Name;
         type Creator;
+        type Domain;
         type CreatedAt;
         type Uri;
+        type Cid;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Domain = Unset;
-        type Cid = Unset;
-        type Name = Unset;
         type Creator = Unset;
+        type Domain = Unset;
         type CreatedAt = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `domain` field to Set
-    pub struct SetDomain<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDomain<S> {}
-    impl<S: State> State for SetDomain<S> {
-        type Domain = Set<members::domain>;
-        type Cid = S::Cid;
-        type Name = S::Name;
-        type Creator = S::Creator;
-        type CreatedAt = S::CreatedAt;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Domain = S::Domain;
-        type Cid = Set<members::cid>;
-        type Name = S::Name;
-        type Creator = S::Creator;
-        type CreatedAt = S::CreatedAt;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Domain = S::Domain;
-        type Cid = S::Cid;
-        type Name = Set<members::name>;
-        type Creator = S::Creator;
-        type CreatedAt = S::CreatedAt;
-        type Uri = S::Uri;
+        type Cid = Unset;
+        type Name = Unset;
     }
     ///State transition - sets the `creator` field to Set
     pub struct SetCreator<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreator<S> {}
     impl<S: State> State for SetCreator<S> {
-        type Domain = S::Domain;
-        type Cid = S::Cid;
-        type Name = S::Name;
         type Creator = Set<members::creator>;
+        type Domain = S::Domain;
         type CreatedAt = S::CreatedAt;
         type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `domain` field to Set
+    pub struct SetDomain<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDomain<S> {}
+    impl<S: State> State for SetDomain<S> {
+        type Creator = S::Creator;
+        type Domain = Set<members::domain>;
+        type CreatedAt = S::CreatedAt;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Name = S::Name;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Domain = S::Domain;
-        type Cid = S::Cid;
-        type Name = S::Name;
         type Creator = S::Creator;
+        type Domain = S::Domain;
         type CreatedAt = Set<members::created_at>;
         type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Name = S::Name;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Domain = S::Domain;
-        type Cid = S::Cid;
-        type Name = S::Name;
         type Creator = S::Creator;
+        type Domain = S::Domain;
         type CreatedAt = S::CreatedAt;
         type Uri = Set<members::uri>;
+        type Cid = S::Cid;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Creator = S::Creator;
+        type Domain = S::Domain;
+        type CreatedAt = S::CreatedAt;
+        type Uri = S::Uri;
+        type Cid = Set<members::cid>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Creator = S::Creator;
+        type Domain = S::Domain;
+        type CreatedAt = S::CreatedAt;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `domain` field
-        pub struct domain(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `creator` field
         pub struct creator(());
+        ///Marker type for the `domain` field
+        pub struct domain(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -835,12 +835,12 @@ impl<'a, S: slice_view_state::State> SliceViewBuilder<'a, S> {
 impl<'a, S> SliceViewBuilder<'a, S>
 where
     S: slice_view_state::State,
-    S::Domain: slice_view_state::IsSet,
-    S::Cid: slice_view_state::IsSet,
-    S::Name: slice_view_state::IsSet,
     S::Creator: slice_view_state::IsSet,
+    S::Domain: slice_view_state::IsSet,
     S::CreatedAt: slice_view_state::IsSet,
     S::Uri: slice_view_state::IsSet,
+    S::Cid: slice_view_state::IsSet,
+    S::Name: slice_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SliceView<'a> {
@@ -895,7 +895,7 @@ fn lexicon_doc_network_slices_slice_defs() -> ::jacquard_lexicon::lexicon::Lexic
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("sliceView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -913,7 +913,7 @@ fn lexicon_doc_network_slices_slice_defs() -> ::jacquard_lexicon::lexicon::Lexic
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("cid"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -1116,7 +1116,7 @@ fn lexicon_doc_network_slices_slice_defs() -> ::jacquard_lexicon::lexicon::Lexic
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("count"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -1168,7 +1168,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SliceView<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1341,7 +1341,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SparklinePoint<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.count;
             if *value < 0i64 {

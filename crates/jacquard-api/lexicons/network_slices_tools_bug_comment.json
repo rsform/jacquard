@@ -1,0 +1,53 @@
+{
+  "lexicon": 1,
+  "id": "network.slices.tools.bug.comment",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "bug",
+          "body",
+          "createdAt"
+        ],
+        "properties": {
+          "attachments": {
+            "type": "union",
+            "refs": [
+              "network.slices.tools.defs#images"
+            ]
+          },
+          "body": {
+            "type": "string",
+            "maxLength": 10000,
+            "maxGraphemes": 3000
+          },
+          "bodyFacets": {
+            "type": "array",
+            "description": "Annotations of body text (mentions and links)",
+            "items": {
+              "type": "ref",
+              "ref": "app.bsky.richtext.facet"
+            }
+          },
+          "bug": {
+            "type": "string",
+            "description": "Reference to the bug report",
+            "format": "at-uri"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "parent": {
+            "type": "string",
+            "description": "Optional reference to parent comment for threading",
+            "format": "at-uri"
+          }
+        }
+      }
+    }
+  }
+}

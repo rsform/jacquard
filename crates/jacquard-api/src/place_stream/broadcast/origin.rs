@@ -50,51 +50,51 @@ pub mod origin_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UpdatedAt;
         type Streamer;
         type Server;
+        type UpdatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UpdatedAt = Unset;
         type Streamer = Unset;
         type Server = Unset;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
-        type UpdatedAt = Set<members::updated_at>;
-        type Streamer = S::Streamer;
-        type Server = S::Server;
+        type UpdatedAt = Unset;
     }
     ///State transition - sets the `streamer` field to Set
     pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStreamer<S> {}
     impl<S: State> State for SetStreamer<S> {
-        type UpdatedAt = S::UpdatedAt;
         type Streamer = Set<members::streamer>;
         type Server = S::Server;
+        type UpdatedAt = S::UpdatedAt;
     }
     ///State transition - sets the `server` field to Set
     pub struct SetServer<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetServer<S> {}
     impl<S: State> State for SetServer<S> {
-        type UpdatedAt = S::UpdatedAt;
         type Streamer = S::Streamer;
         type Server = Set<members::server>;
+        type UpdatedAt = S::UpdatedAt;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
+    impl<S: State> State for SetUpdatedAt<S> {
+        type Streamer = S::Streamer;
+        type Server = S::Server;
+        type UpdatedAt = Set<members::updated_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `updated_at` field
-        pub struct updated_at(());
         ///Marker type for the `streamer` field
         pub struct streamer(());
         ///Marker type for the `server` field
         pub struct server(());
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
     }
 }
 
@@ -247,9 +247,9 @@ impl<'a, S: origin_state::State> OriginBuilder<'a, S> {
 impl<'a, S> OriginBuilder<'a, S>
 where
     S: origin_state::State,
-    S::UpdatedAt: origin_state::IsSet,
     S::Streamer: origin_state::IsSet,
     S::Server: origin_state::IsSet,
+    S::UpdatedAt: origin_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Origin<'a> {
@@ -356,7 +356,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Origin<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.iroh_ticket {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2048usize {
@@ -382,7 +382,7 @@ fn lexicon_doc_place_stream_broadcast_origin() -> ::jacquard_lexicon::lexicon::L
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
@@ -404,7 +404,7 @@ fn lexicon_doc_place_stream_broadcast_origin() -> ::jacquard_lexicon::lexicon::L
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static(
                                     "broadcaster",

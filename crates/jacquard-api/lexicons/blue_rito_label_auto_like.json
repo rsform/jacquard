@@ -1,0 +1,29 @@
+{
+  "lexicon": 1,
+  "id": "blue.rito.label.auto.like",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Setting Like based auto labeling.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "subject": {
+            "type": "string",
+            "description": "When this post receives a Like, it controls whether to apply or remove a label.",
+            "format": "uri"
+          }
+        }
+      }
+    }
+  }
+}

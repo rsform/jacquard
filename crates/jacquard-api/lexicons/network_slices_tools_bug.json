@@ -1,0 +1,81 @@
+{
+  "lexicon": 1,
+  "id": "network.slices.tools.bug",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "title",
+          "namespace",
+          "description",
+          "stepsToReproduce",
+          "severity",
+          "createdAt"
+        ],
+        "properties": {
+          "appUsed": {
+            "type": "string",
+            "maxLength": 300
+          },
+          "attachments": {
+            "type": "union",
+            "refs": [
+              "network.slices.tools.defs#images"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 10000,
+            "maxGraphemes": 3000
+          },
+          "descriptionFacets": {
+            "type": "array",
+            "description": "Annotations of description (mentions and links)",
+            "items": {
+              "type": "ref",
+              "ref": "network.slices.tools.richtext.facet"
+            }
+          },
+          "namespace": {
+            "type": "string",
+            "description": "Target namespace like 'social.grain' or 'app.bsky'"
+          },
+          "severity": {
+            "type": "string",
+            "knownValues": [
+              "cosmetic",
+              "annoying",
+              "broken",
+              "unusable"
+            ]
+          },
+          "stepsToReproduce": {
+            "type": "string",
+            "maxLength": 5000,
+            "maxGraphemes": 1500
+          },
+          "stepsToReproduceFacets": {
+            "type": "array",
+            "description": "Annotations of steps to reproduce (mentions and links)",
+            "items": {
+              "type": "ref",
+              "ref": "network.slices.tools.richtext.facet"
+            }
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 300,
+            "maxGraphemes": 100
+          }
+        }
+      }
+    }
+  }
+}

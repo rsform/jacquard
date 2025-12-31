@@ -288,7 +288,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Gallery<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
@@ -327,7 +327,7 @@ fn lexicon_doc_social_grain_gallery() -> ::jacquard_lexicon::lexicon::LexiconDoc
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
@@ -344,7 +344,7 @@ fn lexicon_doc_social_grain_gallery() -> ::jacquard_lexicon::lexicon::LexiconDoc
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static(
                                     "createdAt",
@@ -461,9 +461,9 @@ pub mod gallery_view_state {
     pub trait State: sealed::Sealed {
         type Uri;
         type IndexedAt;
-        type Record;
-        type Creator;
         type Cid;
+        type Creator;
+        type Record;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -471,9 +471,9 @@ pub mod gallery_view_state {
     impl State for Empty {
         type Uri = Unset;
         type IndexedAt = Unset;
-        type Record = Unset;
-        type Creator = Unset;
         type Cid = Unset;
+        type Creator = Unset;
+        type Record = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
@@ -481,9 +481,9 @@ pub mod gallery_view_state {
     impl<S: State> State for SetUri<S> {
         type Uri = Set<members::uri>;
         type IndexedAt = S::IndexedAt;
-        type Record = S::Record;
-        type Creator = S::Creator;
         type Cid = S::Cid;
+        type Creator = S::Creator;
+        type Record = S::Record;
     }
     ///State transition - sets the `indexed_at` field to Set
     pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
@@ -491,29 +491,9 @@ pub mod gallery_view_state {
     impl<S: State> State for SetIndexedAt<S> {
         type Uri = S::Uri;
         type IndexedAt = Set<members::indexed_at>;
-        type Record = S::Record;
+        type Cid = S::Cid;
         type Creator = S::Creator;
-        type Cid = S::Cid;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecord<S> {}
-    impl<S: State> State for SetRecord<S> {
-        type Uri = S::Uri;
-        type IndexedAt = S::IndexedAt;
-        type Record = Set<members::record>;
-        type Creator = S::Creator;
-        type Cid = S::Cid;
-    }
-    ///State transition - sets the `creator` field to Set
-    pub struct SetCreator<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreator<S> {}
-    impl<S: State> State for SetCreator<S> {
-        type Uri = S::Uri;
-        type IndexedAt = S::IndexedAt;
         type Record = S::Record;
-        type Creator = Set<members::creator>;
-        type Cid = S::Cid;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
@@ -521,9 +501,29 @@ pub mod gallery_view_state {
     impl<S: State> State for SetCid<S> {
         type Uri = S::Uri;
         type IndexedAt = S::IndexedAt;
-        type Record = S::Record;
-        type Creator = S::Creator;
         type Cid = Set<members::cid>;
+        type Creator = S::Creator;
+        type Record = S::Record;
+    }
+    ///State transition - sets the `creator` field to Set
+    pub struct SetCreator<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreator<S> {}
+    impl<S: State> State for SetCreator<S> {
+        type Uri = S::Uri;
+        type IndexedAt = S::IndexedAt;
+        type Cid = S::Cid;
+        type Creator = Set<members::creator>;
+        type Record = S::Record;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecord<S> {}
+    impl<S: State> State for SetRecord<S> {
+        type Uri = S::Uri;
+        type IndexedAt = S::IndexedAt;
+        type Cid = S::Cid;
+        type Creator = S::Creator;
+        type Record = Set<members::record>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -532,12 +532,12 @@ pub mod gallery_view_state {
         pub struct uri(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
-        ///Marker type for the `record` field
-        pub struct record(());
-        ///Marker type for the `creator` field
-        pub struct creator(());
         ///Marker type for the `cid` field
         pub struct cid(());
+        ///Marker type for the `creator` field
+        pub struct creator(());
+        ///Marker type for the `record` field
+        pub struct record(());
     }
 }
 
@@ -712,9 +712,9 @@ where
     S: gallery_view_state::State,
     S::Uri: gallery_view_state::IsSet,
     S::IndexedAt: gallery_view_state::IsSet,
-    S::Record: gallery_view_state::IsSet,
-    S::Creator: gallery_view_state::IsSet,
     S::Cid: gallery_view_state::IsSet,
+    S::Creator: gallery_view_state::IsSet,
+    S::Record: gallery_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GalleryView<'a> {
@@ -759,7 +759,7 @@ fn lexicon_doc_social_grain_gallery_defs() -> ::jacquard_lexicon::lexicon::Lexic
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("galleryView"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -776,7 +776,7 @@ fn lexicon_doc_social_grain_gallery_defs() -> ::jacquard_lexicon::lexicon::Lexic
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("cid"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -895,7 +895,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GalleryView<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

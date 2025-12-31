@@ -51,7 +51,7 @@ fn lexicon_doc_net_anisota_beta_game_session() -> ::jacquard_lexicon::lexicon::L
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("activitySummary"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -64,7 +64,7 @@ fn lexicon_doc_net_anisota_beta_game_session() -> ::jacquard_lexicon::lexicon::L
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
                                 "currentLevel",
@@ -168,7 +168,7 @@ fn lexicon_doc_net_anisota_beta_game_session() -> ::jacquard_lexicon::lexicon::L
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
                                 "dailyRewardsClaimed",
@@ -271,7 +271,7 @@ fn lexicon_doc_net_anisota_beta_game_session() -> ::jacquard_lexicon::lexicon::L
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static(
                                     "activitySummary",
@@ -627,7 +627,7 @@ fn lexicon_doc_net_anisota_beta_game_session() -> ::jacquard_lexicon::lexicon::L
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("features"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -698,7 +698,7 @@ fn lexicon_doc_net_anisota_beta_game_session() -> ::jacquard_lexicon::lexicon::L
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
                                 "averageResponseTime",
@@ -741,7 +741,7 @@ fn lexicon_doc_net_anisota_beta_game_session() -> ::jacquard_lexicon::lexicon::L
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static(
                                 "authenticationMethod",
@@ -834,7 +834,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ActivitySummary<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.current_level {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -923,7 +923,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GameActions<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.daily_rewards_claimed {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -1080,65 +1080,65 @@ pub mod session_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Platform;
         type StartedAt;
         type Status;
-        type Platform;
         type ClientVersion;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Platform = Unset;
         type StartedAt = Unset;
         type Status = Unset;
-        type Platform = Unset;
         type ClientVersion = Unset;
+    }
+    ///State transition - sets the `platform` field to Set
+    pub struct SetPlatform<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPlatform<S> {}
+    impl<S: State> State for SetPlatform<S> {
+        type Platform = Set<members::platform>;
+        type StartedAt = S::StartedAt;
+        type Status = S::Status;
+        type ClientVersion = S::ClientVersion;
     }
     ///State transition - sets the `started_at` field to Set
     pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStartedAt<S> {}
     impl<S: State> State for SetStartedAt<S> {
+        type Platform = S::Platform;
         type StartedAt = Set<members::started_at>;
         type Status = S::Status;
-        type Platform = S::Platform;
         type ClientVersion = S::ClientVersion;
     }
     ///State transition - sets the `status` field to Set
     pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStatus<S> {}
     impl<S: State> State for SetStatus<S> {
+        type Platform = S::Platform;
         type StartedAt = S::StartedAt;
         type Status = Set<members::status>;
-        type Platform = S::Platform;
-        type ClientVersion = S::ClientVersion;
-    }
-    ///State transition - sets the `platform` field to Set
-    pub struct SetPlatform<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPlatform<S> {}
-    impl<S: State> State for SetPlatform<S> {
-        type StartedAt = S::StartedAt;
-        type Status = S::Status;
-        type Platform = Set<members::platform>;
         type ClientVersion = S::ClientVersion;
     }
     ///State transition - sets the `client_version` field to Set
     pub struct SetClientVersion<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetClientVersion<S> {}
     impl<S: State> State for SetClientVersion<S> {
+        type Platform = S::Platform;
         type StartedAt = S::StartedAt;
         type Status = S::Status;
-        type Platform = S::Platform;
         type ClientVersion = Set<members::client_version>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `platform` field
+        pub struct platform(());
         ///Marker type for the `started_at` field
         pub struct started_at(());
         ///Marker type for the `status` field
         pub struct status(());
-        ///Marker type for the `platform` field
-        pub struct platform(());
         ///Marker type for the `client_version` field
         pub struct client_version(());
     }
@@ -1533,9 +1533,9 @@ impl<'a, S: session_state::State> SessionBuilder<'a, S> {
 impl<'a, S> SessionBuilder<'a, S>
 where
     S: session_state::State,
+    S::Platform: session_state::IsSet,
     S::StartedAt: session_state::IsSet,
     S::Status: session_state::IsSet,
-    S::Platform: session_state::IsSet,
     S::ClientVersion: session_state::IsSet,
 {
     /// Build the final struct
@@ -1665,7 +1665,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Session<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.duration {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -1722,7 +1722,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Metadata<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1761,7 +1761,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PerformanceMetrics<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.average_response_time {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -1831,7 +1831,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SessionContext<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

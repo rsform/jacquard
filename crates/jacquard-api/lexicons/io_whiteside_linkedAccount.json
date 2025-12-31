@@ -25,6 +25,10 @@
           "name": {
             "type": "string",
             "description": "Display name of the linked account"
+          },
+          "order": {
+            "type": "integer",
+            "description": "Sort order for displaying linked accounts (lower numbers appear first). Defaults to 999 if not specified."
           }
         }
       }

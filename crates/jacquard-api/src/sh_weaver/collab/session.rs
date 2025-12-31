@@ -44,51 +44,51 @@ pub mod session_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Resource;
-        type NodeId;
         type CreatedAt;
+        type NodeId;
+        type Resource;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Resource = Unset;
-        type NodeId = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `resource` field to Set
-    pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetResource<S> {}
-    impl<S: State> State for SetResource<S> {
-        type Resource = Set<members::resource>;
-        type NodeId = S::NodeId;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `node_id` field to Set
-    pub struct SetNodeId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNodeId<S> {}
-    impl<S: State> State for SetNodeId<S> {
-        type Resource = S::Resource;
-        type NodeId = Set<members::node_id>;
-        type CreatedAt = S::CreatedAt;
+        type NodeId = Unset;
+        type Resource = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Resource = S::Resource;
-        type NodeId = S::NodeId;
         type CreatedAt = Set<members::created_at>;
+        type NodeId = S::NodeId;
+        type Resource = S::Resource;
+    }
+    ///State transition - sets the `node_id` field to Set
+    pub struct SetNodeId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNodeId<S> {}
+    impl<S: State> State for SetNodeId<S> {
+        type CreatedAt = S::CreatedAt;
+        type NodeId = Set<members::node_id>;
+        type Resource = S::Resource;
+    }
+    ///State transition - sets the `resource` field to Set
+    pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetResource<S> {}
+    impl<S: State> State for SetResource<S> {
+        type CreatedAt = S::CreatedAt;
+        type NodeId = S::NodeId;
+        type Resource = Set<members::resource>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `resource` field
-        pub struct resource(());
-        ///Marker type for the `node_id` field
-        pub struct node_id(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `node_id` field
+        pub struct node_id(());
+        ///Marker type for the `resource` field
+        pub struct resource(());
     }
 }
 
@@ -221,9 +221,9 @@ where
 impl<'a, S> SessionBuilder<'a, S>
 where
     S: session_state::State,
-    S::Resource: session_state::IsSet,
-    S::NodeId: session_state::IsSet,
     S::CreatedAt: session_state::IsSet,
+    S::NodeId: session_state::IsSet,
+    S::Resource: session_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Session<'a> {
@@ -328,7 +328,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Session<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -342,7 +342,7 @@ fn lexicon_doc_sh_weaver_collab_session() -> ::jacquard_lexicon::lexicon::Lexico
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
@@ -364,7 +364,7 @@ fn lexicon_doc_sh_weaver_collab_session() -> ::jacquard_lexicon::lexicon::Lexico
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static(
                                     "createdAt",

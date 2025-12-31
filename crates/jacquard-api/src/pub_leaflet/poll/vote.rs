@@ -34,37 +34,37 @@ pub mod vote_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Poll;
         type Option;
+        type Poll;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Poll = Unset;
         type Option = Unset;
-    }
-    ///State transition - sets the `poll` field to Set
-    pub struct SetPoll<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPoll<S> {}
-    impl<S: State> State for SetPoll<S> {
-        type Poll = Set<members::poll>;
-        type Option = S::Option;
+        type Poll = Unset;
     }
     ///State transition - sets the `option` field to Set
     pub struct SetOption<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetOption<S> {}
     impl<S: State> State for SetOption<S> {
-        type Poll = S::Poll;
         type Option = Set<members::option>;
+        type Poll = S::Poll;
+    }
+    ///State transition - sets the `poll` field to Set
+    pub struct SetPoll<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPoll<S> {}
+    impl<S: State> State for SetPoll<S> {
+        type Option = S::Option;
+        type Poll = Set<members::poll>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `poll` field
-        pub struct poll(());
         ///Marker type for the `option` field
         pub struct option(());
+        ///Marker type for the `poll` field
+        pub struct poll(());
     }
 }
 
@@ -137,8 +137,8 @@ where
 impl<'a, S> VoteBuilder<'a, S>
 where
     S: vote_state::State,
-    S::Poll: vote_state::IsSet,
     S::Option: vote_state::IsSet,
+    S::Poll: vote_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Vote<'a> {
@@ -237,7 +237,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Vote<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -251,7 +251,7 @@ fn lexicon_doc_pub_leaflet_poll_vote() -> ::jacquard_lexicon::lexicon::LexiconDo
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
@@ -272,7 +272,7 @@ fn lexicon_doc_pub_leaflet_poll_vote() -> ::jacquard_lexicon::lexicon::LexiconDo
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static("option"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {

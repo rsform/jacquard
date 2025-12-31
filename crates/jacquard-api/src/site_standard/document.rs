@@ -31,13 +31,14 @@ pub struct Document<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    /// combined with the publications url to construct a full url to the document
+    /// combine with the publication url or the document site to construct a full url to the document
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub path: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(borrow)]
-    pub publication: jacquard_common::types::string::AtUri<'a>,
     pub published_at: jacquard_common::types::string::Datetime,
+    /// URI to the site or publication this document belongs to (https or at-uri)
+    #[serde(borrow)]
+    pub site: jacquard_common::types::string::Uri<'a>,
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
@@ -60,7 +61,7 @@ pub mod document_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Publication;
+        type Site;
         type Title;
         type PublishedAt;
     }
@@ -68,15 +69,15 @@ pub mod document_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Publication = Unset;
+        type Site = Unset;
         type Title = Unset;
         type PublishedAt = Unset;
     }
-    ///State transition - sets the `publication` field to Set
-    pub struct SetPublication<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPublication<S> {}
-    impl<S: State> State for SetPublication<S> {
-        type Publication = Set<members::publication>;
+    ///State transition - sets the `site` field to Set
+    pub struct SetSite<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSite<S> {}
+    impl<S: State> State for SetSite<S> {
+        type Site = Set<members::site>;
         type Title = S::Title;
         type PublishedAt = S::PublishedAt;
     }
@@ -84,7 +85,7 @@ pub mod document_state {
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Publication = S::Publication;
+        type Site = S::Site;
         type Title = Set<members::title>;
         type PublishedAt = S::PublishedAt;
     }
@@ -92,15 +93,15 @@ pub mod document_state {
     pub struct SetPublishedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPublishedAt<S> {}
     impl<S: State> State for SetPublishedAt<S> {
-        type Publication = S::Publication;
+        type Site = S::Site;
         type Title = S::Title;
         type PublishedAt = Set<members::published_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `publication` field
-        pub struct publication(());
+        ///Marker type for the `site` field
+        pub struct site(());
         ///Marker type for the `title` field
         pub struct title(());
         ///Marker type for the `published_at` field
@@ -117,8 +118,8 @@ pub struct DocumentBuilder<'a, S: document_state::State> {
         ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::types::string::Uri<'a>>,
         ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
@@ -252,13 +253,13 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
 impl<'a, S> DocumentBuilder<'a, S>
 where
     S: document_state::State,
-    S::Publication: document_state::IsUnset,
+    S::PublishedAt: document_state::IsUnset,
 {
-    /// Set the `publication` field (required)
-    pub fn publication(
+    /// Set the `publishedAt` field (required)
+    pub fn published_at(
         mut self,
-        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
-    ) -> DocumentBuilder<'a, document_state::SetPublication<S>> {
+        value: impl Into<jacquard_common::types::string::Datetime>,
+    ) -> DocumentBuilder<'a, document_state::SetPublishedAt<S>> {
         self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
         DocumentBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -271,13 +272,13 @@ where
 impl<'a, S> DocumentBuilder<'a, S>
 where
     S: document_state::State,
-    S::PublishedAt: document_state::IsUnset,
+    S::Site: document_state::IsUnset,
 {
-    /// Set the `publishedAt` field (required)
-    pub fn published_at(
+    /// Set the `site` field (required)
+    pub fn site(
         mut self,
-        value: impl Into<jacquard_common::types::string::Datetime>,
-    ) -> DocumentBuilder<'a, document_state::SetPublishedAt<S>> {
+        value: impl Into<jacquard_common::types::string::Uri<'a>>,
+    ) -> DocumentBuilder<'a, document_state::SetSite<S>> {
         self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
         DocumentBuilder {
             _phantom_state: ::core::marker::PhantomData,
@@ -366,7 +367,7 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
 impl<'a, S> DocumentBuilder<'a, S>
 where
     S: document_state::State,
-    S::Publication: document_state::IsSet,
+    S::Site: document_state::IsSet,
     S::Title: document_state::IsSet,
     S::PublishedAt: document_state::IsSet,
 {
@@ -378,8 +379,8 @@ where
             cover_image: self.__unsafe_private_named.2,
             description: self.__unsafe_private_named.3,
             path: self.__unsafe_private_named.4,
-            publication: self.__unsafe_private_named.5.unwrap(),
-            published_at: self.__unsafe_private_named.6.unwrap(),
+            published_at: self.__unsafe_private_named.5.unwrap(),
+            site: self.__unsafe_private_named.6.unwrap(),
             tags: self.__unsafe_private_named.7,
             text_content: self.__unsafe_private_named.8,
             title: self.__unsafe_private_named.9.unwrap(),
@@ -401,8 +402,8 @@ where
             cover_image: self.__unsafe_private_named.2,
             description: self.__unsafe_private_named.3,
             path: self.__unsafe_private_named.4,
-            publication: self.__unsafe_private_named.5.unwrap(),
-            published_at: self.__unsafe_private_named.6.unwrap(),
+            published_at: self.__unsafe_private_named.5.unwrap(),
+            site: self.__unsafe_private_named.6.unwrap(),
             tags: self.__unsafe_private_named.7,
             text_content: self.__unsafe_private_named.8,
             title: self.__unsafe_private_named.9.unwrap(),
@@ -412,217 +413,65 @@ where
     }
 }
 
-fn lexicon_doc_site_standard_document() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
-    ::jacquard_lexicon::lexicon::LexiconDoc {
-        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
-        id: ::jacquard_common::CowStr::new_static("site.standard.document"),
-        revision: None,
-        description: None,
-        defs: {
-            let mut map = ::std::collections::BTreeMap::new();
-            map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("main"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: Some(
-                        vec![
-                            ::jacquard_common::smol_str::SmolStr::new_static("publication"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("title"),
-                            ::jacquard_common::smol_str::SmolStr::new_static("publishedAt")
-                        ],
-                    ),
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
-                        map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
-                                "bskyPostRef",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static(
-                                    "com.atproto.repo.strongRef",
-                                ),
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("content"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Union(::jacquard_lexicon::lexicon::LexRefUnion {
-                                    description: None,
-                                    refs: vec![],
-                                    closed: Some(false),
-                                }),
-                                min_length: None,
-                                max_length: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
-                                "coverImage",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
-                                description: None,
-                                accept: None,
-                                max_size: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
-                                "description",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: Some(3000usize),
-                                min_graphemes: None,
-                                max_graphemes: Some(300usize),
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("path"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: Some(
-                                    ::jacquard_common::CowStr::new_static(
-                                        "combined with the publications url to construct a full url to the document",
-                                    ),
-                                ),
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
-                                "publication",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
-                                "publishedAt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("tags"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
-                                description: None,
-                                items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
-                                    description: None,
-                                    format: None,
-                                    default: None,
-                                    min_length: None,
-                                    max_length: Some(100usize),
-                                    min_graphemes: None,
-                                    max_graphemes: Some(50usize),
-                                    r#enum: None,
-                                    r#const: None,
-                                    known_values: None,
-                                }),
-                                min_length: None,
-                                max_length: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
-                                "textContent",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("title"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: None,
-                                default: None,
-                                min_length: None,
-                                max_length: Some(1280usize),
-                                min_graphemes: None,
-                                max_graphemes: Some(128usize),
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static(
-                                "updatedAt",
-                            ),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
-                                description: None,
-                                format: Some(
-                                    ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
-                                ),
-                                default: None,
-                                min_length: None,
-                                max_length: None,
-                                min_graphemes: None,
-                                max_graphemes: None,
-                                r#enum: None,
-                                r#const: None,
-                                known_values: None,
-                            }),
-                        );
-                        map
-                    },
-                }),
-            );
-            map
-        },
+impl<'a> Document<'a> {
+    pub fn uri(
+        uri: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> Result<
+        jacquard_common::types::uri::RecordUri<'a, DocumentRecord>,
+        jacquard_common::types::uri::UriError,
+    > {
+        jacquard_common::types::uri::RecordUri::try_from_uri(
+            jacquard_common::types::string::AtUri::new_cow(uri.into())?,
+        )
     }
+}
+
+/// Typed wrapper for GetRecord response with this collection's record type.
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct DocumentGetRecordOutput<'a> {
+    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(borrow)]
+    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+    #[serde(borrow)]
+    pub value: Document<'a>,
+}
+
+impl From<DocumentGetRecordOutput<'_>> for Document<'_> {
+    fn from(output: DocumentGetRecordOutput<'_>) -> Self {
+        use jacquard_common::IntoStatic;
+        output.value.into_static()
+    }
+}
+
+impl jacquard_common::types::collection::Collection for Document<'_> {
+    const NSID: &'static str = "site.standard.document";
+    type Record = DocumentRecord;
+}
+
+/// Marker type for deserializing records from this collection.
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+pub struct DocumentRecord;
+impl jacquard_common::xrpc::XrpcResp for DocumentRecord {
+    const NSID: &'static str = "site.standard.document";
+    const ENCODING: &'static str = "application/json";
+    type Output<'de> = DocumentGetRecordOutput<'de>;
+    type Err<'de> = jacquard_common::types::collection::RecordError<'de>;
+}
+
+impl jacquard_common::types::collection::Collection for DocumentRecord {
+    const NSID: &'static str = "site.standard.document";
+    type Record = DocumentRecord;
 }
 
 impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Document<'a> {
@@ -637,7 +486,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Document<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 3000usize {
@@ -701,5 +550,224 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Document<'a> {
             }
         }
         Ok(())
+    }
+}
+
+fn lexicon_doc_site_standard_document() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+    'static,
+> {
+    ::jacquard_lexicon::lexicon::LexiconDoc {
+        lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
+        id: ::jacquard_common::CowStr::new_static("site.standard.document"),
+        revision: None,
+        description: None,
+        defs: {
+            let mut map = ::alloc::collections::BTreeMap::new();
+            map.insert(
+                ::jacquard_common::smol_str::SmolStr::new_static("main"),
+                ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
+                    description: None,
+                    key: Some(::jacquard_common::CowStr::new_static("tid")),
+                    record: ::jacquard_lexicon::lexicon::LexRecordRecord::Object(::jacquard_lexicon::lexicon::LexObject {
+                        description: None,
+                        required: Some(
+                            vec![
+                                ::jacquard_common::smol_str::SmolStr::new_static("site"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
+                                ::jacquard_common::smol_str::SmolStr::new_static("publishedAt")
+                            ],
+                        ),
+                        nullable: None,
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "bskyPostRef",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "com.atproto.repo.strongRef",
+                                    ),
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static("content"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                    description: None,
+                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::Union(::jacquard_lexicon::lexicon::LexRefUnion {
+                                        description: None,
+                                        refs: vec![],
+                                        closed: Some(false),
+                                    }),
+                                    min_length: None,
+                                    max_length: None,
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "coverImage",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Blob(::jacquard_lexicon::lexicon::LexBlob {
+                                    description: None,
+                                    accept: None,
+                                    max_size: None,
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "description",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: None,
+                                    default: None,
+                                    min_length: None,
+                                    max_length: Some(3000usize),
+                                    min_graphemes: None,
+                                    max_graphemes: Some(300usize),
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static("path"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "combine with the publication url or the document site to construct a full url to the document",
+                                        ),
+                                    ),
+                                    format: None,
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "publishedAt",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static("site"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "URI to the site or publication this document belongs to (https or at-uri)",
+                                        ),
+                                    ),
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::Uri,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static("tags"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                    description: None,
+                                    items: ::jacquard_lexicon::lexicon::LexArrayItem::String(::jacquard_lexicon::lexicon::LexString {
+                                        description: None,
+                                        format: None,
+                                        default: None,
+                                        min_length: None,
+                                        max_length: Some(100usize),
+                                        min_graphemes: None,
+                                        max_graphemes: Some(50usize),
+                                        r#enum: None,
+                                        r#const: None,
+                                        known_values: None,
+                                    }),
+                                    min_length: None,
+                                    max_length: None,
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "textContent",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: None,
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static("title"),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: None,
+                                    default: None,
+                                    min_length: None,
+                                    max_length: Some(1280usize),
+                                    min_graphemes: None,
+                                    max_graphemes: Some(128usize),
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::smol_str::SmolStr::new_static(
+                                    "updatedAt",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: None,
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
+                                    ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map
+                        },
+                    }),
+                }),
+            );
+            map
+        },
     }
 }

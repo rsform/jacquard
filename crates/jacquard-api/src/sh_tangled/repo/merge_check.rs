@@ -35,7 +35,7 @@ fn lexicon_doc_sh_tangled_repo_mergeCheck() -> ::jacquard_lexicon::lexicon::Lexi
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("conflictInfo"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -49,7 +49,7 @@ fn lexicon_doc_sh_tangled_repo_mergeCheck() -> ::jacquard_lexicon::lexicon::Lexi
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("filename"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -116,7 +116,7 @@ fn lexicon_doc_sh_tangled_repo_mergeCheck() -> ::jacquard_lexicon::lexicon::Lexi
                                 nullable: None,
                                 properties: {
                                     #[allow(unused_mut)]
-                                    let mut map = ::std::collections::BTreeMap::new();
+                                    let mut map = ::alloc::collections::BTreeMap::new();
                                     map.insert(
                                         ::jacquard_common::smol_str::SmolStr::new_static("branch"),
                                         ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -221,7 +221,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ConflictInfo<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -262,67 +262,67 @@ pub mod merge_check_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Branch;
-        type Patch;
         type Name;
+        type Patch;
         type Did;
+        type Branch;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Branch = Unset;
-        type Patch = Unset;
         type Name = Unset;
+        type Patch = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `branch` field to Set
-    pub struct SetBranch<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBranch<S> {}
-    impl<S: State> State for SetBranch<S> {
-        type Branch = Set<members::branch>;
-        type Patch = S::Patch;
-        type Name = S::Name;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `patch` field to Set
-    pub struct SetPatch<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPatch<S> {}
-    impl<S: State> State for SetPatch<S> {
-        type Branch = S::Branch;
-        type Patch = Set<members::patch>;
-        type Name = S::Name;
-        type Did = S::Did;
+        type Branch = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Branch = S::Branch;
-        type Patch = S::Patch;
         type Name = Set<members::name>;
+        type Patch = S::Patch;
         type Did = S::Did;
+        type Branch = S::Branch;
+    }
+    ///State transition - sets the `patch` field to Set
+    pub struct SetPatch<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPatch<S> {}
+    impl<S: State> State for SetPatch<S> {
+        type Name = S::Name;
+        type Patch = Set<members::patch>;
+        type Did = S::Did;
+        type Branch = S::Branch;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Branch = S::Branch;
-        type Patch = S::Patch;
         type Name = S::Name;
+        type Patch = S::Patch;
         type Did = Set<members::did>;
+        type Branch = S::Branch;
+    }
+    ///State transition - sets the `branch` field to Set
+    pub struct SetBranch<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBranch<S> {}
+    impl<S: State> State for SetBranch<S> {
+        type Name = S::Name;
+        type Patch = S::Patch;
+        type Did = S::Did;
+        type Branch = Set<members::branch>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `branch` field
-        pub struct branch(());
-        ///Marker type for the `patch` field
-        pub struct patch(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `patch` field
+        pub struct patch(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `branch` field
+        pub struct branch(());
     }
 }
 
@@ -435,10 +435,10 @@ where
 impl<'a, S> MergeCheckBuilder<'a, S>
 where
     S: merge_check_state::State,
-    S::Branch: merge_check_state::IsSet,
-    S::Patch: merge_check_state::IsSet,
     S::Name: merge_check_state::IsSet,
+    S::Patch: merge_check_state::IsSet,
     S::Did: merge_check_state::IsSet,
+    S::Branch: merge_check_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MergeCheck<'a> {

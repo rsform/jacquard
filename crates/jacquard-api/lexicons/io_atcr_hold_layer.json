@@ -25,15 +25,18 @@
           },
           "digest": {
             "type": "string",
-            "description": "Layer digest (e.g., sha256:abc123...)"
+            "description": "Layer digest (e.g., sha256:abc123...)",
+            "maxLength": 128
           },
           "mediaType": {
             "type": "string",
-            "description": "Media type (e.g., application/vnd.oci.image.layer.v1.tar+gzip)"
+            "description": "Media type (e.g., application/vnd.oci.image.layer.v1.tar+gzip)",
+            "maxLength": 128
           },
           "repository": {
             "type": "string",
-            "description": "Repository this layer belongs to"
+            "description": "Repository this layer belongs to",
+            "maxLength": 255
           },
           "size": {
             "type": "integer",

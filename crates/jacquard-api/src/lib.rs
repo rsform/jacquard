@@ -3,6 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+extern crate alloc;
 #[cfg(feature = "app_blebbit")]
 pub mod app_blebbit;
 
@@ -76,6 +77,9 @@ pub mod com_shinolabs;
 #[cfg(feature = "com_whtwnd")]
 pub mod com_whtwnd;
 
+#[cfg(feature = "com_yuna0x0")]
+pub mod com_yuna0x0;
+
 #[cfg(feature = "community_lexicon")]
 pub mod community_lexicon;
 
@@ -106,8 +110,23 @@ pub mod fyi_questionable;
 #[cfg(feature = "fyi_unravel")]
 pub mod fyi_unravel;
 
+#[cfg(feature = "games_firehose")]
+pub mod games_firehose;
+
 #[cfg(feature = "garden_lexicon")]
 pub mod garden_lexicon;
+
+#[cfg(feature = "io_atcr")]
+pub mod io_atcr;
+
+#[cfg(feature = "io_livewire")]
+pub mod io_livewire;
+
+#[cfg(feature = "io_whiteley")]
+pub mod io_whiteley;
+
+#[cfg(feature = "io_whiteside")]
+pub mod io_whiteside;
 
 #[cfg(feature = "link_bridgebeats")]
 pub mod link_bridgebeats;
@@ -129,6 +148,9 @@ pub mod net_altq;
 
 #[cfg(feature = "net_anisota")]
 pub mod net_anisota;
+
+#[cfg(feature = "net_asadaame5121")]
+pub mod net_asadaame5121;
 
 #[cfg(feature = "net_bnewbold")]
 pub mod net_bnewbold;
@@ -201,6 +223,9 @@ pub mod social_sket;
 
 #[cfg(feature = "tech_manos")]
 pub mod tech_manos;
+
+#[cfg(feature = "tech_tokimeki")]
+pub mod tech_tokimeki;
 
 #[cfg(feature = "tools_ozone")]
 pub mod tools_ozone;

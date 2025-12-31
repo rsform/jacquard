@@ -37,37 +37,37 @@ pub mod status_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Item;
         type Time;
+        type Item;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Item = Unset;
         type Time = Unset;
-    }
-    ///State transition - sets the `item` field to Set
-    pub struct SetItem<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetItem<S> {}
-    impl<S: State> State for SetItem<S> {
-        type Item = Set<members::item>;
-        type Time = S::Time;
+        type Item = Unset;
     }
     ///State transition - sets the `time` field to Set
     pub struct SetTime<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTime<S> {}
     impl<S: State> State for SetTime<S> {
-        type Item = S::Item;
         type Time = Set<members::time>;
+        type Item = S::Item;
+    }
+    ///State transition - sets the `item` field to Set
+    pub struct SetItem<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetItem<S> {}
+    impl<S: State> State for SetItem<S> {
+        type Time = S::Time;
+        type Item = Set<members::item>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `item` field
-        pub struct item(());
         ///Marker type for the `time` field
         pub struct time(());
+        ///Marker type for the `item` field
+        pub struct item(());
     }
 }
 
@@ -160,8 +160,8 @@ where
 impl<'a, S> StatusBuilder<'a, S>
 where
     S: status_state::State,
-    S::Item: status_state::IsSet,
     S::Time: status_state::IsSet,
+    S::Item: status_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Status<'a> {
@@ -262,7 +262,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Status<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -276,7 +276,7 @@ fn lexicon_doc_fm_teal_alpha_actor_status() -> ::jacquard_lexicon::lexicon::Lexi
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
@@ -297,7 +297,7 @@ fn lexicon_doc_fm_teal_alpha_actor_status() -> ::jacquard_lexicon::lexicon::Lexi
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static("expiry"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {

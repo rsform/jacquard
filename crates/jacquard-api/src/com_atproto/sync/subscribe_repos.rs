@@ -40,67 +40,67 @@ pub mod account_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Seq;
         type Active;
         type Time;
         type Did;
+        type Seq;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Seq = Unset;
         type Active = Unset;
         type Time = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `seq` field to Set
-    pub struct SetSeq<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSeq<S> {}
-    impl<S: State> State for SetSeq<S> {
-        type Seq = Set<members::seq>;
-        type Active = S::Active;
-        type Time = S::Time;
-        type Did = S::Did;
+        type Seq = Unset;
     }
     ///State transition - sets the `active` field to Set
     pub struct SetActive<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetActive<S> {}
     impl<S: State> State for SetActive<S> {
-        type Seq = S::Seq;
         type Active = Set<members::active>;
         type Time = S::Time;
         type Did = S::Did;
+        type Seq = S::Seq;
     }
     ///State transition - sets the `time` field to Set
     pub struct SetTime<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTime<S> {}
     impl<S: State> State for SetTime<S> {
-        type Seq = S::Seq;
         type Active = S::Active;
         type Time = Set<members::time>;
         type Did = S::Did;
+        type Seq = S::Seq;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Seq = S::Seq;
         type Active = S::Active;
         type Time = S::Time;
         type Did = Set<members::did>;
+        type Seq = S::Seq;
+    }
+    ///State transition - sets the `seq` field to Set
+    pub struct SetSeq<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSeq<S> {}
+    impl<S: State> State for SetSeq<S> {
+        type Active = S::Active;
+        type Time = S::Time;
+        type Did = S::Did;
+        type Seq = Set<members::seq>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `seq` field
-        pub struct seq(());
         ///Marker type for the `active` field
         pub struct active(());
         ///Marker type for the `time` field
         pub struct time(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `seq` field
+        pub struct seq(());
     }
 }
 
@@ -230,10 +230,10 @@ where
 impl<'a, S> AccountBuilder<'a, S>
 where
     S: account_state::State,
-    S::Seq: account_state::IsSet,
     S::Active: account_state::IsSet,
     S::Time: account_state::IsSet,
     S::Did: account_state::IsSet,
+    S::Seq: account_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Account<'a> {
@@ -274,7 +274,7 @@ fn lexicon_doc_com_atproto_sync_subscribeRepos() -> ::jacquard_lexicon::lexicon:
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("account"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -294,7 +294,7 @@ fn lexicon_doc_com_atproto_sync_subscribeRepos() -> ::jacquard_lexicon::lexicon:
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("active"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Boolean(::jacquard_lexicon::lexicon::LexBoolean {
@@ -397,7 +397,7 @@ fn lexicon_doc_com_atproto_sync_subscribeRepos() -> ::jacquard_lexicon::lexicon:
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("blobs"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -574,7 +574,7 @@ fn lexicon_doc_com_atproto_sync_subscribeRepos() -> ::jacquard_lexicon::lexicon:
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("did"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -655,7 +655,7 @@ fn lexicon_doc_com_atproto_sync_subscribeRepos() -> ::jacquard_lexicon::lexicon:
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("message"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -700,7 +700,7 @@ fn lexicon_doc_com_atproto_sync_subscribeRepos() -> ::jacquard_lexicon::lexicon:
                             required: None,
                             properties: {
                                 #[allow(unused_mut)]
-                                let mut map = ::std::collections::BTreeMap::new();
+                                let mut map = ::alloc::collections::BTreeMap::new();
                                 map.insert(
                                     ::jacquard_common::smol_str::SmolStr::new_static("cursor"),
                                     ::jacquard_lexicon::lexicon::LexXrpcParametersProperty::Integer(::jacquard_lexicon::lexicon::LexInteger {
@@ -739,7 +739,7 @@ fn lexicon_doc_com_atproto_sync_subscribeRepos() -> ::jacquard_lexicon::lexicon:
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("action"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -806,7 +806,7 @@ fn lexicon_doc_com_atproto_sync_subscribeRepos() -> ::jacquard_lexicon::lexicon:
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("blocks"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Bytes(::jacquard_lexicon::lexicon::LexBytes {
@@ -908,7 +908,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Account<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -967,205 +967,205 @@ pub mod commit_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Rebase;
-        type Commit;
         type TooBig;
-        type Time;
-        type Ops;
-        type Rev;
-        type Seq;
         type Repo;
+        type Commit;
         type Blobs;
+        type Ops;
+        type Rebase;
         type Blocks;
+        type Time;
+        type Seq;
+        type Rev;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Rebase = Unset;
-        type Commit = Unset;
         type TooBig = Unset;
-        type Time = Unset;
-        type Ops = Unset;
-        type Rev = Unset;
-        type Seq = Unset;
         type Repo = Unset;
+        type Commit = Unset;
         type Blobs = Unset;
+        type Ops = Unset;
+        type Rebase = Unset;
         type Blocks = Unset;
-    }
-    ///State transition - sets the `rebase` field to Set
-    pub struct SetRebase<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRebase<S> {}
-    impl<S: State> State for SetRebase<S> {
-        type Rebase = Set<members::rebase>;
-        type Commit = S::Commit;
-        type TooBig = S::TooBig;
-        type Time = S::Time;
-        type Ops = S::Ops;
-        type Rev = S::Rev;
-        type Seq = S::Seq;
-        type Repo = S::Repo;
-        type Blobs = S::Blobs;
-        type Blocks = S::Blocks;
-    }
-    ///State transition - sets the `commit` field to Set
-    pub struct SetCommit<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCommit<S> {}
-    impl<S: State> State for SetCommit<S> {
-        type Rebase = S::Rebase;
-        type Commit = Set<members::commit>;
-        type TooBig = S::TooBig;
-        type Time = S::Time;
-        type Ops = S::Ops;
-        type Rev = S::Rev;
-        type Seq = S::Seq;
-        type Repo = S::Repo;
-        type Blobs = S::Blobs;
-        type Blocks = S::Blocks;
+        type Time = Unset;
+        type Seq = Unset;
+        type Rev = Unset;
     }
     ///State transition - sets the `too_big` field to Set
     pub struct SetTooBig<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTooBig<S> {}
     impl<S: State> State for SetTooBig<S> {
-        type Rebase = S::Rebase;
-        type Commit = S::Commit;
         type TooBig = Set<members::too_big>;
-        type Time = S::Time;
-        type Ops = S::Ops;
-        type Rev = S::Rev;
-        type Seq = S::Seq;
         type Repo = S::Repo;
-        type Blobs = S::Blobs;
-        type Blocks = S::Blocks;
-    }
-    ///State transition - sets the `time` field to Set
-    pub struct SetTime<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTime<S> {}
-    impl<S: State> State for SetTime<S> {
-        type Rebase = S::Rebase;
         type Commit = S::Commit;
-        type TooBig = S::TooBig;
-        type Time = Set<members::time>;
+        type Blobs = S::Blobs;
         type Ops = S::Ops;
-        type Rev = S::Rev;
-        type Seq = S::Seq;
-        type Repo = S::Repo;
-        type Blobs = S::Blobs;
-        type Blocks = S::Blocks;
-    }
-    ///State transition - sets the `ops` field to Set
-    pub struct SetOps<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOps<S> {}
-    impl<S: State> State for SetOps<S> {
         type Rebase = S::Rebase;
-        type Commit = S::Commit;
-        type TooBig = S::TooBig;
+        type Blocks = S::Blocks;
         type Time = S::Time;
-        type Ops = Set<members::ops>;
-        type Rev = S::Rev;
         type Seq = S::Seq;
-        type Repo = S::Repo;
-        type Blobs = S::Blobs;
-        type Blocks = S::Blocks;
-    }
-    ///State transition - sets the `rev` field to Set
-    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRev<S> {}
-    impl<S: State> State for SetRev<S> {
-        type Rebase = S::Rebase;
-        type Commit = S::Commit;
-        type TooBig = S::TooBig;
-        type Time = S::Time;
-        type Ops = S::Ops;
-        type Rev = Set<members::rev>;
-        type Seq = S::Seq;
-        type Repo = S::Repo;
-        type Blobs = S::Blobs;
-        type Blocks = S::Blocks;
-    }
-    ///State transition - sets the `seq` field to Set
-    pub struct SetSeq<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSeq<S> {}
-    impl<S: State> State for SetSeq<S> {
-        type Rebase = S::Rebase;
-        type Commit = S::Commit;
-        type TooBig = S::TooBig;
-        type Time = S::Time;
-        type Ops = S::Ops;
         type Rev = S::Rev;
-        type Seq = Set<members::seq>;
-        type Repo = S::Repo;
-        type Blobs = S::Blobs;
-        type Blocks = S::Blocks;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepo<S> {}
     impl<S: State> State for SetRepo<S> {
-        type Rebase = S::Rebase;
-        type Commit = S::Commit;
         type TooBig = S::TooBig;
-        type Time = S::Time;
-        type Ops = S::Ops;
-        type Rev = S::Rev;
-        type Seq = S::Seq;
         type Repo = Set<members::repo>;
+        type Commit = S::Commit;
         type Blobs = S::Blobs;
+        type Ops = S::Ops;
+        type Rebase = S::Rebase;
         type Blocks = S::Blocks;
+        type Time = S::Time;
+        type Seq = S::Seq;
+        type Rev = S::Rev;
+    }
+    ///State transition - sets the `commit` field to Set
+    pub struct SetCommit<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCommit<S> {}
+    impl<S: State> State for SetCommit<S> {
+        type TooBig = S::TooBig;
+        type Repo = S::Repo;
+        type Commit = Set<members::commit>;
+        type Blobs = S::Blobs;
+        type Ops = S::Ops;
+        type Rebase = S::Rebase;
+        type Blocks = S::Blocks;
+        type Time = S::Time;
+        type Seq = S::Seq;
+        type Rev = S::Rev;
     }
     ///State transition - sets the `blobs` field to Set
     pub struct SetBlobs<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBlobs<S> {}
     impl<S: State> State for SetBlobs<S> {
-        type Rebase = S::Rebase;
-        type Commit = S::Commit;
         type TooBig = S::TooBig;
-        type Time = S::Time;
-        type Ops = S::Ops;
-        type Rev = S::Rev;
-        type Seq = S::Seq;
         type Repo = S::Repo;
+        type Commit = S::Commit;
         type Blobs = Set<members::blobs>;
+        type Ops = S::Ops;
+        type Rebase = S::Rebase;
         type Blocks = S::Blocks;
+        type Time = S::Time;
+        type Seq = S::Seq;
+        type Rev = S::Rev;
+    }
+    ///State transition - sets the `ops` field to Set
+    pub struct SetOps<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOps<S> {}
+    impl<S: State> State for SetOps<S> {
+        type TooBig = S::TooBig;
+        type Repo = S::Repo;
+        type Commit = S::Commit;
+        type Blobs = S::Blobs;
+        type Ops = Set<members::ops>;
+        type Rebase = S::Rebase;
+        type Blocks = S::Blocks;
+        type Time = S::Time;
+        type Seq = S::Seq;
+        type Rev = S::Rev;
+    }
+    ///State transition - sets the `rebase` field to Set
+    pub struct SetRebase<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRebase<S> {}
+    impl<S: State> State for SetRebase<S> {
+        type TooBig = S::TooBig;
+        type Repo = S::Repo;
+        type Commit = S::Commit;
+        type Blobs = S::Blobs;
+        type Ops = S::Ops;
+        type Rebase = Set<members::rebase>;
+        type Blocks = S::Blocks;
+        type Time = S::Time;
+        type Seq = S::Seq;
+        type Rev = S::Rev;
     }
     ///State transition - sets the `blocks` field to Set
     pub struct SetBlocks<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBlocks<S> {}
     impl<S: State> State for SetBlocks<S> {
-        type Rebase = S::Rebase;
-        type Commit = S::Commit;
         type TooBig = S::TooBig;
-        type Time = S::Time;
-        type Ops = S::Ops;
-        type Rev = S::Rev;
-        type Seq = S::Seq;
         type Repo = S::Repo;
+        type Commit = S::Commit;
         type Blobs = S::Blobs;
+        type Ops = S::Ops;
+        type Rebase = S::Rebase;
         type Blocks = Set<members::blocks>;
+        type Time = S::Time;
+        type Seq = S::Seq;
+        type Rev = S::Rev;
+    }
+    ///State transition - sets the `time` field to Set
+    pub struct SetTime<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTime<S> {}
+    impl<S: State> State for SetTime<S> {
+        type TooBig = S::TooBig;
+        type Repo = S::Repo;
+        type Commit = S::Commit;
+        type Blobs = S::Blobs;
+        type Ops = S::Ops;
+        type Rebase = S::Rebase;
+        type Blocks = S::Blocks;
+        type Time = Set<members::time>;
+        type Seq = S::Seq;
+        type Rev = S::Rev;
+    }
+    ///State transition - sets the `seq` field to Set
+    pub struct SetSeq<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSeq<S> {}
+    impl<S: State> State for SetSeq<S> {
+        type TooBig = S::TooBig;
+        type Repo = S::Repo;
+        type Commit = S::Commit;
+        type Blobs = S::Blobs;
+        type Ops = S::Ops;
+        type Rebase = S::Rebase;
+        type Blocks = S::Blocks;
+        type Time = S::Time;
+        type Seq = Set<members::seq>;
+        type Rev = S::Rev;
+    }
+    ///State transition - sets the `rev` field to Set
+    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRev<S> {}
+    impl<S: State> State for SetRev<S> {
+        type TooBig = S::TooBig;
+        type Repo = S::Repo;
+        type Commit = S::Commit;
+        type Blobs = S::Blobs;
+        type Ops = S::Ops;
+        type Rebase = S::Rebase;
+        type Blocks = S::Blocks;
+        type Time = S::Time;
+        type Seq = S::Seq;
+        type Rev = Set<members::rev>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `rebase` field
-        pub struct rebase(());
-        ///Marker type for the `commit` field
-        pub struct commit(());
         ///Marker type for the `too_big` field
         pub struct too_big(());
-        ///Marker type for the `time` field
-        pub struct time(());
-        ///Marker type for the `ops` field
-        pub struct ops(());
-        ///Marker type for the `rev` field
-        pub struct rev(());
-        ///Marker type for the `seq` field
-        pub struct seq(());
         ///Marker type for the `repo` field
         pub struct repo(());
+        ///Marker type for the `commit` field
+        pub struct commit(());
         ///Marker type for the `blobs` field
         pub struct blobs(());
+        ///Marker type for the `ops` field
+        pub struct ops(());
+        ///Marker type for the `rebase` field
+        pub struct rebase(());
         ///Marker type for the `blocks` field
         pub struct blocks(());
+        ///Marker type for the `time` field
+        pub struct time(());
+        ///Marker type for the `seq` field
+        pub struct seq(());
+        ///Marker type for the `rev` field
+        pub struct rev(());
     }
 }
 
@@ -1453,16 +1453,16 @@ where
 impl<'a, S> CommitBuilder<'a, S>
 where
     S: commit_state::State,
-    S::Rebase: commit_state::IsSet,
-    S::Commit: commit_state::IsSet,
     S::TooBig: commit_state::IsSet,
-    S::Time: commit_state::IsSet,
-    S::Ops: commit_state::IsSet,
-    S::Rev: commit_state::IsSet,
-    S::Seq: commit_state::IsSet,
     S::Repo: commit_state::IsSet,
+    S::Commit: commit_state::IsSet,
     S::Blobs: commit_state::IsSet,
+    S::Ops: commit_state::IsSet,
+    S::Rebase: commit_state::IsSet,
     S::Blocks: commit_state::IsSet,
+    S::Time: commit_state::IsSet,
+    S::Seq: commit_state::IsSet,
+    S::Rev: commit_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Commit<'a> {
@@ -1520,7 +1520,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Commit<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.ops;
             #[allow(unused_comparisons)]
@@ -1772,7 +1772,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Identity<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1809,7 +1809,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Info<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -2254,7 +2254,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RepoOp<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -2297,85 +2297,85 @@ pub mod sync_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Seq;
         type Did;
         type Blocks;
-        type Seq;
-        type Rev;
         type Time;
+        type Rev;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Seq = Unset;
         type Did = Unset;
         type Blocks = Unset;
-        type Seq = Unset;
-        type Rev = Unset;
         type Time = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Blocks = S::Blocks;
-        type Seq = S::Seq;
-        type Rev = S::Rev;
-        type Time = S::Time;
-    }
-    ///State transition - sets the `blocks` field to Set
-    pub struct SetBlocks<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlocks<S> {}
-    impl<S: State> State for SetBlocks<S> {
-        type Did = S::Did;
-        type Blocks = Set<members::blocks>;
-        type Seq = S::Seq;
-        type Rev = S::Rev;
-        type Time = S::Time;
+        type Rev = Unset;
     }
     ///State transition - sets the `seq` field to Set
     pub struct SetSeq<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSeq<S> {}
     impl<S: State> State for SetSeq<S> {
-        type Did = S::Did;
-        type Blocks = S::Blocks;
         type Seq = Set<members::seq>;
-        type Rev = S::Rev;
-        type Time = S::Time;
-    }
-    ///State transition - sets the `rev` field to Set
-    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRev<S> {}
-    impl<S: State> State for SetRev<S> {
         type Did = S::Did;
         type Blocks = S::Blocks;
-        type Seq = S::Seq;
-        type Rev = Set<members::rev>;
         type Time = S::Time;
+        type Rev = S::Rev;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Seq = S::Seq;
+        type Did = Set<members::did>;
+        type Blocks = S::Blocks;
+        type Time = S::Time;
+        type Rev = S::Rev;
+    }
+    ///State transition - sets the `blocks` field to Set
+    pub struct SetBlocks<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlocks<S> {}
+    impl<S: State> State for SetBlocks<S> {
+        type Seq = S::Seq;
+        type Did = S::Did;
+        type Blocks = Set<members::blocks>;
+        type Time = S::Time;
+        type Rev = S::Rev;
     }
     ///State transition - sets the `time` field to Set
     pub struct SetTime<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTime<S> {}
     impl<S: State> State for SetTime<S> {
+        type Seq = S::Seq;
         type Did = S::Did;
         type Blocks = S::Blocks;
-        type Seq = S::Seq;
-        type Rev = S::Rev;
         type Time = Set<members::time>;
+        type Rev = S::Rev;
+    }
+    ///State transition - sets the `rev` field to Set
+    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRev<S> {}
+    impl<S: State> State for SetRev<S> {
+        type Seq = S::Seq;
+        type Did = S::Did;
+        type Blocks = S::Blocks;
+        type Time = S::Time;
+        type Rev = Set<members::rev>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `seq` field
+        pub struct seq(());
         ///Marker type for the `did` field
         pub struct did(());
         ///Marker type for the `blocks` field
         pub struct blocks(());
-        ///Marker type for the `seq` field
-        pub struct seq(());
-        ///Marker type for the `rev` field
-        pub struct rev(());
         ///Marker type for the `time` field
         pub struct time(());
+        ///Marker type for the `rev` field
+        pub struct rev(());
     }
 }
 
@@ -2508,11 +2508,11 @@ where
 impl<'a, S> SyncBuilder<'a, S>
 where
     S: sync_state::State,
+    S::Seq: sync_state::IsSet,
     S::Did: sync_state::IsSet,
     S::Blocks: sync_state::IsSet,
-    S::Seq: sync_state::IsSet,
-    S::Rev: sync_state::IsSet,
     S::Time: sync_state::IsSet,
+    S::Rev: sync_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Sync<'a> {
@@ -2556,7 +2556,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sync<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

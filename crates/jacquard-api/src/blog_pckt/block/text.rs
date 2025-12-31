@@ -21,7 +21,7 @@ pub struct Text<'a> {
     /// Facets for text formatting and features
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
-    pub facets: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
+    pub facets: std::option::Option<Vec<crate::blog_pckt::richtext::facet::Facet<'a>>>,
     /// The plain text content
     #[serde(borrow)]
     pub plaintext: jacquard_common::CowStr<'a>,
@@ -36,7 +36,7 @@ fn lexicon_doc_blog_pckt_block_text() -> ::jacquard_lexicon::lexicon::LexiconDoc
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
@@ -49,7 +49,7 @@ fn lexicon_doc_blog_pckt_block_text() -> ::jacquard_lexicon::lexicon::LexiconDoc
                     nullable: None,
                     properties: {
                         #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
+                        let mut map = ::alloc::collections::BTreeMap::new();
                         map.insert(
                             ::jacquard_common::smol_str::SmolStr::new_static("facets"),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
@@ -110,7 +110,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Text<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

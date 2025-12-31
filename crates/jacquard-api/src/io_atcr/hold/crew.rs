@@ -8,7 +8,13 @@
 /// Crew member in a hold's embedded PDS. Grants access permissions to push blobs to the hold. Stored in the hold's embedded PDS (one record per member).
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Crew<'a> {
@@ -27,7 +33,7 @@ pub struct Crew<'a> {
 
 pub mod crew_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -35,67 +41,67 @@ pub mod crew_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Member;
         type Permissions;
-        type AddedAt;
         type Role;
+        type AddedAt;
+        type Member;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Member = Unset;
         type Permissions = Unset;
-        type AddedAt = Unset;
         type Role = Unset;
-    }
-    ///State transition - sets the `member` field to Set
-    pub struct SetMember<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMember<S> {}
-    impl<S: State> State for SetMember<S> {
-        type Member = Set<members::member>;
-        type Permissions = S::Permissions;
-        type AddedAt = S::AddedAt;
-        type Role = S::Role;
+        type AddedAt = Unset;
+        type Member = Unset;
     }
     ///State transition - sets the `permissions` field to Set
     pub struct SetPermissions<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPermissions<S> {}
     impl<S: State> State for SetPermissions<S> {
-        type Member = S::Member;
         type Permissions = Set<members::permissions>;
+        type Role = S::Role;
         type AddedAt = S::AddedAt;
-        type Role = S::Role;
-    }
-    ///State transition - sets the `added_at` field to Set
-    pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAddedAt<S> {}
-    impl<S: State> State for SetAddedAt<S> {
         type Member = S::Member;
-        type Permissions = S::Permissions;
-        type AddedAt = Set<members::added_at>;
-        type Role = S::Role;
     }
     ///State transition - sets the `role` field to Set
     pub struct SetRole<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRole<S> {}
     impl<S: State> State for SetRole<S> {
-        type Member = S::Member;
         type Permissions = S::Permissions;
-        type AddedAt = S::AddedAt;
         type Role = Set<members::role>;
+        type AddedAt = S::AddedAt;
+        type Member = S::Member;
+    }
+    ///State transition - sets the `added_at` field to Set
+    pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAddedAt<S> {}
+    impl<S: State> State for SetAddedAt<S> {
+        type Permissions = S::Permissions;
+        type Role = S::Role;
+        type AddedAt = Set<members::added_at>;
+        type Member = S::Member;
+    }
+    ///State transition - sets the `member` field to Set
+    pub struct SetMember<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMember<S> {}
+    impl<S: State> State for SetMember<S> {
+        type Permissions = S::Permissions;
+        type Role = S::Role;
+        type AddedAt = S::AddedAt;
+        type Member = Set<members::member>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `member` field
-        pub struct member(());
         ///Marker type for the `permissions` field
         pub struct permissions(());
-        ///Marker type for the `added_at` field
-        pub struct added_at(());
         ///Marker type for the `role` field
         pub struct role(());
+        ///Marker type for the `added_at` field
+        pub struct added_at(());
+        ///Marker type for the `member` field
+        pub struct member(());
     }
 }
 
@@ -208,10 +214,10 @@ where
 impl<'a, S> CrewBuilder<'a, S>
 where
     S: crew_state::State,
-    S::Member: crew_state::IsSet,
     S::Permissions: crew_state::IsSet,
-    S::AddedAt: crew_state::IsSet,
     S::Role: crew_state::IsSet,
+    S::AddedAt: crew_state::IsSet,
+    S::Member: crew_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Crew<'a> {
@@ -256,7 +262,13 @@ impl<'a> Crew<'a> {
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CrewGetRecordOutput<'a> {
@@ -308,7 +320,20 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Crew<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+        {
+            let value = &self.role;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 32usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "role",
+                    ),
+                    max: 32usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
         Ok(())
     }
 }
@@ -320,7 +345,7 @@ fn lexicon_doc_io_atcr_hold_crew() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
@@ -343,7 +368,7 @@ fn lexicon_doc_io_atcr_hold_crew() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static("addedAt"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -401,7 +426,7 @@ fn lexicon_doc_io_atcr_hold_crew() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                                         format: None,
                                         default: None,
                                         min_length: None,
-                                        max_length: None,
+                                        max_length: Some(64usize),
                                         min_graphemes: None,
                                         max_graphemes: None,
                                         r#enum: None,
@@ -423,7 +448,7 @@ fn lexicon_doc_io_atcr_hold_crew() -> ::jacquard_lexicon::lexicon::LexiconDoc<'s
                                     format: None,
                                     default: None,
                                     min_length: None,
-                                    max_length: None,
+                                    max_length: Some(32usize),
                                     min_graphemes: None,
                                     max_graphemes: None,
                                     r#enum: None,

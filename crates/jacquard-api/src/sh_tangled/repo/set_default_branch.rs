@@ -33,37 +33,37 @@ pub mod set_default_branch_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repo;
         type DefaultBranch;
+        type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repo = Unset;
         type DefaultBranch = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Repo = Set<members::repo>;
-        type DefaultBranch = S::DefaultBranch;
+        type Repo = Unset;
     }
     ///State transition - sets the `default_branch` field to Set
     pub struct SetDefaultBranch<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDefaultBranch<S> {}
     impl<S: State> State for SetDefaultBranch<S> {
-        type Repo = S::Repo;
         type DefaultBranch = Set<members::default_branch>;
+        type Repo = S::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type DefaultBranch = S::DefaultBranch;
+        type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `default_branch` field
         pub struct default_branch(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
     }
 }
 
@@ -136,8 +136,8 @@ where
 impl<'a, S> SetDefaultBranchBuilder<'a, S>
 where
     S: set_default_branch_state::State,
-    S::Repo: set_default_branch_state::IsSet,
     S::DefaultBranch: set_default_branch_state::IsSet,
+    S::Repo: set_default_branch_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SetDefaultBranch<'a> {

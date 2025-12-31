@@ -9,4 +9,5 @@ pub mod document;
 pub mod mark;
 pub mod post;
 pub mod publication;
+pub mod richtext;
 pub mod theme;

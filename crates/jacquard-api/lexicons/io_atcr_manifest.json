@@ -17,11 +17,13 @@
         },
         "digest": {
           "type": "string",
-          "description": "Content digest (e.g., 'sha256:...')"
+          "description": "Content digest (e.g., 'sha256:...')",
+          "maxLength": 128
         },
         "mediaType": {
           "type": "string",
-          "description": "MIME type of the blob"
+          "description": "MIME type of the blob",
+          "maxLength": 128
         },
         "size": {
           "type": "integer",
@@ -67,7 +69,8 @@
           },
           "digest": {
             "type": "string",
-            "description": "Content digest (e.g., 'sha256:abc123...')"
+            "description": "Content digest (e.g., 'sha256:abc123...')",
+            "maxLength": 128
           },
           "holdDid": {
             "type": "string",
@@ -102,6 +105,7 @@
           "mediaType": {
             "type": "string",
             "description": "OCI media type",
+            "maxLength": 128,
             "knownValues": [
               "application/vnd.oci.image.manifest.v1+json",
               "application/vnd.docker.distribution.manifest.v2+json",
@@ -141,11 +145,13 @@
         },
         "digest": {
           "type": "string",
-          "description": "Content digest (e.g., 'sha256:...')"
+          "description": "Content digest (e.g., 'sha256:...')",
+          "maxLength": 128
         },
         "mediaType": {
           "type": "string",
-          "description": "Media type of the referenced manifest"
+          "description": "Media type of the referenced manifest",
+          "maxLength": 128
         },
         "platform": {
           "type": "ref",
@@ -168,26 +174,31 @@
       "properties": {
         "architecture": {
           "type": "string",
-          "description": "CPU architecture (e.g., 'amd64', 'arm64', 'arm')"
+          "description": "CPU architecture (e.g., 'amd64', 'arm64', 'arm')",
+          "maxLength": 32
         },
         "os": {
           "type": "string",
-          "description": "Operating system (e.g., 'linux', 'windows', 'darwin')"
+          "description": "Operating system (e.g., 'linux', 'windows', 'darwin')",
+          "maxLength": 32
         },
         "osFeatures": {
           "type": "array",
           "description": "Optional OS features",
           "items": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 64
           }
         },
         "osVersion": {
           "type": "string",
-          "description": "Optional OS version"
+          "description": "Optional OS version",
+          "maxLength": 64
         },
         "variant": {
           "type": "string",
-          "description": "Optional CPU variant (e.g., 'v7' for ARM)"
+          "description": "Optional CPU variant (e.g., 'v7' for ARM)",
+          "maxLength": 32
         }
       }
     }

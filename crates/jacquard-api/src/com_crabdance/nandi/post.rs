@@ -49,51 +49,51 @@ pub mod post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Content;
         type Title;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Content = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Content = S::Content;
-        type Title = S::Title;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContent<S> {}
     impl<S: State> State for SetContent<S> {
-        type CreatedAt = S::CreatedAt;
         type Content = Set<members::content>;
         type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type CreatedAt = S::CreatedAt;
         type Content = S::Content;
         type Title = Set<members::title>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Content = S::Content;
+        type Title = S::Title;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `content` field
         pub struct content(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -257,9 +257,9 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 impl<'a, S> PostBuilder<'a, S>
 where
     S: post_state::State,
-    S::CreatedAt: post_state::IsSet,
     S::Content: post_state::IsSet,
     S::Title: post_state::IsSet,
+    S::CreatedAt: post_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Post<'a> {
@@ -368,7 +368,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Post<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.content;
             #[allow(unused_comparisons)]
@@ -458,7 +458,7 @@ fn lexicon_doc_com_crabdance_nandi_post() -> ::jacquard_lexicon::lexicon::Lexico
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
@@ -476,7 +476,7 @@ fn lexicon_doc_com_crabdance_nandi_post() -> ::jacquard_lexicon::lexicon::Lexico
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static("content"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {

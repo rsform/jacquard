@@ -53,8 +53,8 @@ pub mod post_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Text;
-        type Visibility;
         type CreatedAt;
+        type Visibility;
         type Uri;
     }
     /// Empty state - all required fields are unset
@@ -62,8 +62,8 @@ pub mod post_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Text = Unset;
-        type Visibility = Unset;
         type CreatedAt = Unset;
+        type Visibility = Unset;
         type Uri = Unset;
     }
     ///State transition - sets the `text` field to Set
@@ -71,17 +71,8 @@ pub mod post_state {
     impl<S: State> sealed::Sealed for SetText<S> {}
     impl<S: State> State for SetText<S> {
         type Text = Set<members::text>;
+        type CreatedAt = S::CreatedAt;
         type Visibility = S::Visibility;
-        type CreatedAt = S::CreatedAt;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `visibility` field to Set
-    pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVisibility<S> {}
-    impl<S: State> State for SetVisibility<S> {
-        type Text = S::Text;
-        type Visibility = Set<members::visibility>;
-        type CreatedAt = S::CreatedAt;
         type Uri = S::Uri;
     }
     ///State transition - sets the `created_at` field to Set
@@ -89,8 +80,17 @@ pub mod post_state {
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type Text = S::Text;
-        type Visibility = S::Visibility;
         type CreatedAt = Set<members::created_at>;
+        type Visibility = S::Visibility;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `visibility` field to Set
+    pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVisibility<S> {}
+    impl<S: State> State for SetVisibility<S> {
+        type Text = S::Text;
+        type CreatedAt = S::CreatedAt;
+        type Visibility = Set<members::visibility>;
         type Uri = S::Uri;
     }
     ///State transition - sets the `uri` field to Set
@@ -98,8 +98,8 @@ pub mod post_state {
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
         type Text = S::Text;
-        type Visibility = S::Visibility;
         type CreatedAt = S::CreatedAt;
+        type Visibility = S::Visibility;
         type Uri = Set<members::uri>;
     }
     /// Marker types for field names
@@ -107,10 +107,10 @@ pub mod post_state {
     pub mod members {
         ///Marker type for the `text` field
         pub struct text(());
-        ///Marker type for the `visibility` field
-        pub struct visibility(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `visibility` field
+        pub struct visibility(());
         ///Marker type for the `uri` field
         pub struct uri(());
     }
@@ -266,8 +266,8 @@ impl<'a, S> PostBuilder<'a, S>
 where
     S: post_state::State,
     S::Text: post_state::IsSet,
-    S::Visibility: post_state::IsSet,
     S::CreatedAt: post_state::IsSet,
+    S::Visibility: post_state::IsSet,
     S::Uri: post_state::IsSet,
 {
     /// Build the final struct
@@ -375,7 +375,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Post<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.additional {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100000usize {
@@ -481,7 +481,7 @@ fn lexicon_doc_uk_skyblur_post() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
@@ -504,7 +504,7 @@ fn lexicon_doc_uk_skyblur_post() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static(
                                     "additional",

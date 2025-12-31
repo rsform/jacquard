@@ -42,103 +42,103 @@ pub mod question_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Content;
         type Title;
+        type Content;
         type CreatedAt;
-        type Tags;
         type Forum;
+        type Tags;
         type IsOpen;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Content = Unset;
         type Title = Unset;
+        type Content = Unset;
         type CreatedAt = Unset;
-        type Tags = Unset;
         type Forum = Unset;
+        type Tags = Unset;
         type IsOpen = Unset;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Content = Set<members::content>;
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-        type Tags = S::Tags;
-        type Forum = S::Forum;
-        type IsOpen = S::IsOpen;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Content = S::Content;
         type Title = Set<members::title>;
+        type Content = S::Content;
         type CreatedAt = S::CreatedAt;
-        type Tags = S::Tags;
         type Forum = S::Forum;
+        type Tags = S::Tags;
+        type IsOpen = S::IsOpen;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type Title = S::Title;
+        type Content = Set<members::content>;
+        type CreatedAt = S::CreatedAt;
+        type Forum = S::Forum;
+        type Tags = S::Tags;
         type IsOpen = S::IsOpen;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Content = S::Content;
         type Title = S::Title;
+        type Content = S::Content;
         type CreatedAt = Set<members::created_at>;
+        type Forum = S::Forum;
         type Tags = S::Tags;
-        type Forum = S::Forum;
-        type IsOpen = S::IsOpen;
-    }
-    ///State transition - sets the `tags` field to Set
-    pub struct SetTags<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTags<S> {}
-    impl<S: State> State for SetTags<S> {
-        type Content = S::Content;
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-        type Tags = Set<members::tags>;
-        type Forum = S::Forum;
         type IsOpen = S::IsOpen;
     }
     ///State transition - sets the `forum` field to Set
     pub struct SetForum<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetForum<S> {}
     impl<S: State> State for SetForum<S> {
-        type Content = S::Content;
         type Title = S::Title;
+        type Content = S::Content;
         type CreatedAt = S::CreatedAt;
-        type Tags = S::Tags;
         type Forum = Set<members::forum>;
+        type Tags = S::Tags;
+        type IsOpen = S::IsOpen;
+    }
+    ///State transition - sets the `tags` field to Set
+    pub struct SetTags<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTags<S> {}
+    impl<S: State> State for SetTags<S> {
+        type Title = S::Title;
+        type Content = S::Content;
+        type CreatedAt = S::CreatedAt;
+        type Forum = S::Forum;
+        type Tags = Set<members::tags>;
         type IsOpen = S::IsOpen;
     }
     ///State transition - sets the `is_open` field to Set
     pub struct SetIsOpen<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIsOpen<S> {}
     impl<S: State> State for SetIsOpen<S> {
-        type Content = S::Content;
         type Title = S::Title;
+        type Content = S::Content;
         type CreatedAt = S::CreatedAt;
-        type Tags = S::Tags;
         type Forum = S::Forum;
+        type Tags = S::Tags;
         type IsOpen = Set<members::is_open>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `content` field
-        pub struct content(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `content` field
+        pub struct content(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `tags` field
-        pub struct tags(());
         ///Marker type for the `forum` field
         pub struct forum(());
+        ///Marker type for the `tags` field
+        pub struct tags(());
         ///Marker type for the `is_open` field
         pub struct is_open(());
     }
@@ -313,11 +313,11 @@ impl<'a, S: question_state::State> QuestionBuilder<'a, S> {
 impl<'a, S> QuestionBuilder<'a, S>
 where
     S: question_state::State,
-    S::Content: question_state::IsSet,
     S::Title: question_state::IsSet,
+    S::Content: question_state::IsSet,
     S::CreatedAt: question_state::IsSet,
-    S::Tags: question_state::IsSet,
     S::Forum: question_state::IsSet,
+    S::Tags: question_state::IsSet,
     S::IsOpen: question_state::IsSet,
 {
     /// Build the final struct
@@ -427,7 +427,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Question<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.content;
             #[allow(unused_comparisons)]
@@ -508,7 +508,7 @@ fn lexicon_doc_dev_fudgeu_experimental_atforumv1_feed_question() -> ::jacquard_l
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
@@ -533,7 +533,7 @@ fn lexicon_doc_dev_fudgeu_experimental_atforumv1_feed_question() -> ::jacquard_l
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static("content"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {

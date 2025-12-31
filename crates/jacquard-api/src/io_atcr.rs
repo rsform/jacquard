@@ -5,5 +5,6 @@
 
 pub mod hold;
 pub mod manifest;
+pub mod repo;
 pub mod sailor;
 pub mod tag;

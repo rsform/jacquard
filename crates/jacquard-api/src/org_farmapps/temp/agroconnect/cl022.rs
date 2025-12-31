@@ -66,37 +66,37 @@ pub mod cl022_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
         type Description;
+        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
         type Description = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Id = Set<members::id>;
-        type Description = S::Description;
+        type Id = Unset;
     }
     ///State transition - sets the `description` field to Set
     pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDescription<S> {}
     impl<S: State> State for SetDescription<S> {
-        type Id = S::Id;
         type Description = Set<members::description>;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Description = S::Description;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `description` field
         pub struct description(());
+        ///Marker type for the `id` field
+        pub struct id(());
     }
 }
 
@@ -328,8 +328,8 @@ impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
 impl<'a, S> Cl022Builder<'a, S>
 where
     S: cl022_state::State,
-    S::Id: cl022_state::IsSet,
     S::Description: cl022_state::IsSet,
+    S::Id: cl022_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Cl022<'a> {
@@ -446,7 +446,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Cl022<'a> {
     }
     fn validate(
         &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.denominator {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -504,7 +504,7 @@ fn lexicon_doc_org_farmapps_temp_agroconnect_cl022() -> ::jacquard_lexicon::lexi
         revision: None,
         description: None,
         defs: {
-            let mut map = ::std::collections::BTreeMap::new();
+            let mut map = ::alloc::collections::BTreeMap::new();
             map.insert(
                 ::jacquard_common::smol_str::SmolStr::new_static("main"),
                 ::jacquard_lexicon::lexicon::LexUserType::Record(::jacquard_lexicon::lexicon::LexRecord {
@@ -525,7 +525,7 @@ fn lexicon_doc_org_farmapps_temp_agroconnect_cl022() -> ::jacquard_lexicon::lexi
                         nullable: None,
                         properties: {
                             #[allow(unused_mut)]
-                            let mut map = ::std::collections::BTreeMap::new();
+                            let mut map = ::alloc::collections::BTreeMap::new();
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static("added"),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
